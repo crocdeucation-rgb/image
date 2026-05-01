@@ -14,15 +14,23 @@ body { background: #f8f9fa; padding: 16px; }
 .tabs { display: flex; gap: 6px; margin-bottom: 14px; }
 .tab { padding: 5px 14px; font-size: 12px; border-radius: 20px; border: 1px solid #ddd; background: white; color: #666; cursor: pointer; }
 .tab.active { background: #1a73e8; color: white; border-color: #1a73e8; }
+.section-label { font-size: 11px; color: #999; margin: 16px 0 8px; font-weight: 500; }
 .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 .card { background: white; border-radius: 10px; padding: 14px 10px; text-align: center; border: 1px solid #eee; }
 .clabel { font-size: 11px; color: #888; margin-bottom: 6px; }
-.cval { font-size: 26px; font-weight: 600; color: #1a1a1a; }
+.cval { font-size: 24px; font-weight: 600; color: #1a1a1a; }
 .cval.blue { color: #1a73e8; }
 .cval.green { color: #0f9d58; }
 .cval.red { color: #ea4335; }
 .cval.amber { color: #f4b400; }
-@media (max-width: 500px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+.cval.purple { color: #9333ea; }
+.cval.sm { font-size: 18px; }
+@media (max-width: 500px) { 
+  .grid { grid-template-columns: repeat(3, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+}
 </style>
 </head>
 <body>
@@ -50,8 +58,23 @@ body { background: #f8f9fa; padding: 16px; }
   <div class="card"><div class="clabel">전환율</div><div class="cval" id="v4">-</div></div>
 </div>
 
+<div class="section-label">매출</div>
+<div class="grid-2">
+  <div class="card"><div class="clabel">이번 달 매출</div><div class="cval purple sm" id="sales-month">-</div></div>
+  <div class="card"><div class="clabel">지난 달 매출</div><div class="cval sm" id="sales-last">-</div></div>
+</div>
+
+<div class="section-label">리드 출처 (이번 달 / 전체)</div>
+<div class="grid-3">
+  <div class="card"><div class="clabel">아라위키</div><div class="cval blue sm" id="src-ara">-</div></div>
+  <div class="card"><div class="clabel">오디플랜</div><div class="cval green sm" id="src-odi">-</div></div>
+  <div class="card"><div class="clabel">기타</div><div class="cval sm" id="src-other">-</div></div>
+</div>
+
 <script>
-let data = [];
+let mainData = [];
+let salesData = [];
+let sourceData = [];
 let currentTab = 0;
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1438610573&single=true&output=csv';
 
@@ -60,13 +83,25 @@ async function loadData() {
     document.getElementById('updated').textContent = '불러오는 중...';
     const res = await fetch(CSV_URL);
     const text = await res.text();
-    const rows = text.trim().split('\n').slice(1);
-    data = rows.map(r => r.split(',').map(c => c.trim()));
+    const allRows = text.trim().split('\n');
+    
+    mainData = allRows.slice(1, 6).map(r => r.split(',').map(c => c.trim()));
+    salesData = allRows.slice(8, 10).map(r => r.split(',').map(c => c.trim()));
+    sourceData = allRows.slice(12, 15).map(r => r.split(',').map(c => c.trim()));
+    
     render();
+    
+    if (salesData[0]) document.getElementById('sales-month').textContent = salesData[0][1] || '-';
+    if (salesData[1]) document.getElementById('sales-last').textContent = salesData[1][1] || '-';
+    
+    if (sourceData[0]) document.getElementById('src-ara').textContent = (sourceData[0][1]||'0') + ' / ' + (sourceData[0][2]||'0');
+    if (sourceData[1]) document.getElementById('src-odi').textContent = (sourceData[1][1]||'0') + ' / ' + (sourceData[1][2]||'0');
+    if (sourceData[2]) document.getElementById('src-other').textContent = (sourceData[2][1]||'0') + ' / ' + (sourceData[2][2]||'0');
+    
     const now = new Date();
     document.getElementById('updated').textContent = '업데이트: ' + now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
   } catch(e) {
-    document.getElementById('updated').textContent = '로드 실패 — 새로고침 해보세요';
+    document.getElementById('updated').textContent = '로드 실패';
   }
 }
 
@@ -78,7 +113,7 @@ function setTab(idx) {
 
 function render() {
   const col = currentTab + 1;
-  data.forEach((row, i) => {
+  mainData.forEach((row, i) => {
     const el = document.getElementById('v'+i);
     if (el && row[col] !== undefined) el.textContent = row[col];
   });
