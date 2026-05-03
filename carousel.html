@@ -52,8 +52,13 @@ body { background: #f8f9fa; padding: 16px; }
   </div>
   <div class="grid-item">
     <img src="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/KakaoTalk_20260430_182543576_04.png" />
-    <p>9개월만에 49→93점</p>
+    <p>새 잠재 고객 광고</p>
   </div>
+  <div class="grid-item">
+  <img src="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/KakaoTalk_20260503_141125052.png" />
+  <p>학습관리컨설팅2</p>
+</div>
+  
 </div>
 
 <div class="carousel">
@@ -63,7 +68,8 @@ body { background: #f8f9fa; padding: 16px; }
       <div class="slide"><img src="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/KakaoTalk_20260501_173008241.png" /><p class="slide-label">중간고사 이후가 중요</p></div>
       <div class="slide"><img src="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/KakaoTalk_20260501_172952760.png" /><p class="slide-label">스스로 해야하는 학습관</p></div>
       <div class="slide"><img src="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/KakaoTalk_20260501_172936432.png" /><p class="slide-label">1:1과외보다 아라온스쿨</p></div>
-      <div class="slide"><img src="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/KakaoTalk_20260430_182543576_04.png" /><p class="slide-label">9개월만에 49→93점</p></div>
+      <div class="slide"><img src="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/KakaoTalk_20260430_182543576_04.png" /><p class="slide-label">새 잠재 고객 광고</p></div>
+      <div class="slide"><img src="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/KakaoTalk_20260503_141125052.png" /><p class="slide-label">학습관리컨설팅2</p></div>
     </div>
   </div>
   <button class="btn btn-prev" onclick="move(-1)">&#8249;</button>
@@ -73,7 +79,7 @@ body { background: #f8f9fa; padding: 16px; }
 
 <script>
 let cur = 0;
-const total = 5;
+const total = 6;
 const track = document.getElementById('track');
 const dotsEl = document.getElementById('dots');
 for (let i = 0; i < total; i++) {
@@ -88,6 +94,14 @@ function goTo(n) {
   document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i===cur));
 }
 function move(dir) { goTo(cur + dir); }
+  // 터치 스와이프
+const wrap = document.querySelector('.track-wrap');
+let startX = 0;
+wrap.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+wrap.addEventListener('touchend', e => {
+  const diff = startX - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 40) move(diff > 0 ? 1 : -1);
+});
 </script>
 </body>
 </html>
