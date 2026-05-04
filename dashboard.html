@@ -14,8 +14,9 @@ body { background: #f8f9fa; padding: 16px; }
 .tabs { display: flex; gap: 6px; margin-bottom: 14px; }
 .tab { padding: 5px 14px; font-size: 12px; border-radius: 20px; border: 1px solid #ddd; background: white; color: #666; cursor: pointer; }
 .tab.active { background: #1a73e8; color: white; border-color: #1a73e8; }
-.section-label { font-size: 11px; color: #999; margin: 16px 0 8px; font-weight: 500; }
-.grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.section-label { font-size: 11px; color: #999; margin: 16px 0 8px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+.section-label .badge { font-size: 9.5px; padding: 2px 7px; border-radius: 10px; background: #eef2f7; color: #5a6a7a; font-weight: 600; }
+.section-label .badge.pay { background: #f3e8ff; color: #7c3aed; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 .card { background: white; border-radius: 10px; padding: 14px 10px; text-align: center; border: 1px solid #eee; }
@@ -27,10 +28,6 @@ body { background: #f8f9fa; padding: 16px; }
 .cval.amber { color: #f4b400; }
 .cval.purple { color: #9333ea; }
 .cval.sm { font-size: 18px; }
-@media (max-width: 500px) { 
-  .grid { grid-template-columns: repeat(3, 1fr); }
-  .grid-3 { grid-template-columns: repeat(3, 1fr); }
-}
 </style>
 </head>
 <body>
@@ -50,21 +47,30 @@ body { background: #f8f9fa; padding: 16px; }
   <button class="tab" onclick="setTab(3)">전체</button>
 </div>
 
-<div class="grid">
+<!-- 표 1: 유입 현황 (신청일 기준) -->
+<div class="section-label">📥 유입 현황 <span class="badge">신청일 기준</span></div>
+<div class="grid-3">
   <div class="card"><div class="clabel">총 유입</div><div class="cval blue" id="v0">-</div></div>
   <div class="card"><div class="clabel">방문예정</div><div class="cval amber" id="v1">-</div></div>
-  <div class="card"><div class="clabel">오더(전환)</div><div class="cval green" id="v2">-</div></div>
-  <div class="card"><div class="clabel">이탈</div><div class="cval red" id="v3">-</div></div>
-  <div class="card"><div class="clabel">전환율</div><div class="cval" id="v4">-</div></div>
+  <div class="card"><div class="clabel">이탈</div><div class="cval red" id="v2">-</div></div>
 </div>
 
-<div class="section-label">매출</div>
+<!-- 표 2: 전환·매출 (결제일 기준) -->
+<div class="section-label">💰 전환·매출 <span class="badge pay">결제일 기준</span></div>
 <div class="grid-2">
-  <div class="card"><div class="clabel">이번 달 매출</div><div class="cval purple sm" id="sales-month">-</div></div>
-  <div class="card"><div class="clabel">지난 달 매출</div><div class="cval sm" id="sales-last">-</div></div>
+  <div class="card"><div class="clabel">신규 오더</div><div class="cval green" id="v3">-</div></div>
+  <div class="card"><div class="clabel" id="sales-label">이번 달 매출</div><div class="cval purple sm" id="sales">-</div></div>
 </div>
 
-<div class="section-label">리드 출처 (이번 달 / 전체)</div>
+<!-- 누적 전환율 -->
+<div class="section-label">📊 누적 전환율 <span class="badge">신청 → 결제</span></div>
+<div class="grid-2">
+  <div class="card"><div class="clabel">이번 달</div><div class="cval sm" id="rate-month">-</div></div>
+  <div class="card"><div class="clabel">전체</div><div class="cval sm" id="rate-all">-</div></div>
+</div>
+
+<!-- 리드 출처 -->
+<div class="section-label">리드 출처 <span class="badge">이번달 / 전체</span></div>
 <div class="grid-3">
   <div class="card"><div class="clabel">아라위키</div><div class="cval blue sm" id="src-ara">-</div></div>
   <div class="card"><div class="clabel">오디플랜</div><div class="cval green sm" id="src-odi">-</div></div>
@@ -72,9 +78,23 @@ body { background: #f8f9fa; padding: 16px; }
 </div>
 
 <script>
-let mainData = [];
-let salesData = [];
-let sourceData = [];
+// 시트 구조 (새 버전):
+// 1행: 헤더 (📥 유입 현황, 오늘, 7일, 이번달, 전체)
+// 2-4행: 총 유입 / 방문예정 / 이탈
+// 6행: 헤더 (💰 전환·매출, 오늘, 7일, 이번달, 전체)
+// 7행: 신규 오더 (결제일 기준) — 오늘/7일/이번달/전체
+// 8행: 매출 (이번달만 데이터)
+// 9행: 지난달 매출
+// 11행: 누적 전환율 헤더
+// 12행: 신청→결제 / 이번달 / 전체
+// 14행: 리드출처 헤더
+// 15-17행: 아라위키 / 오디플랜 / 기타
+
+let inflowData = [];   // 유입 표 (총유입, 방문예정, 이탈)
+let payOrderData = []; // 신규 오더 (결제일 기준)
+let salesData = [];    // 매출
+let rateData = [];     // 누적 전환율
+let sourceData = [];   // 리드 출처
 let currentTab = 0;
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1438610573&single=true&output=csv';
 
@@ -83,17 +103,24 @@ async function loadData() {
     document.getElementById('updated').textContent = '불러오는 중...';
     const res = await fetch(CSV_URL);
     const text = await res.text();
-    const allRows = text.trim().split('\n');
+    const allRows = text.trim().split('\n').map(r => r.split(',').map(c => c.trim()));
     
-    mainData = allRows.slice(1, 6).map(r => r.split(',').map(c => c.trim()));
-    salesData = allRows.slice(8, 10).map(r => r.split(',').map(c => c.trim()));
-    sourceData = allRows.slice(12, 15).map(r => r.split(',').map(c => c.trim()));
+    // 행 인덱스는 0부터 (시트 2행 = 인덱스 1)
+    inflowData   = allRows.slice(1, 4);   // 시트 2-4행
+    payOrderData = allRows[6];            // 시트 7행
+    salesData    = allRows.slice(7, 9);   // 시트 8-9행
+    rateData     = allRows[11];           // 시트 12행
+    sourceData   = allRows.slice(14, 17); // 시트 15-17행
     
     render();
     
-    if (salesData[0]) document.getElementById('sales-month').textContent = salesData[0][1] || '-';
-    if (salesData[1]) document.getElementById('sales-last').textContent = salesData[1][1] || '-';
+    // 누적 전환율 (이번달/전체)
+    if (rateData) {
+      document.getElementById('rate-month').textContent = rateData[1] || '-';
+      document.getElementById('rate-all').textContent = rateData[2] || '-';
+    }
     
+    // 리드 출처
     if (sourceData[0]) document.getElementById('src-ara').textContent = (sourceData[0][1]||'0') + ' / ' + (sourceData[0][2]||'0');
     if (sourceData[1]) document.getElementById('src-odi').textContent = (sourceData[1][1]||'0') + ' / ' + (sourceData[1][2]||'0');
     if (sourceData[2]) document.getElementById('src-other').textContent = (sourceData[2][1]||'0') + ' / ' + (sourceData[2][2]||'0');
@@ -113,10 +140,30 @@ function setTab(idx) {
 
 function render() {
   const col = currentTab + 1;
-  mainData.forEach((row, i) => {
+  
+  // 유입 3개 카드
+  inflowData.forEach((row, i) => {
     const el = document.getElementById('v'+i);
     if (el && row[col] !== undefined) el.textContent = row[col];
   });
+  
+  // 신규 오더 (결제일)
+  if (payOrderData && payOrderData[col] !== undefined) {
+    document.getElementById('v3').textContent = payOrderData[col];
+  }
+  
+  // 매출 (이번달은 currentTab=2일 때만 의미 있음)
+  // 모든 탭에서 "이번 달 매출"을 보여줌 (결제일 기준이라 단일 값)
+  const salesEl = document.getElementById('sales');
+  const salesLabel = document.getElementById('sales-label');
+  if (currentTab === 3) {
+    // 전체 탭에서는 지난달 매출 표시
+    salesLabel.textContent = '지난 달 매출';
+    salesEl.textContent = (salesData[1] && salesData[1][4]) || '-';
+  } else {
+    salesLabel.textContent = '이번 달 매출';
+    salesEl.textContent = (salesData[0] && salesData[0][3]) || '-';
+  }
 }
 
 loadData();
