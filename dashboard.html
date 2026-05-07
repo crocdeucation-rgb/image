@@ -274,27 +274,14 @@ function renderCalendar(events) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
-  // 이번 달 1일과 말일
-  const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-  const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+  // 이번 주 월요일 찾기
+  const dow = today.getDay();
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
   
-  // 캘린더 그리드 시작: 이번 달 1일이 속한 주의 월요일
-  const gridStart = new Date(monthStart);
-  const startDow = gridStart.getDay();
-  gridStart.setDate(gridStart.getDate() - (startDow === 0 ? 6 : startDow - 1));
-  
-  // 캘린더 그리드 끝: 말일이 속한 주의 일요일
-  const gridEnd = new Date(monthEnd);
-  const endDow = gridEnd.getDay();
-  gridEnd.setDate(gridEnd.getDate() + (endDow === 0 ? 0 : 7 - endDow));
-  
-  // 총 주 수 계산
-  const totalDays = Math.round((gridEnd - gridStart) / (1000 * 60 * 60 * 24)) + 1;
-  const totalWeeks = Math.ceil(totalDays / 7);
-  
+  // 2주치 = 14일
   const dayNames = ['일','월','화','수','목','금','토'];
   const todayStr = formatDate(today);
-  const currentMonth = today.getMonth();
   
   // 날짜별 이벤트 그룹
   const eventsByDate = {};
@@ -305,24 +292,23 @@ function renderCalendar(events) {
   
   let html = '';
   
-  for (let week = 0; week < totalWeeks; week++) {
+  // 2주 (각 주 7일)
+  for (let week = 0; week < 2; week++) {
     html += '<div class="cal-week">';
     for (let d = 0; d < 7; d++) {
-      const day = new Date(gridStart);
-      day.setDate(gridStart.getDate() + week * 7 + d);
+      const day = new Date(monday);
+      day.setDate(monday.getDate() + week * 7 + d);
       const dStr = formatDate(day);
       const dayDow = day.getDay();
       
       const isToday = dStr === todayStr;
       const isWeekend = dayDow === 0 || dayDow === 6;
       const isPast = day < today;
-      const isOtherMonth = day.getMonth() !== currentMonth;
       
       let classes = 'cal-day';
       if (isToday) classes += ' today';
       if (isWeekend) classes += ' weekend';
       if (isPast && !isToday) classes += ' past';
-      if (isOtherMonth) classes += ' other-month';
       
       const dayEvents = eventsByDate[dStr] || [];
       if (dayEvents.length === 0) classes += ' empty';
@@ -367,8 +353,10 @@ function renderCalendar(events) {
   
   document.getElementById('cal-body').innerHTML = html;
   
-  // 범위 라벨: 이번 달
-  const rangeLabel = (today.getFullYear()) + '년 ' + (today.getMonth()+1) + '월';
+  // 범위 라벨
+  const last = new Date(monday);
+  last.setDate(monday.getDate() + 13);
+  const rangeLabel = (monday.getMonth()+1) + '/' + monday.getDate() + ' ~ ' + (last.getMonth()+1) + '/' + last.getDate();
   document.getElementById('cal-range').textContent = rangeLabel;
 }
 
