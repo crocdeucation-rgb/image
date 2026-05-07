@@ -6,56 +6,67 @@
 <title>아라온스쿨 리드 현황</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-body { background: #f8f9fa; padding: 16px; }
-.layout { display: grid; grid-template-columns: 1fr 320px; gap: 20px; max-width: 1200px; margin: 0 auto; }
-@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+body { background: #f8f9fa; padding: 14px; }
+.layout { display: grid; grid-template-columns: 420px 1fr; gap: 16px; max-width: 1400px; margin: 0 auto; }
+@media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } }
 
-/* 좌측 (기존 그대로) */
-.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-.title { font-size: 15px; font-weight: 600; color: #1a1a1a; }
-.updated { font-size: 11px; color: #999; margin-top: 2px; }
-.refresh { font-size: 12px; padding: 4px 10px; border: 1px solid #ddd; border-radius: 6px; background: white; cursor: pointer; color: #555; }
-.tabs { display: flex; gap: 6px; margin-bottom: 14px; }
-.tab { padding: 5px 14px; font-size: 12px; border-radius: 20px; border: 1px solid #ddd; background: white; color: #666; cursor: pointer; }
+/* === 좌측 (컴팩트) === */
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.title { font-size: 14px; font-weight: 600; color: #1a1a1a; }
+.updated { font-size: 10px; color: #999; margin-top: 2px; }
+.refresh { font-size: 11px; padding: 3px 9px; border: 1px solid #ddd; border-radius: 6px; background: white; cursor: pointer; color: #555; }
+.tabs { display: flex; gap: 5px; margin-bottom: 10px; }
+.tab { padding: 4px 11px; font-size: 11px; border-radius: 16px; border: 1px solid #ddd; background: white; color: #666; cursor: pointer; }
 .tab.active { background: #1a73e8; color: white; border-color: #1a73e8; }
-.section-label { font-size: 11px; color: #999; margin: 16px 0 8px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
-.section-label .badge { font-size: 9.5px; padding: 2px 7px; border-radius: 10px; background: #eef2f7; color: #5a6a7a; font-weight: 600; }
+.section-label { font-size: 10px; color: #999; margin: 12px 0 6px; font-weight: 500; display: flex; align-items: center; gap: 5px; }
+.section-label .badge { font-size: 9px; padding: 1px 6px; border-radius: 8px; background: #eef2f7; color: #5a6a7a; font-weight: 600; }
 .section-label .badge.pay { background: #f3e8ff; color: #7c3aed; }
-.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-.card { background: white; border-radius: 10px; padding: 14px 10px; text-align: center; border: 1px solid #eee; }
-.clabel { font-size: 11px; color: #888; margin-bottom: 6px; }
-.cval { font-size: 24px; font-weight: 600; color: #1a1a1a; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.card { background: white; border-radius: 8px; padding: 10px 6px; text-align: center; border: 1px solid #eee; }
+.clabel { font-size: 10px; color: #888; margin-bottom: 4px; }
+.cval { font-size: 19px; font-weight: 600; color: #1a1a1a; }
 .cval.blue { color: #1a73e8; }
 .cval.green { color: #0f9d58; }
 .cval.red { color: #ea4335; }
 .cval.amber { color: #f4b400; }
 .cval.purple { color: #9333ea; }
-.cval.sm { font-size: 18px; }
+.cval.sm { font-size: 15px; }
 
-/* 우측 일정 패널 */
-.schedule-panel { background: white; border: 1px solid #eee; border-radius: 10px; padding: 16px; height: fit-content; }
-.schedule-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f0; }
-.schedule-title { font-size: 13px; font-weight: 600; color: #1a1a1a; }
-.schedule-range { font-size: 10px; color: #999; }
-.schedule-empty { font-size: 12px; color: #aaa; text-align: center; padding: 30px 0; }
-.day-group { margin-bottom: 14px; }
-.day-group:last-child { margin-bottom: 0; }
-.day-header { font-size: 11px; font-weight: 600; color: #555; margin-bottom: 6px; padding: 4px 8px; background: #f3f4f6; border-radius: 6px; display: inline-block; }
-.day-header.today { background: #e8f0fe; color: #1a73e8; }
-.day-header.weekend { color: #ea4335; }
-.event { display: flex; gap: 8px; padding: 6px 8px; align-items: baseline; font-size: 12px; border-left: 2px solid #0f9d58; margin-left: 4px; margin-bottom: 3px; }
-.event-time { font-weight: 600; color: #1a1a1a; min-width: 42px; }
-.event-time.notime { color: #999; font-weight: 400; }
-.event-name { color: #333; }
-.event-grade { color: #888; font-size: 11px; margin-left: auto; }
+/* === 우측 캘린더 === */
+.cal-panel { background: white; border: 1px solid #eee; border-radius: 8px; padding: 14px; }
+.cal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #f0f0f0; }
+.cal-title { font-size: 13px; font-weight: 600; color: #1a1a1a; }
+.cal-range { font-size: 10px; color: #999; }
+
+/* 캘린더 그리드 */
+.cal-week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 6px; }
+.cal-week:last-child { margin-bottom: 0; }
+.cal-day { background: #fafbfc; border: 1px solid #eef0f3; border-radius: 6px; padding: 6px; min-height: 90px; display: flex; flex-direction: column; }
+.cal-day.today { background: #e8f0fe; border-color: #1a73e8; }
+.cal-day.weekend { background: #fdf6f6; }
+.cal-day.weekend.today { background: #e8f0fe; }
+.cal-day.past { opacity: 0.4; }
+
+.cal-date { font-size: 10px; color: #888; margin-bottom: 4px; font-weight: 600; display: flex; justify-content: space-between; align-items: baseline; }
+.cal-date .num { font-size: 13px; color: #333; }
+.cal-day.today .cal-date .num { color: #1a73e8; }
+.cal-day.weekend .cal-date .num { color: #ea4335; }
+.cal-day.weekend.today .cal-date .num { color: #1a73e8; }
+.cal-date .dow { font-size: 9px; color: #aaa; }
+
+.cal-event { font-size: 10px; padding: 2px 4px; margin-bottom: 2px; background: white; border-left: 2px solid #0f9d58; border-radius: 3px; line-height: 1.3; }
+.cal-event-time { font-weight: 600; color: #0f9d58; font-size: 9px; }
+.cal-event-time.notime { color: #aaa; font-weight: 400; }
+.cal-event-name { color: #333; }
+.cal-event-grade { color: #999; font-size: 9px; }
 </style>
 </head>
 <body>
 
 <div class="layout">
 
-<!-- 좌측: 기존 대시보드 -->
+<!-- 좌측: 통계 -->
 <div>
 
 <div class="header">
@@ -101,32 +112,20 @@ body { background: #f8f9fa; padding: 16px; }
 
 </div>
 
-<!-- 우측: 방문 일정 -->
-<div class="schedule-panel">
-  <div class="schedule-head">
-    <div class="schedule-title">📅 방문 일정</div>
-    <div class="schedule-range" id="schedule-range">이번 주</div>
+<!-- 우측: 2주 캘린더 -->
+<div class="cal-panel">
+  <div class="cal-head">
+    <div class="cal-title">📅 방문 일정</div>
+    <div class="cal-range" id="cal-range">2주</div>
   </div>
-  <div id="schedule-body">
-    <div class="schedule-empty">불러오는 중...</div>
+  <div id="cal-body">
+    <div style="text-align:center; color:#aaa; font-size:12px; padding:30px 0;">불러오는 중...</div>
   </div>
 </div>
 
 </div>
 
 <script>
-// 시트 구조 (v3):
-// 1행:  유입 헤더
-// 2-4행: 총유입 / 방문예정 / 이탈
-// 6행:  전환·매출 헤더
-// 7행:  신규 오더
-// 9행:  매출 헤더 (항목 / 금액)
-// 10-12행: 이번달 / 지난달 / 누적 매출
-// 14행: 누적 전환율 헤더
-// 15행: 신청→결제 (이번달, 전체)
-// 17행: 리드출처 헤더
-// 18-19행: 아라위키 / 오디플랜
-
 let inflowData = [];
 let payOrderData = [];
 let salesData = [];
@@ -134,8 +133,6 @@ let rateData = [];
 let sourceData = [];
 let currentTab = 0;
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1438610573&single=true&output=csv';
-
-// ⚠️ schedule 탭 publish CSV URL을 여기 넣어야 함 (Apps Script 적용 후 게시 → URL 업데이트)
 const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1384080283&single=true&output=csv';
 
 async function loadAll() {
@@ -160,11 +157,7 @@ async function loadData() {
     if (salesData[0]) document.getElementById('sales-month').textContent = salesData[0][1] || '-';
     if (salesData[1]) document.getElementById('sales-last').textContent = salesData[1][1] || '-';
     if (salesData[2]) document.getElementById('sales-all').textContent = salesData[2][1] || '-';
-    
-    if (rateData) {
-      document.getElementById('rate-month').textContent = rateData[1] || '-';
-    }
-    
+    if (rateData) document.getElementById('rate-month').textContent = rateData[1] || '-';
     if (sourceData[0]) document.getElementById('src-ara').textContent = (sourceData[0][1]||'0') + ' / ' + (sourceData[0][2]||'0');
     if (sourceData[1]) document.getElementById('src-odi').textContent = (sourceData[1][1]||'0') + ' / ' + (sourceData[1][2]||'0');
     
@@ -183,106 +176,118 @@ function setTab(idx) {
 
 function render() {
   const col = currentTab + 1;
-  
   inflowData.forEach((row, i) => {
     const el = document.getElementById('v'+i);
     if (el && row[col] !== undefined) el.textContent = row[col];
   });
-  
   if (payOrderData && payOrderData[col] !== undefined) {
     document.getElementById('v3').textContent = payOrderData[col];
   }
 }
 
-// ===== 일정 로드 =====
+// ===== 캘린더 =====
 async function loadSchedule() {
-  const body = document.getElementById('schedule-body');
+  const body = document.getElementById('cal-body');
   try {
     const res = await fetch(SCHEDULE_CSV_URL);
     const text = await res.text();
     const rows = text.trim().split('\n').map(r => r.split(',').map(c => c.trim()));
     rows.shift(); // 헤더 제거
     
-    // 이번 주 월~일 범위
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const dow = today.getDay(); // 0=일
-    const monday = new Date(today);
-    monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
-    const sunday = new Date(monday);
-    sunday.setDate(monday.getDate() + 6);
-    
-    // 1주치 필터
-    let events = rows
+    const events = rows
       .filter(r => r[0])
-      .map(r => ({ date: r[0], time: r[1] || '', name: r[2] || '', grade: r[3] || '' }))
-      .filter(e => {
-        const d = new Date(e.date);
-        return d >= monday && d <= sunday;
-      });
+      .map(r => ({ date: r[0], time: r[1] || '', name: r[2] || '', grade: r[3] || '' }));
     
-    // 2주치로 확장 (1주치가 적으면)
-    let rangeLabel = '이번 주';
-    if (events.length < 4) {
-      const sunday2 = new Date(monday);
-      sunday2.setDate(monday.getDate() + 13);
-      events = rows
-        .filter(r => r[0])
-        .map(r => ({ date: r[0], time: r[1] || '', name: r[2] || '', grade: r[3] || '' }))
-        .filter(e => {
-          const d = new Date(e.date);
-          return d >= monday && d <= sunday2;
-        });
-      rangeLabel = '2주치';
-    }
-    
-    document.getElementById('schedule-range').textContent = rangeLabel;
-    
-    if (events.length === 0) {
-      body.innerHTML = '<div class="schedule-empty">예정된 방문이 없습니다</div>';
-      return;
-    }
-    
-    // 날짜별 그룹
-    const groups = {};
-    events.forEach(e => {
-      if (!groups[e.date]) groups[e.date] = [];
-      groups[e.date].push(e);
-    });
-    
-    const dayNames = ['일','월','화','수','목','금','토'];
-    const todayStr = formatDate(today);
-    
-    let html = '';
-    Object.keys(groups).sort().forEach(dateStr => {
-      const d = new Date(dateStr);
-      const dow = d.getDay();
-      const isToday = dateStr === todayStr;
-      const isWeekend = dow === 0 || dow === 6;
+    renderCalendar(events);
+  } catch(e) {
+    body.innerHTML = '<div style="text-align:center; color:#ea4335; font-size:12px; padding:30px 0;">일정 로드 실패</div>';
+  }
+}
+
+function renderCalendar(events) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  // 이번 주 월요일 찾기
+  const dow = today.getDay();
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
+  
+  // 2주치 = 14일
+  const dayNames = ['일','월','화','수','목','금','토'];
+  const todayStr = formatDate(today);
+  
+  // 날짜별 이벤트 그룹
+  const eventsByDate = {};
+  events.forEach(e => {
+    if (!eventsByDate[e.date]) eventsByDate[e.date] = [];
+    eventsByDate[e.date].push(e);
+  });
+  
+  let html = '';
+  
+  // 2주 (각 주 7일)
+  for (let week = 0; week < 2; week++) {
+    html += '<div class="cal-week">';
+    for (let d = 0; d < 7; d++) {
+      const day = new Date(monday);
+      day.setDate(monday.getDate() + week * 7 + d);
+      const dStr = formatDate(day);
+      const dayDow = day.getDay();
       
-      const headerClass = isToday ? 'day-header today' : (isWeekend ? 'day-header weekend' : 'day-header');
-      const dateLabel = (d.getMonth()+1) + '/' + d.getDate() + ' (' + dayNames[dow] + ')' + (isToday ? ' · 오늘' : '');
+      const isToday = dStr === todayStr;
+      const isWeekend = dayDow === 0 || dayDow === 6;
+      const isPast = day < today;
       
-      html += '<div class="day-group">';
-      html += '<div class="' + headerClass + '">' + dateLabel + '</div>';
+      let classes = 'cal-day';
+      if (isToday) classes += ' today';
+      if (isWeekend) classes += ' weekend';
+      if (isPast && !isToday) classes += ' past';
       
-      groups[dateStr].forEach(e => {
-        const timeClass = e.time ? 'event-time' : 'event-time notime';
-        const timeText = e.time || '시간미정';
-        html += '<div class="event">';
-        html += '<span class="' + timeClass + '">' + timeText + '</span>';
-        html += '<span class="event-name">' + escapeHtml(e.name) + '</span>';
-        if (e.grade) html += '<span class="event-grade">' + escapeHtml(e.grade) + '</span>';
+      html += '<div class="' + classes + '">';
+      html += '<div class="cal-date">';
+      html += '<span class="num">' + (day.getMonth()+1) + '/' + day.getDate() + '</span>';
+      html += '<span class="dow">' + dayNames[dayDow] + '</span>';
+      html += '</div>';
+      
+      const dayEvents = eventsByDate[dStr] || [];
+      dayEvents.forEach(e => {
+        html += '<div class="cal-event">';
+        if (e.time) {
+          html += '<span class="cal-event-time">' + e.time + '</span> ';
+        } else {
+          html += '<span class="cal-event-time notime">미정</span> ';
+        }
+        html += '<span class="cal-event-name">' + escapeHtml(e.name) + '</span>';
+        if (e.grade) {
+          html += '<div class="cal-event-grade">' + escapeHtml(shortGrade(e.grade)) + '</div>';
+        }
         html += '</div>';
       });
       
       html += '</div>';
-    });
-    
-    body.innerHTML = html;
-  } catch(e) {
-    body.innerHTML = '<div class="schedule-empty">일정 로드 실패</div>';
+    }
+    html += '</div>';
   }
+  
+  document.getElementById('cal-body').innerHTML = html;
+  
+  // 범위 라벨
+  const last = new Date(monday);
+  last.setDate(monday.getDate() + 13);
+  const rangeLabel = (monday.getMonth()+1) + '/' + monday.getDate() + ' ~ ' + (last.getMonth()+1) + '/' + last.getDate();
+  document.getElementById('cal-range').textContent = rangeLabel;
+}
+
+function shortGrade(g) {
+  // "초등_4~6학년" → "초4~6", "중학생" → "중", "고등학생" → "고"
+  if (g.includes('초등')) {
+    const m = g.match(/(\d.*\d)|(\d)/);
+    return m ? '초' + m[0] : '초';
+  }
+  if (g.includes('중')) return '중';
+  if (g.includes('고')) return '고';
+  return g;
 }
 
 function formatDate(d) {
