@@ -56,10 +56,62 @@ body { background: #f8f9fa; padding: 14px; }
 .cal-date .dow { font-size: 9px; color: #aaa; }
 
 .cal-event { font-size: 10px; padding: 2px 4px; margin-bottom: 2px; background: white; border-left: 2px solid #0f9d58; border-radius: 3px; line-height: 1.3; }
+.cal-events-wrap { display: contents; }
+.cal-event.order { border-left-color: #9333ea; }
 .cal-event-time { font-weight: 600; color: #0f9d58; font-size: 9px; }
 .cal-event-time.notime { color: #aaa; font-weight: 400; }
+.cal-event-tag { font-weight: 600; color: #9333ea; font-size: 9px; }
 .cal-event-name { color: #333; }
 .cal-event-grade { color: #999; font-size: 9px; }
+.cal-event-sales { color: #9333ea; font-size: 9px; font-weight: 600; }
+
+/* === 모바일 리스트 모드 === */
+@media (max-width: 700px) {
+  body { padding: 10px; }
+  
+  /* 캘린더 그리드 → 세로 리스트로 전환 */
+  .cal-week { display: block; margin-bottom: 0; }
+  .cal-day { 
+    min-height: 0; 
+    margin-bottom: 6px; 
+    padding: 8px 10px; 
+    flex-direction: row; 
+    align-items: flex-start; 
+    gap: 10px; 
+  }
+  
+  /* 일정 없는 날은 숨김 */
+  .cal-day.empty { display: none; }
+  
+  .cal-date { 
+    margin-bottom: 0; 
+    flex-direction: column; 
+    min-width: 44px; 
+    align-items: center; 
+    text-align: center; 
+    flex-shrink: 0;
+  }
+  .cal-date .num { font-size: 14px; }
+  .cal-date .dow { font-size: 10px; margin-top: 2px; }
+  
+  .cal-events-wrap { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+  .cal-event { 
+    font-size: 12px; 
+    padding: 5px 8px; 
+    margin-bottom: 0; 
+    display: flex; 
+    align-items: center; 
+    gap: 6px; 
+    flex-wrap: wrap;
+  }
+  .cal-event-time, .cal-event-tag { font-size: 11px; }
+  .cal-event-grade { display: inline; margin-left: 4px; }
+  .cal-event-sales { display: inline; margin-left: auto; }
+  
+  /* 좌측 카드도 살짝 크게 (모바일 가독성) */
+  .cval { font-size: 22px; }
+  .cval.sm { font-size: 17px; }
+}
 </style>
 </head>
 <body>
@@ -115,8 +167,12 @@ body { background: #f8f9fa; padding: 14px; }
 <!-- 우측: 2주 캘린더 -->
 <div class="cal-panel">
   <div class="cal-head">
-    <div class="cal-title">📅 방문 일정</div>
-    <div class="cal-range" id="cal-range">2주</div>
+    <div class="cal-title">📅 방문 · 오더</div>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <span style="font-size:9px; color:#0f9d58;">● 방문</span>
+      <span style="font-size:9px; color:#9333ea;">● 오더</span>
+      <span class="cal-range" id="cal-range">2주</span>
+    </div>
   </div>
   <div id="cal-body">
     <div style="text-align:center; color:#aaa; font-size:12px; padding:30px 0;">불러오는 중...</div>
@@ -196,7 +252,14 @@ async function loadSchedule() {
     
     const events = rows
       .filter(r => r[0])
-      .map(r => ({ date: r[0], time: r[1] || '', name: r[2] || '', grade: r[3] || '' }));
+      .map(r => ({ 
+        date: r[0], 
+        time: r[1] || '', 
+        name: r[2] || '', 
+        grade: r[3] || '',
+        type: r[4] || 'visit',
+        sales: r[5] || ''
+      }));
     
     renderCalendar(events);
   } catch(e) {
@@ -244,26 +307,41 @@ function renderCalendar(events) {
       if (isWeekend) classes += ' weekend';
       if (isPast && !isToday) classes += ' past';
       
+      const dayEvents = eventsByDate[dStr] || [];
+      if (dayEvents.length === 0) classes += ' empty';
+      
       html += '<div class="' + classes + '">';
       html += '<div class="cal-date">';
       html += '<span class="num">' + (day.getMonth()+1) + '/' + day.getDate() + '</span>';
       html += '<span class="dow">' + dayNames[dayDow] + '</span>';
       html += '</div>';
       
-      const dayEvents = eventsByDate[dStr] || [];
+      html += '<div class="cal-events-wrap">';
       dayEvents.forEach(e => {
-        html += '<div class="cal-event">';
-        if (e.time) {
-          html += '<span class="cal-event-time">' + e.time + '</span> ';
+        const eventClass = e.type === 'order' ? 'cal-event order' : 'cal-event';
+        html += '<div class="' + eventClass + '">';
+        
+        if (e.type === 'order') {
+          html += '<span class="cal-event-tag">💰</span>';
+          html += '<span class="cal-event-name">' + escapeHtml(e.name) + '</span>';
+          if (e.sales) {
+            html += '<span class="cal-event-sales">' + escapeHtml(e.sales) + '</span>';
+          }
         } else {
-          html += '<span class="cal-event-time notime">미정</span> ';
+          if (e.time) {
+            html += '<span class="cal-event-time">' + e.time + '</span>';
+          } else {
+            html += '<span class="cal-event-time notime">미정</span>';
+          }
+          html += '<span class="cal-event-name">' + escapeHtml(e.name) + '</span>';
+          if (e.grade) {
+            html += '<span class="cal-event-grade">' + escapeHtml(shortGrade(e.grade)) + '</span>';
+          }
         }
-        html += '<span class="cal-event-name">' + escapeHtml(e.name) + '</span>';
-        if (e.grade) {
-          html += '<div class="cal-event-grade">' + escapeHtml(shortGrade(e.grade)) + '</div>';
-        }
+        
         html += '</div>';
       });
+      html += '</div>';
       
       html += '</div>';
     }
