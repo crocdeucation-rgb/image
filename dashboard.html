@@ -6,8 +6,8 @@
 <title>아라온스쿨 리드 현황</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-body { background: #f8f9fa; padding: 14px; }
-.layout { display: grid; grid-template-columns: 420px 1fr; gap: 16px; max-width: 1400px; margin: 0 auto; }
+body { background: #f8f9fa; padding: 0; }
+.layout { display: grid; grid-template-columns: minmax(380px, 1fr) minmax(0, 1.5fr); gap: 16px; max-width: 1600px; margin: 0 auto; padding: 8px 14px; }
 @media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } }
 
 /* === 좌측 (컴팩트) === */
@@ -47,6 +47,8 @@ body { background: #f8f9fa; padding: 14px; }
 .cal-day.weekend { background: #fdf6f6; }
 .cal-day.weekend.today { background: #e8f0fe; }
 .cal-day.past { opacity: 0.4; }
+.cal-day.other-month { opacity: 0.3; background: #fafbfc; }
+.cal-day.other-month .cal-date .num { color: #bbb; }
 
 .cal-date { font-size: 10px; color: #888; margin-bottom: 4px; font-weight: 600; display: flex; justify-content: space-between; align-items: baseline; }
 .cal-date .num { font-size: 13px; color: #333; }
@@ -67,7 +69,7 @@ body { background: #f8f9fa; padding: 14px; }
 
 /* === 모바일 리스트 모드 === */
 @media (max-width: 700px) {
-  body { padding: 10px; }
+  .layout { padding: 6px 8px; }
   
   /* 캘린더 그리드 → 세로 리스트로 전환 */
   .cal-week { display: block; margin-bottom: 0; }
@@ -80,8 +82,9 @@ body { background: #f8f9fa; padding: 14px; }
     gap: 10px; 
   }
   
-  /* 일정 없는 날은 숨김 */
+  /* 일정 없는 날 + 다른 달 날짜 숨김 (모바일) */
   .cal-day.empty { display: none; }
+  .cal-day.other-month { display: none; }
   
   .cal-date { 
     margin-bottom: 0; 
@@ -271,14 +274,27 @@ function renderCalendar(events) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
-  // 이번 주 월요일 찾기
-  const dow = today.getDay();
-  const monday = new Date(today);
-  monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
+  // 이번 달 1일과 말일
+  const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+  const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
   
-  // 2주치 = 14일
+  // 캘린더 그리드 시작: 이번 달 1일이 속한 주의 월요일
+  const gridStart = new Date(monthStart);
+  const startDow = gridStart.getDay();
+  gridStart.setDate(gridStart.getDate() - (startDow === 0 ? 6 : startDow - 1));
+  
+  // 캘린더 그리드 끝: 말일이 속한 주의 일요일
+  const gridEnd = new Date(monthEnd);
+  const endDow = gridEnd.getDay();
+  gridEnd.setDate(gridEnd.getDate() + (endDow === 0 ? 0 : 7 - endDow));
+  
+  // 총 주 수 계산
+  const totalDays = Math.round((gridEnd - gridStart) / (1000 * 60 * 60 * 24)) + 1;
+  const totalWeeks = Math.ceil(totalDays / 7);
+  
   const dayNames = ['일','월','화','수','목','금','토'];
   const todayStr = formatDate(today);
+  const currentMonth = today.getMonth();
   
   // 날짜별 이벤트 그룹
   const eventsByDate = {};
@@ -289,23 +305,24 @@ function renderCalendar(events) {
   
   let html = '';
   
-  // 2주 (각 주 7일)
-  for (let week = 0; week < 2; week++) {
+  for (let week = 0; week < totalWeeks; week++) {
     html += '<div class="cal-week">';
     for (let d = 0; d < 7; d++) {
-      const day = new Date(monday);
-      day.setDate(monday.getDate() + week * 7 + d);
+      const day = new Date(gridStart);
+      day.setDate(gridStart.getDate() + week * 7 + d);
       const dStr = formatDate(day);
       const dayDow = day.getDay();
       
       const isToday = dStr === todayStr;
       const isWeekend = dayDow === 0 || dayDow === 6;
       const isPast = day < today;
+      const isOtherMonth = day.getMonth() !== currentMonth;
       
       let classes = 'cal-day';
       if (isToday) classes += ' today';
       if (isWeekend) classes += ' weekend';
       if (isPast && !isToday) classes += ' past';
+      if (isOtherMonth) classes += ' other-month';
       
       const dayEvents = eventsByDate[dStr] || [];
       if (dayEvents.length === 0) classes += ' empty';
@@ -350,10 +367,8 @@ function renderCalendar(events) {
   
   document.getElementById('cal-body').innerHTML = html;
   
-  // 범위 라벨
-  const last = new Date(monday);
-  last.setDate(monday.getDate() + 13);
-  const rangeLabel = (monday.getMonth()+1) + '/' + monday.getDate() + ' ~ ' + (last.getMonth()+1) + '/' + last.getDate();
+  // 범위 라벨: 이번 달
+  const rangeLabel = (today.getFullYear()) + '년 ' + (today.getMonth()+1) + '월';
   document.getElementById('cal-range').textContent = rangeLabel;
 }
 
