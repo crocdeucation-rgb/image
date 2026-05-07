@@ -7,6 +7,10 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
 body { background: #f8f9fa; padding: 16px; }
+.layout { display: grid; grid-template-columns: 1fr 320px; gap: 20px; max-width: 1200px; margin: 0 auto; }
+@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+/* 좌측 (기존 그대로) */
 .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
 .title { font-size: 15px; font-weight: 600; color: #1a1a1a; }
 .updated { font-size: 11px; color: #999; margin-top: 2px; }
@@ -28,16 +32,38 @@ body { background: #f8f9fa; padding: 16px; }
 .cval.amber { color: #f4b400; }
 .cval.purple { color: #9333ea; }
 .cval.sm { font-size: 18px; }
+
+/* 우측 일정 패널 */
+.schedule-panel { background: white; border: 1px solid #eee; border-radius: 10px; padding: 16px; height: fit-content; }
+.schedule-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f0; }
+.schedule-title { font-size: 13px; font-weight: 600; color: #1a1a1a; }
+.schedule-range { font-size: 10px; color: #999; }
+.schedule-empty { font-size: 12px; color: #aaa; text-align: center; padding: 30px 0; }
+.day-group { margin-bottom: 14px; }
+.day-group:last-child { margin-bottom: 0; }
+.day-header { font-size: 11px; font-weight: 600; color: #555; margin-bottom: 6px; padding: 4px 8px; background: #f3f4f6; border-radius: 6px; display: inline-block; }
+.day-header.today { background: #e8f0fe; color: #1a73e8; }
+.day-header.weekend { color: #ea4335; }
+.event { display: flex; gap: 8px; padding: 6px 8px; align-items: baseline; font-size: 12px; border-left: 2px solid #0f9d58; margin-left: 4px; margin-bottom: 3px; }
+.event-time { font-weight: 600; color: #1a1a1a; min-width: 42px; }
+.event-time.notime { color: #999; font-weight: 400; }
+.event-name { color: #333; }
+.event-grade { color: #888; font-size: 11px; margin-left: auto; }
 </style>
 </head>
 <body>
+
+<div class="layout">
+
+<!-- 좌측: 기존 대시보드 -->
+<div>
 
 <div class="header">
   <div>
     <div class="title">아라온스쿨 리드 현황</div>
     <div class="updated" id="updated">불러오는 중...</div>
   </div>
-  <button class="refresh" onclick="loadData()">새로고침</button>
+  <button class="refresh" onclick="loadAll()">새로고침</button>
 </div>
 
 <div class="tabs">
@@ -47,7 +73,6 @@ body { background: #f8f9fa; padding: 16px; }
   <button class="tab" onclick="setTab(3)">전체</button>
 </div>
 
-<!-- 표 1: 유입 현황 (신청일 기준) -->
 <div class="section-label">📥 유입 현황 <span class="badge">신청일 기준</span></div>
 <div class="grid-3">
   <div class="card"><div class="clabel">총 유입</div><div class="cval blue" id="v0">-</div></div>
@@ -55,14 +80,12 @@ body { background: #f8f9fa; padding: 16px; }
   <div class="card"><div class="clabel">이탈</div><div class="cval red" id="v2">-</div></div>
 </div>
 
-<!-- 표 2: 신규 오더 (결제일 기준) -->
 <div class="section-label">💰 신규 오더 <span class="badge pay">결제일 기준</span></div>
 <div class="grid-2">
   <div class="card"><div class="clabel">오더 건수</div><div class="cval green" id="v3">-</div></div>
   <div class="card"><div class="clabel">전환율 (이번 달)</div><div class="cval sm" id="rate-month">-</div></div>
 </div>
 
-<!-- 매출 -->
 <div class="section-label">매출 <span class="badge pay">결제일 기준</span></div>
 <div class="grid-3">
   <div class="card"><div class="clabel">이번 달</div><div class="cval purple sm" id="sales-month">-</div></div>
@@ -70,11 +93,25 @@ body { background: #f8f9fa; padding: 16px; }
   <div class="card"><div class="clabel">누적</div><div class="cval sm" id="sales-all">-</div></div>
 </div>
 
-<!-- 리드 출처 -->
 <div class="section-label">리드 출처 <span class="badge">이번달 / 전체</span></div>
 <div class="grid-2">
   <div class="card"><div class="clabel">아라위키</div><div class="cval blue sm" id="src-ara">-</div></div>
   <div class="card"><div class="clabel">오디플랜</div><div class="cval green sm" id="src-odi">-</div></div>
+</div>
+
+</div>
+
+<!-- 우측: 방문 일정 -->
+<div class="schedule-panel">
+  <div class="schedule-head">
+    <div class="schedule-title">📅 방문 일정</div>
+    <div class="schedule-range" id="schedule-range">이번 주</div>
+  </div>
+  <div id="schedule-body">
+    <div class="schedule-empty">불러오는 중...</div>
+  </div>
+</div>
+
 </div>
 
 <script>
@@ -98,6 +135,13 @@ let sourceData = [];
 let currentTab = 0;
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1438610573&single=true&output=csv';
 
+// ⚠️ schedule 탭 publish CSV URL을 여기 넣어야 함 (Apps Script 적용 후 게시 → URL 업데이트)
+const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=SCHEDULE_GID_HERE&single=true&output=csv';
+
+async function loadAll() {
+  await Promise.all([loadData(), loadSchedule()]);
+}
+
 async function loadData() {
   try {
     document.getElementById('updated').textContent = '불러오는 중...';
@@ -105,25 +149,22 @@ async function loadData() {
     const text = await res.text();
     const allRows = text.trim().split('\n').map(r => r.split(',').map(c => c.trim()));
     
-    inflowData   = allRows.slice(1, 4);   // 시트 2-4행
-    payOrderData = allRows[6];            // 시트 7행
-    salesData    = allRows.slice(9, 12);  // 시트 10-12행
-    rateData     = allRows[14];           // 시트 15행
-    sourceData   = allRows.slice(17, 19); // 시트 18-19행
+    inflowData   = allRows.slice(1, 4);
+    payOrderData = allRows[6];
+    salesData    = allRows.slice(9, 12);
+    rateData     = allRows[14];
+    sourceData   = allRows.slice(17, 19);
     
     render();
     
-    // 매출 3개
     if (salesData[0]) document.getElementById('sales-month').textContent = salesData[0][1] || '-';
     if (salesData[1]) document.getElementById('sales-last').textContent = salesData[1][1] || '-';
     if (salesData[2]) document.getElementById('sales-all').textContent = salesData[2][1] || '-';
     
-    // 전환율 (이번달)
     if (rateData) {
       document.getElementById('rate-month').textContent = rateData[1] || '-';
     }
     
-    // 리드 출처
     if (sourceData[0]) document.getElementById('src-ara').textContent = (sourceData[0][1]||'0') + ' / ' + (sourceData[0][2]||'0');
     if (sourceData[1]) document.getElementById('src-odi').textContent = (sourceData[1][1]||'0') + ' / ' + (sourceData[1][2]||'0');
     
@@ -143,19 +184,116 @@ function setTab(idx) {
 function render() {
   const col = currentTab + 1;
   
-  // 유입 3개 카드
   inflowData.forEach((row, i) => {
     const el = document.getElementById('v'+i);
     if (el && row[col] !== undefined) el.textContent = row[col];
   });
   
-  // 신규 오더 (결제일)
   if (payOrderData && payOrderData[col] !== undefined) {
     document.getElementById('v3').textContent = payOrderData[col];
   }
 }
 
-loadData();
+// ===== 일정 로드 =====
+async function loadSchedule() {
+  const body = document.getElementById('schedule-body');
+  try {
+    const res = await fetch(SCHEDULE_CSV_URL);
+    const text = await res.text();
+    const rows = text.trim().split('\n').map(r => r.split(',').map(c => c.trim()));
+    rows.shift(); // 헤더 제거
+    
+    // 이번 주 월~일 범위
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dow = today.getDay(); // 0=일
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    
+    // 1주치 필터
+    let events = rows
+      .filter(r => r[0])
+      .map(r => ({ date: r[0], time: r[1] || '', name: r[2] || '', grade: r[3] || '' }))
+      .filter(e => {
+        const d = new Date(e.date);
+        return d >= monday && d <= sunday;
+      });
+    
+    // 2주치로 확장 (1주치가 적으면)
+    let rangeLabel = '이번 주';
+    if (events.length < 4) {
+      const sunday2 = new Date(monday);
+      sunday2.setDate(monday.getDate() + 13);
+      events = rows
+        .filter(r => r[0])
+        .map(r => ({ date: r[0], time: r[1] || '', name: r[2] || '', grade: r[3] || '' }))
+        .filter(e => {
+          const d = new Date(e.date);
+          return d >= monday && d <= sunday2;
+        });
+      rangeLabel = '2주치';
+    }
+    
+    document.getElementById('schedule-range').textContent = rangeLabel;
+    
+    if (events.length === 0) {
+      body.innerHTML = '<div class="schedule-empty">예정된 방문이 없습니다</div>';
+      return;
+    }
+    
+    // 날짜별 그룹
+    const groups = {};
+    events.forEach(e => {
+      if (!groups[e.date]) groups[e.date] = [];
+      groups[e.date].push(e);
+    });
+    
+    const dayNames = ['일','월','화','수','목','금','토'];
+    const todayStr = formatDate(today);
+    
+    let html = '';
+    Object.keys(groups).sort().forEach(dateStr => {
+      const d = new Date(dateStr);
+      const dow = d.getDay();
+      const isToday = dateStr === todayStr;
+      const isWeekend = dow === 0 || dow === 6;
+      
+      const headerClass = isToday ? 'day-header today' : (isWeekend ? 'day-header weekend' : 'day-header');
+      const dateLabel = (d.getMonth()+1) + '/' + d.getDate() + ' (' + dayNames[dow] + ')' + (isToday ? ' · 오늘' : '');
+      
+      html += '<div class="day-group">';
+      html += '<div class="' + headerClass + '">' + dateLabel + '</div>';
+      
+      groups[dateStr].forEach(e => {
+        const timeClass = e.time ? 'event-time' : 'event-time notime';
+        const timeText = e.time || '시간미정';
+        html += '<div class="event">';
+        html += '<span class="' + timeClass + '">' + timeText + '</span>';
+        html += '<span class="event-name">' + escapeHtml(e.name) + '</span>';
+        if (e.grade) html += '<span class="event-grade">' + escapeHtml(e.grade) + '</span>';
+        html += '</div>';
+      });
+      
+      html += '</div>';
+    });
+    
+    body.innerHTML = html;
+  } catch(e) {
+    body.innerHTML = '<div class="schedule-empty">일정 로드 실패</div>';
+  }
+}
+
+function formatDate(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+loadAll();
 </script>
 </body>
 </html>
