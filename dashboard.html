@@ -11,20 +11,43 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 .layout { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; max-width: 1600px; margin: 0 auto; padding: 8px 14px; }
 @media (max-width: 1100px) { .layout { grid-template-columns: 1fr 1fr; } }
 
+/* 모바일 */
 @media (max-width: 700px) {
-  .layout { display: flex; flex-wrap: nowrap; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; gap: 0; padding: 0; }
-  .layout::-webkit-scrollbar { display: none; }
-  .section { min-width: 100vw; scroll-snap-align: start; padding: 8px 12px; }
-  .swipe-hint { display: flex; justify-content: center; gap: 6px; padding: 8px 0 4px; position: fixed; bottom: 8px; left: 0; right: 0; z-index: 10; }
-  .swipe-dot { width: 6px; height: 6px; border-radius: 50%; background: #ccc; transition: background 0.2s; }
-  .swipe-dot.active { background: #1a73e8; }
-  .cval { font-size: 20px; }
-  .cval.sm { font-size: 15px; }
-  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .layout { display: block; padding: 4px 8px; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* 섹션 전환 버튼 */
+  .sec-nav { display: flex; justify-content: center; gap: 6px; margin-bottom: 8px; }
+  .sec-nav-btn { padding: 4px 12px; font-size: 11px; border-radius: 16px; border: 1px solid #ddd; background: white; color: #666; cursor: pointer; }
+  .sec-nav-btn.active { background: #1a73e8; color: white; border-color: #1a73e8; }
+
+  /* 작게 */
+  .cval { font-size: 16px !important; }
+  .cval.sm { font-size: 13px !important; }
+  .cval.xs { font-size: 11px !important; }
+  .clabel { font-size: 9px; }
+  .card { padding: 6px 4px; }
+  .section-label { margin: 8px 0 4px; font-size: 9px; }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); gap: 4px; }
+  .grid-3 { gap: 4px; }
+  .grid-2 { gap: 4px; }
+  .sec-title { font-size: 11px; margin-bottom: 6px; padding-bottom: 4px; }
+  .tabs { gap: 4px; margin-bottom: 6px; }
+  .tab { padding: 3px 8px; font-size: 10px; }
+  .header { margin-bottom: 6px; }
+  .title { font-size: 11px; }
+  .updated { font-size: 9px; }
+  .refresh { font-size: 10px; padding: 2px 7px; }
+  .visit-item { padding: 5px 8px; gap: 6px; }
+  .visit-date { font-size: 10px; min-width: 44px; }
+  .visit-time { font-size: 10px; min-width: 36px; }
+  .visit-name { font-size: 11px; }
+  .visit-grade { font-size: 9px; }
 }
 @media (min-width: 701px) {
-  .swipe-hint { display: none; }
-  .section { min-width: 0; }
+  .sec-nav { display: none; }
+  .section { display: block !important; }
 }
 
 .sec-title { font-size: 13px; font-weight: 700; color: #1a1a1a; margin-bottom: 10px; padding-bottom: 8px; }
@@ -37,11 +60,12 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 .updated { font-size: 10px; color: #999; margin-top: 2px; }
 .refresh { font-size: 11px; padding: 3px 9px; border: 1px solid #ddd; border-radius: 6px; background: white; cursor: pointer; color: #555; }
 .tabs { display: flex; gap: 5px; margin-bottom: 10px; }
-.tab { padding: 4px 11px; font-size: 11px; border-bottom: 16px; border: 1px solid #ddd; background: white; color: #666; cursor: pointer; border-radius: 16px; }
+.tab { padding: 4px 11px; font-size: 11px; border-radius: 16px; border: 1px solid #ddd; background: white; color: #666; cursor: pointer; }
 .tab.active { background: #1a73e8; color: white; border-color: #1a73e8; }
 .section-label { font-size: 10px; color: #999; margin: 12px 0 6px; font-weight: 500; display: flex; align-items: center; gap: 5px; }
 .section-label .badge { font-size: 9px; padding: 1px 6px; border-radius: 8px; background: #eef2f7; color: #5a6a7a; font-weight: 600; }
 .section-label .badge.pay { background: #f3e8ff; color: #7c3aed; }
+.section-label .badge.today { background: #fff3e0; color: #e65100; font-weight: 700; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
 .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
@@ -55,6 +79,7 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 .cval.purple { color: #9333ea; }
 .cval.orange { color: #f97316; }
 .cval.pink   { color: #ec4899; }
+.cval.gray   { color: #888; }
 .cval.sm  { font-size: 15px; }
 .cval.xs  { font-size: 12px; }
 
@@ -70,10 +95,17 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 </head>
 <body>
 
+<!-- 모바일 섹션 전환 버튼 -->
+<div class="sec-nav">
+  <button class="sec-nav-btn active" onclick="showSec(0)">📊 유입</button>
+  <button class="sec-nav-btn" onclick="showSec(1)">🔍 분석</button>
+  <button class="sec-nav-btn" onclick="showSec(2)">📅 방문</button>
+</div>
+
 <div class="layout" id="layout">
 
 <!-- 섹션1: 유입 데이터 -->
-<div class="section" id="sec1">
+<div class="section active" id="sec1">
 <div class="sec-title blue">📊 유입 데이터</div>
 <div class="header">
   <div>
@@ -96,11 +128,12 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
   <div class="card"><div class="clabel">이탈</div><div class="cval red" id="v-drop">-</div></div>
 </div>
 
-<div class="section-label">방문 / 오더 <span class="badge pay">이번달 기준</span></div>
-<div class="grid-3">
-  <div class="card"><div class="clabel">방문</div><div class="cval amber" id="v-visit">-</div></div>
-  <div class="card"><div class="clabel">오더</div><div class="cval green" id="v-order">-</div></div>
-  <div class="card"><div class="clabel">결보</div><div class="cval green sm" id="v-payorder">-</div></div>
+<div class="section-label">방문 / 오더 <span class="badge today">오늘 기준</span></div>
+<div class="grid-4">
+  <div class="card"><div class="clabel">방문완료</div><div class="cval amber sm" id="v-visitdone">-</div></div>
+  <div class="card"><div class="clabel">방문예정</div><div class="cval blue sm" id="v-visitplan">-</div></div>
+  <div class="card"><div class="clabel">오더</div><div class="cval green sm" id="v-order">-</div></div>
+  <div class="card"><div class="clabel">결보</div><div class="cval gray sm" id="v-kulbo">-</div></div>
 </div>
 
 <div class="section-label">매출 <span class="badge pay">결제일 기준</span></div>
@@ -110,7 +143,7 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
   <div class="card"><div class="clabel">누적</div><div class="cval sm" id="sales-all">-</div></div>
 </div>
 
-<div class="section-label">전환 <span class="badge">총수→건수 (비율)</span></div>
+<div class="section-label">전환 <span class="badge">탭 기준</span></div>
 <div class="grid-2">
   <div class="card"><div class="clabel">신청→방문</div><div class="cval amber xs" id="conv-visit">-</div></div>
   <div class="card"><div class="clabel">방문→오더</div><div class="cval green xs" id="conv-order">-</div></div>
@@ -154,18 +187,19 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 
 </div>
 
-<div class="swipe-hint">
-  <div class="swipe-dot active" id="dot0"></div>
-  <div class="swipe-dot" id="dot1"></div>
-  <div class="swipe-dot" id="dot2"></div>
-</div>
-
 <script>
 let allRows = [];
 let currentTab = 0;
+let currentSec = 0;
 
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1438610573&single=true&output=csv';
 const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1384080283&single=true&output=csv';
+
+function showSec(idx) {
+  currentSec = idx;
+  document.querySelectorAll('.section').forEach((s,i) => s.classList.toggle('active', i===idx));
+  document.querySelectorAll('.sec-nav-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
+}
 
 async function loadAll() {
   await Promise.all([loadData(), loadSchedule()]);
@@ -178,9 +212,13 @@ async function loadData() {
     const text = await res.text();
     allRows = text.trim().split('\n').map(r => r.split(',').map(c => c.trim()));
     render();
-    document.getElementById('sales-month').textContent = allRows[9]?.[1]  || '-';
-    document.getElementById('sales-last').textContent  = allRows[10]?.[1] || '-';
-    document.getElementById('sales-all').textContent   = allRows[11]?.[1] || '-';
+    document.getElementById('sales-month').textContent = allRows[11]?.[1] || '-';
+    document.getElementById('sales-last').textContent  = allRows[12]?.[1] || '-';
+    document.getElementById('sales-all').textContent   = allRows[13]?.[1] || '-';
+    document.getElementById('v-visitdone').textContent = allRows[5]?.[1]  || '0';
+    document.getElementById('v-visitplan').textContent = allRows[6]?.[1]  || '0';
+    document.getElementById('v-order').textContent     = allRows[7]?.[1]  || '0';
+    document.getElementById('v-kulbo').textContent     = allRows[8]?.[1]  || '0';
     const now = new Date();
     document.getElementById('updated').textContent = '업데이트: ' + now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
   } catch(e) {
@@ -198,29 +236,23 @@ function render() {
   const col = currentTab + 2;
   const convCol = currentTab + 1;
 
-  document.getElementById('v-total').textContent   = allRows[1]?.[col]  || '-';
-  document.getElementById('v-today').textContent   = allRows[1]?.[1]    || '-';
-  document.getElementById('v-drop').textContent    = allRows[3]?.[col]  || '-';
+  document.getElementById('v-total').textContent = allRows[1]?.[col] || '-';
+  document.getElementById('v-today').textContent = allRows[1]?.[1]  || '-';
+  document.getElementById('v-drop').textContent  = allRows[2]?.[col] || '-';
 
-  document.getElementById('v-visit').textContent    = allRows[2]?.[2]   || '-';
-  document.getElementById('v-order').textContent    = allRows[6]?.[2]   || '-';
-  const visit = parseInt(allRows[2]?.[2]) || 0;
-  const order = parseInt(allRows[6]?.[2]) || 0;
-  document.getElementById('v-payorder').textContent = visit - order;
+  document.getElementById('conv-visit').textContent = allRows[16]?.[convCol] || '-';
+  document.getElementById('conv-order').textContent = allRows[17]?.[convCol] || '-';
 
-  document.getElementById('conv-visit').textContent = allRows[14]?.[convCol] || '-';
-  document.getElementById('conv-order').textContent = allRows[15]?.[convCol] || '-';
-
-  document.getElementById('grade-elem').textContent  = allRows[24]?.[convCol] || '-';
-  document.getElementById('grade-mid').textContent   = allRows[25]?.[convCol] || '-';
-  document.getElementById('grade-high').textContent  = allRows[26]?.[convCol] || '-';
-  document.getElementById('grade-total').textContent = allRows[28]?.[convCol] || '-';
+  document.getElementById('grade-elem').textContent  = allRows[26]?.[convCol] || '-';
+  document.getElementById('grade-mid').textContent   = allRows[27]?.[convCol] || '-';
+  document.getElementById('grade-high').textContent  = allRows[28]?.[convCol] || '-';
+  document.getElementById('grade-total').textContent = allRows[30]?.[convCol] || '-';
 
   const routeIds = ['route-insta','route-fb','route-daangn','route-brand','route-cpa','route-yt','route-ref','route-naver','route-etc'];
   routeIds.forEach((id, i) => {
-    document.getElementById(id).textContent = allRows[31+i]?.[convCol] || '-';
+    document.getElementById(id).textContent = allRows[33+i]?.[convCol] || '-';
   });
-  document.getElementById('route-total').textContent = allRows[40]?.[convCol] || '-';
+  document.getElementById('route-total').textContent = allRows[42]?.[convCol] || '-';
 }
 
 async function loadSchedule() {
@@ -267,14 +299,6 @@ function shortGrade(g) {
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-
-const layout = document.getElementById('layout');
-if (layout) {
-  layout.addEventListener('scroll', () => {
-    const idx = Math.round(layout.scrollLeft / window.innerWidth);
-    document.querySelectorAll('.swipe-dot').forEach((d,i) => d.classList.toggle('active', i===idx));
-  });
 }
 
 loadAll();
