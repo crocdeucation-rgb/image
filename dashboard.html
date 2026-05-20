@@ -100,7 +100,7 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 <div class="grid-3">
   <div class="card"><div class="clabel">방문</div><div class="cval amber" id="v-visit">-</div></div>
   <div class="card"><div class="clabel">오더</div><div class="cval green" id="v-order">-</div></div>
-  <div class="card"><div class="clabel">신규 오더</div><div class="cval green sm" id="v-payorder">-</div></div>
+  <div class="card"><div class="clabel">결보</div><div class="cval green sm" id="v-payorder">-</div></div>
 </div>
 
 <div class="section-label">매출 <span class="badge pay">결제일 기준</span></div>
@@ -204,7 +204,9 @@ function render() {
 
   document.getElementById('v-visit').textContent    = allRows[2]?.[2]   || '-';
   document.getElementById('v-order').textContent    = allRows[6]?.[2]   || '-';
-  document.getElementById('v-payorder').textContent = allRows[6]?.[2]   || '-';
+  const visit = parseInt(allRows[2]?.[2]) || 0;
+  const order = parseInt(allRows[6]?.[2]) || 0;
+  document.getElementById('v-payorder').textContent = visit - order;
 
   document.getElementById('conv-visit').textContent = allRows[14]?.[convCol] || '-';
   document.getElementById('conv-order').textContent = allRows[15]?.[convCol] || '-';
