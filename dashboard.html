@@ -195,35 +195,30 @@ function setTab(idx) {
 }
 
 function render() {
-  const col = currentTab + 2; // 이번달=2, 지난달=3, 전체=4
+  const col = currentTab + 2;
+  const convCol = currentTab + 1;
 
-  // 유입 현황
   document.getElementById('v-total').textContent   = allRows[1]?.[col]  || '-';
-  document.getElementById('v-today').textContent   = allRows[1]?.[1]    || '-'; // 오늘유입 항상 B열
+  document.getElementById('v-today').textContent   = allRows[1]?.[1]    || '-';
   document.getElementById('v-drop').textContent    = allRows[3]?.[col]  || '-';
 
-  // 방문/오더 (이번달 고정)
-  document.getElementById('v-visit').textContent    = allRows[2]?.[2]   || '-'; // 이번달 방문
-  document.getElementById('v-order').textContent    = allRows[6]?.[2]   || '-'; // 이번달 오더(결제기준)
-  document.getElementById('v-payorder').textContent = allRows[6]?.[2]   || '-'; // 신규오더
+  document.getElementById('v-visit').textContent    = allRows[2]?.[2]   || '-';
+  document.getElementById('v-order').textContent    = allRows[6]?.[2]   || '-';
+  document.getElementById('v-payorder').textContent = allRows[6]?.[2]   || '-';
 
-  // 전환 (탭 기준, 열이 다름: 이번달=1, 지난달=2, 전체=3)
-  const convCol = currentTab + 1;
   document.getElementById('conv-visit').textContent = allRows[14]?.[convCol] || '-';
   document.getElementById('conv-order').textContent = allRows[15]?.[convCol] || '-';
 
-  // 학년별
-  document.getElementById('grade-elem').textContent  = allRows[23]?.[convCol] || '-';
-  document.getElementById('grade-mid').textContent   = allRows[24]?.[convCol] || '-';
-  document.getElementById('grade-high').textContent  = allRows[25]?.[convCol] || '-';
-  document.getElementById('grade-total').textContent = allRows[26]?.[convCol] || '-';
+  document.getElementById('grade-elem').textContent  = allRows[24]?.[convCol] || '-';
+  document.getElementById('grade-mid').textContent   = allRows[25]?.[convCol] || '-';
+  document.getElementById('grade-high').textContent  = allRows[26]?.[convCol] || '-';
+  document.getElementById('grade-total').textContent = allRows[28]?.[convCol] || '-';
 
-  // 유입경로별
   const routeIds = ['route-insta','route-fb','route-daangn','route-brand','route-cpa','route-yt','route-ref','route-naver','route-etc'];
   routeIds.forEach((id, i) => {
-    document.getElementById(id).textContent = allRows[29+i]?.[convCol] || '-';
+    document.getElementById(id).textContent = allRows[31+i]?.[convCol] || '-';
   });
-  document.getElementById('route-total').textContent = allRows[38]?.[convCol] || '-';
+  document.getElementById('route-total').textContent = allRows[40]?.[convCol] || '-';
 }
 
 async function loadSchedule() {
