@@ -6,9 +6,26 @@
 <title>아라온스쿨 리드 현황</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-body { background: #f8f9fa; padding: 0; }
-.layout { display: grid; grid-template-columns: minmax(380px, 1fr) minmax(0, 1.5fr); gap: 16px; max-width: 1600px; margin: 0 auto; padding: 8px 14px; }
-@media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } }
+body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
+
+/* 데스크탑 3컬럼 */
+.layout { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; max-width: 1600px; margin: 0 auto; padding: 8px 14px; }
+@media (max-width: 1100px) { .layout { grid-template-columns: 1fr 1fr; } }
+
+/* 모바일 스와이프 */
+@media (max-width: 700px) {
+  body { overflow-x: hidden; }
+  .layout { display: flex; flex-wrap: nowrap; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; gap: 0; padding: 0; scroll-behavior: smooth; }
+  .layout::-webkit-scrollbar { display: none; }
+  .section { min-width: 100vw; scroll-snap-align: start; padding: 8px 12px; box-sizing: border-box; }
+  .swipe-hint { display: flex; justify-content: center; gap: 6px; padding: 8px 0 4px; position: fixed; bottom: 8px; left: 0; right: 0; z-index: 10; }
+  .swipe-dot { width: 6px; height: 6px; border-radius: 50%; background: #ccc; transition: background 0.2s; }
+  .swipe-dot.active { background: #1a73e8; }
+}
+@media (min-width: 701px) {
+  .swipe-hint { display: none; }
+  .section { min-width: 0; }
+}
 
 .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .title { font-size: 14px; font-weight: 600; color: #1a1a1a; }
@@ -34,50 +51,32 @@ body { background: #f8f9fa; padding: 0; }
 .cval.orange { color: #f97316; }
 .cval.pink { color: #ec4899; }
 .cval.sm { font-size: 15px; }
-.cval.xs { font-size: 13px; }
+.cval.xs { font-size: 12px; }
 
-.cal-panel { background: white; border: 1px solid #eee; border-radius: 8px; padding: 14px; }
-.cal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #f0f0f0; }
-.cal-title { font-size: 13px; font-weight: 600; color: #1a1a1a; }
-.cal-range { font-size: 10px; color: #999; }
-.cal-week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 6px; }
-.cal-week:last-child { margin-bottom: 0; }
-.cal-day { background: #fafbfc; border: 1px solid #eef0f3; border-radius: 6px; padding: 6px; min-height: 90px; display: flex; flex-direction: column; }
-.cal-day.today { background: #e8f0fe; border-color: #1a73e8; }
-.cal-day.weekend { background: #fdf6f6; }
-.cal-day.weekend.today { background: #e8f0fe; }
-.cal-day.past { opacity: 0.4; }
-.cal-day.other-month { opacity: 0.3; }
-.cal-date { font-size: 10px; color: #888; margin-bottom: 4px; font-weight: 600; display: flex; justify-content: space-between; align-items: baseline; }
-.cal-date .num { font-size: 13px; color: #333; }
-.cal-day.today .cal-date .num { color: #1a73e8; }
-.cal-day.weekend .cal-date .num { color: #ea4335; }
-.cal-day.weekend.today .cal-date .num { color: #1a73e8; }
-.cal-date .dow { font-size: 9px; color: #aaa; }
-.cal-event { font-size: 10px; padding: 2px 4px; margin-bottom: 2px; background: white; border-left: 2px solid #0f9d58; border-radius: 3px; line-height: 1.3; }
-.cal-events-wrap { display: contents; }
-.cal-event.order { border-left-color: #9333ea; }
-.cal-event-time { font-weight: 600; color: #0f9d58; font-size: 9px; }
-.cal-event-time.notime { color: #aaa; font-weight: 400; }
-.cal-event-tag { font-weight: 600; color: #9333ea; font-size: 9px; }
-.cal-event-name { color: #333; }
-.cal-event-grade { color: #999; font-size: 9px; }
-.cal-event-sales { color: #9333ea; font-size: 9px; font-weight: 600; }
+/* 방문 리스트 */
+.visit-panel { background: white; border-radius: 8px; border: 1px solid #eee; overflow: hidden; }
+.visit-head { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; font-size: 12px; font-weight: 600; color: #1a1a1a; }
+.visit-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #f8f8f8; }
+.visit-item:last-child { border-bottom: none; }
+.visit-date { font-size: 11px; font-weight: 600; color: #1a73e8; min-width: 40px; }
+.visit-time { font-size: 11px; color: #0f9d58; min-width: 44px; }
+.visit-name { font-size: 12px; color: #1a1a1a; font-weight: 500; }
+.visit-grade { font-size: 10px; color: #999; margin-left: 4px; }
+.visit-empty { padding: 20px; text-align: center; color: #aaa; font-size: 12px; }
 
 @media (max-width: 700px) {
-  .layout { padding: 6px 8px; }
-  .cal-panel { display: none; }
-  .cval { font-size: 22px; }
-  .cval.sm { font-size: 17px; }
   .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .cval { font-size: 20px; }
+  .cval.sm { font-size: 15px; }
 }
 </style>
 </head>
 <body>
 
-<div class="layout">
+<div class="layout" id="layout">
 
-<div>
+<!-- 섹션1: 핵심 수치 -->
+<div class="section" id="sec1">
 <div class="header">
   <div>
     <div class="title">아라온스쿨 리드 현황</div>
@@ -113,18 +112,22 @@ body { background: #f8f9fa; padding: 0; }
   <div class="card"><div class="clabel">누적</div><div class="cval sm" id="sales-all">-</div></div>
 </div>
 
-<div class="section-label">📊 전환 <span class="badge">이번달 / 전체</span></div>
+<div class="section-label">📊 전환 <span class="badge">총수→건수 (비율)</span></div>
 <div class="grid-2">
   <div class="card"><div class="clabel">신청→방문</div><div class="cval amber xs" id="conv-visit">-</div></div>
-  <div class="card"><div class="clabel">신청→오더</div><div class="cval green xs" id="conv-order">-</div></div>
+  <div class="card"><div class="clabel">방문→오더</div><div class="cval green xs" id="conv-order">-</div></div>
+</div>
 </div>
 
-<div class="section-label">🎓 학년별 <span class="badge">이번달 / 전체</span></div>
+<!-- 섹션2: 분석 -->
+<div class="section" id="sec2">
+<div class="section-label" style="margin-top:0;">🎓 학년별 <span class="badge">이번달 / 전체</span></div>
 <div class="grid-3">
   <div class="card"><div class="clabel">초등</div><div class="cval blue xs" id="grade-elem">-</div></div>
   <div class="card"><div class="clabel">중학</div><div class="cval green xs" id="grade-mid">-</div></div>
   <div class="card"><div class="clabel">고등</div><div class="cval amber xs" id="grade-high">-</div></div>
 </div>
+<div class="card" style="margin-top:6px;"><div class="clabel">합계</div><div class="cval xs" id="grade-total">-</div></div>
 
 <div class="section-label">🛤️ 유입경로별 <span class="badge">이번달 / 전체</span></div>
 <div class="grid-4">
@@ -138,33 +141,29 @@ body { background: #f8f9fa; padding: 0; }
   <div class="card"><div class="clabel">네이버검색</div><div class="cval blue xs" id="route-naver">-</div></div>
   <div class="card"><div class="clabel">기타</div><div class="cval xs" id="route-etc">-</div></div>
 </div>
+<div class="card" style="margin-top:6px;"><div class="clabel">합계</div><div class="cval xs" id="route-total">-</div></div>
+</div>
+
+<!-- 섹션3: 방문 리스트 -->
+<div class="section" id="sec3">
+<div class="section-label" style="margin-top:0;">📅 방문 예정</div>
+<div class="visit-panel">
+  <div id="visit-list"><div class="visit-empty">불러오는 중...</div></div>
+</div>
+</div>
 
 </div>
 
-<div class="cal-panel">
-  <div class="cal-head">
-    <div class="cal-title">📅 방문 · 오더</div>
-    <div style="display:flex; gap:8px; align-items:center;">
-      <span style="font-size:9px; color:#0f9d58;">● 방문</span>
-      <span style="font-size:9px; color:#9333ea;">● 오더</span>
-      <span class="cal-range" id="cal-range">2주</span>
-    </div>
-  </div>
-  <div id="cal-body">
-    <div style="text-align:center; color:#aaa; font-size:12px; padding:30px 0;">불러오는 중...</div>
-  </div>
-</div>
-
+<!-- 모바일 도트 -->
+<div class="swipe-hint">
+  <div class="swipe-dot active" id="dot0"></div>
+  <div class="swipe-dot" id="dot1"></div>
+  <div class="swipe-dot" id="dot2"></div>
 </div>
 
 <script>
-let inflowData = [];
-let payOrderData = [];
-let salesData = [];
-let rateData = [];
-let convData = [];
-let gradeData = [];
-let routeData = [];
+let inflowData = [], payOrderData = [], salesData = [], rateData = [];
+let convData = [], gradeData = [], routeData = [];
 let currentTab = 0;
 
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1438610573&single=true&output=csv';
@@ -181,32 +180,31 @@ async function loadData() {
     const text = await res.text();
     const allRows = text.trim().split('\n').map(r => r.split(',').map(c => c.trim()));
 
-    inflowData   = allRows.slice(1, 4);   // 2~4행
-    payOrderData = allRows[6];             // 7행
-    salesData    = allRows.slice(9, 12);  // 10~12행
-    rateData     = allRows[14];            // 15행 (전환율 - 미사용)
-    convData     = allRows.slice(14, 16); // 15~16행: 신청→방문, 신청→오더
-    gradeData    = allRows.slice(22, 25); // 23~25행
-    routeData    = allRows.slice(27, 36); // 28~36행
+    inflowData   = allRows.slice(1, 4);
+    payOrderData = allRows[6];
+    salesData    = allRows.slice(9, 12);
+    rateData     = allRows[14];
+    convData     = allRows.slice(14, 16);
+    gradeData    = allRows.slice(22, 26); // 23~26 (합계포함)
+    routeData    = allRows.slice(27, 37); // 28~37 (합계포함)
 
     render();
 
-    // 매출
     if (salesData[0]) document.getElementById('sales-month').textContent = salesData[0][1] || '-';
     if (salesData[1]) document.getElementById('sales-last').textContent  = salesData[1][1] || '-';
     if (salesData[2]) document.getElementById('sales-all').textContent   = salesData[2][1] || '-';
+    if (rateData)     document.getElementById('rate-month').textContent  = rateData[1] || '-';
 
-    // 전환율 (이번달)
-    if (rateData) document.getElementById('rate-month').textContent = rateData[1] || '-';
-
-    // 전환 건수
-    if (convData[0]) document.getElementById('conv-visit').textContent = (convData[0][1]||'0') + ' / ' + (convData[0][2]||'0');
-    if (convData[1]) document.getElementById('conv-order').textContent = (convData[1][1]||'0') + ' / ' + (convData[1][2]||'0');
+    if (convData[0]) document.getElementById('conv-visit').textContent = convData[0][1] || '-';
+    if (convData[1]) document.getElementById('conv-order').textContent = convData[1][1] || '-';
 
     // 학년별
-    if (gradeData[0]) document.getElementById('grade-elem').textContent = (gradeData[0][1]||'0') + ' / ' + (gradeData[0][2]||'0');
-    if (gradeData[1]) document.getElementById('grade-mid').textContent  = (gradeData[1][1]||'0') + ' / ' + (gradeData[1][2]||'0');
-    if (gradeData[2]) document.getElementById('grade-high').textContent = (gradeData[2][1]||'0') + ' / ' + (gradeData[2][2]||'0');
+    const gradeIds = ['grade-elem','grade-mid','grade-high'];
+    gradeIds.forEach((id, i) => {
+      const row = gradeData[i];
+      if (row) document.getElementById(id).textContent = (row[1]||'0') + ' / ' + (row[2]||'0');
+    });
+    if (gradeData[3]) document.getElementById('grade-total').textContent = (gradeData[3][1]||'0') + ' / ' + (gradeData[3][2]||'0');
 
     // 유입경로별
     const routeIds = ['route-insta','route-fb','route-daangn','route-brand','route-cpa','route-yt','route-ref','route-naver','route-etc'];
@@ -214,6 +212,7 @@ async function loadData() {
       const row = routeData[i];
       if (row) document.getElementById(id).textContent = (row[1]||'0') + ' / ' + (row[2]||'0');
     });
+    if (routeData[9]) document.getElementById('route-total').textContent = (routeData[9][1]||'0') + ' / ' + (routeData[9][2]||'0');
 
     const now = new Date();
     document.getElementById('updated').textContent = '업데이트: ' + now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
@@ -240,96 +239,66 @@ function render() {
 }
 
 async function loadSchedule() {
-  const body = document.getElementById('cal-body');
   try {
     const res = await fetch(SCHEDULE_CSV_URL);
     const text = await res.text();
     const rows = text.trim().split('\n').map(r => r.split(',').map(c => c.trim()));
     rows.shift();
-    const events = rows.filter(r => r[0]).map(r => ({
-      date: r[0], time: r[1]||'', name: r[2]||'', grade: r[3]||'', type: r[4]||'visit', sales: r[5]||''
-    }));
-    renderCalendar(events);
-  } catch(e) {
-    body.innerHTML = '<div style="text-align:center; color:#ea4335; font-size:12px; padding:30px 0;">일정 로드 실패</div>';
-  }
-}
 
-function renderCalendar(events) {
-  const today = new Date();
-  today.setHours(0,0,0,0);
-  const dow = today.getDay();
-  const monday = new Date(today);
-  monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
-  const dayNames = ['일','월','화','수','목','금','토'];
-  const todayStr = formatDate(today);
-  const eventsByDate = {};
-  events.forEach(e => {
-    if (!eventsByDate[e.date]) eventsByDate[e.date] = [];
-    eventsByDate[e.date].push(e);
-  });
+    const today = new Date();
+    today.setHours(0,0,0,0);
 
-  let html = '';
-  for (let week = 0; week < 2; week++) {
-    html += '<div class="cal-week">';
-    for (let d = 0; d < 7; d++) {
-      const day = new Date(monday);
-      day.setDate(monday.getDate() + week * 7 + d);
-      const dStr = formatDate(day);
-      const dayDow = day.getDay();
-      const isToday   = dStr === todayStr;
-      const isWeekend = dayDow === 0 || dayDow === 6;
-      const isPast    = day < today;
-      const dayEvents = eventsByDate[dStr] || [];
+    const visits = rows
+      .filter(r => r[0] && r[4] === 'visit')
+      .filter(r => new Date(r[0]) >= today)
+      .sort((a,b) => new Date(a[0]) - new Date(b[0]));
 
-      let classes = 'cal-day';
-      if (isToday)   classes += ' today';
-      if (isWeekend) classes += ' weekend';
-      if (isPast && !isToday) classes += ' past';
-      if (dayEvents.length === 0) classes += ' empty';
-
-      html += '<div class="' + classes + '">';
-      html += '<div class="cal-date"><span class="num">' + (day.getMonth()+1) + '/' + day.getDate() + '</span><span class="dow">' + dayNames[dayDow] + '</span></div>';
-      html += '<div class="cal-events-wrap">';
-      dayEvents.forEach(e => {
-        const ec = e.type === 'order' ? 'cal-event order' : 'cal-event';
-        html += '<div class="' + ec + '">';
-        if (e.type === 'order') {
-          html += '<span class="cal-event-tag">💰</span><span class="cal-event-name">' + escapeHtml(e.name) + '</span>';
-          if (e.sales) html += '<span class="cal-event-sales">' + escapeHtml(e.sales) + '</span>';
-        } else {
-          html += e.time
-            ? '<span class="cal-event-time">' + e.time + '</span>'
-            : '<span class="cal-event-time notime">미정</span>';
-          html += '<span class="cal-event-name">' + escapeHtml(e.name) + '</span>';
-          if (e.grade) html += '<span class="cal-event-grade">' + escapeHtml(shortGrade(e.grade)) + '</span>';
-        }
-        html += '</div>';
-      });
-      html += '</div></div>';
+    const list = document.getElementById('visit-list');
+    if (visits.length === 0) {
+      list.innerHTML = '<div class="visit-empty">방문 예정 없음</div>';
+      return;
     }
-    html += '</div>';
-  }
 
-  document.getElementById('cal-body').innerHTML = html;
-  const last = new Date(monday);
-  last.setDate(monday.getDate() + 13);
-  document.getElementById('cal-range').textContent = (monday.getMonth()+1) + '/' + monday.getDate() + ' ~ ' + (last.getMonth()+1) + '/' + last.getDate();
+    const dayNames = ['일','월','화','수','목','금','토'];
+    list.innerHTML = visits.map(r => {
+      const d = new Date(r[0]);
+      const dateStr = (d.getMonth()+1) + '/' + d.getDate() + ' (' + dayNames[d.getDay()] + ')';
+      const grade = shortGrade(r[3]);
+      return `<div class="visit-item">
+        <span class="visit-date">${dateStr}</span>
+        <span class="visit-time">${r[1] || '미정'}</span>
+        <span class="visit-name">${escapeHtml(r[2])}</span>
+        <span class="visit-grade">${grade}</span>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    document.getElementById('visit-list').innerHTML = '<div class="visit-empty">로드 실패</div>';
+  }
 }
 
 function shortGrade(g) {
+  if (!g) return '';
   if (g.includes('초등')) { const m = g.match(/(\d.*\d)|(\d)/); return m ? '초' + m[0] : '초'; }
   if (g.includes('중')) return '중';
   if (g.includes('고')) return '고';
   return g;
 }
 
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
 function formatDate(d) {
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// 모바일 스와이프 도트
+const layout = document.getElementById('layout');
+if (layout) {
+  layout.addEventListener('scroll', () => {
+    const idx = Math.round(layout.scrollLeft / window.innerWidth);
+    document.querySelectorAll('.swipe-dot').forEach((d,i) => d.classList.toggle('active', i===idx));
+  });
 }
 
 loadAll();
