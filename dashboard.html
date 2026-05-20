@@ -10,7 +10,6 @@ body { background: #f8f9fa; padding: 0; }
 .layout { display: grid; grid-template-columns: minmax(380px, 1fr) minmax(0, 1.5fr); gap: 16px; max-width: 1600px; margin: 0 auto; padding: 8px 14px; }
 @media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } }
 
-/* === 좌측 (컴팩트) === */
 .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .title { font-size: 14px; font-weight: 600; color: #1a1a1a; }
 .updated { font-size: 10px; color: #999; margin-top: 2px; }
@@ -23,6 +22,7 @@ body { background: #f8f9fa; padding: 0; }
 .section-label .badge.pay { background: #f3e8ff; color: #7c3aed; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
 .card { background: white; border-radius: 8px; padding: 10px 6px; text-align: center; border: 1px solid #eee; }
 .clabel { font-size: 10px; color: #888; margin-bottom: 4px; }
 .cval { font-size: 19px; font-weight: 600; color: #1a1a1a; }
@@ -31,15 +31,15 @@ body { background: #f8f9fa; padding: 0; }
 .cval.red { color: #ea4335; }
 .cval.amber { color: #f4b400; }
 .cval.purple { color: #9333ea; }
+.cval.orange { color: #f97316; }
+.cval.pink { color: #ec4899; }
 .cval.sm { font-size: 15px; }
+.cval.xs { font-size: 13px; }
 
-/* === 우측 캘린더 === */
 .cal-panel { background: white; border: 1px solid #eee; border-radius: 8px; padding: 14px; }
 .cal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #f0f0f0; }
 .cal-title { font-size: 13px; font-weight: 600; color: #1a1a1a; }
 .cal-range { font-size: 10px; color: #999; }
-
-/* 캘린더 그리드 */
 .cal-week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 6px; }
 .cal-week:last-child { margin-bottom: 0; }
 .cal-day { background: #fafbfc; border: 1px solid #eef0f3; border-radius: 6px; padding: 6px; min-height: 90px; display: flex; flex-direction: column; }
@@ -47,16 +47,13 @@ body { background: #f8f9fa; padding: 0; }
 .cal-day.weekend { background: #fdf6f6; }
 .cal-day.weekend.today { background: #e8f0fe; }
 .cal-day.past { opacity: 0.4; }
-.cal-day.other-month { opacity: 0.3; background: #fafbfc; }
-.cal-day.other-month .cal-date .num { color: #bbb; }
-
+.cal-day.other-month { opacity: 0.3; }
 .cal-date { font-size: 10px; color: #888; margin-bottom: 4px; font-weight: 600; display: flex; justify-content: space-between; align-items: baseline; }
 .cal-date .num { font-size: 13px; color: #333; }
 .cal-day.today .cal-date .num { color: #1a73e8; }
 .cal-day.weekend .cal-date .num { color: #ea4335; }
 .cal-day.weekend.today .cal-date .num { color: #1a73e8; }
 .cal-date .dow { font-size: 9px; color: #aaa; }
-
 .cal-event { font-size: 10px; padding: 2px 4px; margin-bottom: 2px; background: white; border-left: 2px solid #0f9d58; border-radius: 3px; line-height: 1.3; }
 .cal-events-wrap { display: contents; }
 .cal-event.order { border-left-color: #9333ea; }
@@ -67,53 +64,12 @@ body { background: #f8f9fa; padding: 0; }
 .cal-event-grade { color: #999; font-size: 9px; }
 .cal-event-sales { color: #9333ea; font-size: 9px; font-weight: 600; }
 
-/* === 모바일 리스트 모드 === */
 @media (max-width: 700px) {
   .layout { padding: 6px 8px; }
-  
-  /* 캘린더 그리드 → 세로 리스트로 전환 */
-  .cal-week { display: block; margin-bottom: 0; }
-  .cal-day { 
-    min-height: 0; 
-    margin-bottom: 6px; 
-    padding: 8px 10px; 
-    flex-direction: row; 
-    align-items: flex-start; 
-    gap: 10px; 
-  }
-  
-  /* 일정 없는 날 + 다른 달 날짜 숨김 (모바일) */
-  .cal-day.empty { display: none; }
-  .cal-day.other-month { display: none; }
-  
-  .cal-date { 
-    margin-bottom: 0; 
-    flex-direction: column; 
-    min-width: 44px; 
-    align-items: center; 
-    text-align: center; 
-    flex-shrink: 0;
-  }
-  .cal-date .num { font-size: 14px; }
-  .cal-date .dow { font-size: 10px; margin-top: 2px; }
-  
-  .cal-events-wrap { flex: 1; display: flex; flex-direction: column; gap: 3px; }
-  .cal-event { 
-    font-size: 12px; 
-    padding: 5px 8px; 
-    margin-bottom: 0; 
-    display: flex; 
-    align-items: center; 
-    gap: 6px; 
-    flex-wrap: wrap;
-  }
-  .cal-event-time, .cal-event-tag { font-size: 11px; }
-  .cal-event-grade { display: inline; margin-left: 4px; }
-  .cal-event-sales { display: inline; margin-left: auto; }
-  
-  /* 좌측 카드도 살짝 크게 (모바일 가독성) */
+  .cal-panel { display: none; }
   .cval { font-size: 22px; }
   .cval.sm { font-size: 17px; }
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
 }
 </style>
 </head>
@@ -121,9 +77,7 @@ body { background: #f8f9fa; padding: 0; }
 
 <div class="layout">
 
-<!-- 좌측: 통계 -->
 <div>
-
 <div class="header">
   <div>
     <div class="title">아라온스쿨 리드 현황</div>
@@ -159,15 +113,34 @@ body { background: #f8f9fa; padding: 0; }
   <div class="card"><div class="clabel">누적</div><div class="cval sm" id="sales-all">-</div></div>
 </div>
 
-<div class="section-label">리드 출처 <span class="badge">이번달 / 전체</span></div>
+<div class="section-label">📊 전환 <span class="badge">이번달 / 전체</span></div>
 <div class="grid-2">
-  <div class="card"><div class="clabel">아라위키</div><div class="cval blue sm" id="src-ara">-</div></div>
-  <div class="card"><div class="clabel">오디플랜</div><div class="cval green sm" id="src-odi">-</div></div>
+  <div class="card"><div class="clabel">신청→방문</div><div class="cval amber xs" id="conv-visit">-</div></div>
+  <div class="card"><div class="clabel">신청→오더</div><div class="cval green xs" id="conv-order">-</div></div>
+</div>
+
+<div class="section-label">🎓 학년별 <span class="badge">이번달 / 전체</span></div>
+<div class="grid-3">
+  <div class="card"><div class="clabel">초등</div><div class="cval blue xs" id="grade-elem">-</div></div>
+  <div class="card"><div class="clabel">중학</div><div class="cval green xs" id="grade-mid">-</div></div>
+  <div class="card"><div class="clabel">고등</div><div class="cval amber xs" id="grade-high">-</div></div>
+</div>
+
+<div class="section-label">🛤️ 유입경로별 <span class="badge">이번달 / 전체</span></div>
+<div class="grid-4">
+  <div class="card"><div class="clabel">인스타그램</div><div class="cval purple xs" id="route-insta">-</div></div>
+  <div class="card"><div class="clabel">페이스북</div><div class="cval blue xs" id="route-fb">-</div></div>
+  <div class="card"><div class="clabel">당근</div><div class="cval orange xs" id="route-daangn">-</div></div>
+  <div class="card"><div class="clabel">브랜드</div><div class="cval pink xs" id="route-brand">-</div></div>
+  <div class="card"><div class="clabel">CPA</div><div class="cval red xs" id="route-cpa">-</div></div>
+  <div class="card"><div class="clabel">유튜브</div><div class="cval red xs" id="route-yt">-</div></div>
+  <div class="card"><div class="clabel">지인소개</div><div class="cval green xs" id="route-ref">-</div></div>
+  <div class="card"><div class="clabel">네이버검색</div><div class="cval blue xs" id="route-naver">-</div></div>
+  <div class="card"><div class="clabel">기타</div><div class="cval xs" id="route-etc">-</div></div>
 </div>
 
 </div>
 
-<!-- 우측: 2주 캘린더 -->
 <div class="cal-panel">
   <div class="cal-head">
     <div class="cal-title">📅 방문 · 오더</div>
@@ -189,8 +162,11 @@ let inflowData = [];
 let payOrderData = [];
 let salesData = [];
 let rateData = [];
-let sourceData = [];
+let convData = [];
+let gradeData = [];
+let routeData = [];
 let currentTab = 0;
+
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1438610573&single=true&output=csv';
 const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1384080283&single=true&output=csv';
 
@@ -204,22 +180,41 @@ async function loadData() {
     const res = await fetch(CSV_URL);
     const text = await res.text();
     const allRows = text.trim().split('\n').map(r => r.split(',').map(c => c.trim()));
-    
-    inflowData   = allRows.slice(1, 4);
-    payOrderData = allRows[6];
-    salesData    = allRows.slice(9, 12);
-    rateData     = allRows[14];
-    sourceData   = allRows.slice(17, 19);
-    
+
+    inflowData   = allRows.slice(1, 4);   // 2~4행
+    payOrderData = allRows[6];             // 7행
+    salesData    = allRows.slice(9, 12);  // 10~12행
+    rateData     = allRows[14];            // 15행 (전환율 - 미사용)
+    convData     = allRows.slice(14, 16); // 15~16행: 신청→방문, 신청→오더
+    gradeData    = allRows.slice(22, 25); // 23~25행
+    routeData    = allRows.slice(27, 36); // 28~36행
+
     render();
-    
+
+    // 매출
     if (salesData[0]) document.getElementById('sales-month').textContent = salesData[0][1] || '-';
-    if (salesData[1]) document.getElementById('sales-last').textContent = salesData[1][1] || '-';
-    if (salesData[2]) document.getElementById('sales-all').textContent = salesData[2][1] || '-';
+    if (salesData[1]) document.getElementById('sales-last').textContent  = salesData[1][1] || '-';
+    if (salesData[2]) document.getElementById('sales-all').textContent   = salesData[2][1] || '-';
+
+    // 전환율 (이번달)
     if (rateData) document.getElementById('rate-month').textContent = rateData[1] || '-';
-    if (sourceData[0]) document.getElementById('src-ara').textContent = (sourceData[0][1]||'0') + ' / ' + (sourceData[0][2]||'0');
-    if (sourceData[1]) document.getElementById('src-odi').textContent = (sourceData[1][1]||'0') + ' / ' + (sourceData[1][2]||'0');
-    
+
+    // 전환 건수
+    if (convData[0]) document.getElementById('conv-visit').textContent = (convData[0][1]||'0') + ' / ' + (convData[0][2]||'0');
+    if (convData[1]) document.getElementById('conv-order').textContent = (convData[1][1]||'0') + ' / ' + (convData[1][2]||'0');
+
+    // 학년별
+    if (gradeData[0]) document.getElementById('grade-elem').textContent = (gradeData[0][1]||'0') + ' / ' + (gradeData[0][2]||'0');
+    if (gradeData[1]) document.getElementById('grade-mid').textContent  = (gradeData[1][1]||'0') + ' / ' + (gradeData[1][2]||'0');
+    if (gradeData[2]) document.getElementById('grade-high').textContent = (gradeData[2][1]||'0') + ' / ' + (gradeData[2][2]||'0');
+
+    // 유입경로별
+    const routeIds = ['route-insta','route-fb','route-daangn','route-brand','route-cpa','route-yt','route-ref','route-naver','route-etc'];
+    routeIds.forEach((id, i) => {
+      const row = routeData[i];
+      if (row) document.getElementById(id).textContent = (row[1]||'0') + ' / ' + (row[2]||'0');
+    });
+
     const now = new Date();
     document.getElementById('updated').textContent = '업데이트: ' + now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
   } catch(e) {
@@ -244,26 +239,16 @@ function render() {
   }
 }
 
-// ===== 캘린더 =====
 async function loadSchedule() {
   const body = document.getElementById('cal-body');
   try {
     const res = await fetch(SCHEDULE_CSV_URL);
     const text = await res.text();
     const rows = text.trim().split('\n').map(r => r.split(',').map(c => c.trim()));
-    rows.shift(); // 헤더 제거
-    
-    const events = rows
-      .filter(r => r[0])
-      .map(r => ({ 
-        date: r[0], 
-        time: r[1] || '', 
-        name: r[2] || '', 
-        grade: r[3] || '',
-        type: r[4] || 'visit',
-        sales: r[5] || ''
-      }));
-    
+    rows.shift();
+    const events = rows.filter(r => r[0]).map(r => ({
+      date: r[0], time: r[1]||'', name: r[2]||'', grade: r[3]||'', type: r[4]||'visit', sales: r[5]||''
+    }));
     renderCalendar(events);
   } catch(e) {
     body.innerHTML = '<div style="text-align:center; color:#ea4335; font-size:12px; padding:30px 0;">일정 로드 실패</div>';
@@ -272,27 +257,19 @@ async function loadSchedule() {
 
 function renderCalendar(events) {
   const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
-  // 이번 주 월요일 찾기
+  today.setHours(0,0,0,0);
   const dow = today.getDay();
   const monday = new Date(today);
   monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
-  
-  // 2주치 = 14일
   const dayNames = ['일','월','화','수','목','금','토'];
   const todayStr = formatDate(today);
-  
-  // 날짜별 이벤트 그룹
   const eventsByDate = {};
   events.forEach(e => {
     if (!eventsByDate[e.date]) eventsByDate[e.date] = [];
     eventsByDate[e.date].push(e);
   });
-  
+
   let html = '';
-  
-  // 2주 (각 주 7일)
   for (let week = 0; week < 2; week++) {
     html += '<div class="cal-week">';
     for (let d = 0; d < 7; d++) {
@@ -300,72 +277,48 @@ function renderCalendar(events) {
       day.setDate(monday.getDate() + week * 7 + d);
       const dStr = formatDate(day);
       const dayDow = day.getDay();
-      
-      const isToday = dStr === todayStr;
+      const isToday   = dStr === todayStr;
       const isWeekend = dayDow === 0 || dayDow === 6;
-      const isPast = day < today;
-      
+      const isPast    = day < today;
+      const dayEvents = eventsByDate[dStr] || [];
+
       let classes = 'cal-day';
-      if (isToday) classes += ' today';
+      if (isToday)   classes += ' today';
       if (isWeekend) classes += ' weekend';
       if (isPast && !isToday) classes += ' past';
-      
-      const dayEvents = eventsByDate[dStr] || [];
       if (dayEvents.length === 0) classes += ' empty';
-      
+
       html += '<div class="' + classes + '">';
-      html += '<div class="cal-date">';
-      html += '<span class="num">' + (day.getMonth()+1) + '/' + day.getDate() + '</span>';
-      html += '<span class="dow">' + dayNames[dayDow] + '</span>';
-      html += '</div>';
-      
+      html += '<div class="cal-date"><span class="num">' + (day.getMonth()+1) + '/' + day.getDate() + '</span><span class="dow">' + dayNames[dayDow] + '</span></div>';
       html += '<div class="cal-events-wrap">';
       dayEvents.forEach(e => {
-        const eventClass = e.type === 'order' ? 'cal-event order' : 'cal-event';
-        html += '<div class="' + eventClass + '">';
-        
+        const ec = e.type === 'order' ? 'cal-event order' : 'cal-event';
+        html += '<div class="' + ec + '">';
         if (e.type === 'order') {
-          html += '<span class="cal-event-tag">💰</span>';
-          html += '<span class="cal-event-name">' + escapeHtml(e.name) + '</span>';
-          if (e.sales) {
-            html += '<span class="cal-event-sales">' + escapeHtml(e.sales) + '</span>';
-          }
+          html += '<span class="cal-event-tag">💰</span><span class="cal-event-name">' + escapeHtml(e.name) + '</span>';
+          if (e.sales) html += '<span class="cal-event-sales">' + escapeHtml(e.sales) + '</span>';
         } else {
-          if (e.time) {
-            html += '<span class="cal-event-time">' + e.time + '</span>';
-          } else {
-            html += '<span class="cal-event-time notime">미정</span>';
-          }
+          html += e.time
+            ? '<span class="cal-event-time">' + e.time + '</span>'
+            : '<span class="cal-event-time notime">미정</span>';
           html += '<span class="cal-event-name">' + escapeHtml(e.name) + '</span>';
-          if (e.grade) {
-            html += '<span class="cal-event-grade">' + escapeHtml(shortGrade(e.grade)) + '</span>';
-          }
+          if (e.grade) html += '<span class="cal-event-grade">' + escapeHtml(shortGrade(e.grade)) + '</span>';
         }
-        
         html += '</div>';
       });
-      html += '</div>';
-      
-      html += '</div>';
+      html += '</div></div>';
     }
     html += '</div>';
   }
-  
+
   document.getElementById('cal-body').innerHTML = html;
-  
-  // 범위 라벨
   const last = new Date(monday);
   last.setDate(monday.getDate() + 13);
-  const rangeLabel = (monday.getMonth()+1) + '/' + monday.getDate() + ' ~ ' + (last.getMonth()+1) + '/' + last.getDate();
-  document.getElementById('cal-range').textContent = rangeLabel;
+  document.getElementById('cal-range').textContent = (monday.getMonth()+1) + '/' + monday.getDate() + ' ~ ' + (last.getMonth()+1) + '/' + last.getDate();
 }
 
 function shortGrade(g) {
-  // "초등_4~6학년" → "초4~6", "중학생" → "중", "고등학생" → "고"
-  if (g.includes('초등')) {
-    const m = g.match(/(\d.*\d)|(\d)/);
-    return m ? '초' + m[0] : '초';
-  }
+  if (g.includes('초등')) { const m = g.match(/(\d.*\d)|(\d)/); return m ? '초' + m[0] : '초'; }
   if (g.includes('중')) return '중';
   if (g.includes('고')) return '고';
   return g;
