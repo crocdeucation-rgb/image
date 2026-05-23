@@ -236,13 +236,12 @@ function render() {
   document.getElementById('v-today').textContent = allRows[1]?.[1]  || '-';
   document.getElementById('v-drop').textContent  = allRows[2]?.[col] || '-';
 
-  document.getElementById('conv-visit').textContent = allRows[16]?.[convCol] || '-';
   document.getElementById('v-visitdone').textContent = allRows[5]?.[col] || '0';
   document.getElementById('v-visitplan').textContent = allRows[6]?.[col] || '0';
   document.getElementById('v-order').textContent     = allRows[7]?.[col] || '0';
-  const vd = parseInt(allRows[5]?.[col]) || 0;
-  const vo = parseInt(allRows[7]?.[col]) || 0;
-  document.getElementById('v-kulbo').textContent = vd - vo;
+  document.getElementById('v-kulbo').textContent     = allRows[8]?.[col] || '0';
+
+  document.getElementById('conv-visit').textContent = allRows[16]?.[convCol] || '-';
   document.getElementById('conv-order').textContent = allRows[17]?.[convCol] || '-';
 
   document.getElementById('grade-elem').textContent  = allRows[26]?.[convCol] || '-';
