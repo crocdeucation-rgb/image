@@ -293,8 +293,8 @@ async function loadSchedule() {
 function shortGrade(g) {
   if (!g) return '';
   if (g.includes('초')) { const m = g.match(/\d+/); return m ? '초'+m[0] : '초'; }
-  if (g.includes('중')) return '중';
-  if (g.includes('고')) return '고';
+  if (g.includes('중')) { const m = g.match(/\d+/); return m ? '중'+m[0] : '중'; }
+  if (g.includes('고')) { const m = g.match(/\d+/); return m ? '고'+m[0] : '고'; }
   return g;
 }
 
