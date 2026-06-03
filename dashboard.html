@@ -82,6 +82,10 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 .cval.sm  { font-size: 15px; }
 .cval.xs  { font-size: 12px; }
 
+/* 합계 카드 강조 */
+.card.total { background: #f0f4ff; border-color: #c7d4f5; }
+.card.total .clabel { color: #1a73e8; font-weight: 700; }
+
 /* 퍼널 테이블 */
 .funnel-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; border: 1px solid #eee; font-size: 11px; }
 .funnel-table th { background: #f0f4ff; color: #1a73e8; font-weight: 700; padding: 8px 6px; text-align: center; border-bottom: 1px solid #e0e8ff; white-space: nowrap; }
@@ -101,6 +105,9 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 .visit-panel { background: white; border-radius: 8px; border: 1px solid #eee; overflow: hidden; }
 .visit-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #f8f8f8; }
 .visit-item:last-child { border-bottom: none; }
+.visit-item.today { background: #fff8e1; border-left: 3px solid #f4b400; }
+.visit-item.today .visit-date { color: #e65100; font-weight: 700; }
+.visit-item.today .visit-name { color: #1a1a1a; font-weight: 700; }
 .visit-date { font-size: 11px; font-weight: 600; color: #1a73e8; min-width: 52px; }
 .visit-time { font-size: 11px; color: #0f9d58; min-width: 44px; }
 .visit-name { font-size: 12px; color: #1a1a1a; font-weight: 500; }
@@ -131,17 +138,24 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
   <button class="refresh" onclick="loadAll()">새로고침</button>
 </div>
 
-<div class="tabs">
+<div class="section-label" style="margin-top:0;">매출 <span class="badge pay">결제일 기준</span></div>
+<div class="grid-3">
+  <div class="card"><div class="clabel">이번 달</div><div class="cval purple sm" id="sales-month">-</div></div>
+  <div class="card"><div class="clabel">지난 달</div><div class="cval sm" id="sales-last">-</div></div>
+  <div class="card"><div class="clabel">누적</div><div class="cval sm" id="sales-all">-</div></div>
+</div>
+
+<div class="tabs" style="margin-top:14px;">
   <button class="tab active" onclick="setTab(0)">이번달</button>
   <button class="tab" onclick="setTab(1)">지난달</button>
   <button class="tab" onclick="setTab(2)">전체</button>
 </div>
 
-<div class="section-label">매출 <span class="badge pay">결제일 기준</span></div>
+<div class="section-label" style="margin-top:0;">유입 현황 <span class="badge" id="inflow-label">이번달</span></div>
 <div class="grid-3">
-  <div class="card"><div class="clabel">이번 달</div><div class="cval purple sm" id="sales-month">-</div></div>
-  <div class="card"><div class="clabel">지난 달</div><div class="cval sm" id="sales-last">-</div></div>
-  <div class="card"><div class="clabel">누적</div><div class="cval sm" id="sales-all">-</div></div>
+  <div class="card"><div class="clabel">총 유입</div><div class="cval blue sm" id="v-total">-</div></div>
+  <div class="card"><div class="clabel">오늘 유입</div><div class="cval amber sm" id="v-today">-</div></div>
+  <div class="card"><div class="clabel">이탈</div><div class="cval red sm" id="v-drop">-</div></div>
 </div>
 
 <div class="section-label">담당자별 퍼널 <span class="badge today" id="tab-label">이번달</span></div>
@@ -161,14 +175,6 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
     <tr><td colspan="7" style="color:#aaa;text-align:center;padding:16px;">불러오는 중...</td></tr>
   </tbody>
 </table>
-
-<div class="section-label">오늘 현황 <span class="badge today">실시간</span></div>
-<div class="grid-4">
-  <div class="card"><div class="clabel">오늘 유입</div><div class="cval blue sm" id="v-today">-</div></div>
-  <div class="card"><div class="clabel">방문완료</div><div class="cval amber sm" id="t-visitdone">-</div></div>
-  <div class="card"><div class="clabel">방문예정</div><div class="cval green sm" id="t-visitplan">-</div></div>
-  <div class="card"><div class="clabel">오더</div><div class="cval purple sm" id="t-order">-</div></div>
-</div>
 </div>
 
 <!-- 섹션2: 유입경로 분석 -->
@@ -182,17 +188,19 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 </div>
 
 <div class="section-label" style="margin-top:0;">학년별</div>
-<div class="grid-3">
+<div class="grid-4">
   <div class="card"><div class="clabel">초등</div><div class="cval blue xs" id="grade-elem">-</div></div>
   <div class="card"><div class="clabel">중등</div><div class="cval green xs" id="grade-mid">-</div></div>
   <div class="card"><div class="clabel">고등</div><div class="cval amber xs" id="grade-high">-</div></div>
+  <div class="card total"><div class="clabel">합계</div><div class="cval xs" id="grade-total">-</div></div>
 </div>
 
 <div class="section-label">리드출처</div>
-<div class="grid-3">
+<div class="grid-4">
   <div class="card"><div class="clabel">아라위키</div><div class="cval blue xs" id="src-arawiki">-</div></div>
   <div class="card"><div class="clabel">오디플랜</div><div class="cval green xs" id="src-odi">-</div></div>
   <div class="card"><div class="clabel">브랜드</div><div class="cval pink xs" id="src-brand">-</div></div>
+  <div class="card total"><div class="clabel">합계</div><div class="cval xs" id="src-total">-</div></div>
 </div>
 
 <div class="section-label">유입경로별</div>
@@ -206,6 +214,7 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
   <div class="card"><div class="clabel">지인소개</div><div class="cval green xs" id="route-ref">-</div></div>
   <div class="card"><div class="clabel">네이버검색</div><div class="cval blue xs" id="route-naver">-</div></div>
   <div class="card"><div class="clabel">기타</div><div class="cval xs" id="route-etc">-</div></div>
+  <div class="card total" style="grid-column:span 3;"><div class="clabel">합계</div><div class="cval xs" id="route-total">-</div></div>
 </div>
 </div>
 
@@ -228,7 +237,7 @@ const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk
 const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1384080283&single=true&output=csv';
 
 const ASSIGNEES = ['우혜림', '엄현호', '김윤호', '장윤호'];
-const ASSIGNEE_START_IDX = 47; // 0-indexed: row 48 in sheet (header), data starts at 48
+const ASSIGNEE_START_IDX = 47;
 
 function showSec(idx) {
   currentSec = idx;
@@ -264,23 +273,23 @@ function setTab(idx) {
 }
 
 function render() {
-  const col = currentTab + 2;
+  const col = currentTab + 2;          // 시트 컬럼: 이번달=2, 지난달=3, 전체=4
   const convCol = currentTab + 1;
   const tabName = ['이번달','지난달','전체'][currentTab];
   document.getElementById('tab-label').textContent = tabName;
+  document.getElementById('inflow-label').textContent = tabName;
 
   // 매출 (고정)
   document.getElementById('sales-month').textContent = allRows[11]?.[1] || '-';
   document.getElementById('sales-last').textContent  = allRows[12]?.[1] || '-';
   document.getElementById('sales-all').textContent   = allRows[13]?.[1] || '-';
 
-  // 오늘 현황 (탭 무관, 항상 오늘)
-  document.getElementById('v-today').textContent     = allRows[1]?.[1] || '0';
-  document.getElementById('t-visitdone').textContent = allRows[5]?.[1] || '0';
-  document.getElementById('t-visitplan').textContent = allRows[6]?.[1] || '0';
-  document.getElementById('t-order').textContent     = allRows[7]?.[1] || '0';
+  // 유입 현황 (탭별)
+  document.getElementById('v-total').textContent = allRows[1]?.[col] || '0';
+  document.getElementById('v-today').textContent = allRows[1]?.[1]   || '0';  // 오늘은 고정
+  document.getElementById('v-drop').textContent  = allRows[2]?.[col] || '0';
 
-  // 담당자별 퍼널 (탭별 컬럼: 이번달 1-4, 지난달 5-8, 전체 9-12)
+  // 담당자별 퍼널 (시트: 이번달 1-4, 지난달 5-8, 전체 9-12)
   const offset = currentTab * 4 + 1;
   const tbody = document.getElementById('funnel-tbody');
   let totalDb = 0, totalVisit = 0, totalOrder = 0, totalSalesNum = 0;
@@ -306,7 +315,6 @@ function render() {
       <td class="rate">${orderRate}%</td>
     </tr>`;
   });
-  // 합계 행
   const totVisitRate = totalDb ? Math.round(totalVisit/totalDb*100) : 0;
   const totOrderRate = totalVisit ? Math.round(totalOrder/totalVisit*100) : 0;
   const totSalesStr = totalSalesNum >= 10000 ? Math.round(totalSalesNum/10000) + '만원' : totalSalesNum + '원';
@@ -325,17 +333,21 @@ function render() {
   document.getElementById('grade-elem').textContent  = allRows[26]?.[convCol] || '-';
   document.getElementById('grade-mid').textContent   = allRows[27]?.[convCol] || '-';
   document.getElementById('grade-high').textContent  = allRows[28]?.[convCol] || '-';
+  document.getElementById('grade-total').textContent = allRows[30]?.[convCol] || '-';
 
   // 리드출처
   document.getElementById('src-arawiki').textContent = allRows[20]?.[convCol] || '-';
   document.getElementById('src-odi').textContent     = allRows[21]?.[convCol] || '-';
   document.getElementById('src-brand').textContent   = allRows[22]?.[convCol] || '-';
+  document.getElementById('src-total').textContent   = allRows[23]?.[convCol] || '-';
 
   // 유입경로별
   const routeIds = ['route-insta','route-fb','route-daangn','route-brand','route-cpa','route-yt','route-ref','route-naver','route-etc'];
   routeIds.forEach((id, i) => {
     document.getElementById(id).textContent = allRows[33+i]?.[convCol] || '-';
   });
+  // 유입경로 합계 (시트 sumRow는 row 46 = index 45)
+  document.getElementById('route-total').textContent = allRows[45]?.[convCol] || '-';
 }
 
 async function loadSchedule() {
@@ -346,6 +358,7 @@ async function loadSchedule() {
     rows.shift();
     const today = new Date();
     today.setHours(0,0,0,0);
+    const todayStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
     const visits = rows
       .filter(r => r[0] && r[4] === 'visit')
       .filter(r => new Date(r[0]) >= today)
@@ -359,12 +372,14 @@ async function loadSchedule() {
     const dayNames = ['일','월','화','수','목','금','토'];
     list.innerHTML = visits.map(r => {
       const d = new Date(r[0]);
+      const dStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+      const isToday = dStr === todayStr;
       const dateStr = (d.getMonth()+1) + '/' + d.getDate() + ' (' + dayNames[d.getDay()] + ')';
       const assignee = r[6] || '';
       const assigneeClass = assignee === '우혜림' ? 'visit-assignee hye' : 'visit-assignee';
       const assigneeHtml = assignee ? `<span class="${assigneeClass}">${escapeHtml(assignee)}</span>` : '';
-      return `<div class="visit-item">
-        <span class="visit-date">${dateStr}</span>
+      return `<div class="visit-item${isToday ? ' today' : ''}">
+        <span class="visit-date">${isToday ? '🔥 오늘' : dateStr}</span>
         <span class="visit-time">${r[1] || '미정'}</span>
         <span class="visit-name">${escapeHtml(r[2])}</span>
         <span class="visit-grade">${shortGrade(r[3])}</span>
