@@ -204,14 +204,14 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 <div class="grid-4">
   <div class="card"><div class="clabel">인스타그램</div><div class="cval purple xs" id="route-insta">-</div></div>
   <div class="card"><div class="clabel">페이스북</div><div class="cval blue xs" id="route-fb">-</div></div>
-  <div class="card"><div class="clabel">카카오</div><div class="cval amber xs" id="route-kakao">-</div></div>
   <div class="card"><div class="clabel">당근</div><div class="cval orange xs" id="route-daangn">-</div></div>
+  <div class="card"><div class="clabel">카카오</div><div class="cval amber xs" id="route-kakao">-</div></div>
   <div class="card"><div class="clabel">네이버검색</div><div class="cval blue xs" id="route-naver">-</div></div>
   <div class="card"><div class="clabel">CPA</div><div class="cval red xs" id="route-cpa">-</div></div>
   <div class="card"><div class="clabel">기타</div><div class="cval xs" id="route-etc">-</div></div>
 </div>
 
-<div class="section-label">캠페인별 <span class="badge">Top 20</span></div>
+<div class="section-label">캠페인별 <span class="badge">Top 5</span></div>
 <table class="campaign-table">
   <thead>
     <tr>
@@ -346,11 +346,11 @@ function render() {
   document.getElementById('grade-mid').textContent   = allRows[27]?.[convCol] || '-';
   document.getElementById('grade-high').textContent  = allRows[28]?.[convCol] || '-';
 
-  // 유입경로별 (시트 순서: 인스타/페북/카카오/당근/네이버/CPA/기타)
+  // 유입경로별 (시트 순서: 인스타/페북/당근/카카오/네이버/CPA/기타)
   document.getElementById('route-insta').textContent  = allRows[33]?.[convCol] || '-';
   document.getElementById('route-fb').textContent     = allRows[34]?.[convCol] || '-';
-  document.getElementById('route-kakao').textContent  = allRows[35]?.[convCol] || '-';
-  document.getElementById('route-daangn').textContent = allRows[36]?.[convCol] || '-';
+  document.getElementById('route-daangn').textContent = allRows[35]?.[convCol] || '-';
+  document.getElementById('route-kakao').textContent  = allRows[36]?.[convCol] || '-';
   document.getElementById('route-naver').textContent  = allRows[37]?.[convCol] || '-';
   document.getElementById('route-cpa').textContent    = allRows[38]?.[convCol] || '-';
   document.getElementById('route-etc').textContent    = allRows[39]?.[convCol] || '-';
