@@ -241,7 +241,7 @@ async function loadData() {
 
     // 담당자별 실적 (이번달 기준, 시트 row 49~50 = index 48~49)
     const tbody = document.getElementById('assignee-tbody');
-    const assigneeNames = ['우혜림', '엄현호'];
+    const assigneeNames = ['우혜림', '엄현호', '김윤호', '장윤호'];
     const rows = assigneeNames.map((name, i) => {
       const r = allRows[48 + i] || [];
       return `<tr>
