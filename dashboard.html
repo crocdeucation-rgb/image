@@ -18,9 +18,7 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
   .sec-nav { display: flex; justify-content: center; gap: 6px; margin-bottom: 8px; }
   .sec-nav-btn { padding: 4px 12px; font-size: 11px; border-radius: 16px; border: 1px solid #ddd; background: white; color: #666; cursor: pointer; }
   .sec-nav-btn.active { background: #1a73e8; color: white; border-color: #1a73e8; }
-  .funnel-table th, .funnel-table td { font-size: 10px !important; padding: 5px 4px !important; }
-  .funnel-table .num { font-size: 11px !important; }
-  .funnel-table .sales { font-size: 10px !important; }
+  .funnel-table th, .funnel-table td, .campaign-table th, .campaign-table td { font-size: 10px !important; padding: 5px 4px !important; }
   .cval { font-size: 16px !important; }
   .cval.sm { font-size: 13px !important; }
   .cval.xs { font-size: 11px !important; }
@@ -82,10 +80,6 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 .cval.sm  { font-size: 15px; }
 .cval.xs  { font-size: 12px; }
 
-/* 합계 카드 강조 */
-.card.total { background: #f0f4ff; border-color: #c7d4f5; }
-.card.total .clabel { color: #1a73e8; font-weight: 700; }
-
 /* 퍼널 테이블 */
 .funnel-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; border: 1px solid #eee; font-size: 11px; }
 .funnel-table th { background: #f0f4ff; color: #1a73e8; font-weight: 700; padding: 8px 6px; text-align: center; border-bottom: 1px solid #e0e8ff; white-space: nowrap; }
@@ -100,6 +94,15 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 .funnel-table td.num.order { color: #0f9d58; }
 .funnel-table td.sales { color: #9333ea; font-weight: 700; font-size: 12px; }
 .funnel-table td.rate { color: #888; font-size: 10px; }
+
+/* 캠페인 테이블 */
+.campaign-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; border: 1px solid #eee; font-size: 11px; }
+.campaign-table th { background: #fff3e0; color: #e65100; font-weight: 700; padding: 7px 8px; text-align: left; border-bottom: 1px solid #ffe0b2; }
+.campaign-table th.num { text-align: center; }
+.campaign-table td { padding: 7px 8px; border-bottom: 1px solid #f5f5f5; color: #1a1a1a; }
+.campaign-table tr:last-child td { border-bottom: none; }
+.campaign-table td.name { color: #444; font-size: 10px; word-break: break-all; }
+.campaign-table td.num { text-align: center; font-weight: 600; color: #1a73e8; font-size: 12px; }
 
 /* 방문 스케줄 */
 .visit-panel { background: white; border-radius: 8px; border: 1px solid #eee; overflow: hidden; }
@@ -123,16 +126,16 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 <body>
 
 <div class="sec-nav">
-  <button class="sec-nav-btn active" onclick="showSec(0)">📊 퍼널</button>
-  <button class="sec-nav-btn" onclick="showSec(1)">🔍 분석</button>
-  <button class="sec-nav-btn" onclick="showSec(2)">📅 방문</button>
+  <button class="sec-nav-btn active" onclick="showSec(0)">퍼널</button>
+  <button class="sec-nav-btn" onclick="showSec(1)">분석</button>
+  <button class="sec-nav-btn" onclick="showSec(2)">방문</button>
 </div>
 
 <div class="layout" id="layout">
 
 <!-- 섹션1: 퍼널 -->
 <div class="section active" id="sec1">
-<div class="sec-title blue">📊 아라온스쿨 퍼널</div>
+<div class="sec-title blue">아라온스쿨 퍼널</div>
 <div class="header">
   <div>
     <div class="title">담당자별 실적 + 전체 합계</div>
@@ -182,7 +185,7 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 
 <!-- 섹션2: 유입경로 분석 -->
 <div class="section" id="sec2">
-<div class="sec-title green">🔍 유입경로 분석</div>
+<div class="sec-title green">유입경로 분석</div>
 
 <div class="tabs">
   <button class="tab active" onclick="setTab(0)">이번달</button>
@@ -191,39 +194,42 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 </div>
 
 <div class="section-label" style="margin-top:0;">학년별</div>
-<div class="grid-4">
+<div class="grid-3">
   <div class="card"><div class="clabel">초등</div><div class="cval blue xs" id="grade-elem">-</div></div>
   <div class="card"><div class="clabel">중등</div><div class="cval green xs" id="grade-mid">-</div></div>
   <div class="card"><div class="clabel">고등</div><div class="cval amber xs" id="grade-high">-</div></div>
-  <div class="card total"><div class="clabel">합계</div><div class="cval xs" id="grade-total">-</div></div>
-</div>
-
-<div class="section-label">리드출처</div>
-<div class="grid-4">
-  <div class="card"><div class="clabel">아라위키</div><div class="cval blue xs" id="src-arawiki">-</div></div>
-  <div class="card"><div class="clabel">오디플랜</div><div class="cval green xs" id="src-odi">-</div></div>
-  <div class="card"><div class="clabel">브랜드</div><div class="cval pink xs" id="src-brand">-</div></div>
-  <div class="card total"><div class="clabel">합계</div><div class="cval xs" id="src-total">-</div></div>
 </div>
 
 <div class="section-label">유입경로별</div>
-<div class="grid-4">
+<div class="grid-3">
   <div class="card"><div class="clabel">인스타그램</div><div class="cval purple xs" id="route-insta">-</div></div>
   <div class="card"><div class="clabel">페이스북</div><div class="cval blue xs" id="route-fb">-</div></div>
   <div class="card"><div class="clabel">당근</div><div class="cval orange xs" id="route-daangn">-</div></div>
-  <div class="card"><div class="clabel">브랜드</div><div class="cval pink xs" id="route-brand">-</div></div>
+  <div class="card"><div class="clabel">카카오</div><div class="cval amber xs" id="route-kakao">-</div></div>
+  <div class="card"><div class="clabel">네이버검색</div><div class="cval blue xs" id="route-naver">-</div></div>
   <div class="card"><div class="clabel">CPA</div><div class="cval red xs" id="route-cpa">-</div></div>
   <div class="card"><div class="clabel">유튜브</div><div class="cval red xs" id="route-yt">-</div></div>
-  <div class="card"><div class="clabel">지인소개</div><div class="cval green xs" id="route-ref">-</div></div>
-  <div class="card"><div class="clabel">네이버검색</div><div class="cval blue xs" id="route-naver">-</div></div>
+  <div class="card"><div class="clabel">브랜드</div><div class="cval pink xs" id="route-brand">-</div></div>
   <div class="card"><div class="clabel">기타</div><div class="cval xs" id="route-etc">-</div></div>
-  <div class="card total" style="grid-column:span 3;"><div class="clabel">합계</div><div class="cval xs" id="route-total">-</div></div>
 </div>
+
+<div class="section-label">캠페인별 <span class="badge">Top 20</span></div>
+<table class="campaign-table">
+  <thead>
+    <tr>
+      <th>캠페인명</th>
+      <th class="num">건수</th>
+    </tr>
+  </thead>
+  <tbody id="campaign-tbody">
+    <tr><td colspan="2" style="color:#aaa;text-align:center;padding:14px;">불러오는 중...</td></tr>
+  </tbody>
+</table>
 </div>
 
 <!-- 섹션3: 방문 스케줄 -->
 <div class="section" id="sec3">
-<div class="sec-title amber">📅 방문 스케줄</div>
+<div class="sec-title amber">방문 스케줄</div>
 <div class="visit-panel">
   <div id="visit-list"><div class="visit-empty">불러오는 중...</div></div>
 </div>
@@ -240,7 +246,12 @@ const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk
 const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1384080283&single=true&output=csv';
 
 const ASSIGNEES = ['우혜림', '엄현호', '김윤호', '장윤호'];
-const ASSIGNEE_START_IDX = 48;
+// 시트 위치 (route_keys=9 기준)
+// 유입경로별: rows 34-42 (idx 33-41), 합계 row 43 (idx 42)
+// 담당자 header: row 45 (idx 44), data: rows 46-49 (idx 45-48)
+// 캠페인 header: row 51 (idx 50), data: row 52+ (idx 51+)
+const ASSIGNEE_START_IDX = 45;
+const CAMPAIGN_START_IDX = 51;
 
 function showSec(idx) {
   currentSec = idx;
@@ -276,7 +287,7 @@ function setTab(idx) {
 }
 
 function render() {
-  const col = currentTab + 2;          // 시트 컬럼: 이번달=2, 지난달=3, 전체=4
+  const col = currentTab + 2;
   const convCol = currentTab + 1;
   const tabName = ['이번달','지난달','전체'][currentTab];
   document.getElementById('tab-label').textContent = tabName;
@@ -289,13 +300,13 @@ function render() {
 
   // 유입 현황 (탭별)
   document.getElementById('v-total').textContent = allRows[1]?.[col] || '0';
-  document.getElementById('v-today').textContent = allRows[1]?.[1]   || '0';  // 오늘은 고정
+  document.getElementById('v-today').textContent = allRows[1]?.[1]   || '0';
   document.getElementById('v-drop').textContent  = allRows[2]?.[col] || '0';
 
-  // 담당자별 퍼널 (시트: 이번달 1-4, 지난달 5-8, 전체 9-12)
+  // 담당자 퍼널
   const offset = currentTab * 4 + 1;
   const tbody = document.getElementById('funnel-tbody');
-  let totalDb = 0, totalVisit = 0, totalOrder = 0, totalSalesNum = 0;
+  let totalDb=0, totalVisit=0, totalOrder=0, totalSalesNum=0;
   let rows = ASSIGNEES.map((name, i) => {
     const r = allRows[ASSIGNEE_START_IDX + i] || [];
     const db    = parseInt(r[offset]   || '0') || 0;
@@ -336,21 +347,34 @@ function render() {
   document.getElementById('grade-elem').textContent  = allRows[26]?.[convCol] || '-';
   document.getElementById('grade-mid').textContent   = allRows[27]?.[convCol] || '-';
   document.getElementById('grade-high').textContent  = allRows[28]?.[convCol] || '-';
-  document.getElementById('grade-total').textContent = allRows[30]?.[convCol] || '-';
 
-  // 리드출처
-  document.getElementById('src-arawiki').textContent = allRows[20]?.[convCol] || '-';
-  document.getElementById('src-odi').textContent     = allRows[21]?.[convCol] || '-';
-  document.getElementById('src-brand').textContent   = allRows[22]?.[convCol] || '-';
-  document.getElementById('src-total').textContent   = allRows[23]?.[convCol] || '-';
+  // 유입경로별 (시트 순서: 인스타/페북/당근/카카오/네이버검색/CPA/유튜브/브랜드/기타)
+  document.getElementById('route-insta').textContent  = allRows[33]?.[convCol] || '-';
+  document.getElementById('route-fb').textContent     = allRows[34]?.[convCol] || '-';
+  document.getElementById('route-daangn').textContent = allRows[35]?.[convCol] || '-';
+  document.getElementById('route-kakao').textContent  = allRows[36]?.[convCol] || '-';
+  document.getElementById('route-naver').textContent  = allRows[37]?.[convCol] || '-';
+  document.getElementById('route-cpa').textContent    = allRows[38]?.[convCol] || '-';
+  document.getElementById('route-yt').textContent     = allRows[39]?.[convCol] || '-';
+  document.getElementById('route-brand').textContent  = allRows[40]?.[convCol] || '-';
+  document.getElementById('route-etc').textContent    = allRows[41]?.[convCol] || '-';
 
-  // 유입경로별
-  const routeIds = ['route-insta','route-fb','route-daangn','route-brand','route-cpa','route-yt','route-ref','route-naver','route-etc'];
-  routeIds.forEach((id, i) => {
-    document.getElementById(id).textContent = allRows[33+i]?.[convCol] || '-';
-  });
-  // 유입경로 합계 (시트 sumRow는 row 46 = index 45)
-  document.getElementById('route-total').textContent = allRows[45]?.[convCol] || '-';
+  // 캠페인 (top 20, 동적)
+  const ctbody = document.getElementById('campaign-tbody');
+  const cRows = [];
+  for (let i = CAMPAIGN_START_IDX; i < allRows.length; i++) {
+    const r = allRows[i];
+    if (!r || !r[0]) break;
+    const cnt = parseInt(r[convCol] || '0') || 0;
+    if (cnt === 0 && currentTab !== 2) continue;
+    cRows.push(`<tr>
+      <td class="name">${escapeHtml(r[0])}</td>
+      <td class="num">${cnt}</td>
+    </tr>`);
+  }
+  ctbody.innerHTML = cRows.length > 0
+    ? cRows.join('')
+    : '<tr><td colspan="2" style="color:#aaa;text-align:center;padding:14px;">데이터 없음</td></tr>';
 }
 
 async function loadSchedule() {
@@ -379,11 +403,11 @@ async function loadSchedule() {
       const isToday = dStr === todayStr;
       const dateStr = (d.getMonth()+1) + '/' + d.getDate() + ' (' + dayNames[d.getDay()] + ')';
       const assignee = r[6] || '';
-      const assigneeClassMap = { '우혜림': 'hye', '엄현호': 'eom', '김윤호': 'kim', '장윤호': 'jang' };
-      const assigneeClass = 'visit-assignee ' + (assigneeClassMap[assignee] || '');
+      const cmap = { '우혜림': 'hye', '엄현호': 'eom', '김윤호': 'kim', '장윤호': 'jang' };
+      const assigneeClass = 'visit-assignee ' + (cmap[assignee] || '');
       const assigneeHtml = assignee ? `<span class="${assigneeClass}">${escapeHtml(assignee)}</span>` : '';
       return `<div class="visit-item${isToday ? ' today' : ''}">
-        <span class="visit-date">${isToday ? '🔥 오늘' : dateStr}</span>
+        <span class="visit-date">${isToday ? '오늘' : dateStr}</span>
         <span class="visit-time">${r[1] || '미정'}</span>
         <span class="visit-name">${escapeHtml(r[2])}</span>
         <span class="visit-grade">${shortGrade(r[3])}</span>
