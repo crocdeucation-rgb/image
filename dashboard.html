@@ -11,18 +11,13 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 .layout { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; max-width: 1600px; margin: 0 auto; padding: 8px 14px; }
 @media (max-width: 1100px) { .layout { grid-template-columns: 1fr 1fr; } }
 
-/* 모바일 */
 @media (max-width: 700px) {
   .layout { display: block; padding: 4px 8px; }
   .section { display: none; }
   .section.active { display: block; }
-
-  /* 섹션 전환 버튼 */
   .sec-nav { display: flex; justify-content: center; gap: 6px; margin-bottom: 8px; }
   .sec-nav-btn { padding: 4px 12px; font-size: 11px; border-radius: 16px; border: 1px solid #ddd; background: white; color: #666; cursor: pointer; }
   .sec-nav-btn.active { background: #1a73e8; color: white; border-color: #1a73e8; }
-
-  /* 작게 */
   .cval { font-size: 16px !important; }
   .cval.sm { font-size: 13px !important; }
   .cval.xs { font-size: 11px !important; }
@@ -44,6 +39,7 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
   .visit-time { font-size: 10px; min-width: 36px; }
   .visit-name { font-size: 11px; }
   .visit-grade { font-size: 9px; }
+  .visit-assignee { font-size: 9px; }
 }
 @media (min-width: 701px) {
   .sec-nav { display: none; }
@@ -83,19 +79,30 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 .cval.sm  { font-size: 15px; }
 .cval.xs  { font-size: 12px; }
 
+/* 담당자 실적 테이블 */
+.assignee-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; border: 1px solid #eee; font-size: 11px; }
+.assignee-table th { background: #f0f4ff; color: #1a73e8; font-weight: 700; padding: 7px 8px; text-align: center; border-bottom: 1px solid #e0e8ff; }
+.assignee-table td { padding: 7px 8px; text-align: center; border-bottom: 1px solid #f5f5f5; color: #1a1a1a; }
+.assignee-table tr:last-child td { border-bottom: none; }
+.assignee-table td:first-child { font-weight: 700; color: #444; }
+.assignee-table td.num { color: #1a73e8; font-weight: 600; }
+.assignee-table td.sales { color: #9333ea; font-weight: 600; }
+
+/* 방문 스케줄 */
 .visit-panel { background: white; border-radius: 8px; border: 1px solid #eee; overflow: hidden; }
 .visit-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #f8f8f8; }
 .visit-item:last-child { border-bottom: none; }
 .visit-date { font-size: 11px; font-weight: 600; color: #1a73e8; min-width: 52px; }
 .visit-time { font-size: 11px; color: #0f9d58; min-width: 44px; }
 .visit-name { font-size: 12px; color: #1a1a1a; font-weight: 500; }
-.visit-grade { font-size: 10px; color: #999; margin-left: 4px; }
+.visit-grade { font-size: 10px; color: #999; margin-left: 2px; }
+.visit-assignee { font-size: 10px; color: #fff; background: #1a73e8; border-radius: 10px; padding: 1px 7px; margin-left: auto; white-space: nowrap; }
+.visit-assignee.hye { background: #0f9d58; }
 .visit-empty { padding: 20px; text-align: center; color: #aaa; font-size: 12px; }
 </style>
 </head>
 <body>
 
-<!-- 모바일 섹션 전환 버튼 -->
 <div class="sec-nav">
   <button class="sec-nav-btn active" onclick="showSec(0)">📊 유입</button>
   <button class="sec-nav-btn" onclick="showSec(1)">🔍 분석</button>
@@ -148,6 +155,22 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
   <div class="card"><div class="clabel">신청→방문</div><div class="cval amber xs" id="conv-visit">-</div></div>
   <div class="card"><div class="clabel">방문→오더</div><div class="cval green xs" id="conv-order">-</div></div>
 </div>
+
+<div class="section-label">담당자별 실적 <span class="badge">이번달 기준</span></div>
+<table class="assignee-table">
+  <thead>
+    <tr>
+      <th>담당자</th>
+      <th>DB수</th>
+      <th>방문수</th>
+      <th>오더수</th>
+      <th>매출</th>
+    </tr>
+  </thead>
+  <tbody id="assignee-tbody">
+    <tr><td colspan="5" style="color:#aaa;text-align:center;padding:12px;">불러오는 중...</td></tr>
+  </tbody>
+</table>
 </div>
 
 <!-- 섹션2: 유입경로 분석 -->
@@ -215,6 +238,22 @@ async function loadData() {
     document.getElementById('sales-month').textContent = allRows[11]?.[1] || '-';
     document.getElementById('sales-last').textContent  = allRows[12]?.[1] || '-';
     document.getElementById('sales-all').textContent   = allRows[13]?.[1] || '-';
+
+    // 담당자별 실적 (이번달 기준, 시트 row 49~50 = index 48~49)
+    const tbody = document.getElementById('assignee-tbody');
+    const assigneeNames = ['우혜림', '엄현호'];
+    const rows = assigneeNames.map((name, i) => {
+      const r = allRows[48 + i] || [];
+      return `<tr>
+        <td>${r[0] || name}</td>
+        <td class="num">${r[1] || '0'}</td>
+        <td class="num">${r[2] || '0'}</td>
+        <td class="num">${r[3] || '0'}</td>
+        <td class="sales">${r[4] || '0원'}</td>
+      </tr>`;
+    });
+    tbody.innerHTML = rows.join('');
+
     const now = new Date();
     document.getElementById('updated').textContent = '업데이트: ' + now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
   } catch(e) {
@@ -278,11 +317,15 @@ async function loadSchedule() {
     list.innerHTML = visits.map(r => {
       const d = new Date(r[0]);
       const dateStr = (d.getMonth()+1) + '/' + d.getDate() + ' (' + dayNames[d.getDay()] + ')';
+      const assignee = r[6] || '';
+      const assigneeClass = assignee === '우혜림' ? 'visit-assignee hye' : 'visit-assignee';
+      const assigneeHtml = assignee ? `<span class="${assigneeClass}">${escapeHtml(assignee)}</span>` : '';
       return `<div class="visit-item">
         <span class="visit-date">${dateStr}</span>
         <span class="visit-time">${r[1] || '미정'}</span>
         <span class="visit-name">${escapeHtml(r[2])}</span>
         <span class="visit-grade">${shortGrade(r[3])}</span>
+        ${assigneeHtml}
       </div>`;
     }).join('');
   } catch(e) {
