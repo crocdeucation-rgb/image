@@ -355,21 +355,27 @@ function render() {
   document.getElementById('route-cpa').textContent    = allRows[38]?.[convCol] || '-';
   document.getElementById('route-etc').textContent    = allRows[39]?.[convCol] || '-';
 
-  // 캠페인 (top 20, 동적)
+  // 캠페인 - 시트에서 다 읽고 현재 탭 기준으로 정렬해서 Top 5
   const ctbody = document.getElementById('campaign-tbody');
-  const cRows = [];
+  const campaigns = [];
   for (let i = CAMPAIGN_START_IDX; i < allRows.length; i++) {
     const r = allRows[i];
     if (!r || !r[0]) break;
-    const cnt = parseInt(r[convCol] || '0') || 0;
-    if (cnt === 0 && currentTab !== 2) continue;
-    cRows.push(`<tr>
-      <td class="name">${escapeHtml(r[0])}</td>
-      <td class="num">${cnt}</td>
-    </tr>`);
+    campaigns.push({
+      name: r[0],
+      month: parseInt(r[1] || '0') || 0,
+      last:  parseInt(r[2] || '0') || 0,
+      all:   parseInt(r[3] || '0') || 0
+    });
   }
-  ctbody.innerHTML = cRows.length > 0
-    ? cRows.join('')
+  const sortField = ['month', 'last', 'all'][currentTab];
+  campaigns.sort((a, b) => b[sortField] - a[sortField]);
+  const top5 = campaigns.filter(c => c[sortField] > 0).slice(0, 5);
+  ctbody.innerHTML = top5.length > 0
+    ? top5.map(c => `<tr>
+        <td class="name">${escapeHtml(c.name)}</td>
+        <td class="num">${c[sortField]}</td>
+      </tr>`).join('')
     : '<tr><td colspan="2" style="color:#aaa;text-align:center;padding:14px;">데이터 없음</td></tr>';
 }
 
