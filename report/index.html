@@ -160,6 +160,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .empty .et{font-size:15px;font-weight:700;color:var(--white);margin-bottom:6px}
 .empty .es{font-size:13px}
 
+.divider{height:1px;background:var(--line);margin:32px 0}
 /* 라이트박스 */
 .lb{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:100;display:none;align-items:center;justify-content:center}
 .lb.show{display:flex}
@@ -560,6 +561,62 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   </div>
 </div>
 
+
+<!-- 이번주 할일 -->
+<div class="divider"></div>
+<div style="margin-bottom:24px">
+  <div class="section-label">THIS WEEK</div>
+  <div class="section-title">이번 주 실행 계획</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px">
+
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:30px;height:30px;border-radius:10px;background:rgba(0,229,200,.12);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">🎯</div>
+        <div style="font-size:13px;font-weight:700">이번 주 미션 6</div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:7px;margin-bottom:7px;font-size:12px;color:var(--sub)"><div style="width:5px;height:5px;border-radius:50%;background:var(--teal);margin-top:6px;flex-shrink:0"></div><span><span style="color:var(--white);font-weight:600">①</span> 캡컷 에이전트 Step 1부터 완성</span></div>
+      <div style="display:flex;align-items:flex-start;gap:7px;margin-bottom:7px;font-size:12px;color:var(--sub)"><div style="width:5px;height:5px;border-radius:50%;background:var(--teal);margin-top:6px;flex-shrink:0"></div><span><span style="color:var(--white);font-weight:600">②</span> Claude in Chrome 설치</span></div>
+      <div style="display:flex;align-items:flex-start;gap:7px;margin-bottom:7px;font-size:12px;color:var(--sub)"><div style="width:5px;height:5px;border-radius:50%;background:var(--teal);margin-top:6px;flex-shrink:0"></div><span><span style="color:var(--white);font-weight:600">③</span> 메타 신규 소재 최소 3개 — 릴스 / 캐러셀 / 슬라이드</span></div>
+      <div style="display:flex;align-items:flex-start;gap:7px;margin-bottom:7px;font-size:12px;color:var(--sub)"><div style="width:5px;height:5px;border-radius:50%;background:var(--teal);margin-top:6px;flex-shrink:0"></div><span><span style="color:var(--white);font-weight:600">④</span> 당근 ROAS 낮으니까 소재/타겟 재검토</span></div>
+      <div style="display:flex;align-items:flex-start;gap:7px;margin-bottom:7px;font-size:12px;color:var(--sub)"><div style="width:5px;height:5px;border-radius:50%;background:var(--teal);margin-top:6px;flex-shrink:0"></div><span><span style="color:var(--white);font-weight:600">⑤</span> 네이버 GFA 구조 재설계</span></div>
+      <div style="display:flex;align-items:flex-start;gap:7px;font-size:12px;color:var(--sub)"><div style="width:5px;height:5px;border-radius:50%;background:var(--teal);margin-top:6px;flex-shrink:0"></div><span><span style="color:var(--white);font-weight:600">⑥</span> 카카오모먼트 현황 점검</span></div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:30px;height:30px;border-radius:10px;background:rgba(91,141,239,.12);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">✅</div>
+        <div style="font-size:13px;font-weight:700">지난주 완료</div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:7px;margin-bottom:7px;font-size:12px;color:var(--sub)"><div style="width:5px;height:5px;border-radius:50%;background:#5b8def;margin-top:6px;flex-shrink:0"></div>Claude × Meta MCP 연동 완료 — 자연어로 캠페인 조회·예산 변경</div>
+      <div style="display:flex;align-items:flex-start;gap:7px;margin-bottom:12px;font-size:12px;color:var(--sub)"><div style="width:5px;height:5px;border-radius:50%;background:#5b8def;margin-top:6px;flex-shrink:0"></div>데일리 체크 워크플로우 확립</div>
+      <div style="font-size:11px;color:var(--faint);background:rgba(255,255,255,.03);border-radius:8px;padding:10px;line-height:1.9;border:1px solid var(--line)">
+        <span style="color:var(--teal);font-weight:700">데일리 체크 루틴</span><br>
+        계정: 1397954958746130<br>
+        기간: 어제 기준<br>
+        1. 운영중 캠페인별 CPL / 리드수 / 지출<br>
+        2. 광고세트 노출빈도 3 초과 목록<br>
+        3. 전일 리드 0건 광고세트<br>
+        4. 예산 조정 필요 여부 판단
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:30px;height:30px;border-radius:10px;background:rgba(255,120,60,.12);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">🥕</div>
+        <div style="font-size:13px;font-weight:700">당근 운영 판단</div>
+      </div>
+      <div style="font-size:12px;color:var(--sub);line-height:2">
+        <span style="color:var(--white);font-weight:600">팀 내부 소통 결과</span><br>
+        장윤호: "결보 2개 방문1개 있네요, 근데 대부분 엄마이름으로 신청한거네요 ㅋㅋ"<br>
+        → 타겟 미스는 아님 확인<br>
+        김윤호: "괜찮아요, 니즈도 있고 다들 아직 당근에서 오더가 없긴 하지만 그래도 나쁘지 않습니다"<br><br>
+        <span style="color:var(--amber);font-weight:600">판단</span><br>
+        학부모 타겟 자체는 맞음 — 즉각 종료 아닌 소재·타겟 재검토 후 유지 여부 결정
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <!-- 라이트박스 -->
 <div class="lb" id="lb" onclick="if(event.target===this)closeLb()">
