@@ -123,7 +123,7 @@ canvas { width: 100% !important; }
     <div class="section-title">핵심 지표 요약</div>
     <div class="grid grid-2">
       <div class="card">
-        <div class="card-title">방문 → 오더 전환율 추이</div>
+        <div class="card-title">세팅 → 오더 전환율 추이</div>
         <div class="bar-chart" id="conv-bar" style="height:120px;"></div>
       </div>
       <div class="card">
@@ -149,7 +149,7 @@ canvas { width: 100% !important; }
             <th class="r">방문</th>
             <th class="r">세팅</th>
             <th class="r">오더</th>
-            <th class="r">전환율</th>
+            <th class="r">세팅→오더</th>
             <th class="r">인투</th>
             <th class="r">지사</th>
             <th class="r">합계</th>
@@ -302,8 +302,8 @@ function renderOverview() {
   });
   drawBars('overview-bar', data.map(d=>d.total), months, cols);
 
-  // 전환율
-  const cvt = data.map(d => Math.round(d.order/d.visit*100));
+  // 전환율 (세팅→오더)
+  const cvt = data.map(d => Math.round(d.order/d.set*100));
   const convEl = document.getElementById('conv-bar');
   if (convEl) {
     const mx = Math.max(...cvt);
@@ -334,7 +334,7 @@ function renderOverview() {
 function renderTrend() {
   const tbody = document.getElementById('monthly-tbody');
   tbody.innerHTML = data.map((d,i) => {
-    const cvt = pct(d.order, d.visit);
+    const cvt = pct(d.order, d.set);
     const prev = i>0 ? data[i-1].total : null;
     const diff = prev ? d.total - prev : 0;
     const diffStr = prev ? (diff>=0?'▲':'▼')+(Math.abs(diff/1000000)).toFixed(0)+'M' : '-';
