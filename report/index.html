@@ -468,6 +468,9 @@ body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-ap
   <div class="sec">소재별 성과</div>
   <div class="gal" id="w3-gal"></div>
 
+  <div class="sec">텐핑 CPA 소재</div>
+  <div class="gal" id="w3-cpa-gal"></div>
+
   <div class="log">
     <strong>6/3주 운영 판단 기록</strong><br>
     노트릴스_2505 위너 유지 — CPL ₩13K대 안정, 오더 3건(김경배·권도율·김지안) 연결<br>
@@ -1133,7 +1136,16 @@ const W3_GAL = [
   {key:'노트릴스_채리_2606', title:'ARA_노트릴스_채리_2606', st:'on', tag:'동영상', cpl:'39,862원', sales:0, orders:0},
   {key:'5단계루틴', title:'잠재고객_5단계루틴_2606W19', st:'on', tag:'캐러셀', cpl:'—', sales:0, orders:0},
 ];
+const W3_CPA_GAL = [
+  {key:'텐핑_공부습관무료검사', title:'공부습관 무료검사 (MLST-2)', st:'on', tag:'단일이미지', cpl:'30,000원', sales:0, orders:0},
+  {key:'텐핑_공부잘하고싶은', title:'공부 잘 하고 싶은 초4~고1 찾습니다', st:'on', tag:'단일이미지', cpl:'30,000원', sales:0, orders:0},
+  {key:'텐핑_교육부인가', title:'교육부 인가 정식 온라인 학원', st:'on', tag:'단일이미지', cpl:'30,000원', sales:0, orders:0},
+  {key:'텐핑_맘카페난리', title:'맘카페 난리난 아라온스쿨', st:'on', tag:'단일이미지', cpl:'30,000원', sales:0, orders:0},
+  {key:'텐핑_광주시모집', title:'광주시 학습전략검사 무료체험 모집', st:'on', tag:'텍스트형', cpl:'30,000원', sales:0, orders:0},
+  {key:'텐핑_서울시무료검사', title:'서울시 자녀대상 학습전략 무료검사', st:'on', tag:'단일이미지', cpl:'30,000원', sales:0, orders:0},
+];
 renderGal('w3-gal', W3_GAL);
+renderGal('w3-cpa-gal', W3_CPA_GAL);
 renderW3Ch();
 
 renderW1Ch();
