@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>신상준 · 그로스 운영 대시보드</title>
+<style>
+:root{
+  --bg:#060810;--card:#0F1419;--card2:#141a24;
+  --teal:#00e5c8;--teal-d:#0a8a5c;
+  --text:#fff;--sub:rgba(255,255,255,.55);--faint:rgba(255,255,255,.32);
+  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.05);
+  --amber:#ffc34d;--blue:#6c8bd5;
+  --meta:#6c8bd5;--kk:#f0c020;--dg:#ff7c3c;--nv:#03c75a;--cpa:#b478ff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-apple-system,system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6}
+.wrap{max-width:1080px;margin:0 auto;padding:40px 24px 80px;position:relative}
+
+/* 배경 격자 */
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,200,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,200,.03) 1px,transparent 1px);background-size:80px 80px;pointer-events:none;z-index:0}
+.wrap>*{position:relative;z-index:1}
+
+/* 헤더 */
+.hero{padding:24px 0 40px;border-bottom:1px solid var(--border);margin-bottom:40px}
+.eyebrow{display:inline-block;font-size:11px;color:var(--teal);letter-spacing:3px;padding:5px 14px;border:1px solid rgba(0,229,200,.3);border-radius:20px;background:rgba(0,229,200,.05);margin-bottom:24px;text-transform:uppercase}
+.hero h1{font-size:clamp(28px,5vw,46px);font-weight:800;letter-spacing:-2px;line-height:1.15;margin-bottom:18px}
+.hero h1 em{color:var(--teal);font-style:normal}
+.hero .lead{font-size:clamp(14px,1.7vw,17px);color:var(--sub);max-width:680px;line-height:1.7}
+.hero .meta{margin-top:24px;font-size:12px;color:var(--faint);letter-spacing:.5px}
+.hero .meta b{color:var(--text);font-weight:600}
+
+/* 섹션 헤더 */
+.sec-h{display:flex;align-items:baseline;gap:12px;margin:48px 0 18px}
+.sec-h .no{font-size:12px;color:var(--teal);font-weight:700;letter-spacing:1px}
+.sec-h h2{font-size:17px;font-weight:700;letter-spacing:-.5px}
+.sec-h .cap{font-size:12px;color:var(--faint);margin-left:auto}
+
+/* 대형 KPI */
+.hero-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:32px}
+@media(max-width:760px){.hero-kpis{grid-template-columns:repeat(2,1fr)}}
+.hk{background:var(--bg);padding:24px 22px}
+.hk .v{font-size:clamp(26px,3.5vw,38px);font-weight:800;letter-spacing:-1.5px;line-height:1}
+.hk .v.g{color:var(--teal)}
+.hk .k{font-size:12px;color:var(--sub);margin-top:8px}
+.hk .s{font-size:11px;color:var(--faint);margin-top:2px}
+
+/* KPI 일반 */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:8px}
+@media(max-width:760px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+.kpi .k{font-size:11px;color:var(--faint);letter-spacing:.5px;margin-bottom:8px;text-transform:uppercase}
+.kpi .v{font-size:24px;font-weight:700;letter-spacing:-.5px}
+.kpi .v.g{color:var(--teal)}
+.kpi .s{font-size:11px;color:var(--faint);margin-top:4px}
+.note{font-size:11px;color:var(--faint);margin:14px 2px 0;line-height:1.8}
+
+/* 월별 성장 바 */
+.growth{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px 26px;margin-bottom:8px}
+.gbars{display:flex;align-items:flex-end;gap:16px;height:200px;margin-top:24px;padding:0 4px}
+.gbar-grp{flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;height:100%;justify-content:flex-end}
+.gbar{width:100%;max-width:70px;border-radius:8px 8px 0 0;position:relative;min-height:10px;background:linear-gradient(180deg,var(--teal),var(--teal-d));transition:.4s}
+.gbar.faint{background:linear-gradient(180deg,rgba(0,229,200,.4),rgba(10,138,92,.3))}
+.gbar .gv{position:absolute;top:-44px;left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap}
+.gbar .gv .gm{font-size:14px;font-weight:800;letter-spacing:-.5px}
+.gbar .gv .gd{font-size:10px;color:var(--faint)}
+.gbar-grp .gl{font-size:12px;color:var(--sub);font-weight:600}
+.gbar-grp .gs{font-size:10px;color:var(--faint)}
+
+/* 채널 카드 */
+.channels{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:900px){.channels{grid-template-columns:repeat(2,1fr)}}
+.ch{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+.ch .cn{font-size:13px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.ch .r{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}
+.ch .l{color:var(--faint)}
+.ch .v{font-weight:600}
+.ch .v.g{color:var(--teal)}
+
+/* 2컬럼 */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:768px){.two{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 24px}
+.card h3{font-size:14px;font-weight:700;margin-bottom:4px}
+.card .ccap{font-size:12px;color:var(--faint);margin-bottom:18px}
+
+/* 유입경로 바 */
+.srcbar{margin-bottom:13px}
+.srcbar .sr-top{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}
+.srcbar .sr-name{color:var(--sub)}
+.srcbar .sr-val{font-weight:700}
+.srcbar .sr-track{height:7px;background:var(--border2);border-radius:10px;overflow:hidden}
+.srcbar .sr-fill{height:100%;border-radius:10px}
+
+/* 퍼널 */
+.frow{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.fl{font-size:12px;color:var(--sub);width:84px;flex-shrink:0}
+.fbar{height:30px;border-radius:7px;display:flex;align-items:center;padding:0 12px;font-size:12px;font-weight:700;min-width:54px;color:var(--bg)}
+.fpct{font-size:11px;color:var(--teal);margin-left:8px;font-weight:700}
+
+/* 소재별 성과 표 */
+.cre-list{display:flex;flex-direction:column;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.cre-row{background:var(--card);display:grid;grid-template-columns:1.6fr .7fr .9fr 1fr;align-items:center;gap:10px;padding:15px 18px}
+.cre-row.head{background:var(--card2)}
+.cre-row.head span{font-size:10px;color:var(--faint);letter-spacing:.5px;text-transform:uppercase;font-weight:600}
+.cre-name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px;min-width:0}
+.cre-type{font-size:11px;color:var(--sub)}
+.cre-cpl{font-size:13px;font-weight:700;text-align:right}
+.cre-cpl.best{color:var(--teal)}
+.cre-cpl.bad{color:#ff6b5a}
+.cre-meta{font-size:11px;color:var(--sub);text-align:right;line-height:1.4}
+.cre-st{font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.st-best{background:rgba(0,229,200,.14);color:var(--teal)}
+.st-on{background:rgba(108,139,213,.18);color:#9db4e6}
+.st-learn{background:rgba(255,195,77,.14);color:var(--amber)}
+.st-end{background:rgba(255,107,90,.14);color:#ff8d7a}
+@media(max-width:600px){
+  .cre-row{grid-template-columns:1.4fr 1fr;gap:6px 10px}
+  .cre-row .cre-cpl{text-align:left}
+  .cre-row.head{display:none}
+  .cre-meta{grid-column:1/-1;text-align:left;padding-top:2px}
+}
+
+/* CRM 카드 */
+.crm-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 24px;margin-bottom:14px}
+.crm-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.crm-tag{font-size:11px;font-weight:700;padding:4px 11px;border-radius:999px;letter-spacing:.5px}
+.crm-title{font-size:14px;font-weight:700}
+.crm-date{font-size:12px;color:var(--faint)}
+.crm-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.crm-grid{grid-template-columns:1fr}}
+.crm-col .ch-label{font-size:11px;font-weight:700;margin-bottom:8px;letter-spacing:1px}
+.crm-col .ch-body{font-size:12px;color:var(--sub);line-height:1.95}
+
+/* 파이프라인 */
+.pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:4px}
+@media(max-width:600px){.pipe{grid-template-columns:repeat(2,1fr)}}
+.pipe-item{text-align:center;padding:16px 12px;background:var(--card2);border:1px solid var(--border);border-radius:12px}
+.pipe-item .pe{font-size:22px;margin-bottom:6px}
+.pipe-item .pn{font-size:12px;font-weight:700}
+.pipe-item .ps{font-size:11px;color:var(--teal);margin-top:5px}
+.pipe-item .pd{font-size:10px;color:var(--faint);margin-top:2px}
+
+/* 능력 태그 */
+.skills{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.skill{font-size:12px;padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--sub)}
+.skill b{color:var(--teal);font-weight:600}
+
+/* 푸터 */
+.foot{margin-top:56px;padding-top:24px;border-top:1px solid var(--border);font-size:12px;color:var(--faint);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.foot a{color:var(--teal);text-decoration:none}
+
+@media(max-width:600px){
+  .wrap{padding:28px 18px 60px}
+  .crm-grid{grid-template-columns:1fr}
+  .gbars{gap:10px;height:170px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <span class="eyebrow">Growth Operations · 2026</span>
+    <h1>광고 한 번 돌려본 적 없던 브랜드를<br><em>전채널 ROAS 7</em> 시스템으로 만들었습니다</h1>
+    <p class="lead">2020년 네이버 CPC로 퍼포먼스 마케팅을 시작해, 유입부터 전환·영업 시스템·자동화까지 인바운드 매출 구조 전체를 직접 설계하고 운영합니다. 이 페이지는 실제 운영 데이터를 측정·기록한 결과입니다.</p>
+    <div class="meta">신상준 · <b>퍼포먼스 / 그로스 마케팅 6년차</b> · 現 에듀테크 '아라온스쿨' CGO</div>
+
+    <div class="hero-kpis">
+      <div class="hk"><div class="v g">2.8억</div><div class="k">누적 인바운드 매출</div><div class="s">2026.03~ · 결제일 기준</div></div>
+      <div class="hk"><div class="v g">6.97</div><div class="k">전채널 통합 ROAS</div><div class="s">전수 측정</div></div>
+      <div class="hk"><div class="v">2,280<span style="font-size:18px">건</span></div><div class="k">누적 유입 DB</div><div class="s">광고·소재 직접 운영</div></div>
+      <div class="hk"><div class="v">48<span style="font-size:18px">%</span></div><div class="k">방문 → 오더 전환</div><div class="s">영업 프로세스 설계</div></div>
+    </div>
+  </div>
+
+  <!-- 월별 성장 -->
+  <div class="sec-h"><span class="no">01</span><h2>매출 성장</h2><span class="cap">광고비 0원에서 시작 · 결제일 기준</span></div>
+  <div class="growth">
+    <div class="gbars">
+      <div class="gbar-grp">
+        <div class="gbar faint" style="height:11%"><div class="gv"><div class="gm">1,012만</div><div class="gd">광고비 0원</div></div></div>
+        <div class="gl">3월</div><div class="gs">DB 29</div>
+      </div>
+      <div class="gbar-grp">
+        <div class="gbar faint" style="height:25%"><div class="gv"><div class="gm">2,287만</div><div class="gd">광고비 0원</div></div></div>
+        <div class="gl">4월</div><div class="gs">DB 151</div>
+      </div>
+      <div class="gbar-grp">
+        <div class="gbar" style="height:56%"><div class="gv"><div class="gm">8,835만</div><div class="gd">ROAS 6.97</div></div></div>
+        <div class="gl">5월</div><div class="gs">DB 815</div>
+      </div>
+      <div class="gbar-grp">
+        <div class="gbar" style="height:100%"><div class="gv"><div class="gm">1.57억</div><div class="gd">진행 중</div></div></div>
+        <div class="gl">6월</div><div class="gs">DB 1,285</div>
+      </div>
+    </div>
+    <div class="note">※ 3·4월은 광고 집행 전 오가닉 매출 — 매출이 나오는 구조 자체를 먼저 설계 / 5/27 누적 매출 1억 돌파</div>
+  </div>
+
+  <!-- 채널별 ROAS -->
+  <div class="sec-h"><span class="no">02</span><h2>채널별 성과</h2><span class="cap">5월 결산 · 전 채널 전수 측정</span></div>
+  <div class="channels">
+    <div class="ch">
+      <div class="cn"><span class="dot" style="background:var(--meta)"></span>메타</div>
+      <div class="r"><span class="l">DB</span><span class="v">562건</span></div>
+      <div class="r"><span class="l">CPL</span><span class="v">14,540원</span></div>
+      <div class="r"><span class="l">매출</span><span class="v">4,023만</span></div>
+      <div class="r"><span class="l">ROAS</span><span class="v g">4.92</span></div>
+    </div>
+    <div class="ch">
+      <div class="cn"><span class="dot" style="background:var(--kk)"></span>카카오모먼트</div>
+      <div class="r"><span class="l">DB</span><span class="v">41건</span></div>
+      <div class="r"><span class="l">CPL</span><span class="v">21,918원</span></div>
+      <div class="r"><span class="l">매출</span><span class="v">693.6만</span></div>
+      <div class="r"><span class="l">ROAS</span><span class="v g">7.72</span></div>
+    </div>
+    <div class="ch">
+      <div class="cn"><span class="dot" style="background:var(--cpa)"></span>브랜드검색</div>
+      <div class="r"><span class="l">DB</span><span class="v">7건</span></div>
+      <div class="r"><span class="l">매출</span><span class="v">1,445만</span></div>
+      <div class="r"><span class="l">ROAS</span><span class="v g">9.38</span></div>
+      <div class="r"><span class="l">효율</span><span class="v">검증 채널</span></div>
+    </div>
+    <div class="ch">
+      <div class="cn"><span class="dot" style="background:var(--nv)"></span>네이버 GFA</div>
+      <div class="r"><span class="l">DB</span><span class="v">8건</span></div>
+      <div class="r"><span class="l">CPL</span><span class="v">71,672원</span></div>
+      <div class="r"><span class="l">매출</span><span class="v">346.8만</span></div>
+      <div class="r"><span class="l">ROAS</span><span class="v g">6.05</span></div>
+    </div>
+  </div>
+  <div class="note">※ 메타·카카오·당근·네이버·CPA·브랜드검색 6개 채널을 채널별 광고비·DB·CPL·ROAS로 전수 측정 / 위너 소재(노트릴스 영상) CPL 6,990원 — 메타 매출의 64% 기여</div>
+
+  <!-- 유입경로 + 퍼널 -->
+  <div class="sec-h"><span class="no">03</span><h2>유입 구조 · 전환 퍼널</h2><span class="cap">6월 기준</span></div>
+  <div class="two">
+    <div class="card">
+      <h3>유입경로 분포</h3>
+      <div class="ccap">6개 채널 분산 · 단일 채널 의존 없음</div>
+      <div class="srcbar"><div class="sr-top"><span class="sr-name">인스타그램</span><span class="sr-val">875</span></div><div class="sr-track"><div class="sr-fill" style="width:100%;background:var(--meta)"></div></div></div>
+      <div class="srcbar"><div class="sr-top"><span class="sr-name">CPA (텐핑)</span><span class="sr-val">204</span></div><div class="sr-track"><div class="sr-fill" style="width:23%;background:var(--cpa)"></div></div></div>
+      <div class="srcbar"><div class="sr-top"><span class="sr-name">당근마켓</span><span class="sr-val">51</span></div><div class="sr-track"><div class="sr-fill" style="width:6%;background:var(--dg)"></div></div></div>
+      <div class="srcbar"><div class="sr-top"><span class="sr-name">카카오</span><span class="sr-val">47</span></div><div class="sr-track"><div class="sr-fill" style="width:5.4%;background:var(--kk)"></div></div></div>
+      <div class="srcbar"><div class="sr-top"><span class="sr-name">페이스북</span><span class="sr-val">32</span></div><div class="sr-track"><div class="sr-fill" style="width:3.7%;background:var(--meta)"></div></div></div>
+      <div class="srcbar"><div class="sr-top"><span class="sr-name">네이버검색</span><span class="sr-val">16</span></div><div class="sr-track"><div class="sr-fill" style="width:1.8%;background:var(--nv)"></div></div></div>
+    </div>
+    <div class="card">
+      <h3>전환 퍼널</h3>
+      <div class="ccap">신청 → 방문 → 오더 · 단계별 전수 추적</div>
+      <div class="frow"><div class="fl">신청 DB</div><div class="fbar" style="width:100%;background:var(--blue)">1,285건</div></div>
+      <div class="frow"><div class="fl">방문완료</div><div class="fbar" style="width:18%;background:rgba(0,229,200,.7);min-width:54px">117건</div><span class="fpct">9%</span></div>
+      <div class="frow"><div class="fl">오더</div><div class="fbar" style="width:11%;background:var(--teal);min-width:54px">38건</div><span class="fpct">방문→오더 48%</span></div>
+      <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border);font-size:12px;color:var(--sub);line-height:1.8">
+        DB 수집에서 끝나지 않고, 방문 상담에서 <b style="color:var(--text)">48%가 결제로 전환</b>되는 영업 프로세스(브리핑·스크립트·성과형 조직)까지 직접 설계.
+      </div>
+    </div>
+  </div>
+
+  <!-- 소재별 성과 -->
+  <div class="sec-h"><span class="no">04</span><h2>소재별 성과</h2><span class="cap">5월 결산 · CPL 낮은 순</span></div>
+  <div class="cre-list">
+    <div class="cre-row head"><span>소재 · 타입</span><span style="text-align:right">CPL</span><span></span><span style="text-align:right">매출 · 사유</span></div>
+    <div class="cre-row">
+      <div class="cre-name">노트릴스 영상 <span class="cre-type">· 동영상</span></div>
+      <div class="cre-cpl best">6,990원</div>
+      <div><span class="cre-st st-best">위너</span></div>
+      <div class="cre-meta">매출 4,107만 · 11건</div>
+    </div>
+    <div class="cre-row">
+      <div class="cre-name">GT노트피드백 영상 <span class="cre-type">· 동영상</span></div>
+      <div class="cre-cpl">18,839원</div>
+      <div><span class="cre-st st-on">활성</span></div>
+      <div class="cre-meta">매출 520만</div>
+    </div>
+    <div class="cre-row">
+      <div class="cre-name">5단계루틴 캐러셀 <span class="cre-type">· 캐러셀</span></div>
+      <div class="cre-cpl">21,874원</div>
+      <div><span class="cre-st st-on">활성</span></div>
+      <div class="cre-meta">매출 693.6만</div>
+    </div>
+    <div class="cre-row">
+      <div class="cre-name">너만본다 영상 <span class="cre-type">· 동영상</span></div>
+      <div class="cre-cpl">22,070원</div>
+      <div><span class="cre-st st-learn">학습 중</span></div>
+      <div class="cre-meta">머신러닝 구간</div>
+    </div>
+    <div class="cre-row">
+      <div class="cre-name">비평준화 저격 <span class="cre-type">· 단일이미지</span></div>
+      <div class="cre-cpl">2만원대</div>
+      <div><span class="cre-st st-end">종료</span></div>
+      <div class="cre-meta">ROAS 0 · 전환 없음</div>
+    </div>
+    <div class="cre-row">
+      <div class="cre-name">기초부족 단일 <span class="cre-type">· 단일이미지</span></div>
+      <div class="cre-cpl bad">51,887원</div>
+      <div><span class="cre-st st-end">종료</span></div>
+      <div class="cre-meta">CPL 기준 초과</div>
+    </div>
+  </div>
+  <div class="note">※ CPL이 좋아도 매출이 없으면 끊고(비평준화·ROAS 0), CPL이 기준을 넘으면 끊는다(기초부족) — 두 기준으로 위너를 가려 집중 운영 · 소재 = 타겟 원칙 / 27개 캠페인 전수 추적</div>
+
+  <!-- CRM 자동화 (원본 그대로 이식) -->
+  <div class="sec-h"><span class="no">05</span><h2>CRM 자동화 시스템</h2><span class="cap">직접 설계·개발 · Apps Script</span></div>
+  <div style="font-size:13px;color:var(--sub);margin-bottom:18px;line-height:1.7">디자이너·개발자가 없는 환경에서, 메타·당근·카카오·텐핑 전채널 리드를 노션 CRM으로 통합하는 자동화 파이프라인을 직접 설계하고 코드로 구축했습니다.</div>
+
+  <div class="crm-card">
+    <div class="crm-head">
+      <span class="crm-tag" style="background:rgba(180,120,255,.15);color:#b478ff">v3</span>
+      <span class="crm-title">CRM 앱스크립트 — 중복 이력 자동 파싱</span>
+      <span class="crm-date">2026.06</span>
+    </div>
+    <div class="crm-grid">
+      <div class="crm-col">
+        <div class="ch-label" style="color:var(--teal)">ADDED</div>
+        <div class="ch-body">전화번호 기준 중복 그룹핑, 최신 DB에 이전 이력 자동 연결<br>중복 실행 방지 마커 / 노션 2,000자 제한 대응<br>취소 상태 자동 파싱 — 상태·매출 자동 업데이트<br>1시간 트리거 자동 설치</div>
+      </div>
+      <div class="crm-col">
+        <div class="ch-label" style="color:var(--amber)">CHANGED</div>
+        <div class="ch-body">담당자·상태 추가 수집 로직<br>이전 이력에 담당자·상태 포함 출력<br>취소율 월별 집계 자동 반영</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="crm-card">
+    <div class="crm-head">
+      <span class="crm-tag" style="background:rgba(0,229,200,.12);color:var(--teal)">PATCH</span>
+      <span class="crm-title">카카오 비즈니스폼+ 공식 API 연동</span>
+      <span class="crm-date">2026.06</span>
+    </div>
+    <div class="crm-grid">
+      <div class="crm-col">
+        <div class="ch-label" style="color:var(--teal)">ADDED</div>
+        <div class="ch-body">카카오 비즈니스폼+ 공식 API 연동<br>신청 → 노션 DB · 슬랙 알림 · 알림톡 · 리드 시트 동시 반영<br>응답ID 기반 중복 방지 / 인증 이상 시 슬랙 자동 경보</div>
+      </div>
+      <div class="crm-col">
+        <div class="ch-label" style="color:var(--amber)">CHANGED</div>
+        <div class="ch-body">카카오 리드 반영 주기 10분 자동화<br>메타·구글폼·당근·카카오 전채널 단일 파이프라인 통합</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="crm-card">
+    <div class="crm-head">
+      <span class="crm-tag" style="background:rgba(66,103,178,.2);color:#8aa8f0">MCP</span>
+      <span class="crm-title">Meta Ads MCP 연동 — 자연어 캠페인 운영</span>
+      <span class="crm-date">2026.06</span>
+    </div>
+    <div class="crm-grid">
+      <div class="crm-col">
+        <div class="ch-label" style="color:var(--teal)">ADDED</div>
+        <div class="ch-body">Meta Ads 공식 MCP 커넥터 연동<br>자연어로 캠페인 조회·예산 변경<br>데일리 체크 워크플로우 확립 — CPL·ROAS·노출빈도 실시간 조회</div>
+      </div>
+      <div class="crm-col">
+        <div class="ch-label" style="color:var(--amber)">운영 원칙</div>
+        <div class="ch-body">예산 1회 변경 20% 이내 (안정성)<br>변경 전 read-only 조회 선행<br>시간당 변경 횟수 제한 · 순차 작업</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pipe">
+    <div class="pipe-item"><div class="pe">📘</div><div class="pn">메타</div><div class="ps">웹훅 실시간</div><div class="pd">노션·슬랙·알림톡·CAPI</div></div>
+    <div class="pipe-item"><div class="pe">🥕</div><div class="pn">당근</div><div class="ps">구글시트 연동</div><div class="pd">노션·슬랙·알림톡</div></div>
+    <div class="pipe-item"><div class="pe">💛</div><div class="pn">카카오</div><div class="ps">10분 자동</div><div class="pd">비즈폼+ 공식 API</div></div>
+    <div class="pipe-item"><div class="pe">📋</div><div class="pn">텐핑 CPA</div><div class="ps">요원별 추적</div><div class="pd">노션 일괄 등록</div></div>
+  </div>
+
+  <!-- 일하는 방식 -->
+  <div class="sec-h"><span class="no">06</span><h2>일하는 방식</h2><span class="cap">빈자리를 메워 결과를 완성</span></div>
+  <div class="card" style="line-height:1.9">
+    <div style="font-size:14px;color:var(--text);margin-bottom:16px;font-weight:600">전문은 그로스입니다. 나머지는 그로스를 끝까지 완성하기 위해 익힌 무기입니다.</div>
+    <div class="skills">
+      <span class="skill"><b>퍼포먼스 광고</b> 메타·네이버·카카오·당근·CPA 직접 운영</span>
+      <span class="skill"><b>소재 제작</b> 단일·캐러셀·영상 직접 기획·생산</span>
+      <span class="skill"><b>CRM 자동화</b> Apps Script·노션·슬랙 파이프라인</span>
+      <span class="skill"><b>데이터 추적</b> GA4·GTM·전수 ROAS 측정</span>
+      <span class="skill"><b>영상 편집</b> 편집자 부재 → 직접 제작</span>
+      <span class="skill"><b>UX·랜딩</b> 디자이너 부재 → 직접 기획</span>
+    </div>
+    <div style="font-size:12.5px;color:var(--sub);margin-top:18px;padding-top:16px;border-top:1px solid var(--border)">디자이너가 없으면 디자인을, 편집자가 없으면 영상을, 개발자가 없으면 자동화를 직접 메웠습니다. 그 자리를 차지하려는 게 아니라 결과를 완성하기 위해서였고, 그 과정에서 각 직군을 이해하는 마케터가 됐습니다.</div>
+  </div>
+
+  <div class="foot">
+    <span>신상준 · 그로스 운영 대시보드 · 데이터는 실제 운영 측정값 (결제일 기준 집계)</span>
+    <span>아라온스쿨 · 2026</span>
+  </div>
+
+</div>
+</body>
+</html>
