@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>페이스북 계정 워밍업 14일 · 김상현 이사 숙제</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root{
+    --paper:#F4F5F7;--card:#FFFFFF;--ink:#15181D;--ink-soft:#4B5159;--hair:#E1E4E9;
+    --teal:#0E7C66;--teal-tint:#E7F2EF;--red:#B23B2E;--red-tint:#FBE9E7;
+    --mono:'SFMono-Regular',ui-monospace,'JetBrains Mono','IBM Plex Mono',Menlo,Consolas,monospace;
+    --sans:'Pretendard','Pretendard Variable',-apple-system,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--paper);font-family:var(--sans);color:var(--ink);-webkit-font-smoothing:antialiased;padding:28px 16px;line-height:1.5}
+  .sheet{width:800px;max-width:100%;margin:0 auto;background:var(--card);border:1px solid var(--hair);border-radius:4px;overflow:hidden}
+
+  .head{padding:24px 30px 20px;border-bottom:2px solid var(--ink)}
+  .eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;color:var(--teal);text-transform:uppercase;margin-bottom:9px}
+  .title{font-size:24px;font-weight:800;letter-spacing:-.02em;line-height:1.15}
+  .sub{margin-top:9px;font-size:12px;color:var(--ink-soft);line-height:1.5}
+  .sub b{color:var(--ink);font-weight:600}
+
+  .wk{padding:6px 30px 0}
+  .wklabel{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin:16px 0 8px}
+  .day{display:grid;grid-template-columns:74px 1fr;gap:16px;padding:9px 0;border-bottom:1px solid var(--hair);align-items:start}
+  .day:last-child{border-bottom:none}
+  .dlabel{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--ink);padding-top:2px}
+  .dlabel span{display:block;font-size:9px;font-weight:400;color:var(--ink-soft);margin-top:2px}
+  .task{display:flex;gap:9px;align-items:flex-start;font-size:11.5px;line-height:1.5}
+  .box{flex:none;width:13px;height:13px;border:1.5px solid var(--ink-soft);border-radius:3px;margin-top:2px}
+  .task b{font-weight:600}
+  code{font-family:var(--mono);font-size:10.5px;background:#F1F3F5;padding:1px 5px;border-radius:3px}
+
+  .rules{display:grid;grid-template-columns:1fr 1fr;border-top:2px solid var(--ink);margin-top:14px}
+  .rules > div{padding:16px 30px}
+  .do{border-right:1px solid var(--hair)}
+  .rk{font-size:10px;font-weight:800;letter-spacing:.08em;margin-bottom:9px}
+  .do .rk{color:var(--teal)}
+  .dont .rk{color:var(--red)}
+  .rules ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+  .rules li{font-size:11.5px;line-height:1.45;padding-left:15px;position:relative;color:var(--ink)}
+  .do li::before{content:"✓";position:absolute;left:0;color:var(--teal);font-weight:700;font-size:11px}
+  .dont li::before{content:"✕";position:absolute;left:0;color:var(--red);font-weight:700;font-size:11px}
+
+  .note{padding:12px 30px;border-top:1px solid var(--hair);font-size:10.5px;color:var(--ink-soft);line-height:1.5}
+  .note b{color:var(--ink);font-weight:600}
+
+  @media print{body{background:#fff;padding:0}.sheet{border:none;border-radius:0;width:100%}@page{size:A4;margin:11mm}}
+  @media(max-width:640px){.rules{grid-template-columns:1fr}.do{border-right:none;border-bottom:1px solid var(--hair)}.day{grid-template-columns:62px 1fr;gap:10px}}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="head">
+    <div class="eyebrow">Phase 00 · 선행 숙제</div>
+    <div class="title">페이스북 계정 워밍업 — 14일</div>
+    <div class="sub"><b>목적:</b> 새로 만든 계정을 진짜 사람의 계정처럼 길들여 <b>밴을 피하고 신뢰도를 쌓는다.</b> 가입 첫날부터 광고를 돌리는 것이 신규 계정 밴의 1순위 원인. 2주간 천천히 활동을 쌓은 뒤에 광고로 넘어간다.</div>
+  </div>
+
+  <div class="wk">
+    <div class="wklabel">1주차 — 계정 골격 만들기</div>
+
+    <div class="day">
+      <div class="dlabel">DAY 1<span>생성·보안</span></div>
+      <div class="task"><span class="box"></span><div>실명으로 계정 생성, <b>프로필 사진·기본정보 입력</b>. <code>휴대폰 인증</code> + <code>2단계 인증</code> 즉시 설정.</div></div>
+    </div>
+    <div class="day">
+      <div class="dlabel">DAY 2–3<span>프로필</span></div>
+      <div class="task"><span class="box"></span><div>학력·직장·소개·관심사 등 프로필을 자연스럽게 채우고, <b>실제 아는 사람 5~10명</b>만 친구 추가.</div></div>
+    </div>
+    <div class="day">
+      <div class="dlabel">DAY 4–7<span>일상 활동</span></div>
+      <div class="task"><span class="box"></span><div>매일 로그인해 피드 둘러보기, <b>좋아요·댓글 몇 개</b>, 관심사 페이지 팔로우, 그룹 2~3개 가입.</div></div>
+    </div>
+  </div>
+
+  <div class="wk">
+    <div class="wklabel">2주차 — 활동 누적 & 집행 준비</div>
+
+    <div class="day">
+      <div class="dlabel">DAY 8–10<span>발행</span></div>
+      <div class="task"><span class="box"></span><div>일상 게시물 <b>1~2개 직접 작성</b>, 댓글 활동 이어가기, 친구는 하루 몇 명씩 점진적으로만.</div></div>
+    </div>
+    <div class="day">
+      <div class="dlabel">DAY 11–13<span>다양화</span></div>
+      <div class="task"><span class="box"></span><div>활동 유지 + 마켓플레이스·메신저 등 <b>여러 기능을 자연스럽게</b> 사용해 사용 패턴을 넓힌다.</div></div>
+    </div>
+    <div class="day">
+      <div class="dlabel">DAY 14<span>준비 점검</span></div>
+      <div class="task"><span class="box"></span><div>계정 경고·제한 없는지 확인 후 <b>비즈니스 자산 연결 준비</b>. 이상 없으면 광고 단계(Phase 01)로.</div></div>
+    </div>
+  </div>
+
+  <div class="rules">
+    <div class="do">
+      <div class="rk">반드시 (DO)</div>
+      <ul>
+        <li>한 기기 · 한 IP(집/사무실)에서 일관되게 접속</li>
+        <li>휴대폰 인증 + 2단계 인증 필수</li>
+        <li>진짜 사람처럼 매일 조금씩, 꾸준히</li>
+        <li>광고는 2주 활동 누적 후에만 시작</li>
+      </ul>
+    </div>
+    <div class="dont">
+      <div class="rk">금지 (DON'T)</div>
+      <ul>
+        <li>가입 첫날 광고 계정 생성 — 밴 1순위</li>
+        <li>하루에 친구 요청 대량 발송</li>
+        <li>여러 기기·VPN·해외 IP 번갈아 로그인</li>
+        <li>같은 글·링크 도배, 모르는 사람 무차별 추가</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note"><b>체크 방법</b> — 매일 해당 칸을 체크하고, 경고 메시지가 뜨면 즉시 활동을 멈추고 신상준에게 공유. 워밍업이 끝나야 다음 단계(계정·픽셀·SOP)로 넘어간다.</div>
+
+</div>
+</body>
+</html>
