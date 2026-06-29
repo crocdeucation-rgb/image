@@ -548,11 +548,8 @@ body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-ap
     </table>
   </div>
 
-  <div class="sec">소재별 성과 (메타)</div>
+  <div class="sec">소재별 성과 (메타) · 신청→방문 전환</div>
   <div class="gal" id="w4-gal"></div>
-
-  <div class="sec">텐핑 CPA 소재</div>
-  <div class="gal" id="w4-cpa-gal"></div>
 
   <div class="log">
     <strong>6/4주 운영 판단 기록</strong><br>
@@ -1323,25 +1320,36 @@ document.getElementById('w4-funnel').innerHTML =
   `<div class="frow"><div class="fl">오더</div><div class="fbar" style="width:${17/32*100}%;background:rgba(0,229,200,.9);min-width:48px">17건</div></div>` +
   `<div class="frow"><div class="fl">주간 매출</div><div class="fbar" style="width:85%;background:rgba(0,229,200,.4)">6,242만원</div></div>`;
 
-// W4 갤러리
+// W4 갤러리 (신청\u2192방문 전환 포함)
 const W4_GAL = [
-  {key:'노트릴스_영상', title:'ARA_노트릴스_영상_2505', st:'best', tag:'동영상', cpl:'15,804원', sales:43061000, orders:12},
-  {key:'mlst_v3', title:'MLST_공부방법점검 (단일 4종)', st:'best', tag:'단일이미지', cpl:'10,004원', sales:0, orders:0},
-  {key:'노트릴스_채리_2606', title:'ARA_노트릴스_채리_2606', st:'on', tag:'동영상', cpl:'34,335원', sales:8959000, orders:3},
-  {key:'GT노트피드백_영상', title:'ARA_GT노트피드백_영상_2605', st:'on', tag:'동영상', cpl:'33,409원', sales:3468000, orders:1},
-  {key:'너만본다_영상', title:'2026_영상_너만본다', st:'on', tag:'동영상', cpl:'30,666원', sales:0, orders:0},
-  {key:'캐러셀_1_표지', title:'MLST캐러셀 (5종)', st:'on', tag:'캐러셀', cpl:'24,888원', sales:0, orders:0},
+  {key:'노트릴스_영상', title:'ARA_노트릴스_영상_2505', st:'best', tag:'동영상', cpl:'15,804원', sales:43061000, orders:12, app:106, visit:8},
+  {key:'mlst_v3', title:'MLST_공부방법점검 (단일 4종)', st:'best', tag:'단일이미지', cpl:'10,004원', sales:0, orders:0, app:69, visit:1, warn:'CPL 최저\u00b7DB 대량이나 방문 전환 저조 \u2014 텐핑형 주의(신규라 방문 미도래 가능)'},
+  {key:'노트릴스_채리_2606', title:'ARA_노트릴스_채리_2606', st:'on', tag:'동영상', cpl:'34,335원', sales:8959000, orders:3, app:40, visit:3},
+  {key:'GT노트피드백_영상', title:'ARA_GT노트피드백_영상_2605', st:'on', tag:'동영상', cpl:'33,409원', sales:3468000, orders:1, app:30, visit:2},
+  {key:'너만본다_영상', title:'2026_영상_너만본다', st:'on', tag:'동영상', cpl:'30,666원', sales:0, orders:0, app:20, visit:0, warn:'신청 20건 방문 0 \u2014 CPL 상승 + 방문 미발생, 하향/중단 검토'},
+  {key:'캐러셀_1_표지', title:'MLST캐러셀 (5종)', st:'on', tag:'캐러셀', cpl:'24,888원', sales:0, orders:0, app:null, visit:null},
 ];
-const W4_CPA_GAL = [
-  {key:'텐핑_공부습관무료검사', title:'공부습관 무료검사 (MLST-2)', st:'on', tag:'단일이미지', cpl:'26,955원', sales:0, orders:0},
-  {key:'텐핑_공부잘하고싶은', title:'공부 잘 하고 싶은 초4~고1 찾습니다', st:'on', tag:'단일이미지', cpl:'26,955원', sales:0, orders:0},
-  {key:'텐핑_교육부인가', title:'교육부 인가 정식 온라인 학원', st:'on', tag:'단일이미지', cpl:'26,955원', sales:0, orders:0},
-  {key:'텐핑_맘카페난리', title:'맘카페 난리난 아라온스쿨', st:'on', tag:'단일이미지', cpl:'26,955원', sales:0, orders:0},
-  {key:'텐핑_광주시모집', title:'광주시 학습전략검사 무료체험 모집', st:'on', tag:'텍스트형', cpl:'26,955원', sales:0, orders:0},
-  {key:'텐핑_서울시무료검사', title:'서울시 자녀대상 학습전략 무료검사', st:'on', tag:'단일이미지', cpl:'26,955원', sales:0, orders:0},
-];
-renderGal('w4-gal', W4_GAL);
-renderGal('w4-cpa-gal', W4_CPA_GAL);
+function renderGalW4(){
+  document.getElementById('w4-gal').innerHTML = W4_GAL.map(s=>{
+    const im = IMGS[s.key];
+    const salesLine = s.orders>0
+      ? `<div class="gsales">${won(s.sales)} \u00b7 결제 ${s.orders}건</div>`
+      : `<div class="gm"><span class="gl">결제 귀속 없음</span></div>`;
+    const visitLine = s.app!=null
+      ? `<div style="font-size:11px;margin-top:5px;color:#444;border-top:0.5px solid var(--border2);padding-top:6px">신청 ${s.app} \u2192 방문 <b style="color:${s.visit===0?'var(--red)':'var(--teal-d)'}">${s.visit}</b></div>`
+      : `<div style="font-size:10px;margin-top:5px;color:var(--faint);border-top:0.5px solid var(--border2);padding-top:6px">방문 데이터 매칭 없음</div>`;
+    const warnLine = s.warn ? `<div style="font-size:10px;margin-top:5px;color:#b26a12;line-height:1.4">\u26a0 ${s.warn}</div>` : '';
+    return `<div class="gcard ${s.st=='best'?'best':''}" onclick="${im?`openLb('${s.key}')`:''}">
+      ${im?`<img class="thumb" src="${im}">`:'<div class="thumb-ph"></div>'}
+      <div class="gi">
+        <div class="gt"><span>${s.title}</span> ${badge(s.st)}</div>
+        <div class="gtag">${s.tag} \u00b7 CPL ${s.cpl}</div>
+        ${salesLine}${visitLine}${warnLine}
+      </div>
+    </div>`;
+  }).join('');
+}
+renderGalW4();
 renderW4Ch();
 
 renderW1Ch();
