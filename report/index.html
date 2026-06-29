@@ -206,7 +206,8 @@ body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-ap
   <button class="tab summary" onclick="sel('may',this)">5월 결산</button>
   <button class="tab" onclick="sel('w1',this)">6/1주</button>
   <button class="tab" onclick="sel('w2',this)">6/2주</button>
-  <button class="tab on" onclick="sel('w3',this)">6/3주</button>
+  <button class="tab" onclick="sel('w3',this)">6/3주</button>
+  <button class="tab on" onclick="sel('w4',this)">6/4주</button>
   <button class="tab" onclick="sel('crm',this)" style="border-color:rgba(180,120,255,.3);color:#b478ff">⚙ CRM 패치</button>
 </div>
 
@@ -413,7 +414,7 @@ body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-ap
   </div>
 </div>
 <!-- ===== 6/3주 ===== -->
-<div id="p-w3" class="panel on">
+<div id="p-w3" class="panel">
   <div class="kpis">
     <div class="kpi"><div class="k">광고비</div><div class="v">879만</div><div class="s">8,794,645원</div></div>
     <div class="kpi"><div class="k">총 DB</div><div class="v">370건</div><div class="s">CPL 23,769원</div></div>
@@ -480,6 +481,89 @@ body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-ap
     네이버 GFA 사실상 미집행 43,385원 — 재활성화 검토 중<br>
     당근 이번 주 미집행 — 소재 재편 후 재투입 예정<br>
     ROAS 2.78 낮은 이유: ① 채리_2606 신규 런칭으로 메타 광고비 급증 ② 미납 2건 매출 미반영 ③ 6/22 결제 4건(서수민·지승유·전혜연·우승현 = 1,676.2만) → 4주차 반영
+  </div>
+</div>
+
+<!-- ===== 6/4주 ===== -->
+<div id="p-w4" class="panel on">
+  <div class="kpis">
+    <div class="kpi"><div class="k">광고비</div><div class="v">1,145만</div><div class="s">11,446,096원</div></div>
+    <div class="kpi"><div class="k">총 DB</div><div class="v">442건</div><div class="s">CPL 25,896원</div></div>
+    <div class="kpi"><div class="k">ROAS</div><div class="v t">5.45</div><div class="s">매출/광고비</div></div>
+    <div class="kpi"><div class="k">오더</div><div class="v">17건</div><div class="s">건당 평균 367만</div></div>
+    <div class="kpi"><div class="k">주간 매출</div><div class="v">6,242만</div><div class="s">결제일 기준</div></div>
+  </div>
+  <div class="knote">기간: 2026.06.22 ~ 06.28 / 결제일 기준 집계 / 텐핑은 공급형 채널(수량≠성과, ROAS로 평가) · 당근 22건(광고관리자 0=트래킹 누락, 노션 보정)</div>
+
+  <div class="sec">채널별 성과</div>
+  <div class="channels" id="w4-ch"></div>
+  <div class="detail" id="w4-detail"></div>
+
+  <div class="two">
+    <div class="card">
+      <h2>전환 퍼널</h2>
+      <div class="cap">6/4주 기준 · 신청→방문→오더</div>
+      <div id="w4-funnel"></div>
+    </div>
+    <div class="card">
+      <h2>담당자별 성과</h2>
+      <div class="cap">이번 주 DB·방문·오더·매출</div>
+      <table class="tbl">
+        <thead><tr><th>담당자</th><th>DB</th><th>방문</th><th>오더</th><th>매출</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:700;color:var(--teal)">장윤호</td><td>-</td><td>-</td><td>8</td><td>2,514만</td></tr>
+          <tr><td style="font-weight:700;color:var(--teal)">우혜림</td><td>-</td><td>-</td><td>6</td><td>2,572만</td></tr>
+          <tr><td style="font-weight:700;color:var(--teal)">김윤호</td><td>-</td><td>-</td><td>2</td><td>578만</td></tr>
+          <tr><td style="font-weight:700;color:var(--teal)">김우진</td><td>-</td><td>-</td><td>1</td><td>578만</td></tr>
+          <tr class="sum"><td>합계</td><td>442</td><td>32</td><td>17</td><td>6,242만</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="sec">주간 오더 현황</div>
+  <div style="overflow-x:auto;margin-bottom:16px">
+    <table class="tbl">
+      <thead><tr><th>결제일</th><th>이름</th><th>학년</th><th>매출</th><th>채널</th><th>캠페인</th></tr></thead>
+      <tbody>
+        <tr><td>6/22</td><td class="name">서수민</td><td>중2</td><td class="teal">346.8만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
+        <tr><td>6/22</td><td class="name">지승유</td><td>초6</td><td class="teal">346.8만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
+        <tr><td>6/22</td><td class="name">전혜연</td><td>고1</td><td class="teal">520.2만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
+        <tr><td>6/22</td><td class="name">우승현</td><td>중1</td><td class="teal">462.4만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
+        <tr><td>6/23</td><td class="name">박지훈</td><td>중2</td><td class="teal">346.8만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">GT노트피드백_2605</td></tr>
+        <tr><td>6/23</td><td class="name">윤서</td><td>초6</td><td class="teal">346.8만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
+        <tr><td>6/23</td><td class="name">지민준</td><td>초4</td><td class="teal">28.9만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
+        <tr><td>6/23</td><td class="name">장서윤</td><td>초6</td><td class="teal">346.8만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
+        <tr><td>6/23</td><td class="name">김은성</td><td>초6</td><td class="teal">28.9만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">채리_2606</td></tr>
+        <tr><td>6/24</td><td class="name">김루아</td><td>초5</td><td class="teal">346.8만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">채리_2606</td></tr>
+        <tr><td>6/25</td><td class="name">아라</td><td>초4</td><td class="teal">231.2만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
+        <tr><td>6/25</td><td class="name">이도윤</td><td>중1</td><td class="teal">520.2만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">채리_2606</td></tr>
+        <tr><td>6/26</td><td class="name">김의찬</td><td>초6</td><td class="teal">173.4만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
+        <tr><td>6/27</td><td class="name">김민준</td><td>초6</td><td class="teal">578.0만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
+        <tr><td>6/27</td><td class="name">이연우</td><td>중1</td><td class="teal">578.0만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
+        <tr><td>6/27</td><td class="name">김장우</td><td>중2</td><td class="teal">346.8만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
+        <tr><td>6/28</td><td class="name">박건희</td><td>중1</td><td class="teal">693.2만</td><td><span class="chbadge cb-cpa">CPA</span></td><td style="color:var(--sub);font-size:11px">텐핑 · 주말 전환</td></tr>
+        <tr class="sum"><td colspan="3">합계 17건</td><td class="teal">6,242만원</td><td colspan="2" style="color:var(--sub);font-size:11px">ROAS 5.45 · 메타 16건 / 텐핑 1건</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec">소재별 성과 (메타)</div>
+  <div class="gal" id="w4-gal"></div>
+
+  <div class="sec">텐핑 CPA 소재</div>
+  <div class="gal" id="w4-cpa-gal"></div>
+
+  <div class="log">
+    <strong>6/4주 운영 판단 기록</strong><br>
+    MLST_공부방법점검(단일 4종) 신규 위너 — CPL ₩10,004로 전 캠페인 1위, 리드 70건 / 단일슬라이드가 캐러셀(₩24,888)보다 2.5배 효율<br>
+    노트릴스_2505 볼륨 위너 유지 — 리드 107건 최다, CPL ₩15,804, 오더 12건 연결(주간 매출 견인)<br>
+    채리_2606 — 학습 완료(40건)에도 CPL ₩34,335 부진, 오더 3건 / 유지 여부 판단 필요<br>
+    너만본다 — CPL ₩30,666 상승, 효율 의심 → 모니터링 중, 하향 가능성<br>
+    텐핑 CPA — 단가 ₩28K 고정, 브레이크 안 걸면 1~2일에 200~300개도 유입 가능한 구조. 수량이 아니라 방문 전환·홀딩·실질 매출전환 데이터와 감도 조정이 필수 → 텐핑 전체가 아닌 마케터별(식별코드) 데이터로 추적·취합. 6/28 텐핑 측에 감도조절 관련 요청 전달, 이번 주 '무료·공공기관' 등 규정 위반 표현 삭제된 형태로 광고 예정<br>
+    카카오 CPL ₩130,447 — 이번 주 최악(리드 9 / ₩117만), 소재 5종 사실상 사망 → 정리 + 메타 위너 소재 이식 필요<br>
+    당근 — 광고관리자 리드 0은 트래킹 누락, 노션 기준 실제 22건(CPL ₩45,455) / V3 무료점검 효과 1위, V4 페페 거의 안 돎<br>
+    네이버 GFA ₩28만 — 클릭만, 인스타폼 전환 0 지속 / 파워컨텐츠 ₩5,971 테스트 수준
   </div>
 </div>
 
@@ -690,6 +774,7 @@ body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-ap
 
 
 // 주차별 THIS WEEK 데이터
+const DOCS = 'https://crocdeucation-rgb.github.io/image/report/docs/';
 const WEEK_TODO = {
   may: {
     mission: {title:'5월 결산', items:[]},
@@ -756,6 +841,26 @@ const WEEK_TODO = {
     ]},
     note: 'ROAS 2.78 저조 이유: ① 채리_2606 신규 런칭 광고비 급증 ② 6/22 결제 4건(1,676만) → 4주차 반영'
   },
+  w4: {
+    mission: {title:'이번 주 미션 (6/29~)', items:[
+      {n:'①', t:'광고 전파 1주차 교육 진행', d:'김상현 이사 · 인테리어 공사로 틈틈이 진행'},
+      {n:'②', t:'신규 소재 추가', d:'릴스 1편 업로드 예정'},
+      {n:'③', t:'너만본다 릴스 CPL 모니터링', d:'₩30,666 수상 → 하향/중단 판단'},
+      {n:'④', t:'카카오 소재 정리', d:'CPL ₩13만 → 사망 소재 제거 + 위너 이식'},
+      {n:'⑤', t:'채리_2606 유지 판단', d:'학습 완료에도 CPL ₩34K → 결정'},
+      {n:'⑥', t:'픽클 개발 견적·기간 회신 확인', d:'위트플러스 · PHP·리눅스 1차'},
+    ]},
+    done: {title:'지난주 완료 (6/22~28)', items:[
+      {t:'픽클과외 프로토타입 제작·시연', d:'위트플러스 협의 → PHP·리눅스 1차 개발 합의', link:'https://crocdeucation-rgb.github.io/pickle/'},
+      {t:'픽클 개발설명서 발송', d:'견적·개발기간 회신 대기', link:DOCS+'pickle_dev.pdf'},
+      {t:'광고 전파 4주 교육플랜 설계', d:'김상현 이사 · 신규 리드 생성 역량 육성', link:DOCS+'ad_edu_plan.pdf'},
+      {t:'페북 워밍업 14일 숙제 배포', d:'계정 밴 방지 선행 작업', link:DOCS+'warmup.pdf'},
+      {t:'텐핑 리드품질 소통·소재 시정 요청', d:'식별코드별 품질 공유 + 규정 위반 표현 권장안', link:DOCS+'tenping_quality.pdf'},
+      {t:'텐핑 매출 693.2만 추가', d:'박건희 6/28 · 주말 전환 (신민기 대리 소통)', link:DOCS+'kakao_tenping.png'},
+      {t:'위트플러스 메일·협의 진행', d:'개발설명서 첨부 메일 발송 · 검토 회신 대기', link:DOCS+'kakao_witt.png'},
+    ]},
+    note: 'MLST 단일슬라이드(₩10,004)가 캐러셀(₩24,888)보다 2.5배 효율 → 단일 포맷 승. 카카오 CPL ₩13만·당근 폼 트래킹이 이번 주 핵심 누수.'
+  },
   crm: {
     mission: {title:'CRM 자동화', items:[]},
     done: {title:'구축 완료', items:[]},
@@ -793,9 +898,10 @@ function updateThisWeek(id) {
     <div style="width:30px;height:30px;border-radius:10px;background:#eef3fd;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">✅</div>
     <div style="font-size:13px;font-weight:700">${data.done.title}</div></div>`;
   data.done.items.forEach(item => {
+    const linkHtml = item.link ? ` <a href="${item.link}" target="_blank" rel="noopener" style="display:inline-block;font-size:10px;font-weight:700;color:#3a6cc4;background:#eef3fd;border:0.5px solid #c8d8f0;border-radius:5px;padding:1px 7px;margin-left:4px;text-decoration:none;white-space:nowrap">\uD83D\uDCC4 \uBCF4\uAE30</a>` : '';
     doneHtml += `<div style="display:flex;align-items:flex-start;gap:7px;margin-bottom:6px;font-size:12px;color:#555">
       <div style="width:5px;height:5px;border-radius:50%;background:#3a6cc4;margin-top:6px;flex-shrink:0"></div>
-      <span><strong style="color:#111">${item.t}</strong>${item.d ? ' — '+item.d : ''}</span></div>`;
+      <span><strong style="color:#111">${item.t}</strong>${item.d ? ' — '+item.d : ''}${linkHtml}</span></div>`;
   });
   doneEl.innerHTML = doneHtml;
 
@@ -1147,6 +1253,96 @@ const W3_CPA_GAL = [
 renderGal('w3-gal', W3_GAL);
 renderGal('w3-cpa-gal', W3_CPA_GAL);
 renderW3Ch();
+
+// 6/4주 채널 데이터 (6/22~28)
+const W4_CH = [
+  {id:'meta', n:'메타', spend:5986176, db:280, cpl:21379, order:16, sales:55480000, roas:9.27, color:'#6c8bd5',
+   cr:[
+    {key:'노트릴스_영상', name:'ARA_노트릴스_영상_2505', st:'best', spend:1690979, db:107, cpl:15804, note:'볼륨 위너 · 오더 12건 연결'},
+    {key:'mlst_v3', name:'ARA_MLST_공부방법점검_2606 (단일 4종)', st:'best', spend:700294, db:70, cpl:10004, note:'신규 위너 · CPL 전 캠페인 1위 · 단일슬라이드 v1~v4'},
+    {key:'노트릴스_채리_2606', name:'ARA_노트릴스_채리_2606', st:'on', spend:1373404, db:40, cpl:34335, note:'학습 완료에도 CPL 부진 · 오더 3건'},
+    {key:'GT노트피드백_영상', name:'ARA_GT노트피드백_영상_2605', st:'on', spend:1002276, db:30, cpl:33409, note:'오더 1건(박지훈)'},
+    {key:'너만본다_영상', name:'[아라온스쿨] 2026_영상_너만본다', st:'on', spend:613327, db:20, cpl:30666, note:'CPL 상승 · 모니터링/하향 검토'},
+    {key:'캐러셀_1_표지', name:'ARA_MLST캐러셀_2606 (캐러셀 5종)', st:'on', spend:348425, db:14, cpl:24888, note:'단일 대비 2.5배 비쌈'},
+    {key:'5단계루틴', name:'잠재고객_5단계루틴_2606W19', st:'end', spend:257471, db:6, cpl:42912, note:'PAUSED'},
+  ]},
+  {id:'cpa', n:'텐핑 CPA', spend:2992000, db:111, cpl:26955, order:1, sales:6932000, roas:2.32, color:'#b478ff', cr:null, supply:true},
+  {id:'dg', n:'당근마켓', spend:1000020, db:22, cpl:45455, order:0, sales:0, roas:null, color:'#ff7c3c',
+   cr:[
+    {key:'mlst_v3', name:'V3 무료점검 (맘카페난리)', st:'best', spend:11327, db:null, cpl:null, note:'클릭 1위 · 효과 1위 (노션 22건은 소재 미분류)'},
+    {key:'mlst_v2', name:'V2 공감 (민트)', st:'on', spend:8945, db:null, cpl:null, note:'반응 보통'},
+    {key:'mlst_v1', name:'V1 맘카페 (노랑)', st:'on', spend:8713, db:null, cpl:null, note:'반응 보통'},
+    {key:'mlst_v4', name:'V4 페페', st:'end', spend:1323, db:null, cpl:null, note:'클릭 3 · 거의 안 돎'},
+  ]},
+  {id:'kk', n:'카카오모먼트', spend:1174023, db:9, cpl:130447, order:0, sales:0, roas:null, color:'#f0c020', cr:null},
+  {id:'nv', n:'네이버GFA', spend:287906, db:0, cpl:null, order:0, sales:0, roas:null, color:'#03c75a', cr:null},
+  {id:'pc', n:'파워컨텐츠', spend:5971, db:0, cpl:null, order:0, sales:0, roas:null, color:'#888', cr:null},
+];
+
+let openCh4 = null;
+function renderW4Ch(){
+  document.getElementById('w4-ch').innerHTML = W4_CH.map((c,i)=>{
+    const hasCr = c.cr && c.cr.length;
+    return `<div class="ch ${openCh4===i?'active':''}" ${hasCr?`onclick="togCh4(${i})"`:' style=cursor:default'}>
+      <div class="cn"><span class="dot" style="background:${c.color}"></span>${c.n}</div>
+      <div class="r"><span class="l">광고비</span><span class="v">${c.spend?wons(c.spend):'미집행'}</span></div>
+      <div class="r"><span class="l">DB</span><span class="v t">${c.db==null?'\u2014':c.db+'건'}${c.supply?' <span style="font-size:9px;color:#b478ff;font-weight:700">공급형</span>':''}</span></div>
+      <div class="r"><span class="l">CPL</span><span class="v">${c.cpl==null?'\u2014':wons(c.cpl)}</span></div>
+      <div class="r"><span class="l">ROAS</span><span class="v t" style="color:${dotC(c.roas)}">${c.roas??'\u2014'}</span></div>
+      ${c.supply?`<span style="display:block;font-size:10px;color:#8a6ec4;margin-top:8px;border-top:0.5px solid var(--border);padding-top:8px;line-height:1.5">수량은 무제한 생산 가능 \u2192 평가는 ROAS\u00b7전환만</span>`:''}
+      ${hasCr?`<span class="car">${openCh4===i?'\u25B2 소재 접기':'\u25BC 소재 보기'}</span>`:''}
+    </div>`;
+  }).join('');
+  renderW4Detail();
+}
+function togCh4(i){ openCh4 = openCh4===i ? null : i; renderW4Ch(); }
+function renderW4Detail(){
+  const el = document.getElementById('w4-detail');
+  if(openCh4===null || !W4_CH[openCh4].cr){ el.classList.remove('show'); el.innerHTML=''; return; }
+  const c = W4_CH[openCh4];
+  el.innerHTML = `<h3><span class="dot" style="background:var(--teal)"></span>${c.n} 소재별 성과</h3>` +
+    c.cr.map(cr=>{
+      const im = IMGS[cr.key];
+      return `<div class="crow">
+        ${im?`<img src="${im}" onclick="openLb('${cr.key}')">` :'<div style="width:52px;height:52px;border-radius:8px;background:#1a1f27;flex-shrink:0"></div>'}
+        <div class="ci"><div class="cname">${cr.name} ${badge(cr.st)}</div>${cr.note?`<div class="cnote">${cr.note}</div>`:''}</div>
+        ${cr.spend!=null?`<div class="cm"><div class="cl">광고비</div>${wons(cr.spend)}</div>`:''}
+        ${cr.db!=null?`<div class="cm"><div class="cl">DB</div>${cr.db}건</div>`:''}
+        ${cr.cpl!=null?`<div class="cm"><div class="cl">CPL</div><span class="${cr.cpl<=15000?'cpl-g':cr.cpl>=40000?'cpl-b':''}">${wons(cr.cpl)}</span></div>`:''}
+      </div>`;
+    }).join('');
+  el.classList.add('show');
+}
+
+// W4 퍼널
+document.getElementById('w4-funnel').innerHTML =
+  '<div style="font-size:11px;color:var(--sub);margin-bottom:8px;letter-spacing:.5px">[ 신청 코호트 현황 · 6/22~28 ]</div>' +
+  `<div class="frow"><div class="fl">신청 DB</div><div class="fbar" style="width:100%;background:rgba(91,141,239,.7)">442건</div></div>` +
+  `<div class="frow"><div class="fl">방문완료 <span style="font-size:10px;color:var(--faint)">방문+결보+오더</span></div><div class="fbar" style="width:${32/442*100}%;background:rgba(0,229,200,.7);min-width:48px">32건</div></div>` +
+  '<div style="font-size:11px;color:var(--sub);margin:12px 0 8px;letter-spacing:.5px">[ 이번 주 결제 성과 · 결제일 기준 ]</div>' +
+  `<div class="frow"><div class="fl">오더</div><div class="fbar" style="width:${17/32*100}%;background:rgba(0,229,200,.9);min-width:48px">17건</div></div>` +
+  `<div class="frow"><div class="fl">주간 매출</div><div class="fbar" style="width:85%;background:rgba(0,229,200,.4)">6,242만원</div></div>`;
+
+// W4 갤러리
+const W4_GAL = [
+  {key:'노트릴스_영상', title:'ARA_노트릴스_영상_2505', st:'best', tag:'동영상', cpl:'15,804원', sales:43061000, orders:12},
+  {key:'mlst_v3', title:'MLST_공부방법점검 (단일 4종)', st:'best', tag:'단일이미지', cpl:'10,004원', sales:0, orders:0},
+  {key:'노트릴스_채리_2606', title:'ARA_노트릴스_채리_2606', st:'on', tag:'동영상', cpl:'34,335원', sales:8959000, orders:3},
+  {key:'GT노트피드백_영상', title:'ARA_GT노트피드백_영상_2605', st:'on', tag:'동영상', cpl:'33,409원', sales:3468000, orders:1},
+  {key:'너만본다_영상', title:'2026_영상_너만본다', st:'on', tag:'동영상', cpl:'30,666원', sales:0, orders:0},
+  {key:'캐러셀_1_표지', title:'MLST캐러셀 (5종)', st:'on', tag:'캐러셀', cpl:'24,888원', sales:0, orders:0},
+];
+const W4_CPA_GAL = [
+  {key:'텐핑_공부습관무료검사', title:'공부습관 무료검사 (MLST-2)', st:'on', tag:'단일이미지', cpl:'26,955원', sales:0, orders:0},
+  {key:'텐핑_공부잘하고싶은', title:'공부 잘 하고 싶은 초4~고1 찾습니다', st:'on', tag:'단일이미지', cpl:'26,955원', sales:0, orders:0},
+  {key:'텐핑_교육부인가', title:'교육부 인가 정식 온라인 학원', st:'on', tag:'단일이미지', cpl:'26,955원', sales:0, orders:0},
+  {key:'텐핑_맘카페난리', title:'맘카페 난리난 아라온스쿨', st:'on', tag:'단일이미지', cpl:'26,955원', sales:0, orders:0},
+  {key:'텐핑_광주시모집', title:'광주시 학습전략검사 무료체험 모집', st:'on', tag:'텍스트형', cpl:'26,955원', sales:0, orders:0},
+  {key:'텐핑_서울시무료검사', title:'서울시 자녀대상 학습전략 무료검사', st:'on', tag:'단일이미지', cpl:'26,955원', sales:0, orders:0},
+];
+renderGal('w4-gal', W4_GAL);
+renderGal('w4-cpa-gal', W4_CPA_GAL);
+renderW4Ch();
 
 renderW1Ch();
 
