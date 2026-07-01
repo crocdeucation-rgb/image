@@ -5,73 +5,70 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>신상준 · 그로스 운영 대시보드</title>
 <style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
 :root{
-  --bg:#060810;--card:#0F1419;--card2:#141a24;
-  --teal:#00e5c8;--teal-d:#0a8a5c;
-  --text:#fff;--sub:rgba(255,255,255,.55);--faint:rgba(255,255,255,.32);
-  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.05);
-  --amber:#ffc34d;--blue:#6c8bd5;
-  --meta:#6c8bd5;--kk:#f0c020;--dg:#ff7c3c;--nv:#03c75a;--cpa:#b478ff;
+  --bg:#fbfbf9;--card:#ffffff;--card2:#f6f7f5;
+  --teal:#0a7d5a;--teal-l:#e4f5ee;--teal-b:#12a879;
+  --text:#1a1a1a;--sub:#666;--faint:#9a9a9a;--faint2:#c2c2c2;
+  --border:#ececec;--border2:#f2f2f2;
+  --meta:#4267c4;--kk:#d9a500;--dg:#f2622e;--nv:#03c75a;--cpa:#8a4fe0;--amber:#c98a17;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-apple-system,system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6}
-.wrap{max-width:1080px;margin:0 auto;padding:40px 24px 80px;position:relative}
-
-/* 배경 격자 */
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,200,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,200,.03) 1px,transparent 1px);background-size:80px 80px;pointer-events:none;z-index:0}
-.wrap>*{position:relative;z-index:1}
+body{background:var(--bg);color:var(--text);font-family:'Pretendard',-apple-system,system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6}
+.wrap{max-width:1040px;margin:0 auto;padding:44px 24px 80px}
 
 /* 헤더 */
-.hero{padding:24px 0 40px;border-bottom:1px solid var(--border);margin-bottom:40px}
-.eyebrow{display:inline-block;font-size:11px;color:var(--teal);letter-spacing:3px;padding:5px 14px;border:1px solid rgba(0,229,200,.3);border-radius:20px;background:rgba(0,229,200,.05);margin-bottom:24px;text-transform:uppercase}
-.hero h1{font-size:clamp(28px,5vw,46px);font-weight:800;letter-spacing:-2px;line-height:1.15;margin-bottom:18px}
+.hero{padding:8px 0 40px;border-bottom:1px solid var(--border);margin-bottom:8px}
+.eyebrow{display:inline-block;font-size:11px;font-weight:700;color:var(--teal);letter-spacing:2px;padding:6px 14px;border-radius:20px;background:var(--teal-l);margin-bottom:26px}
+.hero h1{font-size:clamp(28px,4.4vw,42px);font-weight:800;letter-spacing:-2px;line-height:1.15;margin-bottom:20px;color:#111}
 .hero h1 em{color:var(--teal);font-style:normal}
-.hero .lead{font-size:clamp(14px,1.7vw,17px);color:var(--sub);max-width:680px;line-height:1.7}
-.hero .meta{margin-top:24px;font-size:12px;color:var(--faint);letter-spacing:.5px}
-.hero .meta b{color:var(--text);font-weight:600}
-
-/* 섹션 헤더 */
-.sec-h{display:flex;align-items:baseline;gap:12px;margin:48px 0 18px}
-.sec-h .no{font-size:12px;color:var(--teal);font-weight:700;letter-spacing:1px}
-.sec-h h2{font-size:17px;font-weight:700;letter-spacing:-.5px}
-.sec-h .cap{font-size:12px;color:var(--faint);margin-left:auto}
+.hero .lead{font-size:clamp(14px,1.6vw,16px);color:var(--sub);max-width:640px;line-height:1.75}
+.hero .who{margin-top:22px;font-size:13px;color:var(--faint)}
+.hero .who b{color:#333;font-weight:600}
 
 /* 대형 KPI */
-.hero-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:32px}
+.hero-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:38px}
 @media(max-width:760px){.hero-kpis{grid-template-columns:repeat(2,1fr)}}
-.hk{background:var(--bg);padding:24px 22px}
-.hk .v{font-size:clamp(26px,3.5vw,38px);font-weight:800;letter-spacing:-1.5px;line-height:1}
-.hk .v.g{color:var(--teal)}
-.hk .k{font-size:12px;color:var(--sub);margin-top:8px}
-.hk .s{font-size:11px;color:var(--faint);margin-top:2px}
+.hk{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px 22px}
+.hk .v{font-size:clamp(26px,3.4vw,36px);font-weight:800;letter-spacing:-1.5px;line-height:1;color:var(--teal)}
+.hk .v.d{color:#111}
+.hk .v span{font-size:18px}
+.hk .k{font-size:12px;color:var(--sub);margin-top:9px;font-weight:500}
+.hk .s{font-size:11px;color:var(--faint2);margin-top:3px}
+
+/* 섹션 헤더 */
+.sec-h{display:flex;align-items:baseline;gap:12px;margin:52px 0 18px}
+.sec-h .no{font-size:12px;color:var(--teal);font-weight:800;letter-spacing:1px}
+.sec-h h2{font-size:18px;font-weight:700;letter-spacing:-.5px;color:#111}
+.sec-h .cap{font-size:12px;color:var(--faint2);margin-left:auto;text-align:right}
 
 /* KPI 일반 */
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:8px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 @media(max-width:760px){.kpis{grid-template-columns:repeat(2,1fr)}}
 .kpi{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px}
-.kpi .k{font-size:11px;color:var(--faint);letter-spacing:.5px;margin-bottom:8px;text-transform:uppercase}
-.kpi .v{font-size:24px;font-weight:700;letter-spacing:-.5px}
+.kpi .k{font-size:11px;color:var(--faint);letter-spacing:.5px;margin-bottom:8px;font-weight:600}
+.kpi .v{font-size:23px;font-weight:800;letter-spacing:-.5px}
 .kpi .v.g{color:var(--teal)}
-.kpi .s{font-size:11px;color:var(--faint);margin-top:4px}
+.kpi .s{font-size:11px;color:var(--faint);margin-top:5px}
 .note{font-size:11px;color:var(--faint);margin:14px 2px 0;line-height:1.8}
 
 /* 월별 성장 바 */
-.growth{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px 26px;margin-bottom:8px}
+.growth{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px 26px}
 .gbars{display:flex;align-items:flex-end;gap:16px;height:200px;margin-top:24px;padding:0 4px}
 .gbar-grp{flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;height:100%;justify-content:flex-end}
-.gbar{width:100%;max-width:70px;border-radius:8px 8px 0 0;position:relative;min-height:10px;background:linear-gradient(180deg,var(--teal),var(--teal-d));transition:.4s}
-.gbar.faint{background:linear-gradient(180deg,rgba(0,229,200,.4),rgba(10,138,92,.3))}
+.gbar{width:100%;max-width:70px;border-radius:8px 8px 0 0;position:relative;min-height:10px;background:linear-gradient(180deg,var(--teal-b),var(--teal));transition:.4s}
+.gbar.faint{background:linear-gradient(180deg,#bfe6d8,#9fd8c4)}
 .gbar .gv{position:absolute;top:-44px;left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap}
-.gbar .gv .gm{font-size:14px;font-weight:800;letter-spacing:-.5px}
-.gbar .gv .gd{font-size:10px;color:var(--faint)}
+.gbar .gv .gm{font-size:14px;font-weight:800;letter-spacing:-.5px;color:#111}
+.gbar .gv .gd{font-size:10px;color:var(--faint2)}
 .gbar-grp .gl{font-size:12px;color:var(--sub);font-weight:600}
-.gbar-grp .gs{font-size:10px;color:var(--faint)}
+.gbar-grp .gs{font-size:10px;color:var(--faint2)}
 
 /* 채널 카드 */
 .channels{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 @media(max-width:900px){.channels{grid-template-columns:repeat(2,1fr)}}
 .ch{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
-.ch .cn{font-size:13px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.ch .cn{font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:7px}
 .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .ch .r{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}
 .ch .l{color:var(--faint)}
@@ -90,31 +87,31 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .srcbar .sr-top{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}
 .srcbar .sr-name{color:var(--sub)}
 .srcbar .sr-val{font-weight:700}
-.srcbar .sr-track{height:7px;background:var(--border2);border-radius:10px;overflow:hidden}
+.srcbar .sr-track{height:7px;background:var(--card2);border-radius:10px;overflow:hidden}
 .srcbar .sr-fill{height:100%;border-radius:10px}
 
 /* 퍼널 */
 .frow{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .fl{font-size:12px;color:var(--sub);width:84px;flex-shrink:0}
-.fbar{height:30px;border-radius:7px;display:flex;align-items:center;padding:0 12px;font-size:12px;font-weight:700;min-width:54px;color:var(--bg)}
+.fbar{height:30px;border-radius:7px;display:flex;align-items:center;padding:0 12px;font-size:12px;font-weight:700;min-width:54px;color:#fff}
 .fpct{font-size:11px;color:var(--teal);margin-left:8px;font-weight:700}
 
 /* 소재별 성과 표 */
 .cre-list{display:flex;flex-direction:column;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden}
 .cre-row{background:var(--card);display:grid;grid-template-columns:1.6fr .7fr .9fr 1fr;align-items:center;gap:10px;padding:15px 18px}
 .cre-row.head{background:var(--card2)}
-.cre-row.head span{font-size:10px;color:var(--faint);letter-spacing:.5px;text-transform:uppercase;font-weight:600}
+.cre-row.head span{font-size:10px;color:var(--faint);letter-spacing:.5px;font-weight:700}
 .cre-name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px;min-width:0}
-.cre-type{font-size:11px;color:var(--sub)}
+.cre-type{font-size:11px;color:var(--faint)}
 .cre-cpl{font-size:13px;font-weight:700;text-align:right}
 .cre-cpl.best{color:var(--teal)}
-.cre-cpl.bad{color:#ff6b5a}
+.cre-cpl.bad{color:#d94b3a}
 .cre-meta{font-size:11px;color:var(--sub);text-align:right;line-height:1.4}
 .cre-st{font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
-.st-best{background:rgba(0,229,200,.14);color:var(--teal)}
-.st-on{background:rgba(108,139,213,.18);color:#9db4e6}
-.st-learn{background:rgba(255,195,77,.14);color:var(--amber)}
-.st-end{background:rgba(255,107,90,.14);color:#ff8d7a}
+.st-best{background:var(--teal-l);color:var(--teal)}
+.st-on{background:#e7edfa;color:#3a5bb0}
+.st-learn{background:#fbf0d8;color:var(--amber)}
+.st-end{background:#fbe6e2;color:#c0492f}
 @media(max-width:600px){
   .cre-row{grid-template-columns:1.4fr 1fr;gap:6px 10px}
   .cre-row .cre-cpl{text-align:left}
@@ -127,7 +124,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .crm-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
 .crm-tag{font-size:11px;font-weight:700;padding:4px 11px;border-radius:999px;letter-spacing:.5px}
 .crm-title{font-size:14px;font-weight:700}
-.crm-date{font-size:12px;color:var(--faint)}
+.crm-date{font-size:12px;color:var(--faint2)}
 .crm-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:600px){.crm-grid{grid-template-columns:1fr}}
 .crm-col .ch-label{font-size:11px;font-weight:700;margin-bottom:8px;letter-spacing:1px}
@@ -139,19 +136,36 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .pipe-item{text-align:center;padding:16px 12px;background:var(--card2);border:1px solid var(--border);border-radius:12px}
 .pipe-item .pe{font-size:22px;margin-bottom:6px}
 .pipe-item .pn{font-size:12px;font-weight:700}
-.pipe-item .ps{font-size:11px;color:var(--teal);margin-top:5px}
+.pipe-item .ps{font-size:11px;color:var(--teal);margin-top:5px;font-weight:600}
 .pipe-item .pd{font-size:10px;color:var(--faint);margin-top:2px}
 
 /* 신규사업 기획 카드 */
 .prd{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px 26px}
 .prd-flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:16px 0 18px}
 .prd-step{font-size:12px;font-weight:700;padding:7px 14px;border-radius:8px;background:var(--card2);border:1px solid var(--border)}
-.prd-arrow{color:var(--teal);font-size:13px}
+.prd-arrow{color:var(--teal);font-size:13px;font-weight:700}
 .prd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:4px}
 @media(max-width:600px){.prd-grid{grid-template-columns:repeat(2,1fr)}}
 .prd-item{padding:14px 14px;background:var(--card2);border:1px solid var(--border);border-radius:10px}
 .prd-item .pl{font-size:11px;color:var(--teal);font-weight:700;margin-bottom:4px}
 .prd-item .pb{font-size:11.5px;color:var(--sub);line-height:1.5}
+
+/* 운영체계·육성 (신규 섹션) */
+.ops-intro{font-size:13px;color:var(--sub);margin-bottom:18px;line-height:1.75}
+.ops-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:768px){.ops-grid{grid-template-columns:1fr}}
+.ops-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column}
+.ops-card .oe{font-size:20px;margin-bottom:12px}
+.ops-card .ol{font-size:11px;font-weight:700;color:var(--teal);letter-spacing:.5px;margin-bottom:6px}
+.ops-card h4{font-size:14px;font-weight:700;margin-bottom:8px;line-height:1.4}
+.ops-card p{font-size:12px;color:var(--sub);line-height:1.7;flex:1}
+.ops-card a{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:var(--teal);text-decoration:none;margin-top:14px}
+.ops-card a:hover{text-decoration:underline}
+.ops-collab{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+@media(max-width:768px){.ops-collab{grid-template-columns:1fr}}
+.collab{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+.collab .cl{font-size:11px;font-weight:700;color:var(--teal);margin-bottom:6px}
+.collab .cb{font-size:12px;color:var(--sub);line-height:1.65}
 
 /* 능력 태그 */
 .skills{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
@@ -164,7 +178,6 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
 @media(max-width:600px){
   .wrap{padding:28px 18px 60px}
-  .crm-grid{grid-template-columns:1fr}
   .gbars{gap:10px;height:170px}
 }
 </style>
@@ -174,16 +187,16 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
   <!-- HERO -->
   <div class="hero">
-    <span class="eyebrow">Growth Operations · 2026</span>
-    <h1>광고 한 번 돌려본 적 없던 브랜드를<br><em>전채널 ROAS 6</em> 시스템으로 만들었습니다</h1>
+    <span class="eyebrow">GROWTH OPERATIONS · 2026</span>
+    <h1>광고 한 번 돌려본 적 없던 브랜드를<br><em>전채널 ROAS 6.2</em> 시스템으로 만들었습니다</h1>
     <p class="lead">2020년 네이버 CPC로 퍼포먼스 마케팅을 시작해, 유입부터 전환·영업 시스템·자동화까지 인바운드 매출 구조 전체를 직접 설계하고 운영합니다. 이 페이지는 실제 운영 데이터를 측정·기록한 결과입니다.</p>
-    <div class="meta">신상준 · <b>세일즈 리드 15년에서 그로스로 피벗한 마케팅 리더</b> · 現 에듀테크 '아라온스쿨' CGO</div>
+    <div class="who">신상준 · <b>세일즈 리드 21년에서 그로스로 피벗한 마케팅 리더</b> · 現 에듀테크 '아라온스쿨' CGO</div>
 
     <div class="hero-kpis">
-      <div class="hk"><div class="v g">3.0억</div><div class="k">누적 인바운드 매출</div><div class="s">2026.03~06.28 · 결제일 기준</div></div>
-      <div class="hk"><div class="v g">6.2</div><div class="k">전채널 통합 ROAS</div><div class="s">전 기간 전수 · 6.28 기준</div></div>
-      <div class="hk"><div class="v">2,351<span style="font-size:18px">건</span></div><div class="k">누적 유입 DB</div><div class="s">광고·소재 직접 운영</div></div>
-      <div class="hk"><div class="v g">403<span style="font-size:18px">만</span></div><div class="k">오더 건당 평균 매출</div><div class="s">6월 · 고단가 전환</div></div>
+      <div class="hk"><div class="v">3.0억</div><div class="k">누적 인바운드 매출</div><div class="s">2026.03~06.28 · 결제일 기준</div></div>
+      <div class="hk"><div class="v">6.2</div><div class="k">전채널 통합 ROAS</div><div class="s">전 기간 전수 · 6.28 기준</div></div>
+      <div class="hk"><div class="v d">2,351<span>건</span></div><div class="k">누적 유입 DB</div><div class="s">일 유입 40~80건</div></div>
+      <div class="hk"><div class="v">403<span>만</span></div><div class="k">오더 건당 평균 매출</div><div class="s">6월 · 고단가 전환</div></div>
     </div>
   </div>
 
@@ -208,7 +221,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
         <div class="gl">6월</div><div class="gs">DB 1,356</div>
       </div>
     </div>
-    <div class="note">※ 3·4월은 광고 집행 전 오가닉 매출 — 매출이 나오는 구조 자체를 먼저 설계 / 누적 3.0억(2026.3~6.28) / 6월 월매출 1.8억 · 오더 44건. 매출·DB는 매일 갱신되는 라이브 값으로, 표기는 6.28 기준입니다.</div>
+    <div class="note">※ 3·4월은 광고 집행 전 오가닉 매출 — 매출이 나오는 구조 자체를 먼저 설계 / 누적 3.0억(2026.3~6.28) · 6월 월매출 1.8억 · 오더 44건. 매출·DB는 매일 갱신되는 라이브 값으로, 표기는 6.28 기준입니다.</div>
   </div>
 
   <!-- 6월 주간 추이 -->
@@ -271,7 +284,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     <div class="card">
       <h3>전환 퍼널</h3>
       <div class="ccap">신청 → 오더 · 6월 누적 전수 추적</div>
-      <div class="frow"><div class="fl">신청 DB</div><div class="fbar" style="width:100%;background:var(--blue)">1,356건</div></div>
+      <div class="frow"><div class="fl">신청 DB</div><div class="fbar" style="width:100%;background:var(--meta)">1,356건</div></div>
       <div class="frow"><div class="fl">오더</div><div class="fbar" style="width:18%;background:var(--teal);min-width:54px">44건</div><span class="fpct">전환 3.2%</span></div>
       <div style="margin-top:14px;font-size:12px;color:var(--sub)">오더 44건 · 건당 평균 403만원 · 6월 매출 1.8억</div>
       <div style="margin-top:14px;padding-top:16px;border-top:1px solid var(--border);font-size:12px;color:var(--sub);line-height:1.8">
@@ -321,15 +334,15 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       <div class="cre-meta">CPL 기준 초과</div>
     </div>
   </div>
-  <div class="note">※ CPL이 좋아도 매출이 없으면 끊고(비평준화·ROAS 0), CPL이 기준을 넘으면 끊는다(기초부족) — 두 기준으로 위너를 가려 집중 운영 · 소재 = 타겟 원칙 / 27개 캠페인 전수 추적</div>
+  <div class="note">※ CPL이 좋아도 매출이 없으면 끊고(비평준화·ROAS 0), CPL이 기준을 넘으면 끊는다(기초부족) — 두 기준으로 위너를 가려 집중 운영 · 소재 = 타겟 원칙</div>
 
-  <!-- CRM 자동화 (원본 그대로 이식) -->
+  <!-- CRM 자동화 -->
   <div class="sec-h"><span class="no">05</span><h2>CRM 자동화 시스템</h2><span class="cap">직접 설계·개발 · Apps Script</span></div>
   <div style="font-size:13px;color:var(--sub);margin-bottom:18px;line-height:1.7">디자이너·개발자가 없는 환경에서, 메타·당근·카카오·텐핑 전채널 리드를 노션 CRM으로 통합하는 자동화 파이프라인을 직접 설계하고 코드로 구축했습니다.</div>
 
   <div class="crm-card">
     <div class="crm-head">
-      <span class="crm-tag" style="background:rgba(180,120,255,.15);color:#b478ff">v3</span>
+      <span class="crm-tag" style="background:#efe7fb;color:#7040c0">v3</span>
       <span class="crm-title">CRM 앱스크립트 — 중복 이력 자동 파싱</span>
       <span class="crm-date">2026.06</span>
     </div>
@@ -347,7 +360,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
   <div class="crm-card">
     <div class="crm-head">
-      <span class="crm-tag" style="background:rgba(0,229,200,.12);color:var(--teal)">PATCH</span>
+      <span class="crm-tag" style="background:var(--teal-l);color:var(--teal)">PATCH</span>
       <span class="crm-title">카카오 비즈니스폼+ 공식 API 연동</span>
       <span class="crm-date">2026.06</span>
     </div>
@@ -365,7 +378,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
   <div class="crm-card">
     <div class="crm-head">
-      <span class="crm-tag" style="background:rgba(66,103,178,.2);color:#8aa8f0">MCP</span>
+      <span class="crm-tag" style="background:#e7edfa;color:#3a5bb0">MCP</span>
       <span class="crm-title">Meta Ads MCP 연동 — 자연어 캠페인 운영</span>
       <span class="crm-date">2026.06</span>
     </div>
@@ -407,15 +420,56 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     </div>
   </div>
 
+  <!-- 운영 체계 · 조직 자산화 (신규) -->
+  <div class="sec-h"><span class="no">07</span><h2>개인 역량을 조직 자산으로</h2><span class="cap">운영 체계화 · 육성 · 협업</span></div>
+  <div class="ops-intro">혼자 ROAS를 만드는 데 그치지 않고, 그 운영 노하우를 교육 커리큘럼·SOP·마케팅 가이드라인으로 문서화해 팀이 따라 할 수 있는 실행 체계로 만듭니다. 필요한 파트너(대행사·개발사)를 데이터 기준으로 관리하며, 개인기가 아니라 조직의 반복 가능한 시스템으로 남깁니다.</div>
+  <div class="ops-grid">
+    <div class="ops-card">
+      <div class="oe">📚</div>
+      <div class="ol">교육 커리큘럼</div>
+      <h4>리드 생성 역량 육성 프로그램</h4>
+      <p>메타 광고 경험이 없는 구성원도 리드를 생성할 수 있도록, 워밍업부터 독립 운영·검증까지 단계별(Phase 0~4) 육성 커리큘럼을 직접 설계했습니다.</p>
+      <a href="https://crocdeucation-rgb.github.io/image/" target="_blank">육성 커리큘럼 보기 →</a>
+    </div>
+    <div class="ops-card">
+      <div class="oe">📝</div>
+      <div class="ol">실행 과제</div>
+      <h4>계정 워밍업 14일 실습</h4>
+      <p>신규 운영자가 계정을 안전하게 워밍업하도록 14일 단위 실습 과제로 체계화 — 감이 아니라 정해진 절차로 리스크를 관리하게 만든 실행 자료입니다.</p>
+      <a href="https://crocdeucation-rgb.github.io/image/warmup_homework.html" target="_blank">실습 과제 보기 →</a>
+    </div>
+    <div class="ops-card">
+      <div class="oe">⚙️</div>
+      <div class="ol">운영 매뉴얼</div>
+      <h4>노션 CRM 운영 매뉴얼</h4>
+      <p>노션 기반 CRM·리드 관리 프로세스를 누구나 따라 할 수 있도록 매뉴얼로 문서화 — 운영을 개인 기억이 아니라 문서화된 룰로 전환했습니다.</p>
+      <a href="https://crocdeucation-rgb.github.io/image/notion_manual.html" target="_blank">운영 매뉴얼 보기 →</a>
+    </div>
+  </div>
+  <div class="ops-collab">
+    <div class="collab">
+      <div class="cl">대행사 관리</div>
+      <div class="cb">외부 대행사(ODI플랜) 위탁 성과를 정산·CPL·ROAS 기준으로 검증 — 기준 미달 확인 후 데이터 기반으로 직접 운영 전환을 결정.</div>
+    </div>
+    <div class="collab">
+      <div class="cl">개발사 협업</div>
+      <div class="cb">1:1 과외 신규 사업 PRD·프로토타입을 개발사에 전달하고 요건을 조율 — 기획과 개발 사이를 직접 연결.</div>
+    </div>
+    <div class="collab">
+      <div class="cl">유관 협업</div>
+      <div class="cb">영업팀에 리드를 연계하고 전환 피드백을 수집, 대표 보고·컨펌 라인으로 신규 사업·예산 의사결정을 진행.</div>
+    </div>
+  </div>
+
   <!-- 일하는 방식 -->
-  <div class="sec-h"><span class="no">07</span><h2>일하는 방식</h2><span class="cap">빈자리를 메워 결과를 완성</span></div>
+  <div class="sec-h"><span class="no">08</span><h2>일하는 방식</h2><span class="cap">빈자리를 메워 결과를 완성</span></div>
   <div class="card" style="line-height:1.9">
     <div style="font-size:14px;color:var(--text);margin-bottom:16px;font-weight:600">전문은 그로스입니다. 나머지는 그로스를 끝까지 완성하기 위해 익힌 무기입니다.</div>
     <div class="skills">
       <span class="skill"><b>퍼포먼스 광고</b> 메타·네이버·카카오·당근·CPA 직접 운영</span>
       <span class="skill"><b>소재 제작</b> 단일·캐러셀·영상 직접 기획·생산</span>
       <span class="skill"><b>CRM 자동화</b> Apps Script·노션·슬랙 파이프라인</span>
-      <span class="skill"><b>데이터 추적</b> GA4·GTM·전수 ROAS 측정</span>
+      <span class="skill"><b>데이터 추적</b> GA4·GTM·Clarity·전수 ROAS 측정</span>
       <span class="skill"><b>영상 편집</b> 편집자 부재 → 직접 제작</span>
       <span class="skill"><b>UX·랜딩</b> 디자이너 부재 → 직접 기획</span>
     </div>
