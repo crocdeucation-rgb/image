@@ -182,6 +182,7 @@
         <div class="egnote"><b>사교육 일정을 적으면 그 시간을 뺀 나머지가 가능</b>이 됩니다. 학원 <b>앞뒤 30분 이동 여유</b>까지 자동으로 막아줘요 (수학 5-8 → 16:30~20:30 막힘). 숫자는 자동 오후.</div>
       </div>
       <button class="applybtn" onclick="applyStuText()">↓ 텍스트 → 시간표에 반영</button>
+      <span style="font-size:11px;color:var(--ink3);margin-left:8px">위 텍스트로 한 번에 반영하거나, 아래 시간표를 <b style="color:var(--ink2)">직접 드래그</b>해서 칠해도 돼요.</span>
       <div class="parsemsg" id="parseMsg"></div>
 
       <div class="tpwrap" style="margin-top:10px"><table class="tp" id="s-time"></table></div>
@@ -221,6 +222,7 @@
     <div class="fld"><label>가능 시간</label>
       <textarea class="txtin" id="f-time-txt" rows="2" placeholder="예) 월 13-22, 수 13-22, 토 11-24"></textarea>
       <button class="applybtn" onclick="applyTeacherText()">↓ 텍스트 → 시간표 반영</button>
+      <span style="font-size:11px;color:var(--ink3);margin-left:8px">텍스트로 반영하거나, 아래 시간표를 <b style="color:var(--ink2)">직접 드래그</b>해도 돼요.</span>
       <div class="parsemsg" id="fParseMsg"></div>
       <div class="tpwrap" style="margin-top:8px"><table class="tp" id="f-time"></table></div>
       <div class="tphint">드래그로 직접 칠하거나 텍스트로 입력하세요. 숫자는 자동 오후 (강사는 낮 시간도 많으면 24시간제로 "13-22" 권장).</div></div>
