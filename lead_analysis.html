@@ -139,6 +139,47 @@
     <p>팀이 <b>신규 콜·방문이라는 고가치 일</b>에 집중하고, 반복·방치되는 부분은 <b>시스템이 자동으로 메운다.</b> 지금도 잘하고 있으니, 안 새는 장치만 깔면 된다.</p>
   </div>
 
+  <h3 style="margin:40px 0 6px;font-size:15px;">⑦ 알림톡은 이렇게 작동한다 — "2차 부재" 트리거</h3>
+  <p style="color:var(--sub);font-size:13px;margin-bottom:16px;">과거 741건을 한꺼번에 쏘지 않는다. 오래된 부재는 뜬금없어 오히려 역효과. 대신 <b>사람이 1~2차 콜을 시도한 뒤, 그래도 못 닿은 리드만</b> 자동으로 넘긴다. 상담원이 상태를 바꾸는 순간 알림톡이 나가는 구조.</p>
+
+  <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 24px;margin-bottom:24px;font-size:13px;">
+    <span style="background:rgba(255,255,255,0.06);padding:8px 14px;border-radius:8px;">1차 콜 → 부재</span>
+    <span style="color:var(--teal);">→</span>
+    <span style="background:rgba(255,255,255,0.06);padding:8px 14px;border-radius:8px;">2차 콜 → 여전히 부재</span>
+    <span style="color:var(--teal);">→</span>
+    <span style="background:rgba(0,229,200,0.15);color:var(--teal);padding:8px 14px;border-radius:8px;font-weight:900;">상담원이 상태 변경</span>
+    <span style="color:var(--teal);">→</span>
+    <span style="background:rgba(0,229,200,0.15);color:var(--teal);padding:8px 14px;border-radius:8px;font-weight:900;">솔라피 알림톡 자동 발송 📩</span>
+  </div>
+
+  <p style="color:var(--sub);font-size:13px;margin-bottom:14px;"><b>상담원은 딱 하나만</b> — 2차 콜 후에도 부재면, 노션에서 <b>체크박스 하나</b> 누르거나 <b>상태값 변경</b>만 하면 됨. 나머지(발송·중복방지·기록)는 시스템이 처리.</p>
+
+  <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;margin-bottom:12px;">
+    <!-- 카톡 목업 -->
+    <div style="width:300px;background:#9bbbd4;border-radius:14px;padding:16px;">
+      <div style="font-size:12px;color:#3a4a5a;margin-bottom:8px;font-weight:700;">아라온스쿨</div>
+      <div style="background:#fef01b;border-radius:10px 10px 0 0;padding:8px 14px;font-size:12px;font-weight:800;color:#3a1d1d;">알림톡 도착</div>
+      <div style="background:#fff;border-radius:0 0 10px 10px;padding:14px;font-size:13px;line-height:1.6;color:#222;">
+        안녕하세요, <b>○○ 학부모님</b> 😊<br>아라온스쿨입니다.<br><br>
+        아이 학습 상담 관련해 두 차례 연락드렸는데 계속 엇갈렸네요. 바쁘신 줄 알기에 먼저 메시지로 인사드려요.<br><br>
+        편하게 통화 가능한 시간을 살짝 남겨주시면, 그때 맞춰 연락드리겠습니다. 천천히 회신 주셔도 괜찮아요 🙂
+        <div style="margin-top:12px;border-top:1px solid #eee;padding-top:10px;text-align:center;font-size:13px;color:#3a6ea5;font-weight:700;">💬 편한 시간 남기기</div>
+      </div>
+    </div>
+
+    <div style="flex:1;min-width:240px;">
+      <div class="card" style="margin-bottom:12px;">
+        <h3>문구 원칙</h3>
+        <p>"두 번 연락했는데 못 닿았다"는 맥락을 솔직하게 → 부담 대신 배려로. 강매·재촉 없이 "편한 시간만 남겨달라"로 문턱을 낮춤. 검증된 대표 인사 톤(따뜻·저압) 유지.</p>
+      </div>
+      <div class="card">
+        <h3>발송 조건</h3>
+        <p>① 2차 콜 후에도 부재 &nbsp;② 상담원이 상태 변경(또는 체크) &nbsp;③ 아직 알림톡 미발송인 리드만. 오래 방치된 건은 상태 갱신이 안 됐으니 자동 제외됨.</p>
+      </div>
+    </div>
+  </div>
+  <p style="color:var(--sub);font-size:12px;">* 실제 문구·버튼은 알림톡 템플릿 심사 후 확정. 변수(학부모명)는 노션 데이터로 자동 치환.</p>
+
 </div>
 </body>
 </html>
