@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>아라온스쿨 리드관리 수치 분석</title>
+<style>
+  :root{ --bg:#060810; --card:#0F1419; --teal:#00e5c8; --sub:rgba(255,255,255,0.55); --line:rgba(255,255,255,0.08); }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{ background:var(--bg); color:#fff; font-family:'Spoqa Han Sans Neo',-apple-system,sans-serif; padding:40px 20px; line-height:1.5; }
+  .wrap{ max-width:900px; margin:0 auto; }
+  h1{ font-size:26px; font-weight:900; letter-spacing:-1px; margin-bottom:6px; }
+  .date{ color:var(--sub); font-size:13px; margin-bottom:32px; }
+  .eyebrow{ display:inline-block; font-size:12px; color:var(--teal); letter-spacing:2px; padding:5px 12px; border:1px solid rgba(0,229,200,0.3); border-radius:20px; background:rgba(0,229,200,0.05); margin-bottom:14px; }
+  table{ width:100%; border-collapse:collapse; background:var(--card); border-radius:12px; overflow:hidden; margin-bottom:36px; }
+  th,td{ padding:12px 16px; text-align:left; border-bottom:1px solid var(--line); font-size:14px; }
+  th{ background:rgba(255,255,255,0.03); color:var(--sub); font-weight:700; font-size:12px; letter-spacing:0.5px; }
+  td.num{ text-align:right; font-variant-numeric:tabular-nums; }
+  .bar{ height:6px; background:var(--teal); border-radius:3px; display:inline-block; vertical-align:middle; }
+  .hi{ color:var(--teal); font-weight:900; }
+  .warn{ color:#ff6b6b; font-weight:900; }
+  .flag{ background:rgba(255,107,107,0.12); }
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px 24px; margin-bottom:16px; }
+  .card h3{ font-size:15px; color:var(--teal); margin-bottom:8px; }
+  .card p{ font-size:14px; color:rgba(255,255,255,0.85); }
+  .big{ font-size:34px; font-weight:900; letter-spacing:-1px; }
+  .grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:36px; }
+  .stat{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px; text-align:center; }
+  .stat .lbl{ font-size:12px; color:var(--sub); margin-top:4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="eyebrow">LEAD OPS DIAGNOSIS</span>
+  <h1>아라온스쿨 리드관리 수치 분석</h1>
+  <div class="date">전체 DB 2,616건 · 노션 통합 기준</div>
+
+  <div class="grid">
+    <div class="stat"><div class="big warn">41.4%</div><div class="lbl">부재/OFF 비율</div></div>
+    <div class="stat"><div class="big">741</div><div class="lbl">1차 부재 후 방치</div></div>
+    <div class="stat"><div class="big hi">6.1%</div><div class="lbl">실결제(오더+결보)</div></div>
+  </div>
+
+  <h3 style="margin-bottom:12px;font-size:15px;">① 전체 상태 분포</h3>
+  <table>
+    <thead><tr><th>상태</th><th class="num">건수</th><th class="num">비율</th><th style="width:220px">분포</th></tr></thead>
+    <tbody>
+      <tr class="flag"><td>부재/OFF</td><td class="num warn">1,082</td><td class="num">41.4%</td><td><span class="bar" style="width:100%"></span></td></tr>
+      <tr><td>홀딩</td><td class="num">314</td><td class="num">12.0%</td><td><span class="bar" style="width:29%"></span></td></tr>
+      <tr><td>신규(미콜)</td><td class="num">272</td><td class="num">10.4%</td><td><span class="bar" style="width:25%"></span></td></tr>
+      <tr><td>니즈없음</td><td class="num">209</td><td class="num">8.0%</td><td><span class="bar" style="width:19%"></span></td></tr>
+      <tr><td>결번/대상아님</td><td class="num">194</td><td class="num">7.4%</td><td><span class="bar" style="width:18%"></span></td></tr>
+      <tr><td>중복</td><td class="num">187</td><td class="num">7.1%</td><td><span class="bar" style="width:17%"></span></td></tr>
+      <tr class="flag"><td>오더</td><td class="num hi">83</td><td class="num">3.2%</td><td><span class="bar" style="width:8%"></span></td></tr>
+      <tr><td>결보</td><td class="num">76</td><td class="num">2.9%</td><td><span class="bar" style="width:7%"></span></td></tr>
+      <tr><td>잘못신청</td><td class="num">64</td><td class="num">2.4%</td><td><span class="bar" style="width:6%"></span></td></tr>
+      <tr><td>방문취소</td><td class="num">62</td><td class="num">2.4%</td><td><span class="bar" style="width:6%"></span></td></tr>
+      <tr><td>방문</td><td class="num">39</td><td class="num">1.5%</td><td><span class="bar" style="width:4%"></span></td></tr>
+      <tr><td>기타(취소·일대일·미납 등)</td><td class="num">34</td><td class="num">1.3%</td><td><span class="bar" style="width:3%"></span></td></tr>
+    </tbody>
+    <tfoot><tr><th>합계</th><th class="num">2,616</th><th class="num">100%</th><th></th></tr></tfoot>
+  </table>
+
+  <h3 style="margin-bottom:12px;font-size:15px;">② 부재 1,082건 — 콜 시도 횟수별</h3>
+  <table>
+    <thead><tr><th>구분</th><th class="num">건수</th><th class="num">부재 내 비율</th><th>의미</th></tr></thead>
+    <tbody>
+      <tr class="flag"><td><b>1차 부재 후 재콜 안 함</b></td><td class="num warn">741</td><td class="num">68.5%</td><td>손 한 번만 탄 리드 · 회수 1순위</td></tr>
+      <tr><td>2차 부재</td><td class="num">183</td><td class="num">16.9%</td><td>재시도 1회 · 2순위</td></tr>
+      <tr><td>3차 부재</td><td class="num">64</td><td class="num">5.9%</td><td>공들임 · 후순위</td></tr>
+      <tr><td>4차 이상</td><td class="num">63</td><td class="num">5.8%</td><td>이미 다회차 · 알림톡 1회만</td></tr>
+      <tr><td>부재언급 없음(기타)</td><td class="num">31</td><td class="num">2.9%</td><td>상태만 부재 · 확인필요</td></tr>
+    </tbody>
+    <tfoot><tr><th>합계</th><th class="num">1,082</th><th class="num">100%</th><th></th></tr></tfoot>
+  </table>
+
+  <h3 style="margin-bottom:12px;font-size:15px;">③ 왜 "말이 안 되는" 수치인가</h3>
+
+  <div class="card">
+    <h3>⚠️ 부재 41% — 콜 운영의 구조적 병목</h3>
+    <p>DB 10건 중 4건이 부재로 묶임. 광고비로 딴 리드의 41%가 "연락 안 됨"으로 죽고 있다는 뜻. 유입 시간대(새벽·아침)와 업무시간(11:30~20:00)이 어긋나는 게 근본 원인.</p>
+  </div>
+
+  <div class="card">
+    <h3>⚠️ 1차 콜 후 방치 741건 = 부재의 68%</h3>
+    <p>재콜 시스템이 사실상 없음. 한 번 부재나면 그대로 묻힘. 이 741건은 아직 살아있을 확률이 가장 높은 리드인데 방치 중.</p>
+  </div>
+
+  <div class="card">
+    <h3>⚠️ 실결제 159건(6.1%) vs 부재 1,082건</h3>
+    <p>오더 83 + 결보 76 = 159건이 실제 성과. 부재로 묶인 1,082건에서 단 10%만 살려도 실결제 모수가 이론상 크게 늘 수 있음. 회수 여지가 성과 규모를 좌우.</p>
+  </div>
+
+</div>
+</body>
+</html>
