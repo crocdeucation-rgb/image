@@ -471,7 +471,7 @@ function runSearch(){
         blk[d].map(st=>'<button class="sb" data-tid="'+t.id+'" data-d="'+d+'" data-st="'+st+'" onclick="pickSlot(this)">'+st+'~'+endTime(st,cond.dur)+'</button>').join('')+'</div></div>').join('')+'</div>'+
       '<div class="assignbar"><span class="picked" id="pick-'+t.id+'">선택된 시간: 없음</span><button class="doassign" id="do-'+t.id+'" disabled onclick="doAssign(\''+t.id+'\')">주 '+cond.freq+'회 배정</button></div>';
     return '<div class="tcard2'+(days.length?'':' no')+'"><div class="t2h"><div class="av">'+esc(t.name[0])+'</div>'+
-      '<div><div class="nm">'+esc(t.name)+'</div><div class="gl">'+[t.main,...(t.sub||[])].join('·')+' · '+grLabel(t.grades)+'</div></div>'+
+      '<div><div class="nm">'+esc(t.name)+'</div><div class="gl">'+[t.main,...(t.sub||[])].join('·')+' · '+grLabel(t.grades)+(t.edu?' · '+esc(t.edu):'')+'</div></div>'+
       '<span class="st '+(can?'can':'cant')+'">'+(can?'배정 가능':(days.length?'요일 부족':'자리 없음'))+'</span></div>'+inner+'</div>';
   }).join('');
 }
