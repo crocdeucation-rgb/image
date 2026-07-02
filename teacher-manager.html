@@ -68,6 +68,14 @@
   .sw.blue{background:var(--blue)}.sw.busy{background:var(--busy-l);border:1px solid var(--busy)}
   /* results */
   .res-t{font-size:12px;color:var(--ink2);margin:4px 0 10px}.res-t b{color:var(--blue-d)}
+  .sumbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .sumcard{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 13px;box-shadow:var(--shadow);font-size:12px}
+  .sumcard .sn{font-weight:800;color:var(--ink)}
+  .sumcard .sc{color:var(--blue-d);font-weight:800;margin-left:5px}
+  .sumcard .sz{color:var(--ink3);font-weight:600}
+  .sumtot{background:var(--blue);color:#fff;border-color:var(--blue)}
+  .sumtot .sn,.sumtot .sc{color:#fff}
+  .sumempty{font-size:12px;color:var(--ink3);padding:14px;background:var(--panel);border:1px dashed var(--line);border-radius:10px;margin-bottom:14px;text-align:center}
   .tcard2{border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-bottom:10px}
   .tcard2.no{opacity:.55}
   .t2h{display:flex;align-items:center;gap:9px;margin-bottom:4px}
@@ -201,6 +209,7 @@
   <!-- 배정 시간표 -->
   <div class="view" id="v-sched">
     <div class="res-t" style="margin-bottom:12px">배정된 수업만 표시됩니다. 칸을 누르면 배정 해제.</div>
+    <div id="schedSummary"></div>
     <div class="gridwrap"><table class="grid" id="schedGrid"></table></div>
   </div>
 
@@ -497,9 +506,19 @@ function renderSched(){const grid=document.getElementById('schedGrid');const sta
     DAYS.forEach(d=>{html+='<td class="gcell'+(isHour?'':' half')+'">';(startMap[d+'-'+s]||[]).forEach(({t,a})=>{
       html+='<span class="asg" onclick="unassign(\''+t.id+'\',\''+a.day+'\',\''+a.start+'\')" title="해제">'+esc(t.name)+' → '+esc(a.student)+' ('+a.dur+')</span>';});html+='</td>';});
     html+='</tr>';});
-  grid.innerHTML=html+'</tbody>';}
-function unassign(tid,day,start){const t=DATA.find(x=>x.id===tid);if(!t)return;const a=t.assign.find(x=>x.day===day&&x.start===start);if(!a)return;
-  if(confirm(t.name+' · '+day+' '+start+' · '+a.student+' 해제할까요?')){t.assign=t.assign.filter(x=>!(x.day===day&&x.start===start));save();renderSched();toast('해제됨');}}
+  grid.innerHTML=html+'</tbody>';
+  renderSchedSummary();}
+function renderSchedSummary(){
+  const box=document.getElementById('schedSummary');if(!box)return;
+  const rows=DATA.map(t=>({name:t.name,n:(t.assign||[]).length})).filter(x=>x.n>0).sort((a,b)=>b.n-a.n);
+  const total=rows.reduce((s,x)=>s+x.n,0);
+  const studs=new Set();DATA.forEach(t=>(t.assign||[]).forEach(a=>studs.add(a.student)));
+  if(!total){box.innerHTML='<div class="sumempty">아직 배정된 수업이 없습니다. \u2018배정 서치\u2019에서 학생을 강사에 배정하면 여기에 요약이 표시됩니다.</div>';return;}
+  box.innerHTML='<div class="sumbar">'+
+    '<div class="sumcard sumtot"><span class="sn">전체</span><span class="sc">'+total+'</span><span class="sz" style="color:rgba(255,255,255,.8)"> 세션 · 학생 '+studs.size+'명</span></div>'+
+    rows.map(r=>'<div class="sumcard"><span class="sn">'+esc(r.name)+'</span><span class="sc">'+r.n+'</span><span class="sz"> 세션</span></div>').join('')+
+    '</div>';
+}
 
 /* ---- 강사 카드 ---- */
 function renderCards(){document.getElementById('tcount').textContent='· '+DATA.length+'명';
