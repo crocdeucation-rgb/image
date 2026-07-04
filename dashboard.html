@@ -114,7 +114,9 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 .visit-grade { font-size: 10px; color: #999; margin-left: 2px; }
 .visit-assignee { font-size: 10px; color: #fff; background: #888; border-radius: 10px; padding: 1px 7px; margin-left: auto; white-space: nowrap; }
 .visit-assignee.hye { background: #0f9d58; }
-.visit-assignee.eom { background: #9333ea; }
+.visit-assignee.park { background: #9333ea; }
+.visit-assignee.woo { background: #e11d48; }
+.visit-assignee.tae { background: #0891b2; }
 .visit-assignee.kim { background: #1a73e8; }
 .visit-assignee.jang { background: #f97316; }
 .visit-empty { padding: 20px; text-align: center; color: #aaa; font-size: 12px; }
@@ -240,9 +242,9 @@ let currentSec = 0;
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1438610573&single=true&output=csv';
 const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1384080283&single=true&output=csv';
 
-const ASSIGNEES = ['우혜림', '엄현호', '김윤호', '장윤호'];
+const ASSIGNEES = ['우혜림', '김윤호', '장윤호', '박창건', '김우진', '김태석'];
 const ASSIGNEE_START_IDX = 43;
-const CAMPAIGN_START_IDX = 49;
+const CAMPAIGN_START_IDX = 51;
 
 function showSec(idx) {
   currentSec = idx;
@@ -400,7 +402,7 @@ async function loadSchedule() {
       const isToday = dStr === todayStr;
       const dateStr = (d.getMonth()+1) + '/' + d.getDate() + ' (' + dayNames[d.getDay()] + ')';
       const assignee = r[6] || '';
-      const cmap = { '우혜림': 'hye', '엄현호': 'eom', '김윤호': 'kim', '장윤호': 'jang' };
+      const cmap = { '우혜림': 'hye', '김윤호': 'kim', '장윤호': 'jang', '박창건': 'park', '김우진': 'woo', '김태석': 'tae' };
       const assigneeClass = 'visit-assignee ' + (cmap[assignee] || '');
       const assigneeHtml = assignee ? `<span class="${assigneeClass}">${escapeHtml(assignee)}</span>` : '';
       return `<div class="visit-item${isToday ? ' today' : ''}">
