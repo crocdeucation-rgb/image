@@ -398,7 +398,9 @@ function render() {
       if (effCols) {
         const cpl  = r[effCols[0]] || '';
         const roas = r[effCols[1]] || '';
-        const cplNum = parseInt((cpl+'').replace(/[^0-9]/g,'')) || 0;
+        let cplNum = parseInt((cpl+'').replace(/[^0-9]/g,'')) || 0;
+        // 텐핑은 CPA 고정단가 → CPL 항상 ₩28,000 (광고비/전체DB는 무효 포함이라 왜곡)
+        if (dbId === 'route-cpa' && cplNum > 0) cplNum = 28000;
         // 광고비 없는 기간/채널이면 아예 표기 안 함
         if (cplNum > 0 || roas) {
           const cplStr  = cplNum > 0 ? '₩' + cplNum.toLocaleString() : '-';
