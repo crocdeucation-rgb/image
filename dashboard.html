@@ -206,7 +206,7 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 <div class="section-label">유입경로별 <span class="badge pay" id="route-eff-label">CPL·ROAS</span></div>
 <div class="grid-4">
   <div class="card"><div class="clabel">메타광고</div><div class="cval purple xs" id="route-meta">-</div><div class="crate" id="rr-meta"></div></div>
-  <div class="card"><div class="clabel">인스타자연</div><div class="cval blue xs" id="route-insta">-</div><div class="crate" id="rr-insta"></div></div>
+  <div class="card"><div class="clabel">Organic</div><div class="cval blue xs" id="route-insta">-</div><div class="crate" id="rr-insta"></div></div>
   <div class="card"><div class="clabel">당근</div><div class="cval orange xs" id="route-daangn">-</div><div class="crate" id="rr-daangn"></div></div>
   <div class="card"><div class="clabel">카카오</div><div class="cval amber xs" id="route-kakao">-</div><div class="crate" id="rr-kakao"></div></div>
   <div class="card"><div class="clabel">네이버</div><div class="cval blue xs" id="route-naver">-</div><div class="crate" id="rr-naver"></div></div>
@@ -375,7 +375,12 @@ function render() {
   // CPL/ROAS 컬럼: 이번달탭→12/13, 지난달탭→9/10, 전체탭→숨김
   const effCols = currentTab === 0 ? [12,13] : currentTab === 1 ? [9,10] : null;
   const rel = document.getElementById('route-eff-label');
-  if (rel) rel.textContent = currentTab === 0 ? 'CPL·ROAS 이번달 진행중' : currentTab === 1 ? 'CPL·ROAS 지난달 확정' : 'CPL·ROAS';
+  const rSum = allRows[42] || []; // 유입경로 합계행
+  const hasThisSpend = (parseInt((rSum[11]+'').replace(/[^0-9]/g,'')) || 0) > 0;
+  if (rel) rel.textContent =
+    currentTab === 0 ? (hasThisSpend ? 'CPL·ROAS 이번달 진행중' : 'CPL·ROAS 이번달 광고비 미입력')
+    : currentTab === 1 ? 'CPL·ROAS 지난달 확정'
+    : 'CPL·ROAS';
   const routeMap = [
     ['route-meta','rr-meta',35],['route-insta','rr-insta',36],['route-daangn','rr-daangn',37],
     ['route-kakao','rr-kakao',38],['route-naver','rr-naver',39],['route-cpa','rr-cpa',40],['route-etc','rr-etc',41]
