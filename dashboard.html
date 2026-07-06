@@ -120,6 +120,7 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 .visit-assignee.kim { background: #1a73e8; }
 .visit-assignee.jang { background: #f97316; }
 .visit-empty { padding: 20px; text-align: center; color: #aaa; font-size: 12px; }
+  .crate { font-size:10px; margin-top:3px; font-weight:600; }
 </style>
 </head>
 <body>
@@ -203,13 +204,13 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 
 <div class="section-label">유입경로별</div>
 <div class="grid-4">
-  <div class="card"><div class="clabel">인스타그램</div><div class="cval purple xs" id="route-insta">-</div></div>
-  <div class="card"><div class="clabel">페이스북</div><div class="cval blue xs" id="route-fb">-</div></div>
-  <div class="card"><div class="clabel">당근</div><div class="cval orange xs" id="route-daangn">-</div></div>
-  <div class="card"><div class="clabel">카카오</div><div class="cval amber xs" id="route-kakao">-</div></div>
-  <div class="card"><div class="clabel">네이버검색</div><div class="cval blue xs" id="route-naver">-</div></div>
-  <div class="card"><div class="clabel">CPA</div><div class="cval red xs" id="route-cpa">-</div></div>
-  <div class="card"><div class="clabel">기타</div><div class="cval xs" id="route-etc">-</div></div>
+  <div class="card"><div class="clabel">인스타그램</div><div class="cval purple xs" id="route-insta">-</div><div class="crate" id="rr-insta"></div></div>
+  <div class="card"><div class="clabel">페이스북</div><div class="cval blue xs" id="route-fb">-</div><div class="crate" id="rr-fb"></div></div>
+  <div class="card"><div class="clabel">당근</div><div class="cval orange xs" id="route-daangn">-</div><div class="crate" id="rr-daangn"></div></div>
+  <div class="card"><div class="clabel">카카오</div><div class="cval amber xs" id="route-kakao">-</div><div class="crate" id="rr-kakao"></div></div>
+  <div class="card"><div class="clabel">네이버검색</div><div class="cval blue xs" id="route-naver">-</div><div class="crate" id="rr-naver"></div></div>
+  <div class="card"><div class="clabel">CPA</div><div class="cval red xs" id="route-cpa">-</div><div class="crate" id="rr-cpa"></div></div>
+  <div class="card"><div class="clabel">기타</div><div class="cval xs" id="route-etc">-</div><div class="crate" id="rr-etc"></div></div>
 </div>
 
 <div class="section-label">캠페인별 <span class="badge">Top 5</span></div>
@@ -351,14 +352,24 @@ function render() {
   document.getElementById('grade-mid').textContent   = allRows[29]?.[convCol] || '-';
   document.getElementById('grade-high').textContent  = allRows[30]?.[convCol] || '-';
 
-  // 유입경로별
-  document.getElementById('route-insta').textContent  = allRows[41]?.[convCol] || '-';
-  document.getElementById('route-fb').textContent     = allRows[40]?.[convCol] || '-';
-  document.getElementById('route-daangn').textContent = allRows[41]?.[convCol] || '-';
-  document.getElementById('route-kakao').textContent  = allRows[40]?.[convCol] || '-';
-  document.getElementById('route-naver').textContent  = allRows[41]?.[convCol] || '-';
-  document.getElementById('route-cpa').textContent    = allRows[40]?.[convCol] || '-';
-  document.getElementById('route-etc').textContent    = allRows[41]?.[convCol] || '-';
+  // 유입경로별 (36행부터: 인스타/페북/당근/카카오/네이버/CPA/기타)
+  const routeMap = [
+    ['route-insta','rr-insta',36],['route-fb','rr-fb',37],['route-daangn','rr-daangn',38],
+    ['route-kakao','rr-kakao',39],['route-naver','rr-naver',40],['route-cpa','rr-cpa',41],['route-etc','rr-etc',42]
+  ];
+  routeMap.forEach(([dbId, rateId, row]) => {
+    const r = allRows[row] || [];
+    document.getElementById(dbId).textContent = r[convCol] || '-';
+    // 전체 탭일 때만 전환율 표시 (방문율/오더율은 전체 누적 기준)
+    const rateEl = document.getElementById(rateId);
+    if (rateEl) {
+      const visitRate = r[5] || '';   // 방문율
+      const orderRate = r[7] || '';   // 오더율
+      rateEl.innerHTML = (visitRate || orderRate)
+        ? `<span style="color:#0891b2">방${visitRate}</span> · <span style="color:#7c3aed">오${orderRate}</span>`
+        : '';
+    }
+  });
 
   // 캠페인 Top 5
   const ctbody = document.getElementById('campaign-tbody');
