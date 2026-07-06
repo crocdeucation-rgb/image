@@ -369,14 +369,13 @@ function render() {
     }
   });
 
-  // 유입경로별 (요약시트 36행=메타광고부터 → allRows 35~41)
-  // 컬럼: 0채널 1이번달DB 2지난달DB 3전체DB 4방문 5방문율 6방취율 7오더율
-  //       8지난달광고비 9지난달CPL 10지난달ROAS 11이번달광고비 12이번달CPL 13이번달ROAS
-  // CPL/ROAS 컬럼: 이번달탭→12/13, 지난달탭→9/10, 전체탭→숨김
-  const effCols = currentTab === 0 ? [12,13] : currentTab === 1 ? [9,10] : null;
+  // 유입경로별 (요약시트 36행=메타광고부터 → allRows 35~41). 전부 탭 연동.
+  // 컬럼: 0채널 1~3DB(이번달/지난달/전체) 4~6방문율 7~9오더율
+  //       10~12지난달(광고비/CPL/ROAS) 13~15이번달(광고비/CPL/ROAS)
+  const effCols = currentTab === 0 ? [14,15] : currentTab === 1 ? [11,12] : null;
   const rel = document.getElementById('route-eff-label');
   const rSum = allRows[42] || []; // 유입경로 합계행
-  const hasThisSpend = (parseInt((rSum[11]+'').replace(/[^0-9]/g,'')) || 0) > 0;
+  const hasThisSpend = (parseInt((rSum[13]+'').replace(/[^0-9]/g,'')) || 0) > 0;
   if (rel) rel.textContent =
     currentTab === 0 ? (hasThisSpend ? 'CPL·ROAS 이번달 진행중' : 'CPL·ROAS 이번달 광고비 미입력')
     : currentTab === 1 ? 'CPL·ROAS 지난달 확정'
@@ -390,8 +389,8 @@ function render() {
     document.getElementById(dbId).textContent = r[convCol] || '-';
     const rateEl = document.getElementById(rateId);
     if (rateEl) {
-      const visitRate = r[5] || '';   // 방문율
-      const orderRate = r[7] || '';   // 오더율
+      const visitRate = r[4 + currentTab] || '';   // 방문율 (탭 연동)
+      const orderRate = r[7 + currentTab] || '';    // 오더율 (탭 연동)
       let html = (visitRate || orderRate)
         ? `<span style="color:#0891b2">방${visitRate}</span> · <span style="color:#7c3aed">오${orderRate}</span>`
         : '';
