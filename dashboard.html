@@ -170,14 +170,16 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
       <th>담당자</th>
       <th>DB수</th>
       <th>방문수</th>
+      <th>세팅수</th>
+      <th>방취수</th>
       <th>오더수</th>
       <th>매출</th>
-      <th>신→방</th>
-      <th>방→오</th>
+      <th>방취율</th>
+      <th>오더율</th>
     </tr>
   </thead>
   <tbody id="funnel-tbody">
-    <tr><td colspan="7" style="color:#aaa;text-align:center;padding:16px;">불러오는 중...</td></tr>
+    <tr><td colspan="9" style="color:#aaa;text-align:center;padding:16px;">불러오는 중...</td></tr>
   </tbody>
 </table>
 </div>
@@ -299,41 +301,47 @@ function render() {
   document.getElementById('v-yesterday').textContent = allRows[2]?.[1]   || '0';  // 어제 유입
 
   // 담당자 퍼널
-  const offset = currentTab * 4 + 1;
+  const offset = currentTab * 6 + 1;
   const tbody = document.getElementById('funnel-tbody');
-  let totalDb=0, totalVisit=0, totalOrder=0, totalSalesNum=0;
+  let totalDb=0, totalVisit=0, totalSetting=0, totalCancel=0, totalOrder=0, totalSalesNum=0;
   let rows = ASSIGNEES.map((name, i) => {
     const r = allRows[ASSIGNEE_START_IDX + i] || [];
-    const db    = parseInt(r[offset]   || '0') || 0;
-    const visit = parseInt(r[offset+1] || '0') || 0;
-    const order = parseInt(r[offset+2] || '0') || 0;
-    const sales = r[offset+3] || '0원';
-    totalDb += db; totalVisit += visit; totalOrder += order;
+    const db      = parseInt(r[offset]   || '0') || 0;
+    const visit   = parseInt(r[offset+1] || '0') || 0;
+    const setting = parseInt(r[offset+2] || '0') || 0;
+    const cancel  = parseInt(r[offset+3] || '0') || 0;
+    const order   = parseInt(r[offset+4] || '0') || 0;
+    const sales   = r[offset+5] || '0원';
+    totalDb += db; totalVisit += visit; totalSetting += setting; totalCancel += cancel; totalOrder += order;
     const salesNum = parseInt((sales+'').replace(/[^0-9]/g,'')) || 0;
     if (sales.includes('만원')) totalSalesNum += salesNum * 10000;
     else totalSalesNum += salesNum;
-    const visitRate = db ? Math.round(visit/db*100) : 0;
-    const orderRate = visit ? Math.round(order/visit*100) : 0;
+    const cancelRate = visit ? Math.round(cancel/visit*100) : 0;   // 방취율 = 방취/방문
+    const orderRate  = setting ? Math.round(order/setting*100) : 0; // 오더율 = 오더/세팅
     return `<tr>
       <td class="name">${r[0] || name}</td>
       <td class="num db">${db}</td>
       <td class="num visit">${visit}</td>
+      <td class="num" style="color:#2563eb">${setting}</td>
+      <td class="num" style="color:#e11d48">${cancel}</td>
       <td class="num order">${order}</td>
       <td class="sales">${sales}</td>
-      <td class="rate">${visitRate}%</td>
+      <td class="rate" style="color:#e11d48">${cancelRate}%</td>
       <td class="rate">${orderRate}%</td>
     </tr>`;
   });
-  const totVisitRate = totalDb ? Math.round(totalVisit/totalDb*100) : 0;
-  const totOrderRate = totalVisit ? Math.round(totalOrder/totalVisit*100) : 0;
+  const totCancelRate = totalVisit ? Math.round(totalCancel/totalVisit*100) : 0;
+  const totOrderRate  = totalSetting ? Math.round(totalOrder/totalSetting*100) : 0;
   const totSalesStr = totalSalesNum >= 10000 ? Math.round(totalSalesNum/10000) + '만원' : totalSalesNum + '원';
   rows.push(`<tr class="total">
     <td class="name">합계</td>
     <td class="num db">${totalDb}</td>
     <td class="num visit">${totalVisit}</td>
+    <td class="num" style="color:#2563eb">${totalSetting}</td>
+    <td class="num" style="color:#e11d48">${totalCancel}</td>
     <td class="num order">${totalOrder}</td>
     <td class="sales">${totSalesStr}</td>
-    <td class="rate">${totVisitRate}%</td>
+    <td class="rate" style="color:#e11d48">${totCancelRate}%</td>
     <td class="rate">${totOrderRate}%</td>
   </tr>`);
   tbody.innerHTML = rows.join('');
