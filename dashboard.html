@@ -121,6 +121,7 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 .visit-assignee.jang { background: #f97316; }
 .visit-empty { padding: 20px; text-align: center; color: #aaa; font-size: 12px; }
   .crate { font-size:10px; margin-top:3px; font-weight:600; }
+  .route-eff { font-size:9px; margin-top:2px; color:#556; font-weight:600; letter-spacing:-0.2px; }
 </style>
 </head>
 <body>
@@ -202,7 +203,7 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
   <div class="card"><div class="clabel">고등</div><div class="cval amber xs" id="grade-high">-</div></div>
 </div>
 
-<div class="section-label">유입경로별</div>
+<div class="section-label">유입경로별 <span class="badge pay">CPL·ROAS 지난달 확정</span></div>
 <div class="grid-4">
   <div class="card"><div class="clabel">메타광고</div><div class="cval purple xs" id="route-meta">-</div><div class="crate" id="rr-meta"></div></div>
   <div class="card"><div class="clabel">인스타자연</div><div class="cval blue xs" id="route-insta">-</div><div class="crate" id="rr-insta"></div></div>
@@ -347,27 +348,36 @@ function render() {
   </tr>`);
   tbody.innerHTML = rows.join('');
 
-  // 학년별
-  document.getElementById('grade-elem').textContent  = allRows[30]?.[convCol] || '-';
+  // 학년별 (요약시트 29=초/30=중/31=고 → allRows 28/29/30)
+  document.getElementById('grade-elem').textContent  = allRows[28]?.[convCol] || '-';
   document.getElementById('grade-mid').textContent   = allRows[29]?.[convCol] || '-';
   document.getElementById('grade-high').textContent  = allRows[30]?.[convCol] || '-';
 
-  // 유입경로별 (36행부터: 인스타/페북/당근/카카오/네이버/CPA/기타)
+  // 유입경로별 (요약시트 36행=메타광고부터 → allRows 35~41)
+  // 컬럼: 0채널 1이번달 2지난달 3전체 4방문 5방문율 6방취율 7오더율 8지난달광고비 9지난달CPL 10지난달ROAS
   const routeMap = [
-    ['route-meta','rr-meta',36],['route-insta','rr-insta',37],['route-daangn','rr-daangn',38],
-    ['route-kakao','rr-kakao',39],['route-naver','rr-naver',40],['route-cpa','rr-cpa',41],['route-etc','rr-etc',42]
+    ['route-meta','rr-meta',35],['route-insta','rr-insta',36],['route-daangn','rr-daangn',37],
+    ['route-kakao','rr-kakao',38],['route-naver','rr-naver',39],['route-cpa','rr-cpa',40],['route-etc','rr-etc',41]
   ];
   routeMap.forEach(([dbId, rateId, row]) => {
     const r = allRows[row] || [];
     document.getElementById(dbId).textContent = r[convCol] || '-';
-    // 전체 탭일 때만 전환율 표시 (방문율/오더율은 전체 누적 기준)
     const rateEl = document.getElementById(rateId);
     if (rateEl) {
       const visitRate = r[5] || '';   // 방문율
       const orderRate = r[7] || '';   // 오더율
-      rateEl.innerHTML = (visitRate || orderRate)
+      const cpl  = r[9] || '';        // 지난달 CPL (고정)
+      const roas = r[10] || '';       // 지난달 ROAS (고정)
+      let html = (visitRate || orderRate)
         ? `<span style="color:#0891b2">방${visitRate}</span> · <span style="color:#7c3aed">오${orderRate}</span>`
         : '';
+      const cplNum = parseInt((cpl+'').replace(/[^0-9]/g,'')) || 0;
+      if (cplNum > 0 || roas) {
+        const cplStr  = cplNum > 0 ? '₩' + cplNum.toLocaleString() : '-';
+        const roasStr = roas ? roas + '' : '-';
+        html += `<div class="route-eff">CPL ${cplStr} · ROAS ${roasStr}</div>`;
+      }
+      rateEl.innerHTML = html;
     }
   });
 
