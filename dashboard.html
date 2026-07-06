@@ -196,11 +196,11 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
   <button class="tab" onclick="setTab(2)">전체</button>
 </div>
 
-<div class="section-label" style="margin-top:0;">학년별</div>
+<div class="section-label" style="margin-top:0;">학년별 <span class="badge today" id="grade-tab-label">이번달</span></div>
 <div class="grid-3">
-  <div class="card"><div class="clabel">초등</div><div class="cval blue xs" id="grade-elem">-</div></div>
-  <div class="card"><div class="clabel">중등</div><div class="cval green xs" id="grade-mid">-</div></div>
-  <div class="card"><div class="clabel">고등</div><div class="cval amber xs" id="grade-high">-</div></div>
+  <div class="card"><div class="clabel">초등</div><div class="cval blue xs" id="grade-elem">-</div><div class="route-eff" id="ge-elem"></div></div>
+  <div class="card"><div class="clabel">중등</div><div class="cval green xs" id="grade-mid">-</div><div class="route-eff" id="ge-mid"></div></div>
+  <div class="card"><div class="clabel">고등</div><div class="cval amber xs" id="grade-high">-</div><div class="route-eff" id="ge-high"></div></div>
 </div>
 
 <div class="section-label">유입경로별 <span class="badge pay">CPL·ROAS 지난달 확정</span></div>
@@ -219,11 +219,14 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
   <thead>
     <tr>
       <th>캠페인명</th>
-      <th class="num">건수</th>
+      <th class="num">DB</th>
+      <th class="num">방문</th>
+      <th class="num">오더</th>
+      <th class="num">전환율</th>
     </tr>
   </thead>
   <tbody id="campaign-tbody">
-    <tr><td colspan="2" style="color:#aaa;text-align:center;padding:14px;">불러오는 중...</td></tr>
+    <tr><td colspan="5" style="color:#aaa;text-align:center;padding:14px;">불러오는 중...</td></tr>
   </tbody>
 </table>
 </div>
@@ -349,9 +352,22 @@ function render() {
   tbody.innerHTML = rows.join('');
 
   // 학년별 (요약시트 29=초/30=중/31=고 → allRows 28/29/30)
-  document.getElementById('grade-elem').textContent  = allRows[28]?.[convCol] || '-';
-  document.getElementById('grade-mid').textContent   = allRows[29]?.[convCol] || '-';
-  document.getElementById('grade-high').textContent  = allRows[30]?.[convCol] || '-';
+  // 컬럼: 0학년 1이번달DB 2지난달DB 3전체DB 4이번달방문 5지난달방문 6전체방문 7이번달오더 8지난달오더 9전체오더
+  const gtl = document.getElementById('grade-tab-label');
+  if (gtl) gtl.textContent = tabName;
+  [['grade-elem','ge-elem',28],['grade-mid','ge-mid',29],['grade-high','ge-high',30]].forEach(([dbId,effId,row])=>{
+    const r = allRows[row] || [];
+    document.getElementById(dbId).textContent = r[convCol] || '-';
+    const eff = document.getElementById(effId);
+    if (eff) {
+      const db = parseInt(r[convCol] || '0') || 0;
+      const v = parseInt(r[convCol+3] || '0') || 0;   // 방문 (탭 연동)
+      const o = parseInt(r[convCol+6] || '0') || 0;   // 오더 (탭 연동)
+      const vr = db ? Math.round(v/db*100) : 0;         // 방문율 = 방문/DB
+      const or_ = db ? Math.round(o/db*100) : 0;        // 오더율 = 오더/DB
+      eff.innerHTML = `<span style="color:#0891b2">방 ${v}·${vr}%</span> · <span style="color:#7c3aed">오 ${o}·${or_}%</span>`;
+    }
+  });
 
   // 유입경로별 (요약시트 36행=메타광고부터 → allRows 35~41)
   // 컬럼: 0채널 1이번달 2지난달 3전체 4방문 5방문율 6방취율 7오더율 8지난달광고비 9지난달CPL 10지난달ROAS
@@ -381,28 +397,34 @@ function render() {
     }
   });
 
-  // 캠페인 Top 5
+  // 캠페인 Top 5 — 컬럼: 0명 1이번달DB 2지난달DB 3전체DB 4이번달방문 5지난달방문 6전체방문 7이번달오더 8지난달오더 9전체오더
   const ctbody = document.getElementById('campaign-tbody');
   const campaigns = [];
   for (let i = CAMPAIGN_START_IDX; i < allRows.length; i++) {
     const r = allRows[i];
     if (!r || !r[0]) break;
+    const p = currentTab; // 0이번달 1지난달 2전체
     campaigns.push({
       name: r[0],
-      month: parseInt(r[1] || '0') || 0,
-      last:  parseInt(r[2] || '0') || 0,
-      all:   parseInt(r[3] || '0') || 0
+      db:    parseInt(r[1 + p] || '0') || 0,
+      visit: parseInt(r[4 + p] || '0') || 0,
+      order: parseInt(r[7 + p] || '0') || 0
     });
   }
-  const sortField = ['month', 'last', 'all'][currentTab];
-  campaigns.sort((a, b) => b[sortField] - a[sortField]);
-  const top5 = campaigns.filter(c => c[sortField] > 0).slice(0, 5);
+  campaigns.sort((a, b) => b.db - a.db);
+  const top5 = campaigns.filter(c => c.db > 0).slice(0, 5);
   ctbody.innerHTML = top5.length > 0
-    ? top5.map(c => `<tr>
+    ? top5.map(c => {
+        const cr = c.db ? Math.round(c.order / c.db * 100) : 0;  // 전환율 = 오더/DB
+        return `<tr>
         <td class="name">${escapeHtml(c.name)}</td>
-        <td class="num">${c[sortField]}</td>
-      </tr>`).join('')
-    : '<tr><td colspan="2" style="color:#aaa;text-align:center;padding:14px;">데이터 없음</td></tr>';
+        <td class="num">${c.db}</td>
+        <td class="num" style="color:#0891b2">${c.visit}</td>
+        <td class="num order">${c.order}</td>
+        <td class="num" style="color:#7c3aed">${cr}%</td>
+      </tr>`;
+      }).join('')
+    : '<tr><td colspan="5" style="color:#aaa;text-align:center;padding:14px;">데이터 없음</td></tr>';
 }
 
 async function loadSchedule() {
