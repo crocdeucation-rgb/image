@@ -737,6 +737,85 @@ body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-ap
 
   <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:20px">
 
+    <!-- 7/5 담당자 -->
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(0,229,200,.12);color:var(--teal)">PATCH</span>
+        <span style="font-size:14px;font-weight:700">담당자 6명 체제 개편</span>
+        <span style="font-size:12px;color:var(--sub)">2026.07.05</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <div style="font-size:11px;color:var(--teal);font-weight:700;margin-bottom:8px;letter-spacing:1px">ADDED</div>
+          <div style="font-size:12px;color:var(--sub);line-height:2">
+            집계 담당자 6명 확정 — 우혜림·김윤호·장윤호·박창건·김우진·김태석<br>
+            방문 일정 담당자 색상 배지 3종 신규 (박창건 보라 · 김우진 로즈 · 김태석 청록)
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--amber);font-weight:700;margin-bottom:8px;letter-spacing:1px">CHANGED</div>
+          <div style="font-size:12px;color:var(--sub);line-height:2">
+            getLeadStats ASSIGNEES 4→6명 (엄현호 집계 제외)<br>
+            대시보드 담당자 퍼널 6행 · CAMPAIGN_START_IDX 49→51<br>
+            노션 담당자 지정은 위 6명 이름 그대로 (다르면 집계 누락)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7/4 안전망 -->
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(255,107,107,.15);color:#ff6b6b">SAFETY</span>
+        <span style="font-size:14px;font-weight:700">리드 누락 전수복구 + 통합 안전망 reconcileAll</span>
+        <span style="font-size:12px;color:var(--sub)">2026.07.04</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <div style="font-size:11px;color:var(--teal);font-weight:700;margin-bottom:8px;letter-spacing:1px">ADDED</div>
+          <div style="font-size:12px;color:var(--sub);line-height:2">
+            reconcileAll — 10분마다 폼·메타·카카오 시트를 노션과 대조, 누락 리드 자동 재삽입 + 슬랙 🛟 알림<br>
+            MLST 시트 SHEET_CONFIGS 등록 (미등록으로 통짜 누락되던 원인 제거)<br>
+            신규 광고 폼 생성 시 config 등록 규칙 확립
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--amber);font-weight:700;margin-bottom:8px;letter-spacing:1px">CHANGED</div>
+          <div style="font-size:12px;color:var(--sub);line-height:2">
+            누락 리드 73건 소급 복구 (폼 2 · 메타 2 · MLST 69)<br>
+            onFormSubmit·웹훅 순간 유실 시에도 10분 내 자동 회복 구조<br>
+            bulkUploadAllSheets = DONE 미마킹 행 일괄 복구 루틴으로 정착
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7/3 부재 알림톡 -->
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(240,192,32,.15);color:#f0c020">AUTO</span>
+        <span style="font-size:14px;font-weight:700">부재 리드 알림톡 자동 발송</span>
+        <span style="font-size:12px;color:var(--sub)">2026.07.03</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <div style="font-size:11px;color:var(--teal);font-weight:700;margin-bottom:8px;letter-spacing:1px">ADDED</div>
+          <div style="font-size:12px;color:var(--sub);line-height:2">
+            상태 부재_알림톡 변경 → 30분 내 "부재중이셔서 카톡 먼저 드려요" 자동 발송<br>
+            알림톡발송일시 기록으로 동일인 중복 발송 차단<br>
+            솔라피 신규 템플릿 (부재리드_상담리마인드) 심사 승인·가동
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--amber);font-weight:700;margin-bottom:8px;letter-spacing:1px">CHANGED</div>
+          <div style="font-size:12px;color:var(--sub);line-height:2">
+            부재 1,082건 → 잠든 자산 회수 루프 가동 (첫날 전환 다수 확인)<br>
+            운영 규칙: 1~2차 직접 콜 후 못 닿은 건에만 사용 (일괄 발송 금지)
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- v3 -->
     <div class="card">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
