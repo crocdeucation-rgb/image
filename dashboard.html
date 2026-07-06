@@ -245,8 +245,8 @@ const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk
 const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1384080283&single=true&output=csv';
 
 const ASSIGNEES = ['우혜림', '김윤호', '장윤호', '박창건', '김우진', '김태석'];
-const ASSIGNEE_START_IDX = 43;
-const CAMPAIGN_START_IDX = 51;
+const ASSIGNEE_START_IDX = 45;
+const CAMPAIGN_START_IDX = 53;
 
 function showSec(idx) {
   currentSec = idx;
@@ -347,18 +347,18 @@ function render() {
   tbody.innerHTML = rows.join('');
 
   // 학년별
-  document.getElementById('grade-elem').textContent  = allRows[26]?.[convCol] || '-';
-  document.getElementById('grade-mid').textContent   = allRows[27]?.[convCol] || '-';
-  document.getElementById('grade-high').textContent  = allRows[28]?.[convCol] || '-';
+  document.getElementById('grade-elem').textContent  = allRows[30]?.[convCol] || '-';
+  document.getElementById('grade-mid').textContent   = allRows[29]?.[convCol] || '-';
+  document.getElementById('grade-high').textContent  = allRows[30]?.[convCol] || '-';
 
   // 유입경로별
-  document.getElementById('route-insta').textContent  = allRows[33]?.[convCol] || '-';
-  document.getElementById('route-fb').textContent     = allRows[34]?.[convCol] || '-';
-  document.getElementById('route-daangn').textContent = allRows[35]?.[convCol] || '-';
-  document.getElementById('route-kakao').textContent  = allRows[36]?.[convCol] || '-';
-  document.getElementById('route-naver').textContent  = allRows[37]?.[convCol] || '-';
-  document.getElementById('route-cpa').textContent    = allRows[38]?.[convCol] || '-';
-  document.getElementById('route-etc').textContent    = allRows[39]?.[convCol] || '-';
+  document.getElementById('route-insta').textContent  = allRows[41]?.[convCol] || '-';
+  document.getElementById('route-fb').textContent     = allRows[40]?.[convCol] || '-';
+  document.getElementById('route-daangn').textContent = allRows[41]?.[convCol] || '-';
+  document.getElementById('route-kakao').textContent  = allRows[40]?.[convCol] || '-';
+  document.getElementById('route-naver').textContent  = allRows[41]?.[convCol] || '-';
+  document.getElementById('route-cpa').textContent    = allRows[40]?.[convCol] || '-';
+  document.getElementById('route-etc').textContent    = allRows[41]?.[convCol] || '-';
 
   // 캠페인 Top 5
   const ctbody = document.getElementById('campaign-tbody');
