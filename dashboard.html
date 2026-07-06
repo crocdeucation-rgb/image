@@ -204,12 +204,12 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 
 <div class="section-label">유입경로별</div>
 <div class="grid-4">
-  <div class="card"><div class="clabel">인스타그램</div><div class="cval purple xs" id="route-insta">-</div><div class="crate" id="rr-insta"></div></div>
-  <div class="card"><div class="clabel">페이스북</div><div class="cval blue xs" id="route-fb">-</div><div class="crate" id="rr-fb"></div></div>
+  <div class="card"><div class="clabel">메타광고</div><div class="cval purple xs" id="route-meta">-</div><div class="crate" id="rr-meta"></div></div>
+  <div class="card"><div class="clabel">인스타자연</div><div class="cval blue xs" id="route-insta">-</div><div class="crate" id="rr-insta"></div></div>
   <div class="card"><div class="clabel">당근</div><div class="cval orange xs" id="route-daangn">-</div><div class="crate" id="rr-daangn"></div></div>
   <div class="card"><div class="clabel">카카오</div><div class="cval amber xs" id="route-kakao">-</div><div class="crate" id="rr-kakao"></div></div>
-  <div class="card"><div class="clabel">네이버검색</div><div class="cval blue xs" id="route-naver">-</div><div class="crate" id="rr-naver"></div></div>
-  <div class="card"><div class="clabel">CPA</div><div class="cval red xs" id="route-cpa">-</div><div class="crate" id="rr-cpa"></div></div>
+  <div class="card"><div class="clabel">네이버</div><div class="cval blue xs" id="route-naver">-</div><div class="crate" id="rr-naver"></div></div>
+  <div class="card"><div class="clabel">CPA(텐핑)</div><div class="cval red xs" id="route-cpa">-</div><div class="crate" id="rr-cpa"></div></div>
   <div class="card"><div class="clabel">기타</div><div class="cval xs" id="route-etc">-</div><div class="crate" id="rr-etc"></div></div>
 </div>
 
@@ -354,7 +354,7 @@ function render() {
 
   // 유입경로별 (36행부터: 인스타/페북/당근/카카오/네이버/CPA/기타)
   const routeMap = [
-    ['route-insta','rr-insta',36],['route-fb','rr-fb',37],['route-daangn','rr-daangn',38],
+    ['route-meta','rr-meta',36],['route-insta','rr-insta',37],['route-daangn','rr-daangn',38],
     ['route-kakao','rr-kakao',39],['route-naver','rr-naver',40],['route-cpa','rr-cpa',41],['route-etc','rr-etc',42]
   ];
   routeMap.forEach(([dbId, rateId, row]) => {
