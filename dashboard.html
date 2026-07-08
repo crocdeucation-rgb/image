@@ -41,6 +41,7 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
   .visit-name { font-size: 11px; }
   .visit-grade { font-size: 9px; }
   .visit-assignee { font-size: 9px; }
+  .dayno { font-size: 8px !important; }
 }
 @media (min-width: 701px) {
   .sec-nav { display: none; }
@@ -68,6 +69,7 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
 .card { background: white; border-radius: 8px; padding: 10px 6px; text-align: center; border: 1px solid #eee; }
 .clabel { font-size: 10px; color: #888; margin-bottom: 4px; }
+.dayno { font-size: 9px; color: #bbb; font-weight: 600; margin-left: 2px; }
 .cval { font-size: 19px; font-weight: 600; color: #1a1a1a; }
 .cval.blue   { color: #1a73e8; }
 .cval.green  { color: #0f9d58; }
@@ -145,27 +147,41 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
   <button class="refresh" onclick="loadAll()">새로고침</button>
 </div>
 
+<!-- 매출: 2×2 (이번달/지난달 · 이번주/지난주) -->
 <div class="section-label" style="margin-top:0;">매출 <span class="badge pay">결제일 기준</span></div>
-<div class="grid-3">
-  <div class="card"><div class="clabel">이번 달</div><div class="cval purple sm" id="sales-month">-</div></div>
-  <div class="card"><div class="clabel">지난 달</div><div class="cval sm" id="sales-last">-</div></div>
-  <div class="card"><div class="clabel">누적</div><div class="cval sm" id="sales-all">-</div></div>
+<div class="grid-2">
+  <div class="card">
+    <div class="clabel">이번 달<span class="dayno" id="dn-month"></span></div>
+    <div class="cval purple sm" id="sales-month">-</div>
+  </div>
+  <div class="card">
+    <div class="clabel">지난 달</div>
+    <div class="cval sm" id="sales-last">-</div>
+  </div>
+  <div class="card">
+    <div class="clabel">이번 주<span class="dayno" id="dn-week"></span></div>
+    <div class="cval purple sm" id="sales-week">-</div>
+  </div>
+  <div class="card">
+    <div class="clabel">지난 주</div>
+    <div class="cval sm" id="sales-lastweek">-</div>
+  </div>
 </div>
 
-<div class="tabs" style="margin-top:14px;">
-  <button class="tab active" onclick="setTab(0)">이번달</button>
-  <button class="tab" onclick="setTab(1)">지난달</button>
-  <button class="tab" onclick="setTab(2)">전체</button>
-</div>
-
-<div class="section-label" style="margin-top:0;">유입 현황 <span class="badge" id="inflow-label">이번달</span></div>
+<!-- 유입 현황: 이번달 고정 -->
+<div class="section-label">유입 현황 <span class="badge">이번달</span></div>
 <div class="grid-3">
   <div class="card"><div class="clabel">총 유입</div><div class="cval blue sm" id="v-total">-</div></div>
   <div class="card"><div class="clabel">오늘 유입</div><div class="cval amber sm" id="v-today">-</div></div>
   <div class="card"><div class="clabel">어제 유입</div><div class="cval orange sm" id="v-yesterday">-</div></div>
 </div>
-  
+
+<!-- 담당자별 퍼널: 자체 토글 -->
 <div class="section-label">담당자별 퍼널 <span class="badge today" id="tab-label">이번달</span></div>
+<div class="tabs" id="funnel-tabs">
+  <button class="tab active" onclick="setFunnelTab(0)">이번달</button>
+  <button class="tab" onclick="setFunnelTab(1)">지난달</button>
+</div>
 <table class="funnel-table">
   <thead>
     <tr>
@@ -190,10 +206,10 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 <div class="section" id="sec2">
 <div class="sec-title green">유입경로 분석</div>
 
-<div class="tabs">
-  <button class="tab active" onclick="setTab(0)">이번달</button>
-  <button class="tab" onclick="setTab(1)">지난달</button>
-  <button class="tab" onclick="setTab(2)">전체</button>
+<div class="tabs" id="route-tabs">
+  <button class="tab active" onclick="setRouteTab(0)">이번달</button>
+  <button class="tab" onclick="setRouteTab(1)">지난달</button>
+  <button class="tab" onclick="setRouteTab(2)">전체</button>
 </div>
 
 <div class="section-label" style="margin-top:0;">학년별 <span class="badge today" id="grade-tab-label">이번달</span></div>
@@ -243,7 +259,8 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 
 <script>
 let allRows = [];
-let currentTab = 0;
+let funnelTab = 0;   // 0=이번달 1=지난달
+let routeTab  = 0;   // 0=이번달 1=지난달 2=전체
 let currentSec = 0;
 
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1438610573&single=true&output=csv';
@@ -277,36 +294,50 @@ async function loadData() {
   }
 }
 
-function setTab(idx) {
-  currentTab = idx;
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach((t,i) => {
-    if (i % 3 === idx) t.classList.add('active');
-  });
+// 담당자별 퍼널 전용 탭
+function setFunnelTab(idx) {
+  funnelTab = idx;
+  document.querySelectorAll('#funnel-tabs .tab').forEach((t,i) => t.classList.toggle('active', i===idx));
   render();
 }
 
+// 유입경로 분석 전용 탭
+function setRouteTab(idx) {
+  routeTab = idx;
+  document.querySelectorAll('#route-tabs .tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  render();
+}
+
+// "이번 달 매출 (8일차)" → "8일차"
+function pickDayNo(s) {
+  const m = String(s || '').match(/\((\d+일차)\)/);
+  return m ? m[1] : '';
+}
+
 function render() {
-  const col = currentTab + 2;
-  const convCol = currentTab + 1;
-  const tabName = ['이번달','지난달','전체'][currentTab];
-  document.getElementById('tab-label').textContent = tabName;
-  document.getElementById('inflow-label').textContent = tabName;
+  const funnelName = ['이번달','지난달'][funnelTab];
+  const routeName  = ['이번달','지난달','전체'][routeTab];
+  const convCol = routeTab + 1;   // 학년별/유입경로 DB 컬럼
+  document.getElementById('tab-label').textContent = funnelName;
 
-  // 매출 (고정)
-  document.getElementById('sales-month').textContent = allRows[11]?.[1] || '-';
-  document.getElementById('sales-last').textContent  = allRows[12]?.[1] || '-';
-  document.getElementById('sales-all').textContent   = allRows[13]?.[1] || '-';
+  // ── 매출 2×2 (요약시트 12행: 이번달|값|이번주|값 / 13행: 지난달|값|지난주|값)
+  const r12 = allRows[11] || [];
+  const r13 = allRows[12] || [];
+  document.getElementById('sales-month').textContent    = r12[1] || '-';
+  document.getElementById('sales-week').textContent     = r12[3] || '-';
+  document.getElementById('sales-last').textContent     = r13[1] || '-';
+  document.getElementById('sales-lastweek').textContent = r13[3] || '-';
+  document.getElementById('dn-month').textContent = pickDayNo(r12[0]);
+  document.getElementById('dn-week').textContent  = pickDayNo(r12[2]);
 
-  // 유입 현황
-  // allRows[1] = 총 유입 (col별 이번달/지난달/전체)
-  // allRows[2] = 어제 유입 (col[1]에만 값 있음, 나머지 0)
-  document.getElementById('v-total').textContent     = allRows[1]?.[col] || '0';
-  document.getElementById('v-today').textContent     = allRows[1]?.[1]   || '0';  // 오늘 유입은 항상 col[1]
-  document.getElementById('v-yesterday').textContent = allRows[2]?.[1]   || '0';  // 어제 유입
+  // ── 유입 현황 (이번달 고정)
+  // allRows[1] = [총유입, 오늘, 이번달, 지난달, 전체]
+  document.getElementById('v-total').textContent     = allRows[1]?.[2] || '0';
+  document.getElementById('v-today').textContent     = allRows[1]?.[1] || '0';
+  document.getElementById('v-yesterday').textContent = allRows[2]?.[1] || '0';
 
-  // 담당자 퍼널
-  const offset = currentTab * 6 + 1;
+  // ── 담당자 퍼널 (funnelTab)
+  const offset = funnelTab * 6 + 1;
   const tbody = document.getElementById('funnel-tbody');
   let totalDb=0, totalVisit=0, totalSetting=0, totalCancel=0, totalOrder=0, totalSalesNum=0;
   let rows = ASSIGNEES.map((name, i) => {
@@ -321,8 +352,8 @@ function render() {
     const salesNum = parseInt((sales+'').replace(/[^0-9]/g,'')) || 0;
     if (sales.includes('만원')) totalSalesNum += salesNum * 10000;
     else totalSalesNum += salesNum;
-    const cancelRate = visit ? Math.round(cancel/visit*100) : 0;   // 방취율 = 방취/방문
-    const orderRate  = setting ? Math.round(order/setting*100) : 0; // 오더율 = 오더/세팅
+    const cancelRate = visit ? Math.round(cancel/visit*100) : 0;
+    const orderRate  = setting ? Math.round(order/setting*100) : 0;
     return `<tr>
       <td class="name">${r[0] || name}</td>
       <td class="num db">${db}</td>
@@ -351,34 +382,31 @@ function render() {
   </tr>`);
   tbody.innerHTML = rows.join('');
 
-  // 학년별 (요약시트 29=초/30=중/31=고 → allRows 28/29/30)
-  // 컬럼: 0학년 1이번달DB 2지난달DB 3전체DB 4이번달방문 5지난달방문 6전체방문 7이번달오더 8지난달오더 9전체오더
+  // ── 학년별 (routeTab)
   const gtl = document.getElementById('grade-tab-label');
-  if (gtl) gtl.textContent = tabName;
+  if (gtl) gtl.textContent = routeName;
   [['grade-elem','ge-elem',28],['grade-mid','ge-mid',29],['grade-high','ge-high',30]].forEach(([dbId,effId,row])=>{
     const r = allRows[row] || [];
     document.getElementById(dbId).textContent = r[convCol] || '-';
     const eff = document.getElementById(effId);
     if (eff) {
       const db = parseInt(r[convCol] || '0') || 0;
-      const v = parseInt(r[convCol+3] || '0') || 0;   // 방문 (탭 연동)
-      const o = parseInt(r[convCol+6] || '0') || 0;   // 오더 (탭 연동)
-      const vr = db ? Math.round(v/db*100) : 0;         // 방문율 = 방문/DB
-      const or_ = db ? Math.round(o/db*100) : 0;        // 오더율 = 오더/DB
+      const v = parseInt(r[convCol+3] || '0') || 0;
+      const o = parseInt(r[convCol+6] || '0') || 0;
+      const vr = db ? Math.round(v/db*100) : 0;
+      const or_ = db ? Math.round(o/db*100) : 0;
       eff.innerHTML = `<span style="color:#0891b2">방 ${v}·${vr}%</span> · <span style="color:#7c3aed">오 ${o}·${or_}%</span>`;
     }
   });
 
-  // 유입경로별 (요약시트 36행=메타광고부터 → allRows 35~41). 전부 탭 연동.
-  // 컬럼: 0채널 1~3DB(이번달/지난달/전체) 4~6방문율 7~9오더율
-  //       10~12지난달(광고비/CPL/ROAS) 13~15이번달(광고비/CPL/ROAS)
-  const effCols = currentTab === 0 ? [14,15] : currentTab === 1 ? [11,12] : null;
+  // ── 유입경로별 (routeTab)
+  const effCols = routeTab === 0 ? [14,15] : routeTab === 1 ? [11,12] : null;
   const rel = document.getElementById('route-eff-label');
-  const rSum = allRows[42] || []; // 유입경로 합계행
+  const rSum = allRows[42] || [];
   const hasThisSpend = (parseInt((rSum[13]+'').replace(/[^0-9]/g,'')) || 0) > 0;
   if (rel) rel.textContent =
-    currentTab === 0 ? (hasThisSpend ? 'CPL·ROAS 이번달 진행중' : 'CPL·ROAS 이번달 광고비 미입력')
-    : currentTab === 1 ? 'CPL·ROAS 지난달 확정'
+    routeTab === 0 ? (hasThisSpend ? 'CPL·ROAS 이번달 진행중' : 'CPL·ROAS 이번달 광고비 미입력')
+    : routeTab === 1 ? 'CPL·ROAS 지난달 확정'
     : 'CPL·ROAS';
   const routeMap = [
     ['route-meta','rr-meta',35],['route-insta','rr-insta',36],['route-daangn','rr-daangn',37],
@@ -389,8 +417,8 @@ function render() {
     document.getElementById(dbId).textContent = r[convCol] || '-';
     const rateEl = document.getElementById(rateId);
     if (rateEl) {
-      const visitRate = r[4 + currentTab] || '';   // 방문율 (탭 연동)
-      const orderRate = r[7 + currentTab] || '';    // 오더율 (탭 연동)
+      const visitRate = r[4 + routeTab] || '';
+      const orderRate = r[7 + routeTab] || '';
       let html = (visitRate || orderRate)
         ? `<span style="color:#0891b2">방${visitRate}</span> · <span style="color:#7c3aed">오${orderRate}</span>`
         : '';
@@ -398,9 +426,7 @@ function render() {
         const cpl  = r[effCols[0]] || '';
         const roas = r[effCols[1]] || '';
         let cplNum = parseInt((cpl+'').replace(/[^0-9]/g,'')) || 0;
-        // 텐핑은 CPA 고정단가 → CPL 항상 ₩28,000 (광고비/전체DB는 무효 포함이라 왜곡)
         if (dbId === 'route-cpa' && cplNum > 0) cplNum = 28000;
-        // 광고비 없는 기간/채널이면 아예 표기 안 함
         if (cplNum > 0 || roas) {
           const cplStr  = cplNum > 0 ? '₩' + cplNum.toLocaleString() : '-';
           const roasStr = roas ? roas + '' : '-';
@@ -411,13 +437,13 @@ function render() {
     }
   });
 
-  // 캠페인 Top 5 — 컬럼: 0명 1이번달DB 2지난달DB 3전체DB 4이번달방문 5지난달방문 6전체방문 7이번달오더 8지난달오더 9전체오더
+  // ── 캠페인 Top 5 (routeTab)
   const ctbody = document.getElementById('campaign-tbody');
   const campaigns = [];
   for (let i = CAMPAIGN_START_IDX; i < allRows.length; i++) {
     const r = allRows[i];
     if (!r || !r[0]) break;
-    const p = currentTab; // 0이번달 1지난달 2전체
+    const p = routeTab;
     campaigns.push({
       name: r[0],
       db:    parseInt(r[1 + p] || '0') || 0,
@@ -429,7 +455,7 @@ function render() {
   const top5 = campaigns.filter(c => c.db > 0).slice(0, 5);
   ctbody.innerHTML = top5.length > 0
     ? top5.map(c => {
-        const cr = c.db ? Math.round(c.order / c.db * 100) : 0;  // 전환율 = 오더/DB
+        const cr = c.db ? Math.round(c.order / c.db * 100) : 0;
         return `<tr>
         <td class="name">${escapeHtml(c.name)}</td>
         <td class="num">${c.db}</td>
