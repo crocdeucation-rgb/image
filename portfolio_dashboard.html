@@ -303,7 +303,7 @@ footer .mono{color:#7fbfa5}
     </div>
     <div class="g-grid">
       <div class="g-card">
-        <img data-img="notereels_video" alt="노트릴스 영상 소재" loading="lazy">
+        <img src="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/notereels_video.jpg" data-img="notereels_video" alt="노트릴스 영상 소재" loading="lazy">
         <div class="g-meta">
           <div class="g-name">노트릴스 영상 <span class="g-badge win">위너</span></div>
           <div class="g-line">CPL <span class="num">₩6,990</span> · 매출 <span class="num">4,107만</span> · 11건</div>
@@ -311,7 +311,7 @@ footer .mono{color:#7fbfa5}
         </div>
       </div>
       <div class="g-card">
-        <img data-img="notereels_chaeri" alt="채리 릴스 소재" loading="lazy">
+        <img src="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/notereels_chaeri.jpg" data-img="notereels_chaeri" alt="채리 릴스 소재" loading="lazy">
         <div class="g-meta">
           <div class="g-name">채리 릴스 <span class="g-badge live">운영중</span></div>
           <div class="g-line">이틀차 <span class="num">17건</span> · CPL <span class="num">₩7,859</span> · 리드 <span class="num">35세+ 100%</span></div>
@@ -319,7 +319,7 @@ footer .mono{color:#7fbfa5}
         </div>
       </div>
       <div class="g-card">
-        <img data-img="gtnote_video" alt="GT노트피드백 소재" loading="lazy">
+        <img src="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/gtnote_video.jpg" data-img="gtnote_video" alt="GT노트피드백 소재" loading="lazy">
         <div class="g-meta">
           <div class="g-name">GT노트피드백 영상 <span class="g-badge live">재가동</span></div>
           <div class="g-line">과거 ROAS <span class="num">4.3</span> · 재가동 직후 CPM 학부모 대역 재현</div>
@@ -327,7 +327,7 @@ footer .mono{color:#7fbfa5}
         </div>
       </div>
       <div class="g-card">
-        <img data-img="routine5" alt="5단계루틴 캐러셀 소재" loading="lazy">
+        <img src="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/routine5.jpg" data-img="routine5" alt="5단계루틴 캐러셀 소재" loading="lazy">
         <div class="g-meta">
           <div class="g-name">5단계루틴 캐러셀 <span class="g-badge dead">종료</span></div>
           <div class="g-line">CPL <span class="num">₩21,874 → 23,830</span> · CPM 학생 대역</div>
@@ -335,7 +335,7 @@ footer .mono{color:#7fbfa5}
         </div>
       </div>
       <div class="g-card dead">
-        <img data-img="basic" alt="기초부족 단일이미지 소재" loading="lazy">
+        <img src="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/basic.jpg" data-img="basic" alt="기초부족 단일이미지 소재" loading="lazy">
         <div class="g-meta">
           <div class="g-name">기초부족 단일이미지 <span class="g-badge dead">폐기</span></div>
           <div class="g-line">CPL <span class="num">₩21,390 → 51,887</span> · 오더 0</div>
@@ -343,7 +343,7 @@ footer .mono{color:#7fbfa5}
         </div>
       </div>
       <div class="g-card dead">
-        <img data-img="bipyeong" alt="비평준화 저격 소재" loading="lazy">
+        <img src="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/bipyeong.jpg" data-img="bipyeong" alt="비평준화 저격 소재" loading="lazy">
         <div class="g-meta">
           <div class="g-name">비평준화 저격 <span class="g-badge dead">폐기</span></div>
           <div class="g-line">CPL <span class="num">₩36,220 → 100,334</span> · 오더 0</div>
@@ -397,47 +397,11 @@ footer .mono{color:#7fbfa5}
   </div>
 </footer>
 
-<script src="report/imgs.js"></script>
 <script>
-(function(){
-  var pool = null;
-  var known = ['IMGS','imgs','IMG','images','REPORT_IMGS','ImgData','imgData'];
-  for (var i=0;i<known.length;i++){ var v = window[known[i]]; if (v && typeof v==='object'){ pool=v; break; } }
-  if (!pool){
-    try{
-      var ks = Object.keys(window);
-      for (var j=0;j<ks.length;j++){
-        var w = window[ks[j]];
-        if (w && typeof w==='object' && !Array.isArray(w)){
-          var kk = Object.keys(w);
-          if (kk.length>=3 && kk.some(function(x){return /note|reel|basic|bipyeong|gtnote|routine/i.test(x);})){ pool=w; break; }
-        }
-      }
-    }catch(e){}
-  }
-  function resolve(val){
-    if (typeof val!=='string') return null;
-    if (val.indexOf('data:')===0 || val.indexOf('http')===0) return val;
-    return 'report/' + val.replace(/^\.?\//,'');
-  }
-  document.querySelectorAll('img[data-img]').forEach(function(el){
-    var want = el.getAttribute('data-img');
-    var src = null;
-    if (pool){
-      if (pool[want]) src = resolve(pool[want]);
-      if (!src){
-        var keys = Object.keys(pool);
-        for (var m=0;m<keys.length;m++){
-          var k = keys[m];
-          if (k.toLowerCase().indexOf(want.toLowerCase())>=0 || want.toLowerCase().indexOf(k.toLowerCase())>=0){ src = resolve(pool[k]); break; }
-        }
-      }
-    }
-    if (src){ el.src = src; }
-    else { el.style.display='none'; }
-    el.onerror = function(){ el.style.display='none'; };
-  });
-})();
+// 이미지 로드 실패 시 해당 카드 이미지 숨김 (텍스트 카드는 유지)
+document.querySelectorAll('img[data-img]').forEach(function(el){
+  el.onerror = function(){ el.style.display='none'; };
+});
 </script>
 </body>
 </html>
