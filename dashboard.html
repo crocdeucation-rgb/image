@@ -380,7 +380,11 @@ function render() {
   });
   const totCancelRate = totalVisit ? Math.round(totalCancel/totalVisit*100) : 0;
   const totOrderRate  = totalSetting ? Math.round(totalOrder/totalSetting*100) : 0;
-  const totSalesStr = totalSalesNum >= 10000 ? Math.round(totalSalesNum/10000) + '만원' : totalSalesNum + '원';
+  // 합계 매출 = 상단 매출카드(raw 원단위 전체합 → 1회 반올림)를 그대로 사용.
+  // 담당자별 셀은 각자 만원 반올림된 값이라, 되더하면 반올림 오차가 누적됨(8422 vs 8421).
+  // 이번달 탭 → r12[1](sales-month), 지난달 탭 → r13[1](sales-last)와 항상 일치.
+  const totSalesFallback = totalSalesNum >= 10000 ? Math.round(totalSalesNum/10000) + '만원' : totalSalesNum + '원';
+  const totSalesStr = (funnelTab === 0 ? r12[1] : r13[1]) || totSalesFallback;
   rows.push(`<tr class="total">
     <td class="name">합계</td>
     <td class="num db">${totalDb}</td>
