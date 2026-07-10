@@ -243,9 +243,9 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
     <tr>
       <th>캠페인명</th>
       <th class="num">DB</th>
-      <th class="num">방문(율)</th>
+      <th class="num">방문</th>
       <th class="num">세팅</th>
-      <th class="num">오더(율)</th>
+      <th class="num">오더</th>
     </tr>
   </thead>
   <tbody id="campaign-tbody">
@@ -433,10 +433,14 @@ function render() {
     const rateEl = document.getElementById(rateId);
     if (rateEl) {
       const db = parseInt(r[convCol] || '0') || 0;
-      // 시트 유입경로는 이미 '율(%)'로 출력됨 → 그대로 사용 (다시 나누지 않음)
-      const vr = parseInt((r[4 + routeTab]+'').replace('%','')) || 0;  // 방문율%
-      const or_ = parseInt((r[7 + routeTab]+'').replace('%','')) || 0; // 오더율%
-      let html = (db>0) ? `<span class="fnl fnl-v">방 <b>${vr}%</b></span><span class="fnl fnl-o">오 <b>${or_}%</b></span>` : '';
+      // 건수 (시트가 건수로 출력) → 율은 여기서 계산
+      const vis = parseInt(r[4 + routeTab] || '0') || 0;   // 방문수
+      const set = parseInt(r[7 + routeTab] || '0') || 0;   // 세팅수
+      const ord = parseInt(r[10 + routeTab] || '0') || 0;  // 오더수
+      const vr = db ? Math.round(vis/db*100) : 0;          // 방문율=방문/DB
+      const sr = vis ? Math.round(set/vis*100) : 0;        // 세팅율=세팅/방문
+      const or_ = set ? Math.round(ord/set*100) : 0;       // 오더율=오더/세팅
+      let html = (db>0) ? `<span class="fnl fnl-v">방문 ${vis} <b>(${vr}%)</b></span><span class="fnl fnl-s">세팅 ${set} <b>(${sr}%)</b></span><span class="fnl fnl-o">오더 ${ord} <b>(${or_}%)</b></span>` : '';
       if (effCols) {
         const cpl  = r[effCols[0]] || '';
         const roas = r[effCols[1]] || '';
@@ -472,7 +476,8 @@ function render() {
   const top5 = campaigns.filter(c => c.db > 0).slice(0, 8);
   ctbody.innerHTML = top5.length > 0
     ? top5.map(c => {
-        const vr = c.db ? Math.round(c.visit / c.db * 100) : 0;      // 방문율 = 방문/DB
+        const vr = c.db ? Math.round(c.visit / c.db * 100) : 0;         // 방문율 = 방문/DB
+        const sr = c.visit ? Math.round(c.setting / c.visit * 100) : 0;    // 세팅율 = 세팅/방문
         const or_ = c.setting ? Math.round(c.order / c.setting * 100) : 0; // 오더율 = 오더/세팅
         const isMeta = c.channel === '메타';
         const badgeColor = isMeta ? '#1a73e8' : (c.channel.indexOf('텐핑')>=0||c.channel.indexOf('CPA')>=0) ? '#e11d48' : c.channel==='카카오' ? '#f4b400' : c.channel==='네이버' ? '#0f9d58' : '#888';
@@ -480,9 +485,9 @@ function render() {
         return `<tr>
         <td class="name">${badge}${escapeHtml(c.name)}</td>
         <td class="num">${c.db}</td>
-        <td class="num" style="color:#0891b2">${c.visit} <b style="font-size:10px;color:#0891b2">${vr}%</b></td>
-        <td class="num" style="color:#2563eb">${c.setting}</td>
-        <td class="num order">${c.order} <b style="font-size:10px;color:#7c3aed">${or_}%</b></td>
+        <td class="num" style="color:#0891b2">${c.visit} <b style="font-size:10px">(${vr}%)</b></td>
+        <td class="num" style="color:#d97706">${c.setting} <b style="font-size:10px">(${sr}%)</b></td>
+        <td class="num" style="color:#0f9d58">${c.order} <b style="font-size:10px">(${or_}%)</b></td>
       </tr>`;
       }).join('')
     : '<tr><td colspan="5" style="color:#aaa;text-align:center;padding:14px;">데이터 없음</td></tr>';
