@@ -230,7 +230,7 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
   <div class="card"><div class="clabel">기타</div><div class="cval xs" id="route-etc">-</div><div class="crate" id="rr-etc"></div></div>
 </div>
 
-<div class="section-label">캠페인별 <span class="badge">Top 5</span></div>
+<div class="section-label">캠페인별 <span class="badge">오더순</span></div>
 <table class="campaign-table">
   <thead>
     <tr>
@@ -393,8 +393,9 @@ function render() {
       const db = parseInt(r[convCol] || '0') || 0;
       const v = parseInt(r[convCol+3] || '0') || 0;
       const o = parseInt(r[convCol+6] || '0') || 0;
+      const k = parseInt(r[convCol+9] || '0') || 0;   // 결보 (시트 K·L·M열)
       const vr = db ? Math.round(v/db*100) : 0;
-      const or_ = db ? Math.round(o/db*100) : 0;
+      const or_ = (o+k) ? Math.round(o/(o+k)*100) : 0; // 오더/(오더+결보)
       eff.innerHTML = `<span style="color:#0891b2">방 ${v}·${vr}%</span> · <span style="color:#7c3aed">오 ${o}·${or_}%</span>`;
     }
   });
@@ -445,19 +446,23 @@ function render() {
     if (!r || !r[0]) break;
     const p = routeTab;
     campaigns.push({
-      name: r[0],
-      db:    parseInt(r[1 + p] || '0') || 0,
-      visit: parseInt(r[4 + p] || '0') || 0,
-      order: parseInt(r[7 + p] || '0') || 0
+      name:    r[0],
+      channel: r[1] || '',                       // B열: 채널 딱지
+      db:      parseInt(r[2 + p] || '0') || 0,    // DB: C·D·E
+      visit:   parseInt(r[5 + p] || '0') || 0,    // 방문: F·G·H
+      order:   parseInt(r[8 + p] || '0') || 0     // 오더: I·J·K
     });
   }
-  campaigns.sort((a, b) => b.db - a.db);
-  const top5 = campaigns.filter(c => c.db > 0).slice(0, 5);
+  campaigns.sort((a, b) => b.order - a.order || b.db - a.db);  // 오더순
+  const top5 = campaigns.filter(c => c.db > 0).slice(0, 8);
   ctbody.innerHTML = top5.length > 0
     ? top5.map(c => {
         const cr = c.db ? Math.round(c.order / c.db * 100) : 0;
+        const isMeta = c.channel === '메타';
+        const badgeColor = isMeta ? '#1a73e8' : (c.channel.indexOf('텐핑')>=0||c.channel.indexOf('CPA')>=0) ? '#e11d48' : c.channel==='카카오' ? '#f4b400' : c.channel==='네이버' ? '#0f9d58' : '#888';
+        const badge = c.channel ? `<span style="display:inline-block;font-size:9px;font-weight:700;color:#fff;background:${badgeColor};border-radius:6px;padding:1px 5px;margin-right:5px;vertical-align:middle;">${escapeHtml(c.channel)}</span>` : '';
         return `<tr>
-        <td class="name">${escapeHtml(c.name)}</td>
+        <td class="name">${badge}${escapeHtml(c.name)}</td>
         <td class="num">${c.db}</td>
         <td class="num" style="color:#0891b2">${c.visit}</td>
         <td class="num order">${c.order}</td>
