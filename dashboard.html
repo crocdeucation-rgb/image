@@ -227,14 +227,14 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 </div>
 
 <div class="section-label">유입경로별 <span class="badge pay" id="route-eff-label">CPL·ROAS</span></div>
-<div class="grid-4">
+<div class="grid-3">
   <div class="card"><div class="clabel">메타광고</div><div class="cval purple xs" id="route-meta">-</div><div class="crate" id="rr-meta"></div></div>
   <div class="card"><div class="clabel">Organic</div><div class="cval blue xs" id="route-insta">-</div><div class="crate" id="rr-insta"></div></div>
-  <div class="card"><div class="clabel">당근</div><div class="cval orange xs" id="route-daangn">-</div><div class="crate" id="rr-daangn"></div></div>
   <div class="card"><div class="clabel">카카오</div><div class="cval amber xs" id="route-kakao">-</div><div class="crate" id="rr-kakao"></div></div>
   <div class="card"><div class="clabel">네이버</div><div class="cval blue xs" id="route-naver">-</div><div class="crate" id="rr-naver"></div></div>
   <div class="card"><div class="clabel">CPA(텐핑)</div><div class="cval red xs" id="route-cpa">-</div><div class="crate" id="rr-cpa"></div></div>
   <div class="card"><div class="clabel">기타</div><div class="cval xs" id="route-etc">-</div><div class="crate" id="rr-etc"></div></div>
+  <div class="card" id="card-daangn" style="display:none"><div class="clabel">당근</div><div class="cval orange xs" id="route-daangn">-</div><div class="crate" id="rr-daangn"></div></div>
 </div>
 
 <div class="section-label">캠페인별 <span class="badge">오더순</span></div>
@@ -424,12 +424,18 @@ function render() {
     : routeTab === 1 ? 'CPL·ROAS 지난달 확정'
     : 'CPL·ROAS';
   const routeMap = [
-    ['route-meta','rr-meta',35],['route-insta','rr-insta',36],['route-daangn','rr-daangn',37],
-    ['route-kakao','rr-kakao',38],['route-naver','rr-naver',39],['route-cpa','rr-cpa',40],['route-etc','rr-etc',41]
+    ['route-meta','rr-meta',35],['route-insta','rr-insta',36],
+    ['route-kakao','rr-kakao',38],['route-naver','rr-naver',39],['route-cpa','rr-cpa',40],['route-etc','rr-etc',41],
+    ['route-daangn','rr-daangn',37]
   ];
   routeMap.forEach(([dbId, rateId, row]) => {
     const r = allRows[row] || [];
     document.getElementById(dbId).textContent = r[convCol] || '-';
+    if (dbId === 'route-daangn') {
+      const dcard = document.getElementById('card-daangn');
+      const dval = parseInt(r[convCol] || '0') || 0;
+      if (dcard) dcard.style.display = dval > 0 ? '' : 'none';
+    }
     const rateEl = document.getElementById(rateId);
     if (rateEl) {
       const db = parseInt(r[convCol] || '0') || 0;
