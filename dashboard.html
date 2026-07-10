@@ -433,13 +433,10 @@ function render() {
     const rateEl = document.getElementById(rateId);
     if (rateEl) {
       const db = parseInt(r[convCol] || '0') || 0;
-      const v = parseInt(r[4 + routeTab] || '0') || 0;   // 방문 건수 (E·F·G)
-      const s = parseInt(r[7 + routeTab] || '0') || 0;   // 세팅 건수 (H·I·J)
-      const o = parseInt(r[10 + routeTab] || '0') || 0;  // 오더 건수 (K·L·M)
-      const vr = db ? Math.round(v/db*100) : 0;
-      const sr = v ? Math.round(s/v*100) : 0;
-      const or_ = s ? Math.round(o/s*100) : 0;
-      let html = (v||s||o) ? funnelText(v,vr,s,sr,o,or_) : '';
+      // 시트 유입경로는 이미 '율(%)'로 출력됨 → 그대로 사용 (다시 나누지 않음)
+      const vr = parseInt((r[4 + routeTab]+'').replace('%','')) || 0;  // 방문율%
+      const or_ = parseInt((r[7 + routeTab]+'').replace('%','')) || 0; // 오더율%
+      let html = (db>0) ? `<span class="fnl fnl-v">방 <b>${vr}%</b></span><span class="fnl fnl-o">오 <b>${or_}%</b></span>` : '';
       if (effCols) {
         const cpl  = r[effCols[0]] || '';
         const roas = r[effCols[1]] || '';
