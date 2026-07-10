@@ -243,9 +243,9 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
     <tr>
       <th>캠페인명</th>
       <th class="num">DB</th>
-      <th class="num">방문</th>
-      <th class="num">오더</th>
-      <th class="num">전환율</th>
+      <th class="num">방문(율)</th>
+      <th class="num">세팅</th>
+      <th class="num">오더(율)</th>
     </tr>
   </thead>
   <tbody id="campaign-tbody">
@@ -461,26 +461,28 @@ function render() {
     const p = routeTab;
     campaigns.push({
       name:    r[0],
-      channel: r[1] || '',                       // B열: 채널 딱지
-      db:      parseInt(r[2 + p] || '0') || 0,    // DB: C·D·E
-      visit:   parseInt(r[5 + p] || '0') || 0,    // 방문: F·G·H
-      order:   parseInt(r[8 + p] || '0') || 0     // 오더: I·J·K
+      channel: r[1] || '',                        // B열: 채널 딱지
+      db:      parseInt(r[2 + p] || '0') || 0,     // DB: C·D·E
+      visit:   parseInt(r[5 + p] || '0') || 0,     // 방문: F·G·H
+      setting: parseInt(r[8 + p] || '0') || 0,     // 세팅: I·J·K
+      order:   parseInt(r[11 + p] || '0') || 0     // 오더: L·M·N
     });
   }
   campaigns.sort((a, b) => b.order - a.order || b.db - a.db);  // 오더순
   const top5 = campaigns.filter(c => c.db > 0).slice(0, 8);
   ctbody.innerHTML = top5.length > 0
     ? top5.map(c => {
-        const cr = c.db ? Math.round(c.order / c.db * 100) : 0;
+        const vr = c.db ? Math.round(c.visit / c.db * 100) : 0;      // 방문율 = 방문/DB
+        const or_ = c.setting ? Math.round(c.order / c.setting * 100) : 0; // 오더율 = 오더/세팅
         const isMeta = c.channel === '메타';
         const badgeColor = isMeta ? '#1a73e8' : (c.channel.indexOf('텐핑')>=0||c.channel.indexOf('CPA')>=0) ? '#e11d48' : c.channel==='카카오' ? '#f4b400' : c.channel==='네이버' ? '#0f9d58' : '#888';
         const badge = c.channel ? `<span style="display:inline-block;font-size:9px;font-weight:700;color:#fff;background:${badgeColor};border-radius:6px;padding:1px 5px;margin-right:5px;vertical-align:middle;">${escapeHtml(c.channel)}</span>` : '';
         return `<tr>
         <td class="name">${badge}${escapeHtml(c.name)}</td>
         <td class="num">${c.db}</td>
-        <td class="num" style="color:#0891b2">${c.visit}</td>
-        <td class="num order">${c.order}</td>
-        <td class="num" style="color:#7c3aed">${cr}%</td>
+        <td class="num" style="color:#0891b2">${c.visit} <b style="font-size:10px;color:#0891b2">${vr}%</b></td>
+        <td class="num" style="color:#2563eb">${c.setting}</td>
+        <td class="num order">${c.order} <b style="font-size:10px;color:#7c3aed">${or_}%</b></td>
       </tr>`;
       }).join('')
     : '<tr><td colspan="5" style="color:#aaa;text-align:center;padding:14px;">데이터 없음</td></tr>';
