@@ -124,6 +124,13 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 .visit-empty { padding: 20px; text-align: center; color: #aaa; font-size: 12px; }
   .crate { font-size:10px; margin-top:3px; font-weight:600; }
   .route-eff { font-size:9px; margin-top:2px; color:#556; font-weight:600; letter-spacing:-0.2px; }
+
+.fnl { display:inline-block; font-size:10px; line-height:1.5; margin-right:6px; white-space:nowrap; }
+.fnl b { font-weight:700; }
+.fnl-v { color:#0891b2; }  /* 방문 파랑 */
+.fnl-s { color:#d97706; }  /* 세팅 주황 */
+.fnl-o { color:#0f9d58; }  /* 오더 초록 */
+@media (max-width:640px){ .fnl { display:block; margin-right:0; } }
 </style>
 </head>
 <body>
@@ -314,6 +321,11 @@ function pickDayNo(s) {
   return m ? m[1] : '';
 }
 
+function funnelText(v,vr,s,sr,o,or_){
+  return `<span class="fnl fnl-v">방문 ${v} <b>(${vr}%)</b></span>`
+       + `<span class="fnl fnl-s">세팅 ${s} <b>(${sr}%)</b></span>`
+       + `<span class="fnl fnl-o">오더 ${o} <b>(${or_}%)</b></span>`;
+}
 function render() {
   const funnelName = ['이번달','지난달'][funnelTab];
   const routeName  = ['이번달','지난달','전체'][routeTab];
@@ -391,20 +403,22 @@ function render() {
     const eff = document.getElementById(effId);
     if (eff) {
       const db = parseInt(r[convCol] || '0') || 0;
-      const v = parseInt(r[convCol+3] || '0') || 0;
-      const o = parseInt(r[convCol+6] || '0') || 0;
-      const k = parseInt(r[convCol+9] || '0') || 0;   // 결보 (시트 K·L·M열)
-      const vr = db ? Math.round(v/db*100) : 0;
-      const or_ = (o+k) ? Math.round(o/(o+k)*100) : 0; // 오더/(오더+결보)
-      eff.innerHTML = `<span style="color:#0891b2">방 ${v}·${vr}%</span> · <span style="color:#7c3aed">오 ${o}·${or_}%</span>`;
+      const v = parseInt(r[convCol+3] || '0') || 0;   // 방문(전체방문)
+      const o = parseInt(r[convCol+6] || '0') || 0;   // 오더
+      const k = parseInt(r[convCol+9] || '0') || 0;   // 결보
+      const s = o + k;                                 // 세팅 = 결보+오더
+      const vr = db ? Math.round(v/db*100) : 0;        // 방문율 = 방문/DB
+      const sr = v ? Math.round(s/v*100) : 0;          // 세팅율 = 세팅/방문
+      const or_ = s ? Math.round(o/s*100) : 0;         // 오더율 = 오더/세팅
+      eff.innerHTML = funnelText(v,vr,s,sr,o,or_);
     }
   });
 
   // ── 유입경로별 (routeTab)
-  const effCols = routeTab === 0 ? [14,15] : routeTab === 1 ? [11,12] : null;
+  const effCols = routeTab === 0 ? [17,18] : routeTab === 1 ? [14,15] : null;
   const rel = document.getElementById('route-eff-label');
   const rSum = allRows[42] || [];
-  const hasThisSpend = (parseInt((rSum[13]+'').replace(/[^0-9]/g,'')) || 0) > 0;
+  const hasThisSpend = (parseInt((rSum[16]+'').replace(/[^0-9]/g,'')) || 0) > 0;
   if (rel) rel.textContent =
     routeTab === 0 ? (hasThisSpend ? 'CPL·ROAS 이번달 진행중' : 'CPL·ROAS 이번달 광고비 미입력')
     : routeTab === 1 ? 'CPL·ROAS 지난달 확정'
@@ -418,11 +432,14 @@ function render() {
     document.getElementById(dbId).textContent = r[convCol] || '-';
     const rateEl = document.getElementById(rateId);
     if (rateEl) {
-      const visitRate = r[4 + routeTab] || '';
-      const orderRate = r[7 + routeTab] || '';
-      let html = (visitRate || orderRate)
-        ? `<span style="color:#0891b2">방${visitRate}</span> · <span style="color:#7c3aed">오${orderRate}</span>`
-        : '';
+      const db = parseInt(r[convCol] || '0') || 0;
+      const v = parseInt(r[4 + routeTab] || '0') || 0;   // 방문 건수 (E·F·G)
+      const s = parseInt(r[7 + routeTab] || '0') || 0;   // 세팅 건수 (H·I·J)
+      const o = parseInt(r[10 + routeTab] || '0') || 0;  // 오더 건수 (K·L·M)
+      const vr = db ? Math.round(v/db*100) : 0;
+      const sr = v ? Math.round(s/v*100) : 0;
+      const or_ = s ? Math.round(o/s*100) : 0;
+      let html = (v||s||o) ? funnelText(v,vr,s,sr,o,or_) : '';
       if (effCols) {
         const cpl  = r[effCols[0]] || '';
         const roas = r[effCols[1]] || '';
