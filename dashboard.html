@@ -232,6 +232,7 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
   <div class="card"><div class="clabel">Organic</div><div class="cval blue xs" id="route-insta">-</div><div class="crate" id="rr-insta"></div></div>
   <div class="card"><div class="clabel">카카오</div><div class="cval amber xs" id="route-kakao">-</div><div class="crate" id="rr-kakao"></div></div>
   <div class="card"><div class="clabel">네이버</div><div class="cval blue xs" id="route-naver">-</div><div class="crate" id="rr-naver"></div></div>
+  <div class="card" id="card-navergfa" style="display:none"><div class="clabel">네이버GFA</div><div class="cval blue xs" id="route-navergfa">-</div><div class="crate" id="rr-navergfa"></div></div>
   <div class="card"><div class="clabel">CPA(텐핑)</div><div class="cval red xs" id="route-cpa">-</div><div class="crate" id="rr-cpa"></div></div>
   <div class="card"><div class="clabel">기타</div><div class="cval xs" id="route-etc">-</div><div class="crate" id="rr-etc"></div></div>
   <div class="card" id="card-daangn" style="display:none"><div class="clabel">당근</div><div class="cval orange xs" id="route-daangn">-</div><div class="crate" id="rr-daangn"></div></div>
@@ -274,8 +275,9 @@ const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk
 const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1384080283&single=true&output=csv';
 
 const ASSIGNEES = ['우혜림', '김윤호', '장윤호', '박창건', '김우진', '김태석'];
-const ASSIGNEE_START_IDX = 45;
-const CAMPAIGN_START_IDX = 53;
+// ROUTE_KEYS 7→8개(네이버GFA 추가)로 유입경로 표가 1행 늘어 아래 블록이 모두 1행씩 밀림
+const ASSIGNEE_START_IDX = 46;
+const CAMPAIGN_START_IDX = 54;
 
 function showSec(idx) {
   currentSec = idx;
@@ -331,6 +333,28 @@ function render() {
   const routeName  = ['이번달','지난달','전체'][routeTab];
   const convCol = routeTab + 1;   // 학년별/유입경로 DB 컬럼
   document.getElementById('tab-label').textContent = funnelName;
+
+  // ── 텐핑 코호트 블록 파싱 (시트 맨 아래, '텐핑코호트' 헤더로 시작)
+  // 행 번호가 캠페인 수에 따라 달라지므로 라벨로 찾는다.
+  let cpaCohort = null;
+  for (let i = CAMPAIGN_START_IDX; i < allRows.length; i++) {
+    if (allRows[i] && allRows[i][0] === '텐핑코호트') {
+      const get = (label) => {
+        for (let j = i + 1; j < Math.min(i + 12, allRows.length); j++) {
+          if (allRows[j] && allRows[j][0] === label) return allRows[j][1];
+        }
+        return null;
+      };
+      const spend = parseInt(get('누적 투자') || '0') || 0;
+      const cpl   = parseInt(get('실질 CPL') || '0') || 0;
+      const roas  = get('누적 ROAS') || '-';
+      const recov = get('회수율(%)') || 0;
+      const sales = parseInt(get('누적 회수') || '0') || 0;
+      const orders = parseInt(get('누적 오더') || '0') || 0;
+      cpaCohort = { spend, cpl, roas, recov, sales, orders, status: get('집행상태') || '' };
+      break;
+    }
+  }
 
   // ── 매출 2×2 (요약시트 12행: 이번달|값|이번주|값 / 13행: 지난달|값|지난주|값)
   const r12 = allRows[11] || [];
@@ -419,9 +443,11 @@ function render() {
   });
 
   // ── 유입경로별 (routeTab)
+  // ROUTE_KEYS가 7→8개(네이버GFA 추가)로 늘어 유입경로 표가 1행 길어졌음.
+  // 시트 순서: 35 메타 / 36 Organic / 37 당근 / 38 카카오 / 39 네이버 / 40 네이버GFA / 41 CPA / 42 기타 / 43 합계
   const effCols = routeTab === 0 ? [17,18] : routeTab === 1 ? [14,15] : null;
   const rel = document.getElementById('route-eff-label');
-  const rSum = allRows[42] || [];
+  const rSum = allRows[43] || [];
   const hasThisSpend = (parseInt((rSum[16]+'').replace(/[^0-9]/g,'')) || 0) > 0;
   if (rel) rel.textContent =
     routeTab === 0 ? (hasThisSpend ? 'CPL·ROAS 이번달 진행중' : 'CPL·ROAS 이번달 광고비 미입력')
@@ -429,14 +455,17 @@ function render() {
     : 'CPL·ROAS';
   const routeMap = [
     ['route-meta','rr-meta',35],['route-insta','rr-insta',36],
-    ['route-kakao','rr-kakao',38],['route-naver','rr-naver',39],['route-cpa','rr-cpa',40],['route-etc','rr-etc',41],
+    ['route-kakao','rr-kakao',38],['route-naver','rr-naver',39],
+    ['route-navergfa','rr-navergfa',40],['route-cpa','rr-cpa',41],['route-etc','rr-etc',42],
     ['route-daangn','rr-daangn',37]
   ];
   routeMap.forEach(([dbId, rateId, row]) => {
     const r = allRows[row] || [];
     document.getElementById(dbId).textContent = r[convCol] || '-';
-    if (dbId === 'route-daangn') {
-      const dcard = document.getElementById('card-daangn');
+    // DB 0인 채널 카드는 숨김 (당근·네이버GFA)
+    if (dbId === 'route-daangn' || dbId === 'route-navergfa') {
+      const cardId = dbId === 'route-daangn' ? 'card-daangn' : 'card-navergfa';
+      const dcard = document.getElementById(cardId);
       const dval = parseInt(r[convCol] || '0') || 0;
       if (dcard) dcard.style.display = dval > 0 ? '' : 'none';
     }
@@ -454,12 +483,19 @@ function render() {
       if (effCols) {
         const cpl  = r[effCols[0]] || '';
         const roas = r[effCols[1]] || '';
-        let cplNum = parseInt((cpl+'').replace(/[^0-9]/g,'')) || 0;
-        if (dbId === 'route-cpa' && cplNum > 0) cplNum = 28000;
-        if (cplNum > 0 || roas) {
-          const cplStr  = cplNum > 0 ? '₩' + cplNum.toLocaleString() : '-';
-          const roasStr = roas ? roas + '' : '-';
-          html += `<div class="route-eff">CPL ${cplStr} · ROAS ${roasStr}</div>`;
+        // ★ 텐핑(CPA)은 선불 충전형 → 월별 CPL/ROAS 무의미(태운 달=폭망, 안 태운 달=∞).
+        //   getLeadStats가 ROAS 칸에 '코호트'를 넣어주므로, 여기선 누적 지표로 대체 표시.
+        if (dbId === 'route-cpa') {
+          if (cpaCohort) {
+            html += `<div class="route-eff">누적 CPL ₩${cpaCohort.cpl.toLocaleString()} · 누적 ROAS ${cpaCohort.roas}</div>`;
+          }
+        } else {
+          const cplNum = parseInt((cpl+'').replace(/[^0-9]/g,'')) || 0;
+          if (cplNum > 0 || roas) {
+            const cplStr  = cplNum > 0 ? '₩' + cplNum.toLocaleString() : '-';
+            const roasStr = roas ? roas + '' : '-';
+            html += `<div class="route-eff">CPL ${cplStr} · ROAS ${roasStr}</div>`;
+          }
         }
       }
       rateEl.innerHTML = html;
