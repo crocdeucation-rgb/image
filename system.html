@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>측정 시스템 — 아라온스쿨 그로스</title>
+<meta name="description" content="결제 건수만 보면 어디를 고쳐야 할지 알 수 없습니다. 신청→방문→세팅→오더 전 구간을 측정해 무엇을 키우고 무엇을 접을지 판단합니다.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#161d1a; --paper:#f5f7f5; --card:#ffffff;
+  --teal:#0a7d5a; --teal-l:#e4f1eb; --teal-d:#065c43;
+  --red:#c2492f; --red-l:#fbe9e4;
+  --amber:#b57611; --amber-l:#fdf1dd;
+  --sub:#59645e; --faint:#8f9c95;
+  --border:#e2e8e3; --border2:#eef2ef;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--paper);color:var(--ink);
+     line-height:1.72;-webkit-font-smoothing:antialiased;word-break:keep-all}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px}
+.num{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:.94em;color:var(--teal-d)}
+.bad{color:var(--red);font-weight:700}
+b{font-weight:700}
+
+/* nav */
+.nav{border-bottom:1px solid var(--border);background:rgba(245,247,245,.92);backdrop-filter:blur(8px);
+     position:sticky;top:0;z-index:10}
+.nav-in{max-width:900px;margin:0 auto;padding:14px 22px;display:flex;justify-content:space-between;align-items:center}
+.nav a{color:var(--sub);text-decoration:none;font-size:13px;font-weight:600}
+.nav a:hover{color:var(--teal-d)}
+.nav-t{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;color:var(--faint);font-weight:600}
+
+/* hero */
+.hero{padding:64px 0 48px;border-bottom:1px solid var(--border)}
+.hero h1{font-size:clamp(26px,5vw,40px);font-weight:800;letter-spacing:-.035em;line-height:1.28;margin-bottom:20px}
+.hero h1 em{font-style:normal;color:var(--teal-d)}
+.hero p{font-size:15px;color:var(--sub);line-height:1.85;max-width:660px}
+
+/* section */
+section{padding:56px 0;border-bottom:1px solid var(--border)}
+.sec-tag{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;color:var(--teal);
+         font-weight:600;display:block;margin-bottom:12px}
+.sec-h{margin-bottom:26px}
+h2{font-size:clamp(21px,3.8vw,29px);font-weight:800;letter-spacing:-.03em;line-height:1.3}
+.sec-lede{font-size:14px;color:var(--sub);margin-top:11px;line-height:1.8;max-width:680px}
+p{margin-bottom:15px;font-size:14.5px;line-height:1.85;color:#2d3630}
+p:last-child{margin-bottom:0}
+
+/* card */
+.ch{background:var(--card);border:1px solid var(--border);border-radius:18px;margin-bottom:20px;overflow:hidden}
+.ch-head{padding:24px 28px 0}
+.ch-no{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;font-weight:600;color:var(--faint)}
+.ch-title{font-size:clamp(17px,3vw,22px);font-weight:800;letter-spacing:-.025em;margin-top:7px;line-height:1.3}
+.ch-body{padding:16px 28px 26px}
+
+/* callout */
+.call{background:var(--teal-l);border:1px solid #c4ded2;border-radius:14px;padding:20px 24px;margin:22px 0}
+.call.warn{background:var(--red-l);border-color:#f0cec4}
+.call.note{background:var(--amber-l);border-color:#f0dcb8}
+.call-t{font-weight:800;font-size:15px;margin-bottom:8px;letter-spacing:-.02em}
+.call p{font-size:13.5px;margin-bottom:8px;color:#2d3630}
+.call p:last-child{margin-bottom:0}
+
+/* table */
+table{width:100%;border-collapse:collapse;font-size:13px;margin:16px 0}
+th{text-align:left;padding:9px 10px;border-bottom:1.5px solid var(--border);
+   font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.06em;color:var(--faint);font-weight:600}
+td{padding:10px;border-bottom:1px solid var(--border2);color:#2d3630}
+td.r,th.r{text-align:right;font-family:'IBM Plex Mono',monospace}
+tr.hi{background:var(--teal-l)}
+tr.lo{background:var(--red-l)}
+
+/* funnel */
+.fn{display:flex;gap:0;margin:22px 0;flex-wrap:wrap}
+.fn-s{flex:1;min-width:130px;padding:18px 16px;background:var(--card);border:1px solid var(--border);
+      border-right:0;position:relative}
+.fn-s:last-child{border-right:1px solid var(--border);border-radius:0 13px 13px 0}
+.fn-s:first-child{border-radius:13px 0 0 13px}
+.fn-n{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;color:var(--faint);font-weight:600}
+.fn-t{font-size:15px;font-weight:800;margin:6px 0 4px;letter-spacing:-.02em}
+.fn-d{font-size:12px;color:var(--sub);line-height:1.6}
+.fn-q{font-size:12px;color:var(--teal-d);font-weight:700;margin-top:8px;line-height:1.5}
+
+/* metric grid */
+.mg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:20px 0}
+.mc{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:18px 20px}
+.mc-k{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;color:var(--faint);font-weight:600}
+.mc-t{font-size:15px;font-weight:800;margin:6px 0 6px;letter-spacing:-.02em}
+.mc-d{font-size:12.5px;color:var(--sub);line-height:1.65}
+
+/* system cards */
+.sy{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin:22px 0}
+.sy-c{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:20px 22px}
+.sy-t{font-size:14.5px;font-weight:800;margin-bottom:7px;letter-spacing:-.02em}
+.sy-d{font-size:12.5px;color:var(--sub);line-height:1.7}
+.sy-tag{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--teal);
+        font-weight:600;display:block;margin-bottom:8px}
+
+/* quote */
+.q{border-left:3px solid var(--teal);padding:4px 0 4px 20px;margin:24px 0;
+   font-size:16.5px;font-weight:700;letter-spacing:-.02em;line-height:1.6}
+.q span{color:var(--teal-d)}
+
+/* links */
+.links{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.lk{display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--border);
+    border-radius:999px;padding:9px 16px;font-size:12.5px;font-weight:600;color:var(--ink);text-decoration:none}
+.lk:hover{border-color:var(--teal);color:var(--teal-d)}
+
+footer{padding:40px 0 56px;text-align:center}
+footer p{font-size:12.5px;color:var(--faint)}
+footer a{color:var(--teal-d);text-decoration:none;font-weight:600}
+
+@media(max-width:640px){
+  .fn-s{border-right:1px solid var(--border);border-radius:13px!important;margin-bottom:8px}
+  section{padding:44px 0}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav"><div class="nav-in">
+  <span class="nav-t">MEASUREMENT SYSTEM</span>
+  <span class="nav-t" style="color:var(--teal)">아라온스쿨 그로스</span>
+</div></nav>
+
+<div class="wrap">
+
+<div class="hero">
+  <h1>무엇을 키우고<br>무엇을 접을지,<br><em>무엇을 보고 정하는가</em></h1>
+  <p>광고를 늘릴지 줄일지, 소재를 살릴지 죽일지 — 매일 내려야 하는 결정입니다. 리드 단가만 보면 답이 나오지 않습니다. <b>싼 리드가 안 팔리고, 비싼 리드가 팔리는 일이 실제로 일어나기 때문입니다.</b> 이 글은 그 판단을 가능하게 만든 측정 기준에 대한 기록입니다.</p>
+</div>
+
+<!-- 00 -->
+<section>
+  <div class="sec-h">
+    <span class="sec-tag">00 — WHY MEASURE</span>
+    <h2>리드 단가만 보면, 정반대의 결정을 하게 됩니다</h2>
+    <div class="sec-lede">6월에 실제로 있었던 일입니다. 두 소재의 리드 단가는 4배 차이가 났습니다. 그리고 매출은 정확히 반대로 갔습니다.</div>
+  </div>
+
+  <table>
+    <thead><tr><th>소재</th><th class="r">리드 단가</th><th class="r">리드</th><th class="r">오더</th><th class="r">매출</th><th>리드 단가만 보면</th></tr></thead>
+    <tbody>
+      <tr class="lo"><td><b>MLST 공부방법점검</b></td><td class="r"><b>9,494원</b><br><span style="color:var(--faint);font-size:11px">계정 내 1위</span></td><td class="r">97</td><td class="r bad">0</td><td class="r bad">0원</td><td><b>“가장 효율 좋은 소재”</b><br><span style="color:var(--faint);font-size:12px">→ 예산을 더 넣어야 한다</span></td></tr>
+      <tr class="hi"><td><b>채리 릴스</b></td><td class="r"><b>38,721원</b><br><span style="color:var(--faint);font-size:11px">계정 내 9위</span></td><td class="r">85</td><td class="r">4</td><td class="r"><span class="num">1,243만원</span></td><td><b>“가장 비효율적인 소재”</b><br><span style="color:var(--faint);font-size:12px">→ 꺼야 한다</span></td></tr>
+    </tbody>
+  </table>
+
+  <p>리드 단가만 보면 <b>MLST에 예산을 몰고 채리를 꺼야 합니다.</b> 실제로 메타의 AI 어시스턴트도 “CPL 45% 저렴, 안정적인 리드 흐름”을 근거로 <b>MLST로 예산을 재배분하라</b>고 권했습니다.</p>
+
+  <p>그런데 <b>MLST는 97명이 신청하고 한 명도 사지 않았고, 채리는 1,243만원을 팔았습니다.</b> 리드 단가만 봤다면 팔리는 소재를 끄고 안 팔리는 소재에 돈을 더 넣었을 것입니다.</p>
+
+  <div class="call">
+    <div class="call-t">리드의 가격과 리드의 가치는 다릅니다</div>
+    <p>광고 플랫폼은 <b>“신청 버튼을 눌렀다”까지만</b> 압니다. 그 사람이 실제로 방문했는지, 결제했는지는 <b>플랫폼 밖</b>에 있습니다.</p>
+    <p>그래서 리드 단가는 <b>얼마나 싸게 신청을 모았는가</b>만 말해줍니다. <b>그 신청이 매출이 되는지는 말해주지 않습니다.</b></p>
+  </div>
+
+  <p style="margin-top:20px"><b>무엇을 키우고 무엇을 접을지 정하려면, 신청 이후를 봐야 합니다.</b> 그래서 신청부터 결제까지를 네 단계로 쪼갰습니다.</p>
+</section>
+
+<!-- 01 -->
+<section>
+  <div class="sec-h">
+    <span class="sec-tag">01 — THE FUNNEL</span>
+    <h2>그래서 네 단계로 쪼갰습니다</h2>
+    <div class="sec-lede">소재가 어느 구간에서 무너지느냐에 따라, 고쳐야 할 것이 완전히 달라집니다. 같은 “안 팔림”이라도 처방이 다릅니다.</div>
+  </div>
+
+  <div class="fn">
+    <div class="fn-s">
+      <div class="fn-n">STEP 1</div>
+      <div class="fn-t">신청 → 방문</div>
+      <div class="fn-d">전화가 닿았고, 만나기로 했는가</div>
+      <div class="fn-q">낮으면 → 리드가 가짜거나<br>콜이 안 된다</div>
+    </div>
+    <div class="fn-s">
+      <div class="fn-n">STEP 2</div>
+      <div class="fn-t">방문 → 세팅</div>
+      <div class="fn-d">만나서 수업 구조를 잡았는가</div>
+      <div class="fn-q">낮으면 → 상담이 안 됐거나<br><b>기대와 제품이 다르다</b></div>
+    </div>
+    <div class="fn-s">
+      <div class="fn-n">STEP 3</div>
+      <div class="fn-t">세팅 → 오더</div>
+      <div class="fn-d">실제로 결제까지 갔는가</div>
+      <div class="fn-q">낮으면 → 클로징 문제</div>
+    </div>
+    <div class="fn-s">
+      <div class="fn-n">STEP 4</div>
+      <div class="fn-t">방문취소율</div>
+      <div class="fn-d">약속을 잡고도 깨졌는가</div>
+      <div class="fn-q">높으면 → 약속 관리<br>또는 니즈가 얕다</div>
+    </div>
+  </div>
+
+  <div class="mg">
+    <div class="mc">
+      <div class="mc-k">방문율</div>
+      <div class="mc-t">신청 대비 만난 비율</div>
+      <div class="mc-d">리드의 <b>진위</b>를 가장 먼저 드러냅니다. 번호가 틀리거나 대상이 아니면 여기서 무너집니다.</div>
+    </div>
+    <div class="mc">
+      <div class="mc-k">세팅율</div>
+      <div class="mc-t">방문 대비 수업 구조를 잡은 비율</div>
+      <div class="mc-d">만났는데 여기서 죽으면, <b>소재가 약속한 것과 제품이 다르다</b>는 신호입니다.</div>
+    </div>
+    <div class="mc">
+      <div class="mc-k">오더율</div>
+      <div class="mc-t">세팅 대비 결제 비율</div>
+      <div class="mc-d">순수한 <b>클로징 역량</b>. 앞 단계가 정상인데 여기만 낮으면 사람의 문제입니다.</div>
+    </div>
+    <div class="mc">
+      <div class="mc-k">방취율</div>
+      <div class="mc-t">잡힌 약속이 깨진 비율</div>
+      <div class="mc-d">니즈의 <b>깊이</b>를 봅니다. 높으면 “일단 신청”한 리드가 많다는 뜻입니다.</div>
+    </div>
+  </div>
+
+  <p>이 네 개를 <b>소재별·채널별로</b> 봅니다. 리드가 어느 구간에서 죽는지가 보이면, <b>예산을 늘릴지 줄일지, 소재를 고칠지 접을지</b>가 정해집니다.</p>
+
+  <div class="call">
+    <div class="call-t">구간별로 처방이 다릅니다</div>
+    <p><b>방문율이 낮다</b> → 리드가 가짜다. <b>타겟을 고친다.</b><br>
+       <b>방문은 되는데 세팅이 안 된다</b> → 소재가 약속한 것과 제품이 다르다. <b>소재를 고친다.</b><br>
+       <b>세팅은 되는데 오더가 안 된다</b> → 클로징 문제. <b>상담 구조를 본다.</b><br>
+       <b>방취율이 높다</b> → 니즈가 얕다. <b>훅을 다시 본다.</b></p>
+  </div>
+</section>
+
+<!-- 02 -->
+<section>
+  <div class="sec-h">
+    <span class="sec-tag">02 — SAME RESULT, DIFFERENT CAUSE</span>
+    <h2>그러자 “오더 0”이 같은 말이 아니게 됐습니다</h2>
+    <div class="sec-lede">결과는 똑같이 “안 팔렸다”입니다. 그런데 어디서 죽었는지를 보면, 하나는 <b>타겟을 고쳐야 하고</b> 다른 하나는 <b>소재를 고쳐야 합니다.</b> 처방이 정반대입니다.</div>
+  </div>
+
+  <table>
+    <thead><tr><th>소재</th><th class="r">결번·대상아님</th><th class="r">방문율</th><th class="r">방문→세팅</th><th>진단</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td><b>노트릴스</b> (기준)</td><td class="r">6.6%</td><td class="r">11.1%</td><td class="r">57.8%</td><td>정상 — 매출 <span class="num">7,775만</span></td></tr>
+      <tr class="lo"><td><b>5단계루틴</b></td><td class="r bad">18.7%</td><td class="r bad">1.6%</td><td class="r">—</td><td><b>리드가 가짜다</b><br>번호가 틀리고 전화를 안 받는다</td></tr>
+      <tr class="lo"><td><b>너만본다</b></td><td class="r">8.8%</td><td class="r">7.4%</td><td class="r bad">0%</td><td><b>기대가 틀린 채로 왔다</b><br>후반부(화상수업)를 안 보고 신청</td></tr>
+    </tbody>
+  </table>
+
+  <div class="ch">
+    <div class="ch-head">
+      <div class="ch-no">CASE 1 — 리드 품질의 실패</div>
+      <div class="ch-title">5단계루틴 — 전화도 안 받고, 번호도 틀렸다</div>
+    </div>
+    <div class="ch-body">
+      <p>결번·대상아님이 <b class="bad">18.7%</b>. 위너 소재의 2.8배입니다. 방문율은 <b class="bad">1.6%</b> — 123명이 신청했는데 2명만 만났습니다.</p>
+      <p>연령을 열어보니 <b>25–34세가 72%</b>였습니다. 학부모가 아니었습니다. 값싼 오디언스에 도달한 소재가 값싼 리드를 만든 것입니다.</p>
+      <p>다만 <b>방문에 도달한 2건은 100% 세팅됐습니다.</b> 진짜인 사람은 삽니다. <b>리드가 가짜였을 뿐입니다.</b> → 처방은 <b>타겟 교정</b>.</p>
+    </div>
+  </div>
+
+  <div class="ch">
+    <div class="ch-head">
+      <div class="ch-no">CASE 2 — 기대의 실패</div>
+      <div class="ch-title">너만본다 — 끝까지 보지 않은 사람이 신청했다</div>
+    </div>
+    <div class="ch-body">
+      <p>결번율 8.8%로 정상, 연령은 <b>35–54세가 78%</b>. 리드 품질도 타겟도 통과했습니다. 그런데 <b class="bad">방문 5건이 전부 세팅에 실패</b>했습니다. 만났는데 아무도 사지 않은 것입니다.</p>
+      <p>여기서 <b>영상 완주율</b>을 열었습니다. 이 소재는 <b>선생님이 직접 지도하는 장면</b>으로 시작해서, <b>화상수업이라는 사실은 후반부에</b> 나옵니다.</p>
+
+      <table>
+        <thead><tr><th>소재</th><th class="r">50% 지점</th><th class="r">75% 지점</th><th class="r">완주</th><th class="r">ROAS</th></tr></thead>
+        <tbody>
+          <tr class="hi"><td>노트릴스 (위너)</td><td class="r">49%</td><td class="r">30.8%</td><td class="r">18%</td><td class="r">10.86</td></tr>
+          <tr><td>GT노트피드백</td><td class="r">43%</td><td class="r">27.0%</td><td class="r">16%</td><td class="r">4.50</td></tr>
+          <tr><td>채리</td><td class="r">44%</td><td class="r">27.5%</td><td class="r">18%</td><td class="r">3.78</td></tr>
+          <tr class="lo"><td><b>너만본다</b></td><td class="r bad">35%</td><td class="r bad">14.0%</td><td class="r bad">7%</td><td class="r bad">0</td></tr>
+        </tbody>
+      </table>
+
+      <p><b>75% 지점 유지율이 위너의 절반 이하(14.0% vs 30.8%)입니다.</b> 초반 후킹은 오히려 성공했습니다 — 재생 시작은 채리보다 많았습니다. 그러나 <b>화상수업이 등장하는 후반부까지 도달한 사람이 절반밖에 되지 않았습니다.</b></p>
+
+      <div class="call warn" style="margin:16px 0 12px">
+        <div class="call-t">그래서 이런 리드가 들어왔습니다</div>
+        <p>대면으로 직접 지도받는 모습만 보고 신청 → 상담에서 <b>화상수업이라는 사실을 처음 알게 됨</b> → 기대와 다르니 사지 않음.</p>
+        <p><b>소재가 거짓말을 한 것이 아닙니다.</b> 영상 후반에 화상수업이 분명히 나옵니다. 다만 <b>거기까지 보지 않은 사람이 신청 버튼을 누를 수 있게</b> 만든 것이 문제였습니다.</p>
+      </div>
+
+      <p>→ 처방은 카피가 아니라 <b>구조</b>입니다. <b>제품의 형태(온라인 화상수업)는 영상 앞쪽에서 밝힙니다.</b> 후반부 정보에 의존하는 소재는, 완주하지 않은 사람에게 잘못된 기대를 심습니다.</p>
+    </div>
+  </div>
+
+  <div class="q">
+    “오더 0”으로 묶어두면 다음에 무엇을 고칠지 알 수 없습니다.<br>
+    <span>퍼널을 쪼개야 처방이 나옵니다.</span>
+  </div>
+</section>
+
+<!-- 03 -->
+<section>
+  <div class="sec-h">
+    <span class="sec-tag">03 — WHY THE DASHBOARD EXISTS</span>
+    <h2>광고 플랫폼은 리드까지만 봅니다.<br>매출은 우리 노션에만 있습니다.</h2>
+    <div class="sec-lede">이 둘을 잇는 것이 대시보드입니다. 그래서 만들었습니다.</div>
+  </div>
+
+  <p>메타는 “신청 버튼을 눌렀다”까지만 압니다. 그 사람이 방문했는지, 결제했는지는 <b>플랫폼 밖</b>에 있습니다. 카카오도, 네이버도 마찬가지입니다. <b>어떤 광고 플랫폼도 우리 매출을 모릅니다.</b></p>
+
+  <p>그래서 플랫폼의 AI는 <b>리드가 싼 캠페인을 “좋다”고 판단할 수밖에 없습니다.</b> 그것이 그들이 볼 수 있는 전부이기 때문입니다. 앞서 본 MLST 사례가 정확히 그 결과였습니다.</p>
+
+  <div class="call">
+    <div class="call-t">그래서 두 개를 이었습니다</div>
+    <p><b>노션</b> — 신청 → 방문 → 세팅 → 결제를 전부 기록합니다. 매출이 여기 있습니다.<br>
+       <b>광고 플랫폼</b> — 소재별 광고비 · CPM · 연령 · 영상 완주율을 가져옵니다.<br>
+       <b>대시보드</b> — 둘을 <b>소재 단위로 연결</b>합니다.</p>
+    <p>이 연결이 있어야 <b>“1원 써서 몇 원을 벌었나”</b>가 소재별로 나옵니다. 그것 없이는 무엇을 키우고 무엇을 접을지 정할 수 없습니다.</p>
+  </div>
+
+  <div class="mg">
+    <div class="mc">
+      <div class="mc-k">광고 플랫폼이 보여주는 것</div>
+      <div class="mc-t">노출 · 클릭 · 신청</div>
+      <div class="mc-d">여기까지는 자동으로 나옵니다. 그러나 <b>신청이 매출이 되는지는 알 수 없습니다.</b></div>
+    </div>
+    <div class="mc" style="border-color:#c4ded2;background:#fbfefd">
+      <div class="mc-k">우리가 연결해야 하는 것</div>
+      <div class="mc-t">방문 · 세팅 · 결제 · 매출</div>
+      <div class="mc-d">CRM에만 있습니다. <b>이걸 광고비와 잇는 순간, 소재의 생사가 판정 가능해집니다.</b></div>
+    </div>
+  </div>
+
+  <p><b>6월에 소재 9종을 폐기하고 채널 2개를 접었습니다.</b> 전부 이 연결 위에서 판단했습니다.</p>
+</section>
+
+<!-- 03-B -->
+<section>
+  <div class="sec-h">
+    <span class="sec-tag">03-B — ONE PLACE</span>
+    <h2>모든 채널이 한 곳으로 모입니다</h2>
+    <div class="sec-lede">리드가 채널마다 다른 곳에 쌓이면, 채널을 비교할 수 없습니다. 비교할 수 없으면 무엇을 접을지 정할 수 없습니다.</div>
+  </div>
+
+  <div class="ch">
+    <div class="ch-body" style="padding-top:22px">
+      <p style="margin-bottom:14px"><b>메타 · 카카오 · 네이버 브랜드검색 · 네이버 GFA · 텐핑 · 애드릭스 · 구글폼</b> — 유입 경로가 전부 다르고, 각자 다른 시스템에 쌓입니다.</p>
+      <p style="margin-bottom:14px">이걸 <b>노션 한 곳으로 모읍니다.</b> API로 자동 연동되는 것은 자동으로, 안 되는 것(GFA·텐핑)은 정해진 시트를 통해 일괄로.</p>
+      <p style="margin-bottom:0">그리고 <b>어느 채널로 들어왔든 똑같은 처리를 받습니다</b> — 즉시 웰컴 알림톡, 슬랙 실시간 알림, 담당자 배정, 퍼널 추적.</p>
+    </div>
+  </div>
+
+  <div class="call">
+    <div class="call-t">이게 없으면 채널을 비교할 수 없습니다</div>
+    <p>메타 리드는 메타에서 보고, 카카오 리드는 카카오에서 보면 — <b>“어느 채널이 더 나은가”에 답할 수 없습니다.</b> 각 플랫폼은 자기 리드만 보여주고, 매출은 아무도 안 보여주기 때문입니다.</p>
+    <p>6월에 당근(196만)과 네이버 GFA(31만)를 접었습니다. <b>같은 표 위에 놓고 비교했기 때문에</b> 접을 수 있었습니다.</p>
+  </div>
+</section>
+
+<!-- 04 -->
+<section>
+  <div class="sec-h">
+    <span class="sec-tag">04 — STRUCTURE, NOT EFFORT</span>
+    <h2>노력으로 풀리지 않는 것은 구조로 풉니다</h2>
+    <div class="sec-lede">더 부지런히 해서 해결되는 문제와, 아무리 부지런해도 해결되지 않는 문제는 다릅니다. 후자는 시스템으로 바꿔야 합니다.</div>
+  </div>
+
+  <table>
+    <thead><tr><th>문제</th><th>노력만으로는</th><th>구조로 바꾼 것</th></tr></thead>
+    <tbody>
+      <tr><td><b>부재 리드 1,082건</b></td><td>전화를 더 건다<br><span style="color:var(--faint);font-size:12px">→ 안 받는 사람은 계속 안 받는다</span></td><td><b>채널을 바꾼다</b><br>카톡으로, 상대가 시간을 정하게</td></tr>
+      <tr><td><b>신청 직후의 공백</b></td><td>빨리 전화한다<br><span style="color:var(--faint);font-size:12px">→ 통화 중이거나 바쁠 때가 있다</span></td><td><b>즉시 인사한다</b><br>유입 즉시 웰컴 알림톡 자동 발송</td></tr>
+      <tr><td><b>리드 유실</b></td><td>꼼꼼히 확인한다<br><span style="color:var(--faint);font-size:12px">→ 한 번 조용히 새면 영원히 모른다</span></td><td><b>자동으로 대조한다</b><br>10분마다 원본↔노션 검증·복구</td></tr>
+      <tr><td><b>광고비 집계 지연</b></td><td>제때 입력한다<br><span style="color:var(--faint);font-size:12px">→ 사람이 하는 한 항상 뒤처진다</span></td><td><b>API로 가져온다</b><br>매일 오전 8시 자동 수집</td></tr>
+    </tbody>
+  </table>
+
+  <div class="ch">
+    <div class="ch-head">
+      <div class="ch-no">CASE — 부재 리드 회수</div>
+      <div class="ch-title">전화를 안 받는 사람에게, 전화를 더 거는 것은 답이 아니었습니다</div>
+    </div>
+    <div class="ch-body">
+      <p>1~2차 콜을 돌렸는데도 닿지 않는 리드가 <b>1,082건</b> 쌓여 있었습니다. 상담팀은 이미 충분히 콜을 돌리고 있었습니다. <b>더 부지런히 해서 풀릴 문제가 아니었습니다.</b></p>
+
+      <p>그래서 <b>채널을 바꿨습니다.</b> 전화 대신 카톡으로. 상담팀이 상태를 <b>‘부재’</b>로 바꾸기만 하면 <b>30분 안에 알림톡이 자동 발송</b>됩니다. 같은 사람에게 두 번 나가지 않도록 발송 이력도 자동 관리됩니다.</p>
+
+      <div class="call" style="margin:16px 0">
+        <div class="call-t">실제로 나가는 메시지</div>
+        <p style="font-style:italic;line-height:2">
+          안녕하세요, <b>#{이름}</b> 학부모님 😊 아라온스쿨입니다.<br><br>
+          일전에 공부 방법·필기·공부 습관 관련해 상담 신청해주셔서 연락드렸는데, <b>부재중이셔서 카톡으로 먼저 인사드려요.</b><br><br>
+          <b>바쁘신 줄 알기에, 편하게 통화 가능한 시간을 남겨주시면 그때 맞춰 연락드리겠습니다.</b><br><br>
+          천천히 회신 주셔도 괜찮아요.
+        </p>
+      </div>
+
+      <p>이 문장에는 <b>재촉이 없습니다.</b> 부재를 사과처럼 다루고, <b>회신 시점을 상대가 정하게</b> 했습니다. 강요하지 않아야 다음 통화가 열립니다.</p>
+
+      <div class="call note" style="margin-top:16px">
+        <div class="call-t">그리고 함부로 쓰지 못하게 막았습니다</div>
+        <p>1,082건을 한 번에 발송할 수 있었지만 하지 않았습니다. 운영 규칙에 이렇게 못 박았습니다 —</p>
+        <p style="font-style:italic">“오래된 부재를 한꺼번에 처리하지 말고, <b>직접 콜 시도 후 정말 못 닿은 건에만</b> 사용하세요.”</p>
+        <p><b>대량 발송은 회수가 아니라 스팸이 됩니다.</b> 도구를 만들 때는, 그 도구가 잘못 쓰일 경우까지 함께 설계해야 합니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="call note">
+    <div class="call-t">데이터는 감시가 아니라 도구입니다</div>
+    <p>담당자별 퍼널을 공개할 때, 이것을 <b>“각자 본인 퍼널에서 막히는 지점을 찾는 도구”</b>로 설명했습니다. 감시로 받아들이면 팀은 방어하고, 도구로 받아들이면 팀이 활용합니다.</p>
+    <p>시스템이 바뀔 때마다 <b>슬랙에 패치노트를 발행</b>했습니다 — 무엇이 어떻게 바뀌었는지, 헷갈릴 지점까지. 개발팀의 릴리스 노트를 마케팅 조직에서 운영한 셈입니다.</p>
+  </div>
+</section>
+
+<!-- 05 -->
+<section>
+  <div class="sec-h">
+    <span class="sec-tag">05 — TRIPLE CHECK</span>
+    <h2>소재의 생사는 세 개가 일치할 때 결정합니다</h2>
+    <div class="sec-lede">데이터만으로도, 현장 감각만으로도 결정하지 않습니다. 셋이 같은 방향을 가리킬 때 폐기합니다.</div>
+  </div>
+
+  <div class="fn">
+    <div class="fn-s">
+      <div class="fn-n">CHECK 1</div>
+      <div class="fn-t">현장</div>
+      <div class="fn-d">상담팀이 가장 먼저 압니다. 통화 한 시간이면 리드의 정체가 드러납니다.</div>
+      <div class="fn-q">“통화하면 학생만 온다”</div>
+    </div>
+    <div class="fn-s">
+      <div class="fn-n">CHECK 2</div>
+      <div class="fn-t">데이터</div>
+      <div class="fn-d">현장의 감각을 숫자로 검증합니다. CPM · 연령 · 퍼널 전수.</div>
+      <div class="fn-q">CPM 5,645 (계정 최저)<br>18–24세가 리드의 64%</div>
+    </div>
+    <div class="fn-s">
+      <div class="fn-n">CHECK 3</div>
+      <div class="fn-t">결산</div>
+      <div class="fn-d">월이 닫히면 매출로 확정합니다. 여기서 뒤집히면 판단을 되돌립니다.</div>
+      <div class="fn-q">리드 100건 / 오더 0건</div>
+    </div>
+  </div>
+
+  <div class="ch">
+    <div class="ch-head">
+      <div class="ch-no">실제 사례 — MLST 캠페인 폐기</div>
+      <div class="ch-title">메타 AI가 “예산을 더 쓰라”고 권한 캠페인이었습니다</div>
+    </div>
+    <div class="ch-body">
+      <p>MLST 캠페인은 <b>리드 단가가 계정 내 1위</b>였습니다. 1건에 9,494원. 메타의 AI 어시스턴트는 “CPL 45% 저렴, 안정적인 리드 흐름”을 근거로 <b>타 캠페인 예산을 이쪽으로 재배분하라</b>고 권했습니다.</p>
+
+      <div class="call warn" style="margin:16px 0">
+        <div class="call-t">그런데 현장에서 먼저 신호가 왔습니다</div>
+        <p style="font-style:italic">“MLST 캠페인, 학생이 너무 많습니다. <b>비정상적으로</b> 많아요.”</p>
+        <p style="font-style:italic">“엄마랑 통화했을 때 <b>반응이 차게 확 식어요.</b>”</p>
+        <p style="font-style:italic">“지금 <b>DB 10개 연속 학생</b> 받았습니다.”</p>
+        <p style="font-style:italic">“노트필기 유입이랑 비교했을 때 정확도가 너무 떨어져서 <b>시간이 낭비되고 있습니다.</b>”</p>
+        <p style="margin-top:10px;color:var(--faint);font-size:12px">— 상담팀 실시간 피드백 (슬랙·단톡)</p>
+      </div>
+
+      <p><b>바로 데이터를 열었습니다.</b> CPM 5,645원 — 계정 최저였습니다. 값싼 오디언스에 도달했다는 뜻입니다. 연령 리포트를 보니 <b>리드의 64%가 18–24세</b>였습니다. 학부모가 아니라 학생이었습니다.</p>
+
+      <p><b>당일 전량 폐기했습니다.</b> 그리고 월 결산에서 확정됐습니다 — <b>리드 100건, 오더 0건.</b></p>
+
+      <div class="call note" style="margin-top:16px">
+        <div class="call-t">그리고 여기서 더 중요한 것을 배웠습니다</div>
+        <p>리드가 <b>많은 것</b>이 문제가 될 수 있습니다. 하루 100건이 들어오면서 <b>1차 부재콜을 할 시간 자체가 나오지 않았습니다.</b></p>
+        <p>가짜 리드가 상담팀의 시간을 먹으면, <b>진짜 리드까지 함께 죽습니다.</b> 그래서 “DB량은 좋지만 철폐”가 맞는 판단이었습니다.</p>
+        <p><b>볼륨은 공짜가 아닙니다.</b> 상담 캐파를 넘어서는 유입은 마이너스입니다. 이건 데이터만 봐서는 절대 나오지 않는 판단이고, <b>현장이 있어야만 보입니다.</b></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="q">
+    데이터는 <span>무엇이 일어났는지</span>를 말하고,<br>
+    현장은 <span>왜 일어났는지</span>를 말합니다.<br>
+    둘 다 있어야 판단이 됩니다.
+  </div>
+</section>
+
+<!-- 06 -->
+<section>
+  <div class="sec-h">
+    <span class="sec-tag">06 — THE WORK</span>
+    <h2>자동화한 것은 기억해야 할 일이고,<br>제가 하는 것은 판단해야 할 일입니다</h2>
+    <div class="sec-lede">시스템이 다 하는 것처럼 보이지만, 시스템이 하는 것과 사람이 하는 것은 완전히 다릅니다.</div>
+  </div>
+
+  <div class="sy" style="grid-template-columns:1fr 1fr">
+    <div class="sy-c">
+      <span class="sy-tag">SYSTEM — 기억해야 할 일</span>
+      <div class="sy-t">기록 · 수집 · 복구</div>
+      <div class="sy-d">
+        · 리드 유입 즉시 노션 등록 + 웰컴 알림톡<br>
+        · 부재 리드 30분 내 자동 회수<br>
+        · 광고비 매일 08시 자동 수집<br>
+        · 누락 10분마다 자동 복구<br>
+        · 담당자별·소재별 퍼널 자동 집계<br><br>
+        <b>사람이 잊어버려도 새지 않습니다.</b>
+      </div>
+    </div>
+    <div class="sy-c" style="border-color:#c4ded2;background:#fbfefd">
+      <span class="sy-tag">ME — 판단해야 할 일</span>
+      <div class="sy-t">기획 · 제작 · 판정</div>
+      <div class="sy-d">
+        · <b>시즌 캘린더</b>에 맞춰 소재 기획<br>
+        · 촬영 · 편집 · 배포 (디자이너·편집자 없이)<br>
+        · 매일 계정 점검 → 올리고, 내리고, 예산 조정<br>
+        · 데이터 + 현장 + 결산으로 <b>생사 판정</b><br>
+        · 착시를 찾아내고 측정 기준을 고침<br><br>
+        <b>시스템이 대체할 수 없는 부분입니다.</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="ch" style="margin-top:22px">
+    <div class="ch-head">
+      <div class="ch-no">SEASON CALENDAR</div>
+      <div class="ch-title">소재는 취향이 아니라 학부모의 시간표를 따릅니다</div>
+    </div>
+    <div class="ch-body">
+      <p>같은 제품이라도, 학부모가 그것을 필요로 하는 <b>순간</b>이 다릅니다. 그래서 소재는 시즌에 맞춰 기획합니다.</p>
+
+      <table>
+        <thead><tr><th>시즌</th><th>학부모의 마음</th><th>소재의 훅</th></tr></thead>
+        <tbody>
+          <tr><td><b>시험 전</b></td><td>“이번엔 올려야 하는데”</td><td>대비 · 마지막 점검</td></tr>
+          <tr class="hi"><td><b>시험 직후</b></td><td>“이번에도 안 됐네” — <b>가장 아픈 순간</b></td><td><b>원인 진단</b> · “학원 다녀도 그대로라면”</td></tr>
+          <tr><td><b>방학 전</b></td><td>“이번 방학엔 잡아야지”</td><td>계획 · 공부습관 점검</td></tr>
+          <tr><td><b>방학</b></td><td>“지금 안 하면 늦는다”</td><td>실행 · 시간이 있을 때</td></tr>
+        </tbody>
+      </table>
+
+      <p><b>시험 직후가 골든타임입니다.</b> 성적표가 나오고, 지금 다니는 학원이 안 먹혔다는 것이 증명되는 순간이기 때문입니다. 그때 “학원 다녀도 그대로라면”이라는 훅이 꽂힙니다.</p>
+      <p style="margin-bottom:0">이건 데이터에서 나오는 판단이 아닙니다. <b>학부모가 언제 무엇을 느끼는지를 아는 데서 나옵니다.</b></p>
+    </div>
+  </div>
+</section>
+
+<!-- 07 -->
+<section>
+  <div class="sec-h">
+    <span class="sec-tag">07 — THE POINT</span>
+    <h2>측정 기준을 만드는 것이 곧 판단을 만드는 것입니다</h2>
+  </div>
+
+  <p>대시보드와 노션은 <b>‘관리 도구’가 아닙니다.</b> 판단이 가능한 상태를 만드는 장치입니다.</p>
+
+  <p>이것이 없으면 리드는 그냥 숫자이고, 소재는 그냥 취향이고, 담당자 평가는 그냥 인상입니다. <b>아무것도 죽일 수 없고, 아무것도 키울 수 없습니다.</b></p>
+
+  <p>새는 곳이 보이면 <b>다음 행동이 구체적으로 나옵니다</b> — “전화 타이밍을 바꿔봅시다”, “이 소재는 화상수업을 앞에서 밝힙시다”, “이 채널은 접읍시다”. 막연한 독려가 아니라 <b>실행 가능한 다음 수</b>가 나옵니다.</p>
+
+  <div class="q">
+    측정 기준을 만드는 일은 관리가 아니라 <span>전략입니다.</span><br>
+    무엇을 볼지 정하는 사람이, 무엇을 할지 정합니다.
+  </div>
+
+  <div class="call" style="margin-top:24px">
+    <div class="call-t">6월, 이 구조로 내린 결정들</div>
+    <p>· 소재 <b>9종 폐기</b> — CPL은 좋았으나 팔리지 않았습니다<br>
+       · 채널 <b>2개 종료</b> (당근 196만 / GFA 31만) — 오더 0<br>
+       · 카카오 <b>축소</b> — 회수가 투입에 못 미쳤습니다<br>
+       · 채리 소재 <b>유지</b> — 리드 단가는 4배 비쌌지만 1,243만원을 팔았습니다</p>
+    <p style="margin-top:10px">그리고 매출은 5월 대비 <b>2.1배</b>가 됐습니다.</p>
+  </div>
+
+  <div class="links">
+    <a class="lk" href="./report/index.html">주간 그로스 로그 ↗</a>
+    <a class="lk" href="./dashboard.html">대시보드 ↗</a>
+    <a class="lk" href="./notion_manual.html">노션 운영 매뉴얼 ↗</a>
+    <a class="lk" href="./warmup_homework.html">마케터 육성 과제 ↗</a>
+  </div>
+</section>
+
+<footer>
+  <p>아라온스쿨 그로스 · 측정 시스템 기록</p>
+</footer>
+
+</div>
+</body>
+</html>
