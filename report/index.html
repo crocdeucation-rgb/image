@@ -319,7 +319,13 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
     <div class="li" style="margin-bottom:10px"><b>왜 ROAS를 두 개 씁니까.</b> 하나로는 반증이 불가능하기 때문입니다.</div>
     <div class="li" style="margin-bottom:6px"><b>코호트 ROAS</b> = 6월에 태운 광고비 ÷ <b>6월에 들어온 리드가 만든 누적 매출</b>. → “내가 쓴 돈이 무엇을 만들었는가”. 채널·소재의 생사 판단에 씁니다.</div>
     <div class="li" style="margin-bottom:10px"><b>결제일 ROAS</b> = 6월에 태운 광고비 ÷ <b>6월에 결제된 매출</b>. → “이번 달 얼마를 벌었는가”. 경영 보고에 씁니다.</div>
-    <div class="li"><b>두 값의 격차가 곧 진단입니다.</b> 격차가 없으면 전환 시차가 짧은 건강한 채널이고, 격차가 크면 그 채널의 이번 달 매출은 과거 리드가 만든 것입니다. 아래 카카오가 그 사례입니다.</div>
+    <div class="li" style="margin-bottom:8px"><b>두 값의 격차가 곧 진단입니다.</b> 격차가 없으면 전환 시차가 짧은 건강한 채널이고, 격차가 크면 그 채널의 이번 달 매출은 과거 리드가 만든 것입니다. 아래 카카오가 그 사례입니다.</div>
+    <div class="li" style="padding:10px 12px;background:#fff;border-radius:8px;border:0.5px solid var(--border)">
+      <b>※ 표의 “격차”는 뺄셈이 아니라 나눗셈입니다</b> — <b>결제일 ROAS ÷ 코호트 ROAS</b>.<br>
+      ROAS는 비율이므로 <b>몇 배 부풀려졌는가</b>로 봐야 왜곡의 크기가 드러납니다.<br>
+      · 메타: 6.36 ÷ 5.33 = <b>1.2배</b> — 거의 같습니다. 전환이 빨라 어느 기준으로 봐도 판단이 같습니다.<br>
+      · 카카오: 5.65 ÷ 0.88 = <b>6.4배</b> — 결제일 기준이 <b>6배 넘게 부풀려져</b> 있었습니다.
+    </div>
   </div>
 
   <!-- 채널별 -->
@@ -327,7 +333,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   <table class="tbl" style="margin-bottom:10px">
     <thead><tr>
       <th class="l">채널</th><th class="r">광고비</th><th class="r">DB</th><th class="r">CPL</th>
-      <th class="r">오더</th><th class="r">매출(코호트)</th><th class="r">ROAS 코호트</th><th class="r">ROAS 결제일</th><th class="r">격차</th><th class="l">판정</th>
+      <th class="r">오더</th><th class="r">매출(코호트)</th><th class="r">ROAS 코호트</th><th class="r">ROAS 결제일</th><th class="r">격차<br><span style="font-weight:400;font-size:9px;color:var(--faint)">결제일÷코호트</span></th><th class="l">판정</th>
     </tr></thead>
     <tbody>
       <tr><td class="l"><span class="chbadge cb-meta">메타</span></td><td class="r">2,126만</td><td class="r">1,148</td><td class="r">18,519</td><td class="r">32</td><td class="r">1억 1,334.4만</td><td class="r teal"><b>5.33</b></td><td class="r">6.36</td><td class="r">1.2×</td><td class="l">유지 · 증액</td></tr>
