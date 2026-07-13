@@ -330,7 +330,7 @@ body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-ap
     </tr></thead>
     <tbody>
       <tr><td class="l"><span class="chbadge cb-meta">메타</span></td><td class="r">2,126만</td><td class="r">1,148</td><td class="r">18,519</td><td class="r">32</td><td class="r">1억 1,334만</td><td class="r teal"><b>5.33</b></td><td class="r">6.36</td><td class="r">1.2×</td><td class="l">유지 · 증액</td></tr>
-      <tr><td class="l"><span class="chbadge" style="background:rgba(180,120,255,.12);color:#b478ff">텐핑</span></td><td class="r">632만</td><td class="r">227</td><td class="r">27,832</td><td class="r">2</td><td class="r">1,271만</td><td class="r">2.01</td><td class="r">1.10</td><td class="r">0.5×</td><td class="l">코호트로 별도 평가</td></tr>
+      <tr><td class="l"><span class="chbadge" style="background:rgba(180,120,255,.12);color:#b478ff">텐핑</span></td><td class="r">632만 *</td><td class="r">227</td><td class="r">27,832</td><td class="r">2</td><td class="r">1,271만</td><td class="r">2.01</td><td class="r">1.10</td><td class="r">0.5×</td><td class="l">코호트로 별도 평가</td></tr>
       <tr style="background:#fff8f0"><td class="l"><span class="chbadge" style="background:rgba(240,192,32,.15);color:#b8860b">카카오</span></td><td class="r">327만</td><td class="r">53</td><td class="r">61,758</td><td class="r">1</td><td class="r">289만</td><td class="r" style="color:var(--red)"><b>0.88</b></td><td class="r">5.65</td><td class="r" style="color:var(--red)"><b>6.4×</b></td><td class="l" style="color:var(--red)">본전 미달 · 축소</td></tr>
       <tr><td class="l"><span class="chbadge" style="background:rgba(255,124,60,.12);color:#ff7c3c">당근</span></td><td class="r">196만</td><td class="r">57</td><td class="r">34,418</td><td class="r">0</td><td class="r">0</td><td class="r" style="color:var(--red)">0</td><td class="r">0</td><td class="r">—</td><td class="l" style="color:var(--red)">폐기</td></tr>
       <tr><td class="l"><span class="chbadge" style="background:rgba(3,199,90,.12);color:#03c75a">네이버 브랜드검색</span></td><td class="r">157만</td><td class="r">18</td><td class="r">86,949</td><td class="r">1</td><td class="r">347만</td><td class="r">2.22</td><td class="r">2.22</td><td class="r">1.0×</td><td class="l">유지</td></tr>
@@ -340,17 +340,20 @@ body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-ap
     </tbody>
   </table>
   <div class="knote" style="margin-bottom:24px">
-    ※ 텐핑은 선불 충전형이라 월별 ROAS가 성립하지 않습니다(태운 달은 폭망, 안 태운 달은 무한대). 위 2.01은 참고값이며, 실제 판정은 아래 코호트 블록을 따릅니다.
+    <b>* 텐핑 632만 = 6월에 소진된 금액입니다.</b> 총 충전액(821만)과 다릅니다 — 6/29에 넣은 300만 중 일부가 7월에 소진됐기 때문입니다.
+    선불 충전형이라 <b>돈을 넣은 시점과 쓰는 시점이 다릅니다.</b> 그래서 월별로 자르면 월별 ROAS가 성립하지 않습니다(태운 달은 폭망, 안 태운 달은 무한대).
+    위 2.01은 참고값이며, <b>실제 판정은 아래 코호트 블록(총 투자 821만 기준)을 따릅니다.</b>
   </div>
 
   <!-- 텐핑 코호트 -->
   <div class="sec">02 — 텐핑 코호트 (충전형 채널)</div>
   <div class="card" style="margin-bottom:12px">
     <div class="cap" style="margin-bottom:14px">
-      선불 충전형이므로 월로 자르면 왜곡됩니다. <b>잔액 0 = 코호트가 닫혔으므로</b> 누적으로만 평가합니다.
+      선불 충전형이므로 월로 자르면 왜곡됩니다. <b>잔액 0 = 코호트가 닫혔으므로</b> 누적으로만 평가합니다.<br>
+      <b>위 채널표의 632만은 “6월에 소진된 금액”</b>이고, <b>여기 821만은 “총 넣은 금액”</b>입니다. 판정은 후자를 따릅니다.
     </div>
     <div class="kpis" style="grid-template-columns:repeat(5,1fr);margin-bottom:0">
-      <div class="kpi" style="border:0;padding:0"><div class="k">누적 투자</div><div class="v" style="font-size:18px">821만</div><div class="s">4회 충전 · 잔액 0</div></div>
+      <div class="kpi" style="border:0;padding:0"><div class="k">누적 투자</div><div class="v" style="font-size:18px">821만</div><div class="s">6/2 21만 · 6/18 200만<br>6/23 300만 · 6/29 300만</div></div>
       <div class="kpi" style="border:0;padding:0"><div class="k">유효 DB</div><div class="v" style="font-size:18px">301건</div><div class="s">무효 19건 전액 환불</div></div>
       <div class="kpi" style="border:0;padding:0"><div class="k">실질 CPL</div><div class="v" style="font-size:18px">27,276원</div><div class="s">단가 35K→30K→28K 인하</div></div>
       <div class="kpi" style="border:0;padding:0"><div class="k">누적 회수</div><div class="v" style="font-size:18px">2,427만</div><div class="s">오더 5건 / 세팅 19건</div></div>
@@ -381,7 +384,7 @@ body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-ap
       <tr style="background:#f0f7f4"><td class="l"><b>GT노트피드백_2605</b></td><td class="r">438만</td><td class="r">162</td><td class="r teal"><b>19,856</b></td><td class="r">27,028</td><td class="r">7위</td><td class="r">1.94</td><td class="r">5</td><td class="r">1,970만</td><td class="r teal"><b>4.50</b></td><td class="l">생존 · CPL로 껐다 부활</td></tr>
       <tr style="background:#f0f7f4"><td class="l"><b>채리_2606</b></td><td class="r">329만</td><td class="r">85</td><td class="r teal"><b>28,538</b></td><td class="r" style="color:var(--red)">38,721</td><td class="r" style="color:var(--red)">9위</td><td class="r">1.81</td><td class="r">4</td><td class="r">1,243만</td><td class="r teal"><b>3.78</b></td><td class="l">생존 · CPL 최하위권</td></tr>
       <tr><td class="l">잠재고객_5단계루틴</td><td class="r">221만</td><td class="r">83</td><td class="r" style="color:var(--red)"><b>5,683</b></td><td class="r">26,629</td><td class="r">6위</td><td class="r" style="color:var(--red)"><b>2.99</b></td><td class="r">0</td><td class="r">0</td><td class="r" style="color:var(--red)">0</td><td class="l" style="color:var(--red)">폐기 · 리드가 가짜 (결번 18.7%)</td></tr>
-      <tr style="background:#fffbf5"><td class="l">[소재01] 릴스_너만본다</td><td class="r">218만</td><td class="r">69</td><td class="r"><b>22,522</b></td><td class="r">31,571</td><td class="r">8위</td><td class="r">2.04</td><td class="r" style="color:var(--red)">0</td><td class="r">0</td><td class="r" style="color:var(--red)">0</td><td class="l" style="color:var(--amber)"><b>폐기 · 타겟은 맞았으나 약속이 틀렸다</b></td></tr>
+      <tr style="background:#fffbf5"><td class="l">[소재01] 릴스_너만본다</td><td class="r">218만</td><td class="r">69</td><td class="r"><b>22,522</b></td><td class="r">31,571</td><td class="r">8위</td><td class="r">2.04</td><td class="r" style="color:var(--red)">0</td><td class="r">0</td><td class="r" style="color:var(--red)">0</td><td class="l" style="color:var(--amber)"><b>폐기 · 완주율 14% · 기대 불일치</b></td></tr>
       <tr style="background:#fff8f0"><td class="l"><b>MLST_V3_무료점검</b></td><td class="r">92만</td><td class="r">97</td><td class="r" style="color:var(--red)"><b>5,322</b></td><td class="r" style="color:var(--teal-d)"><b>9,494</b></td><td class="r" style="color:var(--teal-d)"><b>1위</b></td><td class="r">1.76</td><td class="r" style="color:var(--red)"><b>0</b></td><td class="r" style="color:var(--red)"><b>0</b></td><td class="r" style="color:var(--red)"><b>0</b></td><td class="l" style="color:var(--red)"><b>폐기 · 18-24가 64%</b></td></tr>
       <tr><td class="l">MLST캐러셀_2606</td><td class="r">67만</td><td class="r">41</td><td class="r" style="color:var(--red)"><b>5,309</b></td><td class="r">16,436</td><td class="r">3위</td><td class="r">1.92</td><td class="r">0</td><td class="r">0</td><td class="r" style="color:var(--red)">0</td><td class="l" style="color:var(--red)">폐기 · 18-24가 78%</td></tr>
       <tr><td class="l">비평준화 저격</td><td class="r">20만</td><td class="r">2</td><td class="r" style="color:var(--red)">6,421</td><td class="r">100,334</td><td class="r">12위</td><td class="r">1.27</td><td class="r">0</td><td class="r">0</td><td class="r" style="color:var(--red)">0</td><td class="l" style="color:var(--red)">폐기</td></tr>
@@ -417,7 +420,7 @@ body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-ap
       </div>
     </div>
     <div class="li" style="margin-bottom:8px"><b>다만 가설에는 예외가 있습니다.</b> 너만본다(CPM 22,522 · 35-54가 78%)와 기초부족(CPM 20,970)은 오디언스는 맞았으나 <b>오더 0</b>이었습니다.</div>
-    <div class="li"><b>CPM 2만은 생존의 필요조건이지 충분조건이 아닙니다.</b> 값비싼 오디언스에 도달했어도 소재가 팔지 못하면 매출은 없습니다. 다만 <b>실패의 원인은 서로 다릅니다</b> — 값싼 CPM 소재는 <b>리드 자체가 가짜</b>였고(결번율·연령), 비싼 CPM인데 실패한 소재는 <b>리드는 진짜인데 약속이 틀렸습니다</b>(아래 04-③ 참조). 진단이 다르면 처방도 다릅니다.</div>
+    <div class="li"><b>CPM 2만은 생존의 필요조건이지 충분조건이 아닙니다.</b> 값비싼 오디언스에 도달했어도 소재가 팔지 못하면 매출은 없습니다. 다만 <b>실패의 원인은 서로 다릅니다</b> — 값싼 CPM 소재는 <b>리드 자체가 가짜</b>였고(결번율·연령), 비싼 CPM인데 실패한 소재는 <b>리드는 진짜인데 기대가 틀렸습니다</b>(아래 04-③ 참조). 진단이 다르면 처방도 다릅니다.</div>
   </div>
 
   <!-- 연령별 -->
@@ -490,12 +493,23 @@ body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-ap
       <tbody>
         <tr><td class="l">노트릴스 (기준)</td><td class="r">6.6%</td><td class="r">11.1%</td><td class="r">57.8%</td><td class="r">95%</td><td class="l">정상</td></tr>
         <tr style="background:#fff8f0"><td class="l"><b>잠재고객_5단계루틴</b></td><td class="r" style="color:var(--red)"><b>18.7%</b></td><td class="r" style="color:var(--red)"><b>1.6%</b></td><td class="r">—</td><td class="r" style="color:var(--red)">24%</td><td class="l" style="color:var(--red)"><b>리드가 가짜</b> — 번호가 틀리고 전화를 안 받음</td></tr>
-        <tr style="background:#fffbf5"><td class="l"><b>[소재01] 너만본다</b></td><td class="r">8.8%</td><td class="r">7.4%</td><td class="r" style="color:var(--red)"><b>0%</b></td><td class="r">78%</td><td class="l" style="color:var(--amber)"><b>리드는 진짜인데 안 팔림</b> — 방문 5건 전부 세팅 실패</td></tr>
+        <tr style="background:#fffbf5"><td class="l"><b>[소재01] 너만본다</b></td><td class="r">8.8%</td><td class="r">7.4%</td><td class="r" style="color:var(--red)"><b>0%</b></td><td class="r">78%</td><td class="l" style="color:var(--amber)"><b>기대가 틀린 채로 왔다</b> — 완주율 14%, 후반부(화상수업)를 안 봄</td></tr>
       </tbody>
     </table>
     <div class="li" style="margin-bottom:8px"><b>5단계루틴 — 리드 품질의 실패입니다.</b> 결번·대상아님이 18.7%로 위너의 2.8배, 방문율은 1.6%. CPM 5,683의 값싼 오디언스(25-34가 72%)가 만든 결과이며, <b>CPM 가설대로</b>입니다. 다만 방문에 도달한 2건은 100% 세팅됐습니다 — <b>진짜인 사람은 삽니다. 리드가 가짜였을 뿐입니다.</b></div>
-    <div class="li" style="margin-bottom:8px"><b>너만본다 — 약속의 실패입니다.</b> 결번율 8.8%로 정상, 연령 35-54가 78%, CPM 22,522. <b>리드 품질과 타겟은 모두 통과했습니다.</b> 그런데 방문 5건이 전부 세팅에 실패했습니다(위너 기준이라면 2.9건은 성사됐어야 하며, 0건일 확률은 1.3%입니다).</div>
-    <div class="li"><b>소재 카피는 “쌤은 너만봐”였습니다.</b> 1:1 관리를 약속하는 언어입니다. 그러나 실제 제품은 <b>1룸 15명의 그룹 라이브수업</b>입니다. 학부모는 1:1을 기대하고 신청했고, 상담에서 구조를 확인한 뒤 사지 않았습니다. <b>소재가 못 판 것이 아니라, 팔 수 없는 것을 약속한 것입니다.</b> 이후 카피 규칙을 “1:1 화상수업 → 관리형 화상수업”으로 고정했습니다.</div>
+    <div class="li" style="margin-bottom:8px"><b>너만본다 — 기대의 실패입니다.</b> 결번율 8.8%로 정상, 연령 35-54가 78%, CPM 22,522. <b>리드 품질과 타겟은 모두 통과했습니다.</b> 그런데 방문 5건이 전부 세팅에 실패했습니다(위너 기준이라면 2.9건은 성사됐어야 하며, 0건일 확률은 1.3%입니다).</div>
+    <div class="li" style="margin-bottom:8px"><b>영상 완주율을 열자 원인이 나왔습니다.</b> 이 소재는 선생님이 직접 지도하는 장면으로 시작하고, <b>화상수업이라는 사실은 후반부에</b> 나옵니다.</div>
+    <table class="tbl" style="margin:10px 0">
+      <thead><tr><th class="l">소재</th><th class="r">50% 지점</th><th class="r">75% 지점</th><th class="r">완주</th><th class="r">ROAS</th></tr></thead>
+      <tbody>
+        <tr><td class="l">노트릴스 (위너)</td><td class="r">49%</td><td class="r">30.8%</td><td class="r">18%</td><td class="r teal">10.86</td></tr>
+        <tr><td class="l">GT노트피드백</td><td class="r">43%</td><td class="r">27.0%</td><td class="r">16%</td><td class="r">4.50</td></tr>
+        <tr><td class="l">채리</td><td class="r">44%</td><td class="r">27.5%</td><td class="r">18%</td><td class="r">3.78</td></tr>
+        <tr style="background:#fff8f0"><td class="l"><b>너만본다</b></td><td class="r" style="color:var(--red)"><b>35%</b></td><td class="r" style="color:var(--red)"><b>14.0%</b></td><td class="r" style="color:var(--red)"><b>7%</b></td><td class="r" style="color:var(--red)"><b>0</b></td></tr>
+      </tbody>
+    </table>
+    <div class="li" style="margin-bottom:8px"><b>75% 지점 유지율이 위너의 절반 이하(14.0% vs 30.8%)입니다.</b> 초반 후킹은 오히려 성공했습니다 — 재생 시작 수는 채리보다 많았습니다. 그러나 <b>화상수업이 등장하는 후반부까지 도달한 사람이 절반뿐이었습니다.</b></div>
+    <div class="li"><b>소재가 거짓말을 한 것이 아닙니다.</b> 영상 후반에 화상수업이 분명히 나옵니다. 다만 <b>거기까지 보지 않은 사람이 신청 버튼을 누를 수 있게</b> 만든 것이 문제였습니다. 대면 지도로 알고 신청 → 상담에서 화상수업임을 처음 알게 됨 → 기대와 달라 사지 않음. <b>처방은 카피가 아니라 구조입니다 — 제품의 형태는 영상 앞쪽에서 밝힙니다.</b></div>
   </div>
 
   <div class="log" style="margin-bottom:12px;background:#fdf3ee;border-color:#f0d5c4">
@@ -1480,7 +1494,7 @@ const JUN_GAL = [
   {key:'GT노트피드백_영상',    title:'GT노트피드백_2605',    st:'ok',   tag:'ROAS 4.50 · CPL로 껐다 부활', cpl:'27,028', sales:19696000, orders:5},
   {key:'노트릴스_채리_2606',   title:'채리_2606',           st:'ok',   tag:'ROAS 3.78 · CPL 9위인데 생존', cpl:'38,721', sales:12427000, orders:4},
   {key:'5단계루틴',           title:'잠재고객_5단계루틴',    st:'dead', tag:'결번 18.7% · 25-34가 72% · 리드가 가짜', cpl:'26,629', sales:6936000, orders:1},
-  {key:'너만본다_영상',        title:'[소재01] 너만본다',    st:'dead', tag:'타겟 정상 · 방문 5건 전부 세팅 실패', cpl:'31,571', sales:0, orders:0},
+  {key:'너만본다_영상',        title:'[소재01] 너만본다',    st:'dead', tag:'완주율 14% · 후반부(화상수업) 못 봄', cpl:'31,571', sales:0, orders:0},
   {key:'mlst_v3',           title:'MLST_V3_무료점검',     st:'dead', tag:'CPL 1위인데 오더 0 · 리드 97', cpl:'9,494', sales:0, orders:0},
   {key:'캐러셀_1_표지',        title:'MLST캐러셀_2606',     st:'dead', tag:'CPL 3위인데 오더 0', cpl:'16,436', sales:0, orders:0},
   {key:'비평준화',            title:'비평준화 저격',        st:'dead', tag:'CPL 10만 · 리드 2', cpl:'100,334', sales:0, orders:0},
