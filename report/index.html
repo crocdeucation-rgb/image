@@ -340,31 +340,48 @@ body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-ap
     </tbody>
   </table>
   <div class="knote" style="margin-bottom:24px">
-    <b>* 텐핑 632만 = 6월에 소진된 금액입니다.</b> 총 충전액(821만)과 다릅니다 — 6/29에 넣은 300만 중 일부가 7월에 소진됐기 때문입니다.
+    <b>* 텐핑 632만 = 6월에 소진된 금액입니다.</b> 총 충전액(921만)과 다릅니다 — 4월 충전분(100만)이 6월에 이월됐고, 6/29에 넣은 300만 중 일부는 7월에 소진됐기 때문입니다.
     선불 충전형이라 <b>돈을 넣은 시점과 쓰는 시점이 다릅니다.</b> 그래서 월별로 자르면 월별 ROAS가 성립하지 않습니다(태운 달은 폭망, 안 태운 달은 무한대).
-    위 2.01은 참고값이며, <b>실제 판정은 아래 코호트 블록(총 투자 821만 기준)을 따릅니다.</b>
+    위 2.01은 참고값이며, <b>실제 판정은 아래 코호트 블록(총 투자 921만 기준)을 따릅니다.</b>
   </div>
 
   <!-- 텐핑 코호트 -->
   <div class="sec">02 — 텐핑 코호트 (충전형 채널)</div>
   <div class="card" style="margin-bottom:12px">
     <div class="cap" style="margin-bottom:14px">
-      선불 충전형이므로 월로 자르면 왜곡됩니다. <b>잔액 0 = 코호트가 닫혔으므로</b> 누적으로만 평가합니다.<br>
-      <b>위 채널표의 632만은 “6월에 소진된 금액”</b>이고, <b>여기 821만은 “총 넣은 금액”</b>입니다. 판정은 후자를 따릅니다.
+      선불 충전형이므로 월로 자르면 왜곡됩니다. <b>잔액이 사실상 0 = 코호트가 닫혔으므로</b> 누적으로만 평가합니다.<br>
+      <b>위 채널표의 632만은 “6월에 소진된 금액”</b>이고, <b>여기 921만은 “총 충전한 금액”</b>입니다. 판정은 후자를 따릅니다.
     </div>
-    <div class="kpis" style="grid-template-columns:repeat(5,1fr);margin-bottom:0">
-      <div class="kpi" style="border:0;padding:0"><div class="k">누적 투자</div><div class="v" style="font-size:18px">821만</div><div class="s">6/2 21만 · 6/18 200만<br>6/23 300만 · 6/29 300만</div></div>
+    <div class="kpis" style="grid-template-columns:repeat(5,1fr);margin-bottom:12px">
+      <div class="kpi" style="border:0;padding:0"><div class="k">광고비 (충전액)</div><div class="v" style="font-size:18px">921만</div><div class="s">VAT 별도 · 잔액 5만<br>다른 채널과 동일 기준</div></div>
       <div class="kpi" style="border:0;padding:0"><div class="k">유효 DB</div><div class="v" style="font-size:18px">301건</div><div class="s">무효 19건 전액 환불</div></div>
-      <div class="kpi" style="border:0;padding:0"><div class="k">실질 CPL</div><div class="v" style="font-size:18px">27,276원</div><div class="s">단가 35K→30K→28K 인하</div></div>
+      <div class="kpi" style="border:0;padding:0"><div class="k">실질 CPL</div><div class="v" style="font-size:18px">30,598원</div><div class="s">단가 35K→30K→28K 인하</div></div>
       <div class="kpi" style="border:0;padding:0"><div class="k">누적 회수</div><div class="v" style="font-size:18px">2,427만</div><div class="s">오더 5건 / 세팅 19건</div></div>
-      <div class="kpi" style="border:0;padding:0"><div class="k">누적 ROAS</div><div class="v t" style="font-size:18px">2.96</div><div class="s">회수 진행 중</div></div>
+      <div class="kpi" style="border:0;padding:0"><div class="k">누적 ROAS</div><div class="v t" style="font-size:18px">2.64</div><div class="s">회수 진행 중</div></div>
+    </div>
+
+    <table class="tbl" style="margin-top:4px">
+      <thead><tr><th class="l">충전 시점</th><th class="r">광고비 (VAT 별도)</th><th class="r">실제 결제 (VAT 포함)</th><th class="r">단가</th><th class="l">비고</th></tr></thead>
+      <tbody>
+        <tr><td class="l">4월 이전</td><td class="r">1,000,000</td><td class="r">1,100,000</td><td class="r">35,000</td><td class="l">구캠(습관상담)에 배정 · 유효 6건 소진</td></tr>
+        <tr><td class="l">6/02</td><td class="r">210,000</td><td class="r">231,000</td><td class="r">35,000</td><td class="l">구캠 소진분 보전 (신캠 게시 조건: 잔액 100만)</td></tr>
+        <tr><td class="l">6/18</td><td class="r">2,000,000</td><td class="r">2,200,000</td><td class="r" style="color:var(--teal-d)"><b>30,000</b></td><td class="l">1차 인하 반영</td></tr>
+        <tr><td class="l">6/23</td><td class="r">3,000,000</td><td class="r">3,300,000</td><td class="r" style="color:var(--teal-d)"><b>28,000</b></td><td class="l">2차 인하 반영</td></tr>
+        <tr><td class="l">6/29</td><td class="r">3,000,000</td><td class="r">3,300,000</td><td class="r">28,000</td><td class="l">감도 조정 후 · 6/30부터 게시</td></tr>
+        <tr style="border-top:1px solid var(--border)"><td class="l"><b>합계</b></td><td class="r"><b>9,210,000</b></td><td class="r"><b>10,131,000</b></td><td class="r">—</td><td class="l">차액 92.1만 = VAT</td></tr>
+      </tbody>
+    </table>
+    <div class="knote" style="margin-top:8px;margin-bottom:0">
+      ※ 텐핑은 <b>330만을 결제하면 300만이 광고비로 충전</b>되는 구조입니다(부가세 별도 충전).
+      <b>ROAS 판정은 921만(VAT 별도) 기준</b>입니다 — 메타·카카오·네이버 API가 모두 VAT 별도 금액을 리턴하므로, 채널 비교를 위해 기준을 맞춥니다.
+      <b>실제 나간 현금은 1,013.1만</b>이며, 그 기준으로는 ROAS 2.40입니다.
     </div>
   </div>
 
   <div class="log" style="margin-bottom:24px">
-    <div class="li" style="margin-bottom:8px"><b>무효 칼처리는 실제로 돈을 회수했습니다.</b> 무효 19건(본인 아님 12 · 허위 기재 3 · 아이신청 1 · 결번 1) — <b>55만원 전액 환불</b>. 무효율 5.2%. 품질 관리가 문서가 아니라 정산으로 증명됐습니다.</div>
-    <div class="li" style="margin-bottom:8px"><b>단가는 협상으로 20% 내렸습니다.</b> 35,000원 → 30,000원(6/15) → <b>28,000원</b>. 감도 조정 요청과 함께 진행했고, 이 인하가 실질 CPL 27,276원을 만들었습니다. 단가 그대로였다면 CPL 35,000원, ROAS는 2.3에 그쳤을 것입니다.</div>
-    <div class="li"><b>ROAS 2.96은 두 방향으로 더 오를 수 있습니다.</b> ① <b>분자</b> — 세팅 19건 중 오더는 아직 5건. 회수가 진행 중입니다. ② <b>분모</b> — 승인대기 13건(36.4만)이 무효 판정되면 환불되어 투자액이 785만으로 줄고, <b>ROAS는 3.09가 됩니다.</b></div>
+    <div class="li" style="margin-bottom:8px"><b>단가는 협상으로 20% 내렸고, 충전 시점이 곧 인하 시점이었습니다.</b> 35,000원(6/04~6/13, 28건) → <b>30,000원</b>(6/18~6/19, 65건) → <b>28,000원</b>(6/23~, 202건). 이 인하가 실질 CPL을 30,598원으로 만들었습니다. 단가가 그대로였다면 CPL 35,000원, ROAS는 2.3에 그쳤을 것입니다.</div>
+    <div class="li" style="margin-bottom:8px"><b>무효 칼처리는 실제로 돈을 회수했습니다.</b> 무효 19건(본인 아님 12 · 허위 기재 3 · 아이신청 1 · 결번 1 · 테스트 2) — <b>55만원 전액 환불</b>. 무효율 5.2%. 품질 관리가 문서가 아니라 정산으로 증명됐습니다.</div>
+    <div class="li"><b>ROAS 2.64는 두 방향으로 더 오를 수 있습니다.</b> ① <b>분자</b> — 세팅 19건 중 오더는 아직 5건. 회수가 진행 중입니다. ② <b>분모</b> — 승인대기 13건(36.4만)이 무효 판정되면 환불되어 투자액이 885만으로 줄고, <b>ROAS는 2.74가 됩니다.</b></div>
   </div>
 
   <!-- 소재별 -->
@@ -523,7 +540,7 @@ body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-ap
   <div class="log" style="margin-bottom:12px">
     <div class="li" style="margin-bottom:8px"><b>⑤ 텐핑 — 끄는 것이 아니라 조이는 것.</b></div>
     <div class="li" style="margin-bottom:8px">6월 결산 시점의 텐핑 ROAS는 <b>1.10</b>. 실패 판정이었습니다. 그러나 이 숫자는 <b>태운 달의 비용 전액과 아직 오지 않은 회수를 나눈 값</b>이었습니다.</div>
-    <div class="li" style="margin-bottom:8px">잔액이 0이 되어 코호트가 닫힌 지금 다시 계산하면 <b>투자 821만 / 회수 2,427만 / ROAS 2.96</b>입니다. 세팅 19건 중 오더는 아직 5건입니다. <b>회수가 진행 중이므로 이 값은 더 오를 수 있습니다.</b></div>
+    <div class="li" style="margin-bottom:8px">잔액이 0이 되어 코호트가 닫힌 지금 다시 계산하면 <b>투자 921만 / 회수 2,427만 / ROAS 2.64</b>입니다. 세팅 19건 중 오더는 아직 5건입니다. <b>회수가 진행 중이므로 이 값은 더 오를 수 있습니다.</b></div>
     <div class="li">품질 관리는 유효했습니다 — 식별코드별 전수조사, 규정 위반 표현 시정 요청, 무효 칼처리(무효율 5.2%, 19건 전액 환불). <b>공급형 채널은 끄는 것이 아니라 조이는 것</b>이 답이었습니다.</div>
   </div>
 
@@ -549,7 +566,7 @@ body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-ap
       <tr><td class="l">당근</td><td class="l">196만 / 오더 0 / ROAS 0</td><td class="l">완전 중단</td><td class="l">7월 0원</td></tr>
       <tr><td class="l">네이버 GFA</td><td class="l">31만 / 오더 0 / ROAS 0</td><td class="l">캠페인 4종 OFF</td><td class="l">일 1.6천원 · 사실상 종료</td></tr>
       <tr><td class="l">카카오</td><td class="l">코호트 ROAS 0.88 · 본전 미달</td><td class="l">증액 원복 · 소재 5종 폐기 · 채리 OFF</td><td class="l">일 9만원</td></tr>
-      <tr><td class="l">텐핑</td><td class="l">코호트 ROAS 2.96 · 회수 진행</td><td class="l">감도 조정 · 무효 칼처리</td><td class="l">잔액 소진 · 재충전 검토</td></tr>
+      <tr><td class="l">텐핑</td><td class="l">코호트 ROAS 2.64 · 회수 진행</td><td class="l">감도 조정 · 무효 칼처리</td><td class="l">잔액 소진 · 재충전 검토</td></tr>
       <tr><td class="l">MLST 계열 5종</td><td class="l">CPL 1위였으나 오더 0</td><td class="l">전량 폐기</td><td class="l">PAUSED</td></tr>
       <tr><td class="l">채리_2606</td><td class="l">CPL 9위였으나 ROAS 3.78</td><td class="l"><b>유지</b> · 예산 20% 조정</td><td class="l">ACTIVE</td></tr>
       <tr><td class="l">노트릴스_영상</td><td class="l">ROAS 10.86 · 매출의 71%</td><td class="l">증액 · 파생 소재 확대</td><td class="l">ACTIVE</td></tr>
@@ -772,7 +789,7 @@ body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-ap
         <tr style="background:#fff"><td class="l"><b>브랜드검색</b></td><td class="r">49</td><td class="r" style="color:var(--red)"><b>77,633</b></td><td class="r teal"><b>12.24%</b></td><td class="r teal"><b>6.84</b></td></tr>
         <tr><td class="l">메타</td><td class="r">2,436</td><td class="r teal">16,762</td><td class="r">2.67%</td><td class="r">5.49</td></tr>
         <tr><td class="l">카카오</td><td class="r">115</td><td class="r">61,758</td><td class="r">4.35%</td><td class="r" style="color:var(--red)">0.88</td></tr>
-        <tr><td class="l">텐핑</td><td class="r">328</td><td class="r">27,276</td><td class="r">1.52%</td><td class="r">2.96</td></tr>
+        <tr><td class="l">텐핑</td><td class="r">328</td><td class="r">30,598</td><td class="r">1.52%</td><td class="r">2.64</td></tr>
       </tbody>
     </table>
     <div class="li" style="margin-bottom:8px"><b>CPL은 메타의 4.6배. 그런데 오더율도 정확히 4.6배입니다.</b> 두 값이 상쇄되고, <b>ROAS는 오히려 메타를 넘어섭니다(6.84 vs 5.49).</b> CPL만 봤다면 진작 껐을 채널이고, 실제로 6월 결산에서는 “CPL 8.7만의 고비용 채널”로 판정했습니다.</div>
@@ -816,7 +833,7 @@ body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-ap
     <div class="li" style="margin-bottom:6px"><b>2. 브랜드검색 가설 검증</b> — 메타 집행량과 브랜드검색 유입의 상관을 주 단위로 추적. 후행 효과가 맞다면 메타 ROAS는 지금보다 높게 재평가되어야 합니다.</div>
     <div class="li" style="margin-bottom:6px"><b>3. 카카오 상담 로그 확인</b> — 방문율은 높은데 오더가 0인 원인이 리드 품질인지 클로징인지 규명.</div>
     <div class="li" style="margin-bottom:6px"><b>4. 노트필기 계열 회수 관찰</b> — AD_노트필기릴스(CPL 12,854)는 위너급 CPL. 7월 신규라 회수 진행 중입니다.</div>
-    <div class="li"><b>5. 텐핑 재충전 판단</b> — 누적 ROAS 2.96 (회수 진행 중). 메타 대비 기회비용을 계산해 결정합니다.</div>
+    <div class="li"><b>5. 텐핑 재충전 판단</b> — 누적 ROAS 2.64 (회수 진행 중). 메타 대비 기회비용을 계산해 결정합니다.</div>
   </div>
 </div>
 
@@ -896,7 +913,7 @@ body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-ap
       </div>
       <div style="font-size:12px;color:var(--sub);line-height:2;margin-bottom:14px">
         <b style="color:var(--text)">발견된 왜곡 3종</b><br>
-        <b>① 텐핑 — 시간축 불일치.</b> 선불 충전형인데 “이번달 매출 ÷ 이번달 광고비”로 계산 → 태운 달(6월)은 ROAS 1.10, 안 태운 달(7월)은 9.68. 같은 821만인데 폭망과 대박으로 갈렸습니다.<br>
+        <b>① 텐핑 — 시간축 불일치.</b> 선불 충전형인데 “이번달 매출 ÷ 이번달 광고비”로 계산 → 태운 달(6월)은 ROAS 1.10, 안 태운 달(7월)은 9.68. 같은 921만인데 폭망과 대박으로 갈렸습니다.<br>
         <b>② 네이버 — 대상 불일치.</b> 브랜드검색(월정액 164만) · 파워컨텐츠 · GFA가 한 버킷. 분모엔 GFA만, 분자엔 브검 매출.<br>
         <b>③ 메타·카카오 — 최신성 불일치.</b> AD_SPEND가 7/1~5에 멈춘 채 11일치 매출로 나눔 → 분모가 절반. 메타 ROAS 12.49로 보였으나 실제 6.1.
       </div>
@@ -914,7 +931,7 @@ body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-ap
           <div style="font-size:11px;color:var(--amber);font-weight:700;margin-bottom:8px;letter-spacing:1px">교정 결과</div>
           <div style="font-size:12px;color:var(--sub);line-height:2">
             네이버 ROAS <b>64.4 → 2.22</b> (최고 효율 → 고비용 채널)<br>
-            텐핑 ROAS <b>1.10 → 2.96</b> (누적 코호트 · 실패 → 회수 중)<br>
+            텐핑 ROAS <b>1.10 → 2.64</b> (누적 코호트 · 실패 → 회수 중)<br>
             메타 ROAS <b>12.49 → 6.1</b> (분모 절반 → 실측)<br>
             카카오 <b>5.65 → 0.88</b> (코호트 · 본전 미달 확인)
           </div>
@@ -1241,12 +1258,12 @@ const WEEK_TODO = {
       {n:'②', t:'브랜드검색 후행효과 가설 검증', d:'메타 집행량 ↔ 브검 유입 상관 주 단위 추적 · 사실이면 메타 ROAS 재평가 필요'},
       {n:'③', t:'카카오 상담 로그 확인', d:'방문율 17%인데 오더 0 — 리드 품질인가 클로징인가 규명 후 중단 판단'},
       {n:'④', t:'노트필기 계열 회수 관찰', d:'AD_노트필기릴스 CPL 12,854(위너급) · 7월 신규라 회수 진행 중'},
-      {n:'⑤', t:'텐핑 재충전 판단', d:'누적 ROAS 2.96 (회수 진행 중) · 메타 대비 기회비용 계산'},
+      {n:'⑤', t:'텐핑 재충전 판단', d:'누적 ROAS 2.64 (회수 진행 중) · 메타 대비 기회비용 계산'},
       {n:'⑥', t:'주간 소재 루틴 유지', d:'릴스1 + 단일5 + 캐러셀1'},
     ]},
     done: {title:'이번 주 완료 (7/6~7/12)', items:[
       {t:'주간 매출 8,988만 — 역대 최고', d:'오더 24건 · 전환 시차 중앙값 2일'},
-      {t:'측정 기준 전면 재검증', d:'분모·분자 불일치 3종 발견 → 네이버 ROAS 64.4→2.22 · 텐핑 1.10→2.96(코호트) · 메타 12.49→6.1'},
+      {t:'측정 기준 전면 재검증', d:'분모·분자 불일치 3종 발견 → 네이버 ROAS 64.4→2.22 · 텐핑 1.10→2.64(코호트) · 메타 12.49→6.1'},
       {t:'카카오 데이터 파이프라인 복구', d:'SignUp 필드 오염(정규식 재합산) 제거 · 중복 적재 차단 · 6/1~ 일자별 백필'},
       {t:'네이버 검색광고 API 신규 연동', d:'브랜드검색 월정액은 API가 0원 리턴 → 1일자 별도 계상 + 월중 일할'},
       {t:'광고비 하드코딩 제거', d:'카카오·네이버 시트 자동 합산 · 매일 08시 트리거 · 남은 수동은 메타뿐'},
