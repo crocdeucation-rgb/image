@@ -204,12 +204,9 @@ body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-ap
 <!-- 탭 -->
 <div class="tabs">
   <button class="tab summary" onclick="sel('may',this)">5월 결산</button>
-  <button class="tab" onclick="sel('w1',this)">6/1주</button>
-  <button class="tab" onclick="sel('w2',this)">6/2주</button>
-  <button class="tab" onclick="sel('w3',this)">6/3주</button>
-  <button class="tab" onclick="sel('w4',this)">6/4주</button>
   <button class="tab summary" onclick="sel('jun',this)">6월 결산</button>
-  <button class="tab on" onclick="sel('jw1',this)">7/1주</button>
+  <button class="tab" onclick="sel('jw1',this)">7/1주</button>
+  <button class="tab on" onclick="sel('jw2',this)">7/2주</button>
   <button class="tab" onclick="sel('crm',this)" style="border-color:rgba(180,120,255,.3);color:#b478ff">⚙ CRM 패치</button>
 </div>
 
@@ -299,368 +296,161 @@ body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-ap
   </div>
 </div>
 
-<!-- ===== 6/1주 ===== -->
-<div id="p-w1" class="panel">
-  <div class="kpis">
-    <div class="kpi"><div class="k">광고비</div><div class="v">443만</div><div class="s">4,443,273원</div></div>
-    <div class="kpi"><div class="k">총 DB</div><div class="v">254건</div><div class="s">CPL 17,493원</div></div>
-    <div class="kpi"><div class="k">ROAS</div><div class="v t">10.68</div><div class="s">매출/광고비</div></div>
-    <div class="kpi"><div class="k">오더</div><div class="v">11건</div><div class="s">건당 평균 431만</div></div>
-    <div class="kpi"><div class="k">주간 매출</div><div class="v">4,745만</div><div class="s">결제일 기준</div></div>
-  </div>
-  <div class="knote">기간: 2026.06.01 ~ 06.07 / 결제일 기준 집계 / 메타 머신러닝 재학습 구간 포함</div>
-
-  <div class="sec">채널별 성과</div>
-  <div class="channels" id="w1-ch"></div>
-  <div class="detail" id="w1-detail"></div>
-
-  <div class="two">
-    <div class="card">
-      <h2>전환 퍼널</h2>
-      <div class="cap">6/1주 기준 · 신청→방문→오더</div>
-      <div id="w1-funnel"></div>
-    </div>
-    <div class="card">
-      <h2>담당자별 성과</h2>
-      <div class="cap">이번 주 DB·방문·오더·매출</div>
-      <table class="tbl" id="w1-agent-tbl">
-        <thead><tr><th>담당자</th><th>DB</th><th>방문</th><th>오더</th><th>매출</th></tr></thead>
-        <tbody id="w1-agent-body"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="sec">주간 오더 현황</div>
-  <div style="overflow-x:auto;margin-bottom:16px">
-    <table class="tbl" id="w1-order-tbl">
-      <thead><tr><th>결제일</th><th>이름</th><th>학년</th><th>매출</th><th>채널</th><th>캠페인</th></tr></thead>
-      <tbody id="w1-order-body"></tbody>
-    </table>
-  </div>
-
-  <div class="sec">소재별 성과</div>
-  <div class="gal" id="w1-gal"></div>
-
-  <div class="log" id="w1-log"></div>
-</div>
-
-<!-- ===== 6/2주 ~ 6/4주 대기 ===== -->
-<div id="p-w2" class="panel">
-  <div class="kpis">
-    <div class="kpi"><div class="k">광고비</div><div class="v">568만</div><div class="s">5,681,308원</div></div>
-    <div class="kpi"><div class="k">총 DB</div><div class="v">290건</div><div class="s">CPL 19,591원</div></div>
-    <div class="kpi"><div class="k">ROAS</div><div class="v t">7.58</div><div class="s">매출/광고비</div></div>
-    <div class="kpi"><div class="k">오더</div><div class="v">10건</div><div class="s">건당 평균 431만</div></div>
-    <div class="kpi"><div class="k">주간 매출</div><div class="v">4,306만</div><div class="s">결제일 기준</div></div>
-  </div>
-  <div class="knote">기간: 2026.06.08 ~ 06.14 / 결제일 기준 집계 / 텐핑 CPA 25건 포함</div>
-
-  <div class="sec">채널별 성과</div>
-  <div class="channels" id="w2-ch"></div>
-  <div class="detail" id="w2-detail"></div>
-
-  <div class="two">
-    <div class="card">
-      <h2>전환 퍼널</h2>
-      <div class="cap">6/2주 기준 · 신청→방문→오더</div>
-      <div id="w2-funnel"></div>
-    </div>
-    <div class="card">
-      <h2>담당자별 성과</h2>
-      <div class="cap">이번 주 DB·방문·오더·매출</div>
-      <table class="tbl">
-        <thead><tr><th>담당자</th><th>DB</th><th>방문</th><th>오더</th><th>매출</th></tr></thead>
-        <tbody>
-          <tr><td style="font-weight:700;color:var(--teal)">우혜림</td><td>-</td><td>-</td><td>6</td><td>2,389만</td></tr>
-          <tr><td style="font-weight:700;color:var(--teal)">엄현호</td><td>-</td><td>-</td><td>0</td><td>0원</td></tr>
-          <tr><td style="font-weight:700;color:var(--teal)">김윤호</td><td>-</td><td>-</td><td>2</td><td>634만</td></tr>
-          <tr><td style="font-weight:700;color:var(--teal)">장윤호</td><td>-</td><td>-</td><td>2</td><td>1,283만</td></tr>
-          <tr class="sum"><td>합계</td><td>287</td><td>10</td><td>10</td><td>4,306만</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="sec">주간 오더 현황</div>
-  <div style="overflow-x:auto;margin-bottom:16px">
-    <table class="tbl">
-      <thead><tr><th>결제일</th><th>이름</th><th>학년</th><th>매출</th><th>채널</th><th>캠페인</th></tr></thead>
-      <tbody>
-        <tr><td>6/9</td><td class="name">황예찬</td><td>초6</td><td class="teal">346.8만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
-        <tr><td>6/9</td><td class="name">민선희</td><td>초6</td><td class="teal">260.1만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
-        <tr><td>6/10</td><td class="name">나서현</td><td>중2</td><td class="teal">289.0만</td><td><span class="chbadge cb-kk">카카오</span></td><td style="color:var(--sub);font-size:11px">-</td></tr>
-        <tr><td>6/10</td><td class="name">최민서</td><td>고1</td><td class="teal">346.8만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
-        <tr><td>6/10</td><td class="name">허수빈</td><td>초6</td><td class="teal">693.6만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
-        <tr><td>6/11</td><td class="name">김라희</td><td>초5</td><td class="teal">346.8만</td><td><span class="chbadge" style="background:rgba(0,229,200,.12);color:var(--teal)">브랜드</span></td><td style="color:var(--sub);font-size:11px">-</td></tr>
-        <tr><td>6/11</td><td class="name">김나영</td><td>중2</td><td class="teal">462.4만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">-</td></tr>
-        <tr><td>6/12</td><td class="name">준홍</td><td>중3</td><td class="teal">867.0만</td><td><span class="chbadge cb-kk">카카오</span></td><td style="color:var(--sub);font-size:11px">-</td></tr>
-        <tr><td>6/13</td><td class="name">하은비</td><td>중3</td><td class="teal">346.8만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
-        <tr><td>6/13</td><td class="name">김소정</td><td>중2</td><td class="teal">346.8만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
-        <tr class="sum"><td colspan="3">합계 10건</td><td class="teal">4,306만원</td><td colspan="2" style="color:var(--sub);font-size:11px">ROAS 7.58</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="sec">소재별 성과</div>
-  <div class="gal" id="w2-gal"></div>
-
-  <div class="log">
-    <strong>6/2주 운영 판단 기록</strong><br>
-    노트릴스 CPL ₩11,000 — 전주(12,045) 대비 개선, 예산 유지<br>
-    GT노트피드백 CPL ₩26,110 — 상승세, 모니터링 강화<br>
-    너만본다 13건 유입 — 학습 완료 후 성과 확인 중<br>
-    준홍 단건 867만 — 카카오 고단가 오더 확인<br>
-    텐핑 25건 유입 — 단가 35,000원 / 결번·무효 팀 모니터링 중 (아직 별다른 이슈 없음)<br>
-    당근 12건 · CPL ₩35,340 — GT노트피드백 7건(메인) / 너만본다 2건 / 체크리스트 3건<br>
-    당근 오더 0건 지속 — 이번 주 소재·타겟 재검토 예정
-  </div>
-</div>
-<!-- ===== 6/3주 ===== -->
-<div id="p-w3" class="panel">
-  <div class="kpis">
-    <div class="kpi"><div class="k">광고비</div><div class="v">879만</div><div class="s">8,794,645원</div></div>
-    <div class="kpi"><div class="k">총 DB</div><div class="v">370건</div><div class="s">CPL 23,769원</div></div>
-    <div class="kpi"><div class="k">ROAS</div><div class="v t">2.78</div><div class="s">매출/광고비</div></div>
-    <div class="kpi"><div class="k">오더</div><div class="v">6건</div><div class="s">건당 평균 408만</div></div>
-    <div class="kpi"><div class="k">주간 매출</div><div class="v">2,449만</div><div class="s">결제일 기준</div></div>
-  </div>
-  <div class="knote">기간: 2026.06.15 ~ 06.21 / 결제일 기준 집계 / 텐핑 CPA 65건 포함 · 채리_2606 신규 런칭 영향</div>
-
-  <div class="sec">채널별 성과</div>
-  <div class="channels" id="w3-ch"></div>
-  <div class="detail" id="w3-detail"></div>
-
-  <div class="two">
-    <div class="card">
-      <h2>전환 퍼널</h2>
-      <div class="cap">6/3주 기준 · 신청→방문→오더</div>
-      <div id="w3-funnel"></div>
-    </div>
-    <div class="card">
-      <h2>담당자별 성과</h2>
-      <div class="cap">이번 주 DB·방문·오더·매출</div>
-      <table class="tbl">
-        <thead><tr><th>담당자</th><th>DB</th><th>방문</th><th>오더</th><th>매출</th></tr></thead>
-        <tbody>
-          <tr><td style="font-weight:700;color:var(--teal)">우혜림</td><td>-</td><td>-</td><td>4</td><td>1,754만</td></tr>
-          <tr><td style="font-weight:700;color:var(--teal)">엄현호</td><td>-</td><td>-</td><td>0</td><td>0원</td></tr>
-          <tr><td style="font-weight:700;color:var(--teal)">김윤호</td><td>-</td><td>-</td><td>1</td><td>349만</td></tr>
-          <tr><td style="font-weight:700;color:var(--teal)">장윤호</td><td>-</td><td>-</td><td>1</td><td>346.8만</td></tr>
-          <tr class="sum"><td>합계</td><td>370</td><td>6</td><td>6</td><td>2,449만</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="sec">주간 오더 현황</div>
-  <div style="overflow-x:auto;margin-bottom:16px">
-    <table class="tbl">
-      <thead><tr><th>결제일</th><th>이름</th><th>학년</th><th>매출</th><th>채널</th><th>캠페인</th></tr></thead>
-      <tbody>
-        <tr><td>6/15</td><td class="name">강동한</td><td>중1</td><td class="teal">346.8만</td><td><span class="chbadge" style="background:rgba(0,229,200,.12);color:var(--teal)">유기</span></td><td style="color:var(--sub);font-size:11px">insta 유기</td></tr>
-        <tr><td>6/16</td><td class="name">장동욱</td><td>중2</td><td class="teal">349.0만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">GT노트피드백_2605</td></tr>
-        <tr><td>6/16</td><td class="name">김리원·김예원</td><td>초5</td><td class="teal">713.6만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">GT노트피드백_2605</td></tr>
-        <tr><td>6/18</td><td class="name">김경배</td><td>중1</td><td class="teal">346.8만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
-        <tr><td>6/20</td><td class="name">권도율</td><td>초4</td><td class="teal">346.8만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
-        <tr><td>6/20</td><td class="name">김지안</td><td>초6</td><td class="teal">346.8만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
-        <tr class="sum"><td colspan="3">합계 6건</td><td class="teal">2,449만원</td><td colspan="2" style="color:var(--sub);font-size:11px">ROAS 2.78 (22일 결제 4건 미포함)</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="sec">소재별 성과</div>
-  <div class="gal" id="w3-gal"></div>
-
-  <div class="sec">텐핑 CPA 소재</div>
-  <div class="gal" id="w3-cpa-gal"></div>
-
-  <div class="log">
-    <strong>6/3주 운영 판단 기록</strong><br>
-    노트릴스_2505 위너 유지 — CPL ₩13K대 안정, 오더 3건(김경배·권도율·김지안) 연결<br>
-    GT노트피드백_2605 유지 — 장동욱(349만)·김리원김예원(713.6만) 오더 연결 확인<br>
-    채리_2606 신규 런칭 6/16 — 복제본 구조, 6/3주까지 35건 학습 중 (목표 50건, 15건 잔여) · CPL ₩39,862<br>
-    텐핑 CPA 급증 65건 — 6/15부터 단가 35,000→30,000원 인하 효과 / 유효DB 품질 모니터링 중<br>
-    네이버 GFA 사실상 미집행 43,385원 — 재활성화 검토 중<br>
-    당근 이번 주 미집행 — 소재 재편 후 재투입 예정<br>
-    ROAS 2.78 낮은 이유: ① 채리_2606 신규 런칭으로 메타 광고비 급증 ② 미납 2건 매출 미반영 ③ 6/22 결제 4건(서수민·지승유·전혜연·우승현 = 1,676.2만) → 4주차 반영
-  </div>
-</div>
-
-<!-- ===== 6/4주 ===== -->
-<div id="p-w4" class="panel">
-  <div class="kpis">
-    <div class="kpi"><div class="k">광고비</div><div class="v">1,145만</div><div class="s">11,446,096원</div></div>
-    <div class="kpi"><div class="k">총 DB</div><div class="v">442건</div><div class="s">CPL 25,896원</div></div>
-    <div class="kpi"><div class="k">ROAS</div><div class="v t">5.45</div><div class="s">매출/광고비</div></div>
-    <div class="kpi"><div class="k">오더</div><div class="v">17건</div><div class="s">건당 평균 367만</div></div>
-    <div class="kpi"><div class="k">주간 매출</div><div class="v">6,242만</div><div class="s">결제일 기준</div></div>
-  </div>
-  <div class="knote">기간: 2026.06.22 ~ 06.28 / 결제일 기준 집계 / 텐핑은 공급형 채널(수량≠성과, ROAS로 평가) · 당근 22건(광고관리자 0=트래킹 누락, 노션 보정)</div>
-
-  <div class="sec">채널별 성과</div>
-  <div class="channels" id="w4-ch"></div>
-  <div class="detail" id="w4-detail"></div>
-
-  <div class="two">
-    <div class="card">
-      <h2>전환 퍼널</h2>
-      <div class="cap">6/4주 기준 · 신청→방문→오더</div>
-      <div id="w4-funnel"></div>
-    </div>
-    <div class="card">
-      <h2>담당자별 성과</h2>
-      <div class="cap">이번 주 DB·방문·오더·매출</div>
-      <table class="tbl">
-        <thead><tr><th>담당자</th><th>DB</th><th>방문</th><th>오더</th><th>매출</th></tr></thead>
-        <tbody>
-          <tr><td style="font-weight:700;color:var(--teal)">장윤호</td><td>-</td><td>-</td><td>8</td><td>2,514만</td></tr>
-          <tr><td style="font-weight:700;color:var(--teal)">우혜림</td><td>-</td><td>-</td><td>6</td><td>2,572만</td></tr>
-          <tr><td style="font-weight:700;color:var(--teal)">김윤호</td><td>-</td><td>-</td><td>2</td><td>578만</td></tr>
-          <tr><td style="font-weight:700;color:var(--teal)">김우진</td><td>-</td><td>-</td><td>1</td><td>578만</td></tr>
-          <tr class="sum"><td>합계</td><td>442</td><td>32</td><td>17</td><td>6,242만</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="sec">주간 오더 현황</div>
-  <div style="overflow-x:auto;margin-bottom:16px">
-    <table class="tbl">
-      <thead><tr><th>결제일</th><th>이름</th><th>학년</th><th>매출</th><th>채널</th><th>캠페인</th></tr></thead>
-      <tbody>
-        <tr><td>6/22</td><td class="name">서수민</td><td>중2</td><td class="teal">346.8만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
-        <tr><td>6/22</td><td class="name">지승유</td><td>초6</td><td class="teal">346.8만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
-        <tr><td>6/22</td><td class="name">전혜연</td><td>고1</td><td class="teal">520.2만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
-        <tr><td>6/22</td><td class="name">우승현</td><td>중1</td><td class="teal">462.4만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
-        <tr><td>6/23</td><td class="name">박지훈</td><td>중2</td><td class="teal">346.8만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">GT노트피드백_2605</td></tr>
-        <tr><td>6/23</td><td class="name">윤서</td><td>초6</td><td class="teal">346.8만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
-        <tr><td>6/23</td><td class="name">지민준</td><td>초4</td><td class="teal">28.9만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
-        <tr><td>6/23</td><td class="name">장서윤</td><td>초6</td><td class="teal">346.8만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
-        <tr><td>6/23</td><td class="name">김은성</td><td>초6</td><td class="teal">28.9만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">채리_2606</td></tr>
-        <tr><td>6/24</td><td class="name">김루아</td><td>초5</td><td class="teal">346.8만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">채리_2606</td></tr>
-        <tr><td>6/25</td><td class="name">아라</td><td>초4</td><td class="teal">231.2만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
-        <tr><td>6/25</td><td class="name">이도윤</td><td>중1</td><td class="teal">520.2만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">채리_2606</td></tr>
-        <tr><td>6/26</td><td class="name">김의찬</td><td>초6</td><td class="teal">173.4만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
-        <tr><td>6/27</td><td class="name">김민준</td><td>초6</td><td class="teal">578.0만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
-        <tr><td>6/27</td><td class="name">이연우</td><td>중1</td><td class="teal">578.0만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
-        <tr><td>6/27</td><td class="name">김장우</td><td>중2</td><td class="teal">346.8만</td><td><span class="chbadge cb-meta">메타</span></td><td style="color:var(--sub);font-size:11px">노트릴스_2505</td></tr>
-        <tr><td>6/28</td><td class="name">박건희</td><td>중1</td><td class="teal">693.2만</td><td><span class="chbadge cb-cpa">CPA</span></td><td style="color:var(--sub);font-size:11px">텐핑 · 주말 전환</td></tr>
-        <tr class="sum"><td colspan="3">합계 17건</td><td class="teal">6,242만원</td><td colspan="2" style="color:var(--sub);font-size:11px">ROAS 5.45 · 메타 16건 / 텐핑 1건</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="sec">소재별 성과 (메타) · 신청→방문 전환</div>
-  <div class="gal" id="w4-gal"></div>
-
-  <div class="log">
-    <strong>6/4주 운영 판단 기록</strong><br>
-    MLST_공부방법점검(단일 4종) 신규 위너 — CPL ₩10,004로 전 캠페인 1위, 리드 70건 / 단일슬라이드가 캐러셀(₩24,888)보다 2.5배 효율<br>
-    노트릴스_2505 볼륨 위너 유지 — 리드 107건 최다, CPL ₩15,804, 오더 12건 연결(주간 매출 견인)<br>
-    채리_2606 — 학습 완료(40건)에도 CPL ₩34,335 부진, 오더 3건 / 유지 여부 판단 필요<br>
-    너만본다 — CPL ₩30,666 상승, 효율 의심 → 모니터링 중, 하향 가능성<br>
-    텐핑 CPA — 단가 ₩28K 고정, 브레이크 안 걸면 1~2일에 200~300개도 유입 가능한 구조. 수량이 아니라 방문 전환·홀딩·실질 매출전환 데이터와 감도 조정이 필수 → 텐핑 전체가 아닌 마케터별(식별코드) 데이터로 추적·취합. 6/28 텐핑 측에 감도조절 관련 요청 전달, 이번 주 '무료·공공기관' 등 규정 위반 표현 삭제된 형태로 광고 예정<br>
-    카카오 CPL ₩130,447 — 이번 주 최악(리드 9 / ₩117만), 소재 5종 사실상 사망 → 정리 + 메타 위너 소재 이식 필요<br>
-    당근 — 광고관리자 리드 0은 트래킹 누락, 노션 기준 실제 22건(CPL ₩45,455) / V3 무료점검 효과 1위, V4 페페 거의 안 돎<br>
-    네이버 GFA ₩28만 — 클릭만, 인스타폼 전환 0 지속 / 파워컨텐츠 ₩5,971 테스트 수준
-  </div>
-</div>
-
-
 <!-- ===== 6월 결산 ===== -->
 <div id="p-jun" class="panel">
+
   <div class="kpis">
-    <div class="kpi"><div class="k">총 광고비</div><div class="v">3,439만</div><div class="s">34,386,276원</div></div>
-    <div class="kpi"><div class="k">총 DB</div><div class="v">1,548건</div><div class="s">CPL 22,213원</div></div>
-    <div class="kpi"><div class="k">ROAS</div><div class="v t">5.50</div><div class="s">전채널 통합</div></div>
-    <div class="kpi"><div class="k">오더</div><div class="v">48건</div><div class="s">결제일 기준</div></div>
-    <div class="kpi"><div class="k">6월 매출</div><div class="v">1억 8,897만</div><div class="s">결제일 기준</div></div>
+    <div class="kpi"><div class="k">총 광고비</div><div class="v">3,469만</div><div class="s">34,693,402원</div></div>
+    <div class="kpi"><div class="k">총 DB</div><div class="v">1,548건</div><div class="s">CPL 22,411원</div></div>
+    <div class="kpi"><div class="k">ROAS · 코호트</div><div class="v t">4.35</div><div class="s">6월 유입이 만든 매출</div></div>
+    <div class="kpi"><div class="k">ROAS · 결제일</div><div class="v">5.55</div><div class="s">6월에 결제된 매출</div></div>
+    <div class="kpi"><div class="k">6월 매출</div><div class="v">1억 9,246만</div><div class="s">결제일 기준 · 오더 48건</div></div>
   </div>
-  <div class="knote">※ 결제일 기준 집계 / 취소 1건(윤성현) 건수 포함·매출 0 처리 / 브랜드검색 고정비 154만 포함 / 텐핑=공급형(ROAS로 평가)</div>
-
-  <div class="sec">5월 대비</div>
-  <div style="overflow-x:auto;margin-bottom:20px">
-    <table class="tbl">
-      <thead><tr><th></th><th>5월</th><th>6월</th><th>변화</th></tr></thead>
-      <tbody>
-        <tr><td>광고비</td><td>1,265만</td><td>3,439만</td><td class="teal">×2.7</td></tr>
-        <tr><td>DB</td><td>815건</td><td>1,548건</td><td class="teal">×1.9</td></tr>
-        <tr><td>CPL</td><td>13,627원</td><td>22,213원</td><td style="color:var(--red)">▲ 63%</td></tr>
-        <tr><td>오더</td><td>25건</td><td>48건</td><td class="teal">×1.9</td></tr>
-        <tr><td>매출</td><td>8,835만</td><td>1억 8,897만</td><td class="teal">×2.1</td></tr>
-        <tr><td>ROAS</td><td>6.97</td><td>5.50</td><td style="color:var(--red)">▼</td></tr>
-      </tbody>
-    </table>
+  <div class="knote">
+    ※ 광고비 전면 재검증 후 수치 (2026-07-11) · 카카오·네이버는 API 실측으로 교체 · 브랜드검색/GFA 분리 · 텐핑은 월별 ROAS 산출 제외(코호트 채널)
   </div>
 
-  <div class="sec">채널별 성과</div>
-  <div class="may-ch">
-    <div class="ch" style="cursor:default">
-      <div class="cn"><span class="dot" style="background:#6c8bd5"></span>메타</div>
-      <div class="r"><span class="l">광고비</span><span class="v">21,260,805원</span></div>
-      <div class="r"><span class="l">DB</span><span class="v t">1,190건</span></div>
-      <div class="r"><span class="l">CPL</span><span class="v">17,866원</span></div>
-      <div class="r"><span class="l">오더/매출</span><span class="v t">41건 / 1억 5,138만</span></div>
-      <div class="r"><span class="l">ROAS</span><span class="v t">7.12</span></div>
+  <!-- 측정 기준 -->
+  <div class="sec">00 — 측정 기준</div>
+  <div class="log" style="margin-bottom:24px">
+    <div class="li" style="margin-bottom:10px"><b>왜 ROAS를 두 개 씁니까.</b> 하나로는 반증이 불가능하기 때문입니다.</div>
+    <div class="li" style="margin-bottom:6px"><b>코호트 ROAS</b> = 6월에 태운 광고비 ÷ <b>6월에 들어온 리드가 만든 누적 매출</b>. → “내가 쓴 돈이 무엇을 만들었는가”. 채널·소재의 생사 판단에 씁니다.</div>
+    <div class="li" style="margin-bottom:10px"><b>결제일 ROAS</b> = 6월에 태운 광고비 ÷ <b>6월에 결제된 매출</b>. → “이번 달 얼마를 벌었는가”. 경영 보고에 씁니다.</div>
+    <div class="li"><b>두 값의 격차가 곧 진단입니다.</b> 격차가 없으면 전환 시차가 짧은 건강한 채널이고, 격차가 크면 그 채널의 이번 달 매출은 과거 리드가 만든 것입니다. 아래 카카오가 그 사례입니다.</div>
+  </div>
+
+  <!-- 채널별 -->
+  <div class="sec">01 — 채널별 판정</div>
+  <table class="tbl" style="margin-bottom:10px">
+    <thead><tr>
+      <th class="l">채널</th><th class="r">광고비</th><th class="r">DB</th><th class="r">CPL</th>
+      <th class="r">오더</th><th class="r">매출(코호트)</th><th class="r">ROAS 코호트</th><th class="r">ROAS 결제일</th><th class="r">격차</th><th class="l">판정</th>
+    </tr></thead>
+    <tbody>
+      <tr><td class="l"><span class="chbadge cb-meta">메타</span></td><td class="r">2,126만</td><td class="r">1,148</td><td class="r">18,519</td><td class="r">32</td><td class="r">1억 1,334만</td><td class="r teal"><b>5.33</b></td><td class="r">6.36</td><td class="r">1.2×</td><td class="l">유지 · 증액</td></tr>
+      <tr><td class="l"><span class="chbadge" style="background:rgba(180,120,255,.12);color:#b478ff">텐핑</span></td><td class="r">632만</td><td class="r">227</td><td class="r">27,832</td><td class="r">2</td><td class="r">1,271만</td><td class="r">2.01</td><td class="r">1.10</td><td class="r">0.5×</td><td class="l">코호트로 별도 평가</td></tr>
+      <tr style="background:#fff8f0"><td class="l"><span class="chbadge" style="background:rgba(240,192,32,.15);color:#b8860b">카카오</span></td><td class="r">327만</td><td class="r">53</td><td class="r">61,758</td><td class="r">1</td><td class="r">289만</td><td class="r" style="color:var(--red)"><b>0.88</b></td><td class="r">5.65</td><td class="r" style="color:var(--red)"><b>6.4×</b></td><td class="l" style="color:var(--red)">본전 미달 · 축소</td></tr>
+      <tr><td class="l"><span class="chbadge" style="background:rgba(255,124,60,.12);color:#ff7c3c">당근</span></td><td class="r">196만</td><td class="r">57</td><td class="r">34,418</td><td class="r">0</td><td class="r">0</td><td class="r" style="color:var(--red)">0</td><td class="r">0</td><td class="r">—</td><td class="l" style="color:var(--red)">폐기</td></tr>
+      <tr><td class="l"><span class="chbadge" style="background:rgba(3,199,90,.12);color:#03c75a">네이버 브랜드검색</span></td><td class="r">157만</td><td class="r">18</td><td class="r">86,949</td><td class="r">1</td><td class="r">347만</td><td class="r">2.22</td><td class="r">2.22</td><td class="r">1.0×</td><td class="l">유지</td></tr>
+      <tr><td class="l"><span class="chbadge" style="background:rgba(3,199,90,.12);color:#03c75a">네이버 GFA</span></td><td class="r">31만</td><td class="r">1</td><td class="r">314,411</td><td class="r">0</td><td class="r">0</td><td class="r" style="color:var(--red)">0</td><td class="r">0</td><td class="r">—</td><td class="l" style="color:var(--red)">사실상 종료</td></tr>
+      <tr><td class="l">자연유입</td><td class="r">0</td><td class="r">40</td><td class="r">—</td><td class="r">4</td><td class="r">1,505만</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td class="l">—</td></tr>
+      <tr style="border-top:1px solid var(--border)"><td class="l"><b>합계</b></td><td class="r"><b>3,469만</b></td><td class="r"><b>1,548</b></td><td class="r"><b>22,411</b></td><td class="r"><b>41</b></td><td class="r"><b>1억 5,093만</b></td><td class="r teal"><b>4.35</b></td><td class="r"><b>5.55</b></td><td class="r">—</td><td class="l"></td></tr>
+    </tbody>
+  </table>
+  <div class="knote" style="margin-bottom:24px">
+    ※ 텐핑은 선불 충전형이라 월별 ROAS가 성립하지 않습니다(태운 달은 폭망, 안 태운 달은 무한대). 위 2.01은 참고값이며, 실제 판정은 아래 코호트 블록을 따릅니다.
+  </div>
+
+  <!-- 텐핑 코호트 -->
+  <div class="sec">02 — 텐핑 코호트 (충전형 채널)</div>
+  <div class="card" style="margin-bottom:24px">
+    <div class="cap" style="margin-bottom:14px">
+      선불 충전형이므로 월로 자르면 왜곡됩니다. <b>잔액 0 = 코호트가 닫혔으므로</b> 누적으로만 평가합니다.
     </div>
-    <div class="ch" style="cursor:default">
-      <div class="cn"><span class="dot" style="background:#e8483f"></span>텐핑 CPA</div>
-      <div class="r"><span class="l">광고비</span><span class="v">6,318,000원</span></div>
-      <div class="r"><span class="l">DB</span><span class="v t">227건</span></div>
-      <div class="r"><span class="l">CPL</span><span class="v">27,833원</span></div>
-      <div class="r"><span class="l">오더/매출</span><span class="v">1건 / 693만</span></div>
-      <div class="r"><span class="l">ROAS</span><span class="v" style="color:var(--red)">1.10</span></div>
-    </div>
-    <div class="ch" style="cursor:default">
-      <div class="cn"><span class="dot" style="background:#f0c020"></span>카카오모먼트</div>
-      <div class="r"><span class="l">광고비</span><span class="v">3,251,708원</span></div>
-      <div class="r"><span class="l">DB</span><span class="v t">53건</span></div>
-      <div class="r"><span class="l">CPL</span><span class="v">61,353원</span></div>
-      <div class="r"><span class="l">오더/매출</span><span class="v t">3건 / 1,850만</span></div>
-      <div class="r"><span class="l">ROAS</span><span class="v t">5.69</span></div>
-    </div>
-    <div class="ch" style="cursor:default">
-      <div class="cn"><span class="dot" style="background:#ff7c3c"></span>당근마켓</div>
-      <div class="r"><span class="l">광고비</span><span class="v">1,961,880원</span></div>
-      <div class="r"><span class="l">DB</span><span class="v t">57건</span></div>
-      <div class="r"><span class="l">CPL</span><span class="v">34,419원</span></div>
-      <div class="r"><span class="l">오더/매출</span><span class="v" style="color:var(--red)">0건</span></div>
-      <div class="r"><span class="l">ROAS</span><span class="v" style="color:var(--red)">0</span></div>
-    </div>
-    <div class="ch" style="cursor:default">
-      <div class="cn"><span class="dot" style="background:#b478ff"></span>브랜드검색</div>
-      <div class="r"><span class="l">광고비</span><span class="v">1,540,000원</span></div>
-      <div class="r"><span class="l">DB</span><span class="v t">1건</span></div>
-      <div class="r"><span class="l">오더/매출</span><span class="v t">1건 / 347만</span></div>
-      <div class="r"><span class="l">ROAS</span><span class="v t">2.25</span></div>
-    </div>
-    <div class="ch" style="cursor:default">
-      <div class="cn"><span class="dot" style="background:#03c75a"></span>네이버 (GFA+파워컨텐츠)</div>
-      <div class="r"><span class="l">광고비</span><span class="v">53,883원</span></div>
-      <div class="r"><span class="l">DB</span><span class="v t">20건</span></div>
-      <div class="r"><span class="l">CPL</span><span class="v">2,694원</span></div>
-      <div class="r"><span class="l">오더/매출</span><span class="v t">1건 / 347만</span></div>
-      <div class="r"><span class="l">ROAS</span><span class="v t">64.4</span></div>
-    </div>
-    <div class="ch" style="cursor:default">
-      <div class="cn"><span class="dot" style="background:#aaa"></span>자연유입·기타</div>
-      <div class="r"><span class="l">오더/매출</span><span class="v t">1건 / 522만</span></div>
-      <div class="r"><span class="l">비고</span><span class="v" style="color:var(--sub)">유튜브·블로그 등</span></div>
+    <div class="kpis" style="grid-template-columns:repeat(5,1fr);margin-bottom:0">
+      <div class="kpi" style="border:0;padding:0"><div class="k">누적 투자</div><div class="v" style="font-size:18px">821만</div><div class="s">4회 충전 · 잔액 0</div></div>
+      <div class="kpi" style="border:0;padding:0"><div class="k">유효 DB</div><div class="v" style="font-size:18px">301건</div><div class="s">무효 19건 환불 · 무효율 5.2%</div></div>
+      <div class="kpi" style="border:0;padding:0"><div class="k">실질 CPL</div><div class="v" style="font-size:18px">27,276원</div><div class="s">단가 35K→30K→28K</div></div>
+      <div class="kpi" style="border:0;padding:0"><div class="k">누적 회수</div><div class="v" style="font-size:18px">2,427만</div><div class="s">오더 5건</div></div>
+      <div class="kpi" style="border:0;padding:0"><div class="k">누적 ROAS</div><div class="v t" style="font-size:18px">2.96</div><div class="s">회수 진행 중 = 바닥값</div></div>
     </div>
   </div>
 
-  <div class="sec">6월 결산 인사이트</div>
+  <!-- 소재별 -->
+  <div class="sec">03 — 소재별 판정 (6월 가동 12종 전수)</div>
+  <div class="cap">분모는 6월 광고비, 분자는 6월에 그 소재로 들어온 리드의 누적 매출입니다. 소재는 그 자체가 하나의 코호트입니다.</div>
+  <table class="tbl" style="margin-bottom:10px">
+    <thead><tr>
+      <th class="l">소재</th><th class="r">광고비</th><th class="r">리드</th><th class="r">CPL</th><th class="r">CPL 순위</th>
+      <th class="r">빈도</th><th class="r">오더</th><th class="r">매출</th><th class="r">ROAS</th><th class="l">판정</th>
+    </tr></thead>
+    <tbody>
+      <tr style="background:#f0f7f4"><td class="l"><b>노트릴스_영상_2505</b></td><td class="r">716만</td><td class="r">550</td><td class="r">13,012</td><td class="r">2위</td><td class="r">2.17</td><td class="r">21</td><td class="r"><b>7,775만</b></td><td class="r teal"><b>10.86</b></td><td class="l">위너 · 증액</td></tr>
+      <tr style="background:#f0f7f4"><td class="l"><b>GT노트피드백_2605</b></td><td class="r">438만</td><td class="r">162</td><td class="r">27,028</td><td class="r">7위</td><td class="r">1.94</td><td class="r">5</td><td class="r">1,970만</td><td class="r teal"><b>4.50</b></td><td class="l">생존 · CPL로 껐다 부활</td></tr>
+      <tr style="background:#f0f7f4"><td class="l"><b>채리_2606</b></td><td class="r">329만</td><td class="r">85</td><td class="r" style="color:var(--red)">38,721</td><td class="r" style="color:var(--red)">9위</td><td class="r">1.81</td><td class="r">4</td><td class="r">1,243만</td><td class="r teal"><b>3.78</b></td><td class="l">생존 · CPL 최하위권</td></tr>
+      <tr><td class="l">잠재고객_5단계루틴</td><td class="r">221만</td><td class="r">83</td><td class="r">26,629</td><td class="r">6위</td><td class="r" style="color:var(--red)"><b>2.99</b></td><td class="r">0</td><td class="r">0</td><td class="r" style="color:var(--red)">0</td><td class="l" style="color:var(--red)">폐기 · 빈도 소진</td></tr>
+      <tr><td class="l">[소재01] 릴스_너만본다</td><td class="r">218만</td><td class="r">69</td><td class="r">31,571</td><td class="r">8위</td><td class="r">2.04</td><td class="r">0</td><td class="r">0</td><td class="r" style="color:var(--red)">0</td><td class="l" style="color:var(--red)">폐기</td></tr>
+      <tr style="background:#fff8f0"><td class="l"><b>MLST_V3_무료점검</b></td><td class="r">92만</td><td class="r">97</td><td class="r" style="color:var(--teal-d)"><b>9,494</b></td><td class="r" style="color:var(--teal-d)"><b>1위</b></td><td class="r">1.76</td><td class="r" style="color:var(--red)"><b>0</b></td><td class="r" style="color:var(--red)"><b>0</b></td><td class="r" style="color:var(--red)"><b>0</b></td><td class="l" style="color:var(--red)"><b>폐기 · CPL 1위인데 오더 0</b></td></tr>
+      <tr><td class="l">MLST캐러셀_2606</td><td class="r">67만</td><td class="r">41</td><td class="r">16,436</td><td class="r">3위</td><td class="r">1.92</td><td class="r">0</td><td class="r">0</td><td class="r" style="color:var(--red)">0</td><td class="l" style="color:var(--red)">폐기</td></tr>
+      <tr><td class="l">비평준화 저격</td><td class="r">20만</td><td class="r">2</td><td class="r">100,334</td><td class="r">12위</td><td class="r">1.27</td><td class="r">0</td><td class="r">0</td><td class="r" style="color:var(--red)">0</td><td class="l" style="color:var(--red)">폐기</td></tr>
+      <tr><td class="l">기초부족_단일이미지</td><td class="r">16만</td><td class="r">3</td><td class="r">51,887</td><td class="r">10위</td><td class="r">1.20</td><td class="r">0</td><td class="r">0</td><td class="r" style="color:var(--red)">0</td><td class="l" style="color:var(--red)">폐기</td></tr>
+      <tr><td class="l">MLST_V1_맘카페</td><td class="r">5.6만</td><td class="r">1</td><td class="r">55,689</td><td class="r">11위</td><td class="r">—</td><td class="r">0</td><td class="r">0</td><td class="r" style="color:var(--red)">0</td><td class="l" style="color:var(--red)">폐기</td></tr>
+      <tr><td class="l">MLST_V4_페페</td><td class="r">2.2만</td><td class="r">1</td><td class="r">21,670</td><td class="r">5위</td><td class="r">—</td><td class="r">0</td><td class="r">0</td><td class="r" style="color:var(--red)">0</td><td class="l" style="color:var(--red)">폐기</td></tr>
+      <tr><td class="l">MLST_V2_공감</td><td class="r">1.7만</td><td class="r">1</td><td class="r">17,249</td><td class="r">4위</td><td class="r">—</td><td class="r">0</td><td class="r">0</td><td class="r" style="color:var(--red)">0</td><td class="l" style="color:var(--red)">폐기</td></tr>
+      <tr style="border-top:1px solid var(--border)"><td class="l"><b>메타 합계</b></td><td class="r"><b>2,126만</b></td><td class="r"><b>1,095</b></td><td class="r"><b>19,417</b></td><td class="r">—</td><td class="r">—</td><td class="r"><b>30</b></td><td class="r"><b>1억 988만</b></td><td class="r teal"><b>5.17</b></td><td class="l"></td></tr>
+    </tbody>
+  </table>
+  <div class="knote" style="margin-bottom:24px">
+    ※ 메타 리포트 리드(1,095)와 노션 DB(1,148)의 차이는 폼 이탈·중복 정제에서 발생합니다. 매출·오더는 노션(결제 확정) 기준입니다.
+  </div>
+
+  <!-- 판단의 기록 -->
+  <div class="sec">04 — 판단의 기록</div>
+
+  <div class="log" style="margin-bottom:12px">
+    <div class="li" style="margin-bottom:8px"><b>① CPL 1위 소재가 오더 0건이었습니다.</b></div>
+    <div class="li" style="margin-bottom:8px">MLST_V3_무료점검은 CPL 9,494원, 6월 전 소재 중 <b>1위</b>였습니다. 리드 97건. 오더 <b>0건</b>.</div>
+    <div class="li" style="margin-bottom:8px">반대로 채리_2606은 CPL 38,721원으로 <b>9위</b>였고, 매출 <b>1,243만</b>을 만들었습니다.</div>
+    <div class="li"><b>CPL 순위와 ROAS 순위가 반대로 갔습니다.</b> CPL 상위 3개 중 2개가 오더 0, CPL 하위권 2개가 매출 3,213만. CPL은 리드의 가격이지 리드의 가치가 아닙니다. 이 결산으로 <b>“CPL 단독 판단 금지”는 원칙이 아니라 실증이 되었습니다.</b></div>
+  </div>
+
+  <div class="log" style="margin-bottom:12px;background:#fdf3ee;border-color:#f0d5c4">
+    <div class="li" style="margin-bottom:8px"><b>② 카카오 — 격차 6.4배가 드러낸 것.</b></div>
+    <div class="li" style="margin-bottom:8px">결제일 기준 카카오 ROAS는 <b>5.65</b>였습니다. 양호한 채널로 보였습니다. 그래서 유입이 떨어졌을 때, <b>ROAS가 좋으니 태우면 더 나온다</b>고 판단해 6/25~27 일 예산을 9만 → 27만으로 증액했습니다.</div>
+    <div class="li" style="margin-bottom:8px">3일 만에 CPL이 <b>13만원</b>으로 튀었습니다. 즉시 원복하고 소재 5종을 폐기했습니다. <b>81만원의 수업료였습니다.</b></div>
+    <div class="li" style="margin-bottom:8px">그런데 코호트로 다시 계산하니 6월 카카오 ROAS는 <b>0.88</b>이었습니다. 327만을 태워 289만을 회수했습니다. <b>본전도 못 뽑는 채널이었습니다.</b> 결제일 기준 5.65는 5월 이전 리드가 6월에 결제된 것을 6월 광고비로 나눈 값이었습니다.</div>
+    <div class="li"><b>판단 루프는 작동했습니다</b> — CPL이 비명을 질렀고 3일 만에 멈췄습니다. 다만 CPL이 튀지 않았다면 계속 태웠을 것입니다. <b>그래서 측정을 고쳤습니다.</b></div>
+  </div>
+
+  <div class="log" style="margin-bottom:12px">
+    <div class="li" style="margin-bottom:8px"><b>③ 텐핑 — 끄는 것이 아니라 조이는 것.</b></div>
+    <div class="li" style="margin-bottom:8px">6월 결산 시점의 텐핑 ROAS는 <b>1.10</b>. 실패 판정이었습니다. 그러나 이 숫자는 <b>태운 달의 비용 전액과 아직 오지 않은 회수를 나눈 값</b>이었습니다.</div>
+    <div class="li" style="margin-bottom:8px">잔액이 0이 되어 코호트가 닫힌 지금 다시 계산하면 <b>투자 821만 / 회수 2,427만 / ROAS 2.96</b>입니다. 세팅 19건 중 오더는 아직 5건이므로 <b>이것도 바닥값</b>입니다.</div>
+    <div class="li">품질 관리는 유효했습니다 — 식별코드별 전수조사, 규정 위반 표현 시정 요청, 무효 칼처리(무효율 5.2%, 19건 전액 환불). <b>공급형 채널은 끄는 것이 아니라 조이는 것</b>이 답이었습니다.</div>
+  </div>
+
+  <div class="log" style="margin-bottom:12px">
+    <div class="li" style="margin-bottom:8px"><b>④ 네이버 ROAS 64.4 — 숫자가 너무 좋아서 의심했습니다.</b></div>
+    <div class="li" style="margin-bottom:8px">6월 결산의 네이버 ROAS는 <b>64.4</b>였습니다. 이것이 사실이라면 전 예산을 네이버로 옮겨야 합니다. <b>그런데 네이버 DB는 20건뿐이었습니다. 결론이 요구하는 행동이 말이 되지 않았습니다.</b></div>
+    <div class="li" style="margin-bottom:8px">분모를 열었습니다 — GFA 실비 1.5만. 분자를 열었습니다 — <b>브랜드검색이 만든 매출 347만.</b> 분모와 분자가 서로 다른 채널을 세고 있었습니다.</div>
+    <div class="li">브랜드검색(월정액 154만)·파워컨텐츠·GFA를 소스 기준으로 분리하고 광고비를 API로 실측했습니다. <b>네이버의 실제 ROAS는 2.22</b>였습니다. 최고 효율 채널이 아니라 CPL 8.7만의 고비용 채널이었습니다.</div>
+  </div>
+
+  <div class="log" style="margin-bottom:24px;background:#f4f2fb;border-color:#ddd6f3">
+    <div class="li" style="margin-bottom:8px"><b>⑤ 관통하는 문제 — 분모와 분자가 서로 다른 것을 세고 있었습니다.</b></div>
+    <div class="li" style="margin-bottom:8px">네이버는 <b>대상</b>이 어긋났고(GFA 분모 / 브검 분자), 텐핑은 <b>기간</b>이 어긋났으며(6월 비용 / 7월 회수), 메타·카카오는 <b>최신성</b>이 어긋나 있었습니다(5일치 분모 / 11일치 분자).</div>
+    <div class="li" style="margin-bottom:8px">숫자가 틀린 것이 아니라 <b>짝이 맞지 않았습니다.</b> 그리고 그 결과로 “네이버가 최고 효율 채널”, “카카오는 양호”, “텐핑은 실패”라는 <b>세 개의 잘못된 결론</b>이 나왔습니다.</div>
+    <div class="li"><b>채널의 성격이 다르면 측정 방식도 달라야 합니다</b> — 유량(메타·카카오)은 월별로, 저량(텐핑)은 코호트로, 정액(브랜드검색)은 일할로. 7/11 전 채널을 이 원칙으로 재계산하고, 카카오·네이버 광고비는 API 자동 수집으로 전환해 하드코딩을 제거했습니다.</div>
+  </div>
+
+  <!-- 조치 -->
+  <div class="sec">05 — 판정에 따른 조치</div>
+  <table class="tbl" style="margin-bottom:24px">
+    <thead><tr><th class="l">채널·소재</th><th class="l">판정 근거</th><th class="l">조치</th><th class="l">현재</th></tr></thead>
+    <tbody>
+      <tr><td class="l">당근</td><td class="l">196만 / 오더 0 / ROAS 0</td><td class="l">완전 중단</td><td class="l">7월 0원</td></tr>
+      <tr><td class="l">네이버 GFA</td><td class="l">31만 / 오더 0 / ROAS 0</td><td class="l">캠페인 4종 OFF</td><td class="l">일 1.6천원 · 사실상 종료</td></tr>
+      <tr><td class="l">카카오</td><td class="l">코호트 ROAS 0.88 · 본전 미달</td><td class="l">증액 원복 · 소재 5종 폐기 · 채리 OFF</td><td class="l">일 9만원</td></tr>
+      <tr><td class="l">텐핑</td><td class="l">코호트 ROAS 2.96 · 회수 진행</td><td class="l">감도 조정 · 무효 칼처리</td><td class="l">잔액 소진 · 재충전 검토</td></tr>
+      <tr><td class="l">MLST 계열 5종</td><td class="l">CPL 1위였으나 오더 0</td><td class="l">전량 폐기</td><td class="l">PAUSED</td></tr>
+      <tr><td class="l">채리_2606</td><td class="l">CPL 9위였으나 ROAS 3.78</td><td class="l"><b>유지</b> · 예산 20% 조정</td><td class="l">ACTIVE</td></tr>
+      <tr><td class="l">노트릴스_영상</td><td class="l">ROAS 10.86 · 매출의 71%</td><td class="l">증액 · 파생 소재 확대</td><td class="l">ACTIVE</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 요약 -->
+  <div class="sec">06 — 6월이 남긴 것</div>
   <div class="log">
-    <div class="li"><b>① 매출 2.1배 성장의 실체는 메타.</b> 오더 41/48건 · 매출의 80%. ROAS 7.12로 예산 2.6배 증액을 소화했다. 노트릴스_영상(550건·CPL 1.3만) + 신규 MLST_공부방법점검(100건·CPL 1.0만) 쌍끌이.</div>
-    <div class="li"><b>② 채널 실험의 결론 — 당근·네이버 GFA 폐기.</b> 6월 내내 소재 교체·타겟 재검토·재활성화까지 시도했으나 당근 196만 지출·오더 0(ROAS 0), GFA는 유의미 전환 없음. "될 때까지"가 아니라 "판단 기준(ROAS)에 도달 못 하면 접는다"로 종결. 절감분은 메타 위너로.</div>
-    <div class="li"><b>③ 텐핑 — 볼륨의 유혹에서 수질 관리로.</b> 초기 일 100~200건까지 들어오는 볼륨이 매력이었으나 ROAS 1.10으로 판정. 식별코드별 품질 전수조사 → 품질 문서 발송 + 규정 위반 표현 시정 요청("무료검사"→"무료 학습진단" 등) → 무효 칼처리 정착. 결과: 한도 없이도 일 10건 내외로 자연 안정화, 6월말부터 방문 확정 수 증가. <b>공급형 채널은 끄는 게 아니라 조이는 것</b>이 답이었다.</div>
-    <div class="li"><b>④ CPL 상승(1.4만→2.2만)은 실험 비용.</b> 비효율 채널(텐핑·당근·카카오)이 통합 CPL을 끌어올렸으나 메타 단독 CPL 1.8만으로 방어. 7월은 실험 종료 + 위너 집중으로 CPL 정상화 목표.</div>
-    <div class="li"><b>⑤ 누적 매출 3억 돌파.</b> 5월 1억(5/27) → 6월 말 3억. CGO 체제 2개월 차.</div>
+    <div class="li" style="margin-bottom:6px"><b>매출 2.1배 성장의 실체는 메타입니다.</b> 오더 41/48건, 매출의 80%. 노트릴스_영상 단일 소재가 6월 메타 매출의 71%(7,775만)를 만들었습니다.</div>
+    <div class="li" style="margin-bottom:6px"><b>채널 실험은 판단 기준으로 종결했습니다.</b> “될 때까지”가 아니라 “ROAS가 기준에 도달하지 못하면 접는다”. 당근·GFA 폐기, 카카오 축소.</div>
+    <div class="li" style="margin-bottom:6px"><b>CPL 상승(1.4만→2.2만)은 실험 비용이었습니다.</b> 비효율 채널이 통합 CPL을 끌어올렸으나 메타 단독 CPL 1.85만으로 방어했습니다.</div>
+    <div class="li" style="margin-bottom:6px"><b>가장 큰 소득은 매출이 아니라 측정입니다.</b> 세 개의 잘못된 결론을 만들던 지표를 걷어냈습니다. 앞으로의 판단은 이 위에서 이루어집니다.</div>
+    <div class="li"><b>누적 매출 3억 돌파.</b> 5월 1억(5/27) → 6월 말 3억. CGO 체제 2개월 차.</div>
   </div>
 </div>
 
 <!-- ===== 7/1주 ===== -->
-<div id="p-jw1" class="panel on">
+<div id="p-jw1" class="panel">
   <div class="kpis">
     <div class="kpi"><div class="k">광고비</div><div class="v">688만</div><div class="s">6,876,554원</div></div>
     <div class="kpi"><div class="k">총 DB</div><div class="v">403건</div><div class="s">CPL 17,064원 · 일평균 80.6건</div></div>
@@ -731,11 +521,281 @@ body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-ap
   </div>
 </div>
 
+<!-- ===== 7/2주 ===== -->
+<div id="p-jw2" class="panel on">
+
+  <div class="kpis">
+    <div class="kpi"><div class="k">광고비</div><div class="v">735만</div><div class="s">7,347,429원</div></div>
+    <div class="kpi"><div class="k">총 DB</div><div class="v">470건</div><div class="s">CPL 15,633원 · 일평균 67건</div></div>
+    <div class="kpi"><div class="k">주간 매출</div><div class="v t">8,988만</div><div class="s">결제일 기준 · 역대 최고</div></div>
+    <div class="kpi"><div class="k">오더</div><div class="v">24건</div><div class="s">건당 평균 375만</div></div>
+    <div class="kpi"><div class="k">전환 시차</div><div class="v">2일</div><div class="s">신청→결제 중앙값</div></div>
+  </div>
+  <div class="knote">
+    기간: 2026.07.06 ~ 07.12 / 광고비는 API 실측(메타 MCP · 카카오 · 네이버SA) / 브랜드검색 월정액은 경과일 일할 / 텐핑은 잔액 소진으로 신규 집행 0
+  </div>
+
+  <!-- 주간 ROAS 경고 -->
+  <div class="log" style="margin-bottom:24px;background:#fdf3ee;border-color:#f0d5c4">
+    <div class="li" style="margin-bottom:8px"><b>주간 ROAS는 판단 기준으로 쓰지 않습니다.</b></div>
+    <div class="li" style="margin-bottom:8px">결제일 기준으로 계산하면 이번 주 ROAS는 <b>12.23</b>입니다. 그러나 이번 주 결제 24건 중 <b>43%(3,873만)는 지난주 이전에 들어온 리드</b>가 만든 매출입니다. 이번 주 광고비로 나누는 것은 짝이 맞지 않습니다.</div>
+    <div class="li" style="margin-bottom:8px">이번 주 유입 리드만으로 계산하면 <b>5,115만 ÷ 735만 = ROAS 6.96</b>이며, 회수가 진행 중이므로 이 값도 아직 바닥값입니다.</div>
+    <div class="li"><b>그래서 주간에는 운영 지표(CPL·빈도·소재 반응)만 봅니다.</b> 생사 판단은 월 결산과 소재 코호트에서 합니다. 주차 데이터는 월이 닫히면 결산으로 통합됩니다.</div>
+  </div>
+
+  <!-- 채널별 -->
+  <div class="sec">01 — 채널별</div>
+  <table class="tbl" style="margin-bottom:24px">
+    <thead><tr>
+      <th class="l">채널</th><th class="r">광고비</th><th class="r">DB</th><th class="r">CPL</th><th class="r">오더</th><th class="r">주간 매출</th><th class="l">비고</th>
+    </tr></thead>
+    <tbody>
+      <tr><td class="l"><span class="chbadge cb-meta">메타</span></td><td class="r">644만</td><td class="r">384</td><td class="r">16,819</td><td class="r">14</td><td class="r">4,653만</td><td class="l">볼륨·매출 모두 주력</td></tr>
+      <tr style="background:#f0f7f4"><td class="l"><span class="chbadge" style="background:rgba(3,199,90,.12);color:#03c75a">네이버 브랜드검색</span></td><td class="r">37.6만</td><td class="r">16</td><td class="r">23,488</td><td class="r"><b>4</b></td><td class="r"><b>1,907만</b></td><td class="l">DB 16건에 오더 4건 — 전환율 25%</td></tr>
+      <tr><td class="l"><span class="chbadge" style="background:rgba(180,120,255,.12);color:#b478ff">텐핑</span></td><td class="r">0</td><td class="r">35</td><td class="r">—</td><td class="r">4</td><td class="r">1,734만</td><td class="l">신규 집행 0 · 과거 코호트 회수</td></tr>
+      <tr style="background:#fff8f0"><td class="l"><span class="chbadge" style="background:rgba(240,192,32,.15);color:#b8860b">카카오</span></td><td class="r">53만</td><td class="r">9</td><td class="r" style="color:var(--red)">58,875</td><td class="r" style="color:var(--red)">0</td><td class="r" style="color:var(--red)">0</td><td class="l" style="color:var(--red)">3주 연속 오더 0</td></tr>
+      <tr><td class="l">자연유입</td><td class="r">0</td><td class="r">18</td><td class="r">—</td><td class="r">1</td><td class="r">347만</td><td class="l">—</td></tr>
+      <tr><td class="l">기타</td><td class="r">0</td><td class="r">8</td><td class="r">—</td><td class="r">1</td><td class="r">347만</td><td class="l">—</td></tr>
+      <tr><td class="l">당근 · GFA</td><td class="r">0</td><td class="r">0</td><td class="r">—</td><td class="r">0</td><td class="r">0</td><td class="l">종료</td></tr>
+      <tr style="border-top:1px solid var(--border)"><td class="l"><b>합계</b></td><td class="r"><b>735만</b></td><td class="r"><b>470</b></td><td class="r"><b>15,633</b></td><td class="r"><b>24</b></td><td class="r"><b>8,988만</b></td><td class="l"></td></tr>
+    </tbody>
+  </table>
+
+  <!-- 소재별 -->
+  <div class="sec">02 — 소재별 (7/6~7/12 가동 15종)</div>
+  <div class="cap">주간은 소재의 <b>반응</b>을 봅니다 — CPL·빈도·리드 볼륨. 생사 판정은 누적 코호트에서 합니다.</div>
+  <table class="tbl" style="margin-bottom:10px">
+    <thead><tr>
+      <th class="l">소재</th><th class="r">광고비</th><th class="r">리드</th><th class="r">CPL</th><th class="r">빈도</th><th class="l">주간 판단</th>
+    </tr></thead>
+    <tbody>
+      <tr style="background:#f0f7f4"><td class="l"><b>노트릴스_영상_2505</b></td><td class="r">241만</td><td class="r"><b>188</b></td><td class="r" style="color:var(--teal-d)"><b>12,836</b></td><td class="r">1.40</td><td class="l">볼륨 위너 유지 · 리드의 49%</td></tr>
+      <tr><td class="l">노트릴스_채리_2606</td><td class="r">134만</td><td class="r">36</td><td class="r" style="color:var(--red)">37,234</td><td class="r">1.41</td><td class="l">CPL 최하위 · <b>누적 ROAS 4.53으로 유지</b> · 예산 20% 조정</td></tr>
+      <tr style="background:#f0f7f4"><td class="l"><b>AD_노트필기릴스_방학점검_2607</b></td><td class="r">67만</td><td class="r">52</td><td class="r" style="color:var(--teal-d)"><b>12,854</b></td><td class="r">1.35</td><td class="l">신규 · 위너급 CPL · 회수 관찰</td></tr>
+      <tr><td class="l">GT노트피드백_2605</td><td class="r">52만</td><td class="r">22</td><td class="r">23,652</td><td class="r">1.23</td><td class="l">누적 ROAS 3.83 · 유지</td></tr>
+      <tr><td class="l">AD_노트필기캐러셀_방학점검</td><td class="r">37만</td><td class="r">8</td><td class="r">45,735</td><td class="r">1.43</td><td class="l">오더 1건 발생 · 표본 부족</td></tr>
+      <tr><td class="l">MLST캐러셀_2606</td><td class="r">33만</td><td class="r">20</td><td class="r">16,630</td><td class="r">1.27</td><td class="l" style="color:var(--red)">누적 오더 0 · 정리 대상</td></tr>
+      <tr><td class="l">MLST_V3_무료점검</td><td class="r">31만</td><td class="r">27</td><td class="r">11,496</td><td class="r">1.18</td><td class="l" style="color:var(--red)">CPL 우수하나 누적 오더 1 · 정리 대상</td></tr>
+      <tr><td class="l">노트필기_01_외심내심</td><td class="r">22만</td><td class="r">17</td><td class="r">12,940</td><td class="r">1.22</td><td class="l">신규 테스트 · 관찰</td></tr>
+      <tr><td class="l">노트필기_02_이차방정식</td><td class="r">13만</td><td class="r">5</td><td class="r">26,077</td><td class="r">1.18</td><td class="l">신규 테스트</td></tr>
+      <tr><td class="l">노트필기_03_감각기관</td><td class="r">6.9만</td><td class="r">4</td><td class="r">17,330</td><td class="r">1.13</td><td class="l">신규 테스트</td></tr>
+      <tr><td class="l">오답노트_02_수학</td><td class="r">4.1만</td><td class="r">4</td><td class="r">10,176</td><td class="r">1.09</td><td class="l">신규 테스트 · CPL 우수</td></tr>
+      <tr><td class="l">오답노트_01_영어</td><td class="r">2.7만</td><td class="r">0</td><td class="r">—</td><td class="r">1.08</td><td class="l" style="color:var(--red)">리드 0</td></tr>
+      <tr><td class="l">MLST_V2 · V4 · V1</td><td class="r">0.3만</td><td class="r">0</td><td class="r">—</td><td class="r">—</td><td class="l">잔여 소진</td></tr>
+      <tr style="border-top:1px solid var(--border)"><td class="l"><b>메타 합계</b></td><td class="r"><b>644만</b></td><td class="r"><b>383</b></td><td class="r"><b>16,819</b></td><td class="r">—</td><td class="l"></td></tr>
+    </tbody>
+  </table>
+  <div class="knote" style="margin-bottom:24px">
+    ※ 빈도는 전 소재 1.1~1.4로 소진 신호 없음. 6월 잠재고객_5단계루틴(빈도 2.99)에서 겪은 소진 구간과 대비됩니다.
+  </div>
+
+  <!-- 주간 오더 -->
+  <div class="sec">03 — 주간 오더 24건</div>
+  <table class="tbl" style="margin-bottom:24px">
+    <thead><tr><th class="l">결제일</th><th class="l">이름</th><th class="l">학년</th><th class="r">매출</th><th class="l">채널</th><th class="l">소재</th><th class="r">시차</th></tr></thead>
+    <tbody>
+      <tr><td class="l">7/6</td><td class="l">강유하</td><td class="l">중2</td><td class="r">346.8만</td><td class="l"><span class="chbadge cb-meta">메타</span></td><td class="l">노트릴스_영상</td><td class="r">2일</td></tr>
+      <tr><td class="l">7/6</td><td class="l">여하랑</td><td class="l">중3</td><td class="r">346.8만</td><td class="l"><span class="chbadge cb-meta">메타</span></td><td class="l">노트릴스_영상</td><td class="r">3일</td></tr>
+      <tr><td class="l">7/6</td><td class="l">이현준</td><td class="l">고1</td><td class="r">346.8만</td><td class="l"><span class="chbadge cb-meta">메타</span></td><td class="l">노트릴스_영상</td><td class="r">5일</td></tr>
+      <tr><td class="l">7/6</td><td class="l">신지인</td><td class="l">중2</td><td class="r">346.8만</td><td class="l"><span class="chbadge cb-meta">메타</span></td><td class="l">채리_2606</td><td class="r">5일</td></tr>
+      <tr><td class="l">7/6</td><td class="l">신민유</td><td class="l">중3</td><td class="r">57.8만</td><td class="l"><span class="chbadge cb-meta">메타</span></td><td class="l">노트릴스_영상</td><td class="r">4일</td></tr>
+      <tr><td class="l">7/6</td><td class="l">임채원</td><td class="l">중3</td><td class="r">578.0만</td><td class="l"><span class="chbadge" style="background:rgba(180,120,255,.12);color:#b478ff">텐핑</span></td><td class="l">—</td><td class="r">11일</td></tr>
+      <tr><td class="l">7/7</td><td class="l">원지유</td><td class="l">중1</td><td class="r">462.4만</td><td class="l"><span class="chbadge cb-meta">메타</span></td><td class="l">노트릴스_영상</td><td class="r">2일</td></tr>
+      <tr><td class="l">7/7</td><td class="l">이승우</td><td class="l">고1</td><td class="r">346.8만</td><td class="l"><span class="chbadge" style="background:rgba(180,120,255,.12);color:#b478ff">텐핑</span></td><td class="l">—</td><td class="r">2일</td></tr>
+      <tr><td class="l">7/8</td><td class="l">김하윤</td><td class="l">중1</td><td class="r">346.8만</td><td class="l"><span class="chbadge cb-meta">메타</span></td><td class="l">노트릴스_영상</td><td class="r">5일</td></tr>
+      <tr><td class="l">7/8</td><td class="l">이수민</td><td class="l">초4</td><td class="r">462.4만</td><td class="l"><span class="chbadge" style="background:rgba(180,120,255,.12);color:#b478ff">텐핑</span></td><td class="l">—</td><td class="r">2일</td></tr>
+      <tr style="background:#f0f7f4"><td class="l">7/8</td><td class="l">박주하</td><td class="l">초6</td><td class="r">346.8만</td><td class="l"><span class="chbadge" style="background:rgba(3,199,90,.12);color:#03c75a">브랜드검색</span></td><td class="l">—</td><td class="r">2일</td></tr>
+      <tr><td class="l">7/9</td><td class="l">김하준</td><td class="l">중2</td><td class="r">346.8만</td><td class="l"><span class="chbadge cb-meta">메타</span></td><td class="l">노트릴스_영상</td><td class="r">2일</td></tr>
+      <tr><td class="l">7/9</td><td class="l">조유찬</td><td class="l">중3</td><td class="r">346.8만</td><td class="l"><span class="chbadge cb-meta">메타</span></td><td class="l">노트릴스_영상</td><td class="r">1일</td></tr>
+      <tr><td class="l">7/9</td><td class="l">최주성</td><td class="l">고1</td><td class="r">346.8만</td><td class="l"><span class="chbadge" style="background:rgba(180,120,255,.12);color:#b478ff">텐핑</span></td><td class="l">—</td><td class="r">2일</td></tr>
+      <tr><td class="l">7/10</td><td class="l">김경희</td><td class="l">고1</td><td class="r">346.8만</td><td class="l"><span class="chbadge cb-meta">메타</span></td><td class="l">MLST_V3_무료점검</td><td class="r">7일</td></tr>
+      <tr><td class="l">7/10</td><td class="l">안서연</td><td class="l">중1</td><td class="r">346.8만</td><td class="l"><span class="chbadge cb-meta">메타</span></td><td class="l">채리_2606</td><td class="r">5일</td></tr>
+      <tr><td class="l">7/10</td><td class="l">지오</td><td class="l">중1</td><td class="r">346.8만</td><td class="l"><span class="chbadge cb-meta">메타</span></td><td class="l">채리_2606</td><td class="r">1일</td></tr>
+      <tr><td class="l">7/10</td><td class="l">박민준</td><td class="l">중3</td><td class="r">346.8만</td><td class="l">자연유입</td><td class="l">—</td><td class="r">3일</td></tr>
+      <tr><td class="l">7/11</td><td class="l">서지유</td><td class="l">초4</td><td class="r">317.9만</td><td class="l"><span class="chbadge cb-meta">메타</span></td><td class="l">채리_2606</td><td class="r">2일</td></tr>
+      <tr><td class="l">7/11</td><td class="l">ㅎ</td><td class="l">중2</td><td class="r">346.8만</td><td class="l"><span class="chbadge cb-meta">메타</span></td><td class="l">AD_노트필기캐러셀</td><td class="r">2일</td></tr>
+      <tr style="background:#f0f7f4"><td class="l">7/11</td><td class="l">조윤희</td><td class="l">중2</td><td class="r"><b>693.6만</b></td><td class="l"><span class="chbadge" style="background:rgba(3,199,90,.12);color:#03c75a">브랜드검색</span></td><td class="l">—</td><td class="r">3일</td></tr>
+      <tr style="background:#f0f7f4"><td class="l">7/11</td><td class="l">최유진</td><td class="l">중2</td><td class="r">520.2만</td><td class="l"><span class="chbadge" style="background:rgba(3,199,90,.12);color:#03c75a">브랜드검색</span></td><td class="l">—</td><td class="r">5일</td></tr>
+      <tr style="background:#f0f7f4"><td class="l">7/11</td><td class="l">김하경</td><td class="l">중3</td><td class="r">346.8만</td><td class="l"><span class="chbadge" style="background:rgba(3,199,90,.12);color:#03c75a">브랜드검색</span></td><td class="l">—</td><td class="r">5일</td></tr>
+      <tr><td class="l">7/11</td><td class="l">유승준</td><td class="l">중3</td><td class="r">346.8만</td><td class="l">기타</td><td class="l">—</td><td class="r">2일</td></tr>
+      <tr style="border-top:1px solid var(--border)"><td class="l"><b>합계 24건</b></td><td class="l"></td><td class="l"></td><td class="r"><b>8,988만</b></td><td class="l"></td><td class="l">평균 시차 3.5일</td><td class="r"></td></tr>
+    </tbody>
+  </table>
+
+  <!-- 판단 -->
+  <div class="sec">04 — 이번 주 판단</div>
+
+  <div class="log" style="margin-bottom:12px;background:#f0f7f4;border-color:#c8e4d8">
+    <div class="li" style="margin-bottom:8px"><b>① 브랜드검색이 살아났습니다. 다만 원인을 아직 모릅니다.</b></div>
+    <div class="li" style="margin-bottom:8px">DB 16건에 오더 <b>4건</b>, 매출 <b>1,907만</b>. 전환율 25%로 전 채널 최고입니다. 6월(DB 18 / 오더 1 / ROAS 2.22)과 비교하면 급격한 개선입니다.</div>
+    <div class="li" style="margin-bottom:8px">가설: 메타 집행량이 늘면서 <b>브랜드 인지가 검색으로 되돌아오는</b> 후행 효과일 수 있습니다. 즉 브랜드검색은 독립 채널이 아니라 <b>메타의 회수 창구</b>일 가능성이 있습니다.</div>
+    <div class="li"><b>아직 가설입니다.</b> 월정액 채널이라 주간 분모가 작아 ROAS가 과대해 보이는 착시일 수도 있습니다. 검증 전까지 예산은 조정하지 않습니다.</div>
+  </div>
+
+  <div class="log" style="margin-bottom:12px;background:#fdf3ee;border-color:#f0d5c4">
+    <div class="li" style="margin-bottom:8px"><b>② 카카오 — 3주 연속 오더 0.</b></div>
+    <div class="li" style="margin-bottom:8px">이번 주 53만 지출, DB 9건, CPL 58,875원, <b>오더 0건</b>. 7월 누적으로도 오더 0입니다.</div>
+    <div class="li" style="margin-bottom:8px">6월 코호트 ROAS 0.88에 이어, 7월은 회수 자체가 없습니다. 채리 광고그룹은 7/10 OFF했고 노트릴스만 일 9만원으로 유지 중입니다.</div>
+    <div class="li"><b>다음 주까지 오더 0이면 중단 판단이 필요합니다.</b> 다만 카카오 리드의 방문율(17%)은 메타보다 높습니다 — 리드가 나쁜 것이 아니라 <b>클로징이 안 되는</b> 구조일 수 있어, 상담 로그를 먼저 확인합니다.</div>
+  </div>
+
+  <div class="log" style="margin-bottom:12px">
+    <div class="li" style="margin-bottom:8px"><b>③ 채리 — CPL로 죽였으면 손해였습니다.</b></div>
+    <div class="li" style="margin-bottom:8px">이번 주 CPL 37,234원. 위너(노트릴스 12,836)의 <b>2.9배</b>로 전 소재 중 최하위입니다. CPL만 보면 폐기 대상입니다.</div>
+    <div class="li" style="margin-bottom:8px">그러나 누적 코호트로 보면 <b>광고비 574만 / 오더 8건 / 매출 2,601만 / ROAS 4.53</b>입니다. 이번 주에도 오더 4건 중 <b>3건이 채리</b>에서 나왔습니다.</div>
+    <div class="li"><b>유지하되 예산은 20% 조정</b>했습니다. 죽이지 않고 조입니다 — 텐핑에서 배운 방식입니다.</div>
+  </div>
+
+  <div class="log" style="margin-bottom:24px">
+    <div class="li" style="margin-bottom:8px"><b>④ 전환 시차 중앙값 2일 — 메타가 건강하다는 증거.</b></div>
+    <div class="li" style="margin-bottom:8px">이번 주 오더 24건의 신청→결제 시차는 <b>중앙값 2일, 평균 3.5일</b>입니다. 리드가 들어오면 며칠 안에 매출이 결정됩니다.</div>
+    <div class="li">시차가 짧다는 것은 <b>코호트 ROAS와 결제일 ROAS의 격차가 작다</b>는 뜻이고, 어느 기준으로 봐도 판단이 같다는 뜻입니다. 카카오(격차 6.4배)와 대비됩니다.</div>
+  </div>
+
+  <!-- 다음 주 -->
+  <div class="sec">05 — 다음 주 실행</div>
+  <div class="log">
+    <div class="li" style="margin-bottom:6px"><b>1. 소재별 ROAS 자동화</b> — 메타 ads_read 토큰 확보 후 소재별 광고비를 Apps Script로 직접 수집. 현재는 수동 대조입니다.</div>
+    <div class="li" style="margin-bottom:6px"><b>2. 브랜드검색 가설 검증</b> — 메타 집행량과 브랜드검색 유입의 상관을 주 단위로 추적. 후행 효과가 맞다면 메타 ROAS는 지금보다 높게 재평가되어야 합니다.</div>
+    <div class="li" style="margin-bottom:6px"><b>3. 카카오 상담 로그 확인</b> — 방문율은 높은데 오더가 0인 원인이 리드 품질인지 클로징인지 규명.</div>
+    <div class="li" style="margin-bottom:6px"><b>4. 노트필기 계열 회수 관찰</b> — AD_노트필기릴스(CPL 12,854)는 위너급 CPL. 7월 신규라 회수 진행 중입니다.</div>
+    <div class="li"><b>5. 텐핑 재충전 판단</b> — 누적 ROAS 2.96(바닥값). 메타 대비 기회비용을 계산해 결정합니다.</div>
+  </div>
+</div>
+
 <div id="p-crm" class="panel">
   <div class="section-title">리드 수집 자동화 — 개발 이력</div>
   <div class="knote">Apps Script 기반 노션 CRM 자동화 · 메타/당근/카카오/텐핑 전채널 통합 파이프라인</div>
 
   <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:20px">
+
+    <!-- 7/13 소스 분리 -->
+    <div class="card" style="border-color:#c8e4d8;background:#fbfefd">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(3,199,90,.12);color:#03c75a">SPLIT</span>
+        <span style="font-size:14px;font-weight:700">네이버 채널 3분할 · 소스 체계 정리</span>
+        <span style="font-size:12px;color:var(--sub)">2026.07.13</span>
+      </div>
+      <div style="font-size:12px;color:var(--sub);line-height:1.9;margin-bottom:14px;padding:12px 14px;background:#f0f7f4;border-radius:8px">
+        <b style="color:var(--text)">왜 했나</b> — 노션 소스가 <code>naver</code> 하나였습니다. 이 값만 봐서는 브랜드검색인지 네이버 전체인지 알 수 없었고, 그래서 광고비(GFA 실비)와 매출(브랜드검색)이 한 버킷에서 섞여 <b>ROAS 64.4</b>라는 착시가 만들어졌습니다. 소스값 자체를 분리해 <b>보는 순간 채널이 식별되도록</b> 바꿨습니다.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <div style="font-size:11px;color:var(--teal);font-weight:700;margin-bottom:8px;letter-spacing:1px">ADDED</div>
+          <div style="font-size:12px;color:var(--sub);line-height:2">
+            <code>naver_brand</code> — 브랜드검색 (arawiki.kr/inbody 폼)<br>
+            <code>naver_gfa</code> — 성과형 디스플레이 (참여유도 폼)<br>
+            파워컨텐츠는 블로그→카톡 유도라 <b>DB 유입 경로 없음</b> — 검색광고 예산에만 포함
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--amber);font-weight:700;margin-bottom:8px;letter-spacing:1px">CHANGED</div>
+          <div style="font-size:12px;color:var(--sub);line-height:2">
+            기존 <code>naver</code> 49건 → <code>naver_brand</code> 일괄 마이그레이션 (DRY_RUN 검증 후 실행)<br>
+            랜딩 URL은 <b>브검 검수 재신청 이슈로 미변경</b> — 저장 시점에 변환<br>
+            srcToChannel에 과거 <code>naver</code> 호환 유지 (마이그레이션 누락분 방어)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7/13 대시보드 -->
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(91,141,239,.12);color:var(--blue)">UI</span>
+        <span style="font-size:14px;font-weight:700">대시보드 가독성 개편</span>
+        <span style="font-size:12px;color:var(--sub)">2026.07.13</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <div style="font-size:11px;color:var(--teal);font-weight:700;margin-bottom:8px;letter-spacing:1px">ADDED</div>
+          <div style="font-size:12px;color:var(--sub);line-height:2">
+            소제목(매출·유입현황·학년별·유입경로별)에 <b>좌측 컬러바 + 볼드</b> — 섹션 경계 식별<br>
+            네이버GFA 카드 신설 (DB 발생 시에만 표시)<br>
+            텐핑 카드에 <b>누적 CPL·누적 ROAS</b> 표기 — 월별 수치는 착시라 제거
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--amber);font-weight:700;margin-bottom:8px;letter-spacing:1px">CHANGED</div>
+          <div style="font-size:12px;color:var(--sub);line-height:2">
+            <b>DB 0인 채널은 자동 숨김</b> — 당근 종료로 6칸 → 3×2 정렬<br>
+            (재집행 시 자동 복귀 — 하드코딩 아님)<br>
+            담당자 합계 매출 반올림 오차 수정 (8422 → 8421만원)<br>
+            유입경로 합계행 % 서식 잔존 버그 수정 (118 → 11800% 표시)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7/11 측정 대수술 -->
+    <div class="card" style="border-color:#ddd6f3;background:#fdfcff">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(180,120,255,.12);color:#b478ff">CORE</span>
+        <span style="font-size:14px;font-weight:700">측정 기준 전면 재검증 — ROAS·CPL 왜곡 3종 제거</span>
+        <span style="font-size:12px;color:var(--sub)">2026.07.11</span>
+      </div>
+      <div style="font-size:12px;color:var(--sub);line-height:1.9;margin-bottom:14px;padding:12px 14px;background:#f4f2fb;border-radius:8px">
+        <b style="color:var(--text)">왜 했나</b> — 네이버 ROAS가 64.4로 찍혔습니다. 사실이라면 전 예산을 네이버로 옮겨야 합니다. <b>그런데 네이버 DB는 20건뿐이었습니다. 결론이 요구하는 행동이 말이 되지 않았습니다.</b> 분모를 열자 GFA 실비 1.5만, 분자를 열자 브랜드검색 매출 347만 — <b>분모와 분자가 서로 다른 채널을 세고 있었습니다.</b> 이 병이 어디까지 퍼져 있는지 전 채널을 다시 계산했습니다.
+      </div>
+      <div style="font-size:12px;color:var(--sub);line-height:2;margin-bottom:14px">
+        <b style="color:var(--text)">발견된 왜곡 3종</b><br>
+        <b>① 텐핑 — 시간축 불일치.</b> 선불 충전형인데 “이번달 매출 ÷ 이번달 광고비”로 계산 → 태운 달(6월)은 ROAS 1.10, 안 태운 달(7월)은 9.68. 같은 821만인데 폭망과 대박으로 갈렸습니다.<br>
+        <b>② 네이버 — 대상 불일치.</b> 브랜드검색(월정액 164만) · 파워컨텐츠 · GFA가 한 버킷. 분모엔 GFA만, 분자엔 브검 매출.<br>
+        <b>③ 메타·카카오 — 최신성 불일치.</b> AD_SPEND가 7/1~5에 멈춘 채 11일치 매출로 나눔 → 분모가 절반. 메타 ROAS 12.49로 보였으나 실제 6.1.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <div style="font-size:11px;color:var(--teal);font-weight:700;margin-bottom:8px;letter-spacing:1px">확립된 원칙</div>
+          <div style="font-size:12px;color:var(--sub);line-height:2">
+            <b>채널 성격이 다르면 측정 방식도 달라야 한다</b><br>
+            유량(메타·카카오) = <b>월별</b><br>
+            저량(텐핑) = <b>코호트</b> (잔액 0 = 코호트가 닫힘)<br>
+            정액(브랜드검색) = <b>일할</b> (월중엔 경과일 비율)
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--amber);font-weight:700;margin-bottom:8px;letter-spacing:1px">교정 결과</div>
+          <div style="font-size:12px;color:var(--sub);line-height:2">
+            네이버 ROAS <b>64.4 → 2.22</b> (최고 효율 → 고비용 채널)<br>
+            텐핑 ROAS <b>1.10 → 2.96</b> (누적 코호트 · 실패 → 회수 중)<br>
+            메타 ROAS <b>12.49 → 6.1</b> (분모 절반 → 실측)<br>
+            카카오 <b>5.65 → 0.88</b> (코호트 · 본전 미달 확인)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7/11 파이프라인 -->
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(0,229,200,.12);color:var(--teal)">AUTO</span>
+        <span style="font-size:14px;font-weight:700">광고비 자동 수집 — 하드코딩 제거</span>
+        <span style="font-size:12px;color:var(--sub)">2026.07.11 ~ 07.13</span>
+      </div>
+      <div style="font-size:12px;color:var(--sub);line-height:1.9;margin-bottom:14px;padding:12px 14px;background:var(--card2);border-radius:8px">
+        <b style="color:var(--text)">왜 했나</b> — 왜곡 ③(최신성 불일치)의 근본 원인은 <b>광고비가 수동 하드코딩</b>이라 항상 뒤처진다는 것이었습니다. 값을 고치는 것으로는 다음 주에 또 어긋납니다. <b>분모를 자동으로 만들어야 재발이 없습니다.</b>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <div style="font-size:11px;color:var(--teal);font-weight:700;margin-bottom:8px;letter-spacing:1px">ADDED</div>
+          <div style="font-size:12px;color:var(--sub);line-height:2">
+            <b>네이버 검색광고 API 신규 연동</b> — HMAC-SHA256 서명 · 토큰 만료 없음<br>
+            브랜드검색 월정액은 API가 0원으로 리턴 → <b>매월 1일자에 별도 계상</b> 후 월중 일할<br>
+            <code>naverDailyAndPush</code> · <code>kakaoDailyAndPush</code> — 매일 08시 적재 + GitHub 자동 커밋<br>
+            getLeadStats가 일자별 시트를 <b>날짜 범위로 직접 합산</b>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--amber);font-weight:700;margin-bottom:8px;letter-spacing:1px">FIXED</div>
+          <div style="font-size:12px;color:var(--sub);line-height:2">
+            <b>카카오 SignUp 오염</b> — 정규식으로 <code>sign_up</code> 포함 키를 재합산해 <code>cost_per_conv_signup</code>이 섞임 (181693.398) → <code>conv_signup_1d</code> 단독 사용<br>
+            중복 적재 차단 (같은 날짜 재실행 시 기존 행 제거 후 적재)<br>
+            6/1~ 일자별 백필 완료<br>
+            <b>남은 수동은 메타뿐</b> — <code>ads_read</code> 권한 확보 시 완전 자동
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- 7/5 담당자 -->
     <div class="card">
@@ -1019,6 +1079,26 @@ body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-ap
 // 주차별 THIS WEEK 데이터
 const DOCS = 'https://crocdeucation-rgb.github.io/image/report/docs/';
 const WEEK_TODO = {
+  jw2: {
+    mission: {title:'다음 주 미션 (7/13~)', items:[
+      {n:'①', t:'소재별 ROAS 자동화', d:'메타 ads_read 토큰 확보 → 소재별 광고비 Apps Script 직접 수집 (현재 수동 대조)'},
+      {n:'②', t:'브랜드검색 후행효과 가설 검증', d:'메타 집행량 ↔ 브검 유입 상관 주 단위 추적 · 사실이면 메타 ROAS 재평가 필요'},
+      {n:'③', t:'카카오 상담 로그 확인', d:'방문율 17%인데 오더 0 — 리드 품질인가 클로징인가 규명 후 중단 판단'},
+      {n:'④', t:'노트필기 계열 회수 관찰', d:'AD_노트필기릴스 CPL 12,854(위너급) · 7월 신규라 회수 진행 중'},
+      {n:'⑤', t:'텐핑 재충전 판단', d:'누적 ROAS 2.96(바닥값) · 메타 대비 기회비용 계산'},
+      {n:'⑥', t:'주간 소재 루틴 유지', d:'릴스1 + 단일5 + 캐러셀1'},
+    ]},
+    done: {title:'이번 주 완료 (7/6~7/12)', items:[
+      {t:'주간 매출 8,988만 — 역대 최고', d:'오더 24건 · 전환 시차 중앙값 2일'},
+      {t:'측정 기준 전면 재검증', d:'분모·분자 불일치 3종 발견 → 네이버 ROAS 64.4→2.22 · 텐핑 1.10→2.96(코호트) · 메타 12.49→6.1'},
+      {t:'카카오 데이터 파이프라인 복구', d:'SignUp 필드 오염(정규식 재합산) 제거 · 중복 적재 차단 · 6/1~ 일자별 백필'},
+      {t:'네이버 검색광고 API 신규 연동', d:'브랜드검색 월정액은 API가 0원 리턴 → 1일자 별도 계상 + 월중 일할'},
+      {t:'광고비 하드코딩 제거', d:'카카오·네이버 시트 자동 합산 · 매일 08시 트리거 · 남은 수동은 메타뿐'},
+      {t:'네이버 채널 3분할', d:'브랜드검색 / 파워컨텐츠 / GFA — 소스 기준 분리 (naver_brand · naver_gfa)'},
+      {t:'채리 유지 결정', d:'CPL 37,234(최하위)이나 누적 ROAS 4.53 · 예산 20% 조정으로 대응'},
+    ]},
+    note: 'CPL 단독 판단 금지 — 이번 주 결산으로 원칙이 실증되었습니다. 6월 CPL 1위 소재(MLST_V3)는 오더 0건, CPL 9위 소재(채리)는 매출 1,243만.'
+  },
   jun: {
     mission: {title:'6월 결산', items:[]},
     done: {title:'6월 완료 (주차 합산)', items:[
