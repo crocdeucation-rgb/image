@@ -83,6 +83,8 @@ body{background:var(--bg);color:var(--text);font-family:'Spoqa Han Sans Neo',-ap
 
 /* 배지 */
 .badge{font-size:10px;padding:2px 8px;border-radius:999px;font-weight:700}
+.b-dead{background:rgba(204,68,68,.12);color:var(--red)}
+.b-watch{background:rgba(212,144,10,.14);color:var(--amber)}
 .b-best{background:#e1f5ee;color:#0a6644}
 .b-on{background:#eef3fd;color:#3a6cc4}
 .b-end{background:#fceaea;color:#993c3c}
@@ -1419,7 +1421,12 @@ const MAY_GAL = [
 const won = n => n==null?'—':Math.round(n/10000)+'만원';
 const wons = n => n==null?'—':n.toLocaleString('ko-KR')+'원';
 const dotC = r => r==null?'rgba(255,255,255,.25)': r>=8?'var(--teal)': r>=5?'var(--amber)':'var(--red)';
-const badge = s => s=='best'?'<span class="badge b-best">최우수</span>':s=='end'?'<span class="badge b-end">종료</span>':'<span class="badge b-on">활성</span>';
+const badge = s => s=='best'?'<span class="badge b-best">위너</span>'
+  : s=='ok'?'<span class="badge b-on">생존</span>'
+  : s=='dead'?'<span class="badge b-dead">폐기</span>'
+  : s=='watch'?'<span class="badge b-watch">관찰</span>'
+  : s=='end'?'<span class="badge b-end">종료</span>'
+  : '<span class="badge b-on">활성</span>';
 const chbadge = id => ({meta:'<span class="chbadge cb-meta">메타</span>',kk:'<span class="chbadge cb-kk">카카오</span>',dg:'<span class="chbadge cb-dg">당근</span>',cpa:'<span class="chbadge cb-cpa">CPA</span>',nv:'<span class="chbadge cb-nv">네이버</span>'}[id]||id);
 
 // 6/1주 채널
