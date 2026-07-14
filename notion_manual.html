@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>노션 리드관리 매뉴얼 · 아라온스쿨</title>
-<link rel="stylesheet" type="text/css" href="https://spoqa.github.io/spoqa-han-sans/css/SpoqaHanSansNeo.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#F4F6F8; --card:#FFFFFF; --ink:#15181D; --sub:#5B626B; --faint:#9AA0A8;
@@ -12,24 +13,24 @@
     --teal:#00C9AE; --teal-d:#0A8A77; --teal-tint:#E4F8F4;
     --red:#E2483B; --red-tint:#FCEBE9; --amber:#C77A12; --amber-tint:#FBF0DE;
     --purple:#7C5CD6; --purple-tint:#EFEAFB;
-    --mono:'SFMono-Regular',ui-monospace,Menlo,Consolas,monospace;
-    --fn:'Spoqa Han Sans Neo','Spoqa Han Sans',-apple-system,system-ui,sans-serif;
+    --mono:'IBM Plex Mono','Pretendard',ui-monospace,monospace;
+    --fn:'Pretendard',-apple-system,system-ui,sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--paper);font-family:var(--fn);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.6;padding:32px 16px 80px}
+  body{background:var(--paper);font-family:var(--fn);color:var(--ink);-webkit-font-smoothing:antialiased;font-size:15px;line-height:1.7;padding:32px 16px 80px;word-break:keep-all}
   .wrap{max-width:860px;margin:0 auto}
 
   /* 헤더 */
   .hd{background:var(--card);border:1px solid var(--hair);border-radius:16px;padding:28px 32px;margin-bottom:20px}
   .eyebrow{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.16em;color:var(--teal-d);background:var(--teal-tint);padding:5px 12px;border-radius:20px;margin-bottom:14px}
-  .hd h1{font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:1.2}
+  .hd h1{font-size:clamp(24px,4vw,29px);font-weight:800;letter-spacing:-.03em;line-height:1.25}
   .hd .sub{margin-top:10px;font-size:13.5px;color:var(--sub);line-height:1.65}
   .hd .sub b{color:var(--ink);font-weight:500}
 
   /* 섹션 */
   .sec{background:var(--card);border:1px solid var(--hair);border-radius:16px;padding:26px 30px;margin-bottom:16px}
   .sec-n{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;background:var(--ink);color:#fff;font-size:13px;font-weight:700;margin-right:10px;flex-shrink:0}
-  .sec h2{font-size:18px;font-weight:700;letter-spacing:-.02em;display:flex;align-items:center;margin-bottom:6px}
+  .sec h2{font-size:19px;font-weight:800;letter-spacing:-.03em;display:flex;align-items:center;margin-bottom:6px}
   .sec .desc{font-size:13px;color:var(--sub);margin:0 0 18px 36px;line-height:1.6}
 
   /* 흐름 4단계 */
@@ -130,7 +131,7 @@
   .pn-date{font-size:12px;color:var(--faint);margin-left:auto}
   .pn-title{font-size:13.5px;color:var(--sub);margin-bottom:16px}
   .pn.major .pn-title{color:var(--ink);font-weight:500}
-  .pn-badge{font-size:10px;font-weight:800;letter-spacing:.05em;padding:3px 8px;border-radius:6px}
+  .pn-badge{font-size:10px;font-weight:700;letter-spacing:.05em;padding:3px 8px;border-radius:6px}
   .bg-hot{background:var(--red-tint);color:var(--red)}
   .bg-new{background:var(--teal-tint);color:var(--teal-d)}
   .bg-fix{background:#E9F0FD;color:#2C5FB8}
