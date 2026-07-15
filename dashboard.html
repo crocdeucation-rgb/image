@@ -575,7 +575,7 @@ async function loadSchedule() {
       const assigneeHtml = assignee ? `<span class="${assigneeClass}">${escapeHtml(assignee)}</span>` : '';
 
       // ★ [추가] pageId(r[7]) 있으면 이름을 노션 카드 직행 링크로.
-      //   하이픈 제거 → https://notion.so/{32자리}. 노션 앱 설치돼 있으면 앱으로 열림(②안).
+      //   notion:// 스킴 → 노션 데스크톱 앱에서 카드 바로 열림.
       const pageId = (r[7] || '').replace(/-/g, '');
       const nameEsc = escapeHtml(r[2]);
       const nameHtml = pageId
