@@ -579,7 +579,7 @@ async function loadSchedule() {
       const pageId = (r[7] || '').replace(/-/g, '');
       const nameEsc = escapeHtml(r[2]);
       const nameHtml = pageId
-        ? `<a class="visit-name" href="https://notion.so/${pageId}" target="_blank" rel="noopener">${nameEsc}</a>`
+        ? `<a class="visit-name" href="notion://notion.so/${pageId}">${nameEsc}</a>`
         : `<span class="visit-name">${nameEsc}</span>`;
 
       return `<div class="visit-item${isToday ? ' today' : ''}">
