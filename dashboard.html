@@ -1,600 +1,857 @@
-<!DOCTYPE html> 
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>아라온스쿨 리드 현황</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard',-apple-system,system-ui,sans-serif; }
-body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
+var NOTION_TOKEN = PropertiesService.getScriptProperties().getProperty('NOTION_TOKEN');
+var DATABASE_ID  = PropertiesService.getScriptProperties().getProperty('DATABASE_ID');
 
-.layout { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; max-width: 1600px; margin: 0 auto; padding: 8px 14px; }
-@media (max-width: 1100px) { .layout { grid-template-columns: 1fr 1fr; } }
+// ============================================
+// [광고비] 채널별 확정 광고비 (YYMM 키). 매주/매월 갱신.
+// 이번달(진행중)은 주간 누적값으로 갱신 → 대시보드 이번달 탭 CPL/ROAS 반영.
+// Organic/기타 = 오가닉(광고비 0). 값 없는 채널은 자동 0 처리.
+//
+// ── 2026-07-11 전면 재검증 (전수 대조 결과) ─────────────────────
+// [네이버 분리] 기존엔 브랜드검색·GFA·파워컨텐츠가 '네이버' 한 버킷에 섞여
+//   분모는 GFA 실비(1.5만)만 잡고 분자는 브검 매출까지 포함 → ROAS 64.4 착시 발생.
+//   실제 유입 구조:
+//     · 브랜드검색  → arawiki.kr/inbody 폼 → 소스 'naver'      (DB 유입 O)
+//     · 파워컨텐츠  → 블로그 → 카톡 상담     (DB 유입 X, 검색광고 예산)
+//     · GFA        → 네이버 참여유도 폼      → 소스 'naver_gfa' (DB 유입 O)
+//   → '네이버'(=브검+파워컨텐츠, SA API 실측) / '네이버GFA'(수동) 로 분리.
+//
+//   네이버 SA API 실측값 (naverSumByMonth):
+//     2606: 브검 1,540,000 + 파워컨텐츠 25,099 = 1,565,099
+//     2607: 브검 1,640,000 + 파워컨텐츠 12,000 = 1,652,000  (7월부터 브검 154만→164만 인상)
+//   ※ 파워컨텐츠를 브검에서 빼려면 위 값에서 25,099 / 12,000 차감할 것.
+//
+//   네이버 GFA 실측값 (GFA 관리자 엑셀):
+//     2606: 314,411  (ARA_GFA_MLST 285,623 + 노트릴스 28,788)
+//     2607:  21,015  (노트릴스만 ON)
+//   ※ GFA API는 '공식 파트너사 전용'이라 신청 불가 → 월 1회 수동 입력 유지.
+//
+// [텐핑(CPA)] 선불 충전형 = 저량(stock) 채널. 매달 태우는 유량(flow) 채널이 아님.
+//   전체 충전 8,210,000원 (6/02 21만 + 6/18 200만 + 6/23 300만 + 6/29 300만), 현재 잔액 0.
+//   7월 신규 충전 0원인데 오더는 계속 발생 → 월별 ROAS는 분모 0으로 무의미(∞).
+//   따라서 월별 ROAS 계산에서 제외하고, 누적 코호트로만 평가한다.
+//   (아래 CPA_COHORT 참조 / AD_SPEND의 CPA는 0으로 두어 월별 ROAS 계산을 끔)
+// ────────────────────────────────────────────────────────────
+var AD_SPEND = {
+  '2606': { 메타광고: 21260805, Organic: 0, 당근: 1961880, 네이버GFA: 314411, CPA: 0, 기타: 0 },
+  '2607': { 메타광고: 9232311,  Organic: 0, 당근: 0,       네이버GFA: 21015,  CPA: 0, 기타: 0 } // 메타는 7/1~10 실측 (MCP, 수동 갱신 필요)
+};
 
-@media (max-width: 700px) {
-  .layout { display: block; padding: 4px 8px; }
-  .section { display: none; }
-  .section.active { display: block; }
-  .sec-nav { display: flex; justify-content: center; gap: 6px; margin-bottom: 8px; }
-  .sec-nav-btn { padding: 4px 12px; font-size: 11px; border-radius: 16px; border: 1px solid #ddd; background: white; color: #666; cursor: pointer; }
-  .sec-nav-btn.active { background: #1a73e8; color: white; border-color: #1a73e8; }
-  .funnel-table th, .funnel-table td, .campaign-table th, .campaign-table td { font-size: 10px !important; padding: 5px 4px !important; }
-  .cval { font-size: 16px !important; }
-  .cval.sm { font-size: 13px !important; }
-  .cval.xs { font-size: 11px !important; }
-  .clabel { font-size: 9px; }
-  .card { padding: 6px 4px; }
-  .section-label { margin: 10px 0 5px; font-size: 11px; padding-left: 7px; }
-  .grid-4 { grid-template-columns: repeat(4, 1fr); gap: 4px; }
-  .grid-3 { gap: 4px; }
-  .grid-2 { gap: 4px; }
-  .sec-title { font-size: 11px; margin-bottom: 6px; padding-bottom: 4px; }
-  .tabs { gap: 4px; margin-bottom: 6px; }
-  .tab { padding: 3px 8px; font-size: 10px; }
-  .header { margin-bottom: 6px; }
-  .title { font-size: 11px; }
-  .updated { font-size: 9px; }
-  .refresh { font-size: 10px; padding: 2px 7px; }
-  .visit-item { padding: 5px 8px; gap: 6px; }
-  .visit-date { font-size: 10px; min-width: 44px; }
-  .visit-time { font-size: 10px; min-width: 36px; }
-  .visit-name { font-size: 11px; }
-  .visit-grade { font-size: 9px; }
-  .visit-assignee { font-size: 9px; }
-  .dayno { font-size: 8px !important; }
-}
-@media (min-width: 701px) {
-  .sec-nav { display: none; }
-  .section { display: block !important; }
-}
+// ============================================
+// [광고비 자동 합산] 카카오 · 네이버(SA)는 일자별 시트에서 날짜 범위로 직접 합산.
+// AD_SPEND 하드코딩이 항상 뒤처지는 문제(7/1~5로 고정 → 분모 절반)를 제거한다.
+//
+// 원천: 스프레드시트 '상담신청서(response)'
+//   · '카카오모먼트' 시트 — 날짜(A) / 비용(F)          ← kakaoMomentDaily 매일 08시 적재
+//   · '네이버SA'     시트 — 날짜(A) / 상품유형(C) / 비용(F) ← naverSearchAdDaily 매일 적재
+//
+// [브랜드검색 일할] BRAND_SEARCH_FEE(월정액)는 매월 1일자에 전액 1행으로 박혀 있다.
+//   월중에 그대로 쓰면 "한 달치 광고비 ÷ N일치 매출"이 되어 ROAS가 저평가된다.
+//   → 경과일 비율(오늘/그달 총일수)로 일할 계산해 분모를 매출 기간과 맞춘다.
+//   완료된 달(지난달)은 비율 1.0이므로 전액 그대로 반영된다.
+// ============================================
+var AD_SPEND_SS_ID = '1K0UYFSJK4QycxYvzRNsitlKKY3YB9KeZ1mRdctGPLFg';  // 상담신청서(response)
 
-.sec-title { font-size: 13px; font-weight: 700; color: #1a1a1a; margin-bottom: 10px; padding-bottom: 8px; }
-.sec-title.blue  { border-bottom: 2px solid #1a73e8; }
-.sec-title.green { border-bottom: 2px solid #0f9d58; }
-.sec-title.amber { border-bottom: 2px solid #f4b400; }
-
-.header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-.title { font-size: 13px; font-weight: 600; color: #1a1a1a; }
-.updated { font-size: 10px; color: #999; margin-top: 2px; }
-.refresh { font-size: 11px; padding: 3px 9px; border: 1px solid #ddd; border-radius: 6px; background: white; cursor: pointer; color: #555; }
-.tabs { display: flex; gap: 5px; margin-bottom: 10px; }
-.tab { padding: 4px 11px; font-size: 11px; border-radius: 16px; border: 1px solid #ddd; background: white; color: #666; cursor: pointer; }
-.tab.active { background: #1a73e8; color: white; border-color: #1a73e8; }
-.section-label { font-size: 13px; color: #0f172a; margin: 15px 0 8px; font-weight: 700; display: flex; align-items: center; gap: 6px; padding-left: 9px; border-left: 4px solid #4338ca; line-height: 1.3; letter-spacing: -0.01em; }
-.section-label .badge { font-size: 9px; padding: 2px 7px; border-radius: 8px; background: #eef2f7; color: #475569; font-weight: 600; }
-.section-label .badge.pay { background: #f3e8ff; color: #7c3aed; }
-.section-label .badge.today { background: #fff3e0; color: #e65100; font-weight: 700; }
-.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
-.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-.card { background: white; border-radius: 8px; padding: 10px 6px; text-align: center; border: 1px solid #eee; }
-.clabel { font-size: 10px; color: #888; margin-bottom: 4px; }
-.dayno { font-size: 9px; color: #bbb; font-weight: 600; margin-left: 2px; }
-.cval { font-size: 19px; font-weight: 600; color: #1a1a1a; }
-.cval.blue   { color: #1a73e8; }
-.cval.green  { color: #0f9d58; }
-.cval.red    { color: #ea4335; }
-.cval.amber  { color: #f4b400; }
-.cval.purple { color: #9333ea; }
-.cval.orange { color: #f97316; }
-.cval.pink   { color: #ec4899; }
-.cval.gray   { color: #888; }
-.cval.sm  { font-size: 15px; }
-.cval.xs  { font-size: 12px; }
-
-.funnel-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; border: 1px solid #eee; font-size: 11px; }
-.funnel-table th { background: #f0f4ff; color: #1a73e8; font-weight: 700; padding: 8px 6px; text-align: center; border-bottom: 1px solid #e0e8ff; white-space: nowrap; }
-.funnel-table td { padding: 8px 6px; text-align: center; border-bottom: 1px solid #f5f5f5; color: #1a1a1a; }
-.funnel-table tr:last-child td { border-bottom: none; }
-.funnel-table tr.total { background: #fafbff; font-weight: 700; }
-.funnel-table tr.total td { border-top: 2px solid #e0e8ff; padding: 10px 6px; }
-.funnel-table td.name { font-weight: 700; color: #444; text-align: left; padding-left: 10px; }
-.funnel-table td.num { font-weight: 600; font-size: 13px; }
-.funnel-table td.num.db { color: #1a73e8; }
-.funnel-table td.num.visit { color: #f4b400; }
-.funnel-table td.num.order { color: #0f9d58; }
-.funnel-table td.sales { color: #9333ea; font-weight: 700; font-size: 12px; }
-.funnel-table td.rate { color: #888; font-size: 10px; }
-
-.campaign-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; border: 1px solid #eee; font-size: 11px; }
-.campaign-table th { background: #fff3e0; color: #e65100; font-weight: 700; padding: 7px 8px; text-align: left; border-bottom: 1px solid #ffe0b2; }
-.campaign-table th.num { text-align: center; }
-.campaign-table td { padding: 7px 8px; border-bottom: 1px solid #f5f5f5; color: #1a1a1a; }
-.campaign-table tr:last-child td { border-bottom: none; }
-.campaign-table td.name { color: #444; font-size: 10px; word-break: break-all; }
-.campaign-table td.num { text-align: center; font-weight: 600; color: #1a73e8; font-size: 12px; }
-
-.visit-panel { background: white; border-radius: 8px; border: 1px solid #eee; overflow: hidden; }
-.visit-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #f8f8f8; }
-.visit-item:last-child { border-bottom: none; }
-.visit-item.today { background: #fff8e1; border-left: 3px solid #f4b400; }
-.visit-item.today .visit-date { color: #e65100; font-weight: 700; }
-.visit-item.today .visit-name { color: #1a1a1a; font-weight: 700; }
-.visit-date { font-size: 11px; font-weight: 600; color: #1a73e8; min-width: 52px; }
-.visit-time { font-size: 11px; color: #0f9d58; min-width: 44px; }
-.visit-name { font-size: 12px; color: #1a1a1a; font-weight: 500; }
-.visit-grade { font-size: 10px; color: #999; margin-left: 2px; }
-.visit-assignee { font-size: 10px; color: #fff; background: #888; border-radius: 10px; padding: 1px 7px; margin-left: auto; white-space: nowrap; }
-.visit-assignee.hye { background: #0f9d58; }
-.visit-assignee.park { background: #9333ea; }
-.visit-assignee.woo { background: #e11d48; }
-.visit-assignee.tae { background: #0891b2; }
-.visit-assignee.kim { background: #1a73e8; }
-.visit-assignee.jang { background: #f97316; }
-.visit-empty { padding: 20px; text-align: center; color: #aaa; font-size: 12px; }
-  .crate { font-size:10px; margin-top:3px; font-weight:600; }
-  .route-eff { font-size:9px; margin-top:2px; color:#556; font-weight:600; letter-spacing:-0.2px; }
-
-.fnl { display:inline-block; font-size:10px; line-height:1.5; margin-right:6px; white-space:nowrap; }
-.fnl b { font-weight:700; }
-.fnl-v { color:#0891b2; }  /* 방문 파랑 */
-.fnl-s { color:#d97706; }  /* 세팅 주황 */
-.fnl-o { color:#0f9d58; }  /* 오더 초록 */
-@media (max-width:640px){ .fnl { display:block; margin-right:0; } }
-</style>
-</head>
-<body>
-
-<div class="sec-nav">
-  <button class="sec-nav-btn active" onclick="showSec(0)">퍼널</button>
-  <button class="sec-nav-btn" onclick="showSec(1)">분석</button>
-  <button class="sec-nav-btn" onclick="showSec(2)">방문</button>
-</div>
-
-<div class="layout" id="layout">
-
-<!-- 섹션1: 퍼널 -->
-<div class="section active" id="sec1">
-<div class="sec-title blue">아라온스쿨 퍼널</div>
-<div class="header">
-  <div>
-    <div class="title">담당자별 실적 + 전체 합계</div>
-    <div class="updated" id="updated">불러오는 중...</div>
-  </div>
-  <button class="refresh" onclick="loadAll()">새로고침</button>
-</div>
-
-<!-- 매출: 2×2 (이번달/지난달 · 이번주/지난주) -->
-<div class="section-label" style="margin-top:0;">매출 <span class="badge pay">결제일 기준</span></div>
-<div class="grid-2">
-  <div class="card">
-    <div class="clabel">이번 달<span class="dayno" id="dn-month"></span></div>
-    <div class="cval purple sm" id="sales-month">-</div>
-  </div>
-  <div class="card">
-    <div class="clabel">지난 달</div>
-    <div class="cval sm" id="sales-last">-</div>
-  </div>
-  <div class="card">
-    <div class="clabel">이번 주<span class="dayno" id="dn-week"></span></div>
-    <div class="cval purple sm" id="sales-week">-</div>
-  </div>
-  <div class="card">
-    <div class="clabel">지난 주</div>
-    <div class="cval sm" id="sales-lastweek">-</div>
-  </div>
-</div>
-
-<!-- 유입 현황: 이번달 고정 -->
-<div class="section-label">유입 현황 <span class="badge">이번달</span></div>
-<div class="grid-3">
-  <div class="card"><div class="clabel">총 유입</div><div class="cval blue sm" id="v-total">-</div></div>
-  <div class="card"><div class="clabel">오늘 유입</div><div class="cval amber sm" id="v-today">-</div></div>
-  <div class="card"><div class="clabel">어제 유입</div><div class="cval orange sm" id="v-yesterday">-</div></div>
-</div>
-
-<!-- 담당자별 퍼널: 자체 토글 -->
-<div class="section-label">담당자별 퍼널 <span class="badge today" id="tab-label">이번달</span></div>
-<div class="tabs" id="funnel-tabs">
-  <button class="tab active" onclick="setFunnelTab(0)">이번달</button>
-  <button class="tab" onclick="setFunnelTab(1)">지난달</button>
-</div>
-<table class="funnel-table">
-  <thead>
-    <tr>
-      <th>담당자</th>
-      <th>DB수</th>
-      <th>방문수</th>
-      <th>세팅수</th>
-      <th>방취수</th>
-      <th>오더수</th>
-      <th>매출</th>
-      <th>방취율</th>
-      <th>오더율</th>
-    </tr>
-  </thead>
-  <tbody id="funnel-tbody">
-    <tr><td colspan="9" style="color:#aaa;text-align:center;padding:16px;">불러오는 중...</td></tr>
-  </tbody>
-</table>
-</div>
-
-<!-- 섹션2: 유입경로 분석 -->
-<div class="section" id="sec2">
-<div class="sec-title green">유입경로 분석</div>
-
-<div class="tabs" id="route-tabs">
-  <button class="tab active" onclick="setRouteTab(0)">이번달</button>
-  <button class="tab" onclick="setRouteTab(1)">지난달</button>
-  <button class="tab" onclick="setRouteTab(2)">전체</button>
-</div>
-
-<div class="section-label" style="margin-top:0;">학년별 <span class="badge today" id="grade-tab-label">이번달</span></div>
-<div class="grid-3">
-  <div class="card"><div class="clabel">초등</div><div class="cval blue xs" id="grade-elem">-</div><div class="route-eff" id="ge-elem"></div></div>
-  <div class="card"><div class="clabel">중등</div><div class="cval green xs" id="grade-mid">-</div><div class="route-eff" id="ge-mid"></div></div>
-  <div class="card"><div class="clabel">고등</div><div class="cval amber xs" id="grade-high">-</div><div class="route-eff" id="ge-high"></div></div>
-</div>
-
-<div class="section-label">유입경로별 <span class="badge pay" id="route-eff-label">CPL·ROAS</span></div>
-<div class="grid-3">
-  <div class="card"><div class="clabel">메타광고</div><div class="cval purple xs" id="route-meta">-</div><div class="crate" id="rr-meta"></div></div>
-  <div class="card"><div class="clabel">Organic</div><div class="cval blue xs" id="route-insta">-</div><div class="crate" id="rr-insta"></div></div>
-  <div class="card"><div class="clabel">카카오</div><div class="cval amber xs" id="route-kakao">-</div><div class="crate" id="rr-kakao"></div></div>
-  <div class="card"><div class="clabel">네이버브랜드</div><div class="cval blue xs" id="route-naver">-</div><div class="crate" id="rr-naver"></div></div>
-  <div class="card" id="card-navergfa" style="display:none"><div class="clabel">네이버GFA</div><div class="cval blue xs" id="route-navergfa">-</div><div class="crate" id="rr-navergfa"></div></div>
-  <div class="card"><div class="clabel">CPA(텐핑)</div><div class="cval red xs" id="route-cpa">-</div><div class="crate" id="rr-cpa"></div></div>
-  <div class="card"><div class="clabel">기타</div><div class="cval xs" id="route-etc">-</div><div class="crate" id="rr-etc"></div></div>
-  <div class="card" id="card-daangn" style="display:none"><div class="clabel">당근</div><div class="cval orange xs" id="route-daangn">-</div><div class="crate" id="rr-daangn"></div></div>
-</div>
-
-<div class="section-label">캠페인별 <span class="badge">오더순</span></div>
-<table class="campaign-table">
-  <thead>
-    <tr>
-      <th>캠페인명</th>
-      <th class="num">DB</th>
-      <th class="num">방문</th>
-      <th class="num">세팅</th>
-      <th class="num">오더</th>
-    </tr>
-  </thead>
-  <tbody id="campaign-tbody">
-    <tr><td colspan="5" style="color:#aaa;text-align:center;padding:14px;">불러오는 중...</td></tr>
-  </tbody>
-</table>
-</div>
-
-<!-- 섹션3: 방문 스케줄 -->
-<div class="section" id="sec3">
-<div class="sec-title amber">방문 스케줄</div>
-<div class="visit-panel">
-  <div id="visit-list"><div class="visit-empty">불러오는 중...</div></div>
-</div>
-</div>
-
-</div>
-
-<script>
-let allRows = [];
-let funnelTab = 0;   // 0=이번달 1=지난달
-let routeTab  = 0;   // 0=이번달 1=지난달 2=전체
-let currentSec = 0;
-
-const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1438610573&single=true&output=csv';
-const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1384080283&single=true&output=csv';
-
-const ASSIGNEES = ['우혜림', '김윤호', '장윤호', '박창건', '김우진', '김태석'];
-// ROUTE_KEYS 7→8개(네이버GFA 추가)로 유입경로 표가 1행 늘어 아래 블록이 모두 1행씩 밀림
-const ASSIGNEE_START_IDX = 46;
-const CAMPAIGN_START_IDX = 54;
-
-function showSec(idx) {
-  currentSec = idx;
-  document.querySelectorAll('.section').forEach((s,i) => s.classList.toggle('active', i===idx));
-  document.querySelectorAll('.sec-nav-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
+// ★ openById()로 연 '다른' 스프레드시트의 Date 객체는 실행 컨텍스트가 달라
+//   `instanceof Date`가 false로 떨어진다 (→ "Mon Jun 01" 같은 쓰레기 문자열이 나옴).
+//   getTime 함수 존재 여부로 판별할 것.
+function ymd(v) {
+  if (v && typeof v.getTime === 'function' && !isNaN(v.getTime())) {
+    return Utilities.formatDate(v, 'GMT+9', 'yyyy-MM-dd');
+  }
+  var s = String(v || '').trim();
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.substring(0, 10);   // 이미 yyyy-MM-dd
+  var d = new Date(s);
+  if (!isNaN(d.getTime())) return Utilities.formatDate(d, 'GMT+9', 'yyyy-MM-dd');
+  return '';
 }
 
-async function loadAll() {
-  await Promise.all([loadData(), loadSchedule()]);
-}
-
-async function loadData() {
+// 시트에서 [since, until] 범위 광고비 합산 (문자열 날짜 비교, YYYY-MM-DD는 사전순=시간순)
+// prorateBrandSearch: 브검 월정액을 경과일 비율로 깎을지 (이번달=true, 지난달=false)
+function sumSpendFromSheet(sheetName, since, until, opts) {
+  opts = opts || {};
   try {
-    document.getElementById('updated').textContent = '불러오는 중...';
-    const res = await fetch(CSV_URL);
-    const text = await res.text();
-    allRows = text.trim().split('\n').map(r => r.split(',').map(c => c.trim()));
-    render();
-    const now = new Date();
-    document.getElementById('updated').textContent = '업데이트: ' + now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
-  } catch(e) {
-    document.getElementById('updated').textContent = '로드 실패';
+    var ss = SpreadsheetApp.openById(AD_SPEND_SS_ID);
+    var sh = ss.getSheetByName(sheetName);
+    if (!sh || sh.getLastRow() < 2) return 0;
+
+    var last = sh.getLastRow();
+    var data = sh.getRange(2, 1, last - 1, 6).getValues();   // A~F (날짜~비용)
+    var total = 0;
+
+    data.forEach(function(r) {
+      var d = ymd(r[0]);
+      if (!d || d < since || d > until) return;
+
+      var type = String(r[2] || '').trim();   // 네이버SA: 상품유형 / 카카오: 상태(무관)
+      var cost = Number(r[5] || 0);
+      if (!cost) return;
+
+      // ★ 브랜드검색 월정액 → 경과일 비율로 일할
+      if (opts.prorate && type === 'BRAND_SEARCH_FEE') {
+        cost = Math.round(cost * opts.prorate);
+      }
+      total += cost;
+    });
+    return total;
+  } catch (e) {
+    Logger.log('⚠️ ' + sheetName + ' 광고비 합산 실패 (0 처리): ' + e);
+    return 0;
   }
 }
 
-// 담당자별 퍼널 전용 탭
-function setFunnelTab(idx) {
-  funnelTab = idx;
-  document.querySelectorAll('#funnel-tabs .tab').forEach((t,i) => t.classList.toggle('active', i===idx));
-  render();
+// ============================================
+// [텐핑 코호트] 충전형 채널 — 누적 기준으로만 평가.
+// 총 투자 821만이 만든 리드가 6월·7월에 걸쳐 회수되는 중이므로
+// "이번달 매출 ÷ 이번달 광고비"로 자르면 6월은 폭망·7월은 무한대로 왜곡된다.
+// 대시보드는 이 상수로 '누적 투자 / 누적 회수 / 누적 ROAS'를 표시한다.
+//
+// 실측 (텐핑 전체사용내역 + 참여자현황 + 결제내역 전수 대조):
+//   ── 충전 내역 (광고비 = VAT 별도) ────────────────────────
+//     4월 이전  1,000,000  (결제 1,100,000)  단가 35,000 · 구캠(습관상담)에 배정
+//     6/02        210,000  (결제   231,000)  단가 35,000 · 구캠 소진분 보전
+//     6/18      2,000,000  (결제 2,200,000)  단가 30,000 · 1차 인하
+//     6/23      3,000,000  (결제 3,300,000)  단가 28,000 · 2차 인하
+//     6/29      3,000,000  (결제 3,300,000)  단가 28,000
+//     ─────────────────────────────────────────────
+//     합계      9,210,000  (결제 10,131,000) ← 차액 921,000 = VAT
+//
+//   ※ 텐핑은 330만 결제 시 300만이 충전되는 구조(부가세 별도 충전).
+//     ROAS 판정은 9,210,000(VAT 별도) 기준 — 메타·카카오·네이버 API가 모두
+//     VAT 별도 금액을 리턴하므로 채널 비교를 위해 기준을 맞춘다.
+//     실제 결제액(10,131,000) 기준 ROAS는 2.40.
+//
+//   ※ 4월 충전 100만은 텐핑 엑셀(4/15~) 기간 밖이라 파일에 없음.
+//     6/04 '사용 취소 790,000'(= 100만 − 구캠 소진 21만)이 그 존재의 증거.
+//
+//   유효 DB    301건 (신캠 295 + 구캠 6) / 무효 19건 / 승인대기 13건
+//   무효율     5.2%  (본인아님 12·허위 3·아이신청 1·결번 1·테스트 2) — 55만 전액 환불
+//   실질 CPL   30,598원
+//   잔여       약 5만 (승인대기 13건 36.4만 홀드 중)
+// 재충전 시 totalSpend에 '충전액(VAT 별도)'을 더할 것. 결제액이 아님.
+// ============================================
+var CPA_COHORT = {
+  totalSpend: 9210000,   // 누적 충전 (VAT 별도) — 다른 채널과 동일 기준
+  paidAmount: 10131000,  // 실제 결제액 (VAT 포함) — 자금 보고용
+  validDb:    301,       // 유효 DB 건수
+  active:     false      // 현재 집행 중단(잔액 소진). 재충전 시 true
+};
+
+function toKSTDateStr(d) {
+  if (!d) return '';
+  return new Date(d.getTime() + 9*60*60*1000).toISOString().slice(0,10);
 }
 
-// 유입경로 분석 전용 탭
-function setRouteTab(idx) {
-  routeTab = idx;
-  document.querySelectorAll('#route-tabs .tab').forEach((t,i) => t.classList.toggle('active', i===idx));
-  render();
-}
+// ============================================
+// [신규] 노션 쿼리 헬퍼 — sleep + null 체크 + 429/5xx 재시도
+// 페이지네이션 전체를 안전하게 수집해서 results 배열 반환
+// ============================================
+function queryNotionAll(filter) {
+  var all = [];
+  var cursor = null;
+  do {
+    var body = { page_size: 100 };
+    if (filter) body.filter = filter;
+    if (cursor) body.start_cursor = cursor;
 
-// "이번 달 매출 (8일차)" → "8일차"
-function pickDayNo(s) {
-  const m = String(s || '').match(/\((\d+일차)\)/);
-  return m ? m[1] : '';
-}
-
-function funnelText(v,vr,s,sr,o,or_){
-  return `<span class="fnl fnl-v">방문 ${v} <b>(${vr}%)</b></span>`
-       + `<span class="fnl fnl-s">세팅 ${s} <b>(${sr}%)</b></span>`
-       + `<span class="fnl fnl-o">오더 ${o} <b>(${or_}%)</b></span>`;
-}
-function render() {
-  const funnelName = ['이번달','지난달'][funnelTab];
-  const routeName  = ['이번달','지난달','전체'][routeTab];
-  const convCol = routeTab + 1;   // 학년별/유입경로 DB 컬럼
-  document.getElementById('tab-label').textContent = funnelName;
-
-  // ── 텐핑 코호트 블록 파싱 (시트 맨 아래, '텐핑코호트' 헤더로 시작)
-  // 행 번호가 캠페인 수에 따라 달라지므로 라벨로 찾는다.
-  let cpaCohort = null;
-  for (let i = CAMPAIGN_START_IDX; i < allRows.length; i++) {
-    if (allRows[i] && allRows[i][0] === '텐핑코호트') {
-      const get = (label) => {
-        for (let j = i + 1; j < Math.min(i + 12, allRows.length); j++) {
-          if (allRows[j] && allRows[j][0] === label) return allRows[j][1];
+    var data = null;
+    for (var attempt = 0; attempt < 3; attempt++) {
+      var res = UrlFetchApp.fetch(
+        'https://api.notion.com/v1/databases/' + DATABASE_ID + '/query',
+        {
+          method: 'post', contentType: 'application/json',
+          headers: { 'Authorization': 'Bearer ' + NOTION_TOKEN, 'Notion-Version': '2022-06-28' },
+          payload: JSON.stringify(body), muteHttpExceptions: true
         }
-        return null;
-      };
-      const spend = parseInt(get('누적 투자') || '0') || 0;
-      const cpl   = parseInt(get('실질 CPL') || '0') || 0;
-      const roas  = get('누적 ROAS') || '-';
-      const recov = get('회수율(%)') || 0;
-      const sales = parseInt(get('누적 회수') || '0') || 0;
-      const orders = parseInt(get('누적 오더') || '0') || 0;
-      cpaCohort = { spend, cpl, roas, recov, sales, orders, status: get('집행상태') || '' };
-      break;
+      );
+      var code = res.getResponseCode();
+      if (code === 200) {
+        data = JSON.parse(res.getContentText());
+        break;
+      }
+      // 429(rate limit) 또는 5xx → 대기 후 재시도
+      if (code === 429 || code >= 500) {
+        Logger.log('노션 ' + code + ' — 재시도 ' + (attempt + 1) + '/3');
+        Utilities.sleep(1500 * (attempt + 1));
+        continue;
+      }
+      // 그 외 에러는 즉시 중단
+      throw new Error('노션 응답 오류 ' + code + ': ' + res.getContentText().substring(0, 200));
     }
-  }
 
-  // ── 매출 2×2 (요약시트 12행: 이번달|값|이번주|값 / 13행: 지난달|값|지난주|값)
-  const r12 = allRows[11] || [];
-  const r13 = allRows[12] || [];
-  document.getElementById('sales-month').textContent    = r12[1] || '-';
-  document.getElementById('sales-week').textContent     = r12[3] || '-';
-  document.getElementById('sales-last').textContent     = r13[1] || '-';
-  document.getElementById('sales-lastweek').textContent = r13[3] || '-';
-  document.getElementById('dn-month').textContent = pickDayNo(r12[0]);
-  document.getElementById('dn-week').textContent  = pickDayNo(r12[2]);
-
-  // ── 유입 현황 (이번달 고정)
-  // allRows[1] = [총유입, 오늘, 이번달, 지난달, 전체]
-  document.getElementById('v-total').textContent     = allRows[1]?.[2] || '0';
-  document.getElementById('v-today').textContent     = allRows[1]?.[1] || '0';
-  document.getElementById('v-yesterday').textContent = allRows[2]?.[1] || '0';
-
-  // ── 담당자 퍼널 (funnelTab)
-  const offset = funnelTab * 6 + 1;
-  const tbody = document.getElementById('funnel-tbody');
-  let totalDb=0, totalVisit=0, totalSetting=0, totalCancel=0, totalOrder=0, totalSalesNum=0;
-  let rows = ASSIGNEES.map((name, i) => {
-    const r = allRows[ASSIGNEE_START_IDX + i] || [];
-    const db      = parseInt(r[offset]   || '0') || 0;
-    const visit   = parseInt(r[offset+1] || '0') || 0;
-    const setting = parseInt(r[offset+2] || '0') || 0;
-    const cancel  = parseInt(r[offset+3] || '0') || 0;
-    const order   = parseInt(r[offset+4] || '0') || 0;
-    const sales   = r[offset+5] || '0원';
-    totalDb += db; totalVisit += visit; totalSetting += setting; totalCancel += cancel; totalOrder += order;
-    const salesNum = parseInt((sales+'').replace(/[^0-9]/g,'')) || 0;
-    if (sales.includes('만원')) totalSalesNum += salesNum * 10000;
-    else totalSalesNum += salesNum;
-    const cancelRate = visit ? Math.round(cancel/visit*100) : 0;
-    const orderRate  = setting ? Math.round(order/setting*100) : 0;
-    return `<tr>
-      <td class="name">${r[0] || name}</td>
-      <td class="num db">${db}</td>
-      <td class="num visit">${visit}</td>
-      <td class="num" style="color:#2563eb">${setting}</td>
-      <td class="num" style="color:#e11d48">${cancel}</td>
-      <td class="num order">${order}</td>
-      <td class="sales">${sales}</td>
-      <td class="rate" style="color:#e11d48">${cancelRate}%</td>
-      <td class="rate">${orderRate}%</td>
-    </tr>`;
-  });
-  const totCancelRate = totalVisit ? Math.round(totalCancel/totalVisit*100) : 0;
-  const totOrderRate  = totalSetting ? Math.round(totalOrder/totalSetting*100) : 0;
-  // 합계 매출 = 상단 매출카드(raw 원단위 전체합 → 1회 반올림)를 그대로 사용.
-  // 담당자별 셀은 각자 만원 반올림된 값이라, 되더하면 반올림 오차가 누적됨(8422 vs 8421).
-  // 이번달 탭 → r12[1](sales-month), 지난달 탭 → r13[1](sales-last)와 항상 일치.
-  const totSalesFallback = totalSalesNum >= 10000 ? Math.round(totalSalesNum/10000) + '만원' : totalSalesNum + '원';
-  const totSalesStr = (funnelTab === 0 ? r12[1] : r13[1]) || totSalesFallback;
-  rows.push(`<tr class="total">
-    <td class="name">합계</td>
-    <td class="num db">${totalDb}</td>
-    <td class="num visit">${totalVisit}</td>
-    <td class="num" style="color:#2563eb">${totalSetting}</td>
-    <td class="num" style="color:#e11d48">${totalCancel}</td>
-    <td class="num order">${totalOrder}</td>
-    <td class="sales">${totSalesStr}</td>
-    <td class="rate" style="color:#e11d48">${totCancelRate}%</td>
-    <td class="rate">${totOrderRate}%</td>
-  </tr>`);
-  tbody.innerHTML = rows.join('');
-
-  // ── 학년별 (routeTab)
-  const gtl = document.getElementById('grade-tab-label');
-  if (gtl) gtl.textContent = routeName;
-  [['grade-elem','ge-elem',28],['grade-mid','ge-mid',29],['grade-high','ge-high',30]].forEach(([dbId,effId,row])=>{
-    const r = allRows[row] || [];
-    document.getElementById(dbId).textContent = r[convCol] || '-';
-    const eff = document.getElementById(effId);
-    if (eff) {
-      const db = parseInt(r[convCol] || '0') || 0;
-      const v = parseInt(r[convCol+3] || '0') || 0;   // 방문(전체방문)
-      const o = parseInt(r[convCol+6] || '0') || 0;   // 오더
-      const k = parseInt(r[convCol+9] || '0') || 0;   // 결보
-      const s = o + k;                                 // 세팅 = 결보+오더
-      const vr = db ? Math.round(v/db*100) : 0;        // 방문율 = 방문/DB
-      const sr = v ? Math.round(s/v*100) : 0;          // 세팅율 = 세팅/방문
-      const or_ = s ? Math.round(o/s*100) : 0;         // 오더율 = 오더/세팅
-      eff.innerHTML = funnelText(v,vr,s,sr,o,or_);
+    if (!data || !data.results) {
+      throw new Error('노션 결과 없음 (rate limit 재시도 실패 가능)');
     }
-  });
 
-  // ── 유입경로별 (routeTab)
-  // ROUTE_KEYS가 7→8개(네이버GFA 추가)로 늘어 유입경로 표가 1행 길어졌음.
-  // 시트 순서: 35 메타 / 36 Organic / 37 당근 / 38 카카오 / 39 네이버 / 40 네이버GFA / 41 CPA / 42 기타 / 43 합계
-  const effCols = routeTab === 0 ? [17,18] : routeTab === 1 ? [14,15] : null;
-  const rel = document.getElementById('route-eff-label');
-  const rSum = allRows[43] || [];
-  const hasThisSpend = (parseInt((rSum[16]+'').replace(/[^0-9]/g,'')) || 0) > 0;
-  if (rel) rel.textContent =
-    routeTab === 0 ? (hasThisSpend ? 'CPL·ROAS 이번달 진행중' : 'CPL·ROAS 이번달 광고비 미입력')
-    : routeTab === 1 ? 'CPL·ROAS 지난달 확정'
-    : 'CPL·ROAS';
-  const routeMap = [
-    ['route-meta','rr-meta',35],['route-insta','rr-insta',36],
-    ['route-kakao','rr-kakao',38],['route-naver','rr-naver',39],
-    ['route-navergfa','rr-navergfa',40],['route-cpa','rr-cpa',41],['route-etc','rr-etc',42],
-    ['route-daangn','rr-daangn',37]
-  ];
-  routeMap.forEach(([dbId, rateId, row]) => {
-    const r = allRows[row] || [];
-    document.getElementById(dbId).textContent = r[convCol] || '-';
-    // DB 0인 채널 카드는 숨김 (당근·네이버GFA)
-    if (dbId === 'route-daangn' || dbId === 'route-navergfa') {
-      const cardId = dbId === 'route-daangn' ? 'card-daangn' : 'card-navergfa';
-      const dcard = document.getElementById(cardId);
-      const dval = parseInt(r[convCol] || '0') || 0;
-      if (dcard) dcard.style.display = dval > 0 ? '' : 'none';
+    all = all.concat(data.results);
+    cursor = data.has_more ? data.next_cursor : null;
+    Utilities.sleep(350); // ✅ rate limit 방어
+  } while (cursor);
+  return all;
+}
+
+// ============================================
+// [신규] 모수 수집 — 신청일 7개월 + 결제일 최근 2개월 머지
+// 신청이 오래됐어도 최근 결제된 특이케이스 누락 방지 (pageId 중복 제거)
+// ============================================
+function collectLeadResults() {
+  var now = new Date();
+  var sevenMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 7, 1);
+  var twoMonthsAgo   = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+
+  var bySignup = queryNotionAll({ property: '신청일', date: { on_or_after: sevenMonthsAgo.toISOString() } });
+  var byPay    = queryNotionAll({ property: '결제일', date: { on_or_after: twoMonthsAgo.toISOString() } });
+
+  var map = {};
+  bySignup.forEach(function(p) { map[p.id] = p; });
+  byPay.forEach(function(p) { map[p.id] = p; }); // 중복은 덮어쓰기 = 동일 객체
+  return Object.keys(map).map(function(k) { return map[k]; });
+}
+
+function getLeadStats() {
+  try {
+    const now = new Date();
+    const monthStart     = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastMonthStart = new Date(now.getFullYear(), now.getMonth()-1, 1);
+    const lastMonthEnd   = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    // ============================================
+    // ✅ [추가] 주 경계 (월~일). 매출은 결제일 기준.
+    // ============================================
+    function startOfWeek(d) {
+      const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const dow = x.getDay();                       // 0=일 … 6=토
+      x.setDate(x.getDate() - (dow === 0 ? 6 : dow - 1));
+      return x;                                     // 이번 주 월요일 00:00
     }
-    const rateEl = document.getElementById(rateId);
-    if (rateEl) {
-      const db = parseInt(r[convCol] || '0') || 0;
-      // 건수 (시트가 건수로 출력) → 율은 여기서 계산
-      const vis = parseInt(r[4 + routeTab] || '0') || 0;   // 방문수
-      const set = parseInt(r[7 + routeTab] || '0') || 0;   // 세팅수
-      const ord = parseInt(r[10 + routeTab] || '0') || 0;  // 오더수
-      const vr = db ? Math.round(vis/db*100) : 0;          // 방문율=방문/DB
-      const sr = vis ? Math.round(set/vis*100) : 0;        // 세팅율=세팅/방문
-      const or_ = set ? Math.round(ord/set*100) : 0;       // 오더율=오더/세팅
-      let html = (db>0) ? `<span class="fnl fnl-v">방문 ${vis} <b>(${vr}%)</b></span><span class="fnl fnl-s">세팅 ${set} <b>(${sr}%)</b></span><span class="fnl fnl-o">오더 ${ord} <b>(${or_}%)</b></span>` : '';
-      if (effCols) {
-        const cpl  = r[effCols[0]] || '';
-        const roas = r[effCols[1]] || '';
-        // ★ 텐핑(CPA)은 선불 충전형 → 월별 CPL/ROAS 무의미(태운 달=폭망, 안 태운 달=∞).
-        //   getLeadStats가 ROAS 칸에 '코호트'를 넣어주므로, 여기선 누적 지표로 대체 표시.
-        if (dbId === 'route-cpa') {
-          if (cpaCohort) {
-            html += `<div class="route-eff">누적 CPL ₩${cpaCohort.cpl.toLocaleString()} · 누적 ROAS ${cpaCohort.roas}</div>`;
-          }
-        } else {
-          const cplNum = parseInt((cpl+'').replace(/[^0-9]/g,'')) || 0;
-          if (cplNum > 0 || roas) {
-            const cplStr  = cplNum > 0 ? '₩' + cplNum.toLocaleString() : '-';
-            const roasStr = roas ? roas + '' : '-';
-            html += `<div class="route-eff">CPL ${cplStr} · ROAS ${roasStr}</div>`;
-          }
+    const weekStart     = startOfWeek(now);
+    const lastWeekStart = new Date(weekStart);
+    lastWeekStart.setDate(weekStart.getDate() - 7);
+    const lastWeekEnd   = weekStart;                // exclusive
+
+    const monthDayNo = now.getDate();                                    // 이번 달 N일차
+    const weekDayNo  = Math.floor((now - weekStart) / 86400000) + 1;     // 이번 주 N일차
+
+    // ✅ 신청일 7개월 + 결제일 2개월 머지 모수
+    let allResults = collectLeadResults();
+
+    let todayInflow=0, yesterdayInflow=0;
+    let todayVisitDone=0, todayVisitPlan=0, todayOrderStatus=0, todayKulbo=0;
+    let monthVisitAll=0, lastMonthVisitAll=0, allVisitAll=0;
+    let monthVisitStatus=0, lastMonthVisitStatus=0, allVisitStatus=0;
+    let monthOrder=0, lastMonthOrder=0, allOrder=0;
+    let monthVisitDone=0, lastMonthVisitDone=0, allVisitDone=0;
+    let monthVisitPlan=0, lastMonthVisitPlan=0, allVisitPlan=0;
+    let monthOrderStatus=0, lastMonthOrderStatus=0, allOrderStatus=0;
+    let monthKulbo=0, lastMonthKulbo=0, allKulbo=0;
+    let monthTotal=0, monthDrop=0, monthPayOrder=0, monthSales=0;
+    let lastMonthTotal=0, lastMonthDrop=0, lastMonthPayOrder=0, lastMonthSales=0;
+    let allTotal=0, allDrop=0, allPayOrder=0, allSales=0;
+
+    // ✅ [추가] 주간 매출
+    let weekSales = 0, lastWeekSales = 0;
+
+    let sourceMonth = { arawiki: 0, odiplaan: 0, brand: 0 };
+    let sourceLast  = { arawiki: 0, odiplaan: 0, brand: 0 };
+    let sourceAll   = { arawiki: 0, odiplaan: 0, brand: 0 };
+    let gradeMonth = { 초: 0, 중: 0, 고: 0, 미기재: 0 };
+    let gradeLast  = { 초: 0, 중: 0, 고: 0, 미기재: 0 };
+    let gradeAll   = { 초: 0, 중: 0, 고: 0, 미기재: 0 };
+    const emptyGrade = () => ({ 초: 0, 중: 0, 고: 0, 미기재: 0 });
+    let gradeVisitMonth = emptyGrade(), gradeVisitLast = emptyGrade(), gradeVisitAll = emptyGrade();
+    let gradeOrderMonth = emptyGrade(), gradeOrderLast = emptyGrade(), gradeOrderAll = emptyGrade();
+    let gradeKulboMonth = emptyGrade(), gradeKulboLast = emptyGrade(), gradeKulboAll = emptyGrade();
+
+    // '네이버브랜드' = 브랜드검색(+파워컨텐츠 예산, 소스 naver_brand) / '네이버GFA' = 성과형 디스플레이(소스 naver_gfa)
+    const ROUTE_KEYS = ['메타광고','Organic','당근','카카오','네이버브랜드','네이버GFA','CPA','기타'];
+    const emptyRoute = () => ROUTE_KEYS.reduce((o, k) => { o[k] = 0; return o; }, {});
+    let routeMonth = emptyRoute();
+    let routeLast  = emptyRoute();
+    let routeAll   = emptyRoute();
+    // 유입경로별 퍼널 (전체 누적 기준)
+    let routeVisit = emptyRoute();   // 방문(방문+취소+결보+오더) 전체
+    let routeSetting = emptyRoute(); // 세팅(결보+오더) 전체
+    let routeCancel = emptyRoute();  // 방취 전체
+    let routeOrder = emptyRoute();   // 오더 전체
+    let routeVisitMonth = emptyRoute(),   routeVisitLast = emptyRoute();
+    let routeSettingMonth = emptyRoute(), routeSettingLast = emptyRoute();
+    let routeOrderMonth = emptyRoute(),   routeOrderLast = emptyRoute();
+    let routeSalesLast  = emptyRoute(); // 지난달 채널매출 (결제일 기준, ROAS용)
+    let routeSalesMonth = emptyRoute(); // 이번달 채널매출
+    let routeSalesAll   = emptyRoute(); // ★ 전체 누적 채널매출 (텐핑 코호트 ROAS용)
+
+    const ASSIGNEES = ['우혜림', '김윤호', '장윤호', '박창건', '김우진', '김태석'];
+    const emptyAssignee = () => ({ db: 0, visit: 0, setting: 0, cancel: 0, order: 0, sales: 0 });
+    // 전사 세팅/방취/방문(4단계 전환표용)
+    let monthSetting=0, lastMonthSetting=0, allSetting=0;
+    let monthCancelAll=0, lastMonthCancelAll=0, allCancelAll=0;
+    let monthVisitFull=0, lastMonthVisitFull=0, allVisitFull=0;
+    let assigneeMonth = {};
+    let assigneeLast  = {};
+    let assigneeAll   = {};
+    ASSIGNEES.forEach(a => {
+      assigneeMonth[a] = emptyAssignee();
+      assigneeLast[a]  = emptyAssignee();
+      assigneeAll[a]   = emptyAssignee();
+    });
+
+    let campaignMonth = {};
+    let campaignLast  = {};
+    let campaignAll   = {};
+    let campaignVisitMonth = {}, campaignVisitLast = {}, campaignVisitAll = {};
+    let campaignOrderMonth = {}, campaignOrderLast = {}, campaignOrderAll = {};
+    let campaignSettingMonth = {}, campaignSettingLast = {}, campaignSettingAll = {};
+    let campaignIsMeta = {};
+
+    const todayStr = toKSTDateStr(now);
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = toKSTDateStr(yesterday);
+
+    allResults.forEach(page => {
+      const props = page.properties;
+      const nameCheck   = props['이름']?.title?.[0]?.plain_text || '';
+      const sourceCheck = props['리드출처']?.select?.name || '';
+      const salesCheck  = props['매출']?.number || 0;
+      if (!nameCheck && !sourceCheck && !salesCheck) return;
+
+      const dateStr      = props['신청일']?.date?.start || page.created_time;
+      const date         = new Date(dateStr);
+      const payDateStr   = props['결제일']?.date?.start || null;
+      const payDate      = payDateStr ? new Date(payDateStr) : null;
+      const visitDateStr = props['방문 일정']?.date?.start || null;
+      const visitDate    = visitDateStr ? new Date(visitDateStr) : null;
+      const status       = props['상태']?.select?.name || '';
+      const salesRaw     = props['매출']?.number || 0;
+      const sales        = salesRaw > 0 ? salesRaw * 1000 : 0;
+      const source       = props['리드출처']?.select?.name || '';
+      // 소스 필드 (채널 구분용): rich_text 또는 select 둘 다 대응
+      const srcRaw = (props['소스']?.select?.name
+                   || (props['소스']?.rich_text || []).map(rt => rt.plain_text).join('')
+                   || '').trim().toLowerCase();
+      function srcToChannel(s) {
+        if (['meta_ad','ig','inbody','fb'].includes(s)) return '메타광고';
+        if (s === 'insta') return 'Organic';
+        if (s === 'daangn') return '당근';
+        if (s === '모먼트' || s === 'kakao_bizform' || s.indexOf('kakao') >= 0) return '카카오';
+        if (s === 'tenping') return 'CPA';
+        // ★ naver_gfa를 naver보다 먼저 체크할 것 (순서 바꾸면 GFA가 네이버로 흡수됨)
+        if (s === 'naver_gfa')   return '네이버GFA';     // 성과형 디스플레이 (참여유도 폼)
+        if (s === 'naver_brand') return '네이버브랜드';   // 브랜드검색 (arawiki.kr/inbody 폼)
+        if (s === 'naver')       return '네이버브랜드';   // 과거 데이터 호환 — 마이그레이션 누락분 방어
+        return '기타';
+      }
+      const assignee     = props['담당자']?.select?.name || '';
+
+      const isToday     = toKSTDateStr(date) === todayStr;
+      const isYesterday = toKSTDateStr(date) === yesterdayStr;
+      const isMonth     = date >= monthStart;
+      const isLastMonth = date >= lastMonthStart && date < lastMonthEnd;
+
+      const visitDateKST         = toKSTDateStr(visitDate);
+      const isVisitDateMonth     = visitDate ? visitDate >= monthStart : false;
+      const isVisitDateLastMonth = visitDate ? (visitDate >= lastMonthStart && visitDate < lastMonthEnd) : false;
+      const isPayMonth           = payDate ? payDate >= monthStart : false;
+      const isPayLastMonth       = payDate ? (payDate >= lastMonthStart && payDate < lastMonthEnd) : false;
+
+      const isKulbo       = status === '결보';
+      const isOrder       = status === '오더';
+      const isDrop        = ['방문취소','결번/대상아님','니즈없음'].includes(status);
+      const isVisitStatus = status === '방문';
+      const isVisitDone   = (isVisitStatus && visitDate && visitDateKST < todayStr) || isKulbo || isOrder;
+      const isVisitPlan   = isVisitStatus && visitDate && visitDateKST >= todayStr;
+
+      allTotal++;
+      if (isDrop)      allDrop++;
+      if (isToday)     todayInflow++;
+      if (isYesterday) yesterdayInflow++;
+
+      if (source.includes('아라위키'))      sourceAll.arawiki++;
+      else if (source.includes('오디플랜')) sourceAll.odiplaan++;
+      else if (source.includes('브랜드'))   sourceAll.brand++;
+
+      const gradeRaw = props['학년']?.select?.name || '';
+      const gradeKey = gradeRaw.includes('초') ? '초' : gradeRaw.includes('중') ? '중' : gradeRaw.includes('고') ? '고' : '미기재';
+      gradeAll[gradeKey]++;
+
+      const routeKey = srcToChannel(srcRaw);
+      routeAll[routeKey]++;
+      {
+        const isCancelR = status === '방문취소';
+        const isVisitR = isVisitStatus || isCancelR || isKulbo || isOrder;
+        const isSettingR = isKulbo || isOrder;
+        const vM = visitDate ? isVisitDateMonth : isMonth;
+        const vL = visitDate ? isVisitDateLastMonth : isLastMonth;
+        if (isVisitR)   { routeVisit[routeKey]++;   if (vM) routeVisitMonth[routeKey]++;   if (vL) routeVisitLast[routeKey]++; }
+        if (isSettingR) { routeSetting[routeKey]++; if (vM) routeSettingMonth[routeKey]++; if (vL) routeSettingLast[routeKey]++; }
+        if (isOrder)    { routeOrder[routeKey]++;   if (isPayMonth) routeOrderMonth[routeKey]++; if (isPayLastMonth) routeOrderLast[routeKey]++; }
+        if (isCancelR)  routeCancel[routeKey]++;
+      }
+
+      // 학년별 방문/오더 (방문=방문일정 기준 기간, 오더=결제일 기준 기간)
+      {
+        const gVisit = isVisitStatus || (status === '방문취소') || isKulbo || isOrder;
+        const gvM = visitDate ? isVisitDateMonth : isMonth;
+        const gvL = visitDate ? isVisitDateLastMonth : isLastMonth;
+        if (gVisit)  { gradeVisitAll[gradeKey]++; if (gvM) gradeVisitMonth[gradeKey]++; if (gvL) gradeVisitLast[gradeKey]++; }
+        if (isOrder) { gradeOrderAll[gradeKey]++; if (isPayMonth) gradeOrderMonth[gradeKey]++; if (isPayLastMonth) gradeOrderLast[gradeKey]++; }
+        if (isKulbo) { gradeKulboAll[gradeKey]++; if (isVisitDateMonth) gradeKulboMonth[gradeKey]++; if (isVisitDateLastMonth) gradeKulboLast[gradeKey]++; }
+      }
+
+      const campaignRaw = ((props['캠페인']?.rich_text || [])
+                        .map(rt => rt.plain_text).join('')
+                        || props['캠페인']?.title?.[0]?.plain_text
+                        || '').trim();
+      const isMetaSrc = ['meta_ad','ig','inbody','fb'].includes(srcRaw);
+      const channelLabel = { 'CPA':'CPA(텐핑)','카카오':'카카오','네이버브랜드':'네이버브랜드','네이버GFA':'네이버GFA','당근':'당근','Organic':'Organic','기타':'기타' }[routeKey] || routeKey;
+      // 메타는 캠페인명 유지(미표기시 기타로), 비메타만 채널명으로 묶음
+      const campaign = isMetaSrc ? (campaignRaw || 'ARA_기타(메타 미표기)') : (campaignRaw || channelLabel);
+      const campIsMeta = isMetaSrc;
+      if (campaign) { campaignAll[campaign] = (campaignAll[campaign] || 0) + 1; campaignIsMeta[campaign] = campIsMeta; }
+
+      // 캠페인별 방문/오더 (방문=방문일정 기준, 오더=결제일 기준)
+      if (campaign) {
+        const cVisit = isVisitStatus || (status === '방문취소') || isKulbo || isOrder;
+        const cvM = visitDate ? isVisitDateMonth : isMonth;
+        const cvL = visitDate ? isVisitDateLastMonth : isLastMonth;
+        const inc = (o, k) => { o[k] = (o[k] || 0) + 1; };
+        if (cVisit) { inc(campaignVisitAll, campaign); if (cvM) inc(campaignVisitMonth, campaign); if (cvL) inc(campaignVisitLast, campaign); }
+        if (isOrder) { inc(campaignOrderAll, campaign); if (isPayMonth) inc(campaignOrderMonth, campaign); if (isPayLastMonth) inc(campaignOrderLast, campaign); }
+        // 세팅 = 결보 + 오더
+        if (isKulbo || isOrder) {
+          inc(campaignSettingAll, campaign);
+          if (isKulbo ? cvM : isPayMonth)     inc(campaignSettingMonth, campaign);
+          if (isKulbo ? cvL : isPayLastMonth) inc(campaignSettingLast, campaign);
         }
       }
-      rateEl.innerHTML = html;
+
+      if (isMonth) {
+        monthTotal++;
+        if (isDrop) monthDrop++;
+        if (source.includes('아라위키'))      sourceMonth.arawiki++;
+        else if (source.includes('오디플랜')) sourceMonth.odiplaan++;
+        else if (source.includes('브랜드'))   sourceMonth.brand++;
+        gradeMonth[gradeKey]++;
+        routeMonth[routeKey]++;
+        if (campaign) campaignMonth[campaign] = (campaignMonth[campaign] || 0) + 1;
+      }
+      if (isLastMonth) {
+        lastMonthTotal++;
+        if (isDrop) lastMonthDrop++;
+        if (source.includes('아라위키'))      sourceLast.arawiki++;
+        else if (source.includes('오디플랜')) sourceLast.odiplaan++;
+        else if (source.includes('브랜드'))   sourceLast.brand++;
+        gradeLast[gradeKey]++;
+        routeLast[routeKey]++;
+        if (campaign) campaignLast[campaign] = (campaignLast[campaign] || 0) + 1;
+      }
+
+      if (isVisitStatus) {
+        allVisitAll++;
+        if (isVisitDateMonth)     monthVisitAll++;
+        if (isVisitDateLastMonth) lastMonthVisitAll++;
+      }
+      if (isKulbo) {
+        allVisitAll++;
+        if (isVisitDateMonth)     monthVisitAll++;
+        if (isVisitDateLastMonth) lastMonthVisitAll++;
+      }
+      if (isOrder) {
+        allVisitAll++;
+        if (isPayMonth)     monthVisitAll++;
+        if (isPayLastMonth) lastMonthVisitAll++;
+      }
+
+      if (isVisitStatus && isVisitDone) {
+        allVisitDone++; allVisitStatus++;
+        if (isVisitDateMonth)     { monthVisitDone++; monthVisitStatus++; }
+        if (isVisitDateLastMonth) { lastMonthVisitDone++; lastMonthVisitStatus++; }
+      }
+      if (isKulbo) {
+        allVisitDone++; allVisitStatus++; allKulbo++;
+        if (isVisitDateMonth)     { monthVisitDone++; monthVisitStatus++; monthKulbo++; }
+        if (isVisitDateLastMonth) { lastMonthVisitDone++; lastMonthVisitStatus++; lastMonthKulbo++; }
+      }
+      if (isOrder) {
+        allVisitDone++; allVisitStatus++; allOrder++; allOrderStatus++;
+        if (isPayMonth)     { monthVisitDone++; monthVisitStatus++; monthOrder++; monthOrderStatus++; }
+        if (isPayLastMonth) { lastMonthVisitDone++; lastMonthVisitStatus++; lastMonthOrder++; lastMonthOrderStatus++; }
+      }
+
+      // 4단계 전환표용 전사 카운트
+      {
+        const isCancelS = status === '방문취소';
+        const isVisitFullS = isVisitStatus || isCancelS || isKulbo || isOrder;
+        const isSettingS = isKulbo || isOrder;
+        const vM = visitDate ? isVisitDateMonth : isMonth;
+        const vL = visitDate ? isVisitDateLastMonth : isLastMonth;
+        if (isVisitFullS) { allVisitFull++; if (vM) monthVisitFull++; if (vL) lastMonthVisitFull++; }
+        if (isSettingS)   { allSetting++;   if (isKulbo?vM:(isOrder?isPayMonth:vM)) monthSetting++; if (isKulbo?vL:(isOrder?isPayLastMonth:vL)) lastMonthSetting++; }
+        if (isCancelS)    { allCancelAll++; if (isMonth) monthCancelAll++; if (isLastMonth) lastMonthCancelAll++; }
+      }
+
+      if (isVisitPlan) {
+        allVisitPlan++;
+        if (isVisitDateMonth)     monthVisitPlan++;
+        if (isVisitDateLastMonth) lastMonthVisitPlan++;
+      }
+
+      if (isVisitStatus && isVisitDone && visitDateKST === todayStr) todayVisitDone++;
+      if (isVisitPlan && visitDateKST === todayStr)                  todayVisitPlan++;
+      if (isOrder && isToday)                                        todayOrderStatus++;
+      if (isKulbo && visitDateKST === todayStr)                      todayKulbo++;
+
+      if (payDate) {
+        allPayOrder++;
+        if (isPayMonth)     monthPayOrder++;
+        if (isPayLastMonth) lastMonthPayOrder++;
+        if (sales > 0) {
+          allSales += sales;
+          routeSalesAll[routeKey] += sales;   // ★ 전체 누적 (텐핑 코호트 ROAS용)
+          if (isPayMonth)     { monthSales += sales;     routeSalesMonth[routeKey] += sales; }
+          if (isPayLastMonth) { lastMonthSales += sales; routeSalesLast[routeKey]  += sales; }
+          // ✅ [추가] 주간 매출 (결제일 기준, 월~일)
+          if (payDate >= weekStart)                              weekSales += sales;
+          if (payDate >= lastWeekStart && payDate < lastWeekEnd) lastWeekSales += sales;
+        }
+      }
+
+      if (ASSIGNEES.includes(assignee)) {
+        if (isMonth)     assigneeMonth[assignee].db++;
+        if (isLastMonth) assigneeLast[assignee].db++;
+        assigneeAll[assignee].db++;
+
+        // 방문 = 방문(상태) + 방문취소 + 결보 + 오더 (= 방문일정 잡힌 전부, 예정 포함)
+        const isCancel   = status === '방문취소';
+        const isVisitAll = isVisitStatus || isCancel || isKulbo || isOrder;
+        // 세팅 = 결보 + 오더 (예정·취소 제외, 성사된 것만)
+        const isSetting  = isKulbo || isOrder;
+
+        // 기간 판정: 방문일 기준 (오더는 결제일 fallback)
+        const inMonth = visitDate ? isVisitDateMonth : (isOrder && isPayMonth);
+        const inLast  = visitDate ? isVisitDateLastMonth : (isOrder && isPayLastMonth);
+
+        if (isVisitAll) {
+          // 방문일정 있으면 그 날짜로, 없으면(취소 등) 신청일로 기간 판정
+          const vMonth = visitDate ? inMonth : isMonth;
+          const vLast  = visitDate ? inLast  : isLastMonth;
+          if (vMonth) assigneeMonth[assignee].visit++;
+          if (vLast)  assigneeLast[assignee].visit++;
+          assigneeAll[assignee].visit++;
+        }
+        if (isSetting) {
+          if (inMonth) assigneeMonth[assignee].setting++;
+          if (inLast)  assigneeLast[assignee].setting++;
+          assigneeAll[assignee].setting++;
+        }
+        if (isCancel) {
+          // 방취는 상태만 보고 카운트 (방문일정 지울 필요 없음). 기간은 신청일 기준.
+          if (isMonth)     assigneeMonth[assignee].cancel++;
+          if (isLastMonth) assigneeLast[assignee].cancel++;
+          assigneeAll[assignee].cancel++;
+        }
+
+        if (isOrder && isPayMonth)     { assigneeMonth[assignee].order++; assigneeMonth[assignee].sales += sales; }
+        if (isOrder && isPayLastMonth) { assigneeLast[assignee].order++;  assigneeLast[assignee].sales += sales; }
+        if (isOrder)                   { assigneeAll[assignee].order++;   assigneeAll[assignee].sales += sales; }
+      }
+    });
+
+    function won(n) {
+      if (!n) return '0원';
+      if (n >= 10000) return Math.round(n/10000) + '만원';
+      return n + '원';
+    }
+    function convStr(visit, total) {
+      return total+'→'+visit+' ('+(total ? Math.round(visit/total*100) : 0)+'%)';
+    }
+    function convOrderStr(order, visit) {
+      return visit+'→'+order+' ('+(visit ? Math.round(order/visit*100) : 0)+'%)';
+    }
+
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName('요약') || ss.insertSheet('요약');
+    sheet.clearContents();
+
+    sheet.getRange('A1:E1').setValues([['유입 현황','오늘','이번달','지난달','전체']]);
+    sheet.getRange('A2:E3').setValues([
+      ['총 유입',   todayInflow,     monthTotal,     lastMonthTotal,     allTotal],
+      ['어제 유입', yesterdayInflow, 0,              0,                  0]
+    ]);
+
+    sheet.getRange('A5:E5').setValues([['방문/오더','오늘','이번달','지난달','전체']]);
+    sheet.getRange('A6:E9').setValues([
+      ['방문완료', todayVisitDone,   monthVisitDone,   lastMonthVisitDone,   allVisitDone],
+      ['방문예정', todayVisitPlan,   monthVisitPlan,   lastMonthVisitPlan,   allVisitPlan],
+      ['오더',     todayOrderStatus, monthOrderStatus, lastMonthOrderStatus, allOrderStatus],
+      ['결보',     todayKulbo,       monthKulbo,       lastMonthKulbo,       allKulbo]
+    ]);
+
+    // ============================================
+    // ✅ [변경] 매출: 2×2 (이번달/지난달 · 이번주/지난주). 누적 삭제.
+    // 14행을 비워 아래 행 번호(45/53 등)는 그대로 유지.
+    // ============================================
+    sheet.getRange('A11:D11').setValues([['매출 항목','금액','매출 항목','금액']]);
+    sheet.getRange('A12:D13').setValues([
+      ['이번 달 매출 (' + monthDayNo + '일차)', won(monthSales),     '이번 주 매출 (' + weekDayNo + '일차)', won(weekSales)],
+      ['지난 달 매출',                          won(lastMonthSales), '지난 주 매출',                        won(lastWeekSales)]
+    ]);
+
+    // 4단계 전환: 신청→방문→세팅→오더
+    function rate(a, b) { return b + '→' + a + ' (' + (b ? Math.round(a/b*100) : 0) + '%)'; }
+    sheet.getRange('A16:D16').setValues([['전환','이번달','지난달','전체']]);
+    sheet.getRange('A17:D20').setValues([
+      ['신청→방문', rate(monthVisitFull, monthTotal),       rate(lastMonthVisitFull, lastMonthTotal),       rate(allVisitFull, allTotal)],
+      ['방문→세팅', rate(monthSetting, monthVisitFull),     rate(lastMonthSetting, lastMonthVisitFull),     rate(allSetting, allVisitFull)],
+      ['세팅→오더', rate(monthOrderStatus, monthSetting),   rate(lastMonthOrderStatus, lastMonthSetting),   rate(allOrderStatus, allSetting)],
+      ['방문취소',  rate(monthCancelAll, monthVisitFull),   rate(lastMonthCancelAll, lastMonthVisitFull),   rate(allCancelAll, allVisitFull)]
+    ]);
+
+    sheet.getRange('A22:D22').setValues([['리드출처','이번달','지난달','전체']]);
+    sheet.getRange('A23:D26').setValues([
+      ['아라위키', sourceMonth.arawiki,  sourceLast.arawiki,  sourceAll.arawiki],
+      ['오디플랜', sourceMonth.odiplaan, sourceLast.odiplaan, sourceAll.odiplaan],
+      ['브랜드',   sourceMonth.brand,    sourceLast.brand,    sourceAll.brand],
+      ['합계', sourceMonth.arawiki+sourceMonth.odiplaan+sourceMonth.brand, sourceLast.arawiki+sourceLast.odiplaan+sourceLast.brand, sourceAll.arawiki+sourceAll.odiplaan+sourceAll.brand]
+    ]);
+
+    sheet.getRange('A28:M28').setValues([['학년별','이번달DB','지난달DB','전체DB','이번달방문','지난달방문','전체방문','이번달오더','지난달오더','전체오더','이번달결보','지난달결보','전체결보']]);
+    const gradeKeysArr = ['초','중','고','미기재'];
+    const gradeLabelMap = { '초':'초등', '중':'중학', '고':'고등', '미기재':'미기재' };
+    const gSum = (o) => gradeKeysArr.reduce((s,k)=>s+o[k],0);
+    const gradeRows = gradeKeysArr.map(k => [
+      gradeLabelMap[k],
+      gradeMonth[k], gradeLast[k], gradeAll[k],
+      gradeVisitMonth[k], gradeVisitLast[k], gradeVisitAll[k],
+      gradeOrderMonth[k], gradeOrderLast[k], gradeOrderAll[k],
+      gradeKulboMonth[k], gradeKulboLast[k], gradeKulboAll[k]
+    ]);
+    gradeRows.push([
+      '합계',
+      gSum(gradeMonth), gSum(gradeLast), gSum(gradeAll),
+      gSum(gradeVisitMonth), gSum(gradeVisitLast), gSum(gradeVisitAll),
+      gSum(gradeOrderMonth), gSum(gradeOrderLast), gSum(gradeOrderAll),
+      gSum(gradeKulboMonth), gSum(gradeKulboLast), gSum(gradeKulboAll)
+    ]);
+    sheet.getRange(29, 1, gradeRows.length, 13).setValues(gradeRows);
+    // ★ clearContents()는 값만 지우고 서식은 남기므로, 옛 % 서식이 살아있으면 118 → 11800% 로 표시됨.
+    //   합계행 포함 전 범위에 숫자 서식 강제.
+    sheet.getRange(29, 2, gradeRows.length, 12).setNumberFormat('0');
+
+    function pct(a,b){ return b ? Math.round(a/b*100)+'%' : '0%'; }
+    // 광고비 맵 (YYMM). 메타·당근·네이버GFA는 AD_SPEND(수동), 카카오·네이버는 시트 자동 합산.
+    const lastYYMM = Utilities.formatDate(lastMonthStart, 'GMT+9', 'yyMM');
+    const thisYYMM = Utilities.formatDate(monthStart, 'GMT+9', 'yyMM');
+    // AD_SPEND는 수정하지 않도록 복사본 사용 (전역 오염 방지)
+    const spendLast = Object.assign({}, AD_SPEND[lastYYMM] || {});
+    const spendThis = Object.assign({}, AD_SPEND[thisYYMM] || {});
+
+    // ── 광고비 자동 합산 (카카오 · 네이버SA) ──
+    // 지난달: 1일 ~ 말일 (완료된 달 → 브검 월정액 전액)
+    const lastSince = Utilities.formatDate(lastMonthStart, 'GMT+9', 'yyyy-MM-dd');
+    const lastUntil = Utilities.formatDate(new Date(lastMonthEnd.getTime() - 86400000), 'GMT+9', 'yyyy-MM-dd');
+    // 이번달: 1일 ~ 오늘 (진행중 → 브검 월정액 일할)
+    const thisSince = Utilities.formatDate(monthStart, 'GMT+9', 'yyyy-MM-dd');
+    const thisUntil = todayStr;
+
+    // ★ 브검 일할 비율 = 경과일 / 그달 총일수
+    //   매출은 1일~오늘치만 쌓였는데 광고비는 월 전액이면 ROAS가 저평가됨 → 분모를 같은 기간으로 맞춘다.
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const prorate = monthDayNo / daysInMonth;
+
+    spendLast['카카오'] = sumSpendFromSheet('카카오모먼트', lastSince, lastUntil);
+    spendThis['카카오'] = sumSpendFromSheet('카카오모먼트', thisSince, thisUntil);
+    spendLast['네이버브랜드'] = sumSpendFromSheet('네이버SA', lastSince, lastUntil);                      // 완료된 달 → 전액
+    spendThis['네이버브랜드'] = sumSpendFromSheet('네이버SA', thisSince, thisUntil, { prorate: prorate }); // 진행중 → 브검 일할
+
+    Logger.log('광고비 자동합산 — 지난달(' + lastSince + '~' + lastUntil + ') 카카오 ' +
+               spendLast['카카오'].toLocaleString() + ' / 네이버브랜드 ' + spendLast['네이버브랜드'].toLocaleString());
+    Logger.log('광고비 자동합산 — 이번달(' + thisSince + '~' + thisUntil + ', 브검 일할 ' +
+               monthDayNo + '/' + daysInMonth + '=' + prorate.toFixed(3) + ') 카카오 ' +
+               spendThis['카카오'].toLocaleString() + ' / 네이버브랜드 ' + spendThis['네이버브랜드'].toLocaleString());
+
+    sheet.getRange('A35:S35').setValues([['유입경로별',
+      '이번달DB','지난달DB','전체DB',
+      '이번달방문','지난달방문','전체방문',
+      '이번달세팅','지난달세팅','전체세팅',
+      '이번달오더','지난달오더','전체오더',
+      '지난달광고비','지난달CPL','지난달ROAS',
+      '이번달광고비','이번달CPL','이번달ROAS']]);
+    const routeRows = ROUTE_KEYS.map(k => {
+      const spL   = spendLast[k] || 0;
+      const cplL  = (spL && routeLast[k]) ? Math.round(spL / routeLast[k]) : 0;
+      const roasL = spL ? (routeSalesLast[k] / spL) : 0;
+      const spM   = spendThis[k] || 0;
+      const cplM  = (spM && routeMonth[k]) ? Math.round(spM / routeMonth[k]) : 0;
+      const roasM = spM ? (routeSalesMonth[k] / spM) : 0;
+
+      // ★ CPA(텐핑)는 충전형이라 월별 ROAS가 왜곡됨(태운 달=폭망, 안 태운 달=∞).
+      //   AD_SPEND에서 CPA를 0으로 둬 계산을 껐고, 여기서 '코호트' 표기로 대체.
+      //   실제 성적은 시트 하단 '텐핑코호트' 블록 참조.
+      const isCohort = (k === 'CPA');
+      const roasLStr = isCohort ? '코호트' : (spL ? roasL.toFixed(2) : '');
+      const roasMStr = isCohort ? '코호트' : (spM ? roasM.toFixed(2) : '');
+
+      return [
+        k,
+        routeMonth[k], routeLast[k], routeAll[k],
+        routeVisitMonth[k], routeVisitLast[k], routeVisit[k],
+        routeSettingMonth[k], routeSettingLast[k], routeSetting[k],
+        routeOrderMonth[k], routeOrderLast[k], routeOrder[k],
+        spL, cplL, roasLStr,
+        spM, cplM, roasMStr
+      ];
+    });
+    sheet.getRange(36, 1, routeRows.length, 19).setValues(routeRows);
+    sheet.getRange(36, 2, routeRows.length, 12).setNumberFormat('0');   // DB·방문·세팅·오더 건수
+    const sumRow = 36 + routeRows.length;
+    const sumOf = (o) => Object.values(o).reduce((a,b)=>a+b,0);
+    const tDb = sumOf(routeAll), tDbLast = sumOf(routeLast), tDbMon = sumOf(routeMonth);
+    const tSpendL = sumOf(spendLast), tRvLast = sumOf(routeSalesLast);
+    const tSpendM = sumOf(spendThis), tRvMon = sumOf(routeSalesMonth);
+    sheet.getRange(sumRow, 1, 1, 19).setValues([[
+      '합계', tDbMon, tDbLast, tDb,
+      sumOf(routeVisitMonth), sumOf(routeVisitLast), sumOf(routeVisit),
+      sumOf(routeSettingMonth), sumOf(routeSettingLast), sumOf(routeSetting),
+      sumOf(routeOrderMonth), sumOf(routeOrderLast), sumOf(routeOrder),
+      tSpendL, (tSpendL && tDbLast) ? Math.round(tSpendL/tDbLast) : 0, tSpendL ? (tRvLast/tSpendL).toFixed(2) : '',
+      tSpendM, (tSpendM && tDbMon) ? Math.round(tSpendM/tDbMon) : 0, tSpendM ? (tRvMon/tSpendM).toFixed(2) : ''
+    ]]);
+    // ★ 합계행은 기존에 setNumberFormat 범위 밖이라 옛 % 서식이 남아 118 → 11800% 로 표시됐음.
+    //   데이터행과 동일하게 건수 칼럼(B~M)에 숫자 서식 강제.
+    sheet.getRange(sumRow, 2, 1, 12).setNumberFormat('0');
+
+    const assigneeStartRow = sumRow + 2;
+    sheet.getRange(assigneeStartRow, 1, 1, 19).setValues([[
+      '담당자',
+      '이번달 DB','이번달 방문','이번달 세팅','이번달 방취','이번달 오더','이번달 매출',
+      '지난달 DB','지난달 방문','지난달 세팅','지난달 방취','지난달 오더','지난달 매출',
+      '전체 DB','전체 방문','전체 세팅','전체 방취','전체 오더','전체 매출'
+    ]]);
+    const assigneeRows = ASSIGNEES.map(a => [
+      a,
+      assigneeMonth[a].db, assigneeMonth[a].visit, assigneeMonth[a].setting, assigneeMonth[a].cancel, assigneeMonth[a].order, won(assigneeMonth[a].sales),
+      assigneeLast[a].db,  assigneeLast[a].visit,  assigneeLast[a].setting,  assigneeLast[a].cancel,  assigneeLast[a].order,  won(assigneeLast[a].sales),
+      assigneeAll[a].db,   assigneeAll[a].visit,   assigneeAll[a].setting,   assigneeAll[a].cancel,   assigneeAll[a].order,   won(assigneeAll[a].sales)
+    ]);
+    sheet.getRange(assigneeStartRow + 1, 1, assigneeRows.length, 19).setValues(assigneeRows);
+
+    const campaignStartRow = assigneeStartRow + 1 + ASSIGNEES.length + 1;
+    sheet.getRange(campaignStartRow, 1, 1, 14).setValues([['캠페인','채널','이번달DB','지난달DB','전체DB','이번달방문','지난달방문','전체방문','이번달세팅','지난달세팅','전체세팅','이번달오더','지난달오더','전체오더']]);
+    const campaignSorted = Object.entries(campaignAll).sort((a,b) => (campaignOrderAll[b[0]]||0)-(campaignOrderAll[a[0]]||0) || b[1]-a[1]).slice(0, 50);
+    if (campaignSorted.length > 0) {
+      const campaignRows = campaignSorted.map(([name]) => [
+        name,
+        campaignIsMeta[name] ? '메타' : name,
+        campaignMonth[name] || 0, campaignLast[name] || 0, campaignAll[name] || 0,
+        campaignVisitMonth[name] || 0, campaignVisitLast[name] || 0, campaignVisitAll[name] || 0,
+        campaignSettingMonth[name] || 0, campaignSettingLast[name] || 0, campaignSettingAll[name] || 0,
+        campaignOrderMonth[name] || 0, campaignOrderLast[name] || 0, campaignOrderAll[name] || 0
+      ]);
+      sheet.getRange(campaignStartRow + 1, 1, campaignRows.length, 14).setValues(campaignRows);
+    }
+
+    // ============================================
+    // ★ [신규] 텐핑(CPA) 코호트 블록 — 시트 맨 아래 (기존 행 번호 영향 없음)
+    // 텐핑은 선불 충전형이라 월별 ROAS가 무의미(6월=분모만, 7월=분자만).
+    // 누적 투자 대비 누적 회수로만 평가한다. 대시보드는 이 블록을 읽어 별도 카드로 표시.
+    // ============================================
+    const cohortStartRow = campaignStartRow + 1 + (campaignSorted.length || 0) + 2;
+    const cpaSales = routeSalesAll['CPA'] || 0;
+    const cpaOrder = routeOrder['CPA'] || 0;
+    const cpaDb    = routeAll['CPA'] || 0;
+    const cpaRoas  = CPA_COHORT.totalSpend ? (cpaSales / CPA_COHORT.totalSpend) : 0;
+    const cpaRecov = CPA_COHORT.totalSpend ? (cpaSales / CPA_COHORT.totalSpend * 100) : 0;
+
+    sheet.getRange(cohortStartRow, 1, 1, 2).setValues([['텐핑코호트','값']]);
+    const cohortRows = [
+      ['누적 투자',   CPA_COHORT.totalSpend],
+      ['유효 DB',     CPA_COHORT.validDb],
+      ['노션 DB',     cpaDb],
+      ['실질 CPL',    CPA_COHORT.validDb ? Math.round(CPA_COHORT.totalSpend / CPA_COHORT.validDb) : 0],
+      ['누적 오더',   cpaOrder],
+      ['누적 회수',   cpaSales],
+      ['누적 ROAS',   cpaRoas.toFixed(2)],
+      ['회수율(%)',   Math.round(cpaRecov)],
+      ['집행상태',    CPA_COHORT.active ? '집행중' : '중단(잔액 0)']
+    ];
+    sheet.getRange(cohortStartRow + 1, 1, cohortRows.length, 2).setValues(cohortRows);
+    sheet.getRange(cohortStartRow + 1, 2, cohortRows.length, 1).setNumberFormat('0');
+    Logger.log('텐핑 코호트 — 투자 ' + CPA_COHORT.totalSpend.toLocaleString() +
+               ' / 회수 ' + cpaSales.toLocaleString() +
+               ' / ROAS ' + cpaRoas.toFixed(2) +
+               ' / 오더 ' + cpaOrder + '건');
+
+    exportSchedule(allResults);
+    Logger.log('완료! (모수 ' + allResults.length + '건)');
+  } catch (err) {
+    // ✅ 실패 시 시트 손대지 않고 종료 — 직전 정상 값 유지
+    Logger.log('getLeadStats 에러 (시트 유지): ' + err.toString());
+  }
+}
+
+function exportSchedule(allResults) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const schedule = [];
+
+  allResults.forEach(page => {
+    const props    = page.properties;
+    const name     = props['이름']?.title?.[0]?.plain_text || '';
+    const grade    = props['학년']?.select?.name || '';
+    const assignee = props['담당자']?.select?.name || '';
+    const status   = props['상태']?.select?.name || '';
+
+    const visitDateStr = props['방문 일정']?.date?.start || null;
+    if (visitDateStr) {
+      const visitDate = new Date(visitDateStr);
+      visitDate.setHours(0, 0, 0, 0);
+      if (visitDate >= today && (status !== '오더' && status !== '결보' && status !== '미납')) {
+        const timeStr = visitDateStr.length > 10 ? visitDateStr.substring(11, 16) : '';
+        schedule.push({ date: visitDate, time: timeStr, name, grade, type: 'visit', sales: '', assignee, pageId: page.id });
+      }
+    }
+
+    const isOrder = status === '오더' || status === '미납';
+    if (isOrder) {
+      const payDateStr = props['결제일']?.date?.start || null;
+      if (payDateStr) {
+        const payDate  = new Date(payDateStr);
+        payDate.setHours(0, 0, 0, 0);
+        const salesRaw = props['매출']?.number || 0;
+        if (salesRaw > 0) {
+          schedule.push({ date: payDate, time: '', name, grade, type: 'order', sales: String(salesRaw), assignee, pageId: page.id });
+        }
+      }
     }
   });
 
-  // ── 캠페인 Top 5 (routeTab)
-  const ctbody = document.getElementById('campaign-tbody');
-  const campaigns = [];
-  for (let i = CAMPAIGN_START_IDX; i < allRows.length; i++) {
-    const r = allRows[i];
-    if (!r || !r[0]) break;
-    const p = routeTab;
-    campaigns.push({
-      name:    r[0],
-      channel: r[1] || '',                        // B열: 채널 딱지
-      db:      parseInt(r[2 + p] || '0') || 0,     // DB: C·D·E
-      visit:   parseInt(r[5 + p] || '0') || 0,     // 방문: F·G·H
-      setting: parseInt(r[8 + p] || '0') || 0,     // 세팅: I·J·K
-      order:   parseInt(r[11 + p] || '0') || 0     // 오더: L·M·N
-    });
-  }
-  campaigns.sort((a, b) => b.order - a.order || b.db - a.db);  // 오더순
-  const top5 = campaigns.filter(c => c.db > 0).slice(0, 8);
-  ctbody.innerHTML = top5.length > 0
-    ? top5.map(c => {
-        const vr = c.db ? Math.round(c.visit / c.db * 100) : 0;         // 방문율 = 방문/DB
-        const sr = c.visit ? Math.round(c.setting / c.visit * 100) : 0;    // 세팅율 = 세팅/방문
-        const or_ = c.setting ? Math.round(c.order / c.setting * 100) : 0; // 오더율 = 오더/세팅
-        const isMeta = c.channel === '메타';
-        const badgeColor = isMeta ? '#1a73e8' : (c.channel.indexOf('텐핑')>=0||c.channel.indexOf('CPA')>=0) ? '#e11d48' : c.channel==='카카오' ? '#f4b400' : c.channel==='네이버' ? '#0f9d58' : '#888';
-        const badge = c.channel ? `<span style="display:inline-block;font-size:9px;font-weight:700;color:#fff;background:${badgeColor};border-radius:6px;padding:1px 5px;margin-right:5px;vertical-align:middle;">${escapeHtml(c.channel)}</span>` : '';
-        return `<tr>
-        <td class="name">${badge}${escapeHtml(c.name)}</td>
-        <td class="num">${c.db}</td>
-        <td class="num" style="color:#0891b2">${c.visit} <b style="font-size:10px">(${vr}%)</b></td>
-        <td class="num" style="color:#d97706">${c.setting} <b style="font-size:10px">(${sr}%)</b></td>
-        <td class="num" style="color:#0f9d58">${c.order} <b style="font-size:10px">(${or_}%)</b></td>
-      </tr>`;
-      }).join('')
-    : '<tr><td colspan="5" style="color:#aaa;text-align:center;padding:14px;">데이터 없음</td></tr>';
+  schedule.sort((a, b) => {
+    if (a.date.getTime() !== b.date.getTime()) return a.date - b.date;
+    if (a.time !== b.time) return (a.time || '99:99').localeCompare(b.time || '99:99');
+    return a.type.localeCompare(b.type);
+  });
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName('schedule') || ss.insertSheet('schedule');
+  sheet.clear();
+
+  const rows = [['날짜','시간','이름','학년','타입','매출','담당자','pageId']];
+  schedule.forEach(s => {
+    const dateStr = Utilities.formatDate(s.date, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+    rows.push([dateStr, s.time, s.name, s.grade, s.type, s.sales, s.assignee, s.pageId || '']);
+  });
+  sheet.getRange(1, 1, rows.length, 8).setValues(rows);
+  Logger.log('일정 export: 방문 ' + schedule.filter(s=>s.type==='visit').length + '건 / 오더 ' + schedule.filter(s=>s.type==='order').length + '건');
 }
 
-async function loadSchedule() {
+function _pad2(n) { return String(n).padStart(2, '0'); }
+
+function exportScheduleStandalone() {
   try {
-    const res = await fetch(SCHEDULE_CSV_URL);
-    const text = await res.text();
-    const rows = text.trim().split('\n').map(r => r.split(',').map(c => c.trim()));
-    rows.shift();
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    const todayStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
-    const visits = rows
-      .filter(r => r[0] && r[4] === 'visit')
-      .filter(r => new Date(r[0]) >= today)
-      .sort((a,b) => new Date(a[0]) - new Date(b[0]));
-
-    const list = document.getElementById('visit-list');
-    if (visits.length === 0) {
-      list.innerHTML = '<div class="visit-empty">방문 예정 없음</div>';
-      return;
-    }
-    const dayNames = ['일','월','화','수','목','금','토'];
-    list.innerHTML = visits.map(r => {
-      const d = new Date(r[0]);
-      const dStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-      const isToday = dStr === todayStr;
-      const dateStr = (d.getMonth()+1) + '/' + d.getDate() + ' (' + dayNames[d.getDay()] + ')';
-      const assignee = r[6] || '';
-      const cmap = { '우혜림': 'hye', '김윤호': 'kim', '장윤호': 'jang', '박창건': 'park', '김우진': 'woo', '김태석': 'tae' };
-      const assigneeClass = 'visit-assignee ' + (cmap[assignee] || '');
-      const assigneeHtml = assignee ? `<span class="${assigneeClass}">${escapeHtml(assignee)}</span>` : '';
-      return `<div class="visit-item${isToday ? ' today' : ''}">
-        <span class="visit-date">${isToday ? '오늘' : dateStr}</span>
-        <span class="visit-time">${r[1] || '미정'}</span>
-        <span class="visit-name">${escapeHtml(r[2])}</span>
-        <span class="visit-grade">${shortGrade(r[3])}</span>
-        ${assigneeHtml}
-      </div>`;
-    }).join('');
-  } catch(e) {
-    document.getElementById('visit-list').innerHTML = '<div class="visit-empty">로드 실패</div>';
+    // ✅ 동일 안전망 적용
+    const allResults = collectLeadResults();
+    exportSchedule(allResults);
+  } catch (err) {
+    Logger.log('exportScheduleStandalone 에러 (시트 유지): ' + err.toString());
   }
 }
-
-function shortGrade(g) {
-  if (!g) return '';
-  if (g.includes('초')) { const m = g.match(/\d+/); return m ? '초'+m[0] : '초'; }
-  if (g.includes('중')) { const m = g.match(/\d+/); return m ? '중'+m[0] : '중'; }
-  if (g.includes('고')) { const m = g.match(/\d+/); return m ? '고'+m[0] : '고'; }
-  return g;
-}
-
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-
-loadAll();
-</script>
-</body>
-</html>
