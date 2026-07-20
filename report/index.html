@@ -1665,7 +1665,7 @@ function renderGal(id, data){
       <div class="gi">
         <div class="gt"><span>${s.title}</span> ${badge(s.st)}</div>
         <div class="gtag">${s.tag} · CPL ${s.cpl}</div>
-        ${s.orders>0?`<div class="gsales">${won(s.sales)} · ${s.orders}건</div>`:'<div class="gm"><span class="gl">결제 귀속 없음</span></div>'}
+        ${s.orders>0?`<div class="gsales">${won(s.sales)} · ${s.orders}건</div>`:'<div class="gm"><span class="gl">코호트 집계 예정</span></div>'}
       </div>
     </div>`;
   }).join('');
@@ -1701,7 +1701,7 @@ const JW2_GAL = [
 
 const JW3_GAL = [
   {key:'노트릴스_영상',       title:'노트릴스_영상_2505',   st:'best', tag:'리드 172 · 35-54 91.5% · 오더 10건', cpl:'15,951', sales:0, orders:0},
-  {key:'노트릴스_채리_2606',   title:'채리_2606',           st:'dead', tag:'25-34 노출 56.7% · 딜리버리 이탈 (DB 학년은 정상)', cpl:'44,882', sales:0, orders:0},
+  {key:'노트릴스_채리_2606',   title:'채리_2606',           st:'ok',   tag:'25-34 노출 이탈했으나 DB 학년 정상 · 오더 1건 · 생존', cpl:'44,882', sales:0, orders:0},
   {key:'GT노트피드백_영상',    title:'GT노트피드백_2605',    st:'ok',   tag:'35-54 71.9% · 회수 관찰', cpl:'29,812', sales:0, orders:0},
   {key:'노트필기릴스_2607', title:'노트필기릴스_2607', st:'best', tag:'필기에도 방법이 있습니다 · 리드 87 · 35-54 81.5%', cpl:'14,333', sales:0, orders:0},
 ];
