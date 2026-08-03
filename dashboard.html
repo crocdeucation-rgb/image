@@ -9,7 +9,8 @@
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard',-apple-system,system-ui,sans-serif; }
 body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 
-.layout { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; max-width: 1600px; margin: 0 auto; padding: 8px 14px; }
+.layout { display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 14px; max-width: 1700px; margin: 0 auto; padding: 8px 14px; }
+.salesbar { max-width: 1700px; margin: 0 auto 4px; padding: 4px 14px 0; }
 @media (max-width: 1100px) { .layout { grid-template-columns: 1fr 1fr; } }
 
 @media (max-width: 700px) {
@@ -170,6 +171,17 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
   <button class="sec-nav-btn" onclick="showSec(2)">방문</button>
 </div>
 
+<!-- 매출 전체폭 상단바 -->
+<div class="salesbar">
+  <div class="section-label" style="margin-top:0;">매출 <span class="badge pay">결제일 기준</span></div>
+  <div class="grid-4">
+    <div class="card"><div class="clabel">이번 달<span class="dayno" id="dn-month"></span></div><div class="cval purple sm" id="sales-month">-</div></div>
+    <div class="card"><div class="clabel">지난 달</div><div class="cval sm" id="sales-last">-</div></div>
+    <div class="card"><div class="clabel">이번 주<span class="dayno" id="dn-week"></span></div><div class="cval purple sm" id="sales-week">-</div></div>
+    <div class="card"><div class="clabel">지난 주</div><div class="cval sm" id="sales-lastweek">-</div></div>
+  </div>
+</div>
+
 <div class="layout" id="layout">
 
 <!-- 섹션1: 퍼널 -->
@@ -181,27 +193,6 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
     <div class="updated" id="updated">불러오는 중...</div>
   </div>
   <button class="refresh" onclick="loadAll()">새로고침</button>
-</div>
-
-<!-- 매출: 2×2 (이번달/지난달 · 이번주/지난주) -->
-<div class="section-label" style="margin-top:0;">매출 <span class="badge pay">결제일 기준</span></div>
-<div class="grid-2">
-  <div class="card">
-    <div class="clabel">이번 달<span class="dayno" id="dn-month"></span></div>
-    <div class="cval purple sm" id="sales-month">-</div>
-  </div>
-  <div class="card">
-    <div class="clabel">지난 달</div>
-    <div class="cval sm" id="sales-last">-</div>
-  </div>
-  <div class="card">
-    <div class="clabel">이번 주<span class="dayno" id="dn-week"></span></div>
-    <div class="cval purple sm" id="sales-week">-</div>
-  </div>
-  <div class="card">
-    <div class="clabel">지난 주</div>
-    <div class="cval sm" id="sales-lastweek">-</div>
-  </div>
 </div>
 
 <!-- 유입 현황: 이번달 고정 -->
@@ -317,7 +308,7 @@ const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJ
 const ASSIGNEES = ['우혜림','김윤호','장윤호','박창건','김태석','김성윤','노영호','김원득','김우진'];
 // ROUTE_KEYS 7→8개(네이버GFA 추가)로 유입경로 표가 1행 늘어 아래 블록이 모두 1행씩 밀림
 const ASSIGNEE_START_IDX = 46;
-const CAMPAIGN_START_IDX = 54;
+const CAMPAIGN_START_IDX = 57;  // 담당자 9명(헤더1+9행+여백1) 반영 — 6명일 땐 54
 
 function showSec(idx) {
   currentSec = idx;
