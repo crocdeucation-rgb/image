@@ -83,6 +83,19 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
 .cval.sm  { font-size: 15px; }
 .cval.xs  { font-size: 12px; }
 
+/* [개편] 관리자/담당자 뷰 · 원가열 · 히트맵 */
+body.personal-view .adm-only { display: none !important; }
+.view-toggle { display:inline-flex; gap:4px; margin-left:6px; vertical-align:middle; }
+.view-toggle button { font-size:10px; padding:2px 9px; border-radius:12px; border:1px solid #ddd; background:#fff; cursor:pointer; color:#999; font-weight:600; }
+.view-toggle button.on { background:#1a73e8; color:#fff; border-color:#1a73e8; }
+.funnel-table td.cost { color:#e65100; font-weight:600; font-size:11px; }
+.funnel-table td.iroas { color:#0f9d58; font-weight:800; font-size:12px; }
+.funnel-table td.eff2 { color:#9333ea; font-weight:600; font-size:11px; }
+.heat-table{width:100%;border-collapse:collapse;font-size:11px;background:#fff;border-radius:8px;overflow:hidden;border:1px solid #eee}
+.heat-table th{font-size:9px;font-weight:700;color:#888;padding:5px 2px;text-align:center;background:#f0f4ff;white-space:nowrap}
+.heat-table th.l,.heat-table td.l{text-align:left;font-weight:700;padding-left:8px;color:#444}
+.heat-table td{text-align:center;padding:1px}
+.heat-cell{display:block;padding:5px 1px;border-radius:4px;font-weight:700;min-width:22px}
 .funnel-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; border: 1px solid #eee; font-size: 11px; }
 .funnel-table th { background: #f0f4ff; color: #1a73e8; font-weight: 700; padding: 8px 6px; text-align: center; border-bottom: 1px solid #e0e8ff; white-space: nowrap; }
 .funnel-table td { padding: 8px 6px; text-align: center; border-bottom: 1px solid #f5f5f5; color: #1a1a1a; }
@@ -126,6 +139,9 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 .visit-assignee.tae { background: #0891b2; }
 .visit-assignee.kim { background: #1a73e8; }
 .visit-assignee.jang { background: #f97316; }
+.visit-assignee.sung { background: #7c3aed; }
+.visit-assignee.noh { background: #0d9488; }
+.visit-assignee.won { background: #b45309; }
 .visit-empty { padding: 20px; text-align: center; color: #aaa; font-size: 12px; }
   .crate { font-size:10px; margin-top:3px; font-weight:600; }
   .route-eff { font-size:9px; margin-top:2px; color:#556; font-weight:600; letter-spacing:-0.2px; }
@@ -189,7 +205,7 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 </div>
 
 <!-- 담당자별 퍼널: 자체 토글 -->
-<div class="section-label">담당자별 퍼널 <span class="badge today" id="tab-label">이번달</span></div>
+<div class="section-label">담당자별 퍼널 <span class="badge today" id="tab-label">이번달</span><span class="view-toggle"><button class="on" onclick="setView('admin')">관리자</button><button onclick="setView('personal')">담당자</button></span></div>
 <div class="tabs" id="funnel-tabs">
   <button class="tab active" onclick="setFunnelTab(0)">이번달</button>
   <button class="tab" onclick="setFunnelTab(1)">지난달</button>
@@ -206,12 +222,19 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
       <th>매출</th>
       <th>방취율</th>
       <th>오더율</th>
+      <th class="adm-only">투입원가</th>
+      <th class="adm-only">개인ROAS</th>
+      <th>DB당효율</th>
     </tr>
   </thead>
   <tbody id="funnel-tbody">
-    <tr><td colspan="9" style="color:#aaa;text-align:center;padding:16px;">불러오는 중...</td></tr>
+    <tr><td colspan="12" style="color:#aaa;text-align:center;padding:16px;">불러오는 중...</td></tr>
   </tbody>
 </table>
+
+<!-- [개편] 담당자 × 소재 배정 히트맵 -->
+<div class="section-label" style="margin-top:14px">담당자 × 소재 배정 <span class="badge" style="background:#e8faf6;color:#0a8a5c">배정 균형</span></div>
+<div id="heatmap-wrap"><div style="color:#aaa;text-align:center;padding:12px;font-size:11px">불러오는 중...</div></div>
 </div>
 
 <!-- 섹션2: 유입경로 분석 -->
@@ -272,6 +295,10 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 
 <script>
 let allRows = [];
+function setView(v){
+  document.body.classList.toggle('personal-view', v==='personal');
+  document.querySelectorAll('.view-toggle button').forEach((b,i)=>b.classList.toggle('on',(v==='admin')===(i===0)));
+}
 let funnelTab = 0;   // 0=이번달 1=지난달
 let routeTab  = 0;   // 0=이번달 1=지난달 2=전체
 let currentSec = 0;
@@ -279,7 +306,7 @@ let currentSec = 0;
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1438610573&single=true&output=csv';
 const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1384080283&single=true&output=csv';
 
-const ASSIGNEES = ['우혜림', '김윤호', '장윤호', '박창건', '김우진', '김태석'];
+const ASSIGNEES = ['우혜림','김윤호','장윤호','박창건','김태석','김성윤','노영호','김원득','김우진'];
 // ROUTE_KEYS 7→8개(네이버GFA 추가)로 유입경로 표가 1행 늘어 아래 블록이 모두 1행씩 밀림
 const ASSIGNEE_START_IDX = 46;
 const CAMPAIGN_START_IDX = 54;
@@ -395,6 +422,9 @@ function render() {
     else totalSalesNum += salesNum;
     const cancelRate = visit ? Math.round(cancel/visit*100) : 0;
     const orderRate  = setting ? Math.round(order/setting*100) : 0;
+    const costV  = r[19] ? r[19]+'만' : '-';
+    const iroasV = r[20] || '-';
+    const effV   = r[21] ? r[21]+'만' : '-';
     return `<tr>
       <td class="name">${r[0] || name}</td>
       <td class="num db">${db}</td>
@@ -405,6 +435,9 @@ function render() {
       <td class="sales">${sales}</td>
       <td class="rate" style="color:#e11d48">${cancelRate}%</td>
       <td class="rate">${orderRate}%</td>
+      <td class="cost adm-only">${costV}</td>
+      <td class="iroas adm-only">${iroasV}</td>
+      <td class="eff2">${effV}</td>
     </tr>`;
   });
   const totCancelRate = totalVisit ? Math.round(totalCancel/totalVisit*100) : 0;
@@ -424,8 +457,28 @@ function render() {
     <td class="sales">${totSalesStr}</td>
     <td class="rate" style="color:#e11d48">${totCancelRate}%</td>
     <td class="rate">${totOrderRate}%</td>
+    <td class="cost adm-only">-</td>
+    <td class="iroas adm-only">-</td>
+    <td class="eff2">-</td>
   </tr>`);
   tbody.innerHTML = rows.join('');
+
+  // [개편] 담당자 × 소재 히트맵 렌더 (r[22] = 소재분포 "키:값;키:값")
+  const SOJ_KEYS=['노트릴스','노필릴스','채리','GT','MLST공부','MLST캐러셀','노트공부법','너만본다','CPA(텐핑)','카카오','Organic','네이버브랜드','기타'];
+  let heatMax=1;
+  const heatData=ASSIGNEES.map((name,i)=>{
+    const r=allRows[ASSIGNEE_START_IDX+i]||[];
+    const soj={}; (r[22]||'').split(';').forEach(p=>{const idx=p.lastIndexOf(':'); if(idx>0){soj[p.slice(0,idx)]=parseInt(p.slice(idx+1))||0;}});
+    SOJ_KEYS.forEach(k=>{if((soj[k]||0)>heatMax)heatMax=soj[k];});
+    return {name:r[0]||name, soj};
+  });
+  const heatColor=v=>{ if(!v) return '#f7f7f7'; const t=Math.min(v/heatMax,1); return 'rgba(0,194,163,'+(0.12+t*0.85).toFixed(2)+')'; };
+  let ht='<table class="heat-table"><thead><tr><th class="l">담당자</th>'+SOJ_KEYS.map(k=>'<th>'+k+'</th>').join('')+'</tr></thead><tbody>';
+  heatData.forEach(d=>{
+    ht+='<tr><td class="l">'+d.name+'</td>'+SOJ_KEYS.map(k=>{const v=d.soj[k]||0; const fg=v>heatMax*0.6?'#fff':'#333'; return '<td><span class="heat-cell" style="background:'+heatColor(v)+';color:'+fg+'">'+(v||'')+'</span></td>';}).join('')+'</tr>';
+  });
+  ht+='</tbody></table>';
+  const hw=document.getElementById('heatmap-wrap'); if(hw) hw.innerHTML=ht;
 
   // ── 학년별 (routeTab)
   const gtl = document.getElementById('grade-tab-label');
@@ -570,7 +623,7 @@ async function loadSchedule() {
       const isToday = dStr === todayStr;
       const dateStr = (d.getMonth()+1) + '/' + d.getDate() + ' (' + dayNames[d.getDay()] + ')';
       const assignee = r[6] || '';
-      const cmap = { '우혜림': 'hye', '김윤호': 'kim', '장윤호': 'jang', '박창건': 'park', '김우진': 'woo', '김태석': 'tae' };
+      const cmap = { '우혜림':'hye','김윤호':'kim','장윤호':'jang','박창건':'park','김우진':'woo','김태석':'tae','김성윤':'sung','노영호':'noh','김원득':'won' };
       const assigneeClass = 'visit-assignee ' + (cmap[assignee] || '');
       const assigneeHtml = assignee ? `<span class="${assigneeClass}">${escapeHtml(assignee)}</span>` : '';
 
