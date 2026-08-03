@@ -91,6 +91,14 @@ body.personal-view .adm-only { display: none !important; }
 .funnel-table td.cost { color:#e65100; font-weight:600; font-size:11px; }
 .funnel-table td.iroas { color:#0f9d58; font-weight:800; font-size:12px; }
 .funnel-table td.eff2 { color:#9333ea; font-weight:600; font-size:11px; }
+.funnel-table td.iroas .rbar{display:inline-block;height:5px;border-radius:3px;background:#0f9d58;margin-left:5px;vertical-align:middle;opacity:.55}
+/* [한 화면 압축] */
+.funnel-table td, .funnel-table th { padding:4px 5px !important; font-size:11px !important; }
+.heat-table td { height:auto; }
+.heat-cell { padding:3px 1px !important; font-size:10px !important; min-width:18px !important; }
+.heat-table th { padding:3px 1px !important; font-size:8px !important; }
+#heatmap-wrap { margin-top:4px; }
+.section-label { margin-top:10px !important; margin-bottom:6px !important; }
 .heat-table{width:100%;border-collapse:collapse;font-size:11px;background:#fff;border-radius:8px;overflow:hidden;border:1px solid #eee}
 .heat-table th{font-size:9px;font-weight:700;color:#888;padding:5px 2px;text-align:center;background:#f0f4ff;white-space:nowrap}
 .heat-table th.l,.heat-table td.l{text-align:left;font-weight:700;padding-left:8px;color:#444}
@@ -233,7 +241,7 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 </table>
 
 <!-- [개편] 담당자 × 소재 배정 히트맵 -->
-<div class="section-label" style="margin-top:14px">담당자 × 소재 배정 <span class="badge" style="background:#e8faf6;color:#0a8a5c">배정 균형</span></div>
+<div class="section-label" style="margin-top:14px">담당자 × 소재 배정 <span class="badge" style="background:#e8faf6;color:#0a8a5c" id="heat-tab-label">이번달</span></div>
 <div id="heatmap-wrap"><div style="color:#aaa;text-align:center;padding:12px;font-size:11px">불러오는 중...</div></div>
 </div>
 
@@ -423,7 +431,8 @@ function render() {
     const cancelRate = visit ? Math.round(cancel/visit*100) : 0;
     const orderRate  = setting ? Math.round(order/setting*100) : 0;
     const costV  = r[19] ? r[19]+'만' : '-';
-    const iroasV = r[20] || '-';
+    const iroasN = parseFloat(r[20])||0;
+    const iroasV = iroasN ? `${iroasN}<span class="rbar" style="width:${Math.min(iroasN*4,52)}px"></span>` : '-';
     const effV   = r[21] ? r[21]+'만' : '-';
     return `<tr>
       <td class="name">${r[0] || name}</td>
@@ -466,9 +475,10 @@ function render() {
   // [개편] 담당자 × 소재 히트맵 렌더 (r[22] = 소재분포 "키:값;키:값")
   const SOJ_KEYS=['노트릴스','노필릴스','채리','GT','MLST공부','MLST캐러셀','노트공부법','너만본다','CPA(텐핑)','카카오','Organic','네이버브랜드','기타'];
   let heatMax=1;
+  const _sojCol = funnelTab===1 ? 23 : (funnelTab===2 ? 24 : 22);
   const heatData=ASSIGNEES.map((name,i)=>{
     const r=allRows[ASSIGNEE_START_IDX+i]||[];
-    const soj={}; (r[22]||'').split(';').forEach(p=>{const idx=p.lastIndexOf(':'); if(idx>0){soj[p.slice(0,idx)]=parseInt(p.slice(idx+1))||0;}});
+    const soj={}; (r[_sojCol]||'').split(';').forEach(p=>{const idx=p.lastIndexOf(':'); if(idx>0){soj[p.slice(0,idx)]=parseInt(p.slice(idx+1))||0;}});
     SOJ_KEYS.forEach(k=>{if((soj[k]||0)>heatMax)heatMax=soj[k];});
     return {name:r[0]||name, soj};
   });
@@ -479,6 +489,7 @@ function render() {
   });
   ht+='</tbody></table>';
   const hw=document.getElementById('heatmap-wrap'); if(hw) hw.innerHTML=ht;
+  const htl=document.getElementById('heat-tab-label'); if(htl) htl.textContent = funnelTab===1?'지난달':(funnelTab===2?'전체':'이번달');
 
   // ── 학년별 (routeTab)
   const gtl = document.getElementById('grade-tab-label');
