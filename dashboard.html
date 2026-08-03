@@ -419,10 +419,11 @@ function render() {
     else totalSalesNum += salesNum;
     const cancelRate = visit ? Math.round(cancel/visit*100) : 0;
     const orderRate  = setting ? Math.round(order/setting*100) : 0;
-    const costV  = r[19] ? r[19]+'만' : '-';
-    const iroasN = parseFloat(r[20])||0;
+    const _co = 19 + funnelTab*3;
+    const costV  = r[_co] ? r[_co]+'만' : '-';
+    const iroasN = parseFloat(r[_co+1])||0;
     const iroasV = iroasN ? `${iroasN}<span class="rbar" style="width:${Math.min(iroasN*4,52)}px"></span>` : '-';
-    const effV   = r[21] ? r[21]+'만' : '-';
+    const effV   = r[_co+2] ? r[_co+2]+'만' : '-';
     return `<tr>
       <td class="name">${r[0] || name}</td>
       <td class="num db">${db}</td>
@@ -464,7 +465,7 @@ function render() {
   // [개편] 담당자 × 소재 히트맵 렌더 (r[22] = 소재분포 "키:값;키:값")
   const SOJ_KEYS=['노트릴스','노필릴스','채리','GT','MLST공부','MLST캐러셀','노트공부법','너만본다','CPA(텐핑)','카카오','Organic','네이버브랜드','기타'];
   let heatMax=1;
-  const _sojCol = funnelTab===1 ? 23 : (funnelTab===2 ? 24 : 22);
+  const _sojCol = funnelTab===1 ? 29 : (funnelTab===2 ? 30 : 28);
   const heatData=ASSIGNEES.map((name,i)=>{
     const r=allRows[ASSIGNEE_START_IDX+i]||[];
     const soj={}; (r[_sojCol]||'').split(';').forEach(p=>{const idx=p.lastIndexOf(':'); if(idx>0){soj[p.slice(0,idx)]=parseInt(p.slice(idx+1))||0;}});
