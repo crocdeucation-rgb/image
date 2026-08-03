@@ -171,17 +171,6 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
   <button class="sec-nav-btn" onclick="showSec(2)">방문</button>
 </div>
 
-<!-- 매출 전체폭 상단바 -->
-<div class="salesbar">
-  <div class="section-label" style="margin-top:0;">매출 <span class="badge pay">결제일 기준</span></div>
-  <div class="grid-4">
-    <div class="card"><div class="clabel">이번 달<span class="dayno" id="dn-month"></span></div><div class="cval purple sm" id="sales-month">-</div></div>
-    <div class="card"><div class="clabel">지난 달</div><div class="cval sm" id="sales-last">-</div></div>
-    <div class="card"><div class="clabel">이번 주<span class="dayno" id="dn-week"></span></div><div class="cval purple sm" id="sales-week">-</div></div>
-    <div class="card"><div class="clabel">지난 주</div><div class="cval sm" id="sales-lastweek">-</div></div>
-  </div>
-</div>
-
 <div class="layout" id="layout">
 
 <!-- 섹션1: 퍼널 -->
@@ -195,19 +184,21 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
   <button class="refresh" onclick="loadAll()">새로고침</button>
 </div>
 
-<!-- 유입 현황: 이번달 고정 -->
-<div class="section-label">유입 현황 <span class="badge">이번달</span></div>
-<div class="grid-3">
-  <div class="card"><div class="clabel">총 유입</div><div class="cval blue sm" id="v-total">-</div></div>
-  <div class="card"><div class="clabel">오늘 유입</div><div class="cval amber sm" id="v-today">-</div></div>
-  <div class="card"><div class="clabel">어제 유입</div><div class="cval orange sm" id="v-yesterday">-</div></div>
+<!-- 매출 (유입현황 자리, 한 줄 4칸) -->
+<div class="section-label" style="margin-top:0;">매출 <span class="badge pay">결제일 기준</span></div>
+<div class="grid-4">
+  <div class="card"><div class="clabel">이번 달<span class="dayno" id="dn-month"></span></div><div class="cval purple sm" id="sales-month">-</div></div>
+  <div class="card"><div class="clabel">지난 달</div><div class="cval sm" id="sales-last">-</div></div>
+  <div class="card"><div class="clabel">이번 주<span class="dayno" id="dn-week"></span></div><div class="cval purple sm" id="sales-week">-</div></div>
+  <div class="card"><div class="clabel">지난 주</div><div class="cval sm" id="sales-lastweek">-</div></div>
 </div>
 
 <!-- 담당자별 퍼널: 자체 토글 -->
-<div class="section-label">담당자별 퍼널 <span class="badge today" id="tab-label">이번달</span><span class="view-toggle"><button class="on" onclick="setView('admin')">관리자</button><button onclick="setView('personal')">담당자</button></span></div>
+<div class="section-label">담당자별 성과분석 <span class="badge today" id="tab-label">이번달</span><span class="view-toggle"><button class="on" onclick="setView('admin')">관리자</button><button onclick="setView('personal')">담당자</button></span></div>
 <div class="tabs" id="funnel-tabs">
   <button class="tab active" onclick="setFunnelTab(0)">이번달</button>
   <button class="tab" onclick="setFunnelTab(1)">지난달</button>
+  <button class="tab" onclick="setFunnelTab(2)">전체</button>
 </div>
 <table class="funnel-table">
   <thead>
@@ -246,7 +237,14 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
   <button class="tab" onclick="setRouteTab(2)">전체</button>
 </div>
 
-<div class="section-label" style="margin-top:0;">학년별 <span class="badge today" id="grade-tab-label">이번달</span></div>
+<div class="section-label" style="margin-top:0;">유입 현황 <span class="badge">이번달</span></div>
+<div class="grid-3">
+  <div class="card"><div class="clabel">총 유입</div><div class="cval blue sm" id="v-total">-</div></div>
+  <div class="card"><div class="clabel">오늘 유입</div><div class="cval amber sm" id="v-today">-</div></div>
+  <div class="card"><div class="clabel">어제 유입</div><div class="cval orange sm" id="v-yesterday">-</div></div>
+</div>
+
+<div class="section-label">학년별 <span class="badge today" id="grade-tab-label">이번달</span></div>
 <div class="grid-3">
   <div class="card"><div class="clabel">초등</div><div class="cval blue xs" id="grade-elem">-</div><div class="route-eff" id="ge-elem"></div></div>
   <div class="card"><div class="clabel">중등</div><div class="cval green xs" id="grade-mid">-</div><div class="route-eff" id="ge-mid"></div></div>
@@ -360,7 +358,7 @@ function funnelText(v,vr,s,sr,o,or_){
        + `<span class="fnl fnl-o">오더 ${o} <b>(${or_}%)</b></span>`;
 }
 function render() {
-  const funnelName = ['이번달','지난달'][funnelTab];
+  const funnelName = ['이번달','지난달','전체'][funnelTab];
   const routeName  = ['이번달','지난달','전체'][routeTab];
   const convCol = routeTab + 1;   // 학년별/유입경로 DB 컬럼
   document.getElementById('tab-label').textContent = funnelName;
