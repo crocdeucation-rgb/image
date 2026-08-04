@@ -136,7 +136,6 @@ body.personal-view .adm-only { display: none !important; }
 .visit-date { font-size: 11px; font-weight: 600; color: #1a73e8; min-width: 52px; }
 .visit-time { font-size: 11px; color: #0f9d58; min-width: 44px; }
 .visit-name { font-size: 12px; color: #1a1a1a; font-weight: 500; }
-/* ★ [추가] 이름이 노션 링크일 때 — 밑줄 없이, 호버 시에만 표시 */
 a.visit-name { text-decoration: none; cursor: pointer; }
 a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 .visit-item.today a.visit-name:hover { color: #e65100; }
@@ -157,9 +156,9 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 
 .fnl { display:inline-block; font-size:10px; line-height:1.5; margin-right:6px; white-space:nowrap; }
 .fnl b { font-weight:700; }
-.fnl-v { color:#0891b2; }  /* 방문 파랑 */
-.fnl-s { color:#d97706; }  /* 세팅 주황 */
-.fnl-o { color:#0f9d58; }  /* 오더 초록 */
+.fnl-v { color:#0891b2; }
+.fnl-s { color:#d97706; }
+.fnl-o { color:#0f9d58; }
 @media (max-width:640px){ .fnl { display:block; margin-right:0; } }
 </style>
 </head>
@@ -184,7 +183,6 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
   <button class="refresh" onclick="loadAll()">새로고침</button>
 </div>
 
-<!-- 매출 (유입현황 자리, 한 줄 4칸) -->
 <div class="section-label" style="margin-top:0;">매출 <span class="badge pay">결제일 기준</span></div>
 <div class="grid-4">
   <div class="card"><div class="clabel">이번 달<span class="dayno" id="dn-month"></span></div><div class="cval purple sm" id="sales-month">-</div></div>
@@ -193,7 +191,6 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
   <div class="card"><div class="clabel">지난 주</div><div class="cval sm" id="sales-lastweek">-</div></div>
 </div>
 
-<!-- 담당자별 퍼널: 자체 토글 -->
 <div class="section-label">담당자별 성과분석 <span class="badge today" id="tab-label">이번달</span><span class="view-toggle"><button class="on" onclick="setView('admin')">관리자</button><button onclick="setView('personal')">담당자</button></span></div>
 <div class="tabs" id="funnel-tabs">
   <button class="tab active" onclick="setFunnelTab(0)">이번달</button>
@@ -222,7 +219,6 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
   </tbody>
 </table>
 
-<!-- [개편] 담당자 × 소재 배정 히트맵 -->
 <div class="section-label" style="margin-top:14px">담당자 × 소재 배정 <span class="badge" style="background:#e8faf6;color:#0a8a5c" id="heat-tab-label">이번달</span></div>
 <div id="heatmap-wrap"><div style="color:#aaa;text-align:center;padding:12px;font-size:11px">불러오는 중...</div></div>
 </div>
@@ -296,17 +292,16 @@ function setView(v){
   document.body.classList.toggle('personal-view', v==='personal');
   document.querySelectorAll('.view-toggle button').forEach((b,i)=>b.classList.toggle('on',(v==='admin')===(i===0)));
 }
-let funnelTab = 0;   // 0=이번달 1=지난달
-let routeTab  = 0;   // 0=이번달 1=지난달 2=전체
+let funnelTab = 0;
+let routeTab  = 0;
 let currentSec = 0;
 
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1438610573&single=true&output=csv';
 const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1384080283&single=true&output=csv';
 
 const ASSIGNEES = ['우혜림','김윤호','장윤호','박창건','김태석','김성윤','노영호','김원득','김우진'];
-// ROUTE_KEYS 7→8개(네이버GFA 추가)로 유입경로 표가 1행 늘어 아래 블록이 모두 1행씩 밀림
 const ASSIGNEE_START_IDX = 46;
-const CAMPAIGN_START_IDX = 57;  // 담당자 9명(헤더1+9행+여백1) 반영 — 6명일 땐 54
+const CAMPAIGN_START_IDX = 57;
 
 function showSec(idx) {
   currentSec = idx;
@@ -332,21 +327,18 @@ async function loadData() {
   }
 }
 
-// 담당자별 퍼널 전용 탭
 function setFunnelTab(idx) {
   funnelTab = idx;
   document.querySelectorAll('#funnel-tabs .tab').forEach((t,i) => t.classList.toggle('active', i===idx));
   render();
 }
 
-// 유입경로 분석 전용 탭
 function setRouteTab(idx) {
   routeTab = idx;
   document.querySelectorAll('#route-tabs .tab').forEach((t,i) => t.classList.toggle('active', i===idx));
   render();
 }
 
-// "이번 달 매출 (8일차)" → "8일차"
 function pickDayNo(s) {
   const m = String(s || '').match(/\((\d+일차)\)/);
   return m ? m[1] : '';
@@ -360,11 +352,9 @@ function funnelText(v,vr,s,sr,o,or_){
 function render() {
   const funnelName = ['이번달','지난달','전체'][funnelTab];
   const routeName  = ['이번달','지난달','전체'][routeTab];
-  const convCol = routeTab + 1;   // 학년별/유입경로 DB 컬럼
+  const convCol = routeTab + 1;
   document.getElementById('tab-label').textContent = funnelName;
 
-  // ── 텐핑 코호트 블록 파싱 (시트 맨 아래, '텐핑코호트' 헤더로 시작)
-  // 행 번호가 캠페인 수에 따라 달라지므로 라벨로 찾는다.
   let cpaCohort = null;
   for (let i = CAMPAIGN_START_IDX; i < allRows.length; i++) {
     if (allRows[i] && allRows[i][0] === '텐핑코호트') {
@@ -385,7 +375,6 @@ function render() {
     }
   }
 
-  // ── 매출 2×2 (요약시트 12행: 이번달|값|이번주|값 / 13행: 지난달|값|지난주|값)
   const r12 = allRows[11] || [];
   const r13 = allRows[12] || [];
   document.getElementById('sales-month').textContent    = r12[1] || '-';
@@ -395,13 +384,10 @@ function render() {
   document.getElementById('dn-month').textContent = pickDayNo(r12[0]);
   document.getElementById('dn-week').textContent  = pickDayNo(r12[2]);
 
-  // ── 유입 현황 (이번달 고정)
-  // allRows[1] = [총유입, 오늘, 이번달, 지난달, 전체]
   document.getElementById('v-total').textContent     = allRows[1]?.[2] || '0';
   document.getElementById('v-today').textContent     = allRows[1]?.[1] || '0';
   document.getElementById('v-yesterday').textContent = allRows[2]?.[1] || '0';
 
-  // ── 담당자 퍼널 (funnelTab)
   const offset = funnelTab * 6 + 1;
   const tbody = document.getElementById('funnel-tbody');
   let totalDb=0, totalVisit=0, totalSetting=0, totalCancel=0, totalOrder=0, totalSalesNum=0;
@@ -441,9 +427,6 @@ function render() {
   });
   const totCancelRate = totalVisit ? Math.round(totalCancel/totalVisit*100) : 0;
   const totOrderRate  = totalSetting ? Math.round(totalOrder/totalSetting*100) : 0;
-  // 합계 매출 = 상단 매출카드(raw 원단위 전체합 → 1회 반올림)를 그대로 사용.
-  // 담당자별 셀은 각자 만원 반올림된 값이라, 되더하면 반올림 오차가 누적됨(8422 vs 8421).
-  // 이번달 탭 → r12[1](sales-month), 지난달 탭 → r13[1](sales-last)와 항상 일치.
   const totSalesFallback = totalSalesNum >= 10000 ? Math.round(totalSalesNum/10000) + '만원' : totalSalesNum + '원';
   const totSalesStr = (funnelTab === 0 ? r12[1] : r13[1]) || totSalesFallback;
   rows.push(`<tr class="total">
@@ -462,26 +445,32 @@ function render() {
   </tr>`);
   tbody.innerHTML = rows.join('');
 
-  // [개편] 담당자 × 소재 히트맵 렌더 (r[22] = 소재분포 "키:값;키:값")
+  // [개편] 담당자 × 소재 히트맵 렌더 (r[_sojCol] = 소재분포 "키:값;키:값")
   const SOJ_KEYS=['노트릴스','노필릴스','채리','GT','MLST공부','MLST캐러셀','노트공부법','너만본다','CPA(텐핑)','카카오','Organic','네이버브랜드','기타'];
-  let heatMax=1;
   const _sojCol = funnelTab===1 ? 29 : (funnelTab===2 ? 30 : 28);
   const heatData=ASSIGNEES.map((name,i)=>{
     const r=allRows[ASSIGNEE_START_IDX+i]||[];
     const soj={}; (r[_sojCol]||'').split(';').forEach(p=>{const idx=p.lastIndexOf(':'); if(idx>0){soj[p.slice(0,idx)]=parseInt(p.slice(idx+1))||0;}});
-    SOJ_KEYS.forEach(k=>{if((soj[k]||0)>heatMax)heatMax=soj[k];});
     return {name:r[0]||name, soj};
   });
+  // ★ [수정] 이 탭에서 1건이라도 배정된 소재만 컬럼으로 (값 0 소재 자동 숨김)
+  const activeSojKeys = SOJ_KEYS.filter(k => heatData.some(d => (d.soj[k]||0) > 0));
+  let heatMax=1;
+  heatData.forEach(d=>{ activeSojKeys.forEach(k=>{if((d.soj[k]||0)>heatMax)heatMax=d.soj[k];}); });
   const heatColor=v=>{ if(!v) return '#f7f7f7'; const t=Math.min(v/heatMax,1); return 'rgba(0,194,163,'+(0.12+t*0.85).toFixed(2)+')'; };
-  let ht='<table class="heat-table"><thead><tr><th class="l">담당자</th>'+SOJ_KEYS.map(k=>'<th>'+k+'</th>').join('')+'</tr></thead><tbody>';
-  heatData.forEach(d=>{
-    ht+='<tr><td class="l">'+d.name+'</td>'+SOJ_KEYS.map(k=>{const v=d.soj[k]||0; const fg=v>heatMax*0.6?'#fff':'#333'; return '<td><span class="heat-cell" style="background:'+heatColor(v)+';color:'+fg+'">'+(v||'')+'</span></td>';}).join('')+'</tr>';
-  });
-  ht+='</tbody></table>';
+  let ht;
+  if (activeSojKeys.length === 0) {
+    ht = '<div style="color:#aaa;text-align:center;padding:12px;font-size:11px">이 기간 소재 배정 없음</div>';
+  } else {
+    ht='<table class="heat-table"><thead><tr><th class="l">담당자</th>'+activeSojKeys.map(k=>'<th>'+k+'</th>').join('')+'</tr></thead><tbody>';
+    heatData.forEach(d=>{
+      ht+='<tr><td class="l">'+d.name+'</td>'+activeSojKeys.map(k=>{const v=d.soj[k]||0; const fg=v>heatMax*0.6?'#fff':'#333'; return '<td><span class="heat-cell" style="background:'+heatColor(v)+';color:'+fg+'">'+(v||'')+'</span></td>';}).join('')+'</tr>';
+    });
+    ht+='</tbody></table>';
+  }
   const hw=document.getElementById('heatmap-wrap'); if(hw) hw.innerHTML=ht;
   const htl=document.getElementById('heat-tab-label'); if(htl) htl.textContent = funnelTab===1?'지난달':(funnelTab===2?'전체':'이번달');
 
-  // ── 학년별 (routeTab)
   const gtl = document.getElementById('grade-tab-label');
   if (gtl) gtl.textContent = routeName;
   [['grade-elem','ge-elem',28],['grade-mid','ge-mid',29],['grade-high','ge-high',30]].forEach(([dbId,effId,row])=>{
@@ -490,20 +479,17 @@ function render() {
     const eff = document.getElementById(effId);
     if (eff) {
       const db = parseInt(r[convCol] || '0') || 0;
-      const v = parseInt(r[convCol+3] || '0') || 0;   // 방문(전체방문)
-      const o = parseInt(r[convCol+6] || '0') || 0;   // 오더
-      const k = parseInt(r[convCol+9] || '0') || 0;   // 결보
-      const s = o + k;                                 // 세팅 = 결보+오더
-      const vr = db ? Math.round(v/db*100) : 0;        // 방문율 = 방문/DB
-      const sr = v ? Math.round(s/v*100) : 0;          // 세팅율 = 세팅/방문
-      const or_ = s ? Math.round(o/s*100) : 0;         // 오더율 = 오더/세팅
+      const v = parseInt(r[convCol+3] || '0') || 0;
+      const o = parseInt(r[convCol+6] || '0') || 0;
+      const k = parseInt(r[convCol+9] || '0') || 0;
+      const s = o + k;
+      const vr = db ? Math.round(v/db*100) : 0;
+      const sr = v ? Math.round(s/v*100) : 0;
+      const or_ = s ? Math.round(o/s*100) : 0;
       eff.innerHTML = funnelText(v,vr,s,sr,o,or_);
     }
   });
 
-  // ── 유입경로별 (routeTab)
-  // ROUTE_KEYS가 7→8개(네이버GFA 추가)로 늘어 유입경로 표가 1행 길어졌음.
-  // 시트 순서: 35 메타 / 36 Organic / 37 당근 / 38 카카오 / 39 네이버 / 40 네이버GFA / 41 CPA / 42 기타 / 43 합계
   const effCols = routeTab === 0 ? [17,18] : routeTab === 1 ? [14,15] : null;
   const rel = document.getElementById('route-eff-label');
   const rSum = allRows[43] || [];
@@ -521,7 +507,6 @@ function render() {
   routeMap.forEach(([dbId, rateId, row]) => {
     const r = allRows[row] || [];
     document.getElementById(dbId).textContent = r[convCol] || '-';
-    // DB 0인 채널 카드는 숨김 (당근·네이버GFA)
     if (dbId === 'route-daangn' || dbId === 'route-navergfa') {
       const cardId = dbId === 'route-daangn' ? 'card-daangn' : 'card-navergfa';
       const dcard = document.getElementById(cardId);
@@ -531,19 +516,16 @@ function render() {
     const rateEl = document.getElementById(rateId);
     if (rateEl) {
       const db = parseInt(r[convCol] || '0') || 0;
-      // 건수 (시트가 건수로 출력) → 율은 여기서 계산
-      const vis = parseInt(r[4 + routeTab] || '0') || 0;   // 방문수
-      const set = parseInt(r[7 + routeTab] || '0') || 0;   // 세팅수
-      const ord = parseInt(r[10 + routeTab] || '0') || 0;  // 오더수
-      const vr = db ? Math.round(vis/db*100) : 0;          // 방문율=방문/DB
-      const sr = vis ? Math.round(set/vis*100) : 0;        // 세팅율=세팅/방문
-      const or_ = set ? Math.round(ord/set*100) : 0;       // 오더율=오더/세팅
+      const vis = parseInt(r[4 + routeTab] || '0') || 0;
+      const set = parseInt(r[7 + routeTab] || '0') || 0;
+      const ord = parseInt(r[10 + routeTab] || '0') || 0;
+      const vr = db ? Math.round(vis/db*100) : 0;
+      const sr = vis ? Math.round(set/vis*100) : 0;
+      const or_ = set ? Math.round(ord/set*100) : 0;
       let html = (db>0) ? `<span class="fnl fnl-v">방문 ${vis} <b>(${vr}%)</b></span><span class="fnl fnl-s">세팅 ${set} <b>(${sr}%)</b></span><span class="fnl fnl-o">오더 ${ord} <b>(${or_}%)</b></span>` : '';
       if (effCols) {
         const cpl  = r[effCols[0]] || '';
         const roas = r[effCols[1]] || '';
-        // ★ 텐핑(CPA)은 선불 충전형 → 월별 CPL/ROAS 무의미(태운 달=폭망, 안 태운 달=∞).
-        //   getLeadStats가 ROAS 칸에 '코호트'를 넣어주므로, 여기선 누적 지표로 대체 표시.
         if (dbId === 'route-cpa') {
           if (cpaCohort) {
             html += `<div class="route-eff">누적 CPL ₩${cpaCohort.cpl.toLocaleString()} · 누적 ROAS ${cpaCohort.roas}</div>`;
@@ -561,7 +543,6 @@ function render() {
     }
   });
 
-  // ── 캠페인 Top 5 (routeTab)
   const ctbody = document.getElementById('campaign-tbody');
   const campaigns = [];
   for (let i = CAMPAIGN_START_IDX; i < allRows.length; i++) {
@@ -570,20 +551,20 @@ function render() {
     const p = routeTab;
     campaigns.push({
       name:    r[0],
-      channel: r[1] || '',                        // B열: 채널 딱지
-      db:      parseInt(r[2 + p] || '0') || 0,     // DB: C·D·E
-      visit:   parseInt(r[5 + p] || '0') || 0,     // 방문: F·G·H
-      setting: parseInt(r[8 + p] || '0') || 0,     // 세팅: I·J·K
-      order:   parseInt(r[11 + p] || '0') || 0     // 오더: L·M·N
+      channel: r[1] || '',
+      db:      parseInt(r[2 + p] || '0') || 0,
+      visit:   parseInt(r[5 + p] || '0') || 0,
+      setting: parseInt(r[8 + p] || '0') || 0,
+      order:   parseInt(r[11 + p] || '0') || 0
     });
   }
-  campaigns.sort((a, b) => b.order - a.order || b.db - a.db);  // 오더순
+  campaigns.sort((a, b) => b.order - a.order || b.db - a.db);
   const top5 = campaigns.filter(c => c.db > 0).slice(0, 8);
   ctbody.innerHTML = top5.length > 0
     ? top5.map(c => {
-        const vr = c.db ? Math.round(c.visit / c.db * 100) : 0;         // 방문율 = 방문/DB
-        const sr = c.visit ? Math.round(c.setting / c.visit * 100) : 0;    // 세팅율 = 세팅/방문
-        const or_ = c.setting ? Math.round(c.order / c.setting * 100) : 0; // 오더율 = 오더/세팅
+        const vr = c.db ? Math.round(c.visit / c.db * 100) : 0;
+        const sr = c.visit ? Math.round(c.setting / c.visit * 100) : 0;
+        const or_ = c.setting ? Math.round(c.order / c.setting * 100) : 0;
         const isMeta = c.channel === '메타';
         const badgeColor = isMeta ? '#1a73e8' : (c.channel.indexOf('텐핑')>=0||c.channel.indexOf('CPA')>=0) ? '#e11d48' : c.channel==='카카오' ? '#f4b400' : c.channel==='네이버' ? '#0f9d58' : '#888';
         const badge = c.channel ? `<span style="display:inline-block;font-size:9px;font-weight:700;color:#fff;background:${badgeColor};border-radius:6px;padding:1px 5px;margin-right:5px;vertical-align:middle;">${escapeHtml(c.channel)}</span>` : '';
@@ -627,17 +608,11 @@ async function loadSchedule() {
       const cmap = { '우혜림':'hye','김윤호':'kim','장윤호':'jang','박창건':'park','김우진':'woo','김태석':'tae','김성윤':'sung','노영호':'noh','김원득':'won' };
       const assigneeClass = 'visit-assignee ' + (cmap[assignee] || '');
       const assigneeHtml = assignee ? `<span class="${assigneeClass}">${escapeHtml(assignee)}</span>` : '';
-
-      // ★ [추가] pageId(r[7]) 있으면 이름을 노션 카드 직행 링크로.
-      //   임베드 iframe은 notion:// 직접호출을 차단(백지) → https를 _blank(새 창)로 연다.
-      //   새 창은 iframe 밖 최상위라, 노션 데스크톱 앱 설치 시 OS가 https를 앱으로 가로챔.
-      //   앱 없으면 그냥 웹으로 열림. 어느 쪽이든 대시보드는 그대로 유지됨.
       const pageId = (r[7] || '').replace(/-/g, '');
       const nameEsc = escapeHtml(r[2]);
       const nameHtml = pageId
         ? `<a class="visit-name" href="https://notion.so/${pageId}" target="_blank" rel="noopener">${nameEsc}</a>`
         : `<span class="visit-name">${nameEsc}</span>`;
-
       return `<div class="visit-item${isToday ? ' today' : ''}">
         <span class="visit-date">${isToday ? '오늘' : dateStr}</span>
         <span class="visit-time">${r[1] || '미정'}</span>
