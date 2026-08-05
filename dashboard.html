@@ -446,7 +446,8 @@ function render() {
   tbody.innerHTML = rows.join('');
 
   // [개편] 담당자 × 소재 히트맵 렌더 (r[_sojCol] = 소재분포 "키:값;키:값")
-  const SOJ_KEYS=['노트릴스','노필릴스','채리','GT','MLST공부','MLST캐러셀','노트공부법','너만본다','CPA(텐핑)','카카오','Organic','네이버브랜드','기타'];
+  // ★ 2026-08-04 신규 소재 추가: 원톱·5단계루틴·기초부족 (getLeadStats sojKeyOf와 키 일치시킬 것)
+  const SOJ_KEYS=['노트릴스','노필릴스','채리','GT','원톱','5단계루틴','기초부족','MLST공부','MLST캐러셀','노트공부법','너만본다','CPA(텐핑)','카카오','Organic','네이버브랜드','기타'];
   const _sojCol = funnelTab===1 ? 29 : (funnelTab===2 ? 30 : 28);
   const heatData=ASSIGNEES.map((name,i)=>{
     const r=allRows[ASSIGNEE_START_IDX+i]||[];
