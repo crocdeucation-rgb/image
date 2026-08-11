@@ -109,9 +109,10 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 .sw input:checked + .sl2:before{transform:translateX(19px)}
 .sw.busy .sl2{background:#e11d48}
 .dchip{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;border:1.5px solid #dfe3ea;background:#fff;color:#aeb4bf;font-size:10.5px;font-weight:800;cursor:pointer;transition:.12s;user-select:none}
-.dchip.off{background:#fdecef;border-color:#f3b6c1;color:#d11846}
+.dchip.on{background:#e6f4ea;border-color:#a8d5b5;color:#0f9d58}
+.wk .evd{font-size:8.5px;color:#0f9d58;background:#e9f6ee;border-radius:6px;padding:1px 5px;font-weight:800;margin-left:5px;vertical-align:middle}
 .wk-note{font-size:10px;color:#9aa1ad;padding:7px 14px 2px}
-.wk-note b{color:#e11d48}
+.wk-note b{color:#0f9d58}
 </style>
 </head>
 <body>
@@ -170,7 +171,7 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
       <div style="padding:0 4px 4px;overflow-x:auto">
         <table class="wk"><thead><tr><th class="l">담당자</th><th>가능</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr></thead><tbody id="wk-body"></tbody></table>
       </div>
-      <div class="wk-note">업무 못 할 땐 <b>가능 OFF</b> · 이번 주 안 되는 날은 <b>요일</b>을 눌러 표시 (토요일 밤 자동 초기화)</div>
+      <div class="wk-note">오늘 못 나오면 <b>가능 OFF</b> · 고정 근무요일이 있으면 <b>요일</b>을 눌러 켜기 (안 누르면 <b>매일</b> 근무)</div>
     </div>
   </div>
 
@@ -187,7 +188,9 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 const SITUATION_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=669050300&single=true&output=csv';
 const SUMMARY_CSV_URL   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1438610573&single=true&output=csv';
 const SCHEDULE_CSV_URL  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1384080283&single=true&output=csv';
-const WORK_CSV_URL      = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=WORK_GID&single=true&output=csv';
+// ★ WORK_CSV_URL: '아라위키 자동화' 스프레드시트(1K0UY...)를 [웹에 게시]한 뒤,
+//   '근무상태' 탭의 gid로 아래 URL 전체를 교체할 것. (게시 전엔 WORK_GID인 채로 두면 기본값=전원 매일근무로 폴백)
+const WORK_CSV_URL      = 'https://docs.google.com/spreadsheets/d/e/PASTE_WORK_PUBLISH_ID/pub?gid=WORK_GID&single=true&output=csv';
 const WEBAPP_URL        = 'https://script.google.com/macros/s/AKfycbx_7WuNu6T6ou_vyBj5w2fEAjZLPm4aVLrKpTbTDD218z_rxThyS_yDytAtJRU4LDk-cQ/exec';
 
 const MID_DAYS=4;
@@ -236,50 +239,54 @@ function tglMid(el,pid){
   fetch(WEBAPP_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'midmanage',pageId:pid,checked:el.checked})}).catch(function(){});
 }
 
-/* ── 근무 스테이터스 (독립 카드) ── */
+/* ── 근무 스테이터스 (독립 카드 / 하이브리드: 요일=근무일 positive) ── */
 const cHex={hye:'#0f9d58',kim:'#1a73e8',jang:'#f97316',park:'#9333ea',woo:'#e11d48',tae:'#0891b2',sung:'#7c3aed',noh:'#0d9488',won:'#b45309'};
 async function loadWork(){
   let ok=false;
-  if(WORK_CSV_URL.indexOf('WORK_GID')<0){
+  if(WORK_CSV_URL.indexOf('WORK_GID')<0 && WORK_CSV_URL.indexOf('PASTE_')<0){
     try{
       const rows=await csv(WORK_CSV_URL); rows.shift();
       rows.forEach(function(r){ if(!r[0])return;
-        var off={}; WDAYS.forEach(function(d,i){off[d]=(r[2+i]==='1'||r[2+i]==='TRUE'||r[2+i]==='O')});
-        workState[r[0]]={active:!(r[1]==='0'||r[1]==='FALSE'), off:off};
+        var work={}; WDAYS.forEach(function(d,i){work[d]=(r[2+i]==='1'||r[2+i]==='TRUE'||r[2+i]==='O')});
+        workState[r[0]]={active:!(r[1]==='0'||r[1]==='FALSE'), work:work};
       }); ok=true;
     }catch(e){}
   }
-  if(!ok){ ASSIGNEES.forEach(function(n){ if(!workState[n]) workState[n]={active:true,off:{월:false,화:false,수:false,목:false,금:false,토:false}}; }); }
+  if(!ok){ ASSIGNEES.forEach(function(n){ if(!workState[n]) workState[n]={active:true,work:{월:false,화:false,수:false,목:false,금:false,토:false}}; }); }
   renderWorkRows();
 }
 function renderWorkRows(){
   if(!document.getElementById('wk-body'))return;
   var todayN=dayN[new Date().getDay()];
   var html=ASSIGNEES.map(function(n){
-    var s=workState[n]||{active:true,off:{}};
+    var s=workState[n]||{active:true,work:{}};
+    var anyWork=WDAYS.some(function(d){return s.work&&s.work[d]});
     var days=WDAYS.map(function(d){
-      var isOff=!!(s.off&&s.off[d]);
+      var isWork=!!(s.work&&s.work[d]);
       var mark=(d===todayN)?'outline:2px solid #c4b5fd;outline-offset:1px':'';
-      return '<td><span class="dchip '+(isOff?'off':'')+'" style="'+mark+'" onclick="tglDay(\''+n+'\',\''+d+'\',this)">'+d+'</span></td>';
+      return '<td><span class="dchip '+(isWork?'on':'')+'" style="'+mark+'" onclick="tglDay(\''+n+'\',\''+d+'\',this)">'+d+'</span></td>';
     }).join('');
     var sw='<label class="sw '+(s.active?'':'busy')+'"><input type="checkbox" '+(s.active?'checked':'')+' onchange="tglActive(\''+n+'\',this)"><span class="sl2"></span></label>';
     var color=cHex[cmap[n]]||'#3c434f';
-    return '<tr><td class="nm" style="color:'+color+'">'+esc(n)+'</td><td>'+sw+'</td>'+days+'</tr>';
+    var evd=anyWork?'':'<span class="evd">매일</span>';
+    return '<tr><td class="nm" style="color:'+color+'">'+esc(n)+evd+'</td><td>'+sw+'</td>'+days+'</tr>';
   }).join('');
   document.getElementById('wk-body').innerHTML=html;
 }
 function tglActive(name,el){
   el.closest('.sw').classList.toggle('busy',!el.checked);
-  if(!workState[name])workState[name]={active:true,off:{}};
+  if(!workState[name])workState[name]={active:true,work:{}};
   workState[name].active=el.checked;
   postWork({action:'setActive',name:name,active:el.checked});
 }
 function tglDay(name,day,el){
-  if(!workState[name])workState[name]={active:true,off:{}};
-  if(!workState[name].off)workState[name].off={};
-  var next=!workState[name].off[day];
-  workState[name].off[day]=next; el.classList.toggle('off',next);
+  if(!workState[name])workState[name]={active:true,work:{}};
+  if(!workState[name].work)workState[name].work={};
+  var next=!workState[name].work[day];
+  workState[name].work[day]=next;
+  // off 파라미터에 '이 요일 체크박스 값'(=근무여부)을 그대로 전달 → 노션 체크박스 true=근무일
   postWork({action:'setDayoff',name:name,day:day,off:next});
+  renderWorkRows(); // '매일' 배지 즉시 갱신
 }
 function postWork(p){
   if(!WEBAPP_URL||WEBAPP_URL.indexOf('PASTE_')===0) return;
