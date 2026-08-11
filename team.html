@@ -22,7 +22,7 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 
 .board{display:grid;grid-template-columns:minmax(0,1.32fr) minmax(0,1fr) minmax(0,.74fr);gap:14px;height:calc(100vh - 62px)}
 .colwrap{display:flex;flex-direction:column;gap:12px;min-height:0}
-.mid{display:grid;grid-template-rows:auto minmax(0,1fr);gap:12px;min-height:0}
+.mid{display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:12px;min-height:0}
 @media (max-width:1240px){ .board{grid-template-columns:1fr;height:auto} .colwrap,.mid{min-height:0} }
 
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
@@ -99,7 +99,7 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 .wk th{background:#f7f8fb;color:#6b7280;font-weight:700;font-size:9.5px;padding:6px 3px;text-align:center}
 .wk th.l{text-align:left;padding-left:14px}
 .wk td{padding:5px 3px;text-align:center;border-bottom:1px solid #f4f5f8}
-.wk td.nm{text-align:left;padding-left:14px;white-space:nowrap}
+.wk td.nm{text-align:left;padding-left:14px;white-space:nowrap;font-weight:800}
 .wk tr:last-child td{border-bottom:none}
 .sw{position:relative;display:inline-block;width:42px;height:23px;cursor:pointer;vertical-align:middle}
 .sw input{opacity:0;width:0;height:0}
@@ -165,6 +165,13 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
       <div class="ch"><span class="t">📋 지금 챙길 리드</span><span class="badge sp">실시간</span></div>
       <div class="scroll" id="situation" style="flex:1"><div class="empty">불러오는 중...</div></div>
     </div>
+    <div class="card">
+      <div class="ch"><span class="t">🟢 근무 스테이터스</span><span class="badge sp">직접 체크</span></div>
+      <div style="padding:0 4px 4px;overflow-x:auto">
+        <table class="wk"><thead><tr><th class="l">담당자</th><th>가능</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr></thead><tbody id="wk-body"></tbody></table>
+      </div>
+      <div class="wk-note">업무 못 할 땐 <b>가능 OFF</b> · 이번 주 안 되는 날은 <b>요일</b>을 눌러 표시 (토요일 밤 자동 초기화)</div>
+    </div>
   </div>
 
   <!-- 우: 방문 목록 -->
@@ -210,24 +217,18 @@ async function loadAll(){
 async function loadSit(){
   let rows;
   try{ rows=await csv(SITUATION_CSV_URL); rows.shift(); }
-  catch(e){ document.getElementById('situation').innerHTML='<div class="empty">데이터를 불러오지 못했어요. GitHub(https)에서 열어야 표시됩니다.</div>'+renderWorkBlock(); renderWorkRows(); return; }
+  catch(e){ document.getElementById('situation').innerHTML='<div class="empty">데이터를 불러오지 못했어요. GitHub(https)에서 열어야 표시됩니다.</div>'; return; }
   const L=rows.filter(r=>r[0]).map(r=>({pageId:r[0],name:r[1],grade:r[2],as:r[3],status:r[4],vd:r[5],vt:r[6],prio:r[7]==='1',mid:r[8]==='1'}));
-  const mid=[],prio=[];
+  const mid=[];
   L.forEach(l=>{ const v=vFmt(l.vd,l.vt);
     if(v.diff!==null&&v.diff>=MID_DAYS) mid.push({l,v});
-    if(l.prio) prio.push({l,v});
   });
   mid.sort((a,b)=>a.v.diff-b.v.diff);
 
   const midRow=({l,v})=>'<div class="item '+(l.mid?'done':'')+'"><input type="checkbox" class="chk" '+(l.mid?'checked':'')+' onchange="tglMid(this,\''+l.pageId+'\')"><span class="when">'+v.lab+'</span>'+nmL(l.name,l.pageId)+' <span class="gr">'+esc(l.grade)+'</span><span class="mn">+'+v.diff+'일</span>'+asB(l.as)+'</div>';
-  const prioRow=({l})=>'<div class="item">'+nmL(l.name,l.pageId)+' <span class="gr">'+esc(l.grade)+'</span><span class="badge">'+esc(l.status)+'</span>'+asB(l.as)+'</div>';
-
   const grp=(icon,label,color,arr,fn)=>'<div class="grp"><div class="glabel">'+icon+' '+label+'<span class="gc" style="background:'+color+'">'+arr.length+'</span></div>'+(arr.length?arr.map(fn).join(''):'<div class="empty">없음</div>')+'</div>';
   document.getElementById('situation').innerHTML =
-    grp('🔔','중간관리','var(--purple)',mid,midRow) +
-    grp('📌','우선순위','var(--red)',prio,prioRow) +
-    renderWorkBlock();
-  renderWorkRows();
+    grp('🔔','중간관리','var(--purple)',mid,midRow);
 }
 function tglMid(el,pid){
   el.closest('.item').classList.toggle('done',el.checked);
@@ -235,7 +236,8 @@ function tglMid(el,pid){
   fetch(WEBAPP_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'midmanage',pageId:pid,checked:el.checked})}).catch(function(){});
 }
 
-/* ── 근무 스테이터스 (홀딩 자리) ── */
+/* ── 근무 스테이터스 (독립 카드) ── */
+const cHex={hye:'#0f9d58',kim:'#1a73e8',jang:'#f97316',park:'#9333ea',woo:'#e11d48',tae:'#0891b2',sung:'#7c3aed',noh:'#0d9488',won:'#b45309'};
 async function loadWork(){
   let ok=false;
   if(WORK_CSV_URL.indexOf('WORK_GID')<0){
@@ -248,12 +250,7 @@ async function loadWork(){
     }catch(e){}
   }
   if(!ok){ ASSIGNEES.forEach(function(n){ if(!workState[n]) workState[n]={active:true,off:{월:false,화:false,수:false,목:false,금:false,토:false}}; }); }
-  if(document.getElementById('wk-body')) renderWorkRows();
-}
-function renderWorkBlock(){
-  return '<div class="grp" style="border-top:6px solid #f1f3f7"><div class="glabel">🟢 근무 스테이터스<span class="gc" style="background:var(--green)">직접 체크</span></div>'+
-    '<div style="padding:0 4px;overflow-x:auto"><table class="wk"><thead><tr><th class="l">담당자</th><th>가능</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr></thead><tbody id="wk-body"></tbody></table></div>'+
-    '<div class="wk-note">업무 못 할 땐 <b>가능 OFF</b> · 이번 주 안 되는 날은 <b>요일</b>을 눌러 표시 (토요일 밤 자동 초기화)</div></div>';
+  renderWorkRows();
 }
 function renderWorkRows(){
   if(!document.getElementById('wk-body'))return;
@@ -266,7 +263,8 @@ function renderWorkRows(){
       return '<td><span class="dchip '+(isOff?'off':'')+'" style="'+mark+'" onclick="tglDay(\''+n+'\',\''+d+'\',this)">'+d+'</span></td>';
     }).join('');
     var sw='<label class="sw '+(s.active?'':'busy')+'"><input type="checkbox" '+(s.active?'checked':'')+' onchange="tglActive(\''+n+'\',this)"><span class="sl2"></span></label>';
-    return '<tr><td class="nm">'+asB(n)+'</td><td>'+sw+'</td>'+days+'</tr>';
+    var color=cHex[cmap[n]]||'#3c434f';
+    return '<tr><td class="nm" style="color:'+color+'">'+esc(n)+'</td><td>'+sw+'</td>'+days+'</tr>';
   }).join('');
   document.getElementById('wk-body').innerHTML=html;
 }
