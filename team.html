@@ -23,8 +23,7 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 /* 3분할: 좌 퍼널 / 가운데 상하 / 우 방문 */
 .board{display:grid;grid-template-columns:minmax(0,1.32fr) minmax(0,1fr) minmax(0,.74fr);gap:14px;height:calc(100vh - 62px)}
 .colwrap{display:flex;flex-direction:column;gap:12px;min-height:0}
-.mid{display:grid;grid-template-rows:auto minmax(0,1fr);gap:12px;min-height:0}
-@media (max-width:1240px){ .board{grid-template-columns:1fr;height:auto} .colwrap,.mid{min-height:0} }
+.mid{display:grid;grid-template-rows:minmax(0,1fr) auto;gap:12px;min-height:0}
 
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
 .ch{display:flex;align-items:center;gap:8px;padding:11px 15px 10px;border-bottom:1px solid var(--line)}
@@ -34,6 +33,7 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 .ch .tabs{display:flex;gap:4px}
 .tab{font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid var(--line);background:#fff;color:#7a828f;cursor:pointer;font-weight:600}
 .tab.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.badge{font-size:9.5px;color:#64748b;background:#f1f3f7;border-radius:7px;padding:1px 7px}
 .pad{padding:12px 14px}
 .scroll{overflow-y:auto;min-height:0}
 .scroll::-webkit-scrollbar{width:7px} .scroll::-webkit-scrollbar-thumb{background:#d5d9e0;border-radius:4px}
@@ -46,7 +46,7 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 .sc.now .v{color:var(--purple)}
 
 /* 성과 표 */
-.pfwrap{overflow:auto} 
+.pfwrap{overflow:auto}
 .pf{width:100%;border-collapse:collapse;font-size:11.5px;white-space:nowrap}
 .pf th{position:sticky;top:0;background:#f5f7fb;color:#5b6472;font-weight:700;font-size:10.5px;padding:7px 6px;text-align:center;border-bottom:1px solid var(--line)}
 .pf td{padding:7px 6px;text-align:center;border-bottom:1px solid #f4f5f8}
@@ -64,7 +64,7 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 .heat td{text-align:center;padding:1.5px}
 .heat .cell{display:block;padding:5px 1px;border-radius:5px;font-weight:800;min-width:20px}
 
-/* 이번주 팀성과 — 컴팩트 로우 */
+/* 이번주 팀성과 */
 .hl{display:flex;flex-direction:column}
 .hlrow{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid #f4f5f8}
 .hlrow:last-child{border-bottom:none}
@@ -76,7 +76,7 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 .hlrow.hold{background:#f6f9ff} .hlrow.hold .vl{color:var(--blue)}
 .hlrow .no{font-size:9px;color:#a7aeba;margin-left:6px}
 
-/* 리드 아이템 공통 */
+/* 리드 아이템 */
 .grp{padding:8px 0}
 .glabel{display:flex;align-items:center;gap:7px;padding:4px 14px 7px;font-size:11.5px;font-weight:800;color:#5b6472}
 .glabel .gc{font-size:10px;font-weight:800;color:#fff;border-radius:20px;padding:0 7px}
@@ -100,6 +100,55 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 /* 담당자 색 */
 .as.hye{background:var(--green)} .as.kim{background:var(--blue)} .as.jang{background:#f97316} .as.park{background:var(--purple)}
 .as.woo{background:var(--red)} .as.tae{background:var(--cyan)} .as.sung{background:#7c3aed} .as.noh{background:#0d9488} .as.won{background:#b45309}
+
+/* ── 근무 스테이터스 ── */
+.wk{width:100%;border-collapse:collapse;font-size:12px}
+.wk th{background:#f5f7fb;color:#5b6472;font-weight:700;font-size:10px;padding:7px 4px;text-align:center;position:sticky;top:0;border-bottom:1px solid var(--line)}
+.wk th.l{text-align:left;padding-left:14px}
+.wk td{padding:6px 4px;text-align:center;border-bottom:1px solid #f4f5f8}
+.wk td.nm{text-align:left;font-weight:800;color:#3c434f;padding-left:14px;white-space:nowrap}
+.wk tr:last-child td{border-bottom:none}
+/* 토글 스위치 */
+.sw{position:relative;display:inline-block;width:46px;height:25px;cursor:pointer;vertical-align:middle}
+.sw input{opacity:0;width:0;height:0}
+.sw .sl2{position:absolute;inset:0;background:#cfd4dd;border-radius:25px;transition:.18s}
+.sw .sl2:before{content:"";position:absolute;height:19px;width:19px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.18s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.sw input:checked + .sl2{background:var(--green)}
+.sw input:checked + .sl2:before{transform:translateX(21px)}
+.sw.busy .sl2{background:#e11d48}
+/* 요일 체크칩 */
+.dchip{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;border:1.5px solid #dfe3ea;background:#fff;color:#aeb4bf;font-size:11px;font-weight:800;cursor:pointer;transition:.12s;user-select:none}
+.dchip.off{background:#fef2f4;border-color:#f5c2 cc;color:var(--red)}
+.dchip.off{background:#fdecef;border-color:#f3b6c1;color:#d11846}
+.wk-note{font-size:10px;color:#9aa1ad;padding:8px 14px 4px}
+.wk-note b{color:#e11d48}
+
+/* ── 모바일 탭바 (기본 숨김) ── */
+.mtabs{display:none}
+.mtab-panel{display:block}
+
+@media (max-width:1240px){
+  body{padding:10px 10px 66px}
+  .board{grid-template-columns:1fr;height:auto;gap:0}
+  .colwrap,.mid{min-height:0;gap:0;display:block}
+  /* 모바일: 패널 단위로 보이기/숨기기 */
+  .mtab-panel{display:none;margin-bottom:0}
+  .mtab-panel.on{display:block}
+  .mtab-panel .card{margin-bottom:12px}
+  .mtab-panel .card:last-child{margin-bottom:0}
+  /* 카드 내부 스크롤 해제(페이지 스크롤로) */
+  .scroll{overflow:visible;max-height:none}
+  .card.colwrap,.card[style]{height:auto!important}
+  /* 하단 탭바 */
+  .mtabs{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:50;background:#fff;border-top:1px solid var(--line);box-shadow:0 -2px 12px rgba(20,25,40,.06)}
+  .mtabs button{flex:1;border:none;background:none;padding:9px 2px 8px;font-size:11px;font-weight:700;color:#9aa1ad;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+  .mtabs button .mi{font-size:17px;line-height:1}
+  .mtabs button.on{color:var(--purple)}
+}
+@media (min-width:1241px){
+  /* 데스크탑에선 모든 패널 항상 표시 (3분할 유지) */
+  .mtab-panel{display:contents}
+}
 </style>
 </head>
 <body>
@@ -111,8 +160,8 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 </div>
 
 <div class="board">
-  <!-- 좌: 담당자 퍼널 -->
-  <div class="colwrap">
+  <!-- 좌: 성과 (모바일 탭: 성과) -->
+  <div class="colwrap mtab-panel on" data-panel="perf">
     <div class="card">
       <div class="ch"><span class="t">매출</span><span class="badge sp">결제일 기준</span></div>
       <div class="sales">
@@ -141,22 +190,36 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
         <div id="heat-wrap"><div class="empty">불러오는 중...</div></div>
       </div>
     </div>
-  </div>
 
-  <!-- 가운데: 상 팀성과 / 하 챙길리드 -->
-  <div class="mid">
     <div class="card">
       <div class="ch"><span class="t">🔥 이번주 팀 성과</span><span class="badge sp">이번주</span></div>
       <div class="hl" id="hl"></div>
     </div>
-    <div class="card colwrap" style="min-height:0;gap:0">
+  </div>
+
+  <!-- 가운데: 챙길 리드 + 근무 스테이터스(챙길 리드 아래) -->
+  <div class="mid">
+    <!-- 챙길 리드 (모바일 탭: 챙길리드) -->
+    <div class="card colwrap mtab-panel" data-panel="lead" style="min-height:0;gap:0">
       <div class="ch"><span class="t">📋 지금 챙길 리드</span><span class="badge sp">실시간</span></div>
       <div class="scroll" id="situation" style="flex:1"><div class="empty">불러오는 중...</div></div>
     </div>
+
+    <!-- 근무 스테이터스 (모바일 탭: 근무) — 챙길 리드 아래(구 홀딩 자리) -->
+    <div class="card mtab-panel" data-panel="work">
+      <div class="ch"><span class="t">🟢 근무 스테이터스</span><span class="badge sp">직접 체크</span></div>
+      <div class="scroll" style="max-height:none">
+        <table class="wk">
+          <thead><tr><th class="l">담당자</th><th>업무가능</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr></thead>
+          <tbody id="wk-body"></tbody>
+        </table>
+      </div>
+      <div class="wk-note">업무 못 할 땐 <b>업무가능 OFF</b> · 이번 주 안 되는 날은 <b>요일</b>을 눌러 표시하세요 (토요일 밤 자동 초기화)</div>
+    </div>
   </div>
 
-  <!-- 우: 방문 목록 -->
-  <div class="colwrap">
+  <!-- 우: 방문 목록 (모바일 탭: 방문) -->
+  <div class="colwrap mtab-panel" data-panel="visit">
     <div class="card colwrap" style="flex:1;min-height:0;gap:0">
       <div class="ch"><span class="t">📅 방문 목록</span><span class="cnt sp" id="c-visit" style="background:var(--amber)">0</span></div>
       <div class="scroll" id="visit" style="flex:1"><div class="empty">불러오는 중...</div></div>
@@ -164,10 +227,20 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
   </div>
 </div>
 
+<!-- 모바일 하단 탭바: 성과 근무 챙길리드 방문 -->
+<nav class="mtabs">
+  <button class="on" data-t="perf" onclick="mtab('perf',this)"><span class="mi">📊</span>성과</button>
+  <button data-t="work" onclick="mtab('work',this)"><span class="mi">🟢</span>근무</button>
+  <button data-t="lead" onclick="mtab('lead',this)"><span class="mi">📋</span>챙길리드</button>
+  <button data-t="visit" onclick="mtab('visit',this)"><span class="mi">📅</span>방문</button>
+</nav>
+
 <script>
 const SITUATION_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=669050300&single=true&output=csv';
 const SUMMARY_CSV_URL   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1438610573&single=true&output=csv';
 const SCHEDULE_CSV_URL  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1384080283&single=true&output=csv';
+/* 근무 스테이터스 CSV (노션 상태표 → 시트 미러). 없으면 기본 전원 ON으로 표시 */
+const WORK_CSV_URL      = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=WORK_GID&single=true&output=csv';
 const WEBAPP_URL        = 'https://script.google.com/macros/s/AKfycbx_7WuNu6T6ou_vyBj5w2fEAjZLPm4aVLrKpTbTDD218z_rxThyS_yDytAtJRU4LDk-cQ/exec';
 
 const MID_DAYS=4;
@@ -176,7 +249,9 @@ const ASSIGNEE_START_IDX=46;
 const SOJ_KEYS=['노트릴스','노필릴스','채리','GT','원톱','5단계루틴','기초부족','MLST공부','MLST캐러셀','노트공부법','너만본다','CPA(텐핑)','카카오','Organic','네이버브랜드','기타'];
 const cmap={'우혜림':'hye','김윤호':'kim','장윤호':'jang','박창건':'park','김우진':'woo','김태석':'tae','김성윤':'sung','노영호':'noh','김원득':'won'};
 const dayN=['일','월','화','수','목','금','토'];
+const WDAYS=['월','화','수','목','금','토'];
 let summaryRows=[], perfTab=0;
+let workState={}; // {이름:{active:true, off:{월:false,...}}}
 
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function asB(a){return a?'<span class="as '+(cmap[a]||'')+'">'+esc(a)+'</span>':''}
@@ -186,34 +261,38 @@ function vFmt(vd,vt){if(!vd)return{lab:'',diff:null};var d=new Date(vd+'T00:00:0
 function pickDay(s){var m=String(s||'').match(/\((\d+일차)\)/);return m?m[1]:''}
 async function csv(u){var t=await (await fetch(u)).text();return t.trim().split('\n').map(r=>r.split(',').map(c=>c.trim()))}
 
+/* ── 모바일 탭 전환 ── */
+function mtab(name,btn){
+  document.querySelectorAll('.mtab-panel').forEach(function(p){p.classList.toggle('on',p.dataset.panel===name)});
+  document.querySelectorAll('.mtabs button').forEach(function(b){b.classList.toggle('on',b===btn)});
+  window.scrollTo(0,0);
+}
+
 async function loadAll(){
   document.getElementById('upd').textContent='불러오는 중...';
-  await Promise.all([loadSit(),loadSum(),loadVisit()]);
+  await Promise.all([loadSit(),loadSum(),loadVisit(),loadWork()]);
   document.getElementById('upd').textContent='업데이트 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
 }
 
-/* ── 지금 챙길 리드 (중간관리·홀딩·우선) ── */
+/* ── 지금 챙길 리드 (중간관리·우선 / 홀딩 제거) ── */
 async function loadSit(){
   let rows;
   try{ rows=await csv(SITUATION_CSV_URL); rows.shift(); }
   catch(e){ document.getElementById('situation').innerHTML='<div class="empty">데이터를 불러오지 못했어요. GitHub(https)에서 열어야 표시됩니다.</div>'; return; }
   const L=rows.filter(r=>r[0]).map(r=>({pageId:r[0],name:r[1],grade:r[2],as:r[3],status:r[4],vd:r[5],vt:r[6],prio:r[7]==='1',mid:r[8]==='1'}));
-  const mid=[],hold=[],prio=[];
+  const mid=[],prio=[];
   L.forEach(l=>{ const v=vFmt(l.vd,l.vt);
     if(v.diff!==null&&v.diff>=MID_DAYS) mid.push({l,v});
-    if((l.status||'').indexOf('홀딩')>=0) hold.push({l,v});
     if(l.prio) prio.push({l,v});
   });
   mid.sort((a,b)=>a.v.diff-b.v.diff);
 
   const midRow=({l,v})=>'<div class="item '+(l.mid?'done':'')+'"><input type="checkbox" class="chk" '+(l.mid?'checked':'')+' onchange="tglMid(this,\''+l.pageId+'\')"><span class="when">'+v.lab+'</span>'+nmL(l.name,l.pageId)+' <span class="gr">'+esc(l.grade)+'</span><span class="mn">+'+v.diff+'일</span>'+asB(l.as)+'</div>';
-  const holdRow=({l,v})=>'<div class="item">'+nmL(l.name,l.pageId)+' <span class="gr">'+esc(l.grade)+'</span>'+(v.lab?'<span class="badge">방문 '+v.lab+'</span>':'')+asB(l.as)+'</div>';
   const prioRow=({l})=>'<div class="item">'+nmL(l.name,l.pageId)+' <span class="gr">'+esc(l.grade)+'</span><span class="badge">'+esc(l.status)+'</span>'+asB(l.as)+'</div>';
 
   const grp=(icon,label,color,arr,fn)=>'<div class="grp"><div class="glabel">'+icon+' '+label+'<span class="gc" style="background:'+color+'">'+arr.length+'</span></div>'+(arr.length?arr.map(fn).join(''):'<div class="empty">없음</div>')+'</div>';
   document.getElementById('situation').innerHTML =
     grp('🔔','중간관리','var(--purple)',mid,midRow) +
-    grp('⏳','홀딩','var(--blue)',hold,holdRow) +
     grp('📌','우선순위','var(--red)',prio,prioRow);
 }
 function tglMid(el,pid){
@@ -222,7 +301,59 @@ function tglMid(el,pid){
   fetch(WEBAPP_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'midmanage',pageId:pid,checked:el.checked})}).catch(function(){});
 }
 
-/* ── 방문 목록 (오늘 포함 전체) ── */
+/* ── 근무 스테이터스 ── */
+async function loadWork(){
+  // CSV 미러가 있으면 읽고, 없으면 전원 기본 ON
+  let ok=false;
+  if(WORK_CSV_URL.indexOf('WORK_GID')<0){
+    try{
+      const rows=await csv(WORK_CSV_URL); rows.shift();
+      rows.forEach(function(r){
+        if(!r[0])return;
+        var off={}; WDAYS.forEach(function(d,i){off[d]=(r[2+i]==='1'||r[2+i]==='TRUE'||r[2+i]==='O')});
+        workState[r[0]]={active:!(r[1]==='0'||r[1]==='FALSE'), off:off};
+      });
+      ok=true;
+    }catch(e){}
+  }
+  if(!ok){ ASSIGNEES.forEach(function(n){ if(!workState[n]) workState[n]={active:true,off:{월:false,화:false,수:false,목:false,금:false,토:false}}; }); }
+  renderWork();
+}
+function renderWork(){
+  var todayN=dayN[new Date().getDay()]; // 오늘 요일
+  var html=ASSIGNEES.map(function(n){
+    var s=workState[n]||{active:true,off:{}};
+    var days=WDAYS.map(function(d){
+      var isOff=!!(s.off&&s.off[d]);
+      var todayMark=(d===todayN)?';outline:2px solid #c4b5fd;outline-offset:1px':'';
+      return '<td><span class="dchip '+(isOff?'off':'')+'" style="'+todayMark.replace(/^;/,'')+'" onclick="tglDay(\''+n+'\',\''+d+'\',this)">'+d+'</span></td>';
+    }).join('');
+    var sw='<label class="sw '+(s.active?'':'busy')+'"><input type="checkbox" '+(s.active?'checked':'')+' onchange="tglActive(\''+n+'\',this)"><span class="sl2"></span></label>';
+    return '<tr><td class="nm">'+asB(n)+' '+esc(n)+'</td><td>'+sw+'</td>'+days+'</tr>';
+  }).join('');
+  document.getElementById('wk-body').innerHTML=html;
+}
+function tglActive(name,el){
+  var busy=!el.checked;
+  el.closest('.sw').classList.toggle('busy',busy);
+  if(!workState[name])workState[name]={active:true,off:{}};
+  workState[name].active=el.checked;
+  postWork({action:'setActive',name:name,active:el.checked});
+}
+function tglDay(name,day,el){
+  if(!workState[name])workState[name]={active:true,off:{}};
+  if(!workState[name].off)workState[name].off={};
+  var next=!workState[name].off[day];
+  workState[name].off[day]=next;
+  el.classList.toggle('off',next);
+  postWork({action:'setDayoff',name:name,day:day,off:next});
+}
+function postWork(payload){
+  if(!WEBAPP_URL||WEBAPP_URL.indexOf('PASTE_')===0) return;
+  fetch(WEBAPP_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)}).catch(function(){});
+}
+
+/* ── 방문 목록 ── */
 async function loadVisit(){
   let rows;
   try{ rows=await csv(SCHEDULE_CSV_URL); rows.shift(); }
@@ -239,7 +370,7 @@ async function loadVisit(){
 }
 function sg(g){if(!g)return'';if(g.indexOf('초')>=0){var m=g.match(/\d+/);return m?'초'+m[0]:'초'}if(g.indexOf('중')>=0){var m=g.match(/\d+/);return m?'중'+m[0]:'중'}if(g.indexOf('고')>=0){var m=g.match(/\d+/);return m?'고'+m[0]:'고'}return g}
 
-/* ── 요약 (매출·주간성과·성과분석·히트맵) ── */
+/* ── 요약 ── */
 async function loadSum(){
   try{ summaryRows=await csv(SUMMARY_CSV_URL); }
   catch(e){ document.getElementById('hl').innerHTML='<div class="empty">성과 로드 실패</div>'; return; }
