@@ -109,10 +109,10 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 .sw input:checked + .sl2:before{transform:translateX(19px)}
 .sw.busy .sl2{background:#e11d48}
 .dchip{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;border:1.5px solid #dfe3ea;background:#fff;color:#aeb4bf;font-size:10.5px;font-weight:800;cursor:pointer;transition:.12s;user-select:none}
-.dchip.on{background:#e6f4ea;border-color:#a8d5b5;color:#0f9d58}
-.wk .evd{font-size:8.5px;color:#0f9d58;background:#e9f6ee;border-radius:6px;padding:1px 5px;font-weight:800;margin-left:5px;vertical-align:middle}
+.dchip.off{background:#fdecef;border-color:#f3b6c1;color:#d11846}
+.dchip.past{opacity:.32;cursor:default}
 .wk-note{font-size:10px;color:#9aa1ad;padding:7px 14px 2px}
-.wk-note b{color:#0f9d58}
+.wk-note b{color:#e11d48}
 </style>
 </head>
 <body>
@@ -171,7 +171,7 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
       <div style="padding:0 4px 4px;overflow-x:auto">
         <table class="wk"><thead><tr><th class="l">담당자</th><th>가능</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr></thead><tbody id="wk-body"></tbody></table>
       </div>
-      <div class="wk-note">오늘 못 나오면 <b>가능 OFF</b> · 고정 근무요일이 있으면 <b>요일</b>을 눌러 켜기 (안 누르면 <b>매일</b> 근무)</div>
+      <div class="wk-note">오늘 못 나오면 <b>가능 OFF</b> · 이번 주 안 되는 날은 <b>요일</b>을 눌러 표시 (지난 요일은 자동 무시 · 토요일 밤 초기화)</div>
     </div>
   </div>
 
@@ -246,46 +246,48 @@ async function loadWork(){
     try{
       const rows=await csv(WORK_CSV_URL); rows.shift();
       rows.forEach(function(r){ if(!r[0])return;
-        var work={}; WDAYS.forEach(function(d,i){work[d]=(r[2+i]==='1'||r[2+i]==='TRUE'||r[2+i]==='O')});
-        workState[r[0]]={active:!(r[1]==='0'||r[1]==='FALSE'), work:work};
+        var off={}; WDAYS.forEach(function(d,i){off[d]=(r[2+i]==='1'||r[2+i]==='TRUE'||r[2+i]==='O')});
+        workState[r[0]]={active:!(r[1]==='0'||r[1]==='FALSE'), off:off};
       }); ok=true;
     }catch(e){}
   }
-  if(!ok){ ASSIGNEES.forEach(function(n){ if(!workState[n]) workState[n]={active:true,work:{월:false,화:false,수:false,목:false,금:false,토:false}}; }); }
+  if(!ok){ ASSIGNEES.forEach(function(n){ if(!workState[n]) workState[n]={active:true,off:{월:false,화:false,수:false,목:false,금:false,토:false}}; }); }
   renderWorkRows();
 }
 function renderWorkRows(){
   if(!document.getElementById('wk-body'))return;
-  var todayN=dayN[new Date().getDay()];
+  var todayIdx=new Date().getDay();           // 0=일 .. 6=토
+  var todayN=dayN[todayIdx];
   var html=ASSIGNEES.map(function(n){
-    var s=workState[n]||{active:true,work:{}};
-    var anyWork=WDAYS.some(function(d){return s.work&&s.work[d]});
+    var s=workState[n]||{active:true,off:{}};
     var days=WDAYS.map(function(d){
-      var isWork=!!(s.work&&s.work[d]);
+      var dIdx=dayN.indexOf(d);               // 월=1 .. 토=6
+      var isOff=!!(s.off&&s.off[d]);
+      var isPast=(todayIdx!==0 && dIdx<todayIdx);   // 오늘보다 앞선 요일 = 지나감(배정 무시)
       var mark=(d===todayN)?'outline:2px solid #c4b5fd;outline-offset:1px':'';
-      return '<td><span class="dchip '+(isWork?'on':'')+'" style="'+mark+'" onclick="tglDay(\''+n+'\',\''+d+'\',this)">'+d+'</span></td>';
+      var cls='dchip'+(isOff?' off':'')+(isPast?' past':'');
+      var click=isPast?'':' onclick="tglDay(\''+n+'\',\''+d+'\',this)"';
+      return '<td><span class="'+cls+'" style="'+mark+'"'+click+'>'+d+'</span></td>';
     }).join('');
     var sw='<label class="sw '+(s.active?'':'busy')+'"><input type="checkbox" '+(s.active?'checked':'')+' onchange="tglActive(\''+n+'\',this)"><span class="sl2"></span></label>';
     var color=cHex[cmap[n]]||'#3c434f';
-    var evd=anyWork?'':'<span class="evd">매일</span>';
-    return '<tr><td class="nm" style="color:'+color+'">'+esc(n)+evd+'</td><td>'+sw+'</td>'+days+'</tr>';
+    return '<tr><td class="nm" style="color:'+color+'">'+esc(n)+'</td><td>'+sw+'</td>'+days+'</tr>';
   }).join('');
   document.getElementById('wk-body').innerHTML=html;
 }
 function tglActive(name,el){
   el.closest('.sw').classList.toggle('busy',!el.checked);
-  if(!workState[name])workState[name]={active:true,work:{}};
+  if(!workState[name])workState[name]={active:true,off:{}};
   workState[name].active=el.checked;
   postWork({action:'setActive',name:name,active:el.checked});
 }
 function tglDay(name,day,el){
-  if(!workState[name])workState[name]={active:true,work:{}};
-  if(!workState[name].work)workState[name].work={};
-  var next=!workState[name].work[day];
-  workState[name].work[day]=next;
-  // off 파라미터에 '이 요일 체크박스 값'(=근무여부)을 그대로 전달 → 노션 체크박스 true=근무일
+  if(!workState[name])workState[name]={active:true,off:{}};
+  if(!workState[name].off)workState[name].off={};
+  var next=!workState[name].off[day];
+  workState[name].off[day]=next; el.classList.toggle('off',next);
+  // 요일 체크 = 그 요일 안 됨(오프) → 노션 체크박스 true=오프
   postWork({action:'setDayoff',name:name,day:day,off:next});
-  renderWorkRows(); // '매일' 배지 즉시 갱신
 }
 function postWork(p){
   if(!WEBAPP_URL||WEBAPP_URL.indexOf('PASTE_')===0) return;
