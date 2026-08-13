@@ -233,7 +233,7 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
   <button class="tab" onclick="setRouteTab(2)">전체</button>
 </div>
 
-<div class="section-label" style="margin-top:0;">유입 현황 <span class="badge">이번달</span></div>
+<div class="section-label" style="margin-top:0;">유입 현황 <span class="badge" id="inflow-tab-label">이번달</span></div>
 <div class="grid-3">
   <div class="card"><div class="clabel">총 유입</div><div class="cval blue sm" id="v-total">-</div></div>
   <div class="card"><div class="clabel">오늘 유입</div><div class="cval amber sm" id="v-today">-</div></div>
@@ -384,7 +384,8 @@ function render() {
   document.getElementById('dn-month').textContent = pickDayNo(r12[0]);
   document.getElementById('dn-week').textContent  = pickDayNo(r12[2]);
 
-  document.getElementById('v-total').textContent     = allRows[1]?.[2] || '0';
+  document.getElementById('v-total').textContent     = allRows[1]?.[routeTab + 2] || '0';  // [수정 2026-08-13] 토글 연동: 이번달[2]/지난달[3]/전체[4]
+  { const itl = document.getElementById('inflow-tab-label'); if (itl) itl.textContent = ['이번달','지난달','전체'][routeTab]; }
   document.getElementById('v-today').textContent     = allRows[1]?.[1] || '0';
   document.getElementById('v-yesterday').textContent = allRows[2]?.[1] || '0';
 
