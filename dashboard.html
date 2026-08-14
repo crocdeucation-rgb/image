@@ -268,10 +268,13 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
       <th class="num">방문</th>
       <th class="num">세팅</th>
       <th class="num">오더</th>
+      <th class="num">광고비</th>
+      <th class="num">매출</th>
+      <th class="num">ROAS</th>
     </tr>
   </thead>
   <tbody id="campaign-tbody">
-    <tr><td colspan="5" style="color:#aaa;text-align:center;padding:14px;">불러오는 중...</td></tr>
+    <tr><td colspan="8" style="color:#aaa;text-align:center;padding:14px;">불러오는 중...</td></tr>
   </tbody>
 </table>
 </div>
@@ -492,7 +495,7 @@ function render() {
     }
   });
 
-  const effCols = routeTab === 0 ? [17,18] : routeTab === 1 ? [14,15] : null;
+  const effCols = routeTab === 0 ? [17,18,16] : routeTab === 1 ? [14,15,13] : null;  // [추가] 3번째=광고비
   const rel = document.getElementById('route-eff-label');
   const rSum = allRows[43] || [];
   const hasThisSpend = (parseInt((rSum[16]+'').replace(/[^0-9]/g,'')) || 0) > 0;
@@ -534,10 +537,12 @@ function render() {
           }
         } else {
           const cplNum = parseInt((cpl+'').replace(/[^0-9]/g,'')) || 0;
-          if (cplNum > 0 || roas) {
+          const spendNum = effCols[2] != null ? (parseInt((r[effCols[2]]+'').replace(/[^0-9]/g,'')) || 0) : 0;
+          if (cplNum > 0 || roas || spendNum > 0) {
             const cplStr  = cplNum > 0 ? '₩' + cplNum.toLocaleString() : '-';
             const roasStr = roas ? roas + '' : '-';
-            html += `<div class="route-eff">CPL ${cplStr} · ROAS ${roasStr}</div>`;
+            const spendStr = spendNum > 0 ? '광고비 ₩' + spendNum.toLocaleString() + ' · ' : '';
+            html += `<div class="route-eff">${spendStr}CPL ${cplStr} · ROAS ${roasStr}</div>`;
           }
         }
       }
@@ -551,13 +556,18 @@ function render() {
     const r = allRows[i];
     if (!r || !r[0]) break;
     const p = routeTab;
+    // 광고비/매출/ROAS: 지난달[14,15,16] 이번달[17,18,19]. 전체(p=2)는 없음 → 이번달로 대체 안 함(0)
+    const effIdx = p === 0 ? [17,18,19] : p === 1 ? [14,15,16] : null;
     campaigns.push({
       name:    r[0],
       channel: r[1] || '',
       db:      parseInt(r[2 + p] || '0') || 0,
       visit:   parseInt(r[5 + p] || '0') || 0,
       setting: parseInt(r[8 + p] || '0') || 0,
-      order:   parseInt(r[11 + p] || '0') || 0
+      order:   parseInt(r[11 + p] || '0') || 0,
+      spend:   effIdx ? (parseInt((r[effIdx[0]]+'').replace(/[^0-9]/g,'')) || 0) : 0,
+      sales:   effIdx ? (parseInt((r[effIdx[1]]+'').replace(/[^0-9]/g,'')) || 0) : 0,
+      roas:    effIdx ? (r[effIdx[2]] || '') : ''
     });
   }
   campaigns.sort((a, b) => b.order - a.order || b.db - a.db);
@@ -576,9 +586,12 @@ function render() {
         <td class="num" style="color:#0891b2">${c.visit} <b style="font-size:10px">(${vr}%)</b></td>
         <td class="num" style="color:#d97706">${c.setting} <b style="font-size:10px">(${sr}%)</b></td>
         <td class="num" style="color:#0f9d58">${c.order} <b style="font-size:10px">(${or_}%)</b></td>
+        <td class="num" style="color:#6b7280;font-size:11px">${c.spend > 0 ? '₩'+c.spend.toLocaleString() : '-'}</td>
+        <td class="num" style="color:#7c3aed;font-size:11px">${c.sales > 0 ? Math.round(c.sales/10000).toLocaleString()+'만' : '-'}</td>
+        <td class="num" style="color:${c.roas && parseFloat(c.roas) >= 1 ? '#0f9d58' : '#e11d48'};font-weight:700">${c.roas || '-'}</td>
       </tr>`;
       }).join('')
-    : '<tr><td colspan="5" style="color:#aaa;text-align:center;padding:14px;">데이터 없음</td></tr>';
+    : '<tr><td colspan="8" style="color:#aaa;text-align:center;padding:14px;">데이터 없음</td></tr>';
 }
 
 async function loadSchedule() {
