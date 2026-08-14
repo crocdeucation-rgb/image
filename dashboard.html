@@ -250,7 +250,7 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 <div class="section-label">유입경로별 <span class="badge pay" id="route-eff-label">CPL·ROAS</span></div>
 <div class="grid-3">
   <div class="card"><div class="clabel">메타광고</div><div class="cval purple xs" id="route-meta">-</div><div class="crate" id="rr-meta"></div></div>
-  <div class="card"><div class="clabel">Organic</div><div class="cval blue xs" id="route-insta">-</div><div class="crate" id="rr-insta"></div></div>
+  <div class="card"><div class="clabel">무료유입</div><div class="cval blue xs" id="route-insta">-</div><div class="crate" id="rr-insta"></div></div>
   <div class="card"><div class="clabel">카카오</div><div class="cval amber xs" id="route-kakao">-</div><div class="crate" id="rr-kakao"></div></div>
   <div class="card"><div class="clabel">네이버브랜드</div><div class="cval blue xs" id="route-naver">-</div><div class="crate" id="rr-naver"></div></div>
   <div class="card" id="card-navergfa" style="display:none"><div class="clabel">네이버GFA</div><div class="cval blue xs" id="route-navergfa">-</div><div class="crate" id="rr-navergfa"></div></div>
@@ -586,7 +586,13 @@ function render() {
     });
   }
   campaigns.sort((a, b) => b.order - a.order || b.db - a.db);
-  const top5 = campaigns.filter(c => c.db > 0).slice(0, 8);
+  // 박은영 PM 3소재는 오더 낮아도 항상 표시 (사장님 브리핑용)
+  const PM_KEEP = ['박은영','방으로가세요','같은점수다른처방'];
+  const isPM = (nm) => PM_KEEP.some(k => (nm||'').indexOf(k) >= 0);
+  const withDb = campaigns.filter(c => c.db > 0);
+  const top10 = withDb.slice(0, 10);
+  const pmExtra = withDb.filter(c => isPM(c.name) && !top10.includes(c));
+  const top5 = top10.concat(pmExtra);
   ctbody.innerHTML = top5.length > 0
     ? top5.map(c => {
         const vr = c.db ? Math.round(c.visit / c.db * 100) : 0;
@@ -594,7 +600,8 @@ function render() {
         const or_ = c.setting ? Math.round(c.order / c.setting * 100) : 0;
         const isMeta = c.channel === '메타';
         const badgeColor = isMeta ? '#1a73e8' : (c.channel.indexOf('텐핑')>=0||c.channel.indexOf('CPA')>=0) ? '#e11d48' : c.channel==='카카오' ? '#f4b400' : c.channel==='네이버' ? '#0f9d58' : '#888';
-        const badge = c.channel ? `<span style="display:inline-block;font-size:9px;font-weight:700;color:#fff;background:${badgeColor};border-radius:6px;padding:1px 5px;margin-right:5px;vertical-align:middle;">${escapeHtml(c.channel)}</span>` : '';
+        const badgeLabel = c.channel === 'Organic' ? '무료유입' : c.channel;
+        const badge = c.channel ? `<span style="display:inline-block;font-size:9px;font-weight:700;color:#fff;background:${badgeColor};border-radius:6px;padding:1px 5px;margin-right:5px;vertical-align:middle;">${escapeHtml(badgeLabel)}</span>` : '';
         return `<tr>
         <td class="name">${badge}${escapeHtml(c.name)}</td>
         <td class="num">${c.db}</td>
