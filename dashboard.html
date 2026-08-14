@@ -362,7 +362,7 @@ function render() {
   for (let i = CAMPAIGN_START_IDX; i < allRows.length; i++) {
     if (allRows[i] && allRows[i][0] === '텐핑코호트') {
       const get = (label) => {
-        for (let j = i + 1; j < Math.min(i + 12, allRows.length); j++) {
+        for (let j = i + 1; j < Math.min(i + 18, allRows.length); j++) {
           if (allRows[j] && allRows[j][0] === label) return allRows[j][1];
         }
         return null;
@@ -373,7 +373,13 @@ function render() {
       const recov = get('회수율(%)') || 0;
       const sales = parseInt(get('누적 회수') || '0') || 0;
       const orders = parseInt(get('누적 오더') || '0') || 0;
-      cpaCohort = { spend, cpl, roas, recov, sales, orders, status: get('집행상태') || '' };
+      // 이번달(8월 리셋) 값
+      const mSpend = parseInt(get('이번달 투자') || '0') || 0;
+      const mCpl   = parseInt(get('이번달 CPL') || '0') || 0;
+      const mRoas  = get('이번달 ROAS') || '-';
+      const mSales = parseInt(get('이번달 회수') || '0') || 0;
+      cpaCohort = { spend, cpl, roas, recov, sales, orders, status: get('집행상태') || '',
+                    mSpend, mCpl, mRoas, mSales };
       break;
     }
   }
@@ -533,7 +539,12 @@ function render() {
         const roas = r[effCols[1]] || '';
         if (dbId === 'route-cpa') {
           if (cpaCohort) {
-            html += `<div class="route-eff">누적 CPL ₩${cpaCohort.cpl.toLocaleString()} · 누적 ROAS ${cpaCohort.roas}</div>`;
+            if (routeTab === 0) {
+              // 이번달(8월 리셋) — 0부터 시작
+              html += `<div class="route-eff">이번달 CPL ₩${(cpaCohort.mCpl||0).toLocaleString()} · 이번달 ROAS ${cpaCohort.mRoas}</div>`;
+            } else {
+              html += `<div class="route-eff">누적 CPL ₩${cpaCohort.cpl.toLocaleString()} · 누적 ROAS ${cpaCohort.roas}</div>`;
+            }
           }
         } else {
           const cplNum = parseInt((cpl+'').replace(/[^0-9]/g,'')) || 0;
