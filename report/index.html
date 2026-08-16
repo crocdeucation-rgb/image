@@ -147,6 +147,20 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 .gtag{font-size:11px;color:var(--sub)}
 .gsales{font-size:12px;color:var(--teal-d);font-weight:700;margin-top:4px}
 .gm .gl{font-size:11px;color:var(--faint)}
+/* 캐러셀 소재 슬라이드 (imgs.js 값이 배열일 때) */
+.gslide{position:relative;overflow:hidden}
+.gslide-track{display:flex;transition:transform .28s ease;will-change:transform}
+.gslide-track .thumb{flex:0 0 100%}
+.gnav{position:absolute;top:50%;transform:translateY(-50%);width:26px;height:26px;padding:0;border-radius:50%;border:0.5px solid var(--border);background:rgba(255,255,255,.9);color:#333;font-size:15px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.5;transition:opacity .15s}
+.gcard:hover .gnav{opacity:1}
+.gnav:disabled{opacity:.18;cursor:default}
+.gnav.prev{left:6px} .gnav.next{right:6px}
+.gdots{position:absolute;bottom:8px;left:0;right:0;display:flex;justify-content:center;gap:5px}
+.gdot{width:5px;height:5px;padding:0;border-radius:50%;background:rgba(255,255,255,.6);border:0.5px solid rgba(0,0,0,.18);cursor:pointer;transition:.15s}
+.gdot.on{background:#fff;width:14px;border-radius:3px}
+.gcount{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.55);color:#fff;font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:999px}
+@media(max-width:768px){.gnav{opacity:.85}}
+.b-new{background:#f0ecfd;color:#6b4fd0}
 
 /* 운영 로그 */
 .log{background:#f0f7f4;border:0.5px solid #c8e4d8;border-radius:12px;padding:16px 18px;margin-bottom:24px;font-size:12px;color:var(--sub);line-height:2}
@@ -208,7 +222,8 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 <div class="tabs">
   <button class="tab summary" onclick="sel('may',this)">5월 결산</button>
   <button class="tab summary" onclick="sel('jun',this)">6월 결산</button>
-  <button class="tab summary on" onclick="sel('jul',this)">7월 결산</button>
+  <button class="tab summary" onclick="sel('jul',this)">7월 결산</button>
+  <button class="tab summary on" onclick="sel('aug',this)">8월</button>
   <button class="tab" onclick="sel('crm',this)" style="border-color:rgba(180,120,255,.3);color:#b478ff">⚙ CRM 패치</button>
 </div>
 
@@ -619,7 +634,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 </div>
 
 <!-- ===== 7월 결산 ===== -->
-<div id="p-jul" class="panel on">
+<div id="p-jul" class="panel">
 
   <div class="kpis" style="grid-template-columns:repeat(3,1fr)">
     <div class="kpi"><div class="k">7월 매출</div><div class="v t">2억 3,644만</div><div class="s">1차 집계 · 취소제외</div></div>
@@ -753,6 +768,140 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
     <div class="li" style="margin-bottom:8px"><b>메타 두 소재가 매출의 82%.</b> 노트릴스·노필릴스 집중이 강점이자 리스크입니다. 위너 파생과 채널 다변화(구글·유튜브)가 다음 과제입니다.</div>
     <div class="li"><b>측정 인프라가 자동화됐습니다.</b> 메타 MCP 연동으로 소재별 광고비·CPM·연령이 실시간 조회 가능해졌고, CRM 자동배정이 라이브됐습니다.</div>
   </div>
+
+</div>
+
+
+<!-- ===== 8월 (MTD 8/1~8/16) ===== -->
+<div id="p-aug" class="panel on">
+
+  <div class="kpis" style="grid-template-columns:repeat(3,1fr)">
+    <div class="kpi"><div class="k">8월 매출 · MTD</div><div class="v t">7,860만</div><div class="s">신청일 코호트 · 8/1~8/16</div></div>
+    <div class="kpi"><div class="k">총 광고비 · MTD</div><div class="v">2,463만</div><div class="s">24,634,444원</div></div>
+    <div class="kpi" style="border-color:var(--amber);border-width:1.5px"><div class="k" style="color:var(--amber)">ROAS · 잠정</div><div class="v" style="color:var(--amber)">3.19</div><div class="s">코호트 미성숙 · 판단 보류</div></div>
+    <div class="kpi"><div class="k">총 DB</div><div class="v">707건</div><div class="s">전 채널 합산</div></div>
+    <div class="kpi"><div class="k">오더</div><div class="v">20건</div><div class="s">오더+미납 인정</div></div>
+    <div class="kpi"><div class="k">메타 광고비</div><div class="v">2,048만</div><div class="s">20,484,676원 · results 실측</div></div>
+  </div>
+  <div class="knote">
+    ※ 광고비 = 메타 results 필드 실측(2026-08-17 02:xx) · 카카오/네이버는 복구된 raw JSON 일자합산 · GFA는 수동 엑셀 · 매출/오더 = 노션 <b>신청일 코호트</b>(결제일 아님, 오더+미납만 인정)
+    <br>⚠️ <b>8월은 진행 중(MTD 8/1~8/16)이며 신규 소재 코호트가 아직 익지 않았습니다.</b> 신규 소재는 ROAS 대신 <b>“코호트 집계 예정”</b>으로 표기합니다 — 0으로 읽지 마십시오.
+  </div>
+
+  <!-- 채널별 -->
+  <div class="sec">01 — 채널별 주차별 (신청일 코호트)</div>
+  <table class="tbl" style="margin-bottom:10px">
+    <thead><tr>
+      <th class="l">채널</th><th class="l">주</th><th class="r">광고비</th><th class="r">DB</th><th class="r">CPL</th>
+      <th class="r">오더</th><th class="r">매출</th><th class="r">ROAS</th><th class="l">비고</th>
+    </tr></thead>
+    <tbody>
+      <tr><td class="l"><span class="chbadge cb-meta">메타</span></td><td class="l">W1</td><td class="r">9,695,144</td><td class="r">311</td><td class="r">31,174</td><td class="r"><b>12</b></td><td class="r"><b>4,221만</b></td><td class="r teal"><b>4.35</b></td><td class="l">주력</td></tr>
+      <tr><td class="l"><span class="chbadge cb-meta">메타</span></td><td class="l">W2</td><td class="r">10,789,532</td><td class="r">253</td><td class="r">42,647</td><td class="r">2</td><td class="r">1,040만</td><td class="r red"><b>0.96</b></td><td class="l">신규 대량 투입 · 오더 미성숙</td></tr>
+      <tr><td class="l"><span class="chbadge cb-kk">카카오</span></td><td class="l">W1</td><td class="r">1,617,890</td><td class="r">34</td><td class="r">47,585</td><td class="r">1</td><td class="r">520만</td><td class="r">3.21</td><td class="l">kakao_daily.json</td></tr>
+      <tr><td class="l"><span class="chbadge cb-kk">카카오</span></td><td class="l">W2</td><td class="r">1,268,731</td><td class="r">16</td><td class="r">79,296</td><td class="r">0</td><td class="r">0</td><td class="r red">0</td><td class="l">파이프 복구완료</td></tr>
+      <tr><td class="l"><span class="chbadge cb-nv">네이버 브검</span></td><td class="l">W1</td><td class="r">479,034</td><td class="r">5</td><td class="r">95,807</td><td class="r"><b>3</b></td><td class="r"><b>1,040만</b></td><td class="r teal"><b>21.71</b></td><td class="l">일할×9일 · 표본 3건 주의</td></tr>
+      <tr><td class="l"><span class="chbadge cb-nv">네이버 브검</span></td><td class="l">W2</td><td class="r">372,582</td><td class="r">6</td><td class="r">62,097</td><td class="r">0</td><td class="r">0</td><td class="r red">0</td><td class="l">일할×7일 · 복구완료</td></tr>
+      <tr><td class="l"><span class="chbadge cb-nv">네이버 GFA</span></td><td class="l">MTD</td><td class="r">411,531</td><td class="r">—</td><td class="r">—</td><td class="r">0</td><td class="r">0</td><td class="r">—</td><td class="l">수동 엑셀 · 노트릴스#2605만 ON</td></tr>
+      <tr><td class="l"><span class="chbadge cb-cpa">텐핑</span></td><td class="l">W1</td><td class="r">0</td><td class="r">1</td><td class="r">—</td><td class="r">0</td><td class="r">0</td><td class="r">—</td><td class="l">잔액 0</td></tr>
+      <tr><td class="l"><span class="chbadge cb-cpa">텐핑</span></td><td class="l">W2</td><td class="r">0</td><td class="r">22</td><td class="r">—</td><td class="r">0</td><td class="r">0</td><td class="r">—</td><td class="l">잔액 0 · 잔류 유입</td></tr>
+      <tr><td class="l"><span class="chbadge cb-cpa">인스타 organic</span></td><td class="l">W1</td><td class="r">0</td><td class="r">25</td><td class="r">—</td><td class="r">1</td><td class="r"><b>693만</b></td><td class="r">∞</td><td class="l">무료 자산</td></tr>
+      <tr><td class="l"><span class="chbadge cb-cpa">인스타 organic</span></td><td class="l">W2</td><td class="r">0</td><td class="r">23</td><td class="r">—</td><td class="r">0</td><td class="r">0</td><td class="r">—</td><td class="l">무료 자산</td></tr>
+      <tr><td class="l">기타/미상</td><td class="l">W1~2</td><td class="r">—</td><td class="r">11</td><td class="r">—</td><td class="r">1</td><td class="r">346만</td><td class="r">—</td><td class="l">소스 미상</td></tr>
+      <tr style="border-top:1.5px solid var(--border)"><td class="l"><b>합계</b></td><td class="l">MTD</td><td class="r"><b>24,634,444</b></td><td class="r"><b>707</b></td><td class="r">—</td><td class="r"><b>20</b></td><td class="r"><b>7,860만</b></td><td class="r"><b>3.19</b></td><td class="l"></td></tr>
+    </tbody>
+  </table>
+  <div class="cap" style="margin-bottom:24px">카카오·네이버 광고비는 <b>복구된 raw JSON에서 일자 합산</b>했습니다(kakao_daily.json · naver_daily.json, 둘 다 8/16까지 적재 확인). 네이버는 지시 기준대로 <b>브랜드검색만</b> 계상했고 파워컨텐츠 소액(W1 7,200 · W2 6,106원)은 합계에서 제외했습니다. <b>네이버 ROAS 21.71은 오더 3건 표본</b>이라 채널 판정 근거로 쓰지 않습니다. <b>합계 ROAS 3.19는 잠정치입니다</b> — W2 신규 소재 코호트가 익지 않아 분자가 미완성입니다.</div>
+
+  <!-- 소재별 -->
+  <div class="sec" style="margin-top:4px">03-C — 8월 CREATIVE LOG (주차별)</div>
+  <div class="cap">광고비·리드·CPL은 <b>메타 results 필드 실측</b>, 매출·오더는 <b>노션 신청일 코호트</b>입니다. 신규 소재는 오더가 아직 안 나온 것이므로 ROAS 칸에 0이 아니라 <b>“집계 예정”</b>을 씁니다.</div>
+
+  <div class="cap" style="font-weight:700;color:var(--text);margin-top:12px">1주차 (8/1~8/9)</div>
+  <table class="tbl" style="margin-bottom:14px">
+    <thead><tr>
+      <th class="l">소재</th><th class="l">배지</th><th class="r">광고비</th><th class="r">리드</th><th class="r">CPL</th><th class="r">오더</th><th class="r">매출</th><th class="r">ROAS</th>
+    </tr></thead>
+    <tbody>
+      <tr><td class="l"><b>노트릴스(위너)</b></td><td class="l"><span class="badge b-best">위너</span></td><td class="r">3,827,034</td><td class="r">126</td><td class="r">30,373</td><td class="r">3</td><td class="r">1,040만</td><td class="r">2.72</td></tr>
+      <tr><td class="l"><b>노필릴스</b></td><td class="l"><span class="badge b-best">위너</span></td><td class="r">1,630,307</td><td class="r">71</td><td class="r teal"><b>22,962</b></td><td class="r">5</td><td class="r"><b>1,851만</b></td><td class="r teal"><b>11.36</b></td></tr>
+      <tr><td class="l">GT노트피드백</td><td class="l"><span class="badge b-on">유지</span></td><td class="r">1,082,830</td><td class="r">20</td><td class="r">54,142</td><td class="r">1</td><td class="r">346만</td><td class="r">3.20</td></tr>
+      <tr><td class="l">채리</td><td class="l"><span class="badge b-watch">관찰</span></td><td class="r">1,012,891</td><td class="r">23</td><td class="r">44,039</td><td class="r">1</td><td class="r">346만</td><td class="r">3.42</td></tr>
+      <tr><td class="l">캐러셀_중간고사전략</td><td class="l"><span class="badge b-new">신규</span></td><td class="r">460,082</td><td class="r">15</td><td class="r">30,672</td><td class="r">0</td><td class="r">—</td><td class="r"><span class="gl">집계 예정</span></td></tr>
+      <tr><td class="l">단일5종(악플삭제)</td><td class="l"><span class="badge b-dead">폐기</span></td><td class="r">434,212</td><td class="r">14</td><td class="r">31,015</td><td class="r">0</td><td class="r">—</td><td class="r"><span class="gl">집계 예정</span></td></tr>
+      <tr><td class="l">5단계루틴</td><td class="l"><span class="badge b-end">정지</span></td><td class="r">395,167</td><td class="r">6</td><td class="r">65,861</td><td class="r">0</td><td class="r">—</td><td class="r"><span class="gl">집계 예정</span></td></tr>
+      <tr><td class="l">릴스_방으로</td><td class="l"><span class="badge b-new">신규</span></td><td class="r">314,903</td><td class="r">8</td><td class="r">39,363</td><td class="r">0</td><td class="r">—</td><td class="r"><span class="gl">집계 예정</span></td></tr>
+      <tr><td class="l">너만본다</td><td class="l"><span class="badge b-end">정지</span></td><td class="r">270,649</td><td class="r">1</td><td class="r red">270,649</td><td class="r">0</td><td class="r">—</td><td class="r"><span class="gl">집계 예정</span></td></tr>
+      <tr><td class="l">기초부족</td><td class="l"><span class="badge b-end">정지</span></td><td class="r">267,069</td><td class="r">3</td><td class="r">89,023</td><td class="r">0</td><td class="r">—</td><td class="r"><span class="gl">집계 예정</span></td></tr>
+      <tr style="border-top:1.5px solid var(--border)"><td class="l"><b>메타 합계</b></td><td class="l"></td><td class="r"><b>9,695,144</b></td><td class="r">287</td><td class="r">—</td><td class="r"><b>3</b></td><td class="r"><b>3,585만</b></td><td class="r"><b>3.70</b></td></tr>
+    </tbody>
+  </table>
+
+  <div class="cap" style="font-weight:700;color:var(--text)">2주차 (8/10~8/16, KST 8/16 24시까지)</div>
+  <table class="tbl" style="margin-bottom:10px">
+    <thead><tr>
+      <th class="l">소재</th><th class="l">배지</th><th class="r">광고비</th><th class="r">리드</th><th class="r">CPL</th><th class="r">오더</th><th class="r">매출</th><th class="r">ROAS</th>
+    </tr></thead>
+    <tbody>
+      <tr><td class="l"><b>노트릴스(위너)</b></td><td class="l"><span class="badge b-best">위너</span></td><td class="r">4,448,443</td><td class="r">111</td><td class="r">40,076</td><td class="r">2</td><td class="r">1,040만</td><td class="r">2.34</td></tr>
+      <tr><td class="l"><b>노필릴스</b></td><td class="l"><span class="badge b-best">위너</span></td><td class="r">1,677,921</td><td class="r">41</td><td class="r">40,925</td><td class="r">0</td><td class="r">—</td><td class="r"><span class="gl">집계 예정</span></td></tr>
+      <tr><td class="l">릴스_박은영중간고사</td><td class="l"><span class="badge b-new">신규</span></td><td class="r">1,313,995</td><td class="r">24</td><td class="r">54,750</td><td class="r">0</td><td class="r">—</td><td class="r"><span class="gl">집계 예정</span></td></tr>
+      <tr><td class="l">릴스_방으로</td><td class="l"><span class="badge b-new">신규</span></td><td class="r">1,166,490</td><td class="r">33</td><td class="r teal"><b>35,348</b></td><td class="r">0</td><td class="r">—</td><td class="r"><span class="gl">집계 예정</span></td></tr>
+      <tr><td class="l">GT노트피드백</td><td class="l"><span class="badge b-on">유지</span></td><td class="r">820,041</td><td class="r">11</td><td class="r">74,549</td><td class="r">0</td><td class="r">—</td><td class="r"><span class="gl">집계 예정</span></td></tr>
+      <tr><td class="l">릴스_맞춤처방</td><td class="l"><span class="badge b-new">신규</span></td><td class="r">567,877</td><td class="r">8</td><td class="r">70,985</td><td class="r">0</td><td class="r">—</td><td class="r"><span class="gl">집계 예정</span></td></tr>
+      <tr><td class="l">채리</td><td class="l"><span class="badge b-dead">폐기판정</span></td><td class="r">413,474</td><td class="r">2</td><td class="r red"><b>206,737</b></td><td class="r">0</td><td class="r">—</td><td class="r"><span class="gl">집계 예정</span></td></tr>
+      <tr><td class="l">캐러셀_중간고사전략</td><td class="l"><span class="badge b-new">신규</span></td><td class="r">220,106</td><td class="r">10</td><td class="r teal">22,011</td><td class="r">0</td><td class="r">—</td><td class="r"><span class="gl">집계 예정</span></td></tr>
+      <tr><td class="l">단일5종(악플삭제)</td><td class="l"><span class="badge b-dead">폐기</span></td><td class="r">161,185</td><td class="r">2</td><td class="r">80,592</td><td class="r">0</td><td class="r">—</td><td class="r"><span class="gl">집계 예정</span></td></tr>
+      <tr style="border-top:1.5px solid var(--border)"><td class="l"><b>메타 합계</b></td><td class="l"></td><td class="r"><b>10,789,532</b></td><td class="r">242</td><td class="r">—</td><td class="r"><b>2</b></td><td class="r"><b>1,040만</b></td><td class="r red"><b>0.96</b></td></tr>
+    </tbody>
+  </table>
+  <div class="cap" style="margin-bottom:16px"><b>메타 8월 MTD 총 광고비 = 20,484,676원</b> (1주 9,695,144 + 2주 10,789,532). 소재 합계 오더(W1 3건)와 채널 표의 메타 W1 오더(12건)가 다른 것은 <b>소재까지 귀속된 오더만 소재 표에 싣기 때문</b>입니다 — 채널 표가 코호트 전수, 소재 표가 귀속분입니다.</div>
+
+  <div class="gal" id="aug-gal"></div>
+
+  <!-- 판단의 기록 -->
+  <div class="sec">04 — 판단의 기록</div>
+
+  <div class="log" style="margin-bottom:12px;background:#f0f8f4;border-color:#c8e4d8">
+    <div class="li" style="margin-bottom:8px"><b>① 노필릴스가 8월 1주 진짜 위너 (ROAS 11.36).</b></div>
+    <div class="li">163만 써서 <b>1,851만</b>. 노트릴스 위너(2.72)보다 강했고 CPL도 <b>22,962로 최저</b>였습니다. 다만 2주차엔 오더 0 — 코호트가 아직 익는 중입니다.</div>
+  </div>
+
+  <div class="log" style="margin-bottom:12px;background:#f5f2fd;border-color:#d8cef0">
+    <div class="li" style="margin-bottom:8px"><b>② 2주차는 신규 소재 대량 투입 주입니다.</b></div>
+    <div class="li" style="margin-bottom:8px">릴스3(방으로·박은영·맞춤처방) + 캐러셀1 + 단일5를 한 번에 태웠습니다. 리드는 활발했으나(방으로 33 · 박은영 24) <b>오더가 미성숙</b>합니다. 지금 ROAS를 내면 대부분 0으로 찍히므로 <b>“코호트 집계 예정”이 정직한 표기</b>입니다.</div>
+    <div class="li"><b>릴스_방으로가 신규 중 최고 CPL 35,348</b> — 다음 주 오더 전환이 관건입니다.</div>
+  </div>
+
+  <div class="log" style="margin-bottom:12px;background:#fff0f0;border-color:#e8b8b8">
+    <div class="li" style="margin-bottom:8px"><b>③ 채리 완전 폐기.</b></div>
+    <div class="li">2주차 CPL이 <b>206,737로 붕괴</b>했습니다(1주차 44,039 → 2주차 206,737). 리드 2건. 6월부터 돌린 소재라 피로가 누적됐습니다. <b>폐기 확정.</b></div>
+  </div>
+
+  <div class="log" style="margin-bottom:12px;background:#fff5f5;border-color:#f0d0d0">
+    <div class="li" style="margin-bottom:8px"><b>④ 단일 5종 폐기 — 악플.</b></div>
+    <div class="li">학생 악플 바이럴로 소재를 삭제했습니다. 리드는 났으나(W1 14 · W2 2) <b>브랜드 리스크로 중단</b>했습니다.</div>
+  </div>
+
+  <div class="log" style="margin-bottom:24px;background:#fff8f0;border-color:#f0d5c4">
+    <div class="li" style="margin-bottom:8px"><b>⑤ 2주차 ROAS 0.96은 착시입니다 (반드시 명시).</b></div>
+    <div class="li">주간 ROAS는 <b>전환 시차(중앙값 2일 · 평균 3.5일)</b> 때문에 판단기준으로 쓰지 않습니다. 2주차 신규 소재 오더가 아직 안 나온 것뿐입니다. <b>코호트가 익으면 재평가</b>합니다.</div>
+  </div>
+
+  <!-- 조치 -->
+  <div class="sec">05 — 판정에 따른 조치</div>
+  <table class="tbl" style="margin-bottom:24px">
+    <thead><tr><th class="l">소재·채널</th><th class="l">판정 근거</th><th class="l">조치</th></tr></thead>
+    <tbody>
+      <tr><td class="l"><b>노필릴스</b></td><td class="l">ROAS 11.36 · CPL 22,962(최저)</td><td class="l"><b>증액 검토</b></td></tr>
+      <tr><td class="l">노트릴스 위너</td><td class="l">볼륨 앵커 · W1 2.72 / W2 2.34</td><td class="l">유지</td></tr>
+      <tr><td class="l">릴스_방으로</td><td class="l">신규 최고 CPL 35,348 · 리드 33</td><td class="l">관찰 (오더 전환 대기)</td></tr>
+      <tr><td class="l">릴스_박은영 · 맞춤처방</td><td class="l">리드 24 / 8 · 오더 미성숙</td><td class="l">관찰 (코호트 집계중)</td></tr>
+      <tr><td class="l">채리</td><td class="l">CPL 206,737 붕괴 · 리드 2</td><td class="l"><b>폐기</b></td></tr>
+      <tr><td class="l">단일 5종</td><td class="l">학생 악플 바이럴 · 브랜드 리스크</td><td class="l"><b>폐기</b></td></tr>
+      <tr><td class="l">카카오 · 네이버 파이프</td><td class="l">8/11 사고 → 8/16 재가동</td><td class="l"><b>복구 완료</b> · 08시 자동화 재설치</td></tr>
+    </tbody>
+  </table>
 
 </div>
 
@@ -1172,6 +1321,24 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 // 주차별 THIS WEEK 데이터
 const DOCS = 'https://crocdeucation-rgb.github.io/image/report/docs/';
 const WEEK_TODO = {
+  aug: {
+    mission: {title:'다음 할 일 (8/17~)', items:[
+      {n:'①', t:'노필릴스 증액 검토', d:'W1 ROAS 11.36 · CPL 22,962(최저) — 증액 폭 산정'},
+      {n:'②', t:'신규 소재 코호트 재집계', d:'릴스3+캐러셀 오더 전환 확인 후 ROAS 확정 (현재 집계 예정)'},
+      {n:'③', t:'릴스_방으로 오더 전환 관찰', d:'신규 최고 CPL 35,348 · 리드 41건의 회수 여부'},
+      {n:'④', t:'채리·단일5종 정리 마감', d:'채리 CPL 206,737 폐기 · 단일5종 악플 삭제분 정산'},
+      {n:'⑤', t:'카카오/네이버 파이프 안정화 확인', d:'8/16 재가동 · 08시 자동화 정상 적재 모니터링'},
+    ]},
+    done: {title:'8월 MTD 완료 (8/1~8/16)', items:[
+      {t:'8월 MTD 매출 7,860만 · 오더 20건', d:'신청일 코호트 · 광고비 2,463만'},
+      {t:'노필릴스 W1 ROAS 11.36', d:'163만 → 1,851만 · CPL 최저 22,962'},
+      {t:'신규 소재 9종 투입', d:'릴스3 + 캐러셀1(4장) + 단일5 — W2 집중 투입'},
+      {t:'채리 폐기 확정', d:'W2 CPL 206,737 붕괴 · 리드 2건'},
+      {t:'단일 5종 중단', d:'학생 악플 바이럴 · 브랜드 리스크 판단'},
+      {t:'카카오·네이버 데이터 파이프 복구', d:'8/11 사고 → 8/16 재가동 · 08시 자동화 재설치'},
+    ]},
+    note: '8월은 진행 중(MTD 8/1~8/16)입니다. 2주차 ROAS 0.96은 전환 시차(중앙값 2일·평균 3.5일)에 따른 착시이며, 신규 소재 코호트가 익은 뒤 재평가합니다.'
+  },
   jul: {
     mission: {title:'다음 할 일', items:[
       {n:'①', t:'CRM 배정 시스템 및 개인화 구축', d:'담당자_P 자동배정 안정화 + 자기 리드만 보기 개인화'},
@@ -1429,6 +1596,9 @@ const badge = s => s=='best'?'<span class="badge b-best">위너</span>'
   : s=='dead'?'<span class="badge b-dead">폐기</span>'
   : s=='watch'?'<span class="badge b-watch">관찰</span>'
   : s=='end'?'<span class="badge b-end">종료</span>'
+  : s=='new'?'<span class="badge b-new">신규</span>'
+  : s=='keep'?'<span class="badge b-on">유지</span>'
+  : s=='hold'?'<span class="badge b-end">정지</span>'
   : '<span class="badge b-on">활성</span>';
 const chbadge = id => ({meta:'<span class="chbadge cb-meta">메타</span>',kk:'<span class="chbadge cb-kk">카카오</span>',dg:'<span class="chbadge cb-dg">당근</span>',cpa:'<span class="chbadge cb-cpa">CPA</span>',nv:'<span class="chbadge cb-nv">네이버</span>'}[id]||id);
 
@@ -1440,6 +1610,33 @@ const chbadge = id => ({meta:'<span class="chbadge cb-meta">메타</span>',kk:'<
 
 // 오더 테이블
 
+// 소재 이미지 렌더 — IMGS 값이 배열이면 넘겨보는 슬라이드, 문자열이면 단일
+function renderCreativeImg(key, im){
+  if(!im) return '<div class="thumb-ph"></div>';
+  if(!Array.isArray(im)) return `<img class="thumb" src="${im}">`;
+  const slides = im.map(u=>`<img class="thumb" src="${u}">`).join('');
+  const dots = im.map((_,i)=>`<button class="gdot ${i==0?'on':''}" onclick="slideGo(event,this,${i})" aria-label="${i+1}번째"></button>`).join('');
+  return `<div class="gslide" data-i="0" data-n="${im.length}">
+    <div class="gslide-track">${slides}</div>
+    <span class="gcount"><span class="gcur">1</span>/${im.length}</span>
+    <button class="gnav prev" onclick="slideNav(event,this,-1)" disabled>&lsaquo;</button>
+    <button class="gnav next" onclick="slideNav(event,this,1)">&rsaquo;</button>
+    <div class="gdots">${dots}</div>
+  </div>`;
+}
+function slideSet(box, i){
+  const n = +box.dataset.n;
+  i = Math.max(0, Math.min(n-1, i));
+  box.dataset.i = i;
+  box.querySelector('.gslide-track').style.transform = `translateX(-${i*100}%)`;
+  box.querySelectorAll('.gdot').forEach((d,k)=>d.classList.toggle('on', k===i));
+  box.querySelector('.gcur').textContent = i+1;
+  box.querySelector('.gnav.prev').disabled = (i===0);
+  box.querySelector('.gnav.next').disabled = (i===n-1);
+}
+function slideNav(e, btn, d){ e.stopPropagation(); const box=btn.closest('.gslide'); slideSet(box, (+box.dataset.i)+d); }
+function slideGo(e, btn, i){ e.stopPropagation(); slideSet(btn.closest('.gslide'), i); }
+
 // 소재 갤러리 공통
 function renderGal(id, data){
   const _IMGS = (typeof IMGS !== 'undefined') ? IMGS : {};
@@ -1447,8 +1644,8 @@ function renderGal(id, data){
   if(!_el) return;
   _el.innerHTML = data.map(s=>{
     const im = _IMGS[s.key];
-    return `<div class="gcard ${s.st=='best'?'best':''}" onclick="${im?`openLb('${s.key}')`:''}">
-      ${im?`<img class="thumb" src="${im}">`:'<div class="thumb-ph"></div>'}
+    return `<div class="gcard ${s.st=='best'?'best':''}" ${im?`onclick="openLbCard(this,'${s.key}')"`:''}>
+      ${renderCreativeImg(s.key, im)}
       <div class="gi">
         <div class="gt"><span>${s.title}</span> ${badge(s.st)}</div>
         <div class="gtag">${s.tag} · CPL ${s.cpl}</div>
@@ -1505,11 +1702,32 @@ const JUL_GAL = [
 ];
 renderGal('jul-gal', JUL_GAL);
 
+// ===== 8월 CREATIVE LOG (MTD 8/1~8/16) =====
+// 매출·오더는 W1+W2 귀속 합. 오더 0이면 renderGal이 "코호트 집계 예정"으로 렌더한다.
+const AUG_GAL = [
+  {key:'노트릴스_영상',        title:'노트릴스(위너)',        st:'best',  tag:'볼륨 앵커 · ROAS 2.72→2.34',        cpl:'W1 30,373 · W2 40,076', sales:20800000, orders:5},
+  {key:'노트필기릴스_2607',    title:'노필릴스',              st:'best',  tag:'W1 ROAS 11.36 · 8월 진짜 위너',      cpl:'W1 22,962 · W2 40,925', sales:18510000, orders:5},
+  {key:'릴스_방으로',          title:'릴스_방으로',           st:'new',   tag:'신규 중 최고 CPL · 리드 41(W1+W2)',   cpl:'W1 39,363 · W2 35,348', sales:0, orders:0},
+  {key:'릴스_박은영중간고사',   title:'릴스_박은영중간고사',    st:'new',   tag:'W2 신규 · 리드 24',                  cpl:'54,750', sales:0, orders:0},
+  {key:'릴스_맞춤처방',        title:'릴스_맞춤처방',          st:'new',   tag:'W2 신규 · 리드 8',                   cpl:'70,985', sales:0, orders:0},
+  {key:'캐러셀_중간고사전략',   title:'캐러셀_중간고사전략',    st:'new',   tag:'4장 캐러셀 · W2 CPL 22,011',         cpl:'W1 30,672 · W2 22,011', sales:0, orders:0},
+  {key:'GT노트피드백_영상',    title:'GT노트피드백',           st:'keep',  tag:'CPL 54,142→74,549 · 관찰',           cpl:'W1 54,142 · W2 74,549', sales:3460000, orders:1},
+  {key:'노트릴스_채리_2606',   title:'채리_2606',             st:'dead',  tag:'CPL 206,737 붕괴 · 폐기 확정',        cpl:'W1 44,039 · W2 206,737', sales:3460000, orders:1},
+  {key:'단일_시험기간',        title:'단일_시험기간',          st:'dead',  tag:'악플 바이럴로 삭제',                  cpl:'단일5종 합 W1 31,015', sales:0, orders:0},
+  {key:'단일_노트',            title:'단일_노트',             st:'dead',  tag:'악플 바이럴로 삭제',                  cpl:'단일5종 합 W1 31,015', sales:0, orders:0},
+  {key:'단일_Dday',           title:'단일_D-day',            st:'dead',  tag:'악플 바이럴로 삭제',                  cpl:'단일5종 합 W1 31,015', sales:0, orders:0},
+  {key:'단일_맘카페',          title:'단일_맘카페',           st:'dead',  tag:'악플 바이럴로 삭제',                  cpl:'단일5종 합 W1 31,015', sales:0, orders:0},
+  {key:'단일_공부습관',        title:'단일_공부습관',          st:'dead',  tag:'악플 바이럴로 삭제',                  cpl:'단일5종 합 W1 31,015', sales:0, orders:0},
+];
+renderGal('aug-gal', AUG_GAL);
+
 renderGal('jw2-gal', JW2_GAL);
   renderGal('jw3-gal', JW3_GAL);
 
 // 라이트박스
-function openLb(key){ const im=(typeof IMGS!=='undefined'?IMGS:{})[key]; if(!im)return; document.getElementById('lb-img').src=im; document.getElementById('lb').classList.add('show'); }
+function openLb(key, idx){ let im=(typeof IMGS!=='undefined'?IMGS:{})[key]; if(!im)return; if(Array.isArray(im)) im=im[idx||0]; document.getElementById('lb-img').src=im; document.getElementById('lb').classList.add('show'); }
+// 캐러셀 카드는 현재 보고 있는 슬라이드를 연다
+function openLbCard(card, key){ const box=card.querySelector('.gslide'); openLb(key, box ? +box.dataset.i : 0); }
 function closeLb(){ document.getElementById('lb').classList.remove('show'); }
 
 function renderGalW4(){
