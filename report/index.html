@@ -776,15 +776,17 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 <div id="p-aug" class="panel on">
 
   <div class="kpis" style="grid-template-columns:repeat(3,1fr)">
-    <div class="kpi"><div class="k">8월 매출 · MTD</div><div class="v t">7,860만</div><div class="s">신청일 코호트 · 8/1~8/16</div></div>
-    <div class="kpi"><div class="k">총 광고비 · MTD</div><div class="v">2,463만</div><div class="s">24,634,444원</div></div>
-    <div class="kpi" style="border-color:var(--amber);border-width:1.5px"><div class="k" style="color:var(--amber)">ROAS · 잠정</div><div class="v" style="color:var(--amber)">3.19</div><div class="s">코호트 미성숙 · 판단 보류</div></div>
+    <div class="kpi"><div class="k">8월 매출 · MTD</div><div class="v t">1억 2,819만</div><div class="s">결제일 기준 · 8/1~16<br><span style="color:var(--faint)">신청일 코호트 7,863만</span></div></div>
+    <div class="kpi"><div class="k">총 광고비 · MTD</div><div class="v">2,463만</div><div class="s">24,634,444원<br><span style="color:var(--faint)">텐핑 실소진 64.4만 별도</span></div></div>
+    <div class="kpi"><div class="k">ROAS</div><div class="v t">5.20</div><div class="s">결제일 기준 · 경영<br><span style="color:var(--faint)">코호트 3.19 (소재 판단용)</span></div></div>
     <div class="kpi"><div class="k">총 DB</div><div class="v">707건</div><div class="s">전 채널 합산</div></div>
-    <div class="kpi"><div class="k">오더</div><div class="v">20건</div><div class="s">오더+미납 인정</div></div>
+    <div class="kpi"><div class="k">오더</div><div class="v">32건</div><div class="s">결제일 기준 · 오더+미납 인정<br><span style="color:var(--faint)">신청일 코호트 20건</span></div></div>
     <div class="kpi"><div class="k">메타 광고비</div><div class="v">2,048만</div><div class="s">20,484,676원 · results 실측</div></div>
   </div>
   <div class="knote">
-    ※ 광고비 = 메타 results 필드 실측(2026-08-17 02:xx) · 카카오/네이버는 복구된 raw JSON 일자합산 · GFA는 수동 엑셀 · 매출/오더 = 노션 <b>신청일 코호트</b>(결제일 아님, 오더+미납만 인정)
+    ※ <b>매출 2기준 병기</b> — <b>결제일 기준</b>(경영·대시보드 일치) = <b>1억 2,819만</b> / <b>신청일 코호트</b>(소재 생사 판단) = <b>7,863만</b>.
+    <br>결제일 매출엔 <b>7월 이전 신청분이 8월에 결제된 것</b>도 포함되고, 코호트는 <b>8월 신규 리드가 만든 매출만</b> 셉니다. <b>두 값이 다른 게 정상입니다.</b>
+    <br>광고비 = 메타 results 실측(2026-08-17 02:xx) · 카카오/네이버 복구 JSON 일자합산 · GFA 수동 엑셀. 매출 = 오더+미납 인정.
     <br>⚠️ <b>8월은 진행 중(MTD 8/1~8/16)이며 신규 소재 코호트가 아직 익지 않았습니다.</b> 신규 소재는 ROAS 대신 <b>“코호트 집계 예정”</b>으로 표기합니다 — 0으로 읽지 마십시오.
   </div>
 
@@ -803,15 +805,16 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
       <tr><td class="l"><span class="chbadge cb-nv">네이버 브검</span></td><td class="l">W1</td><td class="r">479,034</td><td class="r">5</td><td class="r">95,807</td><td class="r"><b>3</b></td><td class="r"><b>1,040만</b></td><td class="r teal"><b>21.71</b></td><td class="l">일할×9일 · 표본 3건 주의</td></tr>
       <tr><td class="l"><span class="chbadge cb-nv">네이버 브검</span></td><td class="l">W2</td><td class="r">372,582</td><td class="r">6</td><td class="r">62,097</td><td class="r">0</td><td class="r">0</td><td class="r red">0</td><td class="l">일할×7일 · 복구완료</td></tr>
       <tr><td class="l"><span class="chbadge cb-nv">네이버 GFA</span></td><td class="l">MTD</td><td class="r">411,531</td><td class="r">—</td><td class="r">—</td><td class="r">0</td><td class="r">0</td><td class="r">—</td><td class="l">수동 엑셀 · 노트릴스#2605만 ON</td></tr>
-      <tr><td class="l"><span class="chbadge cb-cpa">텐핑</span></td><td class="l">W1</td><td class="r">0</td><td class="r">1</td><td class="r">—</td><td class="r">0</td><td class="r">0</td><td class="r">—</td><td class="l">잔액 0</td></tr>
-      <tr><td class="l"><span class="chbadge cb-cpa">텐핑</span></td><td class="l">W2</td><td class="r">0</td><td class="r">22</td><td class="r">—</td><td class="r">0</td><td class="r">0</td><td class="r">—</td><td class="l">잔액 0 · 잔류 유입</td></tr>
+      <tr><td class="l"><span class="chbadge cb-cpa">텐핑</span></td><td class="l">MTD</td><td class="r">644,000<span style="font-size:9px;color:var(--faint)">*</span></td><td class="r">23<span style="font-size:9px;color:var(--faint)"> 유효</span></td><td class="r">28,000</td><td class="r">0</td><td class="r">0</td><td class="r"><span class="gl">집계 예정</span></td><td class="l">8/9~16 실소진 · 무효 4건 제외</td></tr>
       <tr><td class="l"><span class="chbadge cb-cpa">인스타 organic</span></td><td class="l">W1</td><td class="r">0</td><td class="r">25</td><td class="r">—</td><td class="r">1</td><td class="r"><b>693만</b></td><td class="r">∞</td><td class="l">무료 자산</td></tr>
       <tr><td class="l"><span class="chbadge cb-cpa">인스타 organic</span></td><td class="l">W2</td><td class="r">0</td><td class="r">23</td><td class="r">—</td><td class="r">0</td><td class="r">0</td><td class="r">—</td><td class="l">무료 자산</td></tr>
       <tr><td class="l">기타/미상</td><td class="l">W1~2</td><td class="r">—</td><td class="r">11</td><td class="r">—</td><td class="r">1</td><td class="r">346만</td><td class="r">—</td><td class="l">소스 미상</td></tr>
       <tr style="border-top:1.5px solid var(--border)"><td class="l"><b>합계</b></td><td class="l">MTD</td><td class="r"><b>24,634,444</b></td><td class="r"><b>707</b></td><td class="r">—</td><td class="r"><b>20</b></td><td class="r"><b>7,860만</b></td><td class="r"><b>3.19</b></td><td class="l"></td></tr>
     </tbody>
   </table>
-  <div class="cap" style="margin-bottom:24px">카카오·네이버 광고비는 <b>복구된 raw JSON에서 일자 합산</b>했습니다(kakao_daily.json · naver_daily.json, 둘 다 8/16까지 적재 확인). 네이버는 지시 기준대로 <b>브랜드검색만</b> 계상했고 파워컨텐츠 소액(W1 7,200 · W2 6,106원)은 합계에서 제외했습니다. <b>네이버 ROAS 21.71은 오더 3건 표본</b>이라 채널 판정 근거로 쓰지 않습니다. <b>합계 ROAS 3.19는 잠정치입니다</b> — W2 신규 소재 코호트가 익지 않아 분자가 미완성입니다.</div>
+  <div class="cap" style="margin-bottom:24px">이 표는 <b>신청일 코호트</b> 기준입니다(경영 KPI의 결제일 기준과 다릅니다). 카카오·네이버 광고비는 <b>복구된 raw JSON에서 일자 합산</b>했습니다(kakao_daily.json · naver_daily.json, 둘 다 8/16까지 적재 확인). 네이버는 지시 기준대로 <b>브랜드검색만</b> 계상했고 파워컨텐츠 소액(W1 7,200 · W2 6,106원)은 합계에서 제외했습니다. <b>네이버 ROAS 21.71은 오더 3건 표본</b>이라 채널 판정 근거로 쓰지 않습니다.
+  <br><b>*텐핑 644,000원(유효 23건×28,000, 8/9~16 실소진)은 합계 광고비 24,634,444원에 포함되지 않습니다</b> — 선불 코호트라 총 ROAS 분모에서 제외합니다. 무효 4건(박나결·이예림·테스트입니다·최지온)은 DB에서 뺐습니다.
+  <br>합계 코호트 매출은 만원 단위 반올림 합이라 <b>7,860만</b>으로 찍히며, KPI의 코호트 매출 <b>7,863만</b>(78,630,000원)과 3만원 차이가 납니다. ROAS는 두 값 모두 <b>3.19</b>입니다.</div>
 
   <!-- 소재별 -->
   <div class="sec" style="margin-top:4px">03-C — 8월 CREATIVE LOG (주차별)</div>
@@ -857,6 +860,27 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   </table>
   <div class="cap" style="margin-bottom:16px"><b>메타 8월 MTD 총 광고비 = 20,484,676원</b> (1주 9,695,144 + 2주 10,789,532). 소재 합계 오더(W1 3건)와 채널 표의 메타 W1 오더(12건)가 다른 것은 <b>소재까지 귀속된 오더만 소재 표에 싣기 때문</b>입니다 — 채널 표가 코호트 전수, 소재 표가 귀속분입니다.</div>
 
+  <div class="cap" style="font-weight:700;color:var(--text);margin-top:18px">소재별 매출 2기준 병기 (MTD 8/1~8/16)</div>
+  <table class="tbl" style="margin-bottom:10px">
+    <thead><tr>
+      <th class="l">소재</th>
+      <th class="r">코호트 오더</th><th class="r">코호트 매출</th>
+      <th class="r">결제일 오더</th><th class="r">결제일 매출</th>
+      <th class="l">판단 기준</th>
+    </tr></thead>
+    <tbody>
+      <tr><td class="l"><b>노트릴스(위너)</b></td><td class="r">5</td><td class="r">2,080만</td><td class="r"><b>12</b></td><td class="r"><b>4,855만</b></td><td class="l">코호트 ROAS로 판단</td></tr>
+      <tr><td class="l"><b>노필릴스</b></td><td class="r">5</td><td class="r">1,851만</td><td class="r">7</td><td class="r">2,718만</td><td class="l">코호트 ROAS 11.36(W1)</td></tr>
+      <tr><td class="l">릴스_박은영중간고사</td><td class="r">0</td><td class="r"><span class="gl">집계 예정</span></td><td class="r">2</td><td class="r">635만</td><td class="l">코호트 미성숙</td></tr>
+      <tr><td class="l">GT노트피드백</td><td class="r">1</td><td class="r">346만</td><td class="r">1</td><td class="r">346만</td><td class="l">두 기준 일치</td></tr>
+      <tr><td class="l">채리</td><td class="r">1</td><td class="r">346만</td><td class="r">1</td><td class="r">346만</td><td class="l">폐기 확정(CPL 붕괴)</td></tr>
+      <tr><td class="l">기타 <span style="font-size:10px;color:var(--faint)">7월 이전 소재 8월 결제</span></td><td class="r">—</td><td class="r">—</td><td class="r">9</td><td class="r">3,915만</td><td class="l">코호트엔 안 잡힘</td></tr>
+      <tr style="border-top:1.5px solid var(--border)"><td class="l"><b>합계</b></td><td class="r"><b>20</b></td><td class="r"><b>7,863만</b></td><td class="r"><b>32</b></td><td class="r"><b>1억 2,819만</b></td><td class="l"></td></tr>
+    </tbody>
+  </table>
+  <div class="cap" style="margin-bottom:20px">매출을 <b>두 기준으로 병기</b>합니다. <b>코호트</b>(신청일)는 그 소재가 만든 리드의 매출 → <b>소재 생사 판단용</b>. <b>결제일</b>은 8월에 실제 결제된 돈 → <b>경영·대시보드 일치용</b>. 노트릴스가 코호트 5오더인데 결제일 12오더인 것은 <b>7월에 신청한 노트릴스 리드가 8월에 결제 완료됐기 때문</b>입니다. <b>“기타” 결제일 9오더 3,915만은 7월 이전 소재(당근·옛 캠페인)가 8월 결제된 것</b>이라 코호트엔 안 잡힙니다. <b>소재 ROAS 판정은 코호트 기준</b>이며 결제일은 참고 병기입니다 — 광고비·리드·CPL은 메타 실측 그대로입니다.
+  <br>코호트 열의 소재 행은 <b>메타 귀속분</b>(4,623만·12건)이고, 합계 7,863만·20건은 카카오·네이버·인스타·기타를 포함한 <b>전 채널 코호트</b>라 행 합과 다릅니다. 결제일 열은 만원 단위 반올림 탓에 행 합이 12,815만으로 합계 12,819만과 4만원 차이가 납니다.</div>
+
   <div class="gal" id="aug-gal"></div>
 
   <!-- 판단의 기록 -->
@@ -884,8 +908,9 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   </div>
 
   <div class="log" style="margin-bottom:24px;background:#fff8f0;border-color:#f0d5c4">
-    <div class="li" style="margin-bottom:8px"><b>⑤ 2주차 ROAS 0.96은 착시입니다 (반드시 명시).</b></div>
-    <div class="li">주간 ROAS는 <b>전환 시차(중앙값 2일 · 평균 3.5일)</b> 때문에 판단기준으로 쓰지 않습니다. 2주차 신규 소재 오더가 아직 안 나온 것뿐입니다. <b>코호트가 익으면 재평가</b>합니다.</div>
+    <div class="li" style="margin-bottom:8px"><b>⑤ 매출은 두 기준으로 봐야 합니다.</b></div>
+    <div class="li" style="margin-bottom:8px">대시보드(<b>결제일</b>)는 <b>1억 2,819만</b>, 소재 코호트(<b>신청일</b>)는 <b>7,863만</b>입니다. 신규 소재 대량 투입 주라 코호트가 아직 안 익었고(2주차 오더 대부분 미발생), 결제일 매출의 상당부는 <b>7월 신청분이 8월에 결제된 것</b>입니다. <b>소재 생사는 코호트 ROAS로, 경영 매출은 결제일로</b> 판단합니다.</div>
+    <div class="li">같은 이유로 <b>2주차 ROAS 0.96은 착시</b>입니다. 주간 ROAS는 <b>전환 시차(중앙값 2일 · 평균 3.5일)</b> 때문에 판단기준으로 쓰지 않습니다 — 2주차 신규 소재 오더가 아직 안 나온 것뿐이며, <b>코호트가 익으면 재평가</b>합니다.</div>
   </div>
 
   <!-- 조치 -->
@@ -1330,14 +1355,14 @@ const WEEK_TODO = {
       {n:'⑤', t:'카카오/네이버 파이프 안정화 확인', d:'8/16 재가동 · 08시 자동화 정상 적재 모니터링'},
     ]},
     done: {title:'8월 MTD 완료 (8/1~8/16)', items:[
-      {t:'8월 MTD 매출 7,860만 · 오더 20건', d:'신청일 코호트 · 광고비 2,463만'},
+      {t:'8월 MTD 매출 1억 2,819만 (결제일)', d:'오더 32건 · ROAS 5.20 / 신청일 코호트는 7,863만·20건·ROAS 3.19'},
       {t:'노필릴스 W1 ROAS 11.36', d:'163만 → 1,851만 · CPL 최저 22,962'},
       {t:'신규 소재 9종 투입', d:'릴스3 + 캐러셀1(4장) + 단일5 — W2 집중 투입'},
       {t:'채리 폐기 확정', d:'W2 CPL 206,737 붕괴 · 리드 2건'},
       {t:'단일 5종 중단', d:'학생 악플 바이럴 · 브랜드 리스크 판단'},
       {t:'카카오·네이버 데이터 파이프 복구', d:'8/11 사고 → 8/16 재가동 · 08시 자동화 재설치'},
     ]},
-    note: '8월은 진행 중(MTD 8/1~8/16)입니다. 2주차 ROAS 0.96은 전환 시차(중앙값 2일·평균 3.5일)에 따른 착시이며, 신규 소재 코호트가 익은 뒤 재평가합니다.'
+    note: '8월은 진행 중(MTD 8/1~8/16)입니다. 매출은 두 기준으로 봅니다 — 경영·대시보드는 결제일(1억 2,819만), 소재 생사는 신청일 코호트(7,863만). 2주차 ROAS 0.96은 전환 시차(중앙값 2일·평균 3.5일)에 따른 착시이며, 신규 소재 코호트가 익은 뒤 재평가합니다.'
   },
   jul: {
     mission: {title:'다음 할 일', items:[
