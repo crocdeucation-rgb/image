@@ -20,10 +20,38 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 .top .rf{margin-left:auto;font-size:12px;padding:6px 13px;border:1px solid var(--line);border-radius:9px;background:var(--card);cursor:pointer;color:#5a6272;font-weight:600}
 .top .rf:hover{border-color:#cdd2db}
 
+/* 모바일 전용 섹션 탭 (PC에서는 숨김 · 3단 그리드 유지) */
+.sec-nav{display:none;justify-content:center;gap:6px;margin-bottom:12px}
+.sec-nav-btn{font-size:12px;font-weight:700;padding:6px 16px;border-radius:16px;border:1px solid var(--line);background:var(--card);color:#7a828f;cursor:pointer;letter-spacing:-.01em}
+.sec-nav-btn.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+
 .board{display:grid;grid-template-columns:minmax(0,1.32fr) minmax(0,1fr) minmax(0,.74fr);gap:14px;height:calc(100vh - 62px)}
 .colwrap{display:flex;flex-direction:column;gap:12px;min-height:0}
 .mid{display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:12px;min-height:0}
-@media (max-width:1240px){ .board{grid-template-columns:1fr;height:auto} .colwrap,.mid{min-height:0} }
+@media (max-width:1240px){
+  .board{grid-template-columns:1fr;height:auto}
+  .colwrap,.mid{min-height:0}
+  .sec-nav{display:flex}
+  .sec{display:none}
+  .colwrap.sec.on{display:flex}   /* .colwrap은 flex 컨테이너 */
+  .mid.sec.on{display:grid}       /* .mid는 grid 컨테이너 */
+
+  /* 성과 탭: 담당자 표 · 소재 히트맵 폰트/여백 축소 → 가로 스크롤 최소화 */
+  .pf{font-size:10px}
+  .pf th{font-size:9.5px;padding:5px 3px}
+  .pf td{padding:5px 3px}
+  .pf td.nm{padding-left:8px}
+  .heat{font-size:9.5px}
+  .heat th{font-size:8.5px;padding:3px 1px}
+  .heat td{padding:1px}
+  .heat th.l,.heat td.l{padding-left:8px}
+  .heat .cell{min-width:17px;padding:4px 1px}
+}
+@media (min-width:1241px){
+  .sec-nav{display:none}
+  .colwrap.sec{display:flex!important}
+  .mid.sec{display:grid!important}
+}
 
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
 .ch{display:flex;align-items:center;gap:8px;padding:11px 15px 10px;border-bottom:1px solid var(--line)}
@@ -123,9 +151,16 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
   <button class="rf" onclick="loadAll()">새로고침</button>
 </div>
 
+<!-- 모바일 전용 섹션 탭 (1240px 이하에서만 표시) -->
+<div class="sec-nav">
+  <button class="sec-nav-btn on" onclick="showSec(0)">성과</button>
+  <button class="sec-nav-btn" onclick="showSec(1)">팀현황</button>
+  <button class="sec-nav-btn" onclick="showSec(2)">방문</button>
+</div>
+
 <div class="board">
   <!-- 좌: 담당자 퍼널 -->
-  <div class="colwrap">
+  <div class="colwrap sec on">
     <div class="card">
       <div class="ch"><span class="t">매출</span><span class="badge sp">결제일 기준</span></div>
       <div class="sales">
@@ -157,7 +192,7 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
   </div>
 
   <!-- 가운데: 상 팀성과 / 하 챙길리드(+근무 스테이터스) -->
-  <div class="mid">
+  <div class="mid sec">
     <div class="card">
       <div class="ch"><span class="t">🔥 이번주 팀 성과</span><span class="badge sp">이번주</span></div>
       <div class="hl" id="hl"></div>
@@ -176,7 +211,7 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
   </div>
 
   <!-- 우: 방문 목록 -->
-  <div class="colwrap">
+  <div class="colwrap sec">
     <div class="card colwrap" style="flex:1;min-height:0;gap:0">
       <div class="ch"><span class="t">📅 방문 목록</span><span class="cnt sp" id="c-visit" style="background:var(--amber)">0</span></div>
       <div class="scroll" id="visit" style="flex:1"><div class="empty">불러오는 중...</div></div>
@@ -200,6 +235,14 @@ const cmap={'우혜림':'hye','김윤호':'kim','장윤호':'jang','박창건':'
 const dayN=['일','월','화','수','목','금','토'];
 const WDAYS=['월','화','수','목','금','토'];
 let summaryRows=[], perfTab=0, workState={};
+
+/* ── 모바일 섹션 탭 (1240px 이하에서만 동작 · PC는 CSS로 3단 유지) ── */
+let currentSec=0;
+function showSec(i){
+  currentSec=i;
+  document.querySelectorAll('.board > .sec').forEach((s,k)=>s.classList.toggle('on',k===i));
+  document.querySelectorAll('.sec-nav-btn').forEach((b,k)=>b.classList.toggle('on',k===i));
+}
 
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function asB(a){return a?'<span class="as '+(cmap[a]||'')+'">'+esc(a)+'</span>':''}
