@@ -852,32 +852,35 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   </div>
 
   <!-- 채널별 -->
-  <div class="sec">01 — 채널별 주차별 (신청일 코호트)</div>
-  <div class="wk-legend">※ <b>1주차 = 8/1~8/9</b> (8/1 포함) · <b>2주차 = 8/10~8/16</b> · <b>누계 = 8/1~8/16</b></div>
+  <div class="sec">01 — 채널별 주차별 (코호트 · 결제일 병기)</div>
+  <div class="wk-legend">※ <b>1주차 = 8/1~8/9</b> (8/1 포함) · <b>2주차 = 8/10~8/16</b> · <b>누계 = 8/1~8/16</b>
+  <br>※ <b>코호트</b> = 그 주에 <b>들어온 리드</b>가 만든 매출(소재·채널 생사 판단용) · <b>결제일</b> = 그 주에 <b>실제 결제된</b> 매출(경영·대시보드 일치용). <b>두 값이 다른 것이 정상</b>입니다.</div>
   <div class="tbl-scroll" style="margin-bottom:10px">
   <table class="tbl">
     <thead><tr>
       <th class="l">채널</th><th class="l">주</th><th class="r">광고비</th><th class="r">DB</th><th class="r">CPL</th>
-      <th class="r">오더</th><th class="r">매출</th><th class="r">ROAS</th><th class="l">비고</th>
+      <th class="r">코호트<br>오더</th><th class="r">코호트 매출</th>
+      <th class="r">결제일<br>오더</th><th class="r">결제일 매출</th><th class="l">비고</th>
     </tr></thead>
     <tbody>
-      <tr><td class="l"><span class="chbadge cb-meta">메타</span></td><td class="l">1주차</td><td class="r">10,688,099</td><td class="r">311</td><td class="r">34,367</td><td class="r"><b>12</b></td><td class="r"><b>42,216,000원</b></td><td class="r teal"><b>3.95</b></td><td class="l">주력</td></tr>
-      <tr><td class="l"><span class="chbadge cb-meta">메타</span></td><td class="l">2주차</td><td class="r">10,789,532</td><td class="r">253</td><td class="r">42,647</td><td class="r">2</td><td class="r">10,404,000원</td><td class="r red"><b>0.96</b></td><td class="l">신규 대량 투입 · 오더 미성숙</td></tr>
-      <tr><td class="l"><span class="chbadge cb-kk">카카오</span></td><td class="l">1주차</td><td class="r">1,617,890</td><td class="r">34</td><td class="r">47,585</td><td class="r">1</td><td class="r">520만</td><td class="r">3.21</td><td class="l">자동 수집</td></tr>
-      <tr><td class="l"><span class="chbadge cb-kk">카카오</span></td><td class="l">2주차</td><td class="r">1,268,731</td><td class="r">16</td><td class="r">79,296</td><td class="r">0</td><td class="r">0</td><td class="r red">0</td><td class="l">자동 수집 복구 완료</td></tr>
-      <tr><td class="l"><span class="chbadge cb-nv">네이버 브랜드검색</span></td><td class="l">1주차</td><td class="r">479,034</td><td class="r">5</td><td class="r">95,807</td><td class="r"><b>3</b></td><td class="r"><b>1,040만</b></td><td class="r teal"><b>21.71</b></td><td class="l">일할×9일 · 표본 3건 주의</td></tr>
-      <tr><td class="l"><span class="chbadge cb-nv">네이버 브랜드검색</span></td><td class="l">2주차</td><td class="r">372,582</td><td class="r">6</td><td class="r">62,097</td><td class="r">0</td><td class="r">0</td><td class="r red">0</td><td class="l">일할×7일 · 복구완료</td></tr>
-      <tr><td class="l"><span class="chbadge cb-nv">네이버 브랜드컨텐츠</span></td><td class="l">누계</td><td class="r">13,306</td><td class="r">0</td><td class="r">—</td><td class="r">0</td><td class="r">0</td><td class="r">—</td><td class="l">1주차 7,200 + 2주차 6,106 · 링크 유입(블로그→카톡 상담)이라 폼 DB 0</td></tr>
-      <tr><td class="l"><span class="chbadge cb-nv">네이버 GFA</span></td><td class="l">누계</td><td class="r">411,531</td><td class="r">—</td><td class="r">—</td><td class="r">0</td><td class="r">0</td><td class="r">—</td><td class="l">노트릴스#2605 · <b>현재 OFF</b></td></tr>
-      <tr><td class="l"><span class="chbadge cb-cpa">텐핑</span></td><td class="l">누계</td><td class="r">644,000</td><td class="r">23<span style="font-size:9px;color:var(--faint)"> 유효</span></td><td class="r">28,000</td><td class="r">0</td><td class="r">0</td><td class="r"><span class="gl">집계 예정</span></td><td class="l">8/9~16 실소진 · 무효 3건 제외</td></tr>
-      <tr><td class="l"><span class="chbadge cb-cpa">인스타 organic</span></td><td class="l">1주차</td><td class="r">0</td><td class="r">25</td><td class="r">—</td><td class="r">1</td><td class="r"><b>693만</b></td><td class="r">∞</td><td class="l">무료 자산</td></tr>
-      <tr><td class="l"><span class="chbadge cb-cpa">인스타 organic</span></td><td class="l">2주차</td><td class="r">0</td><td class="r">23</td><td class="r">—</td><td class="r">0</td><td class="r">0</td><td class="r">—</td><td class="l">무료 자산</td></tr>
-      <tr><td class="l">기타/미상</td><td class="l">1~2주차</td><td class="r">—</td><td class="r">11</td><td class="r">—</td><td class="r">1</td><td class="r">346만</td><td class="r">—</td><td class="l">소스 미상</td></tr>
-      <tr style="border-top:1.5px solid var(--border)"><td class="l"><b>합계</b></td><td class="l">누계</td><td class="r"><b>26,284,705</b></td><td class="r"><b>707</b></td><td class="r">—</td><td class="r"><b>20</b></td><td class="r"><b>78,630,000원</b></td><td class="r"><b>2.99</b></td><td class="l"></td></tr>
+      <tr><td class="l"><span class="chbadge cb-meta">메타</span></td><td class="l">1주차</td><td class="r">10,688,099</td><td class="r">311</td><td class="r">34,367</td><td class="r"><b>12</b></td><td class="r"><b>42,216,000원</b></td><td class="r"><b>10</b></td><td class="r"><b>38,726,000원</b></td><td class="l">주력</td></tr>
+      <tr><td class="l"><span class="chbadge cb-meta">메타</span></td><td class="l">2주차</td><td class="r">10,789,532</td><td class="r">253</td><td class="r">42,647</td><td class="r">2</td><td class="r">10,404,000원</td><td class="r"><b>13</b></td><td class="r"><b>50,308,000원</b></td><td class="l">신규 대량 투입 · 코호트 미성숙</td></tr>
+      <tr><td class="l"><span class="chbadge cb-kk">카카오</span></td><td class="l">1주차</td><td class="r">1,617,890</td><td class="r">34</td><td class="r">47,585</td><td class="r">1</td><td class="r">5,202,000원</td><td class="r">0</td><td class="r">—</td><td class="l">자동 수집</td></tr>
+      <tr><td class="l"><span class="chbadge cb-kk">카카오</span></td><td class="l">2주차</td><td class="r">1,268,731</td><td class="r">16</td><td class="r">79,296</td><td class="r">0</td><td class="r">—</td><td class="r">1</td><td class="r">5,202,000원</td><td class="l">자동 수집 복구 완료</td></tr>
+      <tr><td class="l"><span class="chbadge cb-nv">네이버 브랜드검색</span></td><td class="l">1주차</td><td class="r">479,034</td><td class="r">5</td><td class="r">95,807</td><td class="r"><b>3</b></td><td class="r"><b>10,404,000원</b></td><td class="r"><b>4</b></td><td class="r"><b>13,149,000원</b></td><td class="l">일할×9일 · 표본 3~4건 주의</td></tr>
+      <tr><td class="l"><span class="chbadge cb-nv">네이버 브랜드검색</span></td><td class="l">2주차</td><td class="r">372,582</td><td class="r">6</td><td class="r">62,097</td><td class="r">0</td><td class="r">—</td><td class="r">0</td><td class="r">—</td><td class="l">일할×7일 · 복구완료</td></tr>
+      <tr><td class="l"><span class="chbadge cb-nv">네이버 브랜드컨텐츠</span></td><td class="l">누계</td><td class="r">13,306</td><td class="r">0</td><td class="r">—</td><td class="r">0</td><td class="r">—</td><td class="r">0</td><td class="r">—</td><td class="l">1주차 7,200 + 2주차 6,106 · 링크 유입(블로그→카톡 상담)이라 폼 DB 0</td></tr>
+      <tr><td class="l"><span class="chbadge cb-nv">네이버 GFA</span></td><td class="l">누계</td><td class="r">411,531</td><td class="r">—</td><td class="r">—</td><td class="r">0</td><td class="r">—</td><td class="r">0</td><td class="r">—</td><td class="l">노트릴스#2605 · <b>현재 OFF</b></td></tr>
+      <tr><td class="l"><span class="chbadge cb-cpa">텐핑</span></td><td class="l">누계</td><td class="r">644,000</td><td class="r">23<span style="font-size:9px;color:var(--faint)"> 유효</span></td><td class="r">28,000</td><td class="r">0</td><td class="r">—</td><td class="r">0</td><td class="r">—</td><td class="l">8/9~16 실소진 · 무효 3건 제외</td></tr>
+      <tr><td class="l"><span class="chbadge cb-cpa">인스타 organic</span></td><td class="l">1주차</td><td class="r">0</td><td class="r">25</td><td class="r">—</td><td class="r">1</td><td class="r"><b>6,936,000원</b></td><td class="r">1</td><td class="r"><b>6,936,000원</b></td><td class="l">무료 자산</td></tr>
+      <tr><td class="l"><span class="chbadge cb-cpa">인스타 organic</span></td><td class="l">2주차</td><td class="r">0</td><td class="r">23</td><td class="r">—</td><td class="r">0</td><td class="r">—</td><td class="r">1</td><td class="r"><b>6,936,000원</b></td><td class="l">무료 자산</td></tr>
+      <tr><td class="l">기타/미상</td><td class="l">1~2주차</td><td class="r">—</td><td class="r">11</td><td class="r">—</td><td class="r">1</td><td class="r">3,468,000원</td><td class="r">2</td><td class="r">6,936,000원</td><td class="l">소스 미상</td></tr>
+      <tr style="border-top:1.5px solid var(--border)"><td class="l"><b>합계</b></td><td class="l">누계</td><td class="r"><b>26,284,705</b></td><td class="r"><b>707</b></td><td class="r">—</td><td class="r"><b>20</b></td><td class="r"><b>78,630,000원</b></td><td class="r"><b>32</b></td><td class="r"><b>128,193,000원</b></td><td class="l"></td></tr>
     </tbody>
   </table>
   </div>
-  <div class="cap" style="margin-bottom:24px"><b>카카오·네이버 광고비 자동 수집 반영</b>. 네이버는 <b>브랜드검색·브랜드컨텐츠·GFA 3개로 분리</b>해 각각 별도 행으로 반영했으며, 셋 다 합계 광고비에 포함됩니다. <b>네이버 ROAS 21.71은 오더 3건 표본</b>이라 채널 판정 근거로 쓰지 않습니다.
+  <div class="cap" style="margin-bottom:24px"><b>두 기준 모두 합계가 닫힙니다</b> — 코호트 <b>20건 · 78,630,000원</b>, 결제일 <b>32건 · 128,193,000원</b>으로 상단 KPI와 정확히 일치합니다. 결제일이 더 큰 것은 <b>7월 이전 신청분이 8월에 결제</b>됐기 때문이고, 메타 2주차가 코호트 2건인데 결제일 13건인 것은 <b>1주차 리드가 2주차에 결제</b>됐기 때문입니다.
+  <br><b>카카오·네이버 광고비 자동 수집 반영</b>. 네이버는 <b>브랜드검색·브랜드컨텐츠·GFA 3개로 분리</b>해 각각 별도 행으로 반영했으며, 셋 다 합계 광고비에 포함됩니다. <b>네이버 브랜드검색은 오더 3~4건 표본</b>(광고비 대비 회수가 커 보이나)이라 채널 판정 근거로 쓰지 않습니다.
   <br><b>텐핑 644,000원(유효 23건×28,000, 8/9~16 실소진)은 합계 광고비 26,284,705원에 포함되어 있습니다.</b> 무효 3건(박나결·이예림·최지온)은 DB에서 뺐습니다.</div>
 
   <!-- 텐핑 CPA · 파운더님 지시 대응 -->
@@ -911,59 +914,62 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 
   <!-- 소재별 -->
   <div class="sec" style="margin-top:4px">03-C — 8월 CREATIVE LOG (주차별)</div>
-  <div class="cap">광고비·리드·CPL은 <b>메타 실측</b>, <b>매출·오더는 결제일 기준</b>입니다 — <b>DB가 언제 들어왔든 그 주에 결제됐으면 그 주 매출</b>로 셉니다. 오더가 없으면 “집계 예정”이 아니라 그냥 <b>“—”</b>입니다(결제일 기준이라 미성숙 개념이 없습니다).
-  <br>※ 위 <b>01 채널별 표는 신청일 코호트</b>라 기준이 다릅니다. 같은 주라도 두 표의 매출이 <b>다른 것이 정상</b>입니다 — 주차표는 “그 주에 번 돈”(경영·대시보드 일치), 채널표는 “그 주 리드가 만든 돈”(소재 생사 판단)입니다.</div>
+  <div class="cap">광고비·리드·CPL은 <b>메타 실측</b>이고, 매출은 <b>위 채널표와 동일하게 코호트/결제일을 병기</b>합니다 — 8월 탭의 모든 표가 같은 기준을 씁니다.
+  <br><b>코호트</b>는 그 주에 <b>들어온 리드</b>가 만든 매출(소재 생사 판단), <b>결제일</b>은 그 주에 <b>결제된</b> 매출(경영·대시보드 일치)입니다. <b>ROAS는 결제일 매출 ÷ 그 주 광고비</b>이며, 결제일 오더가 없으면 “—”입니다.</div>
+  <div class="wk-legend">※ <b>1주차 = 8/1~8/9</b> (8/1 포함) · <b>2주차 = 8/10~8/16</b> (KST 8/16 24시 마감)</div>
 
-  <div class="cap" style="font-weight:700;color:var(--text);margin-top:12px">1주차 (8/1~8/9 결제)</div>
+  <div class="cap" style="font-weight:700;color:var(--text);margin-top:12px">1주차 (8/1~8/9)</div>
   <div class="tbl-scroll" style="margin-bottom:14px">
   <table class="tbl">
     <thead><tr>
-      <th class="l">소재</th><th class="l">배지</th><th class="r">광고비</th><th class="r">리드</th><th class="r">CPL</th><th class="r">오더</th><th class="r">매출</th><th class="r">ROAS</th>
+      <th class="l">소재</th><th class="l">배지</th><th class="r">광고비</th><th class="r">리드</th><th class="r">CPL</th>
+      <th class="r">코호트<br>오더</th><th class="r">코호트 매출</th>
+      <th class="r">결제일<br>오더</th><th class="r">결제일 매출</th><th class="r">ROAS <span style="font-weight:400;font-size:9px;color:var(--faint)">결제일</span></th>
     </tr></thead>
     <tbody>
-      <tr><td class="l"><b>노트릴스(위너)</b></td><td class="l"><span class="badge b-best">위너</span></td><td class="r">3,827,034</td><td class="r">126</td><td class="r">30,373</td><td class="r"><b>6</b></td><td class="r"><b>24,276,000원</b></td><td class="r teal"><b>6.34</b></td></tr>
-      <tr><td class="l"><b>노트필기-방학점검</b></td><td class="l"><span class="badge b-best">위너</span></td><td class="r">1,630,307</td><td class="r">71</td><td class="r teal"><b>22,962</b></td><td class="r">2</td><td class="r">8,092,000원</td><td class="r teal"><b>4.96</b></td></tr>
-      <tr><td class="l">GT노트피드백</td><td class="l"><span class="badge b-on">유지</span></td><td class="r">1,082,830</td><td class="r">20</td><td class="r">54,142</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
-      <tr><td class="l">채리</td><td class="l"><span class="badge b-watch">관찰</span></td><td class="r">1,012,891</td><td class="r">23</td><td class="r">44,039</td><td class="r">1</td><td class="r">3,468,000원</td><td class="r">3.42</td></tr>
-      <tr><td class="l">릴스_박은영중간고사</td><td class="l"><span class="badge b-new">신규</span></td><td class="r">992,955</td><td class="r">23</td><td class="r">43,172</td><td class="r">1</td><td class="r">2,890,000원</td><td class="r">2.91</td></tr>
-      <tr><td class="l">캐러셀_중간고사전략</td><td class="l"><span class="badge b-new">신규</span></td><td class="r">460,082</td><td class="r">15</td><td class="r">30,672</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
-      <tr><td class="l">단일5종(악플삭제)</td><td class="l"><span class="badge b-dead">폐기</span></td><td class="r">434,212</td><td class="r">14</td><td class="r">31,015</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
-      <tr><td class="l">5단계루틴</td><td class="l"><span class="badge b-end">정지</span></td><td class="r">395,167</td><td class="r">6</td><td class="r">65,861</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
-      <tr><td class="l">릴스_방으로</td><td class="l"><span class="badge b-new">신규</span></td><td class="r">314,903</td><td class="r">8</td><td class="r">39,363</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
-      <tr><td class="l">너만본다</td><td class="l"><span class="badge b-end">정지</span></td><td class="r">270,649</td><td class="r">1</td><td class="r red">270,649</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
-      <tr><td class="l">기초부족</td><td class="l"><span class="badge b-end">정지</span></td><td class="r">267,069</td><td class="r">3</td><td class="r">89,023</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
-      <tr style="border-top:1.5px solid var(--border)"><td class="l"><b>소재 합계</b></td><td class="l"></td><td class="r"><b>10,688,099</b></td><td class="r">310</td><td class="r">—</td><td class="r"><b>10</b></td><td class="r"><b>38,726,000원</b></td><td class="r teal"><b>3.62</b></td></tr>
-      <tr><td class="l" style="color:var(--sub)">기타 <span style="font-size:10px;color:var(--faint)">소재 미매칭 · 7월 이전 소재 포함</span></td><td class="l"></td><td class="r" style="color:var(--faint)">—</td><td class="r" style="color:var(--faint)">—</td><td class="r" style="color:var(--faint)">—</td><td class="r" style="color:var(--sub)">5</td><td class="r" style="color:var(--sub)">20,085,000원</td><td class="r" style="color:var(--faint)">—</td></tr>
-      <tr style="border-top:1px solid var(--border);background:var(--card2)"><td class="l"><b>1주차 총 결제</b></td><td class="l"></td><td class="r" style="color:var(--faint)">—</td><td class="r" style="color:var(--faint)">—</td><td class="r" style="color:var(--faint)">—</td><td class="r"><b>15</b></td><td class="r"><b>58,811,000원</b></td><td class="r" style="color:var(--faint)">—</td></tr>
+      <tr><td class="l"><b>노트릴스(위너)</b></td><td class="l"><span class="badge b-best">위너</span></td><td class="r">3,827,034</td><td class="r">126</td><td class="r">30,373</td><td class="r">3</td><td class="r">10,404,000원</td><td class="r"><b>6</b></td><td class="r"><b>24,276,000원</b></td><td class="r teal"><b>6.34</b></td></tr>
+      <tr><td class="l"><b>노트필기-방학점검</b></td><td class="l"><span class="badge b-best">위너</span></td><td class="r">1,630,307</td><td class="r">71</td><td class="r teal"><b>22,962</b></td><td class="r"><b>5</b></td><td class="r"><b>18,518,000원</b></td><td class="r">2</td><td class="r">8,092,000원</td><td class="r teal"><b>4.96</b></td></tr>
+      <tr><td class="l">GT노트피드백</td><td class="l"><span class="badge b-on">유지</span></td><td class="r">1,082,830</td><td class="r">20</td><td class="r">54,142</td><td class="r">1</td><td class="r">3,468,000원</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
+      <tr><td class="l">채리</td><td class="l"><span class="badge b-watch">관찰</span></td><td class="r">1,012,891</td><td class="r">23</td><td class="r">44,039</td><td class="r">1</td><td class="r">3,468,000원</td><td class="r">1</td><td class="r">3,468,000원</td><td class="r">3.42</td></tr>
+      <tr><td class="l">릴스_박은영중간고사</td><td class="l"><span class="badge b-new">신규</span></td><td class="r">992,955</td><td class="r">23</td><td class="r">43,172</td><td class="r">2</td><td class="r">6,358,000원</td><td class="r">1</td><td class="r">2,890,000원</td><td class="r">2.91</td></tr>
+      <tr><td class="l">캐러셀_중간고사전략</td><td class="l"><span class="badge b-new">신규</span></td><td class="r">460,082</td><td class="r">15</td><td class="r">30,672</td><td class="r">0</td><td class="r">—</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
+      <tr><td class="l">단일5종(악플삭제)</td><td class="l"><span class="badge b-dead">폐기</span></td><td class="r">434,212</td><td class="r">14</td><td class="r">31,015</td><td class="r">0</td><td class="r">—</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
+      <tr><td class="l">5단계루틴</td><td class="l"><span class="badge b-end">정지</span></td><td class="r">395,167</td><td class="r">6</td><td class="r">65,861</td><td class="r">0</td><td class="r">—</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
+      <tr><td class="l">릴스_방으로</td><td class="l"><span class="badge b-new">신규</span></td><td class="r">314,903</td><td class="r">8</td><td class="r">39,363</td><td class="r">0</td><td class="r">—</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
+      <tr><td class="l">너만본다</td><td class="l"><span class="badge b-end">정지</span></td><td class="r">270,649</td><td class="r">1</td><td class="r red">270,649</td><td class="r">0</td><td class="r">—</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
+      <tr><td class="l">기초부족</td><td class="l"><span class="badge b-end">정지</span></td><td class="r">267,069</td><td class="r">3</td><td class="r">89,023</td><td class="r">0</td><td class="r">—</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
+      <tr><td class="l" style="color:var(--sub)">기타 <span style="font-size:10px;color:var(--faint)">비메타 채널 · 소재 미귀속</span></td><td class="l"></td><td class="r" style="color:var(--faint)">—</td><td class="r" style="color:var(--faint)">—</td><td class="r" style="color:var(--faint)">—</td><td class="r" style="color:var(--sub)">5</td><td class="r" style="color:var(--sub)">22,542,000원</td><td class="r" style="color:var(--sub)">5</td><td class="r" style="color:var(--sub)">20,085,000원</td><td class="r" style="color:var(--faint)">—</td></tr>
+      <tr style="border-top:1.5px solid var(--border);background:var(--card2)"><td class="l"><b>1주차 합계</b><br><span style="font-size:10px;color:var(--sub);font-weight:400">광고비·리드는 메타</span></td><td class="l"></td><td class="r"><b>10,688,099</b></td><td class="r">310</td><td class="r">—</td><td class="r"><b>17</b></td><td class="r"><b>64,758,000원</b></td><td class="r"><b>15</b></td><td class="r"><b>58,811,000원</b></td><td class="r">—</td></tr>
     </tbody>
   </table>
   </div>
 
-  <div class="cap" style="font-weight:700;color:var(--text)">2주차 (8/10~8/16 결제, KST 8/16 24시까지)</div>
+  <div class="cap" style="font-weight:700;color:var(--text)">2주차 (8/10~8/16, KST 8/16 24시까지)</div>
   <div class="tbl-scroll" style="margin-bottom:10px">
   <table class="tbl">
     <thead><tr>
-      <th class="l">소재</th><th class="l">배지</th><th class="r">광고비</th><th class="r">리드</th><th class="r">CPL</th><th class="r">오더</th><th class="r">매출</th><th class="r">ROAS</th>
+      <th class="l">소재</th><th class="l">배지</th><th class="r">광고비</th><th class="r">리드</th><th class="r">CPL</th>
+      <th class="r">코호트<br>오더</th><th class="r">코호트 매출</th>
+      <th class="r">결제일<br>오더</th><th class="r">결제일 매출</th><th class="r">ROAS <span style="font-weight:400;font-size:9px;color:var(--faint)">결제일</span></th>
     </tr></thead>
     <tbody>
-      <tr><td class="l"><b>노트릴스(위너)</b></td><td class="l"><span class="badge b-best">위너</span></td><td class="r">4,448,443</td><td class="r">111</td><td class="r">40,076</td><td class="r"><b>6</b></td><td class="r"><b>24,276,000원</b></td><td class="r teal"><b>5.46</b></td></tr>
-      <tr><td class="l"><b>노트필기-방학점검</b></td><td class="l"><span class="badge b-best">위너</span></td><td class="r">1,677,921</td><td class="r">41</td><td class="r">40,925</td><td class="r"><b>5</b></td><td class="r"><b>19,096,000원</b></td><td class="r teal"><b>11.38</b></td></tr>
-      <tr><td class="l">릴스_박은영중간고사</td><td class="l"><span class="badge b-new">신규</span></td><td class="r">1,313,995</td><td class="r">24</td><td class="r">54,750</td><td class="r">1</td><td class="r">3,468,000원</td><td class="r">2.64</td></tr>
-      <tr><td class="l">릴스_방으로</td><td class="l"><span class="badge b-new">신규</span></td><td class="r">1,166,490</td><td class="r">33</td><td class="r teal"><b>35,348</b></td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
-      <tr><td class="l">GT노트피드백</td><td class="l"><span class="badge b-on">유지</span></td><td class="r">820,041</td><td class="r">11</td><td class="r">74,549</td><td class="r">1</td><td class="r">3,468,000원</td><td class="r teal"><b>4.23</b></td></tr>
-      <tr><td class="l">릴스_맞춤처방</td><td class="l"><span class="badge b-new">신규</span></td><td class="r">567,877</td><td class="r">8</td><td class="r">70,985</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
-      <tr><td class="l">채리</td><td class="l"><span class="badge b-dead">폐기판정</span></td><td class="r">413,474</td><td class="r">2</td><td class="r red"><b>206,737</b></td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
-      <tr><td class="l">캐러셀_중간고사전략</td><td class="l"><span class="badge b-new">신규</span></td><td class="r">220,106</td><td class="r">10</td><td class="r teal">22,011</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
-      <tr><td class="l">단일5종(악플삭제)</td><td class="l"><span class="badge b-dead">폐기</span></td><td class="r">161,185</td><td class="r">2</td><td class="r">80,592</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
-      <tr style="border-top:1.5px solid var(--border)"><td class="l"><b>소재 합계</b></td><td class="l"></td><td class="r"><b>10,789,532</b></td><td class="r">242</td><td class="r">—</td><td class="r"><b>13</b></td><td class="r"><b>50,308,000원</b></td><td class="r teal"><b>4.66</b></td></tr>
-      <tr><td class="l" style="color:var(--sub)">기타 <span style="font-size:10px;color:var(--faint)">소재 미매칭 · 7월 이전 소재 포함</span></td><td class="l"></td><td class="r" style="color:var(--faint)">—</td><td class="r" style="color:var(--faint)">—</td><td class="r" style="color:var(--faint)">—</td><td class="r" style="color:var(--sub)">4</td><td class="r" style="color:var(--sub)">19,074,000원</td><td class="r" style="color:var(--faint)">—</td></tr>
-      <tr style="border-top:1px solid var(--border);background:var(--card2)"><td class="l"><b>2주차 총 결제</b></td><td class="l"></td><td class="r" style="color:var(--faint)">—</td><td class="r" style="color:var(--faint)">—</td><td class="r" style="color:var(--faint)">—</td><td class="r"><b>17</b></td><td class="r"><b>69,382,000원</b></td><td class="r" style="color:var(--faint)">—</td></tr>
+      <tr><td class="l"><b>노트릴스(위너)</b></td><td class="l"><span class="badge b-best">위너</span></td><td class="r">4,448,443</td><td class="r">111</td><td class="r">40,076</td><td class="r">2</td><td class="r">10,404,000원</td><td class="r"><b>6</b></td><td class="r"><b>24,276,000원</b></td><td class="r teal"><b>5.46</b></td></tr>
+      <tr><td class="l"><b>노트필기-방학점검</b></td><td class="l"><span class="badge b-best">위너</span></td><td class="r">1,677,921</td><td class="r">41</td><td class="r">40,925</td><td class="r">0</td><td class="r">—</td><td class="r"><b>5</b></td><td class="r"><b>19,096,000원</b></td><td class="r teal"><b>11.38</b></td></tr>
+      <tr><td class="l">릴스_박은영중간고사</td><td class="l"><span class="badge b-new">신규</span></td><td class="r">1,313,995</td><td class="r">24</td><td class="r">54,750</td><td class="r">0</td><td class="r">—</td><td class="r">1</td><td class="r">3,468,000원</td><td class="r">2.64</td></tr>
+      <tr><td class="l">릴스_방으로</td><td class="l"><span class="badge b-new">신규</span></td><td class="r">1,166,490</td><td class="r">33</td><td class="r teal"><b>35,348</b></td><td class="r">0</td><td class="r">—</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
+      <tr><td class="l">GT노트피드백</td><td class="l"><span class="badge b-on">유지</span></td><td class="r">820,041</td><td class="r">11</td><td class="r">74,549</td><td class="r">0</td><td class="r">—</td><td class="r">1</td><td class="r">3,468,000원</td><td class="r teal"><b>4.23</b></td></tr>
+      <tr><td class="l">릴스_맞춤처방</td><td class="l"><span class="badge b-new">신규</span></td><td class="r">567,877</td><td class="r">8</td><td class="r">70,985</td><td class="r">0</td><td class="r">—</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
+      <tr><td class="l">채리</td><td class="l"><span class="badge b-dead">폐기판정</span></td><td class="r">413,474</td><td class="r">2</td><td class="r red"><b>206,737</b></td><td class="r">0</td><td class="r">—</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
+      <tr><td class="l">캐러셀_중간고사전략</td><td class="l"><span class="badge b-new">신규</span></td><td class="r">220,106</td><td class="r">10</td><td class="r teal">22,011</td><td class="r">0</td><td class="r">—</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
+      <tr><td class="l">단일5종(악플삭제)</td><td class="l"><span class="badge b-dead">폐기</span></td><td class="r">161,185</td><td class="r">2</td><td class="r">80,592</td><td class="r">0</td><td class="r">—</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
+      <tr><td class="l" style="color:var(--sub)">기타 <span style="font-size:10px;color:var(--faint)">비메타 채널 · 소재 미귀속</span></td><td class="l"></td><td class="r" style="color:var(--faint)">—</td><td class="r" style="color:var(--faint)">—</td><td class="r" style="color:var(--faint)">—</td><td class="r" style="color:var(--sub)">1</td><td class="r" style="color:var(--sub)">3,468,000원</td><td class="r" style="color:var(--sub)">4</td><td class="r" style="color:var(--sub)">19,074,000원</td><td class="r" style="color:var(--faint)">—</td></tr>
+      <tr style="border-top:1.5px solid var(--border);background:var(--card2)"><td class="l"><b>2주차 합계</b><br><span style="font-size:10px;color:var(--sub);font-weight:400">광고비·리드는 메타</span></td><td class="l"></td><td class="r"><b>10,789,532</b></td><td class="r">242</td><td class="r">—</td><td class="r"><b>3</b></td><td class="r"><b>13,872,000원</b></td><td class="r"><b>17</b></td><td class="r"><b>69,382,000원</b></td><td class="r">—</td></tr>
     </tbody>
   </table>
   </div>
-  <div class="cap" style="margin-bottom:16px"><b>메타 8월 누계 총 광고비 = 21,477,631원</b> (1주차 10,688,099 + 2주차 10,789,532). 매출은 <b>전부 원단위 정확값</b>으로 통일했습니다(만원 반올림 없음).
-  <br><b>주차 매출은 결제일 기준으로 검산이 닫힙니다</b> — 1주차 총 결제 <b>58,811,000원(15건)</b> + 2주차 총 결제 <b>69,382,000원(17건)</b> = <b>128,193,000원(32건)</b>으로, 상단 KPI의 8월 결제일 매출과 <b>정확히 일치</b>합니다.
-  <br>각 주차의 <b>“기타”</b>는 소재까지 귀속되지 않은 결제분(7월 이전 소재·당근·옛 캠페인 포함)입니다. <b>ROAS는 그 주 결제 매출 ÷ 그 주 광고비</b>이므로, 전 주에 태운 광고가 이번 주에 결제된 몫도 분자에 들어갑니다 — 주 단위 ROAS는 <b>추세로만</b> 보시고 소재 생사는 아래 코호트 병기표로 판단합니다.</div>
+  <div class="cap" style="margin-bottom:16px"><b>노트필기-방학점검 2주차 ROAS 11.38이 차세대 위너의 증거입니다</b> — 코호트 오더는 0인데 결제일 오더가 5건입니다. <b>1주차에 신청한 리드가 2주차에 결제된 것</b>이며, 코호트만 보면 “2주차 실패”로 오독됩니다. 병기가 필요한 이유가 이 한 줄에 있습니다.
+  <br><b>검산</b> — 결제일 <b>1주차 58,811,000원(15건) + 2주차 69,382,000원(17건) = 128,193,000원(32건)</b>, 코호트 <b>64,758,000 + 13,872,000 = 78,630,000원(20건)</b>으로 <b>양쪽 다 상단 KPI·채널표와 일치</b>합니다.
+  <br>각 주차의 <b>“기타”</b>는 비메타 채널(카카오·네이버·인스타)과 소재 미귀속분이라 <b>광고비·리드 열이 비어 있습니다</b> — 합계 행의 광고비·리드는 <b>메타 실측</b>이고 비메타 광고비는 위 채널표에 있습니다. <b>메타 8월 누계 광고비 = 10,688,099 + 10,789,532 = 21,477,631원</b>입니다.</div>
 
   <div class="cap" style="font-weight:700;color:var(--text);margin-top:18px">소재별 실적 · 매출 2기준 병기 (누계 8/1~8/16)</div>
   <div class="tbl-scroll" style="margin-bottom:10px">
@@ -994,7 +1000,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   </table>
   </div>
   <div class="cap" style="margin-bottom:20px">매출을 <b>두 기준으로 병기</b>합니다. <b>코호트</b>(신청일)는 그 소재가 만든 리드의 매출 → <b>소재 생사 판단용</b>. <b>결제일</b>은 8월에 실제 결제된 돈 → <b>경영·대시보드 일치용</b>. 노트릴스가 코호트 5오더인데 결제일 12오더인 것은 <b>7월에 신청한 노트릴스 리드가 8월에 결제 완료됐기 때문</b>입니다. <b>“기타”는 소재까지 귀속되지 않은 분</b>(7월 이전 소재·당근·옛 캠페인 포함)으로, 코호트 6오더 26,010,000원 · 결제일 9오더 39,159,000원입니다. 두 열 모두 <b>행 합이 합계와 정확히 일치</b>합니다.
-  <br>ROAS 열은 <b>결제일 매출 ÷ 소재 광고비</b>입니다. 소재 광고비 합계 <b>21,477,631원</b>은 채널 표의 메타 누계와 일치합니다 — <b>릴스_박은영중간고사</b>(캠페인 원톱_중간고사_전환_2608)가 1주차 992,955원(리드 23) · 2주차 1,313,995원(리드 24)으로 <b>양 주차에 집행</b>됐고, 이전 집계에서 1주차가 빠져 있던 것을 반영했습니다.</div>
+  <br>ROAS 열은 <b>결제일 매출 ÷ 소재 광고비</b>입니다. 소재 광고비 합계 <b>21,477,631원</b>은 위 주차별 표의 메타 1주차(10,688,099) + 2주차(10,789,532) 합과 일치합니다 — <b>릴스_박은영중간고사</b>(캠페인 원톱_중간고사_전환_2608)가 1주차 992,955원(리드 23) · 2주차 1,313,995원(리드 24)으로 <b>양 주차에 집행</b>됐고, 이전 집계에서 1주차가 빠져 있던 것을 반영했습니다.</div>
 
   <div class="cap" style="font-weight:700;color:var(--text);margin-top:18px">소재 카드 · 라이프타임 (투입일 기준)</div>
   <div class="cap" style="margin-bottom:12px">소재는 <b>투입일이 제각각입니다.</b> 맞춤처방은 4일차, 노트릴스는 3개월차 — <b>같은 CPL도 기간을 봐야 공정하게 평가됩니다.</b> 카드의 <b>누적(라이프타임)은 소재의 진짜 실력</b>이고, <b>8월은 이달 성적</b>입니다.
@@ -1030,7 +1036,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   <div class="log" style="margin-bottom:24px;background:#fff8f0;border-color:#f0d5c4">
     <div class="li" style="margin-bottom:8px"><b>⑤ 매출은 두 기준으로 봐야 합니다.</b></div>
     <div class="li" style="margin-bottom:8px">대시보드(<b>결제일</b>)는 <b>128,193,000원</b>, 소재 코호트(<b>신청일</b>)는 <b>78,630,000원</b>입니다. 신규 소재 대량 투입 주라 코호트가 아직 안 익었고(2주차 오더 대부분 미발생), 결제일 매출의 상당부는 <b>7월 신청분이 8월에 결제된 것</b>입니다. <b>소재 생사는 코호트 ROAS로, 경영 매출은 결제일로</b> 판단합니다.</div>
-    <div class="li">같은 이유로 <b>2주차 코호트 ROAS 0.96은 착시</b>입니다(위 01 채널표 기준 · 주차별 소재표의 결제일 ROAS와 다릅니다). 주간 ROAS는 <b>전환 시차(중앙값 2일 · 평균 3.5일)</b> 때문에 판단기준으로 쓰지 않습니다 — 2주차 신규 소재 오더가 아직 안 나온 것뿐이며, <b>코호트가 익으면 재평가</b>합니다.</div>
+    <div class="li">같은 이유로 <b>메타 2주차 코호트 ROAS 0.96은 착시</b>입니다(코호트 매출 10,404,000 ÷ 광고비 10,789,532). <b>같은 주를 결제일로 보면 13오더 50,308,000원</b>이며, 이는 1주차 리드가 2주차에 결제된 몫입니다 — 모든 표에 두 기준을 나란히 둔 이유입니다. 주간 ROAS는 <b>전환 시차(중앙값 2일 · 평균 3.5일)</b> 때문에 판단기준으로 쓰지 않습니다 — 2주차 신규 소재 오더가 아직 안 나온 것뿐이며, <b>코호트가 익으면 재평가</b>합니다.</div>
   </div>
 
   <!-- 조치 -->
@@ -1484,7 +1490,7 @@ const WEEK_TODO = {
       {t:'단일 5종 중단', d:'학생 악플 바이럴 · 브랜드 리스크 판단'},
       {t:'카카오·네이버 데이터 파이프 복구', d:'8/11 사고 → 8/16 재가동 · 08시 자동화 재설치'},
     ]},
-    note: '8월은 진행 중(누계 8/1~8/16)입니다. 매출은 두 기준으로 봅니다 — 경영·대시보드는 결제일(128,193,000원), 소재 생사는 신청일 코호트(78,630,000원). 2주차 코호트 ROAS 0.96은 전환 시차(중앙값 2일·평균 3.5일)에 따른 착시이며(주차별 소재표는 결제일 기준이라 별도), 신규 소재 코호트가 익은 뒤 재평가합니다.'
+    note: '8월은 진행 중(누계 8/1~8/16)입니다. 매출은 두 기준으로 봅니다 — 경영·대시보드는 결제일(128,193,000원), 소재 생사는 신청일 코호트(78,630,000원). 메타 2주차 코호트 ROAS 0.96은 전환 시차(중앙값 2일·평균 3.5일)에 따른 착시이며(같은 주 결제일 기준은 13오더 50,308,000원), 신규 소재 코호트가 익은 뒤 재평가합니다.'
   },
   jul: {
     mission: {title:'다음 할 일', items:[
