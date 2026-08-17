@@ -111,6 +111,9 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 .fbar{height:28px;border-radius:6px;display:flex;align-items:center;padding:0 10px;font-size:12px;font-weight:700;min-width:48px;color:#fff}
 
 /* 오더 테이블 */
+.tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:16px}
+.tbl-scroll::-webkit-scrollbar{height:4px}
+.tbl-scroll::-webkit-scrollbar-thumb{background:#ccc;border-radius:2px}
 .tbl{width:100%;border-collapse:collapse;font-size:12px}
 .tbl th{text-align:left;color:var(--faint);padding:8px 10px;border-bottom:0.5px solid var(--border);font-weight:500;font-size:11px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap}
 .tbl td{padding:10px 10px;border-bottom:0.5px solid var(--border2);white-space:nowrap;color:var(--text)}
@@ -203,6 +206,14 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   .two{grid-template-columns:1fr}
   .hd{flex-direction:column;gap:10px}
   .hd-meta{text-align:left}
+}
+@media(max-width:640px){
+  .tbl{font-size:11px}
+  .tbl th,.tbl td{padding:7px 6px}
+}
+@media(max-width:560px){
+  .kpi .v{font-size:19px;word-break:keep-all}
+  .kpi{padding:14px}
 }
 </style>
 </head>
@@ -344,7 +355,8 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 
   <!-- 채널별 -->
   <div class="sec">01 — 채널별 판정</div>
-  <table class="tbl" style="margin-bottom:10px">
+  <div class="tbl-scroll" style="margin-bottom:10px">
+  <table class="tbl">
     <thead><tr>
       <th class="l">채널</th><th class="r">광고비</th><th class="r">DB</th><th class="r">CPL</th>
       <th class="r">오더</th><th class="r">매출(코호트)</th><th class="r">ROAS 코호트</th><th class="r">ROAS 결제일</th><th class="r">격차<br><span style="font-weight:400;font-size:9px;color:var(--faint)">결제일÷코호트</span></th><th class="l">판정</th>
@@ -362,6 +374,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
       <tr style="border-top:1px solid var(--border);background:var(--card2)"><td class="l"><b>전체 합계</b></td><td class="r"><b>3,469만</b></td><td class="r"><b>1,548</b></td><td class="r"><b>22,411</b></td><td class="r"><b>41</b></td><td class="r"><b>1억 5,093.2만</b></td><td class="r"><b>4.35</b></td><td class="r"><b>5.55</b></td><td class="r">—</td><td class="l" style="font-size:11px;color:var(--sub)">참고용 · 판정 기준 아님</td></tr>
     </tbody>
   </table>
+  </div>
   <div class="knote" style="margin-bottom:24px">
     <b>텐핑은 채널표에서 월별 지표를 산출하지 않습니다.</b> 선불 충전형이라 <b>돈을 넣은 시점과 쓰는 시점이 다르기</b> 때문입니다 —
     태운 달은 폭망, 안 태운 달은 무한대가 됩니다. 리드 수(227)만 참고로 표시하고, <b>판정은 아래 코호트 블록(총 충전 921만 기준)을 따릅니다.</b><br>
@@ -374,7 +387,8 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
     <div class="kpi"><div class="k">당월 취소</div><div class="v" style="color:var(--red)">4,035만</div><div class="s">12건 · 전액 매출 차감 반영</div></div>
     <div class="kpi"><div class="k">취소 건수</div><div class="v">12건</div><div class="s">1차 집계 실매출에 모두 반영</div></div>
   </div>
-  <table class="tbl" style="margin-bottom:10px">
+  <div class="tbl-scroll" style="margin-bottom:10px">
+  <table class="tbl">
     <thead><tr><th class="l">학생</th><th class="r">날짜</th><th class="r">금액</th><th class="l">담당</th><th class="l">상태</th></tr></thead>
     <tbody>
       <tr><td class="l">남서진</td><td class="r">7/4</td><td class="r">346.8만</td><td class="l">우혜림</td><td class="l">취소완료</td></tr>
@@ -392,6 +406,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
       <tr><td class="l">김사랑</td><td class="r">8/4</td><td class="r">462.4만</td><td class="l">우혜림</td><td class="l">취소완료</td></tr>
     </tbody>
   </table>
+  </div>
   <div class="cap" style="margin-bottom:24px">올미납(전액 미납) 건은 취소가 아닌 <b>결보</b>로 분류했습니다. <b>당월 취소 13건 4,035만은 1차 집계 실매출(2억3,644만)에 전액 반영</b>되어 있습니다. 별도로 <b>현금지원(할인) 4건 143만</b>(최세담·김하윤·이다원·이다윤)은 취소가 아니라 계약 유지 상태에서 금액만 차감된 건으로, 이 역시 실매출에 반영되어 있습니다. 김사라 차장 집계 기준 · 최종 정산 전 데이터입니다.</div>
 
   <!-- 텐핑 코호트 -->
@@ -409,7 +424,8 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
       <div class="kpi" style="border:0;padding:0"><div class="k">누적 ROAS</div><div class="v t" style="font-size:18px">2.64</div><div class="s">회수 진행 중</div></div>
     </div>
 
-    <table class="tbl" style="margin-top:4px">
+    <div class="tbl-scroll" style="margin-top:4px;margin-bottom:0">
+    <table class="tbl">
       <thead><tr><th class="l">충전 시점</th><th class="r">광고비 (VAT 별도)</th><th class="r">실제 결제 (VAT 포함)</th><th class="r">단가</th><th class="l">비고</th></tr></thead>
       <tbody>
         <tr><td class="l">4월 이전</td><td class="r">1,000,000</td><td class="r">1,100,000</td><td class="r">35,000</td><td class="l">구캠(습관상담)에 배정 · 유효 6건 소진</td></tr>
@@ -420,6 +436,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
         <tr style="border-top:1px solid var(--border)"><td class="l"><b>합계</b></td><td class="r"><b>9,210,000</b></td><td class="r"><b>10,131,000</b></td><td class="r">—</td><td class="l">차액 92.1만 = VAT</td></tr>
       </tbody>
     </table>
+    </div>
     <div class="knote" style="margin-top:8px;margin-bottom:0">
       ※ 텐핑은 <b>330만을 결제하면 300만이 광고비로 충전</b>되는 구조입니다(부가세 별도 충전).
       <b>ROAS 판정은 921만(VAT 별도) 기준</b>입니다 — 메타·카카오·네이버 API가 모두 VAT 별도 금액을 리턴하므로, 채널 비교를 위해 기준을 맞춥니다.
@@ -439,7 +456,8 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
     분모는 6월 광고비, 분자는 6월에 그 소재로 들어온 리드의 누적 매출입니다. 소재는 그 자체가 하나의 코호트입니다.<br>
     <b>CPM을 함께 봅니다</b> — CPM은 “얼마나 비싼 오디언스에 도달했는가”이고, 그것이 곧 리드의 정체를 말합니다.
   </div>
-  <table class="tbl" style="margin-bottom:10px">
+  <div class="tbl-scroll" style="margin-bottom:10px">
+  <table class="tbl">
     <thead><tr>
       <th class="l">소재</th><th class="r">광고비</th><th class="r">리드</th>
       <th class="r">CPM</th><th class="r">CPL</th><th class="r">CPL 순위</th>
@@ -461,6 +479,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
       <tr style="border-top:1px solid var(--border)"><td class="l"><b>메타 합계</b></td><td class="r"><b>2,126만</b></td><td class="r"><b>1,095</b></td><td class="r">—</td><td class="r"><b>19,417</b></td><td class="r">—</td><td class="r">—</td><td class="r"><b>30</b></td><td class="r"><b>1억 987.6만</b></td><td class="r teal"><b>5.17</b></td><td class="l"></td></tr>
     </tbody>
   </table>
+  </div>
   <div class="knote" style="margin-bottom:20px">
     ※ 메타 리포트 리드(1,095)와 노션 DB(1,148)의 차이는 폼 이탈·중복 정제에서 발생합니다. 매출·오더는 노션(결제 확정) 기준입니다.<br>
     ※ 잠재고객_5단계루틴은 <b>6월 코호트 기준 오더 0</b>이나, 누적으로는 5월 유입 리드 1건이 결제되어 <b>누적 ROAS 1.95</b>입니다(광고비 357만 / 매출 694만). 6월에 태운 221만은 회수되지 않았습니다.
@@ -492,7 +511,8 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   <!-- 연령별 -->
   <div class="sec" style="margin-top:20px">03-B — 연령별 리드 구성</div>
   <div class="cap">CPM이 <b>왜</b> 진단 신호인지는 연령 분포가 설명합니다. 값싼 CPM 소재는 값싼 연령대를 불렀습니다.</div>
-  <table class="tbl" style="margin-bottom:10px">
+  <div class="tbl-scroll" style="margin-bottom:10px">
+  <table class="tbl">
     <thead><tr>
       <th class="l">캠페인</th><th class="r">CPM</th><th class="r">총 리드</th>
       <th class="r">18-24</th><th class="r">25-34</th><th class="r">35-54 (학부모)</th><th class="r">ROAS</th>
@@ -507,6 +527,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
       <tr><td class="l">잠재고객_5단계루틴</td><td class="r" style="color:var(--red)">5,683</td><td class="r">83</td><td class="r">0 (0%)</td><td class="r" style="color:var(--red)"><b>60 (72%)</b></td><td class="r">20 (24%)</td><td class="r" style="color:var(--red)"><b>0</b></td></tr>
     </tbody>
   </table>
+  </div>
   <div class="knote" style="margin-bottom:24px">
     ※ 오더가 발생한 3종은 <b>35-54가 89~95%, 18-24가 0%</b>. 오더 0인 MLST 계열은 <b>18-24가 64~78%</b>. 5단계루틴은 25-34가 72%로, 학부모도 학생도 아닌 대역이었습니다.
   </div>
@@ -554,7 +575,8 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   <div class="log" style="margin-bottom:12px">
     <div class="li" style="margin-bottom:10px"><b>③ 오더 0인 소재도 실패의 종류가 다릅니다 — 퍼널 전수 대조.</b></div>
     <div class="li" style="margin-bottom:10px">폐기한 소재를 “오더 0”으로 묶어두면 다음에 무엇을 고쳐야 할지 알 수 없습니다. 리드가 <b>어디서 죽었는지</b>를 상태 분포로 대조했습니다.</div>
-    <table class="tbl" style="margin:10px 0">
+    <div class="tbl-scroll" style="margin:10px 0">
+    <table class="tbl">
       <thead><tr><th class="l">소재</th><th class="r">결번·대상아님</th><th class="r">방문율</th><th class="r">방문→세팅</th><th class="r">35-54</th><th class="l">진단</th></tr></thead>
       <tbody>
         <tr><td class="l">노트릴스 (기준)</td><td class="r">6.6%</td><td class="r">11.1%</td><td class="r">57.8%</td><td class="r">95%</td><td class="l">정상</td></tr>
@@ -562,10 +584,12 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
         <tr style="background:#fffbf5"><td class="l"><b>[소재01] 너만본다</b></td><td class="r">8.8%</td><td class="r">7.4%</td><td class="r" style="color:var(--red)"><b>0%</b></td><td class="r">78%</td><td class="l" style="color:var(--amber)"><b>기대가 틀린 채로 왔다</b> — 완주율 14%, 후반부(화상수업)를 안 봄</td></tr>
       </tbody>
     </table>
+    </div>
     <div class="li" style="margin-bottom:8px"><b>5단계루틴 — 리드 품질의 실패입니다.</b> 결번·대상아님이 18.7%로 위너의 2.8배, 방문율은 1.6%. CPM 5,683의 값싼 오디언스(25-34가 72%)가 만든 결과이며, <b>CPM 가설대로</b>입니다. 다만 방문에 도달한 2건은 100% 세팅됐습니다 — <b>진짜인 사람은 삽니다. 리드가 가짜였을 뿐입니다.</b></div>
     <div class="li" style="margin-bottom:8px"><b>너만본다 — 기대의 실패입니다.</b> 결번율 8.8%로 정상, 연령 35-54가 78%, CPM 22,522. <b>리드 품질과 타겟은 모두 통과했습니다.</b> 그런데 방문 5건이 전부 세팅에 실패했습니다(위너 기준이라면 2.9건은 성사됐어야 하며, 0건일 확률은 1.3%입니다).</div>
     <div class="li" style="margin-bottom:8px"><b>영상 완주율을 열자 원인이 나왔습니다.</b> 이 소재는 선생님이 직접 지도하는 장면으로 시작하고, <b>화상수업이라는 사실은 후반부에</b> 나옵니다.</div>
-    <table class="tbl" style="margin:10px 0">
+    <div class="tbl-scroll" style="margin:10px 0">
+    <table class="tbl">
       <thead><tr><th class="l">소재</th><th class="r">50% 지점</th><th class="r">75% 지점</th><th class="r">완주</th><th class="r">ROAS</th></tr></thead>
       <tbody>
         <tr><td class="l">노트릴스 (위너)</td><td class="r">49%</td><td class="r">30.8%</td><td class="r">18%</td><td class="r teal">10.86</td></tr>
@@ -574,6 +598,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
         <tr style="background:#fff8f0"><td class="l"><b>너만본다</b></td><td class="r" style="color:var(--red)"><b>35%</b></td><td class="r" style="color:var(--red)"><b>14.0%</b></td><td class="r" style="color:var(--red)"><b>7%</b></td><td class="r" style="color:var(--red)"><b>0</b></td></tr>
       </tbody>
     </table>
+    </div>
     <div class="li" style="margin-bottom:8px"><b>75% 지점 유지율이 위너의 절반 이하(14.0% vs 30.8%)입니다.</b> 초반 후킹은 오히려 성공했습니다 — 재생 시작 수는 채리보다 많았습니다. 그러나 <b>화상수업이 등장하는 후반부까지 도달한 사람이 절반뿐이었습니다.</b></div>
     <div class="li"><b>소재가 거짓말을 한 것이 아닙니다.</b> 영상 후반에 화상수업이 분명히 나옵니다. 다만 <b>거기까지 보지 않은 사람이 신청 버튼을 누를 수 있게</b> 만든 것이 문제였습니다. 대면 지도로 알고 신청 → 상담에서 화상수업임을 처음 알게 됨 → 기대와 달라 사지 않음. <b>처방은 카피가 아니라 구조입니다 — 제품의 형태는 영상 앞쪽에서 밝힙니다.</b></div>
   </div>
@@ -609,7 +634,8 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 
   <!-- 조치 -->
   <div class="sec">05 — 판정에 따른 조치</div>
-  <table class="tbl" style="margin-bottom:24px">
+  <div class="tbl-scroll" style="margin-bottom:24px">
+  <table class="tbl">
     <thead><tr><th class="l">채널·소재</th><th class="l">판정 근거</th><th class="l">조치</th><th class="l">현재</th></tr></thead>
     <tbody>
       <tr><td class="l">당근</td><td class="l">196만 / 오더 0 / ROAS 0</td><td class="l">완전 중단</td><td class="l">7월 0원</td></tr>
@@ -621,6 +647,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
       <tr><td class="l">노트릴스_영상</td><td class="l">ROAS 10.86 · 매출의 71%</td><td class="l">증액 · 파생 소재 확대</td><td class="l">ACTIVE</td></tr>
     </tbody>
   </table>
+  </div>
 
   <!-- 요약 -->
   <div class="sec">06 — 6월이 남긴 것</div>
@@ -663,7 +690,8 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 
   <!-- 채널별 -->
   <div class="sec">01 — 채널별 판정 (코호트 · 결제일 병기)</div>
-  <table class="tbl" style="margin-bottom:10px">
+  <div class="tbl-scroll" style="margin-bottom:10px">
+  <table class="tbl">
     <thead><tr>
       <th class="l">채널</th><th class="r">광고비</th><th class="r">DB</th><th class="r">CPL</th>
       <th class="r">오더</th><th class="r">매출(코호트)</th><th class="r">ROAS 코호트</th><th class="r">ROAS 결제일</th><th class="r">격차<br><span style="font-weight:400;font-size:9px;color:var(--faint)">결제일÷코호트</span></th><th class="l">판정</th>
@@ -678,22 +706,24 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
       <tr><td class="l"><span class="chbadge cb-cpa">텐핑</span></td><td class="r">0*</td><td class="r">328</td><td class="r">30,598</td><td class="r">8</td><td class="r">3,583만</td><td class="r"><b>3.89</b></td><td class="r">—</td><td class="r">—</td><td class="l">누적 회수 · 코호트 판정(02)</td></tr>
     </tbody>
   </table>
+  </div>
   <div class="cap" style="margin-bottom:24px">인스타 organic이 <b>광고비 0으로 매출 2,081만</b> — 결산에서 가장 저평가된 자산입니다. 브랜드검색은 CPL 최고지만 오더율 17.5%로 ROAS가 뒤집힙니다("리드를 사는 게 아니라 이미 살 사람을 받는 채널"). <b>메타 격차 1.1배는 전환이 빠르다는 증거</b> — 코호트든 결제일이든 판정이 같습니다. <b>텐핑</b>은 7월 신규충전 0(광고비 0)이라 누적 코호트 <b>3.89</b>로만 판정하며, 합계 ROAS 분모·분자 정합을 위해 텐핑 회수분은 합계에서 제외합니다.</div>
 
   <!-- 텐핑 코호트 -->
   <div class="sec">02 — 텐핑 코호트 (누적 · 회수 진행)</div>
   <div class="kpis" style="grid-template-columns:repeat(4,1fr);margin-bottom:10px">
-    <div class="kpi"><div class="k">누적 충전</div><div class="v" style="font-size:22px">921만</div><div class="s">VAT 별도 · 잔액 소진</div></div>
-    <div class="kpi"><div class="k">누적 회수</div><div class="v" style="font-size:22px">3,583만</div><div class="s">오더 8건</div></div>
-    <div class="kpi"><div class="k">누적 ROAS</div><div class="v t" style="font-size:22px">3.89</div><div class="s">7/13 2.64 → 상승</div></div>
-    <div class="kpi"><div class="k">실질 CPL</div><div class="v" style="font-size:22px">30,598원</div><div class="s">유효 DB 301건</div></div>
+    <div class="kpi"><div class="k">누적 충전</div><div class="v">921만</div><div class="s">VAT 별도 · 잔액 소진</div></div>
+    <div class="kpi"><div class="k">누적 회수</div><div class="v">3,583만</div><div class="s">오더 8건</div></div>
+    <div class="kpi"><div class="k">누적 ROAS</div><div class="v t">3.89</div><div class="s">7/13 2.64 → 상승</div></div>
+    <div class="kpi"><div class="k">실질 CPL</div><div class="v">30,598원</div><div class="s">유효 DB 301건</div></div>
   </div>
   <div class="cap" style="margin-bottom:24px">선불 충전형이라 월별 ROAS는 왜곡됩니다(7월 신규충전 0). 잔액 0 = 코호트가 닫혔으므로 누적으로만 평가합니다. <b>7/13 결산 2.64 → 3.89로 상승</b> — 회수가 계속 진행 중입니다.</div>
 
   <!-- 소재별 -->
   <div class="sec">03 — 소재별 판정 (7월 · 35-54 축 · 코호트/결제일 병기)</div>
   <div class="cap">분모는 7월 소재 광고비, 분자는 그 소재로 들어온 리드의 매출입니다. <b>노션 DB ≈ 메타 폼리드로 매칭 검증</b>. 35-54가 곧 소재의 정체입니다.</div>
-  <table class="tbl" style="margin-bottom:10px">
+  <div class="tbl-scroll" style="margin-bottom:10px">
+  <table class="tbl">
     <thead><tr>
       <th class="l">소재</th><th class="r">광고비</th><th class="r">DB</th><th class="r">CPL</th><th class="r">CPM</th>
       <th class="r">35-54</th><th class="r">25-34</th><th class="r">ROAS 코호트</th><th class="r">ROAS 결제일</th><th class="l">구간</th>
@@ -711,6 +741,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
       <tr style="border-top:1.5px solid var(--border)"><td class="l"><b>메타 합계</b></td><td class="r"><b>2,825만</b></td><td class="r"><b>1,489</b></td><td class="r">—</td><td class="r">17,776</td><td class="r">72.8%</td><td class="r">—</td><td class="r teal"><b>5.68</b></td><td class="r"><b>6.18</b></td><td class="l"></td></tr>
     </tbody>
   </table>
+  </div>
   <div class="log" style="margin-bottom:24px">
     <div class="li" style="margin-bottom:6px"><b>≥80% 위너존</b> (노트릴스 92.6% · 노필릴스 83.5%) → ROAS 7.8~8.6. <b>매출의 82%</b>를 두 소재가 만듭니다.</div>
     <div class="li" style="margin-bottom:6px"><b>45~58% 이탈지대</b> (GT·너만본다·노필전환·채리) → 딜리버리가 25-34로 새는 중.</div>
@@ -749,7 +780,8 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 
   <!-- 조치 -->
   <div class="sec">05 — 판정에 따른 조치</div>
-  <table class="tbl" style="margin-bottom:24px">
+  <div class="tbl-scroll" style="margin-bottom:24px">
+  <table class="tbl">
     <thead><tr><th class="l">채널·소재</th><th class="l">판정 근거</th><th class="l">조치</th></tr></thead>
     <tbody>
       <tr><td class="l">노트릴스·노필릴스</td><td class="l">35-54 80%+ · ROAS 7.8~8.6</td><td class="l">주력 유지 · 파생 확대</td></tr>
@@ -760,6 +792,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
       <tr><td class="l">인스타 organic</td><td class="l">무료 매출 2,081만</td><td class="l">콘텐츠 재활용 강화</td></tr>
     </tbody>
   </table>
+  </div>
 
   <!-- 남긴 것 -->
   <div class="sec">06 — 7월이 남긴 것</div>
@@ -792,7 +825,8 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 
   <!-- 채널별 -->
   <div class="sec">01 — 채널별 주차별 (신청일 코호트)</div>
-  <table class="tbl" style="margin-bottom:10px">
+  <div class="tbl-scroll" style="margin-bottom:10px">
+  <table class="tbl">
     <thead><tr>
       <th class="l">채널</th><th class="l">주</th><th class="r">광고비</th><th class="r">DB</th><th class="r">CPL</th>
       <th class="r">오더</th><th class="r">매출</th><th class="r">ROAS</th><th class="l">비고</th>
@@ -813,6 +847,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
       <tr style="border-top:1.5px solid var(--border)"><td class="l"><b>합계</b></td><td class="l">MTD</td><td class="r"><b>26,284,705</b></td><td class="r"><b>707</b></td><td class="r">—</td><td class="r"><b>20</b></td><td class="r"><b>78,630,000원</b></td><td class="r"><b>2.99</b></td><td class="l"></td></tr>
     </tbody>
   </table>
+  </div>
   <div class="cap" style="margin-bottom:24px"><b>카카오·네이버 광고비 자동 수집 반영</b>. 네이버는 <b>브랜드검색·브랜드컨텐츠·GFA 3개로 분리</b>해 각각 별도 행으로 반영했으며, 셋 다 합계 광고비에 포함됩니다. <b>네이버 ROAS 21.71은 오더 3건 표본</b>이라 채널 판정 근거로 쓰지 않습니다.
   <br><b>텐핑 644,000원(유효 23건×28,000, 8/9~16 실소진)은 합계 광고비 26,284,705원에 포함되어 있습니다.</b> 무효 3건(박나결·이예림·최지온)은 DB에서 뺐습니다.</div>
 
@@ -821,7 +856,8 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   <div class="cap">광고비·리드·CPL은 <b>메타 실측</b>이고, 매출·오더는 <b>신청일 코호트</b> 기준입니다. 신규 소재는 아직 오더가 나오지 않은 것이라 ROAS 칸에 0 대신 <b>“집계 예정”</b>으로 표기합니다.</div>
 
   <div class="cap" style="font-weight:700;color:var(--text);margin-top:12px">1주차 (8/1~8/9)</div>
-  <table class="tbl" style="margin-bottom:14px">
+  <div class="tbl-scroll" style="margin-bottom:14px">
+  <table class="tbl">
     <thead><tr>
       <th class="l">소재</th><th class="l">배지</th><th class="r">광고비</th><th class="r">리드</th><th class="r">CPL</th><th class="r">오더</th><th class="r">매출</th><th class="r">ROAS</th>
     </tr></thead>
@@ -840,9 +876,11 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
       <tr style="border-top:1.5px solid var(--border)"><td class="l"><b>메타 합계</b></td><td class="l"></td><td class="r"><b>10,688,099</b></td><td class="r">310</td><td class="r">—</td><td class="r"><b>12</b></td><td class="r"><b>42,216,000원</b></td><td class="r teal"><b>3.95</b></td></tr>
     </tbody>
   </table>
+  </div>
 
   <div class="cap" style="font-weight:700;color:var(--text)">2주차 (8/10~8/16, KST 8/16 24시까지)</div>
-  <table class="tbl" style="margin-bottom:10px">
+  <div class="tbl-scroll" style="margin-bottom:10px">
+  <table class="tbl">
     <thead><tr>
       <th class="l">소재</th><th class="l">배지</th><th class="r">광고비</th><th class="r">리드</th><th class="r">CPL</th><th class="r">오더</th><th class="r">매출</th><th class="r">ROAS</th>
     </tr></thead>
@@ -859,10 +897,12 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
       <tr style="border-top:1.5px solid var(--border)"><td class="l"><b>메타 합계</b></td><td class="l"></td><td class="r"><b>10,789,532</b></td><td class="r">242</td><td class="r">—</td><td class="r"><b>2</b></td><td class="r"><b>10,404,000원</b></td><td class="r red"><b>0.96</b></td></tr>
     </tbody>
   </table>
+  </div>
   <div class="cap" style="margin-bottom:16px"><b>메타 8월 MTD 총 광고비 = 21,477,631원</b> (1주 10,688,099 + 2주 10,789,532). 매출은 <b>전부 원단위 정확값</b>으로 통일했습니다(만원 반올림 없음). <b>릴스_박은영중간고사 1주차 코호트 2오더 · 6,358,000원</b>을 반영해, W1 소재 합계 <b>오더 12건 · 42,216,000원</b>이 채널 표의 메타 W1과 <b>정확히 일치</b>합니다 — 이전에 W1을 “집계 예정”으로 두어 생겼던 10건/12건 차이는 해소됐습니다.</div>
 
   <div class="cap" style="font-weight:700;color:var(--text);margin-top:18px">소재별 실적 · 매출 2기준 병기 (MTD 8/1~8/16)</div>
-  <table class="tbl" style="margin-bottom:10px">
+  <div class="tbl-scroll" style="margin-bottom:10px">
+  <table class="tbl">
     <thead><tr>
       <th class="l">소재</th>
       <th class="r">광고비</th><th class="r">리드</th><th class="r">CPL</th>
@@ -887,6 +927,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
       <tr style="border-top:1.5px solid var(--border)"><td class="l"><b>합계</b></td><td class="r"><b>21,477,631</b></td><td class="r"><b>552</b></td><td class="r">—</td><td class="r"><b>20</b></td><td class="r"><b>78,630,000원</b></td><td class="r"><b>32</b></td><td class="r"><b>128,193,000원</b></td><td class="r">—</td></tr>
     </tbody>
   </table>
+  </div>
   <div class="cap" style="margin-bottom:20px">매출을 <b>두 기준으로 병기</b>합니다. <b>코호트</b>(신청일)는 그 소재가 만든 리드의 매출 → <b>소재 생사 판단용</b>. <b>결제일</b>은 8월에 실제 결제된 돈 → <b>경영·대시보드 일치용</b>. 노트릴스가 코호트 5오더인데 결제일 12오더인 것은 <b>7월에 신청한 노트릴스 리드가 8월에 결제 완료됐기 때문</b>입니다. <b>“기타”는 소재까지 귀속되지 않은 분</b>(7월 이전 소재·당근·옛 캠페인 포함)으로, 코호트 6오더 26,010,000원 · 결제일 9오더 39,159,000원입니다. 두 열 모두 <b>행 합이 합계와 정확히 일치</b>합니다.
   <br>ROAS 열은 <b>결제일 매출 ÷ 소재 광고비</b>입니다. 소재 광고비 합계 <b>21,477,631원</b>은 채널 표의 메타 MTD와 일치합니다 — <b>릴스_박은영중간고사</b>(캠페인 원톱_중간고사_전환_2608)가 1주차 992,955원(리드 23) · 2주차 1,313,995원(리드 24)으로 <b>양 주차에 집행</b>됐고, 이전 집계에서 1주차가 빠져 있던 것을 반영했습니다.</div>
 
@@ -924,7 +965,8 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 
   <!-- 조치 -->
   <div class="sec">05 — 판정에 따른 조치</div>
-  <table class="tbl" style="margin-bottom:24px">
+  <div class="tbl-scroll" style="margin-bottom:24px">
+  <table class="tbl">
     <thead><tr><th class="l">소재·채널</th><th class="l">판정 근거</th><th class="l">조치</th></tr></thead>
     <tbody>
       <tr><td class="l"><b>노트필기-방학점검</b></td><td class="l">ROAS 11.36 · CPL 22,962(최저)</td><td class="l"><b>증액 검토</b></td></tr>
@@ -936,6 +978,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
       <tr><td class="l">카카오 · 네이버 광고비 자동 수집</td><td class="l">8/11 중단 → 8/16 재가동</td><td class="l"><b>복구 완료</b> · 매일 08시 자동 수집</td></tr>
     </tbody>
   </table>
+  </div>
 
 </div>
 
