@@ -51,6 +51,13 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 
 /* 섹션 헤더 */
 .sec{font-size:11px;letter-spacing:1.5px;color:var(--faint);text-transform:uppercase;margin:0 0 10px 2px}
+/* 대제목 (8월 탭 최상위 구분) */
+.sec-major{display:flex;align-items:baseline;flex-wrap:wrap;gap:9px;margin:34px 0 14px;padding-bottom:10px;border-bottom:2px solid var(--hd)}
+.sec-major:first-child,.panel>.sec-major:first-of-type{margin-top:4px}
+.sec-major .n{font-size:11px;font-weight:700;letter-spacing:1px;color:#fff;background:var(--hd);border-radius:6px;padding:4px 10px;line-height:1}
+.sec-major .t{font-size:18px;font-weight:700;letter-spacing:-.5px;color:var(--text)}
+.sec-major .s{font-size:12px;font-weight:500;color:var(--sub)}
+@media(max-width:560px){.sec-major{gap:7px;margin:26px 0 12px}.sec-major .t{font-size:16px}.sec-major .s{font-size:11px;width:100%}}
 
 /* 채널 카드 */
 .channels{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
@@ -194,7 +201,9 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 
 /* 지시 대응 강조 박스 */
 .order-box{border:2px solid var(--amber);border-radius:14px;padding:20px;background:#fffaf6;margin-bottom:24px}
-.order-label{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.5px;color:#8a5a06;background:#fdefd8;border:1px solid #f0d5a0;border-radius:999px;padding:5px 12px;margin-bottom:12px}
+.order-box.sub{border-left-width:7px;margin-left:14px}
+.order-label{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.3px;color:#8a5a06;background:#fdefd8;border:1px solid #f0d5a0;border-radius:999px;padding:6px 14px;margin-bottom:12px}
+@media(max-width:560px){.order-box.sub{margin-left:0}.order-label{font-size:11px;padding:5px 11px}}
 .order-box .sec{margin-top:0}
 
 /* 주차 범례 */
@@ -852,7 +861,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   </div>
 
   <!-- 채널별 -->
-  <div class="sec">01 — 채널별 주차별 (코호트 · 결제일 병기)</div>
+  <div class="sec-major"><span class="n">01</span><span class="t">채널별</span><span class="s">주차별 · 코호트/결제일 병기</span></div>
   <div class="wk-legend">※ <b>1주차 = 8/1~8/9</b> (8/1 포함) · <b>2주차 = 8/10~8/16</b> · <b>누계 = 8/1~8/16</b>
   <br>※ <b>코호트</b> = 그 주에 <b>들어온 리드</b>가 만든 매출(소재·채널 생사 판단용) · <b>결제일</b> = 그 주에 <b>실제 결제된</b> 매출(경영·대시보드 일치용). <b>두 값이 다른 것이 정상</b>입니다.</div>
   <div class="tbl-scroll" style="margin-bottom:10px">
@@ -883,11 +892,10 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   <br><b>카카오·네이버 광고비 자동 수집 반영</b>. 네이버는 <b>브랜드검색·브랜드컨텐츠·GFA 3개로 분리</b>해 각각 별도 행으로 반영했으며, 셋 다 합계 광고비에 포함됩니다. <b>네이버 브랜드검색은 오더 3~4건 표본</b>(광고비 대비 회수가 커 보이나)이라 채널 판정 근거로 쓰지 않습니다.
   <br><b>텐핑 644,000원(유효 23건×28,000, 8/9~16 실소진)은 합계 광고비 26,284,705원에 포함되어 있습니다.</b> 무효 3건(박나결·이예림·최지온)은 DB에서 뺐습니다.</div>
 
-  <!-- 텐핑 CPA · 파운더님 지시 대응 -->
-  <div class="sec">02 — 텐핑 CPA (지시사항 대응)</div>
-  <div class="order-box">
-    <div class="order-label">📌 파운더님 지시사항 — CPA 텐핑 DB 단가·효율</div>
-    <div class="cap" style="margin-bottom:14px">지시하신 <b>CPA(텐핑) DB 단가와 효율</b>에 대한 답입니다. 6·7·8월 추이를 한 표에 놓고, 판단 근거를 아래에 정리했습니다.</div>
+  <!-- 텐핑 = 01 채널별의 하위 세부 보고 -->
+  <div class="order-box sub">
+    <div class="order-label">📌 파운더님 지시사항 — 텐핑 세부 보고</div>
+    <div class="cap" style="margin-bottom:14px">위 <b>01 채널별</b>의 텐핑(CPA) 행을 따로 펼친 세부 보고입니다. 지시하신 <b>DB 단가와 효율</b>에 대한 답으로, <b>6·7·8월 추이</b>와 <b>마케터별 단가·효율</b>을 함께 놓고 판단 근거를 정리했습니다.</div>
     <div class="tbl-scroll" style="margin-bottom:14px">
     <table class="tbl">
       <thead><tr><th class="l">지표</th><th class="r">6월</th><th class="r">7월</th><th class="r">8월 (진행중)</th></tr></thead>
@@ -940,7 +948,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   </div>
 
   <!-- 소재별 -->
-  <div class="sec" style="margin-top:4px">03-C — 8월 CREATIVE LOG (주차별)</div>
+  <div class="sec-major"><span class="n">02</span><span class="t">소재별</span><span class="s">주차별 · 누적 · 코호트/결제일 병기</span></div>
   <div class="cap">광고비·리드·CPL은 <b>메타 실측</b>이고, 매출은 <b>위 채널표와 동일하게 코호트/결제일을 병기</b>합니다 — 8월 탭의 모든 표가 같은 기준을 씁니다.
   <br><b>코호트</b>는 그 주에 <b>들어온 리드</b>가 만든 매출(소재 생사 판단), <b>결제일</b>은 그 주에 <b>결제된</b> 매출(경영·대시보드 일치)입니다. <b>ROAS는 결제일 매출 ÷ 그 주 광고비</b>이며, 결제일 오더가 없으면 “—”입니다.</div>
   <div class="wk-legend">※ <b>1주차 = 8/1~8/9</b> (8/1 포함) · <b>2주차 = 8/10~8/16</b> (KST 8/16 24시 마감)</div>
@@ -1039,7 +1047,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   <div class="gal" id="aug-gal"></div>
 
   <!-- 판단의 기록 -->
-  <div class="sec">04 — 판단의 기록</div>
+  <div class="sec-major"><span class="n">03</span><span class="t">판단의 기록</span></div>
 
   <div class="log" style="margin-bottom:12px;background:#f0f8f4;border-color:#c8e4d8">
     <div class="li" style="margin-bottom:8px"><b>① 노트필기-방학점검이 8월 1주 진짜 위너 (1주차 코호트 ROAS 11.36).</b></div>
@@ -1069,7 +1077,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   </div>
 
   <!-- 조치 -->
-  <div class="sec">05 — 판정에 따른 조치</div>
+  <div class="sec-major"><span class="n">04</span><span class="t">판정에 따른 조치</span></div>
   <div class="tbl-scroll" style="margin-bottom:24px">
   <table class="tbl">
     <thead><tr><th class="l">소재·채널</th><th class="l">판정 근거</th><th class="l">조치</th></tr></thead>
