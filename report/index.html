@@ -991,7 +991,8 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 
   <div class="cap" style="font-weight:700;color:var(--text);margin-top:18px">소재 카드 · 라이프타임 (투입일 기준)</div>
   <div class="cap" style="margin-bottom:12px">소재는 <b>투입일이 제각각입니다.</b> 맞춤처방은 4일차, 노트릴스는 3개월차 — <b>같은 CPL도 기간을 봐야 공정하게 평가됩니다.</b> 카드의 <b>누적(라이프타임)은 소재의 진짜 실력</b>이고, <b>8월은 이달 성적</b>입니다.
-  <br>딱지 읽는 법 — <span class="glaunch long">🏆 투입 1개월+</span> 는 검증된 롱런 소재, <span class="glaunch fresh">🗓 1개월 미만</span> 은 아직 익는 중이라 CPL만으로 끄지 않습니다.</div>
+  <br>딱지 읽는 법 — <span class="glaunch long">🏆 투입 1개월+</span> 는 검증된 롱런 소재, <span class="glaunch fresh">🗓 1개월 미만</span> 은 아직 익는 중이라 CPL만으로 끄지 않습니다.
+  <br>※ <b>누적도 8월과 동일하게 KST 8/16 24시 마감 기준</b>입니다. 8월에 투입된 소재는 마감이 같으므로 <b>누적 = 8월</b>입니다.</div>
   <div class="gal" id="aug-gal"></div>
 
   <!-- 판단의 기록 -->
@@ -1889,11 +1890,11 @@ const AUG_GAL = [
   {key:'노트필기릴스_2607',    title:'노트필기-방학점검',              st:'best',  tag:'8월 최고효율 · 8월 결제일 ROAS 8.22', cpl:'1주차 22,962 · 2주차 40,925', spend:3308228, salesTxt:'결제일 매출 27,188,000원', sales:27188000, orders:7, star:true,
    since:'7/8',  age:'1개월차', long:true,  lifeSpend:7536166,  lifeSales:59000000,  lifeRoas:'7.83', noteType:'win',  note:'차세대 위너 · 증액 1순위 — 투입 1개월 만에 누적 ROAS 7.83으로 벌써 노트릴스급입니다.'},
   {key:'릴스_방으로',          title:'릴스_방으로',           st:'new',   tag:'신규 중 최고 CPL · 리드 41(1~2주차)', cpl:'1주차 39,363 · 2주차 35,348', spend:1481393, sales:0, orders:0,
-   since:'8/6',  age:'11일차',                lifeSpend:1599198,  lifeSales:null,      lifeRoas:null,   note:'11일차입니다. 판단하기 이릅니다 — CPL만으로 끄지 않습니다.'},
+   since:'8/6',  age:'11일차',                lifeSpend:1481393,  lifeSales:null,      lifeRoas:null,   note:'11일차입니다. 판단하기 이릅니다 — CPL만으로 끄지 않습니다.'},
   {key:'릴스_박은영중간고사',   title:'릴스_박은영중간고사',    st:'new',   tag:'신규 · 8월 결제일 ROAS 2.76 · 리드 47', cpl:'49,084', spend:2306950, salesTxt:'결제일 매출 6,358,000원', sales:6358000, orders:2,
-   since:'8/4',  age:'13일차',                lifeSpend:2399953,  lifeSales:6358000,   lifeRoas:'2.65', note:'13일차에 이미 2오더. 신규 중 회수가 가장 빠릅니다.'},
+   since:'8/4',  age:'13일차',                lifeSpend:2306950,  lifeSales:6358000,   lifeRoas:'2.76', note:'13일차에 이미 2오더. 신규 중 회수가 가장 빠릅니다.'},
   {key:'릴스_맞춤처방',        title:'릴스_맞춤처방',          st:'new',   tag:'2주차 신규 · 리드 8',                cpl:'70,985', spend:567877, sales:0, orders:0,
-   since:'8/13', age:'4일차',                 lifeSpend:648437,   lifeSales:null,      lifeRoas:null,   note:'4일차입니다. 판단하기 이릅니다 — CPL만으로 끄지 않습니다.'},
+   since:'8/13', age:'4일차',                 lifeSpend:567877,   lifeSales:null,      lifeRoas:null,   note:'4일차입니다. 판단하기 이릅니다 — CPL만으로 끄지 않습니다.'},
   {key:'캐러셀_중간고사전략',   title:'캐러셀_중간고사전략',    st:'new',   tag:'4장 캐러셀 · 2주차 CPL 22,011',      cpl:'1주차 30,672 · 2주차 22,011', spend:680188, sales:0, orders:0,
    since:'8/5',  age:'12일차',                lifeSpend:680188,   lifeSales:null,      lifeRoas:null,   note:'12일차입니다. 판단하기 이릅니다 — CPL만으로 끄지 않습니다.'},
   {key:'GT노트피드백_영상',    title:'GT노트피드백',           st:'keep',  tag:'유지 · 8월 결제일 ROAS 1.82',         cpl:'1주차 54,142 · 2주차 74,549', spend:1902871, salesTxt:'결제일 매출 3,468,000원', sales:3468000, orders:1,
