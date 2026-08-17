@@ -153,6 +153,21 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 .gsales{font-size:12px;color:var(--teal-d);font-weight:700;margin-top:4px}
 .gm .gl{font-size:11px;color:var(--faint)}
 .gcard.top{border-color:#0a6644;box-shadow:0 0 0 1px #0a6644 inset}
+/* 라이프타임 카드 (8월) — 투입딱지 / 8월 / 누적 3층 */
+.ghead{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:7px}
+.glaunch{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap}
+.glaunch.long{background:#fdf4e0;color:#8a6206;border:0.5px solid #efd9a4}
+.glaunch.fresh{background:#eaf1fd;color:#2f62c4;border:0.5px solid #c6d8f5}
+.gsub{font-size:9px;letter-spacing:.8px;color:var(--faint);margin:9px 0 4px;padding-top:7px;border-top:0.5px solid var(--border2)}
+.gsub+.gspend{margin-top:0;padding-top:0;border-top:0}
+.glife{font-size:11px;color:var(--sub);line-height:1.75}
+.glife b{color:var(--text)}
+.r-hi{color:var(--teal-d);font-weight:700}
+.r-mid{color:var(--text);font-weight:700}
+.r-lo{color:var(--red);font-weight:700}
+.gnote{font-size:10px;line-height:1.55;border-radius:6px;padding:6px 8px;margin-top:8px;background:#eef3fd;color:#3a6cc4}
+.gnote.win{background:#e9f6f0;color:#0a6644;font-weight:600}
+.gnote.warn{background:#fdeeee;color:#a33}
 /* 캐러셀 소재 슬라이드 (imgs.js 값이 배열일 때) */
 .gslide{position:relative;overflow:hidden}
 .gslide-track{display:flex;transition:transform .28s ease;will-change:transform}
@@ -974,6 +989,9 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   <div class="cap" style="margin-bottom:20px">매출을 <b>두 기준으로 병기</b>합니다. <b>코호트</b>(신청일)는 그 소재가 만든 리드의 매출 → <b>소재 생사 판단용</b>. <b>결제일</b>은 8월에 실제 결제된 돈 → <b>경영·대시보드 일치용</b>. 노트릴스가 코호트 5오더인데 결제일 12오더인 것은 <b>7월에 신청한 노트릴스 리드가 8월에 결제 완료됐기 때문</b>입니다. <b>“기타”는 소재까지 귀속되지 않은 분</b>(7월 이전 소재·당근·옛 캠페인 포함)으로, 코호트 6오더 26,010,000원 · 결제일 9오더 39,159,000원입니다. 두 열 모두 <b>행 합이 합계와 정확히 일치</b>합니다.
   <br>ROAS 열은 <b>결제일 매출 ÷ 소재 광고비</b>입니다. 소재 광고비 합계 <b>21,477,631원</b>은 채널 표의 메타 누계와 일치합니다 — <b>릴스_박은영중간고사</b>(캠페인 원톱_중간고사_전환_2608)가 1주차 992,955원(리드 23) · 2주차 1,313,995원(리드 24)으로 <b>양 주차에 집행</b>됐고, 이전 집계에서 1주차가 빠져 있던 것을 반영했습니다.</div>
 
+  <div class="cap" style="font-weight:700;color:var(--text);margin-top:18px">소재 카드 · 라이프타임 (투입일 기준)</div>
+  <div class="cap" style="margin-bottom:12px">소재는 <b>투입일이 제각각입니다.</b> 맞춤처방은 4일차, 노트릴스는 3개월차 — <b>같은 CPL도 기간을 봐야 공정하게 평가됩니다.</b> 카드의 <b>누적(라이프타임)은 소재의 진짜 실력</b>이고, <b>8월은 이달 성적</b>입니다.
+  <br>딱지 읽는 법 — <span class="glaunch long">🏆 투입 1개월+</span> 는 검증된 롱런 소재, <span class="glaunch fresh">🗓 1개월 미만</span> 은 아직 익는 중이라 CPL만으로 끄지 않습니다.</div>
   <div class="gal" id="aug-gal"></div>
 
   <!-- 판단의 기록 -->
@@ -1765,17 +1783,52 @@ function renderGal(id, data, opt){
   const _el = document.getElementById(id);
   if(!_el) return;
   // spendLine:true → 광고비를 gtag에 붙이지 않고 매출 바로 위 독립 줄로 뽑는다 (8월 탭 카드 통일 형식)
+  // lifetime:true → 투입딱지 / 8월 상세 / 누적(라이프타임) 3층 구조로 렌더한다 (8월 탭 전용)
   const spendLine = !!(opt && opt.spendLine);
+  const lifetime = !!(opt && opt.lifetime);
+  const roasCls = r => r==null?'':(+r>=5?'r-hi':(+r>=2?'r-mid':'r-lo'));
   _el.innerHTML = data.map(s=>{
     const im = _IMGS[s.key];
     const spendTxt = s.spendTxt || (s.spend?`광고비 ${s.spend.toLocaleString('ko-KR')}원`:'');
-    return `<div class="gcard ${s.st=='best'?'best':''}${s.star?' top':''}" ${im?`onclick="openLbCard(this,'${s.key}')"`:''}>
+    const badges = `${badge(s.st)}${s.star?'<span class="badge b-top">최고효율</span>':''}`;
+    const salesRow = s.orders>0
+      ? `<div class="gsales">${s.salesTxt||(opt&&opt.exact?wonExact:won)(s.sales)} · ${s.orders}건</div>`
+      : '<div class="gm"><span class="gl">코호트 집계 예정</span></div>';
+    const open = im?`onclick="openLbCard(this,'${s.key}')"`:'';
+
+    if(lifetime){
+      const chip = s.since
+        ? `<span class="glaunch ${s.long?'long':'fresh'}">${s.long?'🏆':'🗓'} ${s.since} 투입 · ${s.age}</span>`
+        : '';
+      const lifeSpend = s.lifeSpendTxt || (s.lifeSpend?`${s.lifeSpend.toLocaleString('ko-KR')}원`:'—');
+      const lifeSales = s.lifeSales?`<b>${s.lifeSales.toLocaleString('ko-KR')}원</b>`:'<span class="gl">집계중</span>';
+      const lifeRoas = s.lifeRoas
+        ? `ROAS <span class="${roasCls(s.lifeRoas)}">${s.lifeRoas}</span>`
+        : '<span class="gl">ROAS 집계중</span>';
+      return `<div class="gcard ${s.st=='best'?'best':''}${s.star?' top':''}" ${open}>
       ${renderCreativeImg(s.key, im)}
       <div class="gi">
-        <div class="gt"><span>${s.title}</span> ${badge(s.st)}${s.star?'<span class="badge b-top">최고효율</span>':''}</div>
+        <div class="ghead">${chip}${badges}</div>
+        <div class="gt"><span>${s.title}</span></div>
+        <div class="gtag">${s.tag}</div>
+        <div class="gsub">8월 (8/1~16)</div>
+        <div class="gspend">${spendTxt||'광고비 —'}</div>
+        <div class="gtag">CPL ${s.cpl}</div>
+        ${salesRow}
+        <div class="gsub">누적 (${s.since||'—'}~)</div>
+        <div class="glife">광고비 ${lifeSpend}<br>매출 ${lifeSales} · ${lifeRoas}</div>
+        ${s.note?`<div class="gnote ${s.noteType||''}">${s.note}</div>`:''}
+      </div>
+    </div>`;
+    }
+
+    return `<div class="gcard ${s.st=='best'?'best':''}${s.star?' top':''}" ${open}>
+      ${renderCreativeImg(s.key, im)}
+      <div class="gi">
+        <div class="gt"><span>${s.title}</span> ${badges}</div>
         <div class="gtag">${s.tag} · CPL ${s.cpl}${(!spendLine && s.spend)?` · 광고비 ${s.spend.toLocaleString('ko-KR')}원`:''}</div>
         ${(spendLine && spendTxt)?`<div class="gspend">${spendTxt}</div>`:''}
-        ${s.orders>0?`<div class="gsales">${s.salesTxt||(opt&&opt.exact?wonExact:won)(s.sales)} · ${s.orders}건</div>`:'<div class="gm"><span class="gl">코호트 집계 예정</span></div>'}
+        ${salesRow}
       </div>
     </div>`;
   }).join('');
@@ -1831,21 +1884,40 @@ renderGal('jul-gal', JUL_GAL);
 // ===== 8월 CREATIVE LOG (누계 8/1~8/16) =====
 // 매출·오더는 1주차+2주차 귀속 합. 오더 0이면 renderGal이 "코호트 집계 예정"으로 렌더한다.
 const AUG_GAL = [
-  {key:'노트릴스_영상',        title:'노트릴스(위너)',        st:'best',  tag:'볼륨 앵커 · 결제일 ROAS 5.87',        cpl:'1주차 30,373 · 2주차 40,076', spend:8275477, salesTxt:'결제일 매출 48,552,000원', sales:48552000, orders:12},
-  {key:'노트필기릴스_2607',    title:'노트필기-방학점검',              st:'best',  tag:'8월 최고효율 · 결제일 ROAS 8.22',     cpl:'1주차 22,962 · 2주차 40,925', spend:3308228, salesTxt:'결제일 매출 27,188,000원', sales:27188000, orders:7, star:true},
-  {key:'릴스_방으로',          title:'릴스_방으로',           st:'new',   tag:'신규 중 최고 CPL · 리드 41(1~2주차)', cpl:'1주차 39,363 · 2주차 35,348', spend:1481393, sales:0, orders:0},
-  {key:'릴스_박은영중간고사',   title:'릴스_박은영중간고사',    st:'new',   tag:'신규 · 결제일 ROAS 2.76 · 리드 47',   cpl:'49,084', spend:2306950, salesTxt:'결제일 매출 6,358,000원', sales:6358000, orders:2},
-  {key:'릴스_맞춤처방',        title:'릴스_맞춤처방',          st:'new',   tag:'2주차 신규 · 리드 8',                cpl:'70,985', spend:567877, sales:0, orders:0},
-  {key:'캐러셀_중간고사전략',   title:'캐러셀_중간고사전략',    st:'new',   tag:'4장 캐러셀 · 2주차 CPL 22,011',      cpl:'1주차 30,672 · 2주차 22,011', spend:680188, sales:0, orders:0},
-  {key:'GT노트피드백_영상',    title:'GT노트피드백',           st:'keep',  tag:'유지 · 결제일 ROAS 1.82',             cpl:'1주차 54,142 · 2주차 74,549', spend:1902871, salesTxt:'결제일 매출 3,468,000원', sales:3468000, orders:1},
-  {key:'노트릴스_채리_2606',   title:'채리_2606',             st:'dead',  tag:'폐기 · 2주차 CPL 206,737 붕괴',       cpl:'1주차 44,039 · 2주차 206,737', spend:1426365, salesTxt:'결제일 매출 3,468,000원', sales:3468000, orders:1},
-  {key:'단일_시험기간',        title:'단일_시험기간',          st:'dead',  tag:'악플 바이럴로 삭제',                  cpl:'단일5종 합 1주차 31,015', spendTxt:'광고비 단일5종 합산 595,397원', sales:0, orders:0},
-  {key:'단일_노트',            title:'단일_노트',             st:'dead',  tag:'악플 바이럴로 삭제',                  cpl:'단일5종 합 1주차 31,015', spendTxt:'광고비 단일5종 합산 595,397원', sales:0, orders:0},
-  {key:'단일_Dday',           title:'단일_D-day',            st:'dead',  tag:'악플 바이럴로 삭제',                  cpl:'단일5종 합 1주차 31,015', spendTxt:'광고비 단일5종 합산 595,397원', sales:0, orders:0},
-  {key:'단일_맘카페',          title:'단일_맘카페',           st:'dead',  tag:'악플 바이럴로 삭제',                  cpl:'단일5종 합 1주차 31,015', spendTxt:'광고비 단일5종 합산 595,397원', sales:0, orders:0},
-  {key:'단일_공부습관',        title:'단일_공부습관',          st:'dead',  tag:'악플 바이럴로 삭제',                  cpl:'단일5종 합 1주차 31,015', spendTxt:'광고비 단일5종 합산 595,397원', sales:0, orders:0},
+  {key:'노트릴스_영상',        title:'노트릴스(위너)',        st:'best',  tag:'볼륨 앵커 · 8월 결제일 ROAS 5.87',    cpl:'1주차 30,373 · 2주차 40,076', spend:8275477, salesTxt:'결제일 매출 48,552,000원', sales:48552000, orders:12,
+   since:'5/14', age:'3개월차', long:true,  lifeSpend:30073349, lifeSales:282676000, lifeRoas:'9.40', noteType:'win',  note:'3개월 검증된 최강 자산 — 누적 ROAS 9.40. 볼륨 앵커로 유지합니다.'},
+  {key:'노트필기릴스_2607',    title:'노트필기-방학점검',              st:'best',  tag:'8월 최고효율 · 8월 결제일 ROAS 8.22', cpl:'1주차 22,962 · 2주차 40,925', spend:3308228, salesTxt:'결제일 매출 27,188,000원', sales:27188000, orders:7, star:true,
+   since:'7/8',  age:'1개월차', long:true,  lifeSpend:7536166,  lifeSales:59000000,  lifeRoas:'7.83', noteType:'win',  note:'차세대 위너 · 증액 1순위 — 투입 1개월 만에 누적 ROAS 7.83으로 벌써 노트릴스급입니다.'},
+  {key:'릴스_방으로',          title:'릴스_방으로',           st:'new',   tag:'신규 중 최고 CPL · 리드 41(1~2주차)', cpl:'1주차 39,363 · 2주차 35,348', spend:1481393, sales:0, orders:0,
+   since:'8/6',  age:'11일차',                lifeSpend:1599198,  lifeSales:null,      lifeRoas:null,   note:'11일차입니다. 판단하기 이릅니다 — CPL만으로 끄지 않습니다.'},
+  {key:'릴스_박은영중간고사',   title:'릴스_박은영중간고사',    st:'new',   tag:'신규 · 8월 결제일 ROAS 2.76 · 리드 47', cpl:'49,084', spend:2306950, salesTxt:'결제일 매출 6,358,000원', sales:6358000, orders:2,
+   since:'8/4',  age:'13일차',                lifeSpend:2399953,  lifeSales:6358000,   lifeRoas:'2.65', note:'13일차에 이미 2오더. 신규 중 회수가 가장 빠릅니다.'},
+  {key:'릴스_맞춤처방',        title:'릴스_맞춤처방',          st:'new',   tag:'2주차 신규 · 리드 8',                cpl:'70,985', spend:567877, sales:0, orders:0,
+   since:'8/13', age:'4일차',                 lifeSpend:648437,   lifeSales:null,      lifeRoas:null,   note:'4일차입니다. 판단하기 이릅니다 — CPL만으로 끄지 않습니다.'},
+  {key:'캐러셀_중간고사전략',   title:'캐러셀_중간고사전략',    st:'new',   tag:'4장 캐러셀 · 2주차 CPL 22,011',      cpl:'1주차 30,672 · 2주차 22,011', spend:680188, sales:0, orders:0,
+   since:'8/5',  age:'12일차',                lifeSpend:680188,   lifeSales:null,      lifeRoas:null,   note:'12일차입니다. 판단하기 이릅니다 — CPL만으로 끄지 않습니다.'},
+  {key:'GT노트피드백_영상',    title:'GT노트피드백',           st:'keep',  tag:'유지 · 8월 결제일 ROAS 1.82',         cpl:'1주차 54,142 · 2주차 74,549', spend:1902871, salesTxt:'결제일 매출 3,468,000원', sales:3468000, orders:1,
+   since:'5/27', age:'2개월차', long:true,  lifeSpend:9384679,  lifeSales:30100000,  lifeRoas:'3.21', note:'2개월 누적 ROAS 3.21 — 본전은 넘지만 8월 CPL이 오르는 중입니다.'},
+  {key:'노트릴스_채리_2606',   title:'채리_2606',             st:'dead',  tag:'폐기 · 2주차 CPL 206,737 붕괴',       cpl:'1주차 44,039 · 2주차 206,737', spend:1426365, salesTxt:'결제일 매출 3,468,000원', sales:3468000, orders:1,
+   since:'6/16', age:'2개월차', long:true,  lifeSpend:10000415, lifeSales:29478000,  lifeRoas:'2.95', noteType:'warn', note:'2개월 누적으로도 2.95. 8월 CPL 붕괴까지 겹쳐 폐기가 맞습니다.'},
+  {key:'5단계루틴',           title:'잠재고객_5단계루틴',      st:'hold',  tag:'정지 · 8월 리드 6',                   cpl:'1주차 65,861', spend:395167, sales:0, orders:0,
+   since:'5/14', age:'3개월차', long:true,  lifeSpend:3961099,  lifeSales:6936000,   lifeRoas:'1.75', noteType:'warn', note:'3개월 누적 ROAS 1.75 — 본전 미달. 누적으로도 약해 정리 근거가 됩니다.'},
+  {key:'너만본다_영상',        title:'[소재01] 너만본다',       st:'hold',  tag:'정지 · 8월 리드 1',                   cpl:'1주차 270,649', spend:270649, sales:0, orders:0,
+   since:'6/4',  age:'2개월차', long:true,  lifeSpend:3284606,  lifeSales:null,      lifeRoas:null,   noteType:'warn', note:'2개월 누적 328만을 태우고 회수 미확인. 정지 유지합니다.'},
+  {key:'기초부족',            title:'기초부족_단일이미지',      st:'hold',  tag:'정지 · 8월 리드 3',                   cpl:'1주차 89,023', spend:267069, sales:0, orders:0,
+   since:'5/14', age:'3개월차', long:true,  lifeSpend:1112826,  lifeSales:3468000,   lifeRoas:'3.12', note:'소액이지만 누적 ROAS 3.12. 재투입 후보로만 남겨둡니다.'},
+  {key:'단일_시험기간',        title:'단일_시험기간',          st:'dead',  tag:'악플 바이럴로 삭제',                  cpl:'단일5종 합 1주차 31,015', spendTxt:'광고비 단일5종 합산 595,397원', sales:0, orders:0,
+   since:'8/5',  age:'12일차',                lifeSpendTxt:'단일5종 합산 595,397원', lifeSales:null, lifeRoas:null, note:'12일차 · 단일5종 묶음입니다. 판단하기 이릅니다.'},
+  {key:'단일_노트',            title:'단일_노트',             st:'dead',  tag:'악플 바이럴로 삭제',                  cpl:'단일5종 합 1주차 31,015', spendTxt:'광고비 단일5종 합산 595,397원', sales:0, orders:0,
+   since:'8/5',  age:'12일차',                lifeSpendTxt:'단일5종 합산 595,397원', lifeSales:null, lifeRoas:null, note:'12일차 · 단일5종 묶음입니다. 판단하기 이릅니다.'},
+  {key:'단일_Dday',           title:'단일_D-day',            st:'dead',  tag:'악플 바이럴로 삭제',                  cpl:'단일5종 합 1주차 31,015', spendTxt:'광고비 단일5종 합산 595,397원', sales:0, orders:0,
+   since:'8/5',  age:'12일차',                lifeSpendTxt:'단일5종 합산 595,397원', lifeSales:null, lifeRoas:null, note:'12일차 · 단일5종 묶음입니다. 판단하기 이릅니다.'},
+  {key:'단일_맘카페',          title:'단일_맘카페',           st:'dead',  tag:'악플 바이럴로 삭제',                  cpl:'단일5종 합 1주차 31,015', spendTxt:'광고비 단일5종 합산 595,397원', sales:0, orders:0,
+   since:'8/5',  age:'12일차',                lifeSpendTxt:'단일5종 합산 595,397원', lifeSales:null, lifeRoas:null, note:'12일차 · 단일5종 묶음입니다. 판단하기 이릅니다.'},
+  {key:'단일_공부습관',        title:'단일_공부습관',          st:'dead',  tag:'악플 바이럴로 삭제',                  cpl:'단일5종 합 1주차 31,015', spendTxt:'광고비 단일5종 합산 595,397원', sales:0, orders:0,
+   since:'8/5',  age:'12일차',                lifeSpendTxt:'단일5종 합산 595,397원', lifeSales:null, lifeRoas:null, note:'12일차 · 단일5종 묶음입니다. 판단하기 이릅니다.'},
 ];
-renderGal('aug-gal', AUG_GAL, {exact:true, spendLine:true});
+renderGal('aug-gal', AUG_GAL, {exact:true, spendLine:true, lifetime:true});
 
 renderGal('jw2-gal', JW2_GAL);
   renderGal('jw3-gal', JW3_GAL);
