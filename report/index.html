@@ -890,7 +890,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   </div>
   <div class="cap" style="margin-bottom:24px"><b>두 기준 모두 합계가 닫힙니다</b> — 코호트 <b>20건 · 78,630,000원</b>, 결제일 <b>32건 · 128,193,000원</b>으로 상단 KPI와 정확히 일치합니다. 결제일이 더 큰 것은 <b>7월 이전 신청분이 8월에 결제</b>됐기 때문이고, 메타 2주차가 코호트 2건인데 결제일 13건인 것은 <b>1주차 리드가 2주차에 결제</b>됐기 때문입니다.
   <br><b>카카오·네이버 광고비 자동 수집 반영</b>. 네이버는 <b>브랜드검색·브랜드컨텐츠·GFA 3개로 분리</b>해 각각 별도 행으로 반영했으며, 셋 다 합계 광고비에 포함됩니다. <b>네이버 브랜드검색은 오더 3~4건 표본</b>(광고비 대비 회수가 커 보이나)이라 채널 판정 근거로 쓰지 않습니다.
-  <br><b>텐핑 644,000원(유효 23건×28,000, 8/9~16 실소진)은 합계 광고비 26,284,705원에 포함되어 있습니다.</b> 무효 3건(박나결·이예림·최지온)은 DB에서 뺐습니다.<br><b>합계 CPL 37,178원은 전체 DB 기준입니다</b> — 인스타 organic·소스미상도 <b>광고 견인 유입</b>으로 봅니다.</div>
+  <br><b>텐핑 644,000원(유효 23건×28,000, 8/9~16 실소진)은 합계 광고비 26,284,705원에 포함되어 있습니다.</b> <b>무효 확정 2건</b>은 DB에서 뺐고, <b>신고접수 2건(문주원·최지온)</b>은 처리 대기입니다.<br><b>합계 CPL 37,178원은 전체 DB 기준입니다</b> — 인스타 organic·소스미상도 <b>광고 견인 유입</b>으로 봅니다.</div>
 
   <!-- 텐핑 = 01 채널별의 하위 세부 보고 -->
   <div class="order-box sub">
@@ -939,31 +939,40 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
     <div class="cap" style="margin-bottom:18px">※ <b>ROAS 2.475는 실소진 9,804,000원(8/16 마감 · 유효 건별 합산) 기준</b>입니다. 충전액 21,000,000원을 분모로 잡으면 <b>1.156</b>이며, 이는 미집행 잔액 11,084,000원이 분모에 포함된 값입니다.<br>계정 잔액 기준(8/18 조회) 실소진은 <b>9,916,000원</b>(21,000,000 − 11,084,000)으로, 8/17~18 소진 <b>112,000원</b>이 포함된 값입니다.</div>
 
     <div class="cap" style="font-weight:700;color:var(--text);margin-top:18px">마케터별 단가·효율 (6~8월 누적)</div>
-    <div class="cap" style="margin-bottom:10px">소재를 보듯 <b>요원별로도 단가와 효율을 봅니다</b>. 매출 있는 순입니다. 단가·유효율은 <b>텐핑 참여자현황</b>, 매출·오더는 <b>노션 결제</b> 기준입니다.</div>
+    <div class="cap" style="margin-bottom:10px"><b>유효DB</b>는 유효+승인대기(무효 제외) 기준이며, 무효는 별도 열로 병기했습니다. 유효DB·무효·유효율은 <b>텐핑 참여자현황(8/16)</b>, 매출·오더는 <b>노션 결제</b> 기준입니다.</div>
     <div class="tbl-scroll" style="margin-bottom:12px">
     <table class="tbl">
       <thead><tr>
-        <th class="l">마케터</th><th class="r">DB</th><th class="r">유효율</th><th class="r">평균단가</th>
+        <th class="l">마케터</th><th class="r">유효DB</th><th class="r">무효</th><th class="r">유효율</th><th class="r">평균단가</th>
         <th class="r">오더</th><th class="r">오더율</th><th class="r">매출</th><th class="r">DB당 매출</th>
       </tr></thead>
       <tbody>
-        <tr><td class="l"><b>페페</b></td><td class="r"><b>209</b></td><td class="r">93%</td><td class="r">28,530원</td><td class="r">4</td><td class="r">1.9%</td><td class="r"><b>17,340,000원</b></td><td class="r">82,966원</td></tr>
-        <tr><td class="l"><b>철수</b></td><td class="r">48</td><td class="r red">59%</td><td class="r">29,111원</td><td class="r">2</td><td class="r">4.2%</td><td class="r">10,400,000원</td><td class="r teal"><b>216,666원</b></td></tr>
-        <tr><td class="l"><b>유리</b></td><td class="r">47</td><td class="r">92%</td><td class="r">29,478원</td><td class="r">2</td><td class="r teal"><b>4.3%</b></td><td class="r">8,092,000원</td><td class="r teal"><b>172,170원</b></td></tr>
-        <tr><td class="l">짱구</td><td class="r">22</td><td class="r">95%</td><td class="r">31,809원</td><td class="r">0</td><td class="r">0%</td><td class="r">—</td><td class="r">—</td></tr>
-        <tr><td class="l">훈이</td><td class="r">11</td><td class="r teal">100%</td><td class="r">30,090원</td><td class="r">0</td><td class="r">0%</td><td class="r">—</td><td class="r">—</td></tr>
-        <tr style="border-top:1.5px solid var(--border);background:var(--card2)"><td class="l"><b>합계</b></td><td class="r"><b>337</b></td><td class="r">—</td><td class="r">—</td><td class="r"><b>8</b></td><td class="r">—</td><td class="r"><b>35,832,000원</b></td><td class="r">—</td></tr>
+        <tr><td class="l"><b>페페</b></td><td class="r"><b>197</b></td><td class="r" style="color:var(--sub)">13</td><td class="r">93.8%</td><td class="r">28,530원</td><td class="r">4</td><td class="r">1.9%</td><td class="r"><b>17,340,000원</b></td><td class="r">82,966원</td></tr>
+        <tr><td class="l"><b>철수</b></td><td class="r">47</td><td class="r" style="color:var(--sub)">1</td><td class="r teal">97.9%</td><td class="r">29,111원</td><td class="r">2</td><td class="r">4.2%</td><td class="r">10,400,000원</td><td class="r teal"><b>216,666원</b></td></tr>
+        <tr><td class="l"><b>유리</b></td><td class="r">43</td><td class="r" style="color:var(--sub)">2</td><td class="r">95.6%</td><td class="r">29,478원</td><td class="r">2</td><td class="r teal"><b>4.3%</b></td><td class="r">8,092,000원</td><td class="r teal"><b>172,170원</b></td></tr>
+        <tr><td class="l">짱구</td><td class="r">21</td><td class="r" style="color:var(--sub)">1</td><td class="r">95.5%</td><td class="r">31,809원</td><td class="r">0</td><td class="r">0%</td><td class="r">—</td><td class="r">—</td></tr>
+        <tr><td class="l">훈이</td><td class="r">11</td><td class="r" style="color:var(--sub)">0</td><td class="r teal">100%</td><td class="r">30,090원</td><td class="r">0</td><td class="r">0%</td><td class="r">—</td><td class="r">—</td></tr>
+        <tr><td class="l">미선</td><td class="r">2</td><td class="r" style="color:var(--sub)">0</td><td class="r teal">100%</td><td class="r">—</td><td class="r">0</td><td class="r">0%</td><td class="r">—</td><td class="r">—</td></tr>
+        <tr><td class="l">철식</td><td class="r">2</td><td class="r" style="color:var(--sub)">0</td><td class="r teal">100%</td><td class="r">—</td><td class="r">0</td><td class="r">0%</td><td class="r">—</td><td class="r">—</td></tr>
+        <tr><td class="l">액션가면</td><td class="r">2</td><td class="r" style="color:var(--sub)">0</td><td class="r teal">100%</td><td class="r">—</td><td class="r">0</td><td class="r">0%</td><td class="r">—</td><td class="r">—</td></tr>
+        <tr><td class="l">부리부리</td><td class="r">2</td><td class="r" style="color:var(--sub)">0</td><td class="r teal">100%</td><td class="r">—</td><td class="r">0</td><td class="r">0%</td><td class="r">—</td><td class="r">—</td></tr>
+        <tr><td class="l">맹구</td><td class="r">2</td><td class="r" style="color:var(--sub)">0</td><td class="r teal">100%</td><td class="r">—</td><td class="r">0</td><td class="r">0%</td><td class="r">—</td><td class="r">—</td></tr>
+        <tr><td class="l">훈만</td><td class="r">1</td><td class="r" style="color:var(--sub)">0</td><td class="r teal">100%</td><td class="r">—</td><td class="r">0</td><td class="r">0%</td><td class="r">—</td><td class="r">—</td></tr>
+        <tr><td class="l">정구</td><td class="r">1</td><td class="r" style="color:var(--sub)">0</td><td class="r teal">100%</td><td class="r">—</td><td class="r">0</td><td class="r">0%</td><td class="r">—</td><td class="r">—</td></tr>
+        <tr><td class="l">흰둥이</td><td class="r">1</td><td class="r" style="color:var(--sub)">1</td><td class="r red">50%</td><td class="r">—</td><td class="r">0</td><td class="r">0%</td><td class="r">—</td><td class="r">—</td></tr>
+        <tr><td class="l">유식</td><td class="r">0</td><td class="r" style="color:var(--sub)">1</td><td class="r red">0%</td><td class="r">—</td><td class="r">0</td><td class="r">—</td><td class="r">—</td><td class="r">—</td></tr>
+        <tr style="border-top:1.5px solid var(--border);background:var(--card2)"><td class="l"><b>합계</b></td><td class="r"><b>332</b></td><td class="r"><b>19</b></td><td class="r">—</td><td class="r">—</td><td class="r"><b>8</b></td><td class="r">—</td><td class="r"><b>35,832,000원</b></td><td class="r">—</td></tr>
       </tbody>
     </table>
     </div>
-    <div class="cap" style="margin-bottom:14px">※ 합계 <b>오더 8건 · 35,832,000원</b>은 위 추이표의 <b>6월(2건·12,712,000) + 7월(6건·23,120,000)</b>과 정확히 일치합니다. DB <b>337</b>은 <b>마케터별 참여자현황</b> 기준 집계로, 월별 유효/무효를 분리해 재검증한 위 추이표와는 <b>집계 기준이 달라 단순 합계가 일치하지 않습니다</b>.</div>
+    <div class="cap" style="margin-bottom:14px">※ 합계 <b>오더 8건 · 35,832,000원</b>은 위 추이표의 <b>6월(2건·12,712,000) + 7월(6건·23,120,000)</b>과 정확히 일치합니다. 유효DB <b>332</b>는 추이표 유효(331)와 <b>시점차 1건</b> 외 일치하며, 무효 <b>19</b>는 과금에서 제외했습니다. 1차 캠페인(4~6월 초 8건)은 <b>마케터 미추적</b>이라 이 표에서 제외했습니다.</div>
 
     <div class="log" style="margin-bottom:0;background:#fff;border-color:#f0d5a0">
-      <div class="li" style="margin-bottom:8px"><b>페페 = 물량 담당.</b> DB <b>209건</b>으로 전체의 60%대, 유효율 93%. 다만 <b>오더율 1.9%</b>라 DB당 매출은 82,966원입니다.</div>
-      <div class="li" style="margin-bottom:8px"><b>철수 = 효율 최고.</b> DB당 매출 <b>216,666원</b>으로 <b>페페의 2.6배</b>입니다. 물량은 적어도 질이 좋습니다. 단 <b>유효율 59%</b>라 무효 관리가 필요합니다.</div>
-      <div class="li" style="margin-bottom:8px"><b>유리 = 균형.</b> 유효율 92% + DB당 172,170원. 안정적입니다.</div>
-      <div class="li" style="margin-bottom:8px"><b>짱구·훈이</b>는 유효율이 높으나(95% · 100%) 오더가 아직 0입니다. 관찰 단계입니다.</div>
-      <div class="li" style="margin-bottom:16px"><b>판단 — 페페의 물량 + 철수·유리의 효율 조합입니다.</b> <b>철수는 무효율만 잡으면 최고 효율</b>이 됩니다.</div>
+      <div class="li" style="margin-bottom:8px"><b>페페 = 물량 담당.</b> 유효DB <b>197건</b>으로 전체의 59%, 유효율 93.8%(무효 13). 다만 <b>오더율 1.9%</b>라 DB당 매출은 82,966원입니다.</div>
+      <div class="li" style="margin-bottom:8px"><b>철수 = 효율 최고.</b> DB당 매출 <b>216,666원</b>으로 <b>페페의 2.6배</b>입니다. 물량은 적어도 질이 좋습니다. 유효율은 <b>97.9%</b>(무효 1)입니다.</div>
+      <div class="li" style="margin-bottom:8px"><b>유리 = 균형.</b> 유효율 95.6%(무효 2) + DB당 172,170원. 안정적입니다.</div>
+      <div class="li" style="margin-bottom:8px"><b>짱구·훈이</b>는 유효율이 높으나(95.5% · 100%) 오더가 아직 0입니다. 관찰 단계입니다. 그 외 <b>미선·철식·액션가면·부리부리·맹구·훈만·정구</b>는 유효DB 1~2건, <b>흰둥이 50%(1/2) · 유식 0%(0/1)</b>입니다.</div>
+      <div class="li" style="margin-bottom:16px"><b>판단 — 페페의 물량 + 철수·유리의 효율 조합입니다.</b> 무효 19건 중 <b>13건이 페페</b>에 몰려 있습니다.</div>
 
       <div class="li" style="margin-bottom:8px"><b>6월은 물량, 7월은 품질입니다.</b> 6월엔 213건을 받아 오더 2건, 7월엔 95건만 받고 오더 6건이 났습니다. <b>DB를 절반으로 줄였는데 매출은 2배</b>(1,271만 → 2,312만), ROAS는 <b>2.02 → 8.69</b>입니다.</div>
       <div class="li" style="margin-bottom:8px"><b>방문율이 핵심입니다.</b> 6월 10% → 7월 19%로 오르면서 오더 전환이 <b>3배</b>가 됐습니다.</div>
