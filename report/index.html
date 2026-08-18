@@ -895,22 +895,48 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   <!-- 텐핑 = 01 채널별의 하위 세부 보고 -->
   <div class="order-box sub">
     <div class="order-label">📌 파운더님 지시사항 — 텐핑 세부 보고</div>
-    <div class="cap" style="margin-bottom:14px">위 <b>01 채널별</b>의 텐핑(CPA) 행을 따로 펼친 세부 보고입니다. 지시하신 <b>DB 단가와 효율</b>에 대한 답으로, <b>6·7·8월 추이</b>와 <b>마케터별 단가·효율</b>을 함께 놓고 판단 근거를 정리했습니다.</div>
+    <div class="cap" style="margin-bottom:14px">위 <b>01 채널별</b>의 텐핑(CPA) 행을 따로 펼친 세부 보고입니다. 지시하신 <b>DB 단가와 효율</b>에 대한 답으로, <b>4월~8월 전체 추이</b>와 <b>마케터별 단가·효율</b>을 함께 놓고 판단 근거를 정리했습니다. 텐핑 <b>참여자현황 원본과 입금내역·계정 잔액으로 전수 재검증</b>한 확정 수치입니다.<br>텐핑은 <b>3/31 테스트 캠페인으로 시작(4/10~6/1 · 유효 6건, 현재 일시정지)</b>해 <b>6/2 본 캠페인으로 전환</b>했습니다. 아래 수치는 두 캠페인을 <b>계정 통합 기준</b>으로 합산한 것입니다.</div>
     <div class="tbl-scroll" style="margin-bottom:14px">
     <table class="tbl">
-      <thead><tr><th class="l">지표</th><th class="r">6월</th><th class="r">7월</th><th class="r">8월 (진행중)</th></tr></thead>
+      <thead><tr><th class="l">지표</th><th class="r">4·5월 <span style="font-weight:400;color:var(--faint)">(테스트)</span></th><th class="r">6월</th><th class="r">7월</th><th class="r">8월 (~16)</th></tr></thead>
       <tbody>
-        <tr><td class="l">유효 DB</td><td class="r">213건</td><td class="r">95건</td><td class="r">26건</td></tr>
-        <tr><td class="l">DB 단가</td><td class="r">29,530원</td><td class="r">28,000원</td><td class="r">28,000원</td></tr>
-        <tr><td class="l">광고비</td><td class="r">6,290,000원</td><td class="r">2,660,000원</td><td class="r">약 730,000원</td></tr>
-        <tr><td class="l">오더</td><td class="r">2건</td><td class="r"><b>6건</b></td><td class="r"><span class="gl">회수 전</span></td></tr>
-        <tr><td class="l">매출</td><td class="r">12,712,000원</td><td class="r"><b>23,120,000원</b></td><td class="r"><span class="gl">회수 전</span></td></tr>
-        <tr><td class="l">DB당 매출</td><td class="r">56,000원</td><td class="r teal"><b>228,910원</b></td><td class="r">—</td></tr>
-        <tr><td class="l">방문율</td><td class="r">10%</td><td class="r teal"><b>19%</b></td><td class="r">8% <span style="color:var(--faint)">(초기)</span></td></tr>
-        <tr><td class="l">ROAS</td><td class="r">2.02</td><td class="r teal"><b>8.69</b></td><td class="r"><span class="gl">관찰</span></td></tr>
+        <tr><td class="l">유효 DB</td><td class="r">6건</td><td class="r">213건</td><td class="r">95건</td><td class="r">23건</td></tr>
+        <tr><td class="l">무효 DB</td><td class="r" style="color:var(--sub)">2건</td><td class="r" style="color:var(--sub)">13건</td><td class="r" style="color:var(--sub)">4건</td><td class="r" style="color:var(--sub)">2건 <span style="font-size:10px;color:var(--faint)">(+승인대기)</span></td></tr>
+        <tr><td class="l">DB 단가</td><td class="r">35,000원</td><td class="r">29,531원<span style="font-size:10px;color:var(--faint)"> 믹스*</span></td><td class="r">28,000원</td><td class="r">28,000 → <b>35,000원</b><span style="font-size:10px;color:var(--faint)"> 8/17~</span></td></tr>
+        <tr><td class="l">광고비 <span style="font-size:10px;color:var(--faint)">실소진</span></td><td class="r">약 210,000원</td><td class="r">6,290,000원</td><td class="r">2,660,000원</td><td class="r">644,000원</td></tr>
+        <tr><td class="l">오더</td><td class="r">—</td><td class="r">2건</td><td class="r"><b>6건</b></td><td class="r"><span class="gl">회수 전</span></td></tr>
+        <tr><td class="l">매출</td><td class="r">—</td><td class="r">12,712,000원</td><td class="r"><b>23,120,000원</b></td><td class="r"><span class="gl">회수 전</span></td></tr>
+        <tr><td class="l">DB당 매출</td><td class="r">—</td><td class="r">56,000원</td><td class="r teal"><b>228,910원</b></td><td class="r">—</td></tr>
+        <tr><td class="l">방문율</td><td class="r">—</td><td class="r">10%</td><td class="r teal"><b>19%</b></td><td class="r">8% <span style="color:var(--faint)">(초기)</span></td></tr>
+        <tr><td class="l">ROAS</td><td class="r">—</td><td class="r">2.02</td><td class="r teal"><b>8.69</b></td><td class="r"><span class="gl">관찰</span></td></tr>
       </tbody>
     </table>
     </div>
+    <div class="cap" style="margin-bottom:18px">* <b>6월 단가는 단일가가 아니라 3단가 믹스</b>입니다 — 아래 구성 표 참조. 무효 DB는 <b>정산에서 제외</b>한 건으로, 전체 21건의 사유는 <b>본인아님 12 · 허위기재 3 · 결번 3 · 중복 1 · 아이신청 1 · 테스트 1</b>입니다.</div>
+
+    <div class="cap" style="font-weight:700;color:var(--text);margin-top:18px">6월 DB 단가 구성 — 평균 29,531원의 근거</div>
+    <div class="cap" style="margin-bottom:10px">사장님께서 "단가가 보고와 다르다"고 하신 부분입니다. 6월은 <b>단가를 두 번 내리며 운영</b>해서, 평균이 아니라 <b>3개 단가가 섞인 결과</b>입니다.</div>
+    <div class="tbl-scroll" style="margin-bottom:14px">
+    <table class="tbl">
+      <thead><tr><th class="l">적용 단가</th><th class="r">건수</th><th class="r">금액</th><th class="l">시기</th></tr></thead>
+      <tbody>
+        <tr><td class="l">35,000원</td><td class="r">28건</td><td class="r">980,000원</td><td class="l">6월 초 (본 캠페인 시작가)</td></tr>
+        <tr><td class="l">30,000원</td><td class="r">65건</td><td class="r">1,950,000원</td><td class="l">6/23 1차 인하</td></tr>
+        <tr><td class="l">28,000원</td><td class="r">120건</td><td class="r">3,360,000원</td><td class="l">6월 말 2차 인하 · 안착</td></tr>
+        <tr style="border-top:1.5px solid var(--border);background:var(--card2)"><td class="l"><b>합계</b></td><td class="r"><b>213건</b></td><td class="r"><b>6,290,000원</b></td><td class="l"><b>평균 29,531원</b></td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="cap" style="font-weight:700;color:var(--text);margin-top:18px">충전 ≠ 소진 — 실소진 기준 ROAS</div>
+    <div class="cap" style="margin-bottom:10px">텐핑은 <b>선불 충전형</b>이라 <b>넣은 돈과 쓴 돈이 다릅니다</b>. 충전액을 분모로 쓰면 <b>아직 쓰지도 않은 1,108만이 분모에 잡혀</b> ROAS가 왜곡됩니다. 그래서 <b>계정 잔액으로 역산한 실소진</b>을 분모로 씁니다.</div>
+    <div class="kpis" style="grid-template-columns:repeat(4,1fr);margin-bottom:10px">
+      <div class="kpi"><div class="k">총 충전</div><div class="v">2,100만</div><div class="s">21,000,000원 (VAT별도)</div></div>
+      <div class="kpi"><div class="k">실소진</div><div class="v">992만</div><div class="s">9,916,000원 = 충전 − 잔액</div></div>
+      <div class="kpi"><div class="k">잔액</div><div class="v">1,108만</div><div class="s">11,084,000원<br><span style="color:var(--faint)">8/6 충전 1,200만 대부분</span></div></div>
+      <div class="kpi"><div class="k">ROAS <span style="color:var(--faint)">실소진</span></div><div class="v g">2.45</div><div class="s">회수 24,272,000원 ÷ 9,916,000원</div></div>
+    </div>
+    <div class="cap" style="margin-bottom:18px">※ <b>ROAS 2.45는 실소진 9,916,000원 기준</b>입니다. 충전액 2,100만을 분모로 잡으면 1.16으로 보이지만, 이는 <b>안 쓴 1,108만까지 비용으로 친 값</b>이라 실제 효율이 아닙니다. 잔액 1,108만은 <b>사라진 돈이 아니라 아직 집행 가능한 예산</b>입니다.</div>
 
     <div class="cap" style="font-weight:700;color:var(--text);margin-top:18px">마케터별 단가·효율 (6~8월 누적)</div>
     <div class="cap" style="margin-bottom:10px">소재를 보듯 <b>요원별로도 단가와 효율을 봅니다</b>. 매출 있는 순입니다. 단가·유효율은 <b>텐핑 참여자현황</b>, 매출·오더는 <b>노션 결제</b> 기준입니다.</div>
@@ -930,7 +956,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
       </tbody>
     </table>
     </div>
-    <div class="cap" style="margin-bottom:14px">※ 합계 <b>오더 8건 · 35,832,000원</b>은 위 추이표의 <b>6월(2건·12,712,000) + 7월(6건·23,120,000)</b>과 정확히 일치합니다. DB 337은 <b>무효 포함 전체</b>라, 추이표의 유효 DB 합(213+95+26=334)보다 3건 많습니다.</div>
+    <div class="cap" style="margin-bottom:14px">※ 합계 <b>오더 8건 · 35,832,000원</b>은 위 추이표의 <b>6월(2건·12,712,000) + 7월(6건·23,120,000)</b>과 정확히 일치합니다. DB <b>337</b>은 <b>마케터별 참여자현황</b> 기준 집계로, 월별 유효/무효를 분리해 재검증한 위 추이표와는 <b>집계 기준이 달라 단순 합계가 일치하지 않습니다</b>.</div>
 
     <div class="log" style="margin-bottom:0;background:#fff;border-color:#f0d5a0">
       <div class="li" style="margin-bottom:8px"><b>페페 = 물량 담당.</b> DB <b>209건</b>으로 전체의 60%대, 유효율 93%. 다만 <b>오더율 1.9%</b>라 DB당 매출은 82,966원입니다.</div>
@@ -941,8 +967,8 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 
       <div class="li" style="margin-bottom:8px"><b>6월은 물량, 7월은 품질입니다.</b> 6월엔 213건을 받아 오더 2건, 7월엔 95건만 받고 오더 6건이 났습니다. <b>DB를 절반으로 줄였는데 매출은 2배</b>(1,271만 → 2,312만), ROAS는 <b>2.02 → 8.69</b>입니다.</div>
       <div class="li" style="margin-bottom:8px"><b>방문율이 핵심입니다.</b> 6월 10% → 7월 19%로 오르면서 오더 전환이 <b>3배</b>가 됐습니다.</div>
-      <div class="li" style="margin-bottom:8px"><b>단가는 협상으로 내렸습니다.</b> 6월 초 35,000원 → 6월 중 30,000원 → <b>6월 말부터 28,000원 안착</b>.</div>
-      <div class="li" style="margin-bottom:8px"><b>8월은 판단을 보류합니다.</b> 26건 대부분이 유효성 검증 만료 전입니다. <b>회수가 없는 게 아니라 아직 안 익은 것</b>입니다. 7월 품질(방문율 19% · ROAS 8.69)이 8월에도 이어지는지가 관건입니다.</div>
+      <div class="li" style="margin-bottom:8px"><b>단가는 내렸다가 다시 올렸습니다.</b> 35,000원(4월 테스트) → 35,000원(6월 초) → 30,000원(6/23) → 28,000원(6월 말~8월 초 안착) → <b>35,000원(8/17 재인상)</b>. 28,000원을 유지하니 <b>우수 마케터가 단가 높은 경쟁 캠페인으로 이탈해 DB 유입이 급감</b>했기 때문입니다(텐핑 알림도 ‘평균보다 낮으니 인상 권장’을 표시했습니다). <b>단가는 비용이 아니라 물량을 사는 가격</b>입니다.</div>
+      <div class="li" style="margin-bottom:8px"><b>8월은 물량이 문제입니다.</b> 8/6에 <b>1,200만을 대량 충전</b>했으나 8/16까지 <b>실소진은 644,000원(유효 23건)</b>뿐입니다. 28,000원 저단가로 DB 유입이 저조해 <b>8/17 35,000원 재인상으로 대응 중</b>이며, 예산 <b>1,108만이 잔액으로 남아 물량 회복 여력은 충분</b>합니다. 7월 품질(방문율 19% · ROAS 8.69)이 8월에도 이어지는지가 관건입니다.</div>
       <div class="li"><b>검증.</b> 7월 오더 6건은 <b>전부 7월 신청 DB가 7월에 결제</b>한 건입니다 — 6월 DB 섞임 없음, 전수 대조 완료했습니다.</div>
     </div>
   </div>
