@@ -252,6 +252,29 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   .kpi{padding:14px}
   .order-box{padding:14px;border-radius:12px}
 }
+
+/* 모바일 카드 레이아웃 — 640px 이하에서 표를 가로 스크롤 대신 1행=1카드로.
+   라벨은 페이지 하단 스크립트가 thead 를 읽어 data-label 로 심는다. .cards 가
+   붙은 표에만 적용되므로, 스크립트가 안 돌면 기존 가로 스크롤이 그대로 남는다.
+   데스크탑(641px 이상)에는 아무 영향 없음. */
+@media(max-width:640px){
+  .tbl-scroll.cards{overflow-x:visible;-webkit-overflow-scrolling:auto}
+  .tbl.cards{display:block;font-size:12px}
+  .tbl.cards thead{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  .tbl.cards tbody{display:block}
+  .tbl.cards tr{display:block;background:#fff;border:1px solid #e9e9e9;border-radius:10px;padding:6px 11px;margin-bottom:9px}
+  .tbl.cards td{display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding:6px 0;border:0;border-bottom:1px solid #f4f4f4;white-space:normal}
+  .tbl.cards td:last-child{border-bottom:0}
+  .tbl.cards td::before{content:attr(data-label);flex:0 0 auto;max-width:52%;color:#8a8a8a;font-weight:600;text-align:left;white-space:normal}
+  .tbl.cards td.card-title{display:block;font-size:13px;font-weight:700;text-align:left;padding:2px 0 8px;border-bottom:1px solid #ececec}
+  .tbl.cards td.card-title::before{content:none}
+  .tbl.cards td.card-empty{display:none}
+}
+/* .kpis 7곳이 인라인 grid-template-columns 를 들고 있어 위 560px 규칙을 이겼고,
+   그 탓에 390px 뷰포트에서 페이지가 가로로 넘쳤다. */
+@media(max-width:560px){
+  .kpis{grid-template-columns:repeat(2,1fr) !important}
+}
 </style>
 </head>
 <body>
@@ -2084,6 +2107,34 @@ renderGalW4();
       updateThisWeek(id);
     }
   }
+})();
+</script>
+<script>
+/* 모바일 카드 라벨 — 표 마크업은 건드리지 않고 thead 를 읽어 각 td 에 data-label 만 심는다.
+   표가 늘거나 열이 바뀌어도 따라가므로 셀에 라벨을 손으로 박을 필요가 없다. */
+(function(){
+  function txt(el){ return (el.textContent || '').replace(/\s+/g, ' ').trim(); }
+  function stamp(){
+    document.querySelectorAll('table.tbl').forEach(function(t){
+      var head = t.querySelector('thead tr');
+      if (!head) return;                                  // 헤더가 없으면 라벨을 못 만드니 가로 스크롤로 남긴다
+      var labels = Array.prototype.map.call(head.cells, txt);
+      Array.prototype.forEach.call(t.tBodies, function(tb){
+        Array.prototype.forEach.call(tb.rows, function(row){
+          Array.prototype.forEach.call(row.cells, function(td, i){
+            if (!txt(td) && td.children.length === 0) { td.classList.add('card-empty'); return; }  // 빈 칸은 라벨만 뜨는 걸 막으려 숨김
+            if (i === 0) { td.classList.add('card-title'); return; }                               // 첫 칸은 카드 제목
+            if (labels[i]) td.setAttribute('data-label', labels[i]);
+          });
+        });
+      });
+      t.classList.add('cards');
+      var wrap = t.closest('.tbl-scroll');
+      if (wrap) wrap.classList.add('cards');
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', stamp);
+  else stamp();
 })();
 </script>
 </body>
