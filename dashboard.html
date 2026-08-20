@@ -341,7 +341,10 @@ const OFF_CAMPAIGNS = [
   'ARA_MLST캐러셀_2606_광고01',
   'ARA_MLST_V3_무료점검',
   '원톱_같은점수다른처방_릴스_2608',
-  '정지_단일5종(삭제-학생들악플바이럴)'
+  '정지_단일5종(삭제-학생들악플바이럴)',
+  // 소재가 아니라 유입경로 버킷이지만 집행이 끝났다 — 하단 종료 그룹으로 내리되 매출은 그대로 둔다
+  '학습관리 무료컨설팅',   // 4월 종료
+  '메타광고'               // 미매칭 누락 복구분
 ];
 // 집행 중인 ON 캠페인 — 오더·매출이 0이어도 표에 남긴다 (신규 소재가 첫 성과 전에 사라지지 않도록)
 const ON_CAMPAIGNS = [
@@ -489,7 +492,7 @@ function render() {
   });
   const totCancelRate = totalVisit ? Math.round(totalCancel/totalVisit*100) : 0;
   const totOrderRate  = totalSetting ? Math.round(totalOrder/totalSetting*100) : 0;
-  const totSalesFallback = totalSalesNum >= 10000 ? Math.round(totalSalesNum/10000) + '만원' : totalSalesNum + '원';
+  const totSalesFallback = totalSalesNum >= 10000 ? manWon(totalSalesNum) + '원' : totalSalesNum + '원';
   const totSalesStr = (funnelTab === 0 ? r12[1] : r13[1]) || totSalesFallback;
   rows.push(`<tr class="total">
     <td class="name">합계</td>
@@ -666,8 +669,9 @@ function render() {
         const badgeLabel = c.channel === 'Organic' ? '무료유입' : c.channel;
         const badge = c.channel ? `<span style="display:inline-block;font-size:9px;font-weight:700;color:#fff;background:${badgeColor};border-radius:6px;padding:1px 5px;margin-right:5px;vertical-align:middle;">${escapeHtml(badgeLabel)}</span>` : '';
         const off = isOff(c.name);
-        // 켜짐/꺼짐은 광고 캠페인에만 있는 개념 → 메타 행에만 뱃지 표시 (Organic·카카오·네이버 등 유입경로 제외)
-        const stateBadge = isMeta ? `<span class="state-badge ${off ? 'off' : 'on'}">${off ? 'OFF' : 'ON'}</span>` : '';
+        // 켜짐/꺼짐은 광고 캠페인에만 있는 개념 → 메타 행에만 뱃지 표시 (Organic·카카오·네이버 등 유입경로 제외).
+        // 단 OFF 목록에 직접 올린 유입경로(학습관리 무료컨설팅·메타광고)는 종료가 명시된 것이므로 OFF 뱃지를 단다.
+        const stateBadge = (isMeta || off) ? `<span class="state-badge ${off ? 'off' : 'on'}">${off ? 'OFF' : 'ON'}</span>` : '';
         return `<tr class="${off ? 'camp-off' : ''}">
         <td class="name">${badge}${stateBadge}${escapeHtml(c.name)}</td>
         <td class="num metric">${c.db}</td>
@@ -675,7 +679,7 @@ function render() {
         <td class="num metric" style="color:#d97706">${c.setting} <b style="font-size:10px">(${sr}%)</b></td>
         <td class="num metric" style="color:#0f9d58">${c.order} <b style="font-size:10px">(${or_}%)</b></td>
         <td class="num spend" style="color:#6b7280;font-size:11px">${c.spend > 0 ? '₩'+c.spend.toLocaleString() : '-'}</td>
-        <td class="num metric" style="color:#7c3aed;font-size:11px">${c.sales > 0 ? Math.round(c.sales/10000).toLocaleString()+'만' : '-'}</td>
+        <td class="num metric" style="color:#7c3aed;font-size:11px">${manWon(c.sales)}</td>
         <td class="num metric" style="color:${c.roas && parseFloat(c.roas) >= 1 ? '#0f9d58' : '#e11d48'};font-weight:700">${c.roas || '-'}</td>
       </tr>`;
       };
@@ -745,6 +749,14 @@ function shortGrade(g) {
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// 원 단위 매출 → 만원 표기. 만원 단위는 유지하되(원 단위로 쓰면 열이 넓어진다)
+// 반올림으로 뭉개지 않게 소수점 1자리까지 살린다. 3,468,000 → 346.8만 / 52,020,000 → 5,202만
+function manWon(won) {
+  const n = Number(won) || 0;
+  if (n <= 0) return '-';
+  return (Math.round(n / 1000) / 10).toLocaleString('ko-KR', { maximumFractionDigits: 1 }) + '만';
 }
 
 loadAll();
