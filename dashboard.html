@@ -126,6 +126,10 @@ body.personal-view .adm-only { display: none !important; }
 .campaign-table tr:last-child td { border-bottom: none; }
 .campaign-table td.name { color: #444; font-size: 10px; word-break: break-all; }
 .campaign-table td.num { text-align: center; font-weight: 600; color: #1a73e8; font-size: 12px; }
+.campaign-table tr.camp-off td { opacity: 0.5; }
+.state-badge { display: inline-block; font-size: 9px; font-weight: 700; color: #fff; border-radius: 6px; padding: 1px 5px; margin-right: 5px; vertical-align: middle; letter-spacing: .3px; }
+.state-badge.on { background: #0f9d58; }
+.state-badge.off { background: #9e9e9e; }
 
 .visit-panel { background: white; border-radius: 8px; border: 1px solid #eee; overflow: hidden; }
 .visit-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #f8f8f8; }
@@ -305,6 +309,32 @@ const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJ
 const ASSIGNEES = ['우혜림','김윤호','장윤호','박창건','김태석','김성윤','노영호','김원득','김우진'];
 const ASSIGNEE_START_IDX = 46;
 const CAMPAIGN_START_IDX = 57;
+
+// 광고 집행상태 — 시트 캠페인명과 한 글자도 다르면 매칭 실패하므로 원문 그대로 유지할 것
+const OFF_CAMPAIGNS = [
+  'ARA_노트릴스_채리_2606',
+  'ARA_GT노트피드백_영상_2605',
+  '[소재01] 릴스_너만본다_유채리_수학81→100_영어83→96',
+  '캐러셀_01_중간고사전략_4장',
+  '아라온스쿨_잠재고객_5단계루틴_2606W19',
+  'ARA_기초부족_단일이미지_2505',
+  'ARA_MLST캐러셀_2606_광고01',
+  'ARA_MLST_V3_무료점검',
+  '원톱_같은점수다른처방_릴스_2608',
+  '정지_단일5종(삭제-학생들악플바이럴)'
+];
+// 항상 표에 노출할 ON 캠페인 (오더·DB 낮아도 top10에서 잘리지 않게)
+const ON_CAMPAIGNS = [
+  'ARA_노트릴스_영상_2505',
+  'AD_노트필기릴스_방학점검_2607',
+  'ARA_원톱_박은영_중간고사훅_2608',
+  '지금 당장 방으로가세요_AD',
+  'ARA_노트필기_중간고사_전환_2608'
+];
+const OFF_SET = new Set(OFF_CAMPAIGNS);
+const ON_SET  = new Set(ON_CAMPAIGNS);
+const isOff = (nm) => OFF_SET.has((nm || '').trim());
+const isKeepOn = (nm) => ON_SET.has((nm || '').trim());
 
 function showSec(idx) {
   currentSec = idx;
@@ -585,14 +615,26 @@ function render() {
       roas:    effIdx ? (r[effIdx[2]] || '') : ''
     });
   }
+  // ON 지정 캠페인이 시트에 아직 없으면 빈 행으로라도 노출 (수치는 시트 반영 시 자동 대체)
+  ON_CAMPAIGNS.forEach(nm => {
+    if (!campaigns.some(c => (c.name || '').trim() === nm)) {
+      campaigns.push({ name: nm, channel: '메타', db: 0, visit: 0, setting: 0, order: 0, spend: 0, sales: 0, roas: '' });
+    }
+  });
   campaigns.sort((a, b) => b.order - a.order || b.db - a.db);
   // 박은영 PM 3소재는 오더 낮아도 항상 표시 (사장님 브리핑용)
   const PM_KEEP = ['박은영','방으로가세요','같은점수다른처방'];
   const isPM = (nm) => PM_KEEP.some(k => (nm||'').indexOf(k) >= 0);
-  const withDb = campaigns.filter(c => c.db > 0);
+  // ON/OFF 로 명시 지정된 캠페인은 DB 0이어도, top10 밖이어도 항상 노출
+  const isNamed = (nm) => isKeepOn(nm) || isOff(nm);
+  const withDb = campaigns.filter(c => c.db > 0 || isNamed(c.name));
   const top10 = withDb.slice(0, 10);
-  const pmExtra = withDb.filter(c => isPM(c.name) && !top10.includes(c));
-  const top5 = top10.concat(pmExtra);
+  const keepExtra = withDb.filter(c => (isPM(c.name) || isNamed(c.name)) && !top10.includes(c));
+  // ON 먼저 → OFF 아래로, 각 그룹 광고비 내림차순
+  const bySpend = (a, b) => b.spend - a.spend || b.order - a.order || b.db - a.db;
+  const picked = top10.concat(keepExtra);
+  const top5 = picked.filter(c => !isOff(c.name)).sort(bySpend)
+        .concat(picked.filter(c => isOff(c.name)).sort(bySpend));
   ctbody.innerHTML = top5.length > 0
     ? top5.map(c => {
         const vr = c.db ? Math.round(c.visit / c.db * 100) : 0;
@@ -602,8 +644,11 @@ function render() {
         const badgeColor = isMeta ? '#1a73e8' : (c.channel.indexOf('텐핑')>=0||c.channel.indexOf('CPA')>=0) ? '#e11d48' : c.channel==='카카오' ? '#f4b400' : c.channel==='네이버' ? '#0f9d58' : '#888';
         const badgeLabel = c.channel === 'Organic' ? '무료유입' : c.channel;
         const badge = c.channel ? `<span style="display:inline-block;font-size:9px;font-weight:700;color:#fff;background:${badgeColor};border-radius:6px;padding:1px 5px;margin-right:5px;vertical-align:middle;">${escapeHtml(badgeLabel)}</span>` : '';
-        return `<tr>
-        <td class="name">${badge}${escapeHtml(c.name)}</td>
+        const off = isOff(c.name);
+        // 켜짐/꺼짐은 광고 캠페인에만 있는 개념 → 메타 행에만 뱃지 표시 (Organic·카카오·네이버 등 유입경로 제외)
+        const stateBadge = isMeta ? `<span class="state-badge ${off ? 'off' : 'on'}">${off ? 'OFF' : 'ON'}</span>` : '';
+        return `<tr class="${off ? 'camp-off' : ''}">
+        <td class="name">${badge}${stateBadge}${escapeHtml(c.name)}</td>
         <td class="num">${c.db}</td>
         <td class="num" style="color:#0891b2">${c.visit} <b style="font-size:10px">(${vr}%)</b></td>
         <td class="num" style="color:#d97706">${c.setting} <b style="font-size:10px">(${sr}%)</b></td>
