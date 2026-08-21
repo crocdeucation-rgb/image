@@ -272,6 +272,25 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
     font-size: 9px; color: #999; font-weight: 600; margin-bottom: 1px;
   }
   .campaign-table td.metric b { font-size: 10px !important; }
+  /* [모바일 전용] 최근 종료 카드 간결화 — CPL·ROAS·매출만, DB/방문/세팅/오더 숨김 (PC는 8칸 표 유지) */
+  .campaign-table tr.camp-kill-head { display: none !important; }  /* 모바일은 헤더행 숨기고 카드 라벨로 대체 */
+  .campaign-table tr.camp-killed-row td.kname {
+    display: block; width: 100%; font-size: 13px !important; font-weight: 700; color: #1a1a1a !important;
+    padding: 0 0 8px 0 !important; margin-bottom: 8px; border-bottom: 1px solid #f0f0f0;
+    word-break: keep-all; overflow-wrap: anywhere; line-height: 1.35;
+  }
+  .campaign-table tr.camp-killed-row td.knum[data-label="DB"],
+  .campaign-table tr.camp-killed-row td.knum[data-label="방문"],
+  .campaign-table tr.camp-killed-row td.knum[data-label="세팅"],
+  .campaign-table tr.camp-killed-row td.knum[data-label="오더"] { display: none !important; }
+  .campaign-table tr.camp-killed-row td.knum {
+    display: inline-block; width: 48%; text-align: left !important;
+    padding: 3px 1px !important; vertical-align: top; font-size: 13px !important; border: none !important;
+  }
+  .campaign-table tr.camp-killed-row td.knum[data-label="종료직전 CPL"] { width: 100% !important; }
+  .campaign-table tr.camp-killed-row td.knum::before {
+    content: attr(data-label); display: block; font-size: 9px; color: #999; font-weight: 600; margin-bottom: 1px;
+  }
   /* 종료소재 구분선 카드형 */
   .campaign-table tr.camp-sep td { display: block; width: 100%; text-align: center; border-radius: 8px; }
   .campaign-table tr.camp-off { opacity: .75; padding: 8px 12px; }
@@ -319,7 +338,7 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
   <div class="card"><div class="clabel">지난 주</div><div class="cval sm" id="sales-lastweek">-</div></div>
 </div>
 
-<div class="section-label">담당자별 성과분석 <span class="badge today" id="tab-label">이번달</span><span class="view-toggle"><button class="on" onclick="setView('admin')">관리자</button><button onclick="setView('personal')">담당자</button></span></div>
+<div class="section-label">담당자별 성과분석 <span class="badge today" id="tab-label">이번달</span></div>
 <div class="tabs" id="funnel-tabs">
   <button class="tab active" onclick="setFunnelTab(0)">이번달</button>
   <button class="tab" onclick="setFunnelTab(1)">지난달</button>
