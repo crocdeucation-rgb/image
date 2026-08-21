@@ -28,42 +28,6 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 .board{display:grid;grid-template-columns:minmax(0,1.32fr) minmax(0,1fr) minmax(0,.74fr);gap:14px;height:calc(100vh - 62px)}
 .colwrap{display:flex;flex-direction:column;gap:12px;min-height:0}
 .mid{display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:12px;min-height:0}
-@media (max-width:1240px){
-  .board{grid-template-columns:1fr;height:auto}
-  .colwrap,.mid{min-height:0}
-  .sec-nav{display:flex}
-  .sec{display:none}
-  .colwrap.sec.on{display:flex}   /* .colwrap은 flex 컨테이너 */
-  .mid.sec.on{display:grid}       /* .mid는 grid 컨테이너 */
-
-  /* 성과 탭: 담당자 표 · 소재 히트맵 폰트/여백 축소 → 가로 스크롤 최소화 */
-  .pf{font-size:10px}
-  .pf th{font-size:9.5px;padding:5px 3px}
-  .pf td{padding:5px 3px}
-  .pf td.nm{padding-left:8px}
-  .heat{font-size:9.5px}
-  .heat th{font-size:8.5px;padding:3px 1px}
-  .heat td{padding:1px}
-  .heat th.l,.heat td.l{padding-left:8px}
-  .heat .cell{min-width:17px;padding:4px 1px}
-
-  /* [2026-08-21] 모바일 개선 — PC 영향 없음 (1240px 이하만) */
-  /* ① 제목·새로고침 한 줄 유지 (쪼개짐 방지) */
-  .top{flex-wrap:nowrap;gap:8px}
-  .top h1{font-size:15px;white-space:nowrap;flex-shrink:0}
-  .top .upd{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-  .top .rf{font-size:11px;padding:5px 10px;white-space:nowrap;flex-shrink:0}
-  /* ② 담당자 성과표·히트맵 가로 스크롤 (열 많아 잘리는 것 → 밀어서 보기) */
-  .pfwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  .pf{min-width:640px}                 /* 표를 강제로 넓혀서 가로스크롤 유발 */
-  #heat-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  .heat{min-width:600px}
-  /* 스크롤 힌트 — 오른쪽 그라데이션으로 "더 있음" 표시 */
-  .pfwrap, #heat-wrap{position:relative}
-  /* ③ 결번왕 등 이름 쪼개짐 방지 */
-  .hlrow .nm{white-space:nowrap;flex-shrink:0}
-  .hlrow .no{font-size:8.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-}
 @media (min-width:1241px){
   .sec-nav{display:none}
   .colwrap.sec{display:flex!important}
@@ -158,6 +122,61 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 .dchip.past{opacity:.32;cursor:default}
 .wk-note{font-size:10px;color:#9aa1ad;padding:7px 14px 2px}
 .wk-note b{color:#e11d48}
+/* [2026-08-21] 모바일 오버라이드 — 원본 뒤로 이동(소스순서 우선 확보) */
+@media (max-width:1240px){
+  .board{grid-template-columns:minmax(0,1fr);height:auto}
+  .colwrap,.mid{min-height:0}
+  .sec-nav{display:flex}
+  .sec{display:none}
+  .colwrap.sec.on{display:flex}   /* .colwrap은 flex 컨테이너 */
+  .mid.sec.on{display:grid}       /* .mid는 grid 컨테이너 */
+
+  /* 성과 탭: 소재 히트맵 폰트/여백 축소 */
+  .heat{font-size:9.5px}
+  .heat th{font-size:8.5px;padding:3px 1px}
+  .heat td{padding:1px}
+  .heat th.l,.heat td.l{padding-left:8px}
+  .heat .cell{min-width:17px;padding:4px 1px}
+
+  /* [2026-08-21] 모바일 개선 — PC 영향 없음 (1240px 이하만) */
+  /* ① 제목·새로고침 한 줄 유지 (쪼개짐 방지) */
+  .top{flex-wrap:nowrap;gap:8px}
+  .top h1{font-size:15px;white-space:nowrap;flex-shrink:0}
+  .top .upd{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .top .rf{font-size:11px;padding:5px 10px;white-space:nowrap;flex-shrink:0}
+  /* ② [2026-08-21 개정] 담당자 성과표 → 카드 2열 (가로스크롤 폐지, 핵심 7지표만) */
+  .pfwrap{min-width:0;overflow-x:hidden}
+  .pf{display:block;width:100%;min-width:0;font-size:12px;white-space:normal}
+  .pf thead{display:none}
+  .pf tbody{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;align-items:start}
+  .pf tr{display:block;min-width:0;overflow:hidden;white-space:normal;background:#fff;border:1px solid #eef0f3;border-radius:10px;padding:9px 11px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .pf tr.tot{grid-column:1/-1;background:#f6f8ff;border-color:#e3e9f7}
+  .pf td{border:none}
+  .pf td.ca,.pf td.rt{display:none}            /* 방취·방취율·오더율 모바일 숨김 (PC 표엔 유지) */
+  .pf td.nm{display:block;width:100%;font-size:13px;font-weight:800;padding:0 0 6px;margin-bottom:6px;border-bottom:1px solid #f0f2f5;text-align:left}
+  .pf td.db,.pf td.vs,.pf td.se,.pf td.od,.pf td.ro,.pf td.ef{display:inline-block;width:48%;padding:3px 1px;vertical-align:top;text-align:left}
+  .pf td.sl{display:block;width:100%;padding:5px 1px 2px;text-align:left;font-size:13px}
+  .pf td.db::before,.pf td.vs::before,.pf td.se::before,.pf td.od::before,.pf td.sl::before,.pf td.ro::before,.pf td.ef::before{display:block;font-size:9px;color:#9aa2ae;font-weight:600;margin-bottom:1px}
+  .pf td.db::before{content:'DB'}
+  .pf td.vs::before{content:'방문'}
+  .pf td.se::before{content:'세팅'}
+  .pf td.od::before{content:'오더'}
+  .pf td.sl::before{content:'매출'}
+  .pf td.ro::before{content:'ROAS'}
+  .pf td.ef::before{content:'효율'}
+  /* 매출 요약 카드도 2열 (우측 잘림 방지) */
+  .sales{grid-template-columns:repeat(2,1fr)}
+  .sales .sc .v{font-size:12.5px;letter-spacing:-.03em;line-height:1.25}
+  /* 소재 히트맵만 가로 스크롤 유지 (매트릭스라 카드화 부적합) */
+  #heat-wrap{min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .heat{min-width:600px}
+  /* 스크롤 힌트 — 오른쪽 그라데이션으로 "더 있음" 표시 */
+  .pfwrap, #heat-wrap{position:relative}
+  /* ③ 결번왕 등 이름 쪼개짐 방지 */
+  .hlrow .nm{white-space:nowrap;flex-shrink:0}
+  .hlrow .no{font-size:8.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+}
+
 </style>
 </head>
 <body>
