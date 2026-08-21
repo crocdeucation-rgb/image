@@ -262,6 +262,15 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
   .campaign-table tr.camp-off td.num, .campaign-table tr.camp-off td.metric, .campaign-table tr.camp-off td.spend { font-size: 11px !important; }
 }
 
+
+/* [2026-08-21] 종료 소재 접기 — 모바일에서만 기본 숨김. PC(701px+)는 항상 표시. */
+@media (max-width: 700px) {
+  .camp-off-row { display: none; }
+  body.show-off-campaigns .camp-off-row { display: block; }
+  .camp-toggle { cursor: pointer; }
+  .camp-toggle td { color: #1a73e8 !important; font-weight: 700 !important; background: #f0f6ff !important; }
+}
+
 </style>
 </head>
 <body>
@@ -763,11 +772,25 @@ function render() {
       };
   // 종료 소재는 숨기지 않고 전부 노출 — 구분 헤더 아래로 밀도만 낮춘다 (토글 없음)
   const sepRow = offList.length
-    ? `<tr class="camp-sep"><td colspan="8">── 종료된 소재 ${offList.length}종 ──</td></tr>`
+    ? `<tr class="camp-sep camp-toggle" onclick="toggleOffCampaigns()"><td colspan="8"><span id="off-toggle-txt">── 종료된 소재 ${offList.length}종 (펼치기 ▾) ──</span></td></tr>`
     : '';
+  // 종료 소재는 camp-off-hidden 클래스로 감쌈 → 모바일에서 기본 접힘, 토글로 펴기
+  const offRows = offList.map(c => campRow(c).replace('<tr class="', '<tr class="camp-off-row ')).join('');
   ctbody.innerHTML = (onList.length + offList.length) > 0
-    ? onList.map(campRow).join('') + sepRow + offList.map(campRow).join('')
+    ? onList.map(campRow).join('') + sepRow + offRows
     : '<tr><td colspan="8" style="color:#aaa;text-align:center;padding:14px;">데이터 없음</td></tr>';
+}
+
+
+// [2026-08-21] 종료 소재 접기/펴기 (모바일에서 카드가 너무 길어지는 것 방지)
+function toggleOffCampaigns() {
+  document.body.classList.toggle('show-off-campaigns');
+  const txt = document.getElementById('off-toggle-txt');
+  if (txt) {
+    const n = document.querySelectorAll('.camp-off-row').length;
+    const open = document.body.classList.contains('show-off-campaigns');
+    txt.textContent = `── 종료된 소재 ${n}종 (${open ? '접기 ▴' : '펼치기 ▾'}) ──`;
+  }
 }
 
 async function loadSchedule() {
