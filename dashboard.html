@@ -447,14 +447,17 @@ const OFF_CAMPAIGNS = [
 const ON_CAMPAIGNS = [
   'ARA_노트릴스_영상_2505',
   'AD_노트필기릴스_방학점검_2607',
-  '노트필기_시간압박_2608',
-  '노트필기_학원무용_2608',
-  '노트필기_방법제시_2608',
-  '노트필기_관리부재_2608',
+  'ARA_노트필기_중간고사_2608',
   '코넬필기_5R릴스_2608'
 ];
 
 const OFF_SET = new Set(OFF_CAMPAIGNS);
+// [최근 종료 근거] 종료 직전 마지막날 CPL — 이 캠페인들은 CPL이 위너(약 3.8만)의 4.5~5배로 치솟아 종료함
+const OFF_LAST_CPL = {
+  '원톱_같은점수다른처방_릴스_2608': 196408,
+  'ARA_원톱_박은영_중간고사훅_2608': 171800,
+  '지금 당장 방으로가세요_AD': 174900
+};
 const ON_SET  = new Set(ON_CAMPAIGNS);
 const isOff = (nm) => OFF_SET.has((nm || '').trim());
 const isKeepOn = (nm) => ON_SET.has((nm || '').trim());
@@ -719,7 +722,7 @@ function render() {
   });
 
   const ctbody = document.getElementById('campaign-tbody');
-  const campaigns = [];
+  let campaigns = [];
   for (let i = CAMPAIGN_START_IDX; i < allRows.length; i++) {
     const r = allRows[i];
     if (!r || !r[0]) break;
@@ -744,6 +747,16 @@ function render() {
       campaigns.push({ name: nm, channel: '메타', db: 0, visit: 0, setting: 0, order: 0, spend: 0, sales: 0, roas: '' });
     }
   });
+  // [중간고사 4종 묶기] 노트필기_시간압박/학원무용/방법제시/관리부재_2608 → 한 줄로 합산 (개별 성과는 소재배정 히트맵에서 확인)
+  const midtermRe = /노트필기_(관리부재|시간압박|학원무용|방법제시)_2608/;
+  const midtermParts = campaigns.filter(c => midtermRe.test(c.name || ''));
+  if (midtermParts.length) {
+    const merged = { name: 'ARA_노트필기_중간고사_2608', channel: '메타', db: 0, visit: 0, setting: 0, order: 0, spend: 0, sales: 0, roas: '' };
+    midtermParts.forEach(c => { merged.db += c.db; merged.visit += c.visit; merged.setting += c.setting; merged.order += c.order; merged.spend += c.spend; merged.sales += c.sales; });
+    merged.roas = merged.spend > 0 ? (merged.sales / merged.spend).toFixed(2) : '';
+    campaigns = campaigns.filter(c => !midtermRe.test(c.name || ''));
+    campaigns.push(merged);
+  }
   campaigns.sort((a, b) => b.order - a.order || b.db - a.db);
   // ── 라이브 현황판 표시 조건 ────────────────────────────────────────────────
   // 숨기는 건 "꺼졌고 이번달 매출도 0인 메타 소재" 하나뿐이다. 집계에는 그대로
@@ -751,9 +764,10 @@ function render() {
   // 표에서만 빠진다.
   const isLiveChannel = (c) => c.channel !== '메타';   // 채널은 켜고 끄는 개념이 아님
   const hasThisMonth  = (c) => c.order > 0 || c.sales > 0;
-  const showRow = (c) => isLiveChannel(c)
+  const isBucketRow = (c) => (c.name || '').indexOf('미표기') >= 0;  // 미분류 버킷 = 캠페인 아님, 표에서 제외
+  const showRow = (c) => isBucketRow(c) ? false : (isLiveChannel(c)
     ? (c.db > 0 || hasThisMonth(c))     // 유입이 아예 없는 옛 채널 버킷까지 띄우지는 않는다
-    : (isKeepOn(c.name) || hasThisMonth(c));
+    : (isKeepOn(c.name) || hasThisMonth(c)));
   // ARA_기타(메타 미표기) 도 이 조건을 그대로 탄다 — 매출 있으면 뜨고 없으면 빠진다.
   const shown = campaigns.filter(showRow);
   // 정렬은 오더순 유지. ON 먼저 → OFF 아래 그룹은 그대로 둔다.

@@ -150,7 +150,9 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
   .pf thead{display:none}
   .pf tbody{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:6px;align-items:start}
   .pf tr{display:block;min-width:0;overflow:hidden;white-space:normal;background:#fff;border:1px solid #eef0f3;border-radius:10px;padding:9px 11px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-  .pf tr.tot{grid-column:1/-1;background:#f6f8ff;border-color:#e3e9f7}
+  .pf tr.tot{grid-column:1/-1;background:#f6f8ff;border-color:#e3e9f7;display:flex;flex-wrap:wrap;align-items:flex-start}
+  .pf tr.tot td.nm{flex:0 0 100%}
+  .pf tr.tot td.db,.pf tr.tot td.vs,.pf tr.tot td.se,.pf tr.tot td.od,.pf tr.tot td.sl,.pf tr.tot td.ro,.pf tr.tot td.ef{width:auto;flex:1 1 22%;min-width:70px}
   .pf td{border:none}
   .pf td.ca,.pf td.rt{display:none}            /* 방취·방취율·오더율 모바일 숨김 (PC 표엔 유지) */
   .pf td.nm{display:block;width:100%;font-size:13px;font-weight:800;padding:0 0 6px;margin-bottom:6px;border-bottom:1px solid #f0f2f5;text-align:left}
@@ -419,16 +421,18 @@ function setPerfTab(i){perfTab=i;var ts=document.querySelectorAll('#pf-tabs .tab
 function renderPerf(){
   if(!summaryRows.length)return;
   var off=perfTab*6+1, co=19+perfTab*3;
-  var tDb=0,tVs=0,tSe=0,tCa=0,tOd=0;
+  var tDb=0,tVs=0,tSe=0,tCa=0,tOd=0,tSales=0;
   var rows=ASSIGNEES.map(function(name,i){
     var r=summaryRows[ASSIGNEE_START_IDX+i]||[];
     var db=+(r[off]||0),vs=+(r[off+1]||0),se=+(r[off+2]||0),ca=+(r[off+3]||0),od=+(r[off+4]||0);
     var sales=r[off+5]||'0원'; tDb+=db;tVs+=vs;tSe+=se;tCa+=ca;tOd+=od;
+    tSales+=(parseInt((sales+'').replace(/[^0-9]/g,''))||0);  // "2601만원" → 2601 합산
     var cr=vs?Math.round(ca/vs*100):0, or=se?Math.round(od/se*100):0;
     var roas=r[co+1]?(+r[co+1]).toFixed(2):'-', ef=r[co+2]?r[co+2]+'만':'-';
     return '<tr><td class="nm">'+esc(r[0]||name)+'</td><td class="db">'+db+'</td><td class="vs">'+vs+'</td><td class="se">'+se+'</td><td class="ca">'+ca+'</td><td class="od">'+od+'</td><td class="sl">'+esc(sales)+'</td><td class="rt" style="color:var(--red)">'+cr+'%</td><td class="rt">'+or+'%</td><td class="ro">'+roas+'</td><td class="ef">'+ef+'</td></tr>';
   });
-  rows.push('<tr class="tot"><td class="nm">합계</td><td class="db">'+tDb+'</td><td class="vs">'+tVs+'</td><td class="se">'+tSe+'</td><td class="ca">'+tCa+'</td><td class="od">'+tOd+'</td><td class="sl">-</td><td class="rt" style="color:var(--red)">'+(tVs?Math.round(tCa/tVs*100):0)+'%</td><td class="rt">'+(tSe?Math.round(tOd/tSe*100):0)+'%</td><td class="ro">-</td><td class="ef">-</td></tr>');
+  var tEf=tDb?Math.round(tSales/tDb*10)/10:0;  // 효율=DB당 매출(만원)
+  rows.push('<tr class="tot"><td class="nm">합계</td><td class="db">'+tDb+'</td><td class="vs">'+tVs+'</td><td class="se">'+tSe+'</td><td class="ca">'+tCa+'</td><td class="od">'+tOd+'</td><td class="sl">'+tSales.toLocaleString()+'만원</td><td class="rt" style="color:var(--red)">'+(tVs?Math.round(tCa/tVs*100):0)+'%</td><td class="rt">'+(tSe?Math.round(tOd/tSe*100):0)+'%</td><td class="ro">-</td><td class="ef">'+tEf+'만</td></tr>');
   document.getElementById('pf-body').innerHTML=rows.join('');
 
   var sojCol=perfTab===1?29:(perfTab===2?30:28);
