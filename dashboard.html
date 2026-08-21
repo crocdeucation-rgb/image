@@ -775,9 +775,10 @@ function render() {
   const isLiveChannel = (c) => c.channel !== '메타';   // 채널은 켜고 끄는 개념이 아님
   const hasThisMonth  = (c) => c.order > 0 || c.sales > 0;
   const isBucketRow = (c) => (c.name || '').indexOf('미표기') >= 0;  // 미분류 버킷 = 캠페인 아님, 표에서 제외
-  const showRow = (c) => isBucketRow(c) ? false : (isLiveChannel(c)
+  const isKilledRow = (c) => OFF_LAST_CPL[(c.name || '').trim()] != null;  // 최근 종료 근거 대상은 매출 0이어도 표시
+  const showRow = (c) => isBucketRow(c) ? false : (isKilledRow(c) ? true : (isLiveChannel(c)
     ? (c.db > 0 || hasThisMonth(c))     // 유입이 아예 없는 옛 채널 버킷까지 띄우지는 않는다
-    : (isKeepOn(c.name) || hasThisMonth(c)));
+    : (isKeepOn(c.name) || hasThisMonth(c))));
   // ARA_기타(메타 미표기) 도 이 조건을 그대로 탄다 — 매출 있으면 뜨고 없으면 빠진다.
   const shown = campaigns.filter(showRow);
   // 정렬은 오더순 유지. ON 먼저 → OFF 아래 그룹은 그대로 둔다.
@@ -827,8 +828,15 @@ function render() {
   const killRow = (c) => {
     const cpl = OFF_LAST_CPL[(c.name || '').trim()];
     const roasBad = !c.roas || parseFloat(c.roas) < 1;
+    const vr = c.db ? Math.round(c.visit / c.db * 100) : 0;
+    const sr = c.visit ? Math.round(c.setting / c.visit * 100) : 0;
+    const or_ = c.setting ? Math.round(c.order / c.setting * 100) : 0;
     return `<tr class="camp-killed-row">
       <td class="kname">${nameWithBreaks(c.name)}</td>
+      <td class="knum" data-label="DB">${c.db}</td>
+      <td class="knum" data-label="방문" style="color:#0891b2">${c.visit} <b style="font-size:9px">(${vr}%)</b></td>
+      <td class="knum" data-label="세팅" style="color:#d97706">${c.setting} <b style="font-size:9px">(${sr}%)</b></td>
+      <td class="knum" data-label="오더" style="color:#0f9d58">${c.order} <b style="font-size:9px">(${or_}%)</b></td>
       <td class="knum" data-label="종료직전 CPL" style="color:#e11d48;font-weight:800">₩${cpl.toLocaleString()}</td>
       <td class="knum" data-label="ROAS" style="color:${roasBad ? '#e11d48' : '#b45309'};font-weight:800">${c.roas || '0'}</td>
       <td class="knum" data-label="매출" style="color:#6b7280;font-weight:700">${manWon(c.sales)}</td>
@@ -838,7 +846,7 @@ function render() {
     ? `<tr class="camp-sep"><td colspan="8"><span>── 최근 종료 (CPL·ROAS 미달로 중단) ──</span></td></tr>`
     : '';
   const killHead = killedList.length
-    ? `<tr class="camp-kill-head"><td class="kname">캠페인</td><td class="knum">종료직전 CPL</td><td class="knum">ROAS</td><td class="knum">매출</td></tr>`
+    ? `<tr class="camp-kill-head"><td class="kname">캠페인</td><td class="knum">DB</td><td class="knum">방문</td><td class="knum">세팅</td><td class="knum">오더</td><td class="knum">종료직전 CPL</td><td class="knum">ROAS</td><td class="knum">매출</td></tr>`
     : '';
   const offRows = sepRow + killHead + killedList.map(killRow).join('');
   ctbody.innerHTML = (onList.length + killedList.length) > 0
