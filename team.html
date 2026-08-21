@@ -46,6 +46,23 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
   .heat td{padding:1px}
   .heat th.l,.heat td.l{padding-left:8px}
   .heat .cell{min-width:17px;padding:4px 1px}
+
+  /* [2026-08-21] 모바일 개선 — PC 영향 없음 (1240px 이하만) */
+  /* ① 제목·새로고침 한 줄 유지 (쪼개짐 방지) */
+  .top{flex-wrap:nowrap;gap:8px}
+  .top h1{font-size:15px;white-space:nowrap;flex-shrink:0}
+  .top .upd{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .top .rf{font-size:11px;padding:5px 10px;white-space:nowrap;flex-shrink:0}
+  /* ② 담당자 성과표·히트맵 가로 스크롤 (열 많아 잘리는 것 → 밀어서 보기) */
+  .pfwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .pf{min-width:640px}                 /* 표를 강제로 넓혀서 가로스크롤 유발 */
+  #heat-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .heat{min-width:600px}
+  /* 스크롤 힌트 — 오른쪽 그라데이션으로 "더 있음" 표시 */
+  .pfwrap, #heat-wrap{position:relative}
+  /* ③ 결번왕 등 이름 쪼개짐 방지 */
+  .hlrow .nm{white-space:nowrap;flex-shrink:0}
+  .hlrow .no{font-size:8.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 }
 @media (min-width:1241px){
   .sec-nav{display:none}
