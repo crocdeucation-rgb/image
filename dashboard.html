@@ -21,6 +21,9 @@ body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
   .sec-nav-btn { padding: 4px 12px; font-size: 11px; border-radius: 16px; border: 1px solid #ddd; background: white; color: #666; cursor: pointer; }
   .sec-nav-btn.active { background: #1a73e8; color: white; border-color: #1a73e8; }
   .funnel-table th, .funnel-table td, .campaign-table th, .campaign-table td { font-size: 10px !important; padding: 5px 4px !important; }
+  /* 담당자 성과: 모바일에선 방취율·오더율 숨김 (개인 ROAS만 보이면 됨) */
+  .funnel-table th:nth-child(8), .funnel-table td:nth-child(8),
+  .funnel-table th:nth-child(9), .funnel-table td:nth-child(9) { display: none !important; }
   .cval { font-size: 16px !important; }
   .cval.sm { font-size: 13px !important; }
   .cval.xs { font-size: 11px !important; }
@@ -102,7 +105,7 @@ body.personal-view .adm-only { display: none !important; }
 .section-label { margin-top:10px !important; margin-bottom:6px !important; }
 .heat-table{width:100%;border-collapse:collapse;font-size:11px;background:#fff;border-radius:8px;overflow:hidden;border:1px solid #eee}
 .heat-table th{font-size:9px;font-weight:700;color:#888;padding:5px 2px;text-align:center;background:#f0f4ff;white-space:nowrap}
-.heat-table th.l,.heat-table td.l{text-align:left;font-weight:700;padding-left:8px;color:#444}
+.heat-table th.l,.heat-table td.l{text-align:left;font-weight:700;padding-left:8px;color:#444;white-space:nowrap;min-width:38px}
 .heat-table td{text-align:center;padding:1px}
 .heat-cell{display:block;padding:5px 1px;border-radius:4px;font-weight:700;min-width:22px}
 .funnel-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; border: 1px solid #eee; font-size: 11px; }
@@ -230,7 +233,7 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 @media (max-width: 700px) {
   .campaign-table thead { display: none; }               /* 헤더행 숨김 (data-label로 대체) */
   .campaign-table { display: block; width: 100%; border: none; background: transparent; }
-  .campaign-table tbody { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: start; width: 100%; }
+  .campaign-table tbody { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; align-items: start; width: 100%; }
   .campaign-table tr:not(.camp-sep) {
     display: block; background: #fff; border: 1px solid #eee;
     border-radius: 10px; margin-bottom: 0; padding: 10px 11px;
@@ -768,7 +771,8 @@ function render() {
         const off = isOff(c.name);
         // 켜짐/꺼짐은 광고 캠페인에만 있는 개념 → 메타 행에만 뱃지 표시 (Organic·카카오·네이버 등 유입경로 제외).
         // 단 OFF 목록에 직접 올린 유입경로(학습관리 무료컨설팅·메타광고)는 종료가 명시된 것이므로 OFF 뱃지를 단다.
-        const stateBadge = (isMeta || off) ? `<span class="state-badge ${off ? 'off' : 'on'}">${off ? 'OFF' : 'ON'}</span>` : '';
+        const isBucket = (c.name || '').indexOf('미표기') >= 0;
+        const stateBadge = (!isBucket && (isMeta || off)) ? `<span class="state-badge ${off ? 'off' : 'on'}">${off ? 'OFF' : 'ON'}</span>` : '';
         return `<tr class="${off ? 'camp-off' : ''}">
         <td class="name">${badge}${stateBadge}<span class="cname">${nameWithBreaks(c.name)}</span></td>
         <td class="num metric" data-label="DB">${c.db}</td>
@@ -782,7 +786,7 @@ function render() {
       };
   // 종료 소재는 숨기지 않고 전부 노출 — 구분 헤더 아래로 밀도만 낮춘다 (토글 없음)
   const sepRow = offList.length
-    ? `<tr class="camp-sep camp-toggle" onclick="toggleOffCampaigns()"><td colspan="8"><span id="off-toggle-txt">── 종료된 소재 ${offList.length}종 (펼치기 ▾) ──</span></td></tr>`
+    ? `<tr class="camp-sep camp-toggle" onclick="toggleOffCampaigns()"><td colspan="8"><span id="off-toggle-txt">── 최근 종료 캠페인 ${offList.length} (펼치기 ▾) ──</span></td></tr>`
     : '';
   // 종료 소재는 camp-off-hidden 클래스로 감쌈 → 모바일에서 기본 접힘, 토글로 펴기
   const offRows = offList.map(c => campRow(c).replace('<tr class="', '<tr class="camp-off-row ')).join('');
@@ -799,7 +803,7 @@ function toggleOffCampaigns() {
   if (txt) {
     const n = document.querySelectorAll('.camp-off-row').length;
     const open = document.body.classList.contains('show-off-campaigns');
-    txt.textContent = `── 종료된 소재 ${n}종 (${open ? '접기 ▴' : '펼치기 ▾'}) ──`;
+    txt.textContent = `── 최근 종료 캠페인 ${n} (${open ? '접기 ▴' : '펼치기 ▾'}) ──`;
   }
 }
 
