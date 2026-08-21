@@ -228,12 +228,14 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
    캠페인명은 위에 크게, 지표(DB/방문/세팅/오더/광고비/매출/ROAS)는 아래 그리드로. */
 @media (max-width: 700px) {
   .campaign-table thead { display: none; }               /* 헤더행 숨김 (data-label로 대체) */
-  .campaign-table, .campaign-table tbody { display: block; width: 100%; border: none; background: transparent; }
+  .campaign-table { display: block; width: 100%; border: none; background: transparent; }
+  .campaign-table tbody { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: start; width: 100%; }
   .campaign-table tr:not(.camp-sep) {
     display: block; background: #fff; border: 1px solid #eee;
-    border-radius: 10px; margin-bottom: 8px; padding: 10px 12px;
+    border-radius: 10px; margin-bottom: 0; padding: 10px 11px;
     box-shadow: 0 1px 3px rgba(0,0,0,.04);
   }
+  .campaign-table tr.camp-sep { grid-column: 1 / -1; }
   /* 캠페인명 — 카드 상단, 크게, 줄바꿈 자연스럽게 */
   .campaign-table td.name {
     display: block; width: 100%; max-width: 100%;
@@ -245,10 +247,11 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
   .campaign-table td.name .cname { font-size: 13px !important; white-space: normal; }
   /* 지표들 — 3열 그리드 카드 */
   .campaign-table td.num, .campaign-table td.metric, .campaign-table td.spend {
-    display: inline-block; width: 32%; text-align: left !important;
-    padding: 4px 2px !important; vertical-align: top; font-size: 13px !important;
+    display: inline-block; width: 48%; text-align: left !important;
+    padding: 3px 1px !important; vertical-align: top; font-size: 12px !important;
     border: none !important;
   }
+  .campaign-table td.spend { width: 100% !important; font-size: 11px !important; }
   /* 각 지표 위에 라벨 (data-label) */
   .campaign-table td.num::before, .campaign-table td.spend::before {
     content: attr(data-label); display: block;
@@ -265,8 +268,8 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 
 /* [2026-08-21] 종료 소재 접기 — 모바일에서만 기본 숨김. PC(701px+)는 항상 표시. */
 @media (max-width: 700px) {
-  .camp-off-row { display: none; }
-  body.show-off-campaigns .camp-off-row { display: block; }
+  .campaign-table tr.camp-off-row { display: none !important; }
+  body.show-off-campaigns .campaign-table tr.camp-off-row { display: block !important; }
   .camp-toggle { cursor: pointer; }
   .camp-toggle td { color: #1a73e8 !important; font-weight: 700 !important; background: #f0f6ff !important; }
 }
