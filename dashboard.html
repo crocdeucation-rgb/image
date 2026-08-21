@@ -148,6 +148,9 @@ body.personal-view .adm-only { display: none !important; }
 .campaign-table tr.camp-off td.spend { opacity: 0.85; }
 .campaign-table tr.camp-off td.spend { color: #4b5563 !important; font-weight: 700; }
 .campaign-table tr.camp-off td.metric { opacity: 0.38; color: #9ca3af !important; font-weight: 500; }
+/* [최근 종료 근거] CPL 강조 대상은 회색 해제 — 종료 이유(CPL·매출·ROAS)가 선명히 보이게 */
+.campaign-table tr.camp-killed td.metric { opacity: 1 !important; color: #374151 !important; font-weight: 600 !important; }
+.campaign-table tr.camp-killed td.spend { opacity: 1 !important; }
 .campaign-table tr.camp-off td.metric b { font-weight: 500; }
 @media (max-width: 700px) {
   .campaign-table tr.camp-off td { font-size: 9px !important; padding: 2px 4px !important; }
@@ -741,13 +744,7 @@ function render() {
       roas:    effIdx ? (r[effIdx[2]] || '') : ''
     });
   }
-  // ON 지정 캠페인이 시트에 아직 없으면 빈 행으로라도 노출 (수치는 시트 반영 시 자동 대체)
-  ON_CAMPAIGNS.forEach(nm => {
-    if (!campaigns.some(c => (c.name || '').trim() === nm)) {
-      campaigns.push({ name: nm, channel: '메타', db: 0, visit: 0, setting: 0, order: 0, spend: 0, sales: 0, roas: '' });
-    }
-  });
-  // [중간고사 4종 묶기] 노트필기_시간압박/학원무용/방법제시/관리부재_2608 → 한 줄로 합산 (개별 성과는 소재배정 히트맵에서 확인)
+  // [중간고사 4종 묶기] 노트필기_시간압박/학원무용/방법제시/관리부재_2608 → 한 줄로 합산 (ON_CAMPAIGNS 빈행 추가보다 먼저 해야 중복 안 생김)
   const midtermRe = /노트필기_(관리부재|시간압박|학원무용|방법제시)_2608/;
   const midtermParts = campaigns.filter(c => midtermRe.test(c.name || ''));
   if (midtermParts.length) {
@@ -757,6 +754,12 @@ function render() {
     campaigns = campaigns.filter(c => !midtermRe.test(c.name || ''));
     campaigns.push(merged);
   }
+  // ON 지정 캠페인이 시트에 아직 없으면 빈 행으로라도 노출 (수치는 시트 반영 시 자동 대체)
+  ON_CAMPAIGNS.forEach(nm => {
+    if (!campaigns.some(c => (c.name || '').trim() === nm)) {
+      campaigns.push({ name: nm, channel: '메타', db: 0, visit: 0, setting: 0, order: 0, spend: 0, sales: 0, roas: '' });
+    }
+  });
   campaigns.sort((a, b) => b.order - a.order || b.db - a.db);
   // ── 라이브 현황판 표시 조건 ────────────────────────────────────────────────
   // 숨기는 건 "꺼졌고 이번달 매출도 0인 메타 소재" 하나뿐이다. 집계에는 그대로
@@ -773,7 +776,13 @@ function render() {
   // 정렬은 오더순 유지. ON 먼저 → OFF 아래 그룹은 그대로 둔다.
   const byOrder = (a, b) => b.order - a.order || b.db - a.db || b.spend - a.spend;
   const onList  = shown.filter(c => !isOff(c.name)).sort(byOrder);
-  const offList = shown.filter(c =>  isOff(c.name)).sort(byOrder);
+  // 종료 그룹: 최근 종료(OFF_LAST_CPL, 종료 근거 강조 대상)를 맨 위로 → 그 아래 나머지는 오더순
+  const offList = shown.filter(c =>  isOff(c.name)).sort((a, b) => {
+    const ka = OFF_LAST_CPL[(a.name||'').trim()] != null ? 0 : 1;
+    const kb = OFF_LAST_CPL[(b.name||'').trim()] != null ? 0 : 1;
+    if (ka !== kb) return ka - kb;
+    return byOrder(a, b);
+  });
   const campRow = (c) => {
         const vr = c.db ? Math.round(c.visit / c.db * 100) : 0;
         const sr = c.visit ? Math.round(c.setting / c.visit * 100) : 0;
@@ -787,15 +796,20 @@ function render() {
         // 단 OFF 목록에 직접 올린 유입경로(학습관리 무료컨설팅·메타광고)는 종료가 명시된 것이므로 OFF 뱃지를 단다.
         const isBucket = (c.name || '').indexOf('미표기') >= 0;
         const stateBadge = (!isBucket && (isMeta || off)) ? `<span class="state-badge ${off ? 'off' : 'on'}">${off ? 'OFF' : 'ON'}</span>` : '';
-        return `<tr class="${off ? 'camp-off' : ''}">
-        <td class="name">${badge}${stateBadge}<span class="cname">${nameWithBreaks(c.name)}</span></td>
+        // [최근 종료 근거] OFF_LAST_CPL에 있으면 종료 직전 CPL을 빨간 뱃지로 표시하고 행을 강조(회색 해제)
+        const lastCpl = OFF_LAST_CPL[(c.name || '').trim()];
+        const isKilled = lastCpl != null;
+        const cplBadge = isKilled ? `<span style="display:inline-block;font-size:9px;font-weight:800;color:#fff;background:#e11d48;border-radius:5px;padding:1px 5px;margin-left:5px;vertical-align:middle;">종료직전 CPL ₩${lastCpl.toLocaleString()}</span>` : '';
+        const roasColor = isKilled ? '#e11d48' : (c.roas && parseFloat(c.roas) >= 1 ? '#0f9d58' : '#e11d48');
+        return `<tr class="${off ? 'camp-off' : ''}${isKilled ? ' camp-killed' : ''}">
+        <td class="name">${badge}${stateBadge}<span class="cname">${nameWithBreaks(c.name)}</span>${cplBadge}</td>
         <td class="num metric" data-label="DB">${c.db}</td>
         <td class="num metric" data-label="방문" style="color:#0891b2">${c.visit} <b style="font-size:10px">(${vr}%)</b></td>
         <td class="num metric" data-label="세팅" style="color:#d97706">${c.setting} <b style="font-size:10px">(${sr}%)</b></td>
         <td class="num metric" data-label="오더" style="color:#0f9d58">${c.order} <b style="font-size:10px">(${or_}%)</b></td>
         <td class="num spend" data-label="광고비" style="color:#6b7280;font-size:11px">${c.spend > 0 ? '₩'+c.spend.toLocaleString() : '-'}</td>
         <td class="num metric" data-label="매출" style="color:#7c3aed;font-size:11px">${manWon(c.sales)}</td>
-        <td class="num metric" data-label="ROAS" style="color:${c.roas && parseFloat(c.roas) >= 1 ? '#0f9d58' : '#e11d48'};font-weight:700">${c.roas || '-'}</td>
+        <td class="num metric" data-label="ROAS" style="color:${roasColor};font-weight:700">${c.roas || '-'}</td>
       </tr>`;
       };
   // 종료 소재는 숨기지 않고 전부 노출 — 구분 헤더 아래로 밀도만 낮춘다 (토글 없음)
