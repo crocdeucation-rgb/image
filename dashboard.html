@@ -222,6 +222,46 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 .fnl-s { color:#d97706; }
 .fnl-o { color:#0f9d58; }
 @media (max-width:640px){ .fnl { display:block; margin-right:0; } }
+
+/* ══ [2026-08-21] 모바일 캠페인 카드형 — 700px 이하 ══
+   표를 억지로 좁히는 대신, 각 캠페인 행을 카드로 재배치.
+   캠페인명은 위에 크게, 지표(DB/방문/세팅/오더/광고비/매출/ROAS)는 아래 그리드로. */
+@media (max-width: 700px) {
+  .campaign-table thead { display: none; }               /* 헤더행 숨김 (data-label로 대체) */
+  .campaign-table, .campaign-table tbody { display: block; width: 100%; border: none; background: transparent; }
+  .campaign-table tr:not(.camp-sep) {
+    display: block; background: #fff; border: 1px solid #eee;
+    border-radius: 10px; margin-bottom: 8px; padding: 10px 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  }
+  /* 캠페인명 — 카드 상단, 크게, 줄바꿈 자연스럽게 */
+  .campaign-table td.name {
+    display: block; width: 100%; max-width: 100%;
+    font-size: 13px !important; font-weight: 700; color: #1a1a1a !important;
+    padding: 0 0 8px 0 !important; margin-bottom: 8px;
+    border-bottom: 1px solid #f0f0f0; word-break: keep-all; overflow-wrap: anywhere;
+    line-height: 1.35;
+  }
+  .campaign-table td.name .cname { font-size: 13px !important; white-space: normal; }
+  /* 지표들 — 3열 그리드 카드 */
+  .campaign-table td.num, .campaign-table td.metric, .campaign-table td.spend {
+    display: inline-block; width: 32%; text-align: left !important;
+    padding: 4px 2px !important; vertical-align: top; font-size: 13px !important;
+    border: none !important;
+  }
+  /* 각 지표 위에 라벨 (data-label) */
+  .campaign-table td.num::before, .campaign-table td.spend::before {
+    content: attr(data-label); display: block;
+    font-size: 9px; color: #999; font-weight: 600; margin-bottom: 1px;
+  }
+  .campaign-table td.metric b { font-size: 10px !important; }
+  /* 종료소재 구분선 카드형 */
+  .campaign-table tr.camp-sep td { display: block; width: 100%; text-align: center; border-radius: 8px; }
+  .campaign-table tr.camp-off { opacity: .75; padding: 8px 12px; }
+  .campaign-table tr.camp-off td.name { font-size: 11px !important; padding-bottom: 6px !important; }
+  .campaign-table tr.camp-off td.num, .campaign-table tr.camp-off td.metric, .campaign-table tr.camp-off td.spend { font-size: 11px !important; }
+}
+
 </style>
 </head>
 <body>
@@ -712,13 +752,13 @@ function render() {
         const stateBadge = (isMeta || off) ? `<span class="state-badge ${off ? 'off' : 'on'}">${off ? 'OFF' : 'ON'}</span>` : '';
         return `<tr class="${off ? 'camp-off' : ''}">
         <td class="name">${badge}${stateBadge}<span class="cname">${nameWithBreaks(c.name)}</span></td>
-        <td class="num metric">${c.db}</td>
-        <td class="num metric" style="color:#0891b2">${c.visit} <b style="font-size:10px">(${vr}%)</b></td>
-        <td class="num metric" style="color:#d97706">${c.setting} <b style="font-size:10px">(${sr}%)</b></td>
-        <td class="num metric" style="color:#0f9d58">${c.order} <b style="font-size:10px">(${or_}%)</b></td>
-        <td class="num spend" style="color:#6b7280;font-size:11px">${c.spend > 0 ? '₩'+c.spend.toLocaleString() : '-'}</td>
-        <td class="num metric" style="color:#7c3aed;font-size:11px">${manWon(c.sales)}</td>
-        <td class="num metric" style="color:${c.roas && parseFloat(c.roas) >= 1 ? '#0f9d58' : '#e11d48'};font-weight:700">${c.roas || '-'}</td>
+        <td class="num metric" data-label="DB">${c.db}</td>
+        <td class="num metric" data-label="방문" style="color:#0891b2">${c.visit} <b style="font-size:10px">(${vr}%)</b></td>
+        <td class="num metric" data-label="세팅" style="color:#d97706">${c.setting} <b style="font-size:10px">(${sr}%)</b></td>
+        <td class="num metric" data-label="오더" style="color:#0f9d58">${c.order} <b style="font-size:10px">(${or_}%)</b></td>
+        <td class="num spend" data-label="광고비" style="color:#6b7280;font-size:11px">${c.spend > 0 ? '₩'+c.spend.toLocaleString() : '-'}</td>
+        <td class="num metric" data-label="매출" style="color:#7c3aed;font-size:11px">${manWon(c.sales)}</td>
+        <td class="num metric" data-label="ROAS" style="color:${c.roas && parseFloat(c.roas) >= 1 ? '#0f9d58' : '#e11d48'};font-weight:700">${c.roas || '-'}</td>
       </tr>`;
       };
   // 종료 소재는 숨기지 않고 전부 노출 — 구분 헤더 아래로 밀도만 낮춘다 (토글 없음)
