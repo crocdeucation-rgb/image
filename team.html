@@ -100,7 +100,7 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 .item.today .when{color:#e65100;font-weight:800}
 .empty{padding:16px 14px;text-align:center;color:#b5bac4;font-size:11.5px}
 
-.as.hye{background:var(--green)} .as.kim{background:var(--blue)} .as.jang{background:#f97316} .as.park{background:var(--purple)}
+.as.hye{background:var(--green)} .as.kim{background:var(--blue)} .as.jang{background:#f97316} .as.park{background:var(--purple)} .as.ahn{background:#4338ca}
 .as.woo{background:var(--red)} .as.tae{background:var(--cyan)} .as.sung{background:#7c3aed} .as.noh{background:#0d9488} .as.won{background:#b45309}
 
 /* 근무 스테이터스 (홀딩 자리 대체) */
@@ -267,7 +267,7 @@ const MID_DAYS=4;
 const ASSIGNEES=['우혜림','김윤호','장윤호','박창건','김태석','김성윤','노영호','김원득','김우진'];
 const ASSIGNEE_START_IDX=46;
 const SOJ_KEYS=['노트릴스','노필릴스','채리','GT','원톱','5단계루틴','기초부족','MLST공부','MLST캐러셀','노트공부법','너만본다','CPA(텐핑)','카카오','Organic','네이버브랜드','기타'];
-const cmap={'우혜림':'hye','김윤호':'kim','장윤호':'jang','박창건':'park','김우진':'woo','김태석':'tae','김성윤':'sung','노영호':'noh','김원득':'won'};
+const cmap={'우혜림':'hye','김윤호':'kim','장윤호':'jang','박창건':'park','김우진':'woo','김태석':'tae','김성윤':'sung','노영호':'noh','김원득':'won','안준섭':'ahn'};
 const dayN=['일','월','화','수','목','금','토'];
 const WDAYS=['월','화','수','목','금','토'];
 let summaryRows=[], perfTab=0, workState={};
@@ -318,7 +318,7 @@ function tglMid(el,pid){
 }
 
 /* ── 근무 스테이터스 (독립 카드 / 하이브리드: 요일=근무일 positive) ── */
-const cHex={hye:'#0f9d58',kim:'#1a73e8',jang:'#f97316',park:'#9333ea',woo:'#e11d48',tae:'#0891b2',sung:'#7c3aed',noh:'#0d9488',won:'#b45309'};
+const cHex={hye:'#0f9d58',kim:'#1a73e8',jang:'#f97316',park:'#9333ea',woo:'#e11d48',tae:'#0891b2',sung:'#7c3aed',noh:'#0d9488',won:'#b45309',ahn:'#4338ca'};
 async function loadWork(){
   let ok=false;
   if(WORK_CSV_URL.indexOf('WORK_GID')<0 && WORK_CSV_URL.indexOf('PASTE_')<0){

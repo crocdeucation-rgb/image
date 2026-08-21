@@ -212,6 +212,7 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 .visit-assignee.sung { background: #7c3aed; }
 .visit-assignee.noh { background: #0d9488; }
 .visit-assignee.won { background: #b45309; }
+.visit-assignee.ahn { background: #4338ca; }
 .visit-empty { padding: 20px; text-align: center; color: #aaa; font-size: 12px; }
   .crate { font-size:10px; margin-top:3px; font-weight:600; }
   .route-eff { font-size:9px; margin-top:2px; color:#556; font-weight:600; letter-spacing:-0.2px; }
@@ -416,9 +417,9 @@ let currentSec = 0;
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1438610573&single=true&output=csv';
 const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1384080283&single=true&output=csv';
 
-const ASSIGNEES = ['우혜림','김윤호','장윤호','박창건','김태석','김성윤','노영호','김원득','김우진'];
+const ASSIGNEES = ['우혜림','김윤호','장윤호','박창건','김태석','김성윤','노영호','김원득','김우진','안준섭'];
 const ASSIGNEE_START_IDX = 46;
-const CAMPAIGN_START_IDX = 57;
+const CAMPAIGN_START_IDX = 58;
 
 // 광고 집행상태 — 시트 캠페인명과 한 글자도 다르면 매칭 실패하므로 원문 그대로 유지할 것
 const OFF_CAMPAIGNS = [
@@ -822,7 +823,7 @@ async function loadSchedule() {
       const isToday = dStr === todayStr;
       const dateStr = (d.getMonth()+1) + '/' + d.getDate() + ' (' + dayNames[d.getDay()] + ')';
       const assignee = r[6] || '';
-      const cmap = { '우혜림':'hye','김윤호':'kim','장윤호':'jang','박창건':'park','김우진':'woo','김태석':'tae','김성윤':'sung','노영호':'noh','김원득':'won' };
+      const cmap = { '우혜림':'hye','김윤호':'kim','장윤호':'jang','박창건':'park','김우진':'woo','김태석':'tae','김성윤':'sung','노영호':'noh','김원득':'won','안준섭':'ahn' };
       const assigneeClass = 'visit-assignee ' + (cmap[assignee] || '');
       const assigneeHtml = assignee ? `<span class="${assigneeClass}">${escapeHtml(assignee)}</span>` : '';
       const pageId = (r[7] || '').replace(/-/g, '');
