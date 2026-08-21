@@ -17,6 +17,9 @@
 - 개인정보 조항 절대 수정/축약 금지
 
 ## 작업 원칙
+- **파일을 받으면 무조건 먼저 읽는다. 사용자가 "이상하다"고 말하지 않아도.** 파일이 있는데 안 열고 추측으로 답하는 것 금지. 코드/동작 관련 질문은 반드시 해당 파일을 grep/열람해 실제 코드를 확인한 뒤 답한다. (교훈: dashboard.html ON/OFF 원인을 파일 안 읽고 dash.gs·시트·campaignActiveIdx로 30분 추측했으나, 실제는 dashboard.html 내 ON_CAMPAIGNS/OFF_CAMPAIGNS 배열이었음)
+- **표시/로직이 어디서 결정되는지 모르면 추측하지 말고 그 파일에서 찾는다.** GitHub raw URL(raw.githubusercontent.com/.../main/파일명)로 원본을 받아 확인 가능 — 이 방법을 먼저 쓴다.
+- 대시보드 ON/OFF 판단 = dashboard.html의 ON_CAMPAIGNS / OFF_CAMPAIGNS 배열 (dash.gs status나 시트 칼럼 아님). 캠페인 껐다 켜면 이 두 배열을 직접 수정해야 함.
 - 원본 코드/문서 기반 작업 시 임의 수정 금지 — 바꿀 땐 뭘 바꾸는지 명시
 - 수정 요청 = 해당 부분만. 전체 재작성은 요청 시에만
 - 불명확하면 추측 말고 확인. 오타도 의미 추측 금지
