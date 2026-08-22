@@ -591,7 +591,7 @@ function render() {
 
   const offset = funnelTab * 6 + 1;
   const tbody = document.getElementById('funnel-tbody');
-  let totalDb=0, totalVisit=0, totalSetting=0, totalCancel=0, totalOrder=0, totalSalesNum=0;
+  let totalDb=0, totalVisit=0, totalSetting=0, totalCancel=0, totalOrder=0, totalSalesNum=0, totalCost=0;
   let rows = ASSIGNEES.map((name, i) => {
     const r = allRows[ASSIGNEE_START_IDX + i] || [];
     const db      = parseInt(r[offset]   || '0') || 0;
@@ -607,6 +607,7 @@ function render() {
     const cancelRate = visit ? Math.round(cancel/visit*100) : 0;
     const orderRate  = setting ? Math.round(order/setting*100) : 0;
     const _co = 19 + funnelTab*3;
+    totalCost += parseFloat(r[_co]||'0')||0;  // 원가(만원) 합계 — 소수점 보존
     const costV  = r[_co] ? r[_co]+'만' : '-';
     const iroasN = parseFloat(r[_co+1])||0;
     const iroasV = iroasN ? `${iroasN}<span class="rbar" style="width:${Math.min(iroasN*4,52)}px"></span>` : '-';
@@ -645,9 +646,9 @@ function render() {
     <td class="sales">${totSalesStr}</td>
     <td class="rate" style="color:#e11d48">${totCancelRate}%</td>
     <td class="rate">${totOrderRate}%</td>
-    <td class="cost adm-only">-</td>
-    <td class="iroas adm-only">-</td>
-    <td class="eff2">-</td>
+    <td class="cost adm-only">${totalCost?Number(totalCost.toFixed(1)).toLocaleString()+'만':'-'}</td>
+    <td class="iroas adm-only">${totalCost?(totalSalesNum/(totalCost*10000)).toFixed(2):'-'}</td>
+    <td class="eff2">${totalDb?(totalSalesNum/totalDb/10000).toFixed(1)+'만':'-'}</td>
   </tr>`);
   tbody.innerHTML = rows.join('');
 
