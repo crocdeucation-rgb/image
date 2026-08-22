@@ -470,14 +470,14 @@ const OFF_CAMPAIGNS = [
   '메타광고',              // 미매칭 누락 복구분
   'ARA_원톱_박은영_중간고사훅_2608',
   '지금 당장 방으로가세요_AD',
-  'ARA_노트필기_중간고사_전환_2608'
+  'ARA_노트필기_중간고사_전환_2608',
+  '코넬필기_5R릴스_2608'   // 사장님 지시 전면 재편집 (노출 거의 없이 중단)
 ];
 // 집행 중인 ON 캠페인 — 오더·매출이 0이어도 표에 남긴다 (신규 소재가 첫 성과 전에 사라지지 않도록)
 const ON_CAMPAIGNS = [
   'ARA_노트릴스_영상_2505',
   'AD_노트필기릴스_방학점검_2607',
-  'ARA_노트필기_중간고사_2608',
-  '코넬필기_5R릴스_2608'
+  'ARA_노트필기_중간고사_2608'
 ];
 
 const OFF_SET = new Set(OFF_CAMPAIGNS);
@@ -486,6 +486,10 @@ const OFF_LAST_CPL = {
   '원톱_같은점수다른처방_릴스_2608': 196408,
   'ARA_원톱_박은영_중간고사훅_2608': 171800,
   '지금 당장 방으로가세요_AD': 174900
+};
+// [최근 종료 - 텍스트 사유] CPL 미달이 아니라 별도 사유로 종료 (종료표에 사유 텍스트 표시)
+const OFF_REASON = {
+  '코넬필기_5R릴스_2608': '사장님 지시 전면 재편집'
 };
 const ON_SET  = new Set(ON_CAMPAIGNS);
 const isOff = (nm) => OFF_SET.has((nm || '').trim());
@@ -622,6 +626,11 @@ function render() {
       <td class="eff2">${effV}</td>
     </tr>`;
   });
+  // [정합] 미배정/이관 DB는 합계에만 포함(행은 숨김) — 대시보드 합계 DB = 총유입 유지
+  {
+    const _ur = allRows[ASSIGNEE_START_IDX + ASSIGNEES.length] || [];
+    totalDb += parseInt(_ur[offset] || '0') || 0;
+  }
   const totCancelRate = totalVisit ? Math.round(totalCancel/totalVisit*100) : 0;
   const totOrderRate  = totalSetting ? Math.round(totalOrder/totalSetting*100) : 0;
   const totSalesFallback = totalSalesNum >= 10000 ? manWon(totalSalesNum) + '원' : totalSalesNum + '원';
@@ -786,6 +795,12 @@ function render() {
       campaigns.push({ name: nm, channel: '메타', db: 0, visit: 0, setting: 0, order: 0, spend: 0, sales: 0, roas: '' });
     }
   });
+  // [최근 종료 - 텍스트 사유] 사유종료 캐페인이 시트에 없으면 빈 행으로 주입 (종료표 노출)
+  Object.keys(OFF_REASON).forEach(nm => {
+    if (!campaigns.some(c => (c.name || '').trim() === nm)) {
+      campaigns.push({ name: nm, channel: '메타', db: 0, visit: 0, setting: 0, order: 0, spend: 0, sales: 0, roas: '' });
+    }
+  });
   campaigns.sort((a, b) => b.order - a.order || b.db - a.db);
   // ── 라이브 현황판 표시 조건 ────────────────────────────────────────────────
   // 숨기는 건 "꺼졌고 이번달 매출도 0인 메타 소재" 하나뿐이다. 집계에는 그대로
@@ -794,7 +809,7 @@ function render() {
   const isLiveChannel = (c) => c.channel !== '메타';   // 채널은 켜고 끄는 개념이 아님
   const hasThisMonth  = (c) => c.order > 0 || c.sales > 0;
   const isBucketRow = (c) => (c.name || '').indexOf('미표기') >= 0;  // 미분류 버킷 = 캠페인 아님, 표에서 제외
-  const isKilledRow = (c) => OFF_LAST_CPL[(c.name || '').trim()] != null;  // 최근 종료 근거 대상은 매출 0이어도 표시
+  const isKilledRow = (c) => OFF_LAST_CPL[(c.name || '').trim()] != null || OFF_REASON[(c.name || '').trim()] != null;  // 최근 종료 근거 대상은 매출 0이어도 표시
   const showRow = (c) => isBucketRow(c) ? false : (isKilledRow(c) ? true : (isLiveChannel(c)
     ? (c.db > 0 || hasThisMonth(c))     // 유입이 아예 없는 옛 채널 버킷까지 띄우지는 않는다
     : (isKeepOn(c.name) || hasThisMonth(c))));
@@ -827,7 +842,8 @@ function render() {
         const lastCpl = OFF_LAST_CPL[(c.name || '').trim()];
         const isKilled = lastCpl != null;
         const cplBadge = isKilled ? `<span style="display:inline-block;font-size:9px;font-weight:800;color:#fff;background:#e11d48;border-radius:5px;padding:1px 5px;margin-left:5px;vertical-align:middle;">종료직전 CPL ₩${lastCpl.toLocaleString()}</span>` : '';
-        const roasColor = isKilled ? '#e11d48' : (c.roas && parseFloat(c.roas) >= 1 ? '#0f9d58' : '#e11d48');
+        const _roasNum = parseFloat(c.roas);
+        const roasColor = isKilled ? '#e11d48' : (isNaN(_roasNum) ? '#6b7280' : (_roasNum >= 1 ? '#0f9d58' : '#e11d48'));
         return `<tr class="${off ? 'camp-off' : ''}${isKilled ? ' camp-killed' : ''}">
         <td class="name">${badge}${stateBadge}<span class="cname">${nameWithBreaks(c.name)}</span>${cplBadge}</td>
         <td class="num metric" data-label="DB">${c.db}</td>
@@ -842,10 +858,11 @@ function render() {
   // ── 최근 종료 캠페인: 위 퍼널표와 다른 "종료 근거" 형식 (종료직전 CPL·ROAS·매출) ─────────
   // OFF_LAST_CPL에 등록된 최근 종료 3개만 노출. 옛날 종료(채리·GT 등)는 제외.
   const killedList = offList
-    .filter(c => OFF_LAST_CPL[(c.name || '').trim()] != null)
-    .sort((a, b) => OFF_LAST_CPL[(b.name||'').trim()] - OFF_LAST_CPL[(a.name||'').trim()]); // CPL 높은 순
+    .filter(c => OFF_LAST_CPL[(c.name || '').trim()] != null || OFF_REASON[(c.name || '').trim()] != null)
+    .sort((a, b) => (OFF_LAST_CPL[(b.name||'').trim()]||0) - (OFF_LAST_CPL[(a.name||'').trim()]||0)); // CPL 높은 순 → 사유종료는 아래
   const killRow = (c) => {
     const cpl = OFF_LAST_CPL[(c.name || '').trim()];
+    const reason = OFF_REASON[(c.name || '').trim()];
     const roasBad = !c.roas || parseFloat(c.roas) < 1;
     const vr = c.db ? Math.round(c.visit / c.db * 100) : 0;
     const sr = c.visit ? Math.round(c.setting / c.visit * 100) : 0;
@@ -856,16 +873,16 @@ function render() {
       <td class="knum" data-label="방문" style="color:#0891b2">${c.visit} <b style="font-size:9px">(${vr}%)</b></td>
       <td class="knum" data-label="세팅" style="color:#d97706">${c.setting} <b style="font-size:9px">(${sr}%)</b></td>
       <td class="knum" data-label="오더" style="color:#0f9d58">${c.order} <b style="font-size:9px">(${or_}%)</b></td>
-      <td class="knum" data-label="종료직전 CPL" style="color:#e11d48;font-weight:800">₩${cpl.toLocaleString()}</td>
+      <td class="knum" data-label="종료직전 CPL/사유" style="color:#e11d48;font-weight:800">${reason ? reason : '₩'+cpl.toLocaleString()}</td>
       <td class="knum" data-label="ROAS" style="color:${roasBad ? '#e11d48' : '#b45309'};font-weight:800">${c.roas || '0'}</td>
       <td class="knum" data-label="매출" style="color:#6b7280;font-weight:700">${manWon(c.sales)}</td>
     </tr>`;
   };
   const sepRow = killedList.length
-    ? `<tr class="camp-sep"><td colspan="8"><span>── 최근 종료 (CPL·ROAS 미달로 중단) ──</span></td></tr>`
+    ? `<tr class="camp-sep"><td colspan="8"><span>── 최근 종료 ──</span></td></tr>`
     : '';
   const killHead = killedList.length
-    ? `<tr class="camp-kill-head"><td class="kname">캠페인</td><td class="knum">DB</td><td class="knum">방문</td><td class="knum">세팅</td><td class="knum">오더</td><td class="knum">종료직전 CPL</td><td class="knum">ROAS</td><td class="knum">매출</td></tr>`
+    ? `<tr class="camp-kill-head"><td class="kname">캠페인</td><td class="knum">DB</td><td class="knum">방문</td><td class="knum">세팅</td><td class="knum">오더</td><td class="knum">종료직전 CPL/사유</td><td class="knum">ROAS</td><td class="knum">매출</td></tr>`
     : '';
   const offRows = sepRow + killHead + killedList.map(killRow).join('');
   ctbody.innerHTML = (onList.length + killedList.length) > 0
