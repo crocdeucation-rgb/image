@@ -64,7 +64,7 @@ var t=D.total;
 document.getElementById('t_g').innerHTML=won(t.gonggo)+'<span style="font-size:13px;opacity:.7">원</span>';
 document.getElementById('t_i').textContent=t.iryeok;document.getElementById('t_m').textContent=t.myeontong;document.getElementById('t_c').textContent=t.myeoncham;document.getElementById('t_e').textContent=t.edu;document.getElementById('t_t').textContent=t.toesa+'명';
 var cw=D.operations.chongwon;
-function fmtCw(str){var m=String(str).match(/내근(\d+)(?:\/재택(\d+))?/);if(!m)return str;return m[1]+(m[2]?'<small style="font-size:12px;color:var(--soft);font-weight:600"> / 재택 '+m[2]+'</small>':'');}
+function fmtCw(str){var m=String(str).match(/내근(\d+)(?:\/재택(\d+))?/);if(!m)return str;var nae=parseInt(m[1]);var jae=m[2]?parseInt(m[2]):0;var tot=nae+jae;return tot+'<small style="font-size:12px;color:var(--soft);font-weight:600"> 명</small>'+(jae?'<div style="font-size:11px;color:var(--soft);font-weight:500;margin-top:2px">내근 '+nae+' · 재택 '+jae+'</div>':'<div style="font-size:11px;color:var(--soft);font-weight:500;margin-top:2px">내근 '+nae+'</div>');}
 document.getElementById('cw_k').innerHTML=fmtCw(cw['코칭']);
 document.getElementById('cw_s').innerHTML=fmtCw(cw['수업']);
 document.getElementById('cw_o').innerHTML=fmtCw(cw['출석체크']);
