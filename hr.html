@@ -56,7 +56,7 @@ var ch='';D.groups.forEach(function(g,i){ch+='<div class="mc g'+i+'"><div class=
 document.getElementById('cards').innerHTML=ch;
 var tb='';D.groups.forEach(function(g,i){tb+='<button class="tabbtn'+(i===0?' on':'')+'" onclick="sw(\''+g.key+'\',this)">'+g.label+'</button>';});
 document.getElementById('tabs').innerHTML=tb;
-function render(key){var arr=D.roster[key];var g=D.groups.filter(function(x){return x.key===key;})[0];
+function render(key){var arr=D.roster[key].slice().sort(function(a,b){var ai=a.in||"9999";var bi=b.in||"9999";return ai<bi?-1:ai>bi?1:0;});var g=D.groups.filter(function(x){return x.key===key;})[0];
 document.getElementById('cnt').textContent=g.label+' 재직 '+arr.length+'명 (마스킹 명부)';
 var h='<div class="sx"><table><thead><tr><th>이름</th><th>'+(key==='수업'?'과목':key==='코칭'?'직급/팀':'부서')+'</th>'+(arr[0]&&arr[0].rank?'<th>직급</th>':'')+'<th style="text-align:right">입사</th></tr></thead><tbody>';
 arr.forEach(function(x){h+='<tr><td class="nm">'+x.name+'</td><td>'+x.sub+'</td>'+(x.rank!==undefined?'<td>'+(x.rank||'')+'</td>':'')+'<td class="dt">'+x.in+'</td></tr>';});
