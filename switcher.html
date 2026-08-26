@@ -18,12 +18,6 @@
   .tab .badge{font-size:10px;background:rgba(107,118,136,.2);color:var(--soft);padding:1px 6px;border-radius:8px;margin-left:5px;}
   .stage{position:relative;}
   iframe{width:100%;border:0;display:block;background:var(--bg);}
-  .soonbox{display:none;padding:80px 20px;text-align:center;color:var(--soft);}
-  .soonbox.show{display:block;}
-  .soonbox .ic{font-size:40px;opacity:.4;}
-  .soonbox h2{font-size:20px;font-weight:800;color:var(--ink);margin:14px 0 8px;}
-  .soonbox p{font-size:14px;line-height:1.7;max-width:440px;margin:0 auto;}
-  .soonbox .src{margin-top:16px;font-size:12px;color:#9AA2B4;}
 </style>
 </head>
 <body>
@@ -31,8 +25,8 @@
     <div class="logo"><b>통합 대시보드</b></div>
     <button class="tab on" data-t="total" onclick="go(this)">전체실적</button>
     <button class="tab" data-t="hire" onclick="go(this)">증원현황</button>
-    <button class="tab soon" data-t="hr" onclick="go(this)">인사기록<span class="badge">준비중</span></button>
-    <button class="tab soon" data-t="coach" onclick="go(this)">코칭현황<span class="badge">구축예정</span></button>
+    <button class="tab" data-t="hr" onclick="go(this)">인사기록</button>
+    <button class="tab" data-t="coach" onclick="go(this)">코칭현황</button>
     <button class="tab" data-t="web" onclick="go(this)">웹마케팅</button>
   </div>
 
@@ -43,14 +37,10 @@
       <p>운영센터·상담부·잡코리아 주간보고를 집계해서 공고비·이력서·면접·퇴사·현재총원을 보여줄 예정입니다. 매주 토요일 입력분이 자동 반영됩니다.</p>
       <div class="src">소스: 주간보고 구글시트 (앵커 파싱) · 다음 구축</div>
     </div>
-    <div class="soonbox" id="soon-hr">
-      <div class="ic">🪪</div>
       <h2>인사기록 — 준비중</h2>
       <p>부서별 재직 인원·입퇴사 흐름·마스킹 명부(이름·부서·직급·입사일)를 보여줄 예정입니다. 주민번호·계좌·연락처 등 신상정보는 제외됩니다.</p>
       <div class="src">소스: 인사 엑셀 3종 · 집계+마스킹 · 다음 구축</div>
     </div>
-    <div class="soonbox" id="soon-coach">
-      <div class="ic">🧭</div>
       <h2>코칭현황 — 구축예정</h2>
       <p>신규 오더의 온보딩 파이프라인(해피콜→개통→OT→시간표→첫수업→온보딩)과 민원 현황을 계약일 기준으로 추적할 예정입니다.</p>
       <div class="src">소스: 오티리스트·민원 · 데이터 설계부터</div>
@@ -62,14 +52,12 @@
   </div>
 
 <script>
-  var FRAMES={total:{src:'total.html',h:1250},hire:{src:'hire.html',h:1150},web:{src:'dashboard.html',h:1700}};
+  var FRAMES={total:{src:'total.html',h:1250},hire:{src:'hire.html',h:1150},hr:{src:'hr.html',h:1400},coach:{src:'coach.html',h:420},web:{src:'dashboard.html',h:1700}};
   function go(btn){
     document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
-    document.querySelectorAll('.soonbox').forEach(function(s){s.classList.remove('show');});
     btn.classList.add('on');
     var t=btn.dataset.t, f=document.getElementById('frame');
-    if(FRAMES[t]){ f.style.display='block'; f.src=FRAMES[t].src; f.style.height=FRAMES[t].h+'px'; }
-    else { f.style.display='none'; document.getElementById('soon-'+t).classList.add('show'); }
+    f.src=FRAMES[t].src; f.style.height=FRAMES[t].h+'px';
   }
 </script>
 </body>
