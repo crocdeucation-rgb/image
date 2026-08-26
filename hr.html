@@ -1,0 +1,64 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>인사기록</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+:root{--bg:#F1F4F9;--ink:#1B2436;--soft:#6B7688;--line:#E3E8F0;--pan:#fff;--v1:#4C6EF5;--teal:#1D9E75;--amber:#BA7517;--red:#E23A22;--pos:#20A56D;--barbg:#EDF1F8}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:24px 20px 60px}
+.hd .k{font-size:12px;letter-spacing:2px;color:var(--v1);font-weight:800}
+.hd h1{font-size:24px;font-weight:800;margin-top:6px}.hd .m{font-size:12px;color:var(--soft);margin-top:7px}
+.mask{font-size:11px;color:var(--pos);background:#EAF7F0;border:0.5px solid #B8E6CE;border-radius:8px;padding:8px 12px;margin:12px 0}
+.four{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.mc{background:var(--pan);border-radius:14px;padding:18px 20px;box-shadow:0 2px 8px rgba(27,36,54,.05)}
+.mc .l{font-size:13px;color:var(--soft);font-weight:600;display:flex;align-items:center;gap:7px}
+.mc .dot{width:9px;height:9px;border-radius:50%}
+.mc.g0 .dot{background:var(--teal)}.mc.g1 .dot{background:var(--v1)}.mc.g2 .dot{background:var(--amber)}.mc.g3 .dot{background:#7048E8}
+.mc .v{font-size:30px;font-weight:900;margin-top:8px}.mc .v small{font-size:14px;color:var(--soft)}
+.mc .io{display:flex;gap:12px;margin-top:8px;font-size:12px}
+.mc .io .in{color:var(--pos)}.mc .io .out{color:var(--red)}
+.hero{background:var(--ink);color:#fff;border-radius:16px;padding:20px 26px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.hero .l{font-size:13px;color:#B6C2DC}.hero .v{font-size:36px;font-weight:900}
+.hero .io{display:flex;gap:24px}.hero .io div{font-size:12px;color:#B6C2DC}.hero .io b{display:block;font-size:20px;margin-top:2px}
+.hero .io .in b{color:#5DCAA5}.hero .io .out b{color:#F09595}
+.panel{background:var(--pan);border-radius:14px;padding:20px 22px;box-shadow:0 2px 8px rgba(27,36,54,.05)}
+.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.tabbtn{background:var(--barbg);border:none;color:var(--soft);font-family:inherit;font-weight:700;font-size:13px;padding:8px 15px;border-radius:30px;cursor:pointer}
+.tabbtn.on{background:var(--v1);color:#fff}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:11px;color:var(--soft);font-weight:700;padding:9px 10px;border-bottom:1px solid var(--line)}
+td{padding:11px 10px;border-bottom:1px solid #F2F4F7}
+td.nm{font-weight:700}td.dt{text-align:right;color:var(--soft);font-variant-numeric:tabular-nums}
+.cnt{font-size:12px;color:var(--soft);margin-bottom:12px}
+.ft{text-align:center;font-size:11px;color:var(--soft);margin-top:20px;line-height:1.8}
+@media(max-width:820px){.four{grid-template-columns:repeat(2,1fr)}}
+</style></head><body><div class="wrap">
+<div class="hd"><div class="k">INTOEDU · HR</div><h1>인사기록</h1>
+<div class="m">2026년 8월 기준 · 재직 현황 · 입퇴사 흐름</div></div>
+<div class="mask"><i class="ti ti-lock"></i> 개인정보 보호 — 주민번호·계좌·연락처·주소·생년월일·특이사항 전부 제외 · 이름·부서·직급·입사일만 표시</div>
+<div class="hero"><div><div class="l">전체 재직 인원</div><div class="v" id="h_tot"></div></div>
+<div class="io"><div class="in">8월 입사<b id="h_in"></b></div><div class="out">8월 퇴사<b id="h_out"></b></div></div></div>
+<div class="four" id="cards"></div>
+<div class="panel">
+<div class="tabs" id="tabs"></div>
+<div class="cnt" id="cnt"></div>
+<div id="body"></div></div>
+<div class="ft">소스 = 인사기록카드(수업·코칭) · 사업부 인사 · 파트타이머 · 2026년 8월 기준<br>파트타이머는 재직자만 · 신상정보 일체 제외 · 매주(또는 매월) 엑셀 갱신</div>
+</div>
+<script>const D={"groups": [{"key": "수업", "label": "수업 강사", "jae": 43, "ipsa": 4, "toesa": 2}, {"key": "코칭", "label": "코칭 코치", "jae": 24, "ipsa": 3, "toesa": 1}, {"key": "사업부", "label": "사업부", "jae": 21, "ipsa": 1, "toesa": 0}, {"key": "파트", "label": "파트타이머 재직", "jae": 34, "ipsa": 13, "toesa": 12}], "roster": {"수업": [{"name": "노현아", "sub": "사회", "in": "2018-07"}, {"name": "백수영", "sub": "국어", "in": "2019-04"}, {"name": "배하영", "sub": "영어", "in": "2020-03"}, {"name": "김지선", "sub": "영어", "in": "2022-11"}, {"name": "심예지", "sub": "영어", "in": "2023-08"}, {"name": "황정원", "sub": "국어", "in": "2023-09"}, {"name": "신은희", "sub": "국어", "in": "2023-10"}, {"name": "홍수진", "sub": "미술", "in": "2023-11"}, {"name": "하유라", "sub": "수학", "in": "2023-11"}, {"name": "김희태", "sub": "사회", "in": "2024-01"}, {"name": "신우성", "sub": "국어", "in": "2024-01"}, {"name": "서정현", "sub": "수학", "in": "2024-02"}, {"name": "이정인", "sub": "영어", "in": "2024-08"}, {"name": "강현준", "sub": "수학", "in": "2024-08"}, {"name": "한용균", "sub": "사회", "in": "2024-12"}, {"name": "이랑", "sub": "사회", "in": "2024-12"}, {"name": "김한슬", "sub": "역사", "in": "2025-02"}, {"name": "윤제인", "sub": "사회", "in": "2025-04"}, {"name": "김하민", "sub": "영어", "in": "2025-08"}, {"name": "권은혜", "sub": "필기방", "in": "2025-09"}, {"name": "황보소영", "sub": "사회", "in": "2025-09"}, {"name": "김수진", "sub": "수학", "in": "2025-10"}, {"name": "황예지", "sub": "영어", "in": "2025-11"}, {"name": "김건우", "sub": "코딩", "in": "2025-11"}, {"name": "한유신", "sub": "수학", "in": "2025-12"}, {"name": "박윤준", "sub": "수학", "in": "2026-02"}, {"name": "김지안", "sub": "영어", "in": "2026-02"}, {"name": "최종인", "sub": "사회", "in": "2026-02"}, {"name": "박현재", "sub": "국어", "in": "2026-02"}, {"name": "최정헌", "sub": "국어", "in": "2026-02"}, {"name": "김예빈", "sub": "수학", "in": "2026-04"}, {"name": "김준용", "sub": "수학", "in": "2026-04"}, {"name": "박지환", "sub": "수학", "in": "2026-05"}, {"name": "김민영", "sub": "영어", "in": "2026-06"}, {"name": "김도은", "sub": "사무보조", "in": "2026-06"}, {"name": "이승은", "sub": "수학", "in": "2026-07"}, {"name": "이혜정", "sub": "수학", "in": "2026-07"}, {"name": "백민제", "sub": "영어", "in": "2026-07"}, {"name": "문나영", "sub": "위드온", "in": "2026-07"}, {"name": "강유신", "sub": "영어", "in": "2026-08"}, {"name": "엄선일", "sub": "수학", "in": "2026-08"}, {"name": "김은서", "sub": "영어", "in": "2026-08"}, {"name": "유지수", "sub": "수학", "in": "2026-08"}], "코칭": [{"name": "장영주", "sub": "과장/B", "in": ""}, {"name": "이현아", "sub": "인턴/A", "in": "2018-07"}, {"name": "손수지", "sub": "대리/A", "in": "2023-06"}, {"name": "유현정", "sub": "인턴/B", "in": "2023-08"}, {"name": "박성광", "sub": "인턴", "in": "2023-12"}, {"name": "정형민", "sub": "주임/A", "in": "2024-05"}, {"name": "정예영", "sub": "인턴/A", "in": "2024-07"}, {"name": "최유지", "sub": "주임/B", "in": "2024-08"}, {"name": "정성윤", "sub": "인턴", "in": "2025-03"}, {"name": "서우석", "sub": "인턴", "in": "2025-06"}, {"name": "이다성", "sub": "인턴/B", "in": "2025-06"}, {"name": "이해욱", "sub": "인턴/B", "in": "2025-12"}, {"name": "정화은", "sub": "사원/B", "in": "2026-02"}, {"name": "김윤주", "sub": "사원/A", "in": "2026-02"}, {"name": "김준석", "sub": "인턴/B", "in": "2026-02"}, {"name": "이인우", "sub": "인턴", "in": "2026-02"}, {"name": "정영후", "sub": "사원/B", "in": "2026-04"}, {"name": "이충현", "sub": "인턴/A", "in": "2026-04"}, {"name": "최지희", "sub": "사원/B", "in": "2026-04"}, {"name": "김효빈", "sub": "사원/A", "in": "2026-06"}, {"name": "박주찬", "sub": "사원/A", "in": "2026-06"}, {"name": "강유준", "sub": "사원/A", "in": "2026-07"}, {"name": "윤용권", "sub": "인턴/A", "in": "2026-08"}, {"name": "이승주", "sub": "인턴/B", "in": "2026-08"}], "사업부": [{"name": "장형열", "sub": "인투경상팀", "in": "2025-04", "rank": "주임"}, {"name": "고경태", "sub": "인투경상팀", "in": "2025-05", "rank": "주임"}, {"name": "원도연", "sub": "인투경상팀", "in": "2026-04", "rank": "사원"}, {"name": "박종현", "sub": "인투수도권1팀", "in": "2022-08", "rank": "대리"}, {"name": "성훈규", "sub": "인투수도권1팀", "in": "2024-07", "rank": "대리(팀장)"}, {"name": "김학빈", "sub": "인투수도권1팀", "in": "2024-08", "rank": "주임"}, {"name": "오현정", "sub": "인투수도권1팀", "in": "2025-11", "rank": "사원"}, {"name": "박창건", "sub": "인투수도권1팀", "in": "2025-11", "rank": "주임"}, {"name": "김주환", "sub": "인투수도권1팀", "in": "2026-03", "rank": "사원"}, {"name": "서승호", "sub": "인투수도권1팀", "in": "2026-06", "rank": "사원"}, {"name": "김태석", "sub": "인투수도권2팀", "in": "2026-02", "rank": "주임(팀장)"}, {"name": "박은영", "sub": "인투수도권2팀", "in": "2026-05", "rank": "PM"}, {"name": "송영주", "sub": "인투수도권2팀", "in": "2026-07", "rank": "사원"}, {"name": "서경윤", "sub": "인투충청전라팀", "in": "2017-10", "rank": "본부장(팀장)"}, {"name": "조건국", "sub": "인투충청전라팀", "in": "2019-07", "rank": "과장"}, {"name": "정웅섭", "sub": "인투충청전라팀", "in": "2024-01", "rank": "주임"}, {"name": "권준영", "sub": "인투충청전라팀", "in": "2025-01", "rank": "주임"}, {"name": "구혜미", "sub": "인투충청전라팀", "in": "2025-11", "rank": "사원"}, {"name": "이용주", "sub": "인투충청전라팀", "in": "2026-03", "rank": "사원"}, {"name": "배수희", "sub": "인투충청전라팀", "in": "2026-04", "rank": "사원"}, {"name": "정원호", "sub": "인투충청전라팀", "in": "2026-08", "rank": "사원"}], "파트": [{"name": "전관우", "sub": "가산연합메이킷위드팀", "in": "2026-08", "rank": "주4일사원"}, {"name": "김현중A", "sub": "마포연합파인더팀", "in": "2026-08", "rank": "주3일사원"}, {"name": "김민철", "sub": "가산연합인투팀", "in": "2026-08", "rank": "주4일사원"}, {"name": "서휘선", "sub": "가산연합인투팀", "in": "2026-08", "rank": "주4일사원"}, {"name": "이원준", "sub": "가산연합인투팀", "in": "2026-08", "rank": "주4일사원"}, {"name": "이준호A", "sub": "부평1팀", "in": "2026-08", "rank": ""}, {"name": "이은빈", "sub": "수원지점", "in": "2026-07", "rank": "주5일사원"}, {"name": "임성민", "sub": "수원지점", "in": "2026-07", "rank": "주5일사원"}, {"name": "서승재", "sub": "부평1팀", "in": "2026-07", "rank": "주4일사원"}, {"name": "이아현", "sub": "마곡지점", "in": "2026-07", "rank": "주4일사원"}, {"name": "백충열", "sub": "마포연합인투팀", "in": "2026-06", "rank": "주3일사원"}, {"name": "신상윤", "sub": "마곡지점", "in": "2026-06", "rank": "주4일사원"}, {"name": "이성혁", "sub": "마포연합파인더팀", "in": "2026-06", "rank": "주4일사원"}, {"name": "정현우A", "sub": "가산연합메이킷위드팀", "in": "2026-06", "rank": "주4일사원"}, {"name": "김종범", "sub": "마포연합인투팀", "in": "2026-06", "rank": "주3일사원"}, {"name": "김예원A", "sub": "가산연합메이킷위드팀", "in": "2026-06", "rank": "주5일사원"}, {"name": "김세호", "sub": "수원지점", "in": "2026-05", "rank": "주5일사원"}, {"name": "박민수", "sub": "수원지점", "in": "2026-04", "rank": "주5일사원"}, {"name": "김채영", "sub": "부평1팀", "in": "2026-04", "rank": "주임1호"}, {"name": "송동근", "sub": "마포연합인투팀", "in": "2026-04", "rank": "주4일사원"}, {"name": "조수현A", "sub": "가산연합인투팀", "in": "2026-04", "rank": "주5일사원"}, {"name": "박윤서", "sub": "부평2팀", "in": "2026-03", "rank": "주5일사원"}, {"name": "이의재", "sub": "가산연합메이킷위드팀", "in": "2026-03", "rank": "주4일사원"}, {"name": "권순재", "sub": "수원지점", "in": "2026-01", "rank": "주5일사원"}, {"name": "김민성B", "sub": "가산연합메이킷위드팀", "in": "2026-01", "rank": "주임2호"}, {"name": "고국희", "sub": "마곡지점", "in": "2025-11", "rank": "주4일사원"}, {"name": "임한별", "sub": "부평2팀", "in": "2025-06", "rank": "주임1호"}, {"name": "이승엽", "sub": "마곡지점", "in": "2025-04", "rank": "주임1호"}, {"name": "김준수", "sub": "가산연합인투팀", "in": "2025-04", "rank": "주임2호"}, {"name": "문정현", "sub": "마곡지점", "in": "2025-01", "rank": "주임2호"}, {"name": "홍혜민", "sub": "부평2팀", "in": "2024-12", "rank": "주임2호"}, {"name": "김우진", "sub": "수원지점", "in": "2024-11", "rank": "대리"}, {"name": "안세령", "sub": "부평1팀", "in": "2024-06", "rank": "주임2호"}, {"name": "안준섭", "sub": "마곡지점", "in": "2023-07", "rank": "대리1호"}]}, "total": 122};
+document.getElementById('h_tot').innerHTML=D.total+'<small style="font-size:16px;color:#B6C2DC"> 명</small>';
+var ti=D.groups.reduce(function(a,g){return a+g.ipsa;},0);
+var to=D.groups.reduce(function(a,g){return a+g.toesa;},0);
+document.getElementById('h_in').textContent=ti+'명';document.getElementById('h_out').textContent=to+'명';
+var ch='';D.groups.forEach(function(g,i){ch+='<div class="mc g'+i+'"><div class="l"><span class="dot"></span>'+g.label+'</div><div class="v">'+g.jae+'<small> 명</small></div><div class="io"><span class="in">+'+g.ipsa+'</span><span class="out">-'+g.toesa+'</span></div></div>';});
+document.getElementById('cards').innerHTML=ch;
+var tb='';D.groups.forEach(function(g,i){tb+='<button class="tabbtn'+(i===0?' on':'')+'" onclick="sw(\''+g.key+'\',this)">'+g.label+'</button>';});
+document.getElementById('tabs').innerHTML=tb;
+function render(key){var arr=D.roster[key];var g=D.groups.filter(function(x){return x.key===key;})[0];
+document.getElementById('cnt').textContent=g.label+' 재직 '+arr.length+'명 (마스킹 명부)';
+var h='<table><thead><tr><th>이름</th><th>'+(key==='수업'?'과목':key==='코칭'?'직급/팀':'부서')+'</th>'+(arr[0]&&arr[0].rank?'<th>직급</th>':'')+'<th style="text-align:right">입사</th></tr></thead><tbody>';
+arr.forEach(function(x){h+='<tr><td class="nm">'+x.name+'</td><td>'+x.sub+'</td>'+(x.rank!==undefined?'<td>'+(x.rank||'')+'</td>':'')+'<td class="dt">'+x.in+'</td></tr>';});
+document.getElementById('body').innerHTML=h+'</tbody></table>';}
+function sw(key,btn){document.querySelectorAll('.tabbtn').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');render(key);}
+render(D.groups[0].key);
+</script></body></html>
