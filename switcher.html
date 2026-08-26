@@ -26,7 +26,6 @@
     <button class="tab on" data-t="total" onclick="go(this)">전체실적</button>
     <button class="tab" data-t="hire" onclick="go(this)">증원현황</button>
     <button class="tab" data-t="hr" onclick="go(this)">인사기록</button>
-    <button class="tab" data-t="coach" onclick="go(this)">코칭현황</button>
     <button class="tab" data-t="web" onclick="go(this)">웹마케팅</button>
   </div>
 
@@ -35,7 +34,7 @@
   </div>
 
 <script>
-  var FRAMES={total:{src:'total.html',h:1250},hire:{src:'hire.html',h:1150},hr:{src:'hr.html',h:2600},coach:{src:'coach.html',h:6500},web:{src:'dashboard.html',h:1700}};
+  var FRAMES={total:{src:'total.html',h:1250},hire:{src:'hire.html',h:1150},hr:{src:'hr.html',h:2600},web:{src:'dashboard.html',h:1700}};
   function go(btn){
     document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
     btn.classList.add('on');
