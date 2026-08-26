@@ -32,27 +32,10 @@
 
   <div class="stage">
     <iframe id="frame" src="total.html" style="height:1250px"></iframe>
-
-      <h2>증원현황 — 준비중</h2>
-      <p>운영센터·상담부·잡코리아 주간보고를 집계해서 공고비·이력서·면접·퇴사·현재총원을 보여줄 예정입니다. 매주 토요일 입력분이 자동 반영됩니다.</p>
-      <div class="src">소스: 주간보고 구글시트 (앵커 파싱) · 다음 구축</div>
-    </div>
-      <h2>인사기록 — 준비중</h2>
-      <p>부서별 재직 인원·입퇴사 흐름·마스킹 명부(이름·부서·직급·입사일)를 보여줄 예정입니다. 주민번호·계좌·연락처 등 신상정보는 제외됩니다.</p>
-      <div class="src">소스: 인사 엑셀 3종 · 집계+마스킹 · 다음 구축</div>
-    </div>
-      <h2>코칭현황 — 구축예정</h2>
-      <p>신규 오더의 온보딩 파이프라인(해피콜→개통→OT→시간표→첫수업→온보딩)과 민원 현황을 계약일 기준으로 추적할 예정입니다.</p>
-      <div class="src">소스: 오티리스트·민원 · 데이터 설계부터</div>
-    </div>
-      <h2>강사현황 — 구축예정</h2>
-      <p>강사평가(국·수·사·과·영)·대타·마감 현황을 보여줄 예정입니다.</p>
-      <div class="src">소스: 오티리스트 강사 시트 · 데이터 설계부터</div>
-    </div>
   </div>
 
 <script>
-  var FRAMES={total:{src:'total.html',h:1250},hire:{src:'hire.html',h:1150},hr:{src:'hr.html',h:1400},coach:{src:'coach.html',h:1400},web:{src:'dashboard.html',h:1700}};
+  var FRAMES={total:{src:'total.html',h:1250},hire:{src:'hire.html',h:1150},hr:{src:'hr.html',h:2600},coach:{src:'coach.html',h:6500},web:{src:'dashboard.html',h:1700}};
   function go(btn){
     document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
     btn.classList.add('on');
