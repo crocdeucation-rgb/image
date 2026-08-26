@@ -29,11 +29,11 @@
   </div>
 
   <div class="stage">
-    <iframe id="frame" src="total.html?v=827j" style="height:1250px"></iframe>
+    <iframe id="frame" src="total.html?v=827m" style="height:1250px"></iframe>
   </div>
 
 <script>
-  var FRAMES={total:{src:'total.html?v=827j',h:1250},hire:{src:'hire.html?v=827j',h:2400},hr:{src:'hr.html?v=827j',h:2600},web:{src:'dashboard.html?v=827j',h:1700}};
+  var FRAMES={total:{src:'total.html?v=827m',h:1250},hire:{src:'hire.html?v=827m',h:2400},hr:{src:'hr.html?v=827m',h:2600},web:{src:'dashboard.html?v=827m',h:1700}};
   var frame=document.getElementById('frame');
   function fitHeight(){
     try{
@@ -48,6 +48,13 @@
     try{ window.parent.postMessage('setHeight:'+h,'*'); }catch(e){}
   }
   frame.addEventListener('load', function(){ fitHeight(); setTimeout(fitHeight,300); setTimeout(fitHeight,800); });
+  
+  window.addEventListener('message',function(e){
+    if(e.data&&e.data.t==='dashH'&&e.data.h>0){
+      var cur=document.querySelector('.tab.on');
+      if(cur&&cur.dataset.t==='web'){ frame.style.height=(e.data.h+10)+'px'; }
+    }
+  });
   function go(btn){
     document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
     btn.classList.add('on');
