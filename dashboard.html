@@ -983,5 +983,13 @@ function manWon(won) {
 
 loadAll();
 </script>
+<script>
+(function(){
+  function sendH(){try{var h=document.body.scrollHeight;parent.postMessage({t:'dashH',h:h},'*');}catch(e){}}
+  window.addEventListener('load',function(){sendH();setTimeout(sendH,400);setTimeout(sendH,1000);});
+  setInterval(sendH,1200);
+  document.addEventListener('click',function(){setTimeout(sendH,150);setTimeout(sendH,500);});
+})();
+</script>
 </body>
 </html>
