@@ -22,7 +22,6 @@
 </head>
 <body>
   <div class="bar">
-    <div class="logo"><b>통합 대시보드</b></div>
     <button class="tab on" data-t="total" onclick="go(this)">전체실적</button>
     <button class="tab" data-t="hire" onclick="go(this)">증원현황</button>
     <button class="tab" data-t="hr" onclick="go(this)">인사기록</button>
@@ -35,12 +34,28 @@
 
 <script>
   var FRAMES={total:{src:'total.html',h:1250},hire:{src:'hire.html',h:1150},hr:{src:'hr.html',h:2600},web:{src:'dashboard.html',h:1700}};
+  var frame=document.getElementById('frame');
+  function fitHeight(){
+    try{
+      var doc=frame.contentWindow.document;
+      var h=Math.max(doc.body.scrollHeight, doc.documentElement.scrollHeight);
+      if(h>0){ frame.style.height=(h+20)+'px'; notifyParent(h+90); }
+    }catch(e){}
+  }
+  function notifyParent(h){
+    // 노션 등 부모 프레임에 높이 전달 (iframe-resizer 호환 + 일반 postMessage)
+    try{ window.parent.postMessage({type:'resize-iframe',height:h},'*'); }catch(e){}
+    try{ window.parent.postMessage('setHeight:'+h,'*'); }catch(e){}
+  }
+  frame.addEventListener('load', function(){ fitHeight(); setTimeout(fitHeight,300); setTimeout(fitHeight,800); });
   function go(btn){
     document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
     btn.classList.add('on');
-    var t=btn.dataset.t, f=document.getElementById('frame');
-    f.src=FRAMES[t].src; f.style.height=FRAMES[t].h+'px';
+    var t=btn.dataset.t;
+    frame.style.height=FRAMES[t].h+'px';
+    frame.src=FRAMES[t].src;
   }
+  window.addEventListener('load', function(){ setTimeout(fitHeight,500); });
 </script>
 </body>
 </html>
