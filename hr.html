@@ -28,10 +28,12 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{text-align:left;font-size:11px;color:var(--soft);font-weight:700;padding:9px 10px;border-bottom:1px solid var(--line)}
 td{padding:11px 10px;border-bottom:1px solid #F2F4F7}
-td.nm{font-weight:700}td.dt{text-align:right;color:var(--soft);font-variant-numeric:tabular-nums}
+td.nm{font-weight:700;word-break:keep-all}td.dt{text-align:right;color:var(--soft);font-variant-numeric:tabular-nums}
 .cnt{font-size:12px;color:var(--soft);margin-bottom:12px}
 .ft{text-align:center;font-size:11px;color:var(--soft);margin-top:20px;line-height:1.8}
-@media(max-width:820px){.four{grid-template-columns:repeat(2,1fr)}}@media(max-width:480px){body{overflow-x:hidden}.wrap{padding:16px 12px 40px}.hero{padding:18px 16px}.hero .big{font-size:30px;letter-spacing:-1px}.hero .chips{gap:14px}.hero .chips b{font-size:16px}.panel{padding:16px 14px}.hd h1{font-size:21px}.headbar{flex-wrap:wrap}.hb{flex:1 1 45%;padding:11px}.hb .v{font-size:19px}.card{padding:15px 16px}.al{padding:14px}.al .v{font-size:24px}}
+@media(max-width:820px){.four{grid-template-columns:repeat(2,1fr)}}@media(max-width:480px){body{overflow-x:hidden}td{padding:8px 5px;font-size:12px}th{font-size:10px;padding:8px 5px}.wrap{padding:16px 12px 40px}.hero{padding:18px 16px}.hero .big{font-size:30px;letter-spacing:-1px}.hero .chips{gap:14px}.hero .chips b{font-size:16px}.panel{padding:16px 14px}.hd h1{font-size:21px}.headbar{flex-wrap:wrap}.hb{flex:1 1 45%;padding:11px}.hb .v{font-size:19px}.card{padding:15px 16px}.al{padding:14px}.al .v{font-size:24px}}
+.sx{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:8px}
+.sx table{min-width:340px}
 </style></head><body><div class="wrap">
 <div class="hd"><div class="k">HR 인사기록</div><h1>인사기록</h1>
 <div class="m">2026년 8월 기준 · 재직 현황 · 입퇴사 흐름</div></div>
@@ -56,9 +58,9 @@ var tb='';D.groups.forEach(function(g,i){tb+='<button class="tabbtn'+(i===0?' on
 document.getElementById('tabs').innerHTML=tb;
 function render(key){var arr=D.roster[key];var g=D.groups.filter(function(x){return x.key===key;})[0];
 document.getElementById('cnt').textContent=g.label+' 재직 '+arr.length+'명 (마스킹 명부)';
-var h='<table><thead><tr><th>이름</th><th>'+(key==='수업'?'과목':key==='코칭'?'직급/팀':'부서')+'</th>'+(arr[0]&&arr[0].rank?'<th>직급</th>':'')+'<th style="text-align:right">입사</th></tr></thead><tbody>';
+var h='<div class="sx"><table><thead><tr><th>이름</th><th>'+(key==='수업'?'과목':key==='코칭'?'직급/팀':'부서')+'</th>'+(arr[0]&&arr[0].rank?'<th>직급</th>':'')+'<th style="text-align:right">입사</th></tr></thead><tbody>';
 arr.forEach(function(x){h+='<tr><td class="nm">'+x.name+'</td><td>'+x.sub+'</td>'+(x.rank!==undefined?'<td>'+(x.rank||'')+'</td>':'')+'<td class="dt">'+x.in+'</td></tr>';});
-document.getElementById('body').innerHTML=h+'</tbody></table>';}
+document.getElementById('body').innerHTML=h+'</tbody></table></div>';}
 function sw(key,btn){document.querySelectorAll('.tabbtn').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');render(key);}
 render(D.groups[0].key);
 </script></body></html>
