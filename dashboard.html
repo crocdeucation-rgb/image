@@ -307,6 +307,10 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
   .camp-toggle td { color: #1a73e8 !important; font-weight: 700 !important; background: #f0f6ff !important; }
 }
 
+
+.tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}
+.tbl-scroll table{min-width:640px}
+@media(max-width:768px){.tbl-scroll table{min-width:600px}}
 </style>
 </head>
 <body>
@@ -344,7 +348,7 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
   <button class="tab" onclick="setFunnelTab(1)">지난달</button>
   <button class="tab" onclick="setFunnelTab(2)">전체</button>
 </div>
-<table class="funnel-table">
+<div class="tbl-scroll"><table class="funnel-table">
   <thead>
     <tr>
       <th>담당자</th>
@@ -364,7 +368,7 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
   <tbody id="funnel-tbody">
     <tr><td colspan="12" style="color:#aaa;text-align:center;padding:16px;">불러오는 중...</td></tr>
   </tbody>
-</table>
+</table></div>
 
 <div class="section-label" style="margin-top:14px">담당자 × 소재 배정 <span class="badge" style="background:#e8faf6;color:#0a8a5c" id="heat-tab-label">이번달</span></div>
 <div id="heatmap-wrap"><div style="color:#aaa;text-align:center;padding:12px;font-size:11px">불러오는 중...</div></div>
@@ -407,7 +411,7 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 </div>
 
 <div class="section-label">캠페인별 <span class="badge">오더순</span></div>
-<table class="campaign-table">
+<div class="tbl-scroll"><table class="campaign-table">
   <thead>
     <tr>
       <th>캠페인명</th>
@@ -423,7 +427,7 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
   <tbody id="campaign-tbody">
     <tr><td colspan="8" style="color:#aaa;text-align:center;padding:14px;">불러오는 중...</td></tr>
   </tbody>
-</table>
+</table></div>
 </div>
 
 <!-- 섹션3: 방문 스케줄 -->
@@ -670,11 +674,11 @@ function render() {
   if (activeSojKeys.length === 0) {
     ht = '<div style="color:#aaa;text-align:center;padding:12px;font-size:11px">이 기간 소재 배정 없음</div>';
   } else {
-    ht='<table class="heat-table"><thead><tr><th class="l">담당자</th>'+activeSojKeys.map(k=>'<th>'+k+'</th>').join('')+'</tr></thead><tbody>';
+    ht='<div class="tbl-scroll"><table class="heat-table"><thead><tr><th class="l">담당자</th>'+activeSojKeys.map(k=>'<th>'+k+'</th>').join('')+'</tr></thead><tbody>';
     heatData.forEach(d=>{
       ht+='<tr><td class="l">'+d.name+'</td>'+activeSojKeys.map(k=>{const v=d.soj[k]||0; const fg=v>heatMax*0.6?'#fff':'#333'; return '<td><span class="heat-cell" style="background:'+heatColor(v)+';color:'+fg+'">'+(v||'')+'</span></td>';}).join('')+'</tr>';
     });
-    ht+='</tbody></table>';
+    ht+='</tbody></table>'+'</div>';
   }
   const hw=document.getElementById('heatmap-wrap'); if(hw) hw.innerHTML=ht;
   const htl=document.getElementById('heat-tab-label'); if(htl) htl.textContent = funnelTab===1?'지난달':(funnelTab===2?'전체':'이번달');
