@@ -342,15 +342,10 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 
 <div class="section-label" style="margin-top:0;">매출 <span class="badge pay">결제일 기준</span></div>
 <div class="grid-4">
-  <div class="card"><div class="clabel">이번 달<span class="dayno" id="dn-month"></span></div><div class="cval purple sm" id="sales-month">-</div></div>
-  <div class="card"><div class="clabel">이번 주<span class="dayno" id="dn-week"></span></div><div class="cval purple sm" id="sales-week">-</div></div>
-  <div class="card"><div class="clabel">지난 주</div><div class="cval sm" id="sales-lastweek">-</div></div>
-  <div class="card"><div class="clabel">이번 달 취소</div><div class="cval sm" id="cancel-month" style="color:#e05252;">-</div></div>
-</div>
-<div class="section-label" style="margin-top:16px;">취소 현황 <span class="badge today" id="cancel-tab-label">이번달</span></div>
-<div class="grid-4">
-  <div class="card"><div class="clabel">취소 금액</div><div class="cval sm" id="cancel-amt" style="color:#e05252;">-</div></div>
-  <div class="card"><div class="clabel">취소 건수</div><div class="cval sm" id="cancel-cnt">-</div></div>
+  <div class="card"><div class="clabel"><span id="sm-label">이번 달</span><span class="dayno" id="dn-month"></span></div><div class="cval purple sm" id="sales-month">-</div></div>
+  <div class="card" id="card-week"><div class="clabel">이번 주<span class="dayno" id="dn-week"></span></div><div class="cval purple sm" id="sales-week">-</div></div>
+  <div class="card" id="card-lastweek"><div class="clabel">지난 주</div><div class="cval sm" id="sales-lastweek">-</div></div>
+  <div class="card"><div class="clabel"><span id="cx-label">이번 달 취소</span></div><div class="cval sm" id="cancel-month" style="color:#e05252;">-</div></div>
 </div>
 
 <div class="section-label">담당자별 성과분석 <span class="badge today" id="tab-label">이번달</span></div>
@@ -565,16 +560,14 @@ function renderCancel() {
   const disp = won >= 10000 ? Math.round(won/10000).toLocaleString() + '만원' : (won>0? won.toLocaleString()+'원' : '0원');
   const amtEl = document.getElementById('cancel-amt');
   const cntEl = document.getElementById('cancel-cnt');
-  const monthEl = document.getElementById('cancel-month');  // 상단 요약 카드(항상 이번달)
+  const monthEl = document.getElementById('cancel-month');  // 매출 그리드 취소 카드 — 통합 토글 연동
   if (amtEl) amtEl.textContent = sum > 0 ? '-' + disp : '0원';
   if (cntEl) cntEl.textContent = cnt + '건';
 
-  // 상단 '이번 달 취소' 카드는 항상 이번달 값
-  let mSum = 0;
-  cancelData.rows.forEach(r => { if ((r[0]||'').indexOf(thisYM)===0) mSum += (parseFloat(r[3])||0); });
-  const mWon = mSum*1000;
-  const mDisp = mWon >= 10000 ? Math.round(mWon/10000).toLocaleString()+'만원' : (mWon>0? mWon.toLocaleString()+'원':'0원');
-  if (monthEl) monthEl.textContent = mSum>0 ? '-'+mDisp : '0원';
+  // [2026-08-27] 취소 카드 = 통합 토글(cancelTab) 연동 (이번달/지난달/전체)
+  const cxl = document.getElementById('cx-label');
+  if (cxl) cxl.textContent = ['이번 달 취소','지난 달 취소','전체 취소'][cancelTab];
+  if (monthEl) monthEl.textContent = sum > 0 ? '-' + disp : '0원';
 }
 
 async function loadData() {
@@ -659,10 +652,8 @@ function render() {
 
   const r12 = allRows[11] || [];
   const r13 = allRows[12] || [];
-  document.getElementById('sales-month').textContent    = r12[1] || '-';
   document.getElementById('sales-week').textContent     = r12[3] || '-';
   document.getElementById('sales-lastweek').textContent = r13[3] || '-';
-  document.getElementById('dn-month').textContent = pickDayNo(r12[0]);
   document.getElementById('dn-week').textContent  = pickDayNo(r12[2]);
 
   document.getElementById('v-total').textContent     = allRows[1]?.[routeTab + 2] || '0';  // [수정 2026-08-13] 토글 연동: 이번달[2]/지난달[3]/전체[4]
@@ -716,7 +707,7 @@ function render() {
   const totCancelRate = totalVisit ? Math.round(totalCancel/totalVisit*100) : 0;
   const totOrderRate  = totalSetting ? Math.round(totalOrder/totalSetting*100) : 0;
   const totSalesFallback = totalSalesNum >= 10000 ? manWon(totalSalesNum) + '원' : totalSalesNum + '원';
-  const totSalesStr = (funnelTab === 0 ? r12[1] : r13[1]) || totSalesFallback;
+  const totSalesStr = funnelTab === 0 ? (r12[1] || totSalesFallback) : funnelTab === 1 ? (r13[1] || totSalesFallback) : totSalesFallback;
   rows.push(`<tr class="total">
     <td class="name">합계</td>
     <td class="num db">${totalDb}</td>
@@ -732,6 +723,18 @@ function render() {
     <td class="eff2">${totalDb?(totalSalesNum/totalDb/10000).toFixed(1)+'만':'-'}</td>
   </tr>`);
   tbody.innerHTML = rows.join('');
+
+  // [2026-08-27] 매출 카드 — 퍼널 통합 토글 연동 (지난달·전체 시 이번주/지난주 숨김)
+  {
+    const showWeeks = (funnelTab === 0);
+    const cw  = document.getElementById('card-week');     if (cw)  cw.style.display  = showWeeks ? '' : 'none';
+    const clw = document.getElementById('card-lastweek'); if (clw) clw.style.display = showWeeks ? '' : 'none';
+    const sml = document.getElementById('sm-label');
+    if (sml) sml.textContent = funnelTab === 0 ? '이번 달' : funnelTab === 1 ? '지난 달' : '전체';
+    const smVal = funnelTab === 0 ? (r12[1] || '-') : funnelTab === 1 ? (r13[1] || '-') : totSalesFallback;
+    document.getElementById('sales-month').textContent = smVal;
+    document.getElementById('dn-month').textContent = funnelTab === 0 ? pickDayNo(r12[0]) : '';
+  }
 
   // [개편] 담당자 × 소재 히트맵 렌더 (r[_sojCol] = 소재분포 "키:값;키:값")
   // ★ 2026-08-04 신규 소재 추가: 원톱·5단계루틴·기초부족 (getLeadStats sojKeyOf와 키 일치시킬 것)
