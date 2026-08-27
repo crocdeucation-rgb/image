@@ -338,9 +338,19 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 <div class="section-label" style="margin-top:0;">매출 <span class="badge pay">결제일 기준</span></div>
 <div class="grid-4">
   <div class="card"><div class="clabel">이번 달<span class="dayno" id="dn-month"></span></div><div class="cval purple sm" id="sales-month">-</div></div>
-  <div class="card"><div class="clabel">지난 달</div><div class="cval sm" id="sales-last">-</div></div>
   <div class="card"><div class="clabel">이번 주<span class="dayno" id="dn-week"></span></div><div class="cval purple sm" id="sales-week">-</div></div>
   <div class="card"><div class="clabel">지난 주</div><div class="cval sm" id="sales-lastweek">-</div></div>
+  <div class="card"><div class="clabel">이번 달 취소</div><div class="cval sm" id="cancel-month" style="color:#e05252;">-</div></div>
+</div>
+<div class="section-label" style="margin-top:16px;">취소 현황 <span class="badge today" id="cancel-tab-label">이번달</span></div>
+<div class="tabs" id="cancel-tabs">
+  <button class="tab active" onclick="setCancelTab(0)">이번달</button>
+  <button class="tab" onclick="setCancelTab(1)">지난달</button>
+  <button class="tab" onclick="setCancelTab(2)">전체</button>
+</div>
+<div class="grid-4">
+  <div class="card"><div class="clabel">취소 금액</div><div class="cval sm" id="cancel-amt" style="color:#e05252;">-</div></div>
+  <div class="card"><div class="clabel">취소 건수</div><div class="cval sm" id="cancel-cnt">-</div></div>
 </div>
 
 <div class="section-label">담당자별 성과분석 <span class="badge today" id="tab-label">이번달</span></div>
@@ -453,6 +463,8 @@ let currentSec = 0;
 
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1438610573&single=true&output=csv';
 const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1384080283&single=true&output=csv';
+    const LEDGER_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBUBxnTPPn_AebCqxIC8Q2x-5V3VuvIY6MM6QlgKVUUA7Bbjh3jMO7q6i4sDgQse-UKsNGe5Hxt7QF/pub?gid=431762866&single=true&output=csv';
+    const CANCEL_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBUBxnTPPn_AebCqxIC8Q2x-5V3VuvIY6MM6QlgKVUUA7Bbjh3jMO7q6i4sDgQse-UKsNGe5Hxt7QF/pub?gid=128666314&single=true&output=csv';
 
 const ASSIGNEES = ['우혜림','김윤호','장윤호','박창건','김태석','김성윤','노영호','김원득','김우진','안준섭'];
 const ASSIGNEE_START_IDX = 46;
@@ -507,7 +519,67 @@ function showSec(idx) {
 }
 
 async function loadAll() {
-  await Promise.all([loadData(), loadSchedule()]);
+  await Promise.all([loadData(), loadSchedule(), loadCancel()]);
+}
+
+let cancelData = { rows: [] };  // 원장 취소 데이터 캐시
+let cancelTab = 0;              // 0=이번달 1=지난달 2=전체
+
+// 원장 CSV 로드 (취소 데이터 캐시)
+async function loadCancel() {
+  try {
+    const res = await fetch(CANCEL_CSV_URL);
+    const text = await res.text();
+    const rows = text.trim().split('\n').map(r => r.split(',').map(c => c.trim()));
+    rows.shift();
+    // 취소요약_전체 컬럼: 날짜(0)|학생(1)|학년(2)|취소액(3)|담당자(4) — 전부 cancel
+    cancelData.rows = rows.filter(r => r[0] && (parseFloat(r[3])||0) > 0);
+    renderCancel();
+  } catch(e) {
+    const el = document.getElementById('cancel-amt');
+    if (el) el.textContent = '-';
+  }
+}
+
+function setCancelTab(idx) {
+  cancelTab = idx;
+  document.querySelectorAll('#cancel-tabs .tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  const lbl = document.getElementById('cancel-tab-label');
+  if (lbl) lbl.textContent = ['이번달','지난달','전체'][idx];
+  renderCancel();
+}
+
+function renderCancel() {
+  const now = new Date();
+  const thisYM = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+  const lastM = new Date(now.getFullYear(), now.getMonth()-1, 1);
+  const lastYM = lastM.getFullYear() + '-' + String(lastM.getMonth()+1).padStart(2,'0');
+
+  let sum = 0, cnt = 0;
+  cancelData.rows.forEach(r => {
+    const date = r[0] || '';
+    const amt = parseFloat(r[3]) || 0;
+    let match = false;
+    if (cancelTab === 0) match = date.indexOf(thisYM) === 0;      // 이번달
+    else if (cancelTab === 1) match = date.indexOf(lastYM) === 0;  // 지난달
+    else match = true;                                            // 전체
+    if (match) { sum += amt; cnt++; }
+  });
+
+  const won = sum * 1000;
+  const disp = won >= 10000 ? Math.round(won/10000).toLocaleString() + '만원' : (won>0? won.toLocaleString()+'원' : '0원');
+  const amtEl = document.getElementById('cancel-amt');
+  const cntEl = document.getElementById('cancel-cnt');
+  const monthEl = document.getElementById('cancel-month');  // 상단 요약 카드(항상 이번달)
+  if (amtEl) amtEl.textContent = sum > 0 ? '-' + disp : '0원';
+  if (cntEl) cntEl.textContent = cnt + '건';
+
+  // 상단 '이번 달 취소' 카드는 항상 이번달 값
+  let mSum = 0;
+  cancelData.rows.forEach(r => { if ((r[0]||'').indexOf(thisYM)===0) mSum += (parseFloat(r[3])||0); });
+  const mWon = mSum*1000;
+  const mDisp = mWon >= 10000 ? Math.round(mWon/10000).toLocaleString()+'만원' : (mWon>0? mWon.toLocaleString()+'원':'0원');
+  if (monthEl) monthEl.textContent = mSum>0 ? '-'+mDisp : '0원';
 }
 
 async function loadData() {
