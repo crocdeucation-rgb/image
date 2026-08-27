@@ -84,4 +84,23 @@ function sw(i,btn){document.querySelectorAll('.tabbtn').forEach(function(b){b.cl
 document.getElementById('note').style.display=(i===2||i===4)?'block':'none';
 document.getElementById('body').innerHTML=i===2?barsDv(D.divs):i===3?barsP(D.persons):i===4?barsP(D.divpersons):barsBr(D.branches);}
 document.getElementById('body').innerHTML=barsBr(D.branches);
-</script><script>(function(){function s(){try{parent.postMessage({t:"frameH",h:document.body.scrollHeight},"*");}catch(e){}}window.addEventListener("load",function(){s();setTimeout(s,400);setTimeout(s,1000);});setInterval(s,1200);document.addEventListener("click",function(){setTimeout(s,200);setTimeout(s,600);});})();</script></body></html>
+</script><script>(function(){function s(){try{parent.postMessage({t:"frameH",h:document.body.scrollHeight},"*");}catch(e){}}window.addEventListener("load",function(){s();setTimeout(s,400);setTimeout(s,1000);});setInterval(s,1200);document.addEventListener("click",function(){setTimeout(s,200);setTimeout(s,600);});})();</script><script>
+/* 웹마케팅 취소 = 원장(취소요약_전체) 실시간 덮어쓰기 — total/대시보드 소스 일치 (2026-08-27) */
+(function(){
+  var CANCEL_CSV_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vTBUBxnTPPn_AebCqxIC8Q2x-5V3VuvIY6MM6QlgKVUUA7Bbjh3jMO7q6i4sDgQse-UKsNGe5Hxt7QF/pub?gid=128666314&single=true&output=csv';
+  var thisYM=(function(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');})();
+  fetch(CANCEL_CSV_URL).then(function(r){return r.text();}).then(function(t){
+    var rows=t.trim().split('\n').map(function(x){return x.split(',').map(function(c){return c.trim();});});
+    var sum=0,cnt=0;
+    rows.forEach(function(r){
+      if((r[0]||'').indexOf(thisYM)!==0) return;
+      sum+=parseFloat(r[3])||0; cnt++;
+    });
+    var webCx=sum*1000;
+    var wEl=document.getElementById('w_cx');
+    if(wEl) wEl.textContent=won(webCx)+'원';
+    var hEl=document.getElementById('h_cx');
+    if(hEl) hEl.textContent=won(webCx+(D.sang.cxa||0))+'원 ('+(cnt+(D.sang.cxc||0))+'건)';
+  }).catch(function(e){});
+})();
+</script></body></html>
