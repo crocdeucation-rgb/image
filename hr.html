@@ -54,6 +54,7 @@ td.nm{font-weight:700}td.dt{text-align:right;color:var(--soft);font-variant-nume
 .subteam{font-size:11px;font-weight:700;color:#7048E8;padding:8px 10px 3px;border-top:1px dashed #E9EEF5;margin-top:3px}
 .subteam:first-child{border-top:none;margin-top:0}
 .subcnt{color:#B6C2DC;font-weight:600;margin-left:3px}
+.sublead{color:#7048E8;font-weight:700;font-size:11px;margin-left:4px}
 .bg-new{background:#E6F7EE;color:#20A56D;font-size:10px;font-weight:800;padding:1px 6px;border-radius:6px;margin-left:5px}
 .bg-out{background:#FBE9E7;color:#E23A22;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:5px}
 .mrow.out{opacity:.5}
@@ -122,18 +123,33 @@ function ym(v){ // 입사일 → YYYY-MM
 function _h2branch(h){
   h=String(h||'').trim();
   if(h==='부평1팀'||h==='부평2팀'||h==='부평운영팀') return '부평지점';
-  if(h==='메이킷위드1과'||h==='메이킷위드2과'||h==='메이킷위드운영팀') return '메이킷위드';
-  if(h==='가산연합메이킷위드팀'||h==='가산연합인투팀') return '가산연합센터';
-  if(h==='마포연합파인더팀'||h==='마포연합인투팀'||h==='마포연합파인더팀') return '마포연합센터';
-  if(h==='스카이에듀1팀'||h==='스카이에듀2팀') return '스카이에듀';
-  if(h==='파인더루원') return '파인더루원';
+  // 메이킷위드 = 메이킷위드1과·2과·운영팀(+팀표기) + 가산연합(메이킷위드팀·인투팀)
+  if(h==='메이킷위드1과'||h==='메이킷위드2과'||h==='메이킷위드운영팀'||h==='메이킷위드1팀'||h==='메이킷위드2팀'||h==='가산연합메이킷위드팀'||h==='가산연합인투팀') return '메이킷위드';
+  // 파인더루원 = 파인더루원 + 마포연합(센터·인투팀·파인더팀)
+  if(h==='파인더루원'||h==='마포연합센터'||h==='마포연합인투팀'||h==='마포연합파인더팀') return '파인더루원';
+  if(h==='스카이에듀1팀'||h==='스카이에듀2팀'||h==='스카이에듀3팀') return '스카이에듀';
   return h; // 마곡지점/수원지점 등 그대로
 }
+// 세부팀명 정규화 (안현규 등 잔류 "팀" 표기 → "과"로 통일)
+var SUB_REMAP = { '메이킷위드1팀':'메이킷위드1과', '메이킷위드2팀':'메이킷위드2과' };
 // 강제 제외 (행정상 시트엔 재직이나 실제 퇴사)
 var FORCE_EXCLUDE = ['박종현'];
 
 var WONJANG = {
   '코칭': { 'A':'정나영', 'B':'장영주' }
+};
+// 상담부 지사장/지점장 (코칭 원장처럼 지점 헤더에 강조 — 명단엔 남김)
+var BRANCH_LEAD = {
+  '메이킷위드':'지사장 장윤호',
+  '파인더루원':'지사장 김윤호',
+  '부평지점':'지점장 우혜림',
+  '마곡지점':'김슬기 (휴직)',
+  '수원지점':'김우진 대리'
+};
+// 세부팀 담당 (지사장 아래)
+var SUB_LEAD = {
+  '가산연합메이킷위드팀':'김성윤','가산연합인투팀':'김성윤',
+  '마포연합센터':'김원득·노영호','마포연합인투팀':'김원득·노영호','마포연합파인더팀':'김원득·노영호'
 };
 // 팀 라벨 (A → 코칭A)
 var TEAMLABEL = {
@@ -244,7 +260,7 @@ function render(key){
     // 2단계: 지점(대분류) > 세부팀
     var branchMap={}, bOrder=[];
     arr.forEach(function(x){
-      var sub=x.sub||'미구분';
+      var sub=SUB_REMAP[(x.sub||'').trim()]||x.sub||'미구분';
       var br=_h2branch(sub);
       if(!branchMap[br]){branchMap[br]={};}
       if(!branchMap[br][sub]){branchMap[br][sub]=[];}
@@ -256,10 +272,12 @@ function render(key){
       var teams=branchMap[br];
       var teamKeys=Object.keys(teams).sort();
       var total=0; teamKeys.forEach(function(t){total+=teams[t].filter(function(m){return !m.isOut;}).length;});
-      h+='<div class="gcard"><div class="ghd"><span class="gnm">'+br+'</span><span class="gcnt">'+total+'</span></div><div class="gbody">';
+      var leadHtml=BRANCH_LEAD[br]?'<span class="c-won">'+BRANCH_LEAD[br]+'</span>':'';
+      h+='<div class="gcard"><div class="ghd"><span class="gnm">'+br+'</span>'+leadHtml+'<span class="gcnt">'+total+'</span></div><div class="gbody">';
       teamKeys.forEach(function(t){
         // 세부팀 소제목 (지점명과 다를 때만 표시)
-        if(t!==br){ h+='<div class="subteam">'+t+' <span class="subcnt">'+teams[t].filter(function(m){return !m.isOut;}).length+'</span></div>'; }
+        var subLeadHtml=SUB_LEAD[t]?' <span class="sublead">'+SUB_LEAD[t]+'</span>':'';
+        if(t!==br){ h+='<div class="subteam">'+t+' <span class="subcnt">'+teams[t].filter(function(m){return !m.isOut;}).length+'</span>'+subLeadHtml+'</div>'; }
         teams[t].sort(function(a,b){if(a.isOut!==b.isOut)return a.isOut?1:-1;return (a.in||'')<(b.in||'')?-1:1;});
         teams[t].forEach(function(x){ h+=memRow(x); });
       });
