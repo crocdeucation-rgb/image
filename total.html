@@ -70,6 +70,11 @@ body{overflow-x:hidden}
 .q3nm{font-weight:700;color:var(--ink);font-size:14px}
 .q3tm{font-size:11px;color:var(--soft)}
 .q3v{margin-left:auto;font-weight:800;color:var(--v2);font-size:13px}
+
+
+
+@media(max-width:1100px){.kings{grid-template-columns:1fr}.q3{grid-template-columns:1fr}}
+@media(max-width:820px){.two{grid-template-columns:1fr}.headbar{flex-wrap:wrap}.hb{flex:1 1 40%}.bar{flex-wrap:wrap}.bar .nm{width:auto;flex:1}.bar .track{order:3;flex:1 1 100%;margin-top:5px}.bar .meta{order:4;flex:1 1 100%;width:auto;text-align:left;margin-top:3px}.kings,.q3{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;-webkit-overflow-scrolling:touch;padding-bottom:6px}.kwrap,.q3card{flex:0 0 88%;scroll-snap-align:start}}
 @media(max-width:480px){body{overflow-x:hidden}.wrap{padding:16px 12px 40px}.hero{padding:18px 16px}.hero .big{font-size:30px;letter-spacing:-1px}.hero .chips{gap:14px}.hero .chips b{font-size:16px}.panel{padding:16px 14px}.hd h1{font-size:21px}.headbar{flex-wrap:wrap}.hb{flex:1 1 45%;padding:11px}.hb .v{font-size:19px}.card{padding:15px 16px}.al{padding:14px}.al .v{font-size:24px}
 .wrap{max-width:100%}
 .kwrap,.q3card{padding:12px 13px}
@@ -82,8 +87,15 @@ body{overflow-x:hidden}
 .q3row{flex-wrap:wrap}
 .q3nm{font-size:13px}
 .q3v{font-size:12px}}
-@media(max-width:1100px){.kings{grid-template-columns:1fr}.q3{grid-template-columns:1fr}}
-@media(max-width:820px){.two{grid-template-columns:1fr}.headbar{flex-wrap:wrap}.hb{flex:1 1 40%}.bar .nm{width:84px}.bar .meta{width:auto}.kings{grid-template-columns:1fr;gap:10px}.q3{grid-template-columns:1fr;gap:10px}}
+
+.swipe-hint{display:none}
+@media(max-width:820px){
+.swipe-hint{display:flex;justify-content:center;gap:6px;margin:2px 0 8px}
+.swipe-hint .dot{width:6px;height:6px;border-radius:50%;background:#D0D8E6;transition:.2s}
+.swipe-hint .dot.on{background:#7048E8;width:18px;border-radius:3px}
+.swipe-label{display:none}
+@media(max-width:820px){.swipe-label{display:block;text-align:center;font-size:11px;color:#B6C2DC;margin-top:-4px;margin-bottom:8px}}
+}
 </style></head><body><div class="wrap">
 <div class="hd"><div class="k">전부서 실적</div><h1>전체실적 대시보드</h1>
 <div class="m">취소 반영 확정 · 미납 포함/취소 제외/연장 포함 · 매일 갱신</div></div>
@@ -91,8 +103,10 @@ body{overflow-x:hidden}
 <div class="chips"><div>세팅<b id="h_set"></b></div><div>오더<b id="h_ord"></b></div><div>오더율<b id="h_rate"></b></div><div class="cx">당월 취소<b id="h_cx"></b></div></div></div>
 <!-- 이번주/지난주 왕 -->
 <div class="kings" id="kings"></div>
+<div class="swipe-hint" id="kings-hint"></div><div class="swipe-label">← 밀어서 지난주·이달 TOP3 보기 →</div>
 <!-- 3개월 누적 TOP3 -->
 <div class="q3" id="q3"></div>
+<div class="swipe-hint" id="q3-hint"></div><div class="swipe-label">← 밀어서 상담·사업 TOP3 보기 →</div>
 <div class="two">
 <div class="card web"><div class="ct"><span class="dot"></span>웹마케팅</div><div class="v" id="w_s"></div><div class="r"><div>세팅<b id="w_set"></b></div><div>오더<b id="w_ord"></b></div><div>오더율<b id="w_r"></b></div><div class="cx">취소<b id="w_cx"></b></div></div></div>
 <div class="card sang"><div class="ct"><span class="dot"></span>상담지점</div><div class="v" id="s_s"></div><div class="r"><div>세팅<b id="s_set"></b></div><div>오더<b id="s_ord"></b></div><div>오더율<b id="s_r"></b></div><div class="cx">취소<b id="s_cx"></b></div></div></div></div>
@@ -164,6 +178,22 @@ function renderAll(D){
     var q3El = document.getElementById('q3');
     if(q3El){
       q3El.innerHTML = q3card('3개월 지점 TOP3', t3.branch, true) + q3card('3개월 상담 TOP3', t3.sang, true) + q3card('3개월 사업 TOP3', t3.saup, true);
+    }
+    // 스와이프 힌트 dot 설정
+    setTimeout(function(){ setupSwipe('kings','kings-hint'); setupSwipe('q3','q3-hint'); }, 100);
+    function setupSwipe(gridId, hintId){
+      var grid=document.getElementById(gridId), hint=document.getElementById(hintId);
+      if(!grid||!hint) return;
+      var cards=grid.children.length;
+      if(cards<=1){ hint.innerHTML=''; return; }
+      var dots='';
+      for(var i=0;i<cards;i++) dots+='<span class="dot'+(i===0?' on':'')+'"></span>';
+      hint.innerHTML=dots;
+      grid.addEventListener('scroll', function(){
+        var idx=Math.round(grid.scrollLeft/(grid.scrollWidth/cards));
+        var ds=hint.querySelectorAll('.dot');
+        ds.forEach(function(d,i){ d.classList.toggle('on', i===idx); });
+      });
     }
   })();
 function won(n){return n.toLocaleString('ko-KR');}
