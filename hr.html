@@ -36,6 +36,23 @@ td.nm{font-weight:700}td.dt{text-align:right;color:var(--soft);font-variant-nume
 .grp td{background:#F1F4F9;padding:8px 12px !important;border-top:2px solid #E3E8F0}
 .grp-nm{font-weight:800;color:#4C6EF5;font-size:13px}
 .grp-cnt{float:right;color:#8A94A6;font-size:12px;font-weight:600}
+.grp-won{margin-left:10px;color:#7048E8;font-size:12px;font-weight:700}
+
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:4px}
+.gcard{border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;background:#fff}
+.ghd{display:flex;align-items:center;gap:8px;padding:9px 12px;background:#F1F4F9;border-bottom:1px solid #E9EEF5}
+.gnm{font-weight:800;color:#4C6EF5;font-size:13px}
+.c-won{color:#7048E8;font-size:11px;font-weight:700}
+.gcnt{margin-left:auto;color:#8A94A6;font-size:12px;font-weight:700;background:#fff;border-radius:10px;padding:1px 9px}
+.gbody{padding:6px 4px}
+.mrow{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:6px}
+.mrow:hover{background:#F7F9FC}
+.mnm{font-weight:600;color:#1B2436;font-size:13px}
+.mrank{color:#8A94A6;font-size:11px}
+.mdt{margin-left:auto;color:#B6C2DC;font-size:11px}
+.mnote{color:#F76707;font-weight:800;margin-left:3px;cursor:help}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
 </style></head><body><div class="wrap">
 <div class="hd"><div class="k">HR 인사기록</div><h1>인사기록</h1>
 <div class="m">2026년 8월 기준 · 재직 현황 · 입퇴사 흐름</div></div>
@@ -93,9 +110,18 @@ function ym(v){ // 입사일 → YYYY-MM
 }
 
 // 시트별 파싱 규칙
+// 원장(팀 헤더에 표시, 멤버 명단 제외)
+var WONJANG = {
+  '코칭': { 'A':'정나영', 'B':'장영주' }
+};
+// 팀 라벨 (A → 코칭A)
+var TEAMLABEL = {
+  '코칭': function(t){ return t==='미구분'?'미구분':'코칭'+t; }
+};
+
 var SHEETS = [
-  { key:'수업', label:'수업 강사', url:CSV.수업, group:'과목', retireBy:'퇴사일' },
-  { key:'코칭', label:'코칭 코치', url:CSV.코칭, group:'팀',   retireBy:'퇴사일' },
+  { key:'수업', label:'수업 강사', url:CSV.수업, group:'과목', retireBy:'퇴사일', note:'특이사항' },
+  { key:'코칭', label:'코칭 코치', url:CSV.코칭, group:'팀',   retireBy:'퇴사일', note:'특이사항' },
   { key:'사업부', label:'사업부',   url:CSV.사업, group:'부서명', retireBy:'재직', note:'공개특이사항' },
   { key:'상담부', label:'상담부',   url:CSV.상담, group:'부서명', retireBy:'재직', note:'특이사항' }
 ];
@@ -162,31 +188,39 @@ async function boot(){
 
 function render(key){
   var g=STATE[key]; var arr=g.members.slice();
-  document.getElementById('cnt').textContent=g.label+' 재직 '+arr.length+'명 (마스킹 명부)';
-  var hasNote = arr.some(function(x){return x.note;});
-  var hasRank = arr.some(function(x){return x.rank;});
+  var wonMap = WONJANG[key] || {};
+  var teamLabelFn = TEAMLABEL[key] || function(t){return t;};
+
+  var wonNames = {};
+  Object.keys(wonMap).forEach(function(t){ wonNames[wonMap[t]]=true; });
+  arr = arr.filter(function(x){ return !wonNames[x.name]; });
+
+  document.getElementById('cnt').textContent=g.label+' 재직 '+g.members.length+'명 (마스킹 명부)';
 
   // 부서(sub)별로 묶기
   var groups={}, order=[];
   arr.forEach(function(x){ var k=x.sub||'미구분'; if(!groups[k]){groups[k]=[];order.push(k);} groups[k].push(x); });
-  // 부서명 정렬 (미구분은 맨 뒤)
   order.sort(function(a,b){ if(a==='미구분')return 1; if(b==='미구분')return -1; return a<b?-1:1; });
 
-  var cols = 2 + (hasRank?1:0) + (hasNote?1:0); // 이름+입사 + 옵션
-  var h='<table>';
+  var h='<div class="grid">';
   order.forEach(function(sub){
     var mem=groups[sub];
-    mem.sort(function(a,b){ return (a.in||'')<(b.in||'')?-1:1; }); // 부서 내 입사순
-    // 부서 헤더 행
-    h+='<tbody><tr class="grp"><td colspan="'+cols+'"><span class="grp-nm">'+sub+'</span><span class="grp-cnt">'+mem.length+'명</span></td></tr>';
+    mem.sort(function(a,b){ return (a.in||'')<(b.in||'')?-1:1; });
+    var label = teamLabelFn(sub);
+    var won = wonMap[sub];
+    var wonHtml = won ? '<span class="c-won">원장 '+won+'</span>' : '';
+    h+='<div class="gcard"><div class="ghd"><span class="gnm">'+label+'</span>'+wonHtml+'<span class="gcnt">'+mem.length+'</span></div><div class="gbody">';
     mem.forEach(function(x){
-      h+='<tr><td class="nm">'+x.name+'</td>'+(hasRank?'<td>'+(x.rank||'')+'</td>':'')+(hasNote?'<td class="note-cell">'+(x.note||'')+'</td>':'')+'<td class="dt">'+x.in+'</td></tr>';
+      var noteHtml = x.note ? '<span class="mnote" title="'+x.note.replace(/"/g,'&quot;')+'">·</span>' : '';
+      var rankHtml = x.rank ? '<span class="mrank">'+x.rank+'</span>' : '';
+      h+='<div class="mrow"><span class="mnm">'+x.name+noteHtml+'</span>'+rankHtml+'<span class="mdt">'+x.in+'</span></div>';
     });
-    h+='</tbody>';
+    h+='</div></div>';
   });
-  h+='</table>';
+  h+='</div>';
   document.getElementById('body').innerHTML=h;
 }
+
 function sw(key,btn){document.querySelectorAll('.tabbtn').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');render(key);}
 
 boot();
