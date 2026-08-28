@@ -255,11 +255,11 @@ function render(key){
     bOrder.forEach(function(br){
       var teams=branchMap[br];
       var teamKeys=Object.keys(teams).sort();
-      var total=0; teamKeys.forEach(function(t){total+=teams[t].length;});
+      var total=0; teamKeys.forEach(function(t){total+=teams[t].filter(function(m){return !m.isOut;}).length;});
       h+='<div class="gcard"><div class="ghd"><span class="gnm">'+br+'</span><span class="gcnt">'+total+'</span></div><div class="gbody">';
       teamKeys.forEach(function(t){
         // 세부팀 소제목 (지점명과 다를 때만 표시)
-        if(t!==br){ h+='<div class="subteam">'+t+' <span class="subcnt">'+teams[t].length+'</span></div>'; }
+        if(t!==br){ h+='<div class="subteam">'+t+' <span class="subcnt">'+teams[t].filter(function(m){return !m.isOut;}).length+'</span></div>'; }
         teams[t].sort(function(a,b){if(a.isOut!==b.isOut)return a.isOut?1:-1;return (a.in||'')<(b.in||'')?-1:1;});
         teams[t].forEach(function(x){ h+=memRow(x); });
       });
@@ -276,7 +276,7 @@ function render(key){
       var label = teamLabelFn(sub);
       var won = wonMap[sub];
       var wonHtml = won ? '<span class="c-won">원장 '+won+'</span>' : '';
-      h+='<div class="gcard"><div class="ghd"><span class="gnm">'+label+'</span>'+wonHtml+'<span class="gcnt">'+mem.length+'</span></div><div class="gbody">';
+      h+='<div class="gcard"><div class="ghd"><span class="gnm">'+label+'</span>'+wonHtml+'<span class="gcnt">'+mem.filter(function(m){return !m.isOut;}).length+'</span></div><div class="gbody">';
       mem.forEach(function(x){ h+=memRow(x); });
       h+='</div></div>';
     });
