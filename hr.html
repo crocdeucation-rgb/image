@@ -5,7 +5,7 @@
 :root{--bg:#F1F4F9;--ink:#1B2436;--soft:#6B7688;--line:#E3E8F0;--pan:#fff;--v1:#4C6EF5;--teal:#1D9E75;--amber:#BA7517;--red:#E23A22;--pos:#20A56D;--barbg:#EDF1F8}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1120px;margin:0 auto;padding:24px 20px 60px}
+.wrap{max-width:1560px;margin:0 auto;padding:24px 24px 60px}
 .hd .k{font-size:12px;letter-spacing:2px;color:var(--v1);font-weight:800}
 .hd h1{font-size:24px;font-weight:800;margin-top:6px}.hd .m{font-size:12px;color:var(--soft);margin-top:7px}
 .mask{font-size:11px;color:var(--pos);background:#EAF7F0;border:0.5px solid #B8E6CE;border-radius:8px;padding:8px 12px;margin:12px 0}
@@ -51,6 +51,9 @@ td.nm{font-weight:700}td.dt{text-align:right;color:var(--soft);font-variant-nume
 .mrank{color:#8A94A6;font-size:11px}
 .mdt{margin-left:auto;color:#B6C2DC;font-size:11px}
 .mnote{color:#F76707;font-weight:800;margin-left:3px;cursor:help}
+.subteam{font-size:11px;font-weight:700;color:#7048E8;padding:8px 10px 3px;border-top:1px dashed #E9EEF5;margin-top:3px}
+.subteam:first-child{border-top:none;margin-top:0}
+.subcnt{color:#B6C2DC;font-weight:600;margin-left:3px}
 @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.grid{grid-template-columns:1fr}}
 </style></head><body><div class="wrap">
@@ -111,6 +114,20 @@ function ym(v){ // 입사일 → YYYY-MM
 
 // 시트별 파싱 규칙
 // 원장(팀 헤더에 표시, 멤버 명단 제외)
+// 상담부 팀구분 → 지점(대분류) 묶기
+function _h2branch(h){
+  h=String(h||'').trim();
+  if(h==='부평1팀'||h==='부평2팀'||h==='부평운영팀') return '부평지점';
+  if(h==='메이킷위드1과'||h==='메이킷위드2과'||h==='메이킷위드운영팀') return '메이킷위드';
+  if(h==='가산연합메이킷위드팀'||h==='가산연합인투팀') return '가산연합센터';
+  if(h==='마포연합파인더팀'||h==='마포연합인투팀'||h==='마포연합파인더팀') return '마포연합센터';
+  if(h==='스카이에듀1팀'||h==='스카이에듀2팀') return '스카이에듀';
+  if(h==='파인더루원') return '파인더루원';
+  return h; // 마곡지점/수원지점 등 그대로
+}
+// 강제 제외 (행정상 시트엔 재직이나 실제 퇴사)
+var FORCE_EXCLUDE = ['박종현'];
+
 var WONJANG = {
   '코칭': { 'A':'정나영', 'B':'장영주' }
 };
@@ -191,32 +208,62 @@ function render(key){
   var wonMap = WONJANG[key] || {};
   var teamLabelFn = TEAMLABEL[key] || function(t){return t;};
 
+  // 원장 + 강제제외 제거
   var wonNames = {};
   Object.keys(wonMap).forEach(function(t){ wonNames[wonMap[t]]=true; });
-  arr = arr.filter(function(x){ return !wonNames[x.name]; });
+  arr = arr.filter(function(x){ return !wonNames[x.name] && FORCE_EXCLUDE.indexOf(x.name)<0; });
 
-  document.getElementById('cnt').textContent=g.label+' 재직 '+g.members.length+'명 (마스킹 명부)';
+  document.getElementById('cnt').textContent=g.label+' 재직 '+arr.length+'명 (마스킹 명부)';
 
-  // 부서(sub)별로 묶기
-  var groups={}, order=[];
-  arr.forEach(function(x){ var k=x.sub||'미구분'; if(!groups[k]){groups[k]=[];order.push(k);} groups[k].push(x); });
-  order.sort(function(a,b){ if(a==='미구분')return 1; if(b==='미구분')return -1; return a<b?-1:1; });
+  function memRow(x){
+    var noteHtml = x.note ? '<span class="mnote" title="'+x.note.replace(/"/g,'&quot;')+'">·</span>' : '';
+    var rankHtml = x.rank ? '<span class="mrank">'+x.rank+'</span>' : '';
+    return '<div class="mrow"><span class="mnm">'+x.name+noteHtml+'</span>'+rankHtml+'<span class="mdt">'+x.in+'</span></div>';
+  }
 
   var h='<div class="grid">';
-  order.forEach(function(sub){
-    var mem=groups[sub];
-    mem.sort(function(a,b){ return (a.in||'')<(b.in||'')?-1:1; });
-    var label = teamLabelFn(sub);
-    var won = wonMap[sub];
-    var wonHtml = won ? '<span class="c-won">원장 '+won+'</span>' : '';
-    h+='<div class="gcard"><div class="ghd"><span class="gnm">'+label+'</span>'+wonHtml+'<span class="gcnt">'+mem.length+'</span></div><div class="gbody">';
-    mem.forEach(function(x){
-      var noteHtml = x.note ? '<span class="mnote" title="'+x.note.replace(/"/g,'&quot;')+'">·</span>' : '';
-      var rankHtml = x.rank ? '<span class="mrank">'+x.rank+'</span>' : '';
-      h+='<div class="mrow"><span class="mnm">'+x.name+noteHtml+'</span>'+rankHtml+'<span class="mdt">'+x.in+'</span></div>';
+
+  if(key==='상담부'){
+    // 2단계: 지점(대분류) > 세부팀
+    var branchMap={}, bOrder=[];
+    arr.forEach(function(x){
+      var sub=x.sub||'미구분';
+      var br=_h2branch(sub);
+      if(!branchMap[br]){branchMap[br]={};}
+      if(!branchMap[br][sub]){branchMap[br][sub]=[];}
+      branchMap[br][sub].push(x);
+      if(bOrder.indexOf(br)<0)bOrder.push(br);
     });
-    h+='</div></div>';
-  });
+    bOrder.sort(function(a,b){if(a==='미구분')return 1;if(b==='미구분')return -1;return a<b?-1:1;});
+    bOrder.forEach(function(br){
+      var teams=branchMap[br];
+      var teamKeys=Object.keys(teams).sort();
+      var total=0; teamKeys.forEach(function(t){total+=teams[t].length;});
+      h+='<div class="gcard"><div class="ghd"><span class="gnm">'+br+'</span><span class="gcnt">'+total+'</span></div><div class="gbody">';
+      teamKeys.forEach(function(t){
+        // 세부팀 소제목 (지점명과 다를 때만 표시)
+        if(t!==br){ h+='<div class="subteam">'+t+' <span class="subcnt">'+teams[t].length+'</span></div>'; }
+        teams[t].sort(function(a,b){return (a.in||'')<(b.in||'')?-1:1;});
+        teams[t].forEach(function(x){ h+=memRow(x); });
+      });
+      h+='</div></div>';
+    });
+  } else {
+    // 기존 1단계
+    var groups={}, order=[];
+    arr.forEach(function(x){ var k=x.sub||'미구분'; if(!groups[k]){groups[k]=[];order.push(k);} groups[k].push(x); });
+    order.sort(function(a,b){ if(a==='미구분')return 1; if(b==='미구분')return -1; return a<b?-1:1; });
+    order.forEach(function(sub){
+      var mem=groups[sub];
+      mem.sort(function(a,b){ return (a.in||'')<(b.in||'')?-1:1; });
+      var label = teamLabelFn(sub);
+      var won = wonMap[sub];
+      var wonHtml = won ? '<span class="c-won">원장 '+won+'</span>' : '';
+      h+='<div class="gcard"><div class="ghd"><span class="gnm">'+label+'</span>'+wonHtml+'<span class="gcnt">'+mem.length+'</span></div><div class="gbody">';
+      mem.forEach(function(x){ h+=memRow(x); });
+      h+='</div></div>';
+    });
+  }
   h+='</div>';
   document.getElementById('body').innerHTML=h;
 }
