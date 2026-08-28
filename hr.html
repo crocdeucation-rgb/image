@@ -54,6 +54,10 @@ td.nm{font-weight:700}td.dt{text-align:right;color:var(--soft);font-variant-nume
 .subteam{font-size:11px;font-weight:700;color:#7048E8;padding:8px 10px 3px;border-top:1px dashed #E9EEF5;margin-top:3px}
 .subteam:first-child{border-top:none;margin-top:0}
 .subcnt{color:#B6C2DC;font-weight:600;margin-left:3px}
+.bg-new{background:#E6F7EE;color:#20A56D;font-size:10px;font-weight:800;padding:1px 6px;border-radius:6px;margin-left:5px}
+.bg-out{background:#FBE9E7;color:#E23A22;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:5px}
+.mrow.out{opacity:.5}
+.mrow.out .mnm{text-decoration:line-through;color:#8A94A6}
 @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.grid{grid-template-columns:1fr}}
 </style></head><body><div class="wrap">
@@ -162,20 +166,28 @@ async function loadSheet(cfg){
       // 재직 판별
       var isJae = cfg.retireBy==='재직' ? (jaev==='재직') : (!outv);
       var inYm = ym(cIn>=0?row[cIn]:'');
-      // 8월 입퇴사
-      if(inYm==='2026-08') ipsa++;
-      if(outv && ym(outv)==='2026-08') toesa++;
-      if(!isJae) continue;
+      var outYm = outv ? ym(outv) : '';
+      var isNew = (inYm==='2026-08');
+      var isOutThisMonth = (outYm==='2026-08');
+      // 8월 입퇴사 카운트
+      if(isNew) ipsa++;
+      if(isOutThisMonth) toesa++;
+      // 재직자 OR 이번달 퇴사자만 명단에 (옛날 퇴사자는 제외)
+      if(!isJae && !isOutThisMonth) continue;
       var sub=(cGroup>=0?row[cGroup]:'').trim() || '미구분';
       members.push({
         name:name,
         sub:sub,
         rank:(cRank>=0?(row[cRank]||'').trim():''),
         in:inYm,
-        note:(cNote>=0?(row[cNote]||'').trim():'')
+        note:(cNote>=0?(row[cNote]||'').trim():''),
+        isNew:isNew,
+        isOut:isOutThisMonth,
+        outYm:outYm
       });
     }
-    return { key:cfg.key, label:cfg.label, jae:members.length, ipsa:ipsa, toesa:toesa, members:members };
+    var jaeCount=members.filter(function(m){return !m.isOut;}).length;
+    return { key:cfg.key, label:cfg.label, jae:jaeCount, ipsa:ipsa, toesa:toesa, members:members };
   }catch(e){
     console.error('시트 로드 실패 '+cfg.key, e);
     return { key:cfg.key, label:cfg.label, jae:0, ipsa:0, toesa:0, members:[], error:true };
@@ -218,7 +230,12 @@ function render(key){
   function memRow(x){
     var noteHtml = x.note ? '<span class="mnote" title="'+x.note.replace(/"/g,'&quot;')+'">·</span>' : '';
     var rankHtml = x.rank ? '<span class="mrank">'+x.rank+'</span>' : '';
-    return '<div class="mrow"><span class="mnm">'+x.name+noteHtml+'</span>'+rankHtml+'<span class="mdt">'+x.in+'</span></div>';
+    var badge = '';
+    if(x.isOut) badge = '<span class="bg-out">퇴사</span>';
+    else if(x.isNew) badge = '<span class="bg-new">NEW</span>';
+    var cls = x.isOut ? 'mrow out' : 'mrow';
+    var dt = x.isOut ? (x.outYm+' 퇴사') : x.in;
+    return '<div class="'+cls+'"><span class="mnm">'+x.name+noteHtml+badge+'</span>'+rankHtml+'<span class="mdt">'+dt+'</span></div>';
   }
 
   var h='<div class="grid">';
@@ -243,7 +260,7 @@ function render(key){
       teamKeys.forEach(function(t){
         // 세부팀 소제목 (지점명과 다를 때만 표시)
         if(t!==br){ h+='<div class="subteam">'+t+' <span class="subcnt">'+teams[t].length+'</span></div>'; }
-        teams[t].sort(function(a,b){return (a.in||'')<(b.in||'')?-1:1;});
+        teams[t].sort(function(a,b){if(a.isOut!==b.isOut)return a.isOut?1:-1;return (a.in||'')<(b.in||'')?-1:1;});
         teams[t].forEach(function(x){ h+=memRow(x); });
       });
       h+='</div></div>';
@@ -255,7 +272,7 @@ function render(key){
     order.sort(function(a,b){ if(a==='미구분')return 1; if(b==='미구분')return -1; return a<b?-1:1; });
     order.forEach(function(sub){
       var mem=groups[sub];
-      mem.sort(function(a,b){ return (a.in||'')<(b.in||'')?-1:1; });
+      mem.sort(function(a,b){ if(a.isOut!==b.isOut)return a.isOut?1:-1; return (a.in||'')<(b.in||'')?-1:1; });
       var label = teamLabelFn(sub);
       var won = wonMap[sub];
       var wonHtml = won ? '<span class="c-won">원장 '+won+'</span>' : '';
