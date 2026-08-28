@@ -94,9 +94,13 @@ function renderAll(D){
   (function(){
     var w = D.weekly || {tw:{},lw:{}};
     var tw = w.thisWeek||{}, lw = w.lastWeek||{};
-    function kline(lbl, obj, cls){
+    function kline(lbl, obj){
       if(!obj) return '<div class="krow"><span class="klbl">'+lbl+'</span><span class="kname" style="color:#B6C2DC">-</span></div>';
-      var val = (lbl.indexOf('결보')>=0) ? (obj.gb||0)+'건' : won(obj.sales);
+      var val;
+      if(lbl.indexOf('결보')>=0) val=(obj.gb||0)+'건';
+      else if(lbl.indexOf('세팅')>=0) val=(obj.set||0)+'건';
+      else if(lbl.indexOf('확률')>=0) val=(obj.rate||0)+'% ('+(obj.ord||0)+'/'+(obj.set||0)+')';
+      else val=won(obj.sales);
       var team = obj.team ? '<span class="kteam">·'+obj.team+'</span>' : '';
       return '<div class="krow"><span class="klbl">'+lbl+'</span><span class="kname">'+obj.name+team+'</span><span class="kval">'+val+'</span></div>';
     }
@@ -108,16 +112,25 @@ function renderAll(D){
         + kline('결보왕', d.sangGb)
         + '<div class="krow" style="margin-top:4px"><span class="kbadge b">사업</span></div>'
         + kline('매출왕', d.saupSales)
-        + kline('세팅왕', d.saupSet)
+        + kline('확률왕', d.saupRate)
         + kline('결보왕', d.saupGb)
         + '</div>';
     }
     var kingsEl = document.getElementById('kings');
     if(kingsEl){
+      // 이달 매출 TOP3 (persons=상담, divpersons=사업)
+      function top3mini(title, arr){
+        var h='<div style="margin-bottom:12px"><div style="font-size:12px;color:#6B7688;font-weight:700;margin-bottom:6px">'+title+'</div>';
+        (arr||[]).slice(0,3).forEach(function(x,i){
+          h+='<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px"><span style="width:16px;height:16px;border-radius:5px;background:'+(i===0?'#7048E8':'#EEF0FF')+';color:'+(i===0?'#fff':'#4C6EF5')+';font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center">'+(i+1)+'</span><b style="color:#1B2436">'+x.name+'</b>'+(x.team?'<span style="font-size:11px;color:#8A94A6">'+x.team+'</span>':'')+'<span style="margin-left:auto;font-weight:800;color:#7048E8;font-size:12px">'+won(x.sales)+'</span></div>';
+        });
+        return h+'</div>';
+      }
       kingsEl.innerHTML = kcard('🔥 이번주', '이번주 월~일', tw) + kcard('지난주', '지난주 월~일', lw)
-        + '<div class="kwrap"><h3>📊 요약</h3><div style="font-size:12px;color:#6B7688;line-height:1.9;padding-top:4px">'
-        + '이번주 상담 매출왕<br><b style="color:#7048E8">'+(tw.sangSales?tw.sangSales.name+' '+won(tw.sangSales.sales):'-')+'</b><br>'
-        + '이번주 사업 매출왕<br><b style="color:#7048E8">'+(tw.saupSales?tw.saupSales.name+' '+won(tw.saupSales.sales):'-')+'</b></div></div>';
+        + '<div class="kwrap"><h3>💰 이달 매출 TOP3</h3>'
+        + top3mini('상담', D.persons)
+        + top3mini('사업', D.divpersons)
+        + '</div>';
     }
     // 3개월 TOP3
     var t3 = D.top3 || {};
