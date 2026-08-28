@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title> </title>
+<title>전체실적 · 아라온 그로스</title>
+<meta name="description" content="아라온 전부서 실적 대시보드 · 취소 반영 · 매일 갱신">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 72'><rect width='72' height='72' rx='18' fill='%23EDE9FE'/><path d='M36 60 L36 28' stroke='%23059669' stroke-width='4' stroke-linecap='round' fill='none'/><ellipse cx='23' cy='30' rx='11' ry='7' fill='%2334D399' transform='rotate(-28 23 30)'/><ellipse cx='49' cy='30' rx='11' ry='7' fill='%2310B981' transform='rotate(28 49 30)'/></svg>">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <style>
   :root{--bg:#EEF1F6;--ink:#1B2436;--soft:#6B7688;--line:#E3E8F0;--v1:#4C6EF5;--pan:#fff;}
@@ -27,11 +29,9 @@
     <button class="tab" data-t="hr" onclick="go(this)">인사기록</button>
     <button class="tab" data-t="web" onclick="go(this)">웹마케팅</button>
   </div>
-
   <div class="stage">
     <iframe id="frame" src="total.html?v=828c" style="height:1250px"></iframe>
   </div>
-
 <script>
   var FRAMES={total:{src:'total.html?v=828c',h:900},hire:{src:'hire.html?v=828c',h:900},hr:{src:'hr.html?v=828c',h:780},web:{src:'dashboard.html?v=828c',h:1700}};
   var frame=document.getElementById('frame');
@@ -48,7 +48,7 @@
     try{ window.parent.postMessage('setHeight:'+h,'*'); }catch(e){}
   }
   frame.addEventListener('load', function(){ fitHeight(); setTimeout(fitHeight,300); setTimeout(fitHeight,800); });
-  
+
   window.addEventListener('message',function(e){
     if(e.data&&(e.data.t==='dashH'||e.data.t==='frameH')&&e.data.h>0){
       frame.style.height=(e.data.h+10)+'px';
@@ -60,6 +60,7 @@
     var t=btn.dataset.t;
     frame.style.height=FRAMES[t].h+'px';
     frame.src=FRAMES[t].src;
+    document.title=btn.textContent.trim()+' · 아라온 그로스';  // 탭별 제목
   }
   window.addEventListener('load', function(){ setTimeout(fitHeight,500); });
 </script>
