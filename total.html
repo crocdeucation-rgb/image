@@ -189,11 +189,11 @@ body{overflow-x:hidden}
 </div>
 <script>
 var TOTAL_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBUBxnTPPn_AebCqxIC8Q2x-5V3VuvIY6MM6QlgKVUUA7Bbjh3jMO7q6i4sDgQse-UKsNGe5Hxt7QF/pub?gid=1261488271&single=true&output=csv";
-// 지점 인원 (상담부 매출현황 기준 — 실적현황 갱신 시 같이 업데이트). 인투본사 무시.
+// 지점 인원 (상담부 매출현황 기준 — 실적현황 갱신 시 같이 업데이트). 인투본사 무시. 오름=미파악(공란).
 var BRANCH_HEAD = {
   '가산연합센터':11, '메이킷위드':11, '부평지점':7, '마포연합센터':11,
   '수호에듀':11, '마곡지점':7, '더온에듀':8, '수원지점':5,
-  '파인더루원':5, '스카이에듀':3, '오름에듀':4
+  '파인더루원':5, '스카이에듀':3
 };
 function renderAll(D){
   window.__D = D;
@@ -282,7 +282,9 @@ document.getElementById('s_s').innerHTML=won(D.sang.sales)+' <span>원</span>';d
 function barsBr(arr,byPer){var a=arr.slice();if(byPer)a.sort(function(x,y){return y.per-x.per;});var key=byPer?'per':'sales';var mx=Math.max.apply(null,a.map(function(x){return x[key];}))||1;var h='';
 a.forEach(function(x,i){var w=Math.max(x[key]/mx*100,3);var lbl=byPer?won(x.per)+'/인':won(x.sales);
 var cx=x.cxa>0?' · <span class="cx">취소 '+won(x.cxa)+'</span>':'';
-var inside=w>=18;var lblhtml=inside?'<span>'+lbl+'</span>':'';var outlbl=inside?'':'<span class="outlbl">'+lbl+'</span>';h+='<div class="bar"><div class="rk'+(i<3?' t':'')+'">'+(i+1)+'</div><div class="nm">'+x.name+'</div><div class="track"><div class="fill" style="width:'+w+'%">'+lblhtml+'</div>'+outlbl+'</div><div class="meta">오더 <b>'+x.ord+'</b> · 1인당 <b>'+won(x.per)+'</b>'+cx+'</div></div>';});return h;}
+var head=(typeof BRANCH_HEAD!=='undefined'?BRANCH_HEAD:{})[x.name];
+var hm=head?' · 인원 <b>'+head+'명</b> · 1인당 <b>'+won(Math.round(x.sales/head))+'</b>':'';
+var inside=w>=18;var lblhtml=inside?'<span>'+lbl+'</span>':'';var outlbl=inside?'':'<span class="outlbl">'+lbl+'</span>';h+='<div class="bar"><div class="rk'+(i<3?' t':'')+'">'+(i+1)+'</div><div class="nm">'+x.name+'</div><div class="track"><div class="fill" style="width:'+w+'%">'+lblhtml+'</div>'+outlbl+'</div><div class="meta">오더 <b>'+x.ord+'</b>'+hm+cx+'</div></div>';});return h;}
 function barsDv(arr){var mx=Math.max.apply(null,arr.map(function(x){return x.sales;}))||1;var h='';
 arr.forEach(function(x,i){var w=Math.max(x.sales/mx*100,3);
 var ins=w>=18;h+='<div class="bar"><div class="rk'+(i<3?' t':'')+'">'+(i+1)+'</div><div class="nm">'+x.name+'</div><div class="track"><div class="fill" style="width:'+w+'%">'+(ins?'<span>'+won(x.sales)+'</span>':'')+'</div>'+(ins?'':'<span class="outlbl">'+won(x.sales)+'</span>')+'</div><div class="meta">세팅 <b>'+x.set+'</b> · 오더 <b>'+x.ord+'</b> · 1인당 <b>'+won(x.per)+'</b></div></div>';});return h;}
