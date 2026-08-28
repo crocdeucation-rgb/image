@@ -41,19 +41,8 @@ body{overflow-x:hidden}
 .bar .meta{width:200px;text-align:right;font-size:11px;color:var(--soft);flex-shrink:0}.bar .meta b{color:var(--ink)}.bar .meta .cx{color:var(--red)}
 .note{font-size:11px;color:var(--soft);background:#FFF6F5;border:0.5px solid #F5D0CC;border-radius:8px;padding:8px 12px;margin-top:12px}
 .ft{text-align:center;font-size:11px;color:var(--soft);margin-top:20px;line-height:1.8}
-@media(max-width:1100px){.kings{grid-template-columns:1fr}.q3{grid-template-columns:1fr}}
-@media(max-width:820px){.two{grid-template-columns:1fr}.headbar{flex-wrap:wrap}.hb{flex:1 1 40%}.bar .nm{width:84px}.bar .meta{width:auto}.kings{grid-template-columns:1fr;gap:10px}.q3{grid-template-columns:1fr;gap:10px}}@media(max-width:480px){body{overflow-x:hidden}.wrap{padding:16px 12px 40px}.hero{padding:18px 16px}.hero .big{font-size:30px;letter-spacing:-1px}.hero .chips{gap:14px}.hero .chips b{font-size:16px}.panel{padding:16px 14px}.hd h1{font-size:21px}.headbar{flex-wrap:wrap}.hb{flex:1 1 45%;padding:11px}.hb .v{font-size:19px}.card{padding:15px 16px}.al{padding:14px}.al .v{font-size:24px}
-.wrap{max-width:100%}
-.kwrap,.q3card{padding:12px 13px}
-.krow{flex-wrap:wrap;gap:4px 8px;align-items:baseline}
-.klbl{min-width:34px;font-size:10px}
-.kname{font-size:13px}
-.kval{font-size:12px;margin-left:auto}
-.kmo{font-size:9px;width:100%;margin-left:34px}
-.kteam{display:inline}
-.q3row{flex-wrap:wrap}
-.q3nm{font-size:13px}
-.q3v{font-size:12px}}
+
+
 
 /* 왕 카드 */
 .kings{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0}
@@ -81,6 +70,20 @@ body{overflow-x:hidden}
 .q3nm{font-weight:700;color:var(--ink);font-size:14px}
 .q3tm{font-size:11px;color:var(--soft)}
 .q3v{margin-left:auto;font-weight:800;color:var(--v2);font-size:13px}
+@media(max-width:480px){body{overflow-x:hidden}.wrap{padding:16px 12px 40px}.hero{padding:18px 16px}.hero .big{font-size:30px;letter-spacing:-1px}.hero .chips{gap:14px}.hero .chips b{font-size:16px}.panel{padding:16px 14px}.hd h1{font-size:21px}.headbar{flex-wrap:wrap}.hb{flex:1 1 45%;padding:11px}.hb .v{font-size:19px}.card{padding:15px 16px}.al{padding:14px}.al .v{font-size:24px}
+.wrap{max-width:100%}
+.kwrap,.q3card{padding:12px 13px}
+.krow{flex-wrap:wrap;gap:4px 8px;align-items:baseline}
+.klbl{min-width:34px;font-size:10px}
+.kname{font-size:13px}
+.kval{font-size:12px;margin-left:auto}
+.kmo{font-size:9px;width:100%;margin-left:34px}
+.kteam{display:inline}
+.q3row{flex-wrap:wrap}
+.q3nm{font-size:13px}
+.q3v{font-size:12px}}
+@media(max-width:1100px){.kings{grid-template-columns:1fr}.q3{grid-template-columns:1fr}}
+@media(max-width:820px){.two{grid-template-columns:1fr}.headbar{flex-wrap:wrap}.hb{flex:1 1 40%}.bar .nm{width:84px}.bar .meta{width:auto}.kings{grid-template-columns:1fr;gap:10px}.q3{grid-template-columns:1fr;gap:10px}}
 </style></head><body><div class="wrap">
 <div class="hd"><div class="k">전부서 실적</div><h1>전체실적 대시보드</h1>
 <div class="m">취소 반영 확정 · 미납 포함/취소 제외/연장 포함 · 매일 갱신</div></div>
