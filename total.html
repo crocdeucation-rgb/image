@@ -1,315 +1,109 @@
-/**
- * buildTotalData() — 총매출_전사 탭을 읽어 total.html용 D 객체(JSON)를 생성,
- * "total_data" 탭 A1에 저장한다.
- *
- * [사용법]
- *  1. 매일(3시경) 원장 총매출을 '총매출_전사' 탭에 붙여넣기 (1행 헤더 포함)
- *  2. 메뉴/편집기에서 buildTotalData() 실행
- *  3. total.html이 total_data 탭 CSV(pub)를 읽어 렌더
- *
- * [범위] 1차: 매출카드(tot/web/sang) + branches(지점) + persons(상담개인)
- *        + divpersons(사업개인) + cancel. divs(사업부팀)·head(인원)는 2차(인사 매칭).
- */
-
-var TOTAL_SRC_SHEET = '총매출_전사';   // 원장 데이터 붙여넣는 탭
-var TOTAL_OUT_SHEET = 'total_data';    // JSON 출력 탭
-var WEB_B = ['웹마케팅팀']; // 웹마케팅팀만 (수호웹마=인스타는 상담/수호에듀로)
-var MONTHCLOSE_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBUBxnTPPn_AebCqxIC8Q2x-5V3VuvIY6MM6QlgKVUUA7Bbjh3jMO7q6i4sDgQse-UKsNGe5Hxt7QF/pub?gid=1739211827&single=true&output=csv';
-
-// H(팀구분) → 지점(branches) 묶기
-function _h2branch(h) {
-  h = String(h || '').trim();
-  if (h === '부평1팀' || h === '부평2팀') return '부평지점';
-  if (h === '메이킷위드1과' || h === '메이킷위드2과') return '메이킷위드';
-  if (h === '가산연합메이킷위드팀' || h === '가산연합인투팀') return '가산연합센터';
-  if (h === '마포연합파인더팀' || h === '마포연합인투팀') return '마포연합센터';
-  if (h === '수호에듀1팀' || h === '수호에듀2팀') return '수호에듀';
-  if (h === '스카이에듀1팀' || h === '스카이에듀2팀') return '스카이에듀';
-  if (h === '더온에듀2팀' || h === '더온에듀운영팀') return '더온에듀';
-  return h; // 마곡지점/수원지점/파인더루원/오름에듀/인투본사 등 그대로
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>전체실적</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+:root{--bg:#F1F4F9;--ink:#1B2436;--soft:#6B7688;--line:#E3E8F0;--pan:#fff;--v1:#4C6EF5;--v2:#7048E8;--web:#F76707;--pos:#20A56D;--red:#E23A22;--barbg:#EDF1F8}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:24px 20px 60px}
+.hd .k{font-size:12px;letter-spacing:2px;color:var(--v1);font-weight:800}
+.hd h1{font-size:24px;font-weight:800;margin-top:6px}.hd .m{font-size:12px;color:var(--soft);margin-top:7px}
+.headbar{display:flex;gap:0;background:var(--pan);border-radius:14px;overflow:hidden;margin:14px 0;box-shadow:0 2px 8px rgba(27,36,54,.05)}
+.hb{flex:1;padding:14px 18px;text-align:center;border-right:1px solid var(--line)}
+.hb:last-child{border-right:0}.hb.tot{background:var(--ink);color:#fff}
+.hb .l{font-size:12px;color:var(--soft)}.hb.tot .l{color:#B6C2DC}
+.hb .v{font-size:22px;font-weight:900;margin-top:3px}.hb .v small{font-size:12px;font-weight:700;opacity:.7}
+.hero{background:linear-gradient(120deg,#4C6EF5,#7048E8);border-radius:18px;padding:24px 28px;color:#fff;margin-bottom:12px}
+.hero .lb{font-size:13px;opacity:.85;font-weight:600}
+.hero .big{font-size:40px;font-weight:900;letter-spacing:-2px;margin-top:4px}.hero .big span{font-size:17px;opacity:.85;margin-left:6px}
+.hero .chips{display:flex;gap:22px;margin-top:14px;flex-wrap:wrap}
+.hero .chips div{font-size:12px;opacity:.85}.hero .chips b{display:block;font-size:19px;font-weight:800;margin-top:2px}
+.hero .chips .cx b{color:#FFD9D2}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.card{background:var(--pan);border-radius:14px;padding:18px 20px;box-shadow:0 2px 8px rgba(27,36,54,.05)}
+.ct{font-size:14px;font-weight:800;display:flex;align-items:center;gap:8px}
+.dot{width:10px;height:10px;border-radius:50%}.card.web .dot{background:var(--web)}.card.sang .dot{background:var(--v1)}
+.card .v{font-size:23px;font-weight:900;margin-top:8px}.card .v span{font-size:13px;color:var(--soft)}
+.card .r{display:flex;gap:16px;margin-top:8px;flex-wrap:wrap}.card .r div{font-size:12px;color:var(--soft)}.card .r b{display:block;font-size:16px;color:var(--ink);margin-top:2px}
+.card .r .cx b{color:var(--red)}
+.panel{background:var(--pan);border-radius:14px;padding:20px 22px;box-shadow:0 2px 8px rgba(27,36,54,.05)}
+.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.tabbtn{background:var(--barbg);border:none;color:var(--soft);font-family:inherit;font-weight:700;font-size:13px;padding:8px 15px;border-radius:30px;cursor:pointer}
+.tabbtn.on{background:var(--v1);color:#fff}
+.bar{display:flex;align-items:center;gap:11px;padding:7px 0}
+.bar .rk{width:22px;text-align:center;font-weight:800;color:var(--soft);font-size:13px}.bar .rk.t{color:var(--web)}
+.bar .nm{width:110px;font-weight:700;font-size:13px;flex-shrink:0}.bar .nm .s{display:block;font-size:11px;color:var(--soft);font-weight:500}
+.bar .track{flex:1;background:var(--barbg);border-radius:7px;height:26px;overflow:hidden}
+.bar .fill{height:100%;border-radius:7px;background:linear-gradient(90deg,var(--v1),var(--v2));display:flex;align-items:center;justify-content:flex-end;padding-right:9px}
+.bar .fill span{color:#fff;font-size:12px;font-weight:800;white-space:nowrap}
+.bar .track{position:relative}.bar .outlbl{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:800;color:var(--ink);white-space:nowrap}
+.bar .meta{width:200px;text-align:right;font-size:11px;color:var(--soft);flex-shrink:0}.bar .meta b{color:var(--ink)}.bar .meta .cx{color:var(--red)}
+.note{font-size:11px;color:var(--soft);background:#FFF6F5;border:0.5px solid #F5D0CC;border-radius:8px;padding:8px 12px;margin-top:12px}
+.ft{text-align:center;font-size:11px;color:var(--soft);margin-top:20px;line-height:1.8}
+@media(max-width:820px){.two{grid-template-columns:1fr}.headbar{flex-wrap:wrap}.hb{flex:1 1 40%}.bar .nm{width:84px}.bar .meta{width:auto}}@media(max-width:480px){body{overflow-x:hidden}.wrap{padding:16px 12px 40px}.hero{padding:18px 16px}.hero .big{font-size:30px;letter-spacing:-1px}.hero .chips{gap:14px}.hero .chips b{font-size:16px}.panel{padding:16px 14px}.hd h1{font-size:21px}.headbar{flex-wrap:wrap}.hb{flex:1 1 45%;padding:11px}.hb .v{font-size:19px}.card{padding:15px 16px}.al{padding:14px}.al .v{font-size:24px}}
+</style></head><body><div class="wrap">
+<div class="hd"><div class="k">전부서 실적</div><h1>전체실적 대시보드</h1>
+<div class="m">취소 반영 확정 · 미납 포함/취소 제외/연장 포함 · 매일 갱신</div></div>
+<div class="hero"><div class="lb">전사 매출 (웹마케팅 포함)</div><div class="big" id="h_s"></div>
+<div class="chips"><div>세팅<b id="h_set"></b></div><div>오더<b id="h_ord"></b></div><div>오더율<b id="h_rate"></b></div><div class="cx">당월 취소<b id="h_cx"></b></div></div></div>
+<div class="two">
+<div class="card web"><div class="ct"><span class="dot"></span>웹마케팅</div><div class="v" id="w_s"></div><div class="r"><div>세팅<b id="w_set"></b></div><div>오더<b id="w_ord"></b></div><div>오더율<b id="w_r"></b></div><div class="cx">취소<b id="w_cx"></b></div></div></div>
+<div class="card sang"><div class="ct"><span class="dot"></span>상담지점</div><div class="v" id="s_s"></div><div class="r"><div>세팅<b id="s_set"></b></div><div>오더<b id="s_ord"></b></div><div>오더율<b id="s_r"></b></div><div class="cx">취소<b id="s_cx"></b></div></div></div></div>
+<div class="panel">
+<div class="tabs"><button class="tabbtn on" onclick="sw(0,this)">상담 지점 매출순</button><button class="tabbtn" onclick="sw(3,this)">상담 개인 TOP</button><button class="tabbtn" onclick="sw(4,this)">사업 개인 TOP</button></div>
+<div id="body"></div>
+<div class="note" id="note" style="display:none">지점별/개인별 매출 순위 · 매일 갱신</div>
+</div>
+<div class="ft">소스 = 총매출_전사 (매일 갱신) · 당월 취소 = 특이사항 파싱 · 수호웹마는 수호에듀 포함 · 웹마케팅은 전사 합계 포함/지점순위 분리</div>
+</div>
+<script>
+var TOTAL_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBUBxnTPPn_AebCqxIC8Q2x-5V3VuvIY6MM6QlgKVUUA7Bbjh3jMO7q6i4sDgQse-UKsNGe5Hxt7QF/pub?gid=1261488271&single=true&output=csv";
+function renderAll(D){
+  window.__D = D;
+function won(n){return n.toLocaleString('ko-KR');}
+function eok(n){return (n/100000000).toFixed(2)+'억';}
+document.getElementById('h_s').innerHTML=won(D.tot.sales)+'<span>원</span>';
+document.getElementById('h_set').textContent=D.tot.set;document.getElementById('h_ord').textContent=D.tot.ord;document.getElementById('h_rate').textContent=D.tot.rate+'%';
+document.getElementById('h_cx').textContent=won(D.cancel.amt)+'원 ('+D.cancel.cnt+'건)';
+document.getElementById('w_s').innerHTML=won(D.web.sales)+' <span>원</span>';document.getElementById('w_set').textContent=D.web.set;document.getElementById('w_ord').textContent=D.web.ord;document.getElementById('w_r').textContent=D.web.rate+'%';document.getElementById('w_cx').textContent=won(D.web.cxa)+'원';
+document.getElementById('s_s').innerHTML=won(D.sang.sales)+' <span>원</span>';document.getElementById('s_set').textContent=D.sang.set;document.getElementById('s_ord').textContent=D.sang.ord;document.getElementById('s_r').textContent=D.sang.rate+'%';document.getElementById('s_cx').textContent=won(D.sang.cxa)+'원';
+function barsBr(arr,byPer){var a=arr.slice();if(byPer)a.sort(function(x,y){return y.per-x.per;});var key=byPer?'per':'sales';var mx=Math.max.apply(null,a.map(function(x){return x[key];}))||1;var h='';
+a.forEach(function(x,i){var w=Math.max(x[key]/mx*100,3);var lbl=byPer?won(x.per)+'/인':won(x.sales);
+var cx=x.cxa>0?' · <span class="cx">취소 '+won(x.cxa)+'</span>':'';
+var inside=w>=18;var lblhtml=inside?'<span>'+lbl+'</span>':'';var outlbl=inside?'':'<span class="outlbl">'+lbl+'</span>';h+='<div class="bar"><div class="rk'+(i<3?' t':'')+'">'+(i+1)+'</div><div class="nm">'+x.name+'</div><div class="track"><div class="fill" style="width:'+w+'%">'+lblhtml+'</div>'+outlbl+'</div><div class="meta">오더 <b>'+x.ord+'</b> · 1인당 <b>'+won(x.per)+'</b>'+cx+'</div></div>';});return h;}
+function barsDv(arr){var mx=Math.max.apply(null,arr.map(function(x){return x.sales;}))||1;var h='';
+arr.forEach(function(x,i){var w=Math.max(x.sales/mx*100,3);
+var ins=w>=18;h+='<div class="bar"><div class="rk'+(i<3?' t':'')+'">'+(i+1)+'</div><div class="nm">'+x.name+'</div><div class="track"><div class="fill" style="width:'+w+'%">'+(ins?'<span>'+won(x.sales)+'</span>':'')+'</div>'+(ins?'':'<span class="outlbl">'+won(x.sales)+'</span>')+'</div><div class="meta">세팅 <b>'+x.set+'</b> · 오더 <b>'+x.ord+'</b> · 1인당 <b>'+won(x.per)+'</b></div></div>';});return h;}
+function barsP(arr){var mx=Math.max.apply(null,arr.map(function(x){return x.sales;}))||1;var h='';
+arr.forEach(function(x,i){var w=Math.max(x.sales/mx*100,3);
+var ip=w>=18;var cx=x.cxa>0?' · <span class="cx">취소 '+won(x.cxa)+'</span>':'';
+h+='<div class="bar"><div class="rk'+(i<3?' t':'')+'">'+(i+1)+'</div><div class="nm">'+x.name+'<span class="s">'+x.team+'</span></div><div class="track"><div class="fill" style="width:'+w+'%">'+(ip?'<span>'+won(x.sales)+'</span>':'')+'</div>'+(ip?'':'<span class="outlbl">'+won(x.sales)+'</span>')+'</div><div class="meta">세팅 <b>'+x.set+'</b> · 오더 <b>'+x.ord+'</b>'+cx+'</div></div>';});return h;}
+window.sw=function(i,btn){var D=window.__D;document.querySelectorAll('.tabbtn').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');
+document.getElementById('note').style.display=(i===2||i===4)?'block':'none';
+document.getElementById('body').innerHTML=i===0?barsBr(D.branches,false):i===2?barsDv(D.divs):i===3?barsP(D.persons):barsP(D.divpersons);}
+document.getElementById('body').innerHTML=barsBr(D.branches,false);
 }
-
-function _num(v) { return (typeof v === 'number' && !isNaN(v)) ? v : 0; }
-
-// 날짜 파싱 ("2026-08-01" / "08월 01일" / Date)
-function _pdate(v) {
-  if (Object.prototype.toString.call(v) === '[object Date]') return v;
-  var s = String(v || '');
-  var m = s.match(/(\d{4})[-.\/](\d{1,2})[-.\/](\d{1,2})/);
-  if (m) return new Date(+m[1], +m[2]-1, +m[3]);
-  var m2 = s.match(/(\d{1,2})\uc6d4\s*(\d{1,2})\uc77c/); // "08월 01일"
-  if (m2) return new Date(2026, +m2[1]-1, +m2[2]);
-  return null;
-}
-function _ymd(d){ return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
-function _weekMonday(d){ // 그 주 월요일
-  var day = (d.getDay()+6)%7; // 월=0
-  var m = new Date(d.getFullYear(), d.getMonth(), d.getDate()-day);
-  return m;
-}
-
-// 월종결 CSV(과거 5·6·7월) 읽어서 rows 반환
-function _fetchMonthClose() {
-  var out = [];
-  try {
-    var res = UrlFetchApp.fetch(MONTHCLOSE_CSV, { muteHttpExceptions:true });
-    if (res.getResponseCode() !== 200) return out;
-    var lines = res.getContentText().trim().split('\n').map(function(r){
-      return r.split(',').map(function(c){ return c.trim().replace(/^"|"$/g,''); });
-    });
-    var H = lines.shift();
-    function ci(name){ for (var i=0;i<H.length;i++){ if (H[i]===name) return i; } return -1; }
-    var iD=ci('날짜'), iB=ci('상담'), iS=ci('매출'), iF=ci('사업부'), iH=ci('팀구분');
-    lines.forEach(function(r){
-      var b=(r[iB]||'').trim(); if(!b) return;
-      var sv=parseFloat(r[iS]); var sales=isNaN(sv)?0:sv;
-      out.push({ date:_pdate(r[iD]), b:b, f:(r[iF]||'').trim(), h:(r[iH]||'').trim(), sales:sales, gb:(String(r[iS]||'').indexOf('결보')>=0?1:0) });
-    });
-  } catch(e){ Logger.log('월종결 로드 실패: '+e); }
-  return out;
-}
-
-
-function buildTotalData() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sh = ss.getSheetByName(TOTAL_SRC_SHEET);
-  if (!sh) { throw new Error('탭 없음: ' + TOTAL_SRC_SHEET); }
-
-  var values = sh.getDataRange().getValues();
-  if (values.length < 2) { throw new Error('총매출_전사 데이터 없음'); }
-
-  // 헤더에서 컬럼 인덱스 찾기 (순서 바뀌어도 안전)
-  var H = values[0].map(function(x){ return String(x || '').trim(); });
-  function col(name){ for (var i=0;i<H.length;i++){ if (H[i] === name) return i; } return -1; }
-  var iDate = col('날짜'), iB = col('상담'), iName = col('학생'),
-      iSales = col('매출'), iNote = col('특이사항'), iF = col('사업부'), iH = col('팀구분');
-  if (iB < 0 || iSales < 0 || iH < 0) {
-    throw new Error('필수 컬럼(상담/매출/팀구분) 못 찾음. 헤더 확인: ' + H.join(','));
-  }
-
-  var isWeb = function(b){ return WEB_B.indexOf(String(b||'').trim()) >= 0; };
-
-  // 집계 컨테이너
-  var tot = { sales:0, ord:0, set:0 };
-  var web = { sales:0, ord:0, set:0, cxa:0, cxc:0 };
-  var sang = { sales:0, ord:0, set:0, cxa:0, cxc:0 };
-  var brMap = {};   // 지점 → {sales,ord,set,cxa,cxc}
-  var perMap = {};  // 상담개인(B) → {team(H지점), sales,ord,set,cxa}
-  var divpMap = {}; // 사업개인(F) → {sales,ord,set,cxa}
-  var cancelAmt = 0, cancelCnt = 0;
-
-  function ensure(map, key, extra){
-    if (!map[key]) { map[key] = { sales:0, ord:0, set:0, cxa:0, cxc:0 }; if (extra) for (var k in extra) map[key][k]=extra[k]; }
-    return map[key];
-  }
-
-  for (var r = 1; r < values.length; r++) {
-    var row = values[r];
-    var b = String(row[iB] || '').trim();
-    if (!b) continue;
-    var salesRaw = row[iSales];
-    var sales = _num(salesRaw);           // 매출(천원)
-    var note = iNote>=0 ? String(row[iNote]||'') : '';
-    var hRaw = row[iH];
-    var fRaw = iF>=0 ? String(row[iF]||'').trim() : '';
-    var isOrder = sales > 0;
-    var isSet = true; // 시트에 올라온 행 = 세팅 이상 (결보 포함). 세팅수는 전체 행 기준.
-
-    // 취소 추출 (특이사항 "숫자취소" 패턴)
-    var cxAmt = 0;
-    var m = note.match(/(\d+)\s*취소/);
-    if (m) cxAmt = parseInt(m[1], 10);
-
-    // 전사
-    tot.set++;
-    if (isOrder) { tot.sales += sales; tot.ord++; }
-
-    if (isWeb(b)) {
-      web.set++;
-      if (isOrder) { web.sales += sales; web.ord++; }
-      if (cxAmt) { web.cxa += cxAmt; web.cxc++; }
-    } else {
-      sang.set++;
-      if (isOrder) { sang.sales += sales; sang.ord++; }
-      if (cxAmt) { sang.cxa += cxAmt; sang.cxc++; }
-
-      // 지점(branches) — 웹마 제외, 인투본사(웹마 결보 자리) 제외
-      var br = _h2branch(hRaw);
-      if (br && br !== '인투본사') {
-        var bo = ensure(brMap, br);
-        bo.set++;
-        if (isOrder) { bo.sales += sales; bo.ord++; }
-        if (cxAmt) { bo.cxa += cxAmt; bo.cxc++; }
-      }
-      // 상담개인(persons) — B별
-      var po = ensure(perMap, b, { team: br || '' });
-      po.set++;
-      if (isOrder) { po.sales += sales; po.ord++; }
-      if (cxAmt) po.cxa += cxAmt;
-      // 사업개인(divpersons) — F별
-      if (fRaw) {
-        var dpo = ensure(divpMap, fRaw);
-        dpo.set++;
-        if (isOrder) { dpo.sales += sales; dpo.ord++; }
-        if (cxAmt) dpo.cxa += cxAmt;
-      }
+(async function(){
+  try{
+    var res = await fetch(TOTAL_CSV + "&_=" + Date.now());
+    var text = await res.text();
+    // total_data A1 = JSON 문자열 (CSV로 나오면 따옴표 감싸질 수 있음)
+    text = text.trim();
+    // Google CSV: JSON 전체를 "..."로 감싸고 내부 "를 ""로 이스케이프함
+    // 1) 앞뒤를 감싼 바깥 큰따옴표 제거
+    if(text.charAt(0)==='"' && text.charAt(text.length-1)==='"'){
+      text = text.substring(1, text.length-1);
     }
-
-    if (cxAmt) { cancelAmt += cxAmt; cancelCnt++; }
+    // 2) "" → " 복원
+    text = text.split('""').join('"');
+    // 3) JSON 본문만 ({ ... })
+    var a = text.indexOf('{'), b = text.lastIndexOf('}');
+    if(a>=0 && b>a){ text = text.substring(a, b+1); }
+    var D = JSON.parse(text);
+    renderAll(D);
+  }catch(e){
+    document.body.insertAdjacentHTML('afterbegin','<div style="padding:20px;color:#E23A22">total_data 로드 실패: '+e+'</div>');
+    console.error(e);
   }
-
-  // 천원 → 원 변환 + 정렬/구조화
-  function won(n){ return Math.round(n * 1000); }
-  function rate(o,s){ return s ? Math.round(o/s*100) : 0; }
-
-  function mapToSortedArr(map, withTeam){
-    var arr = [];
-    for (var k in map){
-      var v = map[k];
-      var o = { name:k, sales:won(v.sales), set:v.set, ord:v.ord, cxa:won(v.cxa||0), cxc:v.cxc||0 };
-      if (withTeam) o.team = v.team || '';
-      arr.push(o);
-    }
-    arr.sort(function(a,b){ return b.sales - a.sales; });
-    return arr;
-  }
-
-  var branches = mapToSortedArr(brMap, false).map(function(o){
-    o.per = o.ord ? Math.round(o.sales / o.ord) : 0;  // 오더당 매출
-    return o;
-  });
-  var persons = mapToSortedArr(perMap, true);
-  var divpersons = mapToSortedArr(divpMap, false).map(function(o){ o.team=''; return o; });
-
-  // ─────────────────────────────────────────────
-  // [기간 집계] 이번주/지난주 왕 + 3개월 TOP3 (월종결 5·6·7 + 총매출_전사 8월)
-  // ─────────────────────────────────────────────
-  var past = _fetchMonthClose();  // 5·6·7월 rows: {date,b,f,h,sales}
-  // 8월(총매출_전사) rows도 같은 형식으로 수집
-  var cur = [];
-  for (var rr = 1; rr < values.length; rr++) {
-    var row2 = values[rr];
-    var b2 = String(row2[iB]||'').trim(); if(!b2) continue;
-    cur.push({
-      date: iDate>=0 ? _pdate(row2[iDate]) : null,
-      b: b2,
-      f: iF>=0 ? String(row2[iF]||'').trim() : '',
-      h: String(row2[iH]||'').trim(),
-      sales: _num(row2[iSales]),
-      gb: (String(row2[iSales]||'').indexOf('결보')>=0) ? 1 : 0
-    });
-  }
-  var allRows = past.concat(cur);
-  var isWebRow = function(b){ return WEB_B.indexOf(String(b||'').trim()) >= 0; };
-
-  // 기간 필터로 상담(B)/사업(F) 개인 매출·세팅 집계 → 소속 포함
-  function aggPersons(dateFilter, useF) {
-    var m = {}; // key → {sales,set,gb,team}
-    allRows.forEach(function(r){
-      if (!r.date || !dateFilter(r.date)) return;
-      if (isWebRow(r.b)) return;               // 웹마 제외
-      var key = useF ? r.f : r.b;
-      if (!key) return;
-      if (!m[key]) m[key] = { name:key, sales:0, set:0, gb:0, team: _h2branch(r.h) };
-      m[key].set++;
-      if (r.sales > 0) m[key].sales += r.sales;
-      else if (r.gb) m[key].gb++;              // 결보 카운트 (aggPersons 호출 전 r.gb 세팅)
-      if (!m[key].team && r.h) m[key].team = _h2branch(r.h);
-    });
-    return m;
-  }
-  function topBy(m, field, n) {
-    var arr = [];
-    for (var k in m){ var v=m[k]; arr.push({ name:v.name, team:v.team||'', sales:won(v.sales), set:v.set, gb:v.gb||0 }); }
-    arr.sort(function(a,b){ return b[field] - a[field]; });
-    return arr.slice(0, n);
-  }
-
-  // 주 경계 (오늘 기준 월~일)
-  var _today = new Date();
-  var _mon = _weekMonday(_today);
-  var _lastMon = new Date(_mon.getFullYear(), _mon.getMonth(), _mon.getDate()-7);
-  var _nextMon = new Date(_mon.getFullYear(), _mon.getMonth(), _mon.getDate()+7);
-  function inThisWeek(d){ return d >= _mon && d < _nextMon; }
-  function inLastWeek(d){ return d >= _lastMon && d < _mon; }
-  // 3개월(당월 포함 직전 3개월): 이번달 기준 6·7·8월
-  var _cm = _today.getMonth(); // 0-based
-  function inLast3M(d){
-    var diff = (_today.getFullYear()-d.getFullYear())*12 + (_today.getMonth()-d.getMonth());
-    return diff >= 0 && diff <= 2;  // 이번달, 1달전, 2달전
-  }
-
-  // 이번주/지난주 — 상담·사업 각각 매출왕/세팅왕
-  var sangThis = aggPersons(inThisWeek, false), sangLast = aggPersons(inLastWeek, false);
-  var saupThis = aggPersons(inThisWeek, true),  saupLast = aggPersons(inLastWeek, true);
-  var weekly = {
-    thisWeek: {
-      sangSales: topBy(sangThis,'sales',1)[0]||null,
-      sangSet:   topBy(sangThis,'set',1)[0]||null,
-      sangGb:    topBy(sangThis,'gb',1)[0]||null,
-      saupSales: topBy(saupThis,'sales',1)[0]||null,
-      saupSet:   topBy(saupThis,'set',1)[0]||null,
-      saupGb:    topBy(saupThis,'gb',1)[0]||null
-    },
-    lastWeek: {
-      sangSales: topBy(sangLast,'sales',1)[0]||null,
-      sangSet:   topBy(sangLast,'set',1)[0]||null,
-      sangGb:    topBy(sangLast,'gb',1)[0]||null,
-      saupSales: topBy(saupLast,'sales',1)[0]||null,
-      saupSet:   topBy(saupLast,'set',1)[0]||null,
-      saupGb:    topBy(saupLast,'gb',1)[0]||null
-    }
-  };
-
-  // 3개월 누적 TOP3 — 지점/상담/사업
-  var sang3 = aggPersons(inLast3M, false), saup3 = aggPersons(inLast3M, true);
-  // 지점 3개월
-  var br3map = {};
-  allRows.forEach(function(r){
-    if (!r.date || !inLast3M(r.date)) return;
-    if (isWebRow(r.b)) return;
-    var br = _h2branch(r.h);
-    if (!br || br==='인투본사') return;
-    if (!br3map[br]) br3map[br] = { name:br, sales:0, set:0, team:'' };
-    br3map[br].set++;
-    if (r.sales>0) br3map[br].sales += r.sales;
-  });
-  var top3 = {
-    branch:   topBy(br3map,'sales',3),
-    sang:     topBy(sang3,'sales',3),
-    saup:     topBy(saup3,'sales',3),
-    sangGb:   topBy(sang3,'gb',3),
-    saupGb:   topBy(saup3,'gb',3)
-  };
-
-  var D = {
-    date: Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd'),
-    tot:  { sales:won(tot.sales), set:tot.set, ord:tot.ord, rate:rate(tot.ord,tot.set) },
-    web:  { sales:won(web.sales), set:web.set, ord:web.ord, rate:rate(web.ord,web.set), cxa:won(web.cxa), cxc:web.cxc },
-    sang: { sales:won(sang.sales), set:sang.set, ord:sang.ord, rate:rate(sang.ord,sang.set), cxa:won(sang.cxa), cxc:sang.cxc },
-    cancel: { amt:won(cancelAmt), cnt:cancelCnt },
-    branches: branches,
-    divs: [],        // 2차 (F→인사부서 매칭)
-    persons: persons,
-    divpersons: divpersons,
-    head: { web:2, sang:0, div:0, total:2 },  // 2차 (인사 4시트)
-    weekly: weekly,   // 이번주/지난주 매출왕·세팅왕 (상담/사업)
-    top3: top3        // 3개월 누적 TOP3 (지점/상담/사업)
-  };
-
-  // total_data 탭에 JSON 저장
-  var out = ss.getSheetByName(TOTAL_OUT_SHEET) || ss.insertSheet(TOTAL_OUT_SHEET);
-  out.clearContents();
-  out.getRange('A1').setValue(JSON.stringify(D));
-
-  var _w = D.weekly.thisWeek;
-  Logger.log('이번주 상담매출왕 ' + (_w.sangSales?_w.sangSales.name+' '+_w.sangSales.sales.toLocaleString():'-')
-    + ' / 사업매출왕 ' + (_w.saupSales?_w.saupSales.name+' '+_w.saupSales.sales.toLocaleString():'-'));
-  Logger.log('3개월 지점TOP ' + D.top3.branch.map(function(x){return x.name+' '+x.sales.toLocaleString();}).join(' / '));
-  Logger.log('total 생성 — 전사 ' + D.tot.sales.toLocaleString()
-    + ' / 웹마 ' + D.web.sales.toLocaleString()
-    + ' / 상담 ' + D.sang.sales.toLocaleString()
-    + ' / 취소 ' + D.cancel.amt.toLocaleString()
-    + ' / 지점 ' + branches.length + '개');
-  return D;
-}
+})();
+</script></body></html>
