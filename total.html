@@ -137,9 +137,9 @@ body{overflow-x:hidden}
 .dchips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
 .dchip{background:var(--barbg);border:none;color:var(--soft);font-family:inherit;font-weight:700;font-size:12px;padding:6px 12px;border-radius:20px;cursor:pointer}
 .dchip.on{background:var(--ink);color:#fff}
-.dsvg{width:100%;height:auto;display:block}
-.dxlbl{font-size:12px;fill:var(--soft);font-weight:600}
-.dptlbl{font-size:12px;font-weight:800}
+.dsvg{width:100%;max-width:680px;height:auto;display:block;margin:0 auto}
+.dxlbl{font-size:11px;fill:var(--soft);font-weight:600}
+.dptlbl{font-size:11px;font-weight:800}
 .dptlbl.v2{fill:var(--v2)}.dptlbl.v1{fill:var(--v1)}
 .dlegend{display:flex;gap:16px;justify-content:center;margin-top:4px}
 .dlegend .lg{font-size:11px;font-weight:700}
@@ -189,8 +189,12 @@ body{overflow-x:hidden}
 </div>
 <script>
 var TOTAL_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBUBxnTPPn_AebCqxIC8Q2x-5V3VuvIY6MM6QlgKVUUA7Bbjh3jMO7q6i4sDgQse-UKsNGe5Hxt7QF/pub?gid=1261488271&single=true&output=csv";
-// 지사 인원 (수동 파악 — 데이터로 자동 산출 불가한 독립지사). 파악되면 숫자만 채우기.
-var BRANCH_HEAD = { '더온에듀':7, '스카이에듀':2 };  // 오름에듀·수호에듀 = 미파악
+// 지점 인원 (상담부 매출현황 기준 — 실적현황 갱신 시 같이 업데이트). 인투본사 무시.
+var BRANCH_HEAD = {
+  '가산연합센터':11, '메이킷위드':11, '부평지점':7, '마포연합센터':11,
+  '수호에듀':11, '마곡지점':7, '더온에듀':8, '수원지점':5,
+  '파인더루원':5, '스카이에듀':3, '오름에듀':4
+};
 function renderAll(D){
   window.__D = D;
   // ── 이번주/지난주 왕 + 3개월 TOP3 렌더 ──
@@ -334,7 +338,7 @@ function renderTrend(){
 window.selBranch=function(i,btn){document.querySelectorAll('.dchip').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');drawChart(i);};
 function drawChart(i){
   var dk=window.__DK; var bt=dk.branchTrend; var b=bt.branches[i]; var s=b.series;
-  var W=620,H=240,padL=16,padR=16,padT=24,padB=30,iw=W-padL-padR,ih=H-padT-padB,n=s.length;
+  var W=720,H=200,padL=14,padR=14,padT=24,padB=34,iw=W-padL-padR,ih=H-padT-padB,n=s.length;
   var maxS=Math.max.apply(null,s.map(function(x){return x.sales;}))||1;
   var maxSet=Math.max.apply(null,s.map(function(x){return x.set;}))||1;
   function px(idx){return padL+(n<=1?iw/2:iw*idx/(n-1));}
@@ -343,11 +347,11 @@ function drawChart(i){
   var salesPts=s.map(function(x,idx){return px(idx)+','+pyS(x.sales);}).join(' ');
   var setPts=s.map(function(x,idx){return px(idx)+','+pySet(x.set);}).join(' ');
   var svg='<svg viewBox="0 0 '+W+' '+H+'" class="dsvg">';
-  s.forEach(function(x,idx){var xx=px(idx);svg+='<line x1="'+xx+'" y1="'+padT+'" x2="'+xx+'" y2="'+(padT+ih)+'" stroke="#EEF1F8"/><text x="'+xx+'" y="'+(H-10)+'" text-anchor="middle" class="dxlbl">'+x.m+'월</text>';});
-  svg+='<polyline points="'+setPts+'" fill="none" stroke="#4C6EF5" stroke-width="2" stroke-dasharray="5 4"/>';
-  s.forEach(function(x,idx){var xx=px(idx),yy=pySet(x.set);svg+='<circle cx="'+xx+'" cy="'+yy+'" r="3.5" fill="#4C6EF5"/><text x="'+xx+'" y="'+(yy+17)+'" text-anchor="middle" class="dptlbl v1">'+x.set+'</text>';});
-  svg+='<polyline points="'+salesPts+'" fill="none" stroke="#7048E8" stroke-width="2.5"/>';
-  s.forEach(function(x,idx){var xx=px(idx),yy=pyS(x.sales);svg+='<circle cx="'+xx+'" cy="'+yy+'" r="4" fill="#7048E8"/><text x="'+xx+'" y="'+(yy-9)+'" text-anchor="middle" class="dptlbl v2">'+eokman(x.sales)+'</text>';});
+  s.forEach(function(x,idx){var xx=px(idx);svg+='<line x1="'+xx+'" y1="'+padT+'" x2="'+xx+'" y2="'+(padT+ih)+'" stroke="#EEF1F8"/><text x="'+xx+'" y="'+(H-11)+'" text-anchor="middle" class="dxlbl">'+x.m+'월</text>';});
+  svg+='<polyline points="'+setPts+'" fill="none" stroke="#4C6EF5" stroke-width="1.4" stroke-dasharray="4 3"/>';
+  s.forEach(function(x,idx){var xx=px(idx),yy=pySet(x.set);svg+='<circle cx="'+xx+'" cy="'+yy+'" r="2.5" fill="#4C6EF5"/><text x="'+xx+'" y="'+(yy+14)+'" text-anchor="middle" class="dptlbl v1">'+x.set+'</text>';});
+  svg+='<polyline points="'+salesPts+'" fill="none" stroke="#7048E8" stroke-width="1.8"/>';
+  s.forEach(function(x,idx){var xx=px(idx),yy=pyS(x.sales);svg+='<circle cx="'+xx+'" cy="'+yy+'" r="3" fill="#7048E8"/><text x="'+xx+'" y="'+(yy-8)+'" text-anchor="middle" class="dptlbl v2">'+eokman(x.sales)+'</text>';});
   svg+='</svg>';
   var head=(typeof BRANCH_HEAD!=='undefined'?BRANCH_HEAD:{})[b.name], last=s[s.length-1];
   var info = head ? '<div class="dbinfo"><b>'+b.name+'</b> · '+head+'명 · '+last.m+'월 1인당 '+eokman(Math.round(last.sales/head))+'</div>'
