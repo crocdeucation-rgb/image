@@ -55,6 +55,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .kname{font-weight:700;color:var(--ink);font-size:14px}
 .kteam{font-size:11px;color:var(--soft);margin-left:2px}
 .kval{margin-left:auto;font-weight:800;color:var(--v2);font-size:13px}
+.kmo{display:block;font-size:10px;color:#8A94A6;margin-top:1px}
 .klbl{font-size:11px;color:var(--soft);min-width:38px}
 /* 3개월 TOP3 */
 .q3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0}
@@ -102,7 +103,8 @@ function renderAll(D){
       else if(lbl.indexOf('확률')>=0) val=(obj.rate||0)+'% ('+(obj.ord||0)+'/'+(obj.set||0)+')';
       else val=won(obj.sales);
       var team = obj.team ? '<span class="kteam">·'+obj.team+'</span>' : '';
-      return '<div class="krow"><span class="klbl">'+lbl+'</span><span class="kname">'+obj.name+team+'</span><span class="kval">'+val+'</span></div>';
+      var mo = (obj.mSet!==undefined) ? '<span class="kmo">이달 세팅'+obj.mSet+' · '+won(obj.mSales)+'</span>' : '';
+      return '<div class="krow"><span class="klbl">'+lbl+'</span><span class="kname">'+obj.name+team+mo+'</span><span class="kval">'+val+'</span></div>';
     }
     function kcard(title, wk, d){
       return '<div class="kwrap"><h3>'+title+' <span class="wk">'+wk+'</span></h3>'
@@ -122,7 +124,7 @@ function renderAll(D){
       function top3mini(title, arr){
         var h='<div style="margin-bottom:12px"><div style="font-size:12px;color:#6B7688;font-weight:700;margin-bottom:6px">'+title+'</div>';
         (arr||[]).slice(0,3).forEach(function(x,i){
-          h+='<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px"><span style="width:16px;height:16px;border-radius:5px;background:'+(i===0?'#7048E8':'#EEF0FF')+';color:'+(i===0?'#fff':'#4C6EF5')+';font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center">'+(i+1)+'</span><b style="color:#1B2436">'+x.name+'</b>'+(x.team?'<span style="font-size:11px;color:#8A94A6">'+x.team+'</span>':'')+'<span style="margin-left:auto;font-weight:800;color:#7048E8;font-size:12px">'+won(x.sales)+'</span></div>';
+          h+='<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px"><span style="width:16px;height:16px;border-radius:5px;background:'+(i===0?'#7048E8':'#EEF0FF')+';color:'+(i===0?'#fff':'#4C6EF5')+';font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(i+1)+'</span><b style="color:#1B2436">'+x.name+'</b>'+(x.team?'<span style="font-size:11px;color:#8A94A6">'+x.team+'</span>':'')+'<span style="margin-left:auto;text-align:right"><span style="font-weight:800;color:#7048E8;font-size:12px">'+won(x.sales)+'</span><br><span style="font-size:10px;color:#8A94A6">세팅'+(x.set||0)+' · 오더'+(x.ord||0)+'</span></span></div>';
         });
         return h+'</div>';
       }
@@ -134,17 +136,18 @@ function renderAll(D){
     }
     // 3개월 TOP3
     var t3 = D.top3 || {};
-    function q3card(title, arr){
+    function q3card(title, arr, showSet){
       var h='<div class="q3card"><h3>'+title+'</h3>';
       (arr||[]).forEach(function(x,i){
+        var meta = showSet ? '<br><span style="font-size:10px;color:#8A94A6;font-weight:600">세팅'+(x.set||0)+' · 오더'+(x.ord||0)+'</span>' : '';
         h+='<div class="q3row"><span class="q3rk'+(i===0?' t':'')+'">'+(i+1)+'</span><span class="q3nm">'+x.name
-          +(x.team?' <span class="q3tm">'+x.team+'</span>':'')+'</span><span class="q3v">'+won(x.sales)+'</span></div>';
+          +(x.team?' <span class="q3tm">'+x.team+'</span>':'')+'</span><span class="q3v" style="text-align:right">'+won(x.sales)+meta+'</span></div>';
       });
       return h+'</div>';
     }
     var q3El = document.getElementById('q3');
     if(q3El){
-      q3El.innerHTML = q3card('3개월 지점 TOP3', t3.branch) + q3card('3개월 상담 TOP3', t3.sang) + q3card('3개월 사업 TOP3', t3.saup);
+      q3El.innerHTML = q3card('3개월 지점 TOP3', t3.branch, true) + q3card('3개월 상담 TOP3', t3.sang, true) + q3card('3개월 사업 TOP3', t3.saup, true);
     }
   })();
 function won(n){return n.toLocaleString('ko-KR');}
