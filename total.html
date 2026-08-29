@@ -88,6 +88,13 @@ body{overflow-x:hidden}
 .tag{font-size:11px;margin-left:3px;vertical-align:baseline}
 .tag.crown{filter:saturate(1.2)}
 .q3cx,.kcx{color:var(--red);font-size:10px;font-weight:700}
+/* 빛나는 눈물 — 큰 취소일수록 반짝 (블론세이브: 고생했다 위로) */
+.cx-shine2{filter:drop-shadow(0 0 1.5px rgba(240,119,26,.55))}
+.cx-shine3{animation:cxshine 1.7s ease-in-out infinite}
+@keyframes cxshine{
+  0%,100%{filter:drop-shadow(0 0 0.5px rgba(226,58,34,.35));text-shadow:0 0 2px rgba(226,58,34,.2)}
+  50%{filter:drop-shadow(0 0 5px rgba(226,58,34,.9));text-shadow:0 0 8px rgba(226,58,34,.5)}
+}
 
 
 
@@ -139,6 +146,11 @@ body{overflow-x:hidden}
 .drnone{font-size:12px;color:#B6C2DC;padding:6px 0}
 .drsub{font-size:11px;color:var(--v2);font-weight:800;margin:2px 0 2px}
 .drsub2{font-size:10px;color:var(--soft);font-weight:700;margin:1px 0 1px;padding-left:2px}
+.surge-two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.surge-two .drrow{padding:4px 0}
+.surge-two .drnm{font-size:12px}
+.surge-two .drprev{font-size:9px}
+@media(max-width:900px){.surge-two{grid-template-columns:1fr;gap:2px}}
 .dpanel{margin-bottom:12px}
 .dhd{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px}
 .dhd h3{font-size:14px;font-weight:800;margin:0;display:flex;align-items:center;gap:7px}
@@ -238,17 +250,23 @@ function renderAll(D){
     if(D.newbie && D.newbie[name]) s+='<span class="tag" title="입사 6개월내">🌱</span>';
     return s;
   }
-  // [작업3] 취소 표기 — 💧 (블론세이브: 까는 게 아니라 중립·위로). 큰 건은 색 강조
-  function cxTag(cxa, sales){
+  // [작업3] 취소 표기 — 임계 미만은 숨김(남발 방지). 상담/사업 기준 다름. 3단계 색 차등(회색→주황→빨강)
+  var CX_T = { sang:[15000000,20000000,25000000], saup:[20000000,25000000,30000000] };  // 만원 기준 튜닝값
+  function cxTag(cxa, seg){
     if(!cxa || cxa<=0) return '';
-    var big = cxa>=20000000 || (sales>0 && cxa/sales>=0.3);   // 2000만+ 또는 매출의 30%+
-    return '<span class="'+(big?'q3cx':'kcx')+'" style="'+(big?'':'color:#9AA6B8')+'">💧'+won(cxa)+'</span>';
+    var t = CX_T[seg] || CX_T.sang;
+    if(cxa < t[0]) return '';                    // 최소 기준 미만 = 표시 안 함
+    var lv = cxa>=t[2] ? 3 : cxa>=t[1] ? 2 : 1;
+    var c  = lv===3 ? '#E23A22' : lv===2 ? '#F0771A' : '#9AA6B8';
+    var fw = lv===3 ? '800' : '700';
+    var cls= lv===3 ? 'cx-shine3' : lv===2 ? 'cx-shine2' : '';
+    return '<span class="'+cls+'" style="color:'+c+';font-size:10px;font-weight:'+fw+'">💧'+won(cxa)+'</span>';
   }
   // ── 이번주/지난주 왕 + 3개월 TOP3 렌더 ──
   (function(){
     var w = D.weekly || {tw:{},lw:{}};
     var tw = w.thisWeek||{}, lw = w.lastWeek||{};
-    function kline(lbl, obj){
+    function kline(lbl, obj, seg){
       if(!obj) return '<div class="krow"><span class="klbl">'+lbl+'</span><span class="kname" style="color:#B6C2DC">-</span></div>';
       var val;
       if(lbl.indexOf('결보')>=0) val=(obj.gb||0)+'건';
@@ -258,19 +276,20 @@ function renderAll(D){
       var team = obj.team ? '<span class="kteam">·'+obj.team+'</span>' : '';
       var mo = (obj.mSet!==undefined) ? '<span class="kmo">이달 세팅'+obj.mSet+' · '+won(obj.mSales)+'</span>' : '';
       var nb = (D.newbie&&D.newbie[obj.name]) ? '<span class="tag" title="입사 6개월내">🌱</span>' : '';
-      var cx = (lbl.indexOf('매출')>=0 && obj.cxa>0) ? '<span class="kmo">'+cxTag(obj.cxa,obj.sales)+'</span>' : '';
+      var _ct = (lbl.indexOf('매출')>=0 && obj.cxa>0) ? cxTag(obj.cxa, seg) : '';
+      var cx = _ct ? '<span class="kmo">'+_ct+'</span>' : '';
       return '<div class="krow"><span class="klbl">'+lbl+'</span><span class="kname">'+obj.name+nb+team+mo+cx+'</span><span class="kval">'+val+'</span></div>';
     }
     function kcard(title, wk, d){
       return '<div class="kwrap"><h3>'+title+' <span class="wk">'+wk+'</span></h3>'
         + '<div class="krow"><span class="kbadge s">상담</span></div>'
-        + kline('매출왕', d.sangSales)
-        + kline('세팅왕', d.sangSet)
-        + kline('결보왕', d.sangGb)
+        + kline('매출왕', d.sangSales, 'sang')
+        + kline('세팅왕', d.sangSet, 'sang')
+        + kline('결보왕', d.sangGb, 'sang')
         + '<div class="krow" style="margin-top:4px"><span class="kbadge b">사업</span></div>'
-        + kline('매출왕', d.saupSales)
-        + kline('확률왕', d.saupRate)
-        + kline('결보왕', d.saupGb)
+        + kline('매출왕', d.saupSales, 'saup')
+        + kline('확률왕', d.saupRate, 'saup')
+        + kline('결보왕', d.saupGb, 'saup')
         + '</div>';
     }
     var kingsEl = document.getElementById('kings');
@@ -279,7 +298,7 @@ function renderAll(D){
       function top3mini(title, arr){
         var h='<div style="margin-bottom:12px"><div style="font-size:12px;color:#6B7688;font-weight:700;margin-bottom:6px">'+title+'</div>';
         (arr||[]).slice(0,3).forEach(function(x,i){
-          var _cx=cxTag(x.cxa,x.sales);
+          var _cx=cxTag(x.cxa, title==='사업'?'saup':'sang');
           h+='<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px"><span style="width:16px;height:16px;border-radius:5px;background:'+(i===0?'#7048E8':'#EEF0FF')+';color:'+(i===0?'#fff':'#4C6EF5')+';font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(i+1)+'</span><b style="color:#1B2436">'+x.name+'</b>'+tags(x.name,i===0)+(x.team?'<span style="font-size:11px;color:#8A94A6">'+x.team+'</span>':'')+'<span style="margin-left:auto;text-align:right"><span style="font-weight:800;color:#7048E8;font-size:12px">'+won(x.sales)+'</span><br><span style="font-size:10px;color:#8A94A6">세팅'+(x.set||0)+' · 오더'+(x.ord||0)+'</span>'+(_cx?'<br>'+_cx:'')+'</span></div>';
         });
         return h+'</div>';
@@ -349,13 +368,13 @@ var inside=w>=18;var lblhtml=inside?'<span>'+lbl+'</span>':'';var outlbl=inside?
 function barsDv(arr){var mx=Math.max.apply(null,arr.map(function(x){return x.sales;}))||1;var h='';
 arr.forEach(function(x,i){var w=Math.max(x.sales/mx*100,3);
 var ins=w>=18;h+='<div class="bar"><div class="rk'+(i<3?' t':'')+'">'+(i+1)+'</div><div class="nm">'+x.name+'</div><div class="track"><div class="fill" style="width:'+w+'%">'+(ins?'<span>'+won(x.sales)+'</span>':'')+'</div>'+(ins?'':'<span class="outlbl">'+won(x.sales)+'</span>')+'</div><div class="meta">세팅 <b>'+x.set+'</b> · 오더 <b>'+x.ord+'</b> · 1인당 <b>'+won(x.per)+'</b></div></div>';});return h;}
-function barsP(arr){var mx=Math.max.apply(null,arr.map(function(x){return x.sales;}))||1;var h='';
+function barsP(arr,seg){var mx=Math.max.apply(null,arr.map(function(x){return x.sales;}))||1;var h='';
 arr.forEach(function(x,i){var w=Math.max(x.sales/mx*100,3);
-var ip=w>=18;var cx=x.cxa>0?' · '+cxTag(x.cxa,x.sales):'';
+var ip=w>=18;var _c=cxTag(x.cxa,seg);var cx=_c?' · '+_c:'';
 h+='<div class="bar"><div class="rk'+(i<3?' t':'')+'">'+(i+1)+'</div><div class="nm">'+x.name+tags(x.name,i===0)+'<span class="s">'+x.team+'</span></div><div class="track"><div class="fill" style="width:'+w+'%">'+(ip?'<span>'+won(x.sales)+'</span>':'')+'</div>'+(ip?'':'<span class="outlbl">'+won(x.sales)+'</span>')+'</div><div class="meta">세팅 <b>'+x.set+'</b> · 오더 <b>'+x.ord+'</b>'+cx+'</div></div>';});return h;}
 window.sw=function(i,btn){var D=window.__D;document.querySelectorAll('.tabbtn').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');
 document.getElementById('note').style.display=(i===2||i===4)?'block':'none';
-document.getElementById('body').innerHTML=i===0?barsBr(D.branches,false):i===2?barsDv(D.divs):i===3?barsP(D.persons):barsP(D.divpersons);}
+document.getElementById('body').innerHTML=i===0?barsBr(D.branches,false):i===2?barsDv(D.divs):i===3?barsP(D.persons,'sang'):barsP(D.divpersons,'saup');}
 document.getElementById('body').innerHTML=barsBr(D.branches,false);
 try{renderDukji(D);}catch(e){console.error('dukji',e);}
 }
@@ -376,17 +395,19 @@ function surgeBlk(surge){
   // 팀
   var teamArr = (surge.team&&surge.team[pd]) || surge[pd] || [];
   var teamBlk = '<div class="drsub">팀</div>' + teamSurgeRows(teamArr, pd);
-  // 개인 (상담·사업)
+  // 개인 (상담·사업) — 좌우 2열로 압축
   var per = surge.person||{}, pm = per[pd]||{};
   var perBlk = '<div class="drsub" style="margin-top:9px">개인</div>'
-    + '<div class="drsub2">상담</div>' + personSurgeRows(pm.sang, pd)
-    + '<div class="drsub2" style="margin-top:5px">사업</div>' + personSurgeRows(pm.saup, pd);
+    + '<div class="surge-two">'
+    + '<div><div class="drsub2">상담</div>' + personSurgeRows(pm.sang, pd) + '</div>'
+    + '<div><div class="drsub2">사업</div>' + personSurgeRows(pm.saup, pd) + '</div>'
+    + '</div>';
   return '<div class="drgrp">'+tog+teamBlk+perBlk+'</div>';
 }
 function teamSurgeRows(arr, pd){
   if(!arr||!arr.length) return '<div class="drnone">'+(pd==='weekly'?'이번주':'이달')+' 급등 팀 없음</div>';
   var h='';
-  arr.forEach(function(x,i){
+  arr.slice(0,3).forEach(function(x,i){
     var pct = x.ratio ? Math.round(x.ratio*100)+'%' : '신규';
     var comp = pd==='weekly' ? ('지난주 '+eokman(x.lastW)+' → 이번주 '+eokman(x.thisW)) : ('지난달 '+eokman(x.jul)+' → 이달 '+eokman(x.aug));
     h+='<div class="drrow'+(i===0?' top':'')+'"><span class="drmedal">🚀</span><span class="drnm">'+x.team+'</span><span class="drrec"><b>'+pct+'</b><span class="drprev">'+comp+'</span></span></div>';
@@ -396,7 +417,7 @@ function teamSurgeRows(arr, pd){
 function personSurgeRows(arr, pd){
   if(!arr||!arr.length) return '<div class="drnone" style="padding-left:2px">해당 없음</div>';
   var h='';
-  arr.forEach(function(x,i){
+  arr.slice(0,3).forEach(function(x,i){
     var pct = x.ratio ? Math.round(x.ratio*100)+'%' : '신규';
     var comp = pd==='weekly' ? ('지난주 '+eokman(x.lastW)+' → 이번주 '+eokman(x.thisW)) : ('지난달 '+eokman(x.prev)+' → 이달 '+eokman(x.cur));
     h+='<div class="drrow'+(i===0?' top':'')+'"><span class="drmedal">🚀</span><span class="drnm">'+x.name+(x.team?'<span class="drtm">'+x.team+'</span>':'')+'</span><span class="drrec"><b>'+pct+'</b><span class="drprev">'+comp+'</span></span></div>';
