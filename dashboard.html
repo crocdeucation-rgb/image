@@ -539,7 +539,7 @@ function renderWebmaDukji(){
   el.style.display='';
   var esc=function(s){return escapeHtml(String(s));};
   var row=function(k,dd){ dd=dd||{name:'-',val:''}; return '<div class="wd-row"><span class="wk">'+k+'</span><span class="wn">'+esc(dd.name)+'</span><span class="wv">'+esc(dd.val)+'</span></div>'; };
-  var rise=d['급상왕']||{name:'-',val:''};
+  var rise=d['급상승']||{name:'-',val:''};
   document.getElementById('webma-dukji-body').innerHTML =
     '<div class="wd-body">'+
       '<div class="wd-col"><div class="wd-col-h">🔥 이번주</div>'+row('오더왕',d['이번주오더왕'])+row('매출왕',d['이번주매출왕'])+'</div>'+
