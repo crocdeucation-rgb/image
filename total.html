@@ -25,9 +25,10 @@ body{overflow-x:hidden}
 .hero .breakdown .biz{background:rgba(255,255,255,.16);padding:2px 9px;border-radius:20px}
 .hero .breakdown .biz b{color:#FFE9A8}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
-.tophead{display:grid;grid-template-columns:1.55fr 1fr;gap:12px;align-items:stretch;margin-bottom:14px}
+.tophead{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:12px;align-items:stretch;margin-bottom:14px}
 .tophead .hero{margin-bottom:0}
-.tophead .two{grid-template-columns:1fr;margin-bottom:0;align-content:space-between}
+.tophead .two{display:contents}
+.tophead .two .card{margin-bottom:0}
 .card{background:var(--pan);border-radius:14px;padding:18px 20px;box-shadow:0 2px 8px rgba(27,36,54,.05)}
 .ct{font-size:14px;font-weight:800;display:flex;align-items:center;gap:8px}
 .dot{width:10px;height:10px;border-radius:50%}.card.web .dot{background:var(--web)}.card.sang .dot{background:var(--v1)}
@@ -81,7 +82,7 @@ body{overflow-x:hidden}
 
 
 @media(max-width:1100px){.kings{grid-template-columns:1fr}.q3{grid-template-columns:1fr}}
-@media(max-width:820px){.tophead{display:block}.tophead .hero{margin-bottom:12px}.tophead .two{grid-template-columns:1fr}.two{grid-template-columns:1fr}.headbar{flex-wrap:wrap}.hb{flex:1 1 40%}.bar{flex-wrap:wrap}.bar .nm{width:auto;flex:1}.bar .track{order:3;flex:1 1 100%;margin-top:5px}.bar .meta{order:4;flex:1 1 100%;width:auto;text-align:left;margin-top:3px}.kings,.q3{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;-webkit-overflow-scrolling:touch;padding-bottom:6px}.kwrap,.q3card{flex:0 0 88%;scroll-snap-align:start}}
+@media(max-width:820px){.tophead{display:block}.tophead .hero{margin-bottom:12px}.tophead .two{display:block}.tophead .two .card{margin-bottom:12px}.two{grid-template-columns:1fr}.headbar{flex-wrap:wrap}.hb{flex:1 1 40%}.bar{flex-wrap:wrap}.bar .nm{width:auto;flex:1}.bar .track{order:3;flex:1 1 100%;margin-top:5px}.bar .meta{order:4;flex:1 1 100%;width:auto;text-align:left;margin-top:3px}.kings,.q3{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;-webkit-overflow-scrolling:touch;padding-bottom:6px}.kwrap,.q3card{flex:0 0 88%;scroll-snap-align:start}}
 @media(max-width:480px){body{overflow-x:hidden}.wrap{padding:16px 12px 40px}.hero{padding:18px 16px}.hero .big{font-size:30px;letter-spacing:-1px}.hero .chips{gap:14px}.hero .chips b{font-size:16px}.panel{padding:16px 14px}.hd h1{font-size:21px}.headbar{flex-wrap:wrap}.hb{flex:1 1 45%;padding:11px}.hb .v{font-size:19px}.card{padding:15px 16px}.al{padding:14px}.al .v{font-size:24px}
 .wrap{max-width:100%}
 .kwrap,.q3card{padding:12px 13px}
@@ -180,7 +181,7 @@ body{overflow-x:hidden}
 <div class="dcard"><h3>🏆 커리어하이 <span class="dsub">이달 자기 최고 갱신</span></h3><div id="d_records"></div></div>
 </div>
 <div class="panel dpanel">
-<div class="dhd"><h3>📈 순위 변동</h3>
+<div class="dhd"><h3>📈 순위 변동 <span class="dsub" id="rm_basis">· 전주 대비</span></h3>
 <div class="dtog"><button class="dtogbtn on" data-p="weekly" onclick="rmPeriod('weekly',this)">주간</button><button class="dtogbtn" data-p="monthly" onclick="rmPeriod('monthly',this)">월간</button><span class="dsp"></span><button class="dtogbtn seg on" data-s="sang" onclick="rmSeg('sang',this)">상담</button><button class="dtogbtn seg" data-s="saup" onclick="rmSeg('saup',this)">사업</button></div></div>
 <div id="d_rank"></div>
 </div>
@@ -342,6 +343,7 @@ function renderRank(){
     h+='<div class="rkrow"><span class="rkn">'+x.rank+'</span><span class="rknm">'+x.name+(x.team?'<span class="rktm">'+x.team+'</span>':'')+'</span>'+mv+'<span class="rksales">'+dwon(x.sales)+'</span></div>';
   });
   el.innerHTML=h;
+  var bs=document.getElementById('rm_basis'); if(bs) bs.textContent = (window.__rm.period==='monthly') ? '· 전월 대비 (이번달 순위 vs 지난달)' : '· 전주 대비 (이번주 순위 vs 지난주)';
 }
 window.rmPeriod=function(p,btn){window.__rm.period=p;document.querySelectorAll('.dtogbtn[data-p]').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');renderRank();};
 window.rmSeg=function(s,btn){window.__rm.seg=s;document.querySelectorAll('.dtogbtn[data-s]').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');renderRank();};
