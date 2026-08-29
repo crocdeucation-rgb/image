@@ -112,6 +112,9 @@ body{overflow-x:hidden}
 .dcard{background:var(--pan);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
 .dcard h3{font-size:14px;font-weight:800;margin:0 0 12px;display:flex;align-items:center;gap:7px}
 .dcard .dsub{font-size:11px;color:var(--soft);font-weight:600}
+.sgtog{display:inline-flex;gap:4px;margin-left:6px;vertical-align:middle}
+.sgbtn{font-size:11px;padding:2px 9px;border-radius:10px;border:1px solid #E3E8F0;background:#fff;color:#8A94A6;cursor:pointer;font-weight:700}
+.sgbtn.on{background:#7048E8;color:#fff;border-color:#7048E8}
 .drgrp{margin-bottom:10px}.drgrp:last-child{margin-bottom:0}
 .drlbl{font-size:11px;color:var(--v1);font-weight:800;margin-bottom:4px}
 .drrow{display:flex;align-items:center;gap:8px;padding:5px 0;border-top:1px solid #F4F6FA}
@@ -177,7 +180,7 @@ body{overflow-x:hidden}
 <div class="dukji-wrap">
 <div class="dsect-hd">👑 덕질 스탯</div>
 <div class="dukji-two">
-<div class="dcard"><h3>🔥 이번주 핫 <span class="dsub">급상승왕 (지난주 대비)</span></h3><div id="d_risers"></div></div>
+<div class="dcard"><h3>🔥 이번주 핫 <span class="dsub">급상승왕 · 이달 급등주</span></h3><div id="d_risers"></div></div>
 <div class="dcard"><h3>🏆 커리어하이 <span class="dsub">이달 자기 최고 갱신</span></h3><div id="d_records"></div></div>
 </div>
 <div class="panel dpanel">
@@ -315,7 +318,7 @@ document.getElementById('body').innerHTML=barsBr(D.branches,false);
 try{renderDukji(D);}catch(e){console.error('dukji',e);}
 }
 /* ── 덕질 스탯 렌더 ── */
-window.__DK=null; window.__rm={period:'weekly',seg:'sang'};
+window.__DK=null; window.__rm={period:'weekly',seg:'sang'}; window.__sg='weekly';
 function dwon(n){return (n||0).toLocaleString('ko-KR');}
 function eokman(n){n=n||0; if(n>=100000000)return (n/100000000).toFixed(1)+'억'; if(n>=10000)return Math.round(n/10000)+'만'; return dwon(n);}
 function renderRisers(dk){
@@ -324,8 +327,25 @@ function renderRisers(dk){
     if(!arr||!arr.length)return h+'<div class="drnone">이번주 상승자 없음</div></div>';
     arr.forEach(function(x,i){h+='<div class="drrow'+(i===0?' top':'')+'"><span class="drmedal">'+(i===0?'🥇':i===1?'🥈':'🥉')+'</span><span class="drnm">'+x.name+(x.team?'<span class="drtm">'+x.team+'</span>':'')+'</span><span class="drdelta">▲ '+dwon(x.delta)+'</span></div>';});
     return h+'</div>';}
-  el.innerHTML=blk('상담',dk.risers.sang)+blk('사업',dk.risers.saup);
+  el.innerHTML=blk('상담',dk.risers.sang)+blk('사업',dk.risers.saup)+surgeBlk(dk.surge);
 }
+function surgeBlk(surge){
+  surge = surge || {};
+  var wk = surge.weekly||[], mo = surge.monthly||[];
+  var period = window.__sg || 'weekly';
+  var arr = period==='weekly' ? wk : mo;
+  var h='<div class="drgrp"><div class="drlbl">🔥 이달 급등주 '
+    + '<span class="sgtog"><button class="sgbtn'+(period==='weekly'?' on':'')+'" onclick="sgPeriod(\'weekly\')">주간</button>'
+    + '<button class="sgbtn'+(period==='monthly'?' on':'')+'" onclick="sgPeriod(\'monthly\')">월간</button></span></div>';
+  if(!arr.length) return h+'<div class="drnone">'+(period==='weekly'?'이번주':'이달')+' 급등 팀 없음</div></div>';
+  arr.forEach(function(x,i){
+    var pct = x.ratio ? Math.round(x.ratio*100)+'%' : '신규';
+    var comp = period==='weekly' ? ('지난주 '+eokman(x.lastW)+' → 이번주 '+eokman(x.thisW)) : ('7월 '+eokman(x.jul)+' → 8월 '+eokman(x.aug));
+    h+='<div class="drrow'+(i===0?' top':'')+'"><span class="drmedal">🚀</span><span class="drnm">'+x.team+'</span><span class="drrec"><b>'+pct+'</b><span class="drprev">'+comp+'</span></span></div>';
+  });
+  return h+'</div>';
+}
+window.sgPeriod=function(p){ window.__sg=p; if(window.__DK) renderRisers(window.__DK); };
 function renderRecords(dk){
   var el=document.getElementById('d_records'); if(!el)return;
   function blk(t,arr){var h='<div class="drgrp"><div class="drlbl">'+t+'</div>';
