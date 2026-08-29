@@ -421,18 +421,20 @@ function setPerfTab(i){perfTab=i;var ts=document.querySelectorAll('#pf-tabs .tab
 function renderPerf(){
   if(!summaryRows.length)return;
   var off=perfTab*6+1, co=19+perfTab*3;
-  var tDb=0,tVs=0,tSe=0,tCa=0,tOd=0,tSales=0;
+  var tDb=0,tVs=0,tSe=0,tCa=0,tOd=0,tSales=0,tSpend=0;
   var rows=ASSIGNEES.map(function(name,i){
     var r=summaryRows[ASSIGNEE_START_IDX+i]||[];
     var db=+(r[off]||0),vs=+(r[off+1]||0),se=+(r[off+2]||0),ca=+(r[off+3]||0),od=+(r[off+4]||0);
     var sales=r[off+5]||'0원'; tDb+=db;tVs+=vs;tSe+=se;tCa+=ca;tOd+=od;
-    tSales+=(parseInt((sales+'').replace(/[^0-9]/g,''))||0);  // "2601만원" → 2601 합산
-    var cr=vs?Math.round(ca/vs*100):0, or=se?Math.round(od/se*100):0;
+    var salesNum=parseInt((sales+'').replace(/[^0-9]/g,''))||0; tSales+=salesNum;  // "2601만원" → 2601 합산
     var roas=r[co+1]?(+r[co+1]).toFixed(2):'-', ef=r[co+2]?r[co+2]+'만':'-';
+    var roasNum=+(r[co+1]||0); if(roasNum>0&&salesNum>0) tSpend+=salesNum/roasNum;  // 광고비=매출/ROAS 역산 → 합계 ROAS용
+    var cr=vs?Math.round(ca/vs*100):0, or=se?Math.round(od/se*100):0;
     return '<tr><td class="nm">'+esc(r[0]||name)+'</td><td class="db">'+db+'</td><td class="vs">'+vs+'</td><td class="se">'+se+'</td><td class="ca">'+ca+'</td><td class="od">'+od+'</td><td class="sl">'+esc(sales)+'</td><td class="rt" style="color:var(--red)">'+cr+'%</td><td class="rt">'+or+'%</td><td class="ro">'+roas+'</td><td class="ef">'+ef+'</td></tr>';
   });
   var tEf=tDb?Math.round(tSales/tDb*10)/10:0;  // 효율=DB당 매출(만원)
-  rows.push('<tr class="tot"><td class="nm">합계</td><td class="db">'+tDb+'</td><td class="vs">'+tVs+'</td><td class="se">'+tSe+'</td><td class="ca">'+tCa+'</td><td class="od">'+tOd+'</td><td class="sl">'+tSales.toLocaleString()+'만원</td><td class="rt" style="color:var(--red)">'+(tVs?Math.round(tCa/tVs*100):0)+'%</td><td class="rt">'+(tSe?Math.round(tOd/tSe*100):0)+'%</td><td class="ro">-</td><td class="ef">'+tEf+'만</td></tr>');
+  var tRoas=tSpend>0?(tSales/tSpend).toFixed(2):'-';  // 합계 ROAS = 총매출 ÷ 역산 총광고비 (매출0·ROAS0인 담당자 광고비는 산정 불가라 제외)
+  rows.push('<tr class="tot"><td class="nm">합계</td><td class="db">'+tDb+'</td><td class="vs">'+tVs+'</td><td class="se">'+tSe+'</td><td class="ca">'+tCa+'</td><td class="od">'+tOd+'</td><td class="sl">'+tSales.toLocaleString()+'만원</td><td class="rt" style="color:var(--red)">'+(tVs?Math.round(tCa/tVs*100):0)+'%</td><td class="rt">'+(tSe?Math.round(tOd/tSe*100):0)+'%</td><td class="ro">'+tRoas+'</td><td class="ef">'+tEf+'만</td></tr>');
   document.getElementById('pf-body').innerHTML=rows.join('');
 
   var sojCol=perfTab===1?29:(perfTab===2?30:28);

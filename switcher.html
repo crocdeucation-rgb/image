@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>전체실적 · 아라온 그로스</title>
+<meta name="description" content="아라온 전부서 실적 대시보드 · 취소 반영 · 매일 갱신">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 72'><rect width='72' height='72' rx='18' fill='%23EDE9FE'/><path d='M36 60 L36 28' stroke='%23059669' stroke-width='4' stroke-linecap='round' fill='none'/><ellipse cx='23' cy='30' rx='11' ry='7' fill='%2334D399' transform='rotate(-28 23 30)'/><ellipse cx='49' cy='30' rx='11' ry='7' fill='%2310B981' transform='rotate(28 49 30)'/></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  :root{--bg:#EEF1F6;--ink:#1B2436;--soft:#6B7688;--line:#E3E8F0;--v1:#4C6EF5;--pan:#fff;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);font-family:'Pretendard',sans-serif;color:var(--ink);}
+  .bar{background:var(--pan);border-bottom:1px solid var(--line);padding:10px 16px;position:sticky;top:0;z-index:10;display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+  .bar .logo{font-size:14px;font-weight:800;margin-right:14px;letter-spacing:-.3px;}
+  .bar .logo b{color:var(--v1);}
+  .tab{background:var(--bg);border:none;color:var(--soft);font-family:inherit;font-weight:700;font-size:13px;padding:9px 18px;border-radius:30px;cursor:pointer;}
+  .tab.on{background:var(--v1);color:#fff;}
+  .tab.soon{opacity:.55;}
+  .tab .badge{font-size:10px;background:rgba(107,118,136,.2);color:var(--soft);padding:1px 6px;border-radius:8px;margin-left:5px;}
+  .stage{position:relative;}
+  iframe{width:100%;border:0;display:block;background:var(--bg);}
+</style>
+</head>
+<body>
+  <div class="bar">
+    <button class="tab on" data-t="total" onclick="go(this)">전체실적</button>
+    <button class="tab" data-t="hire" onclick="go(this)">증원현황</button>
+    <button class="tab" data-t="hr" onclick="go(this)">인사기록</button>
+    <button class="tab" data-t="web" onclick="go(this)">웹마케팅</button>
+  </div>
+  <div class="stage">
+    <iframe id="frame" src="total.html?v=828c" style="height:1250px"></iframe>
+  </div>
+<script>
+  var FRAMES={total:{src:'total.html?v=828c',h:900},hire:{src:'hire.html?v=828c',h:900},hr:{src:'hr.html?v=828c',h:780},web:{src:'dashboard.html?v=828c',h:1700}};
+  var frame=document.getElementById('frame');
+  function fitHeight(){
+    try{
+      var doc=frame.contentWindow.document;
+      var h=Math.max(doc.body.scrollHeight, doc.documentElement.scrollHeight);
+      if(h>0){ var target=(h+20)+'px'; if(frame.style.height!==target){ frame.style.height=target; notifyParent(h+90); } }
+    }catch(e){}
+  }
+  // 자식(hr 등)이 CSV 렌더를 늦게 끝내도 iframe이 그만큼 자동으로 커지게 — 중첩 스크롤 방지
+  var _ro=null;
+  function watchFrame(){
+    try{
+      if(_ro){ _ro.disconnect(); _ro=null; }
+      var doc=frame.contentWindow.document;
+      if(window.ResizeObserver && doc && doc.body){
+        _ro=new ResizeObserver(function(){ fitHeight(); });
+        _ro.observe(doc.body);
+      }
+    }catch(e){}
+  }
+  function notifyParent(h){
+    // 노션 등 부모 프레임에 높이 전달 (iframe-resizer 호환 + 일반 postMessage)
+    try{ window.parent.postMessage({type:'resize-iframe',height:h},'*'); }catch(e){}
+    try{ window.parent.postMessage('setHeight:'+h,'*'); }catch(e){}
+  }
+  frame.addEventListener('load', function(){ fitHeight(); setTimeout(fitHeight,300); setTimeout(fitHeight,800); setTimeout(fitHeight,1600); watchFrame(); });
+
+  window.addEventListener('message',function(e){
+    if(e.data&&(e.data.t==='dashH'||e.data.t==='frameH')&&e.data.h>0){
+      frame.style.height=(e.data.h+10)+'px';
+    }
+  });
+  function go(btn){
+    document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+    btn.classList.add('on');
+    var t=btn.dataset.t;
+    if(_ro){ try{_ro.disconnect();}catch(e){} _ro=null; }
+    frame.style.height=FRAMES[t].h+'px';
+    frame.src=FRAMES[t].src;
+    document.title=btn.textContent.trim()+' · 아라온 그로스';  // 탭별 제목
+  }
+  window.addEventListener('load', function(){ setTimeout(fitHeight,500); });
+</script>
+</body>
+</html>
