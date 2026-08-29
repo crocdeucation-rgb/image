@@ -364,11 +364,26 @@ function drawChart(i){
   s.forEach(function(x,idx){if(x.set==null)return;var xx=px(idx),yy=pySet(x.set);svg+='<circle cx="'+xx+'" cy="'+yy+'" r="2.5" fill="#4C6EF5"/><text x="'+xx+'" y="'+(yy+14)+'" text-anchor="middle" class="dptlbl v1">'+x.set+'</text>';});
   svg+='<polyline points="'+salesPts+'" fill="none" stroke="#7048E8" stroke-width="1.8"/>';
   s.forEach(function(x,idx){if(x.sales==null)return;var xx=px(idx),yy=pyS(x.sales);svg+='<circle cx="'+xx+'" cy="'+yy+'" r="3" fill="#7048E8"/><text x="'+xx+'" y="'+(yy-8)+'" text-anchor="middle" class="dptlbl v2">'+eokman(x.sales)+'</text>';});
+  // 연합/오픈 기준선 — 축 안(off=false)이면 세로 점선+라벨
+  var lc=b.launch;
+  if(lc && !lc.off){
+    var _li=-1; s.forEach(function(x,idx){ if(x.m===lc.m) _li=idx; });
+    if(_li>=0){ var lx=px(_li);
+      svg+='<line x1="'+lx+'" y1="'+(padT-6)+'" x2="'+lx+'" y2="'+(padT+ih)+'" stroke="#F06595" stroke-width="1.3" stroke-dasharray="5 3"/>';
+      svg+='<text x="'+lx+'" y="'+(padT-11)+'" text-anchor="middle" style="font-size:12px;font-weight:800;fill:#F06595">'+lc.m+'월 '+lc.label+'</text>';
+    }
+  }
   svg+='</svg>';
   var head=(typeof BRANCH_HEAD!=='undefined'?BRANCH_HEAD:{})[b.name], last=null;
   for(var _j=s.length-1;_j>=0;_j--){ if(s[_j].sales!=null){last=s[_j];break;} }
-  var info = (head && last) ? '<div class="dbinfo"><b>'+b.name+'</b> · '+head+'명 · '+last.m+'월 1인당 '+eokman(Math.round(last.sales/head))+'</div>'
-                  : '<div class="dbinfo"><b>'+b.name+'</b></div>';
+  var lcNote='';
+  if(lc){
+    if(lc.off) lcNote=' · <span style="color:#F06595;font-weight:800">'+lc.y+'년 '+lc.m+'월 '+lc.label+'</span>';
+    else lcNote=' · <span style="color:#F06595;font-weight:800">'+lc.m+'월 '+lc.label+'</span>';
+    if(lc.pre) lcNote+=' <span style="color:#8A94A6;font-size:11px">('+lc.pre+')</span>';
+  }
+  var info = (head && last) ? '<div class="dbinfo"><b>'+b.name+'</b> · '+head+'명 · '+last.m+'월 1인당 '+eokman(Math.round(last.sales/head))+lcNote+'</div>'
+                  : '<div class="dbinfo"><b>'+b.name+'</b>'+lcNote+'</div>';
   document.getElementById('d_chart').innerHTML=info+svg+'<div class="dlegend"><span class="lg v2">● 매출</span><span class="lg v1">● 세팅(건)</span></div>';
 }
 function renderDukji(D){
