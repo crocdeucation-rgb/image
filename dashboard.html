@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard',-apple-system,system-ui,sans-serif; }
-body { background: #f8f9fa; padding: 0; overflow-x: hidden; }
+body { background: #f8f9fa; padding: 20px 0 0; overflow-x: hidden; }
 
 .layout { display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 14px; max-width: 1700px; margin: 0 auto; padding: 8px 14px; }
 .salesbar { max-width: 1700px; margin: 0 auto 4px; padding: 4px 14px 0; }
@@ -307,6 +307,29 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
   .camp-toggle td { color: #1a73e8 !important; font-weight: 700 !important; background: #f0f6ff !important; }
 }
 
+
+.tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}
+.tbl-scroll table{min-width:640px}
+.tbl-scroll .campaign-table{min-width:0}
+@media(max-width:768px){.tbl-scroll table{min-width:600px}.tbl-scroll .campaign-table{min-width:0}}
+/* 웹마 덕질 스탯 (하단 · 이번주 vs 지난주) */
+.wd-card{background:#fff;border:1px solid #eee;border-radius:10px;padding:14px;margin:14px 0}
+.wd-title{font-size:13px;font-weight:700;color:#1a1a1a;border-bottom:2px solid #9333ea;padding-bottom:8px;margin-bottom:4px}
+.wd-badge{font-size:9px;padding:2px 7px;border-radius:8px;background:#f3e8ff;color:#7c3aed;font-weight:600;margin-left:4px}
+.wd-body{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.wd-col{background:#fafbfd;border:1px solid #eef0f3;border-radius:9px;padding:12px 14px}
+.wd-col-h{font-size:12px;font-weight:700;color:#475569;margin-bottom:8px}
+.wd-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid #f2f4f7}
+.wd-row:first-of-type{border-top:none}
+.wd-row .wk{font-size:11px;color:#94a3b8;width:44px;flex:0 0 auto;font-weight:700}
+.wd-row .wn{font-size:14px;font-weight:700;color:#1a1a1a}
+.wd-row .wv{margin-left:auto;font-size:13px;font-weight:700;color:#9333ea}
+.wd-rise{display:flex;align-items:center;gap:8px;margin-top:10px;padding:11px 14px;background:linear-gradient(90deg,#fff7ed,#fef2f2);border:1px solid #fde4d6;border-radius:9px}
+.wd-rise .rk{font-size:11px;font-weight:700;color:#e65100}
+.wd-rise b{font-size:15px;font-weight:700;color:#1a1a1a}
+.wd-rise .rv{font-size:14px;font-weight:700;color:#ea4335}
+.wd-rise small{margin-left:auto;font-size:10.5px;color:#b08968}
+@media (max-width:1240px){ .wd-body{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
@@ -322,6 +345,11 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 <!-- 섹션1: 퍼널 -->
 <div class="section active" id="sec1">
 <div class="sec-title blue">아라온스쿨 퍼널</div>
+<div class="tabs" id="funnel-all-tabs" style="margin-bottom:12px">
+  <button class="tab active" onclick="setFunnelAll(0)">이번달</button>
+  <button class="tab" onclick="setFunnelAll(1)">지난달</button>
+  <button class="tab" onclick="setFunnelAll(2)">전체</button>
+</div>
 <div class="header">
   <div>
     <div class="title">담당자별 실적 + 전체 합계</div>
@@ -332,19 +360,14 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 
 <div class="section-label" style="margin-top:0;">매출 <span class="badge pay">결제일 기준</span></div>
 <div class="grid-4">
-  <div class="card"><div class="clabel">이번 달<span class="dayno" id="dn-month"></span></div><div class="cval purple sm" id="sales-month">-</div></div>
-  <div class="card"><div class="clabel">지난 달</div><div class="cval sm" id="sales-last">-</div></div>
-  <div class="card"><div class="clabel">이번 주<span class="dayno" id="dn-week"></span></div><div class="cval purple sm" id="sales-week">-</div></div>
-  <div class="card"><div class="clabel">지난 주</div><div class="cval sm" id="sales-lastweek">-</div></div>
+  <div class="card"><div class="clabel"><span id="sm-label">이번 달</span><span class="dayno" id="dn-month"></span></div><div class="cval purple sm" id="sales-month">-</div></div>
+  <div class="card" id="card-week"><div class="clabel">이번 주<span class="dayno" id="dn-week"></span></div><div class="cval purple sm" id="sales-week">-</div></div>
+  <div class="card" id="card-lastweek"><div class="clabel">지난 주</div><div class="cval sm" id="sales-lastweek">-</div></div>
+  <div class="card"><div class="clabel"><span id="cx-label">이번 달 취소</span></div><div class="cval sm" id="cancel-month" style="color:#e05252;">-</div></div>
 </div>
 
 <div class="section-label">담당자별 성과분석 <span class="badge today" id="tab-label">이번달</span></div>
-<div class="tabs" id="funnel-tabs">
-  <button class="tab active" onclick="setFunnelTab(0)">이번달</button>
-  <button class="tab" onclick="setFunnelTab(1)">지난달</button>
-  <button class="tab" onclick="setFunnelTab(2)">전체</button>
-</div>
-<table class="funnel-table">
+<div class="tbl-scroll"><table class="funnel-table">
   <thead>
     <tr>
       <th>담당자</th>
@@ -364,10 +387,14 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
   <tbody id="funnel-tbody">
     <tr><td colspan="12" style="color:#aaa;text-align:center;padding:16px;">불러오는 중...</td></tr>
   </tbody>
-</table>
+</table></div>
 
 <div class="section-label" style="margin-top:14px">담당자 × 소재 배정 <span class="badge" style="background:#e8faf6;color:#0a8a5c" id="heat-tab-label">이번달</span></div>
 <div id="heatmap-wrap"><div style="color:#aaa;text-align:center;padding:12px;font-size:11px">불러오는 중...</div></div>
+<div id="webma-dukji" class="wd-card" style="display:none">
+  <div class="wd-title">👑 웹마 덕질 스탯 <span class="wd-badge">이번주 vs 지난주</span></div>
+  <div id="webma-dukji-body"></div>
+</div>
 </div>
 
 <!-- 섹션2: 유입경로 분석 -->
@@ -407,7 +434,7 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 </div>
 
 <div class="section-label">캠페인별 <span class="badge">오더순</span></div>
-<table class="campaign-table">
+<div class="tbl-scroll"><table class="campaign-table">
   <thead>
     <tr>
       <th>캠페인명</th>
@@ -423,7 +450,7 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
   <tbody id="campaign-tbody">
     <tr><td colspan="8" style="color:#aaa;text-align:center;padding:14px;">불러오는 중...</td></tr>
   </tbody>
-</table>
+</table></div>
 </div>
 
 <!-- 섹션3: 방문 스케줄 -->
@@ -448,6 +475,8 @@ let currentSec = 0;
 
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1438610573&single=true&output=csv';
 const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1384080283&single=true&output=csv';
+    const LEDGER_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBUBxnTPPn_AebCqxIC8Q2x-5V3VuvIY6MM6QlgKVUUA7Bbjh3jMO7q6i4sDgQse-UKsNGe5Hxt7QF/pub?gid=431762866&single=true&output=csv';
+    const CANCEL_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBUBxnTPPn_AebCqxIC8Q2x-5V3VuvIY6MM6QlgKVUUA7Bbjh3jMO7q6i4sDgQse-UKsNGe5Hxt7QF/pub?gid=128666314&single=true&output=csv';
 
 const ASSIGNEES = ['우혜림','김윤호','장윤호','박창건','김태석','김성윤','노영호','김원득','김우진','안준섭'];
 const ASSIGNEE_START_IDX = 46;
@@ -501,8 +530,84 @@ function showSec(idx) {
   document.querySelectorAll('.sec-nav-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
 }
 
+function renderWebmaDukji(){
+  var d={};
+  for(var i=0;i<allRows.length;i++){ if(allRows[i]&&allRows[i][0]==='웹마덕질'){ for(var j=i+1;j<Math.min(i+8,allRows.length);j++){var r=allRows[j];if(!r||!r[0])break;d[r[0]]={name:r[1]||'-',val:r[2]||''}} break; } }
+  var el=document.getElementById('webma-dukji');
+  if(!el) return;
+  if(!Object.keys(d).length){ el.style.display='none'; return; }
+  el.style.display='';
+  var esc=function(s){return escapeHtml(String(s));};
+  var row=function(k,dd){ dd=dd||{name:'-',val:''}; return '<div class="wd-row"><span class="wk">'+k+'</span><span class="wn">'+esc(dd.name)+'</span><span class="wv">'+esc(dd.val)+'</span></div>'; };
+  var rise=d['급상승왕']||{name:'-',val:''};
+  document.getElementById('webma-dukji-body').innerHTML =
+    '<div class="wd-body">'+
+      '<div class="wd-col"><div class="wd-col-h">🔥 이번주</div>'+row('오더왕',d['이번주오더왕'])+row('매출왕',d['이번주매출왕'])+'</div>'+
+      '<div class="wd-col"><div class="wd-col-h">📅 지난주</div>'+row('오더왕',d['지난주오더왕'])+row('매출왕',d['지난주매출왕'])+'</div>'+
+    '</div>'+
+    '<div class="wd-rise">🚀 <span class="rk">급상왕</span> <b>'+esc(rise.name)+'</b> <span class="rv">'+esc(rise.val)+'</span> <small>지난주 대비 매출</small></div>';
+}
+
 async function loadAll() {
-  await Promise.all([loadData(), loadSchedule()]);
+  await Promise.all([loadData(), loadSchedule(), loadCancel()]);
+}
+
+let cancelData = { rows: [] };  // 원장 취소 데이터 캐시
+let cancelTab = 0;              // 0=이번달 1=지난달 2=전체
+
+// 원장 CSV 로드 (취소 데이터 캐시)
+async function loadCancel() {
+  try {
+    const res = await fetch(CANCEL_CSV_URL);
+    const text = await res.text();
+    const rows = text.trim().split('\n').map(r => r.split(',').map(c => c.trim()));
+    rows.shift();
+    // 취소요약_전체 컬럼: 날짜(0)|학생(1)|학년(2)|취소액(3)|담당자(4) — 전부 cancel
+    cancelData.rows = rows.filter(r => r[0] && (parseFloat(r[3])||0) > 0);
+    renderCancel();
+  } catch(e) {
+    const el = document.getElementById('cancel-amt');
+    if (el) el.textContent = '-';
+  }
+}
+
+function setCancelTab(idx) {
+  cancelTab = idx;
+  document.querySelectorAll('#cancel-tabs .tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  const lbl = document.getElementById('cancel-tab-label');
+  if (lbl) lbl.textContent = ['이번달','지난달','전체'][idx];
+  renderCancel();
+}
+
+function renderCancel() {
+  const now = new Date();
+  const thisYM = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+  const lastM = new Date(now.getFullYear(), now.getMonth()-1, 1);
+  const lastYM = lastM.getFullYear() + '-' + String(lastM.getMonth()+1).padStart(2,'0');
+
+  let sum = 0, cnt = 0;
+  cancelData.rows.forEach(r => {
+    const date = r[0] || '';
+    const amt = parseFloat(r[3]) || 0;
+    let match = false;
+    if (cancelTab === 0) match = date.indexOf(thisYM) === 0;      // 이번달
+    else if (cancelTab === 1) match = date.indexOf(lastYM) === 0;  // 지난달
+    else match = true;                                            // 전체
+    if (match) { sum += amt; cnt++; }
+  });
+
+  const won = sum * 1000;
+  const disp = won >= 10000 ? Math.round(won/10000).toLocaleString() + '만원' : (won>0? won.toLocaleString()+'원' : '0원');
+  const amtEl = document.getElementById('cancel-amt');
+  const cntEl = document.getElementById('cancel-cnt');
+  const monthEl = document.getElementById('cancel-month');  // 매출 그리드 취소 카드 — 통합 토글 연동
+  if (amtEl) amtEl.textContent = sum > 0 ? '-' + disp : '0원';
+  if (cntEl) cntEl.textContent = cnt + '건';
+
+  // [2026-08-27] 취소 카드 = 통합 토글(cancelTab) 연동 (이번달/지난달/전체)
+  const cxl = document.getElementById('cx-label');
+  if (cxl) cxl.textContent = ['이번 달 취소','지난 달 취소','전체 취소'][cancelTab];
+  if (monthEl) monthEl.textContent = sum > 0 ? '-' + disp : '0원';
 }
 
 async function loadData() {
@@ -512,6 +617,7 @@ async function loadData() {
     const text = await res.text();
     allRows = text.trim().split('\n').map(r => r.split(',').map(c => c.trim()));
     render();
+    renderWebmaDukji();
     const now = new Date();
     document.getElementById('updated').textContent = '업데이트: ' + now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
   } catch(e) {
@@ -523,6 +629,16 @@ function setFunnelTab(idx) {
   funnelTab = idx;
   document.querySelectorAll('#funnel-tabs .tab').forEach((t,i) => t.classList.toggle('active', i===idx));
   render();
+}
+
+// [2026-08-27] 퍼널 통합 토글 — 취소현황+성과분석+히트맵 한 토글로 연동
+function setFunnelAll(idx) {
+  funnelTab = idx;
+  cancelTab = idx;
+  document.querySelectorAll('#funnel-all-tabs .tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  const cl = document.getElementById('cancel-tab-label'); if (cl) cl.textContent = ['이번달','지난달','전체'][idx];
+  render();
+  renderCancel();
 }
 
 function setRouteTab(idx) {
@@ -577,11 +693,8 @@ function render() {
 
   const r12 = allRows[11] || [];
   const r13 = allRows[12] || [];
-  document.getElementById('sales-month').textContent    = r12[1] || '-';
   document.getElementById('sales-week').textContent     = r12[3] || '-';
-  document.getElementById('sales-last').textContent     = r13[1] || '-';
   document.getElementById('sales-lastweek').textContent = r13[3] || '-';
-  document.getElementById('dn-month').textContent = pickDayNo(r12[0]);
   document.getElementById('dn-week').textContent  = pickDayNo(r12[2]);
 
   document.getElementById('v-total').textContent     = allRows[1]?.[routeTab + 2] || '0';  // [수정 2026-08-13] 토글 연동: 이번달[2]/지난달[3]/전체[4]
@@ -635,7 +748,7 @@ function render() {
   const totCancelRate = totalVisit ? Math.round(totalCancel/totalVisit*100) : 0;
   const totOrderRate  = totalSetting ? Math.round(totalOrder/totalSetting*100) : 0;
   const totSalesFallback = totalSalesNum >= 10000 ? manWon(totalSalesNum) + '원' : totalSalesNum + '원';
-  const totSalesStr = (funnelTab === 0 ? r12[1] : r13[1]) || totSalesFallback;
+  const totSalesStr = funnelTab === 0 ? (r12[1] || totSalesFallback) : funnelTab === 1 ? (r13[1] || totSalesFallback) : totSalesFallback;
   rows.push(`<tr class="total">
     <td class="name">합계</td>
     <td class="num db">${totalDb}</td>
@@ -651,6 +764,18 @@ function render() {
     <td class="eff2">${totalDb?(totalSalesNum/totalDb/10000).toFixed(1)+'만':'-'}</td>
   </tr>`);
   tbody.innerHTML = rows.join('');
+
+  // [2026-08-27] 매출 카드 — 퍼널 통합 토글 연동 (지난달·전체 시 이번주/지난주 숨김)
+  {
+    const showWeeks = (funnelTab === 0);
+    const cw  = document.getElementById('card-week');     if (cw)  cw.style.display  = showWeeks ? '' : 'none';
+    const clw = document.getElementById('card-lastweek'); if (clw) clw.style.display = showWeeks ? '' : 'none';
+    const sml = document.getElementById('sm-label');
+    if (sml) sml.textContent = funnelTab === 0 ? '이번 달' : funnelTab === 1 ? '지난 달' : '전체';
+    const smVal = funnelTab === 0 ? (r12[1] || '-') : funnelTab === 1 ? (r13[1] || '-') : totSalesFallback;
+    document.getElementById('sales-month').textContent = smVal;
+    document.getElementById('dn-month').textContent = funnelTab === 0 ? pickDayNo(r12[0]) : '';
+  }
 
   // [개편] 담당자 × 소재 히트맵 렌더 (r[_sojCol] = 소재분포 "키:값;키:값")
   // ★ 2026-08-04 신규 소재 추가: 원톱·5단계루틴·기초부족 (getLeadStats sojKeyOf와 키 일치시킬 것)
@@ -670,11 +795,11 @@ function render() {
   if (activeSojKeys.length === 0) {
     ht = '<div style="color:#aaa;text-align:center;padding:12px;font-size:11px">이 기간 소재 배정 없음</div>';
   } else {
-    ht='<table class="heat-table"><thead><tr><th class="l">담당자</th>'+activeSojKeys.map(k=>'<th>'+k+'</th>').join('')+'</tr></thead><tbody>';
+    ht='<div class="tbl-scroll"><table class="heat-table"><thead><tr><th class="l">담당자</th>'+activeSojKeys.map(k=>'<th>'+k+'</th>').join('')+'</tr></thead><tbody>';
     heatData.forEach(d=>{
       ht+='<tr><td class="l">'+d.name+'</td>'+activeSojKeys.map(k=>{const v=d.soj[k]||0; const fg=v>heatMax*0.6?'#fff':'#333'; return '<td><span class="heat-cell" style="background:'+heatColor(v)+';color:'+fg+'">'+(v||'')+'</span></td>';}).join('')+'</tr>';
     });
-    ht+='</tbody></table>';
+    ht+='</tbody></table>'+'</div>';
   }
   const hw=document.getElementById('heatmap-wrap'); if(hw) hw.innerHTML=ht;
   const htl=document.getElementById('heat-tab-label'); if(htl) htl.textContent = funnelTab===1?'지난달':(funnelTab===2?'전체':'이번달');
@@ -978,6 +1103,14 @@ function manWon(won) {
 }
 
 loadAll();
+</script>
+<script>
+(function(){
+  function sendH(){try{var h=document.body.scrollHeight;parent.postMessage({t:'dashH',h:h},'*');}catch(e){}}
+  window.addEventListener('load',function(){sendH();setTimeout(sendH,400);setTimeout(sendH,1000);});
+  setInterval(sendH,1200);
+  document.addEventListener('click',function(){setTimeout(sendH,150);setTimeout(sendH,500);});
+})();
 </script>
 </body>
 </html>
