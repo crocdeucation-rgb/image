@@ -141,7 +141,7 @@ body{overflow-x:hidden}
 .dchips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
 .dchip{background:var(--barbg);border:none;color:var(--soft);font-family:inherit;font-weight:700;font-size:12px;padding:6px 12px;border-radius:20px;cursor:pointer}
 .dchip.on{background:var(--ink);color:#fff}
-.dsvg{width:100%;max-width:680px;height:auto;display:block;margin:0 auto}
+.dsvg{width:100%;max-width:1500px;height:auto;display:block;margin:0 auto}
 .dxlbl{font-size:11px;fill:var(--soft);font-weight:600}
 .dptlbl{font-size:11px;font-weight:800}
 .dptlbl.v2{fill:var(--v2)}.dptlbl.v1{fill:var(--v1)}
@@ -158,12 +158,15 @@ body{overflow-x:hidden}
 <div class="hero"><div class="lb">전사 매출 (실입금 기준 · 웹마케팅 포함)</div><div class="big" id="h_s"></div>
 <div class="breakdown" id="h_bd" style="display:none"></div>
 <div class="chips"><div>세팅<b id="h_set"></b></div><div>오더<b id="h_ord"></b></div><div>오더율<b id="h_rate"></b></div><div class="cx">당월 취소<b id="h_cx"></b></div></div></div>
+<div class="two">
+<div class="card web"><div class="ct"><span class="dot"></span>웹마케팅</div><div class="v" id="w_s"></div><div class="r"><div>세팅<b id="w_set"></b></div><div>오더<b id="w_ord"></b></div><div>오더율<b id="w_r"></b></div><div class="cx">취소<b id="w_cx"></b></div></div></div>
+<div class="card sang"><div class="ct"><span class="dot"></span>상담지점</div><div class="v" id="s_s"></div><div class="r"><div>세팅<b id="s_set"></b></div><div>오더<b id="s_ord"></b></div><div>오더율<b id="s_r"></b></div><div class="cx">취소<b id="s_cx"></b></div></div></div></div>
 <!-- 이번주/지난주 왕 -->
 <div class="kings" id="kings"></div>
 <div class="swipe-hint" id="kings-hint"></div><div class="swipe-label">← 밀어서 지난주·이달 TOP3 보기 →</div>
 <!-- 3개월 누적 TOP3 -->
 <div class="q3" id="q3"></div>
-<div class="swipe-hint" id="q3-hint"></div><div class="swipe-label">← 밀어서 상담·사업 TOP3 보기 →</div>
+<div class="swipe-hint" id="q3-hint"></div><div class="swipe-label">← 밀어서 3개월·6개월 TOP3 보기 →</div>
 <!-- 덕질 스탯 -->
 <div class="dukji-wrap">
 <div class="dsect-hd">👑 덕질 스탯</div>
@@ -182,9 +185,6 @@ body{overflow-x:hidden}
 <div id="d_chart"></div>
 </div>
 </div>
-<div class="two">
-<div class="card web"><div class="ct"><span class="dot"></span>웹마케팅</div><div class="v" id="w_s"></div><div class="r"><div>세팅<b id="w_set"></b></div><div>오더<b id="w_ord"></b></div><div>오더율<b id="w_r"></b></div><div class="cx">취소<b id="w_cx"></b></div></div></div>
-<div class="card sang"><div class="ct"><span class="dot"></span>상담지점</div><div class="v" id="s_s"></div><div class="r"><div>세팅<b id="s_set"></b></div><div>오더<b id="s_ord"></b></div><div>오더율<b id="s_r"></b></div><div class="cx">취소<b id="s_cx"></b></div></div></div></div>
 <div class="panel">
 <div class="tabs"><button class="tabbtn on" onclick="sw(0,this)">상담 지점 매출순</button><button class="tabbtn" onclick="sw(3,this)">상담 개인 TOP</button><button class="tabbtn" onclick="sw(4,this)">사업 개인 TOP</button></div>
 <div id="body"></div>
@@ -258,7 +258,9 @@ function renderAll(D){
     }
     var q3El = document.getElementById('q3');
     if(q3El){
-      q3El.innerHTML = q3card('3개월 지점 TOP3', t3.branch, true) + q3card('3개월 상담 TOP3', t3.sang, true) + q3card('3개월 사업 TOP3', t3.saup, true);
+      var t6 = D.top6 || {};
+      q3El.innerHTML = q3card('3개월 지점 TOP3', t3.branch, true) + q3card('3개월 상담 TOP3', t3.sang, true) + q3card('3개월 사업 TOP3', t3.saup, true)
+        + q3card('6개월 지점 TOP3', t6.branch, true) + q3card('6개월 상담 TOP3', t6.sang, true) + q3card('6개월 사업 TOP3', t6.saup, true);
     }
     // 스와이프 힌트 dot 설정
     setTimeout(function(){ setupSwipe('kings','kings-hint'); setupSwipe('q3','q3-hint'); }, 100);
@@ -348,7 +350,7 @@ function renderTrend(){
 window.selBranch=function(i,btn){document.querySelectorAll('.dchip').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');drawChart(i);};
 function drawChart(i){
   var dk=window.__DK; var bt=dk.branchTrend; var b=bt.branches[i]; var s=b.series;
-  var W=720,H=200,padL=14,padR=14,padT=24,padB=34,iw=W-padL-padR,ih=H-padT-padB,n=s.length;
+  var W=1500,H=300,padL=24,padR=24,padT=32,padB=40,iw=W-padL-padR,ih=H-padT-padB,n=s.length;
   var maxS=Math.max.apply(null,s.map(function(x){return x.sales||0;}))||1;
   var maxSet=Math.max.apply(null,s.map(function(x){return x.set||0;}))||1;
   function px(idx){return padL+(n<=1?iw/2:iw*idx/(n-1));}
