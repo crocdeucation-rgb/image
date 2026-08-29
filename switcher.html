@@ -39,7 +39,19 @@
     try{
       var doc=frame.contentWindow.document;
       var h=Math.max(doc.body.scrollHeight, doc.documentElement.scrollHeight);
-      if(h>0){ frame.style.height=(h+20)+'px'; notifyParent(h+90); }
+      if(h>0){ var target=(h+20)+'px'; if(frame.style.height!==target){ frame.style.height=target; notifyParent(h+90); } }
+    }catch(e){}
+  }
+  // 자식(hr 등)이 CSV 렌더를 늦게 끝내도 iframe이 그만큼 자동으로 커지게 — 중첩 스크롤 방지
+  var _ro=null;
+  function watchFrame(){
+    try{
+      if(_ro){ _ro.disconnect(); _ro=null; }
+      var doc=frame.contentWindow.document;
+      if(window.ResizeObserver && doc && doc.body){
+        _ro=new ResizeObserver(function(){ fitHeight(); });
+        _ro.observe(doc.body);
+      }
     }catch(e){}
   }
   function notifyParent(h){
@@ -47,7 +59,7 @@
     try{ window.parent.postMessage({type:'resize-iframe',height:h},'*'); }catch(e){}
     try{ window.parent.postMessage('setHeight:'+h,'*'); }catch(e){}
   }
-  frame.addEventListener('load', function(){ fitHeight(); setTimeout(fitHeight,300); setTimeout(fitHeight,800); });
+  frame.addEventListener('load', function(){ fitHeight(); setTimeout(fitHeight,300); setTimeout(fitHeight,800); setTimeout(fitHeight,1600); watchFrame(); });
 
   window.addEventListener('message',function(e){
     if(e.data&&(e.data.t==='dashH'||e.data.t==='frameH')&&e.data.h>0){
@@ -58,6 +70,7 @@
     document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
     btn.classList.add('on');
     var t=btn.dataset.t;
+    if(_ro){ try{_ro.disconnect();}catch(e){} _ro=null; }
     frame.style.height=FRAMES[t].h+'px';
     frame.src=FRAMES[t].src;
     document.title=btn.textContent.trim()+' · 아라온 그로스';  // 탭별 제목
