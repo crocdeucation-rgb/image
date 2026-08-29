@@ -312,6 +312,24 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 .tbl-scroll table{min-width:640px}
 .tbl-scroll .campaign-table{min-width:0}
 @media(max-width:768px){.tbl-scroll table{min-width:600px}.tbl-scroll .campaign-table{min-width:0}}
+/* 웹마 덕질 스탯 (하단 · 이번주 vs 지난주) */
+.wd-card{background:#fff;border:1px solid #eee;border-radius:10px;padding:14px;margin:14px 0}
+.wd-title{font-size:13px;font-weight:700;color:#1a1a1a;border-bottom:2px solid #9333ea;padding-bottom:8px;margin-bottom:4px}
+.wd-badge{font-size:9px;padding:2px 7px;border-radius:8px;background:#f3e8ff;color:#7c3aed;font-weight:600;margin-left:4px}
+.wd-body{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.wd-col{background:#fafbfd;border:1px solid #eef0f3;border-radius:9px;padding:12px 14px}
+.wd-col-h{font-size:12px;font-weight:700;color:#475569;margin-bottom:8px}
+.wd-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid #f2f4f7}
+.wd-row:first-of-type{border-top:none}
+.wd-row .wk{font-size:11px;color:#94a3b8;width:44px;flex:0 0 auto;font-weight:700}
+.wd-row .wn{font-size:14px;font-weight:700;color:#1a1a1a}
+.wd-row .wv{margin-left:auto;font-size:13px;font-weight:700;color:#9333ea}
+.wd-rise{display:flex;align-items:center;gap:8px;margin-top:10px;padding:11px 14px;background:linear-gradient(90deg,#fff7ed,#fef2f2);border:1px solid #fde4d6;border-radius:9px}
+.wd-rise .rk{font-size:11px;font-weight:700;color:#e65100}
+.wd-rise b{font-size:15px;font-weight:700;color:#1a1a1a}
+.wd-rise .rv{font-size:14px;font-weight:700;color:#ea4335}
+.wd-rise small{margin-left:auto;font-size:10.5px;color:#b08968}
+@media (max-width:1240px){ .wd-body{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
@@ -441,6 +459,11 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 
 </div>
 
+<div id="webma-dukji" class="wd-card" style="display:none">
+  <div class="wd-title">👑 웹마 덕질 스탯 <span class="wd-badge">이번주 vs 지난주</span></div>
+  <div id="webma-dukji-body"></div>
+</div>
+
 <script>
 let allRows = [];
 function setView(v){
@@ -506,6 +529,24 @@ function showSec(idx) {
   currentSec = idx;
   document.querySelectorAll('.section').forEach((s,i) => s.classList.toggle('active', i===idx));
   document.querySelectorAll('.sec-nav-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
+}
+
+function renderWebmaDukji(){
+  var d={};
+  for(var i=0;i<allRows.length;i++){ if(allRows[i]&&allRows[i][0]==='웹마덕질'){ for(var j=i+1;j<Math.min(i+8,allRows.length);j++){var r=allRows[j];if(!r||!r[0])break;d[r[0]]={name:r[1]||'-',val:r[2]||''}} break; } }
+  var el=document.getElementById('webma-dukji');
+  if(!el) return;
+  if(!Object.keys(d).length){ el.style.display='none'; return; }
+  el.style.display='';
+  var esc=function(s){return escapeHtml(String(s));};
+  var row=function(k,dd){ dd=dd||{name:'-',val:''}; return '<div class="wd-row"><span class="wk">'+k+'</span><span class="wn">'+esc(dd.name)+'</span><span class="wv">'+esc(dd.val)+'</span></div>'; };
+  var rise=d['급상왕']||{name:'-',val:''};
+  document.getElementById('webma-dukji-body').innerHTML =
+    '<div class="wd-body">'+
+      '<div class="wd-col"><div class="wd-col-h">🔥 이번주</div>'+row('오더왕',d['이번주오더왕'])+row('매출왕',d['이번주매출왕'])+'</div>'+
+      '<div class="wd-col"><div class="wd-col-h">📅 지난주</div>'+row('오더왕',d['지난주오더왕'])+row('매출왕',d['지난주매출왕'])+'</div>'+
+    '</div>'+
+    '<div class="wd-rise">🚀 <span class="rk">급상왕</span> <b>'+esc(rise.name)+'</b> <span class="rv">'+esc(rise.val)+'</span> <small>지난주 대비 매출</small></div>';
 }
 
 async function loadAll() {
@@ -577,6 +618,7 @@ async function loadData() {
     const text = await res.text();
     allRows = text.trim().split('\n').map(r => r.split(',').map(c => c.trim()));
     render();
+    renderWebmaDukji();
     const now = new Date();
     document.getElementById('updated').textContent = '업데이트: ' + now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
   } catch(e) {
