@@ -177,7 +177,7 @@ body{overflow-x:hidden}
 <div id="d_rank"></div>
 </div>
 <div class="panel dpanel">
-<div class="dhd"><h3>🏢 지점 추이 <span class="dsub">최근 4개월 매출·세팅</span></h3></div>
+<div class="dhd"><h3>🏢 지점 추이 <span class="dsub">월별 추이 · 매출·세팅</span></h3></div>
 <div class="dchips" id="d_chips"></div>
 <div id="d_chart"></div>
 </div>
@@ -349,22 +349,23 @@ window.selBranch=function(i,btn){document.querySelectorAll('.dchip').forEach(fun
 function drawChart(i){
   var dk=window.__DK; var bt=dk.branchTrend; var b=bt.branches[i]; var s=b.series;
   var W=720,H=200,padL=14,padR=14,padT=24,padB=34,iw=W-padL-padR,ih=H-padT-padB,n=s.length;
-  var maxS=Math.max.apply(null,s.map(function(x){return x.sales;}))||1;
-  var maxSet=Math.max.apply(null,s.map(function(x){return x.set;}))||1;
+  var maxS=Math.max.apply(null,s.map(function(x){return x.sales||0;}))||1;
+  var maxSet=Math.max.apply(null,s.map(function(x){return x.set||0;}))||1;
   function px(idx){return padL+(n<=1?iw/2:iw*idx/(n-1));}
   function pyS(v){return padT+ih-ih*(v/maxS);}
   function pySet(v){return padT+ih-ih*(v/maxSet);}
-  var salesPts=s.map(function(x,idx){return px(idx)+','+pyS(x.sales);}).join(' ');
-  var setPts=s.map(function(x,idx){return px(idx)+','+pySet(x.set);}).join(' ');
+  var salesPts=s.map(function(x,idx){return x.sales!=null?(px(idx)+','+pyS(x.sales)):null;}).filter(Boolean).join(' ');
+  var setPts=s.map(function(x,idx){return x.set!=null?(px(idx)+','+pySet(x.set)):null;}).filter(Boolean).join(' ');
   var svg='<svg viewBox="0 0 '+W+' '+H+'" class="dsvg">';
-  s.forEach(function(x,idx){var xx=px(idx);svg+='<line x1="'+xx+'" y1="'+padT+'" x2="'+xx+'" y2="'+(padT+ih)+'" stroke="#EEF1F8"/><text x="'+xx+'" y="'+(H-11)+'" text-anchor="middle" class="dxlbl">'+x.m+'월</text>';});
+  s.forEach(function(x,idx){var xx=px(idx);var fut=(x.sales==null);svg+='<line x1="'+xx+'" y1="'+padT+'" x2="'+xx+'" y2="'+(padT+ih)+'" stroke="#EEF1F8"/><text x="'+xx+'" y="'+(H-11)+'" text-anchor="middle" class="dxlbl"'+(fut?' fill="#C3CAD9"':'')+'>'+x.m+'월</text>';});
   svg+='<polyline points="'+setPts+'" fill="none" stroke="#4C6EF5" stroke-width="1.4" stroke-dasharray="4 3"/>';
-  s.forEach(function(x,idx){var xx=px(idx),yy=pySet(x.set);svg+='<circle cx="'+xx+'" cy="'+yy+'" r="2.5" fill="#4C6EF5"/><text x="'+xx+'" y="'+(yy+14)+'" text-anchor="middle" class="dptlbl v1">'+x.set+'</text>';});
+  s.forEach(function(x,idx){if(x.set==null)return;var xx=px(idx),yy=pySet(x.set);svg+='<circle cx="'+xx+'" cy="'+yy+'" r="2.5" fill="#4C6EF5"/><text x="'+xx+'" y="'+(yy+14)+'" text-anchor="middle" class="dptlbl v1">'+x.set+'</text>';});
   svg+='<polyline points="'+salesPts+'" fill="none" stroke="#7048E8" stroke-width="1.8"/>';
-  s.forEach(function(x,idx){var xx=px(idx),yy=pyS(x.sales);svg+='<circle cx="'+xx+'" cy="'+yy+'" r="3" fill="#7048E8"/><text x="'+xx+'" y="'+(yy-8)+'" text-anchor="middle" class="dptlbl v2">'+eokman(x.sales)+'</text>';});
+  s.forEach(function(x,idx){if(x.sales==null)return;var xx=px(idx),yy=pyS(x.sales);svg+='<circle cx="'+xx+'" cy="'+yy+'" r="3" fill="#7048E8"/><text x="'+xx+'" y="'+(yy-8)+'" text-anchor="middle" class="dptlbl v2">'+eokman(x.sales)+'</text>';});
   svg+='</svg>';
-  var head=(typeof BRANCH_HEAD!=='undefined'?BRANCH_HEAD:{})[b.name], last=s[s.length-1];
-  var info = head ? '<div class="dbinfo"><b>'+b.name+'</b> · '+head+'명 · '+last.m+'월 1인당 '+eokman(Math.round(last.sales/head))+'</div>'
+  var head=(typeof BRANCH_HEAD!=='undefined'?BRANCH_HEAD:{})[b.name], last=null;
+  for(var _j=s.length-1;_j>=0;_j--){ if(s[_j].sales!=null){last=s[_j];break;} }
+  var info = (head && last) ? '<div class="dbinfo"><b>'+b.name+'</b> · '+head+'명 · '+last.m+'월 1인당 '+eokman(Math.round(last.sales/head))+'</div>'
                   : '<div class="dbinfo"><b>'+b.name+'</b></div>';
   document.getElementById('d_chart').innerHTML=info+svg+'<div class="dlegend"><span class="lg v2">● 매출</span><span class="lg v1">● 세팅(건)</span></div>';
 }
