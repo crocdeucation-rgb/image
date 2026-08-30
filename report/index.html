@@ -43,6 +43,27 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 @media(max-width:900px){.kpis{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:560px){.kpis{grid-template-columns:repeat(2,1fr)}}
 .kpi{background:var(--card);border:0.5px solid var(--border);border-radius:12px;padding:16px 18px}
+/* 접기 아코디언 (사장님 편의 — 과거·상세는 접어둠) */
+.acc{border:0.5px solid var(--border);border-radius:12px;margin:14px 0;background:var(--card);overflow:hidden}
+.acc>summary{list-style:none;cursor:pointer;padding:14px 18px;font-weight:700;font-size:14px;color:var(--text);display:flex;align-items:center;justify-content:space-between}
+.acc>summary::-webkit-details-marker{display:none}
+.acc>summary::after{content:'펼치기 ▾';font-size:12px;color:var(--sub);font-weight:500}
+.acc[open]>summary::after{content:'접기 ▴'}
+.acc>summary:hover{background:var(--card2)}
+.acc>summary .sub{font-size:11px;color:var(--sub);font-weight:400;margin-left:8px}
+.acc-body{padding:0 18px 8px}
+/* 이번 주 요약 카드 (최상단 — 열자마자 최신) */
+.thisweek{background:linear-gradient(135deg,rgba(76,110,245,.06),rgba(76,110,245,.02));border:1px solid rgba(76,110,245,.25);border-radius:14px;padding:18px 20px;margin-bottom:20px}
+.thisweek h4{font-size:15px;font-weight:800;color:var(--blue);margin-bottom:4px}
+.thisweek .tw-date{font-size:12px;color:var(--sub);margin-bottom:14px}
+.tw-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.tw-cell{background:var(--card);border:0.5px solid var(--border);border-radius:10px;padding:12px 14px}
+.tw-cell .k{font-size:11px;color:var(--sub);margin-bottom:3px}
+.tw-cell .v{font-size:19px;font-weight:800;color:var(--text);letter-spacing:-.5px}
+.tw-cell .d{font-size:11px;font-weight:600;margin-top:2px}
+.tw-up{color:#2f9e44}.tw-dn{color:#e03131}
+.tw-note{font-size:12px;color:var(--sub);line-height:1.6}
+@media(max-width:600px){.tw-grid{grid-template-columns:repeat(2,1fr)}}
 .kpi .k{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
 .kpi .v{font-size:22px;font-weight:700;letter-spacing:-.5px;color:var(--text)}
 .kpi .v.g{color:var(--teal-d)}
@@ -897,6 +918,21 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 <!-- ===== 8월 (누계 8/1~8/21) ===== -->
 <div id="p-aug" class="panel on">
 
+  <!-- 📌 이번 주 요약 (4주차) — 열자마자 최신부터 -->
+  <div class="thisweek">
+    <h4>📌 이번 주 요약</h4>
+    <div class="tw-date">4주차 · 8/24 ~ 8/30 · <span style="color:var(--faint)">전주(3주차) 대비</span></div>
+    <div class="tw-grid">
+      <div class="tw-cell"><div class="k">광고비</div><div class="v">1,978만</div><div class="d tw-dn">▲ 20% (전주 1,643만)</div></div>
+      <div class="tw-cell"><div class="k">총 DB</div><div class="v">525건</div><div class="d tw-up">▲ 30% (전주 403건)</div></div>
+      <div class="tw-cell"><div class="k">결제 매출</div><div class="v">5,955만</div><div class="d tw-dn">▼ (전주 7,607만)</div></div>
+      <div class="tw-cell"><div class="k">코호트 매출</div><div class="v">3,493만</div><div class="d">회수 대기</div></div>
+    </div>
+    <div class="tw-note">
+      <b>메타 CPL이 44,783 → 40,196으로 개선</b>됐습니다(방학점검·위너테스트 소재가 살아나며 효율↑). <b>텐핑 4주차 DB 216건 대량 유입</b>은 아직 결제 전(코호트 미성숙)이라 회수 대기 중입니다 — 4주차 코호트 매출이 낮게 보이는 이유입니다. <b>인스타 organic(광고비 0)이 계속 결제를 만들어</b> 무료 자산 효율이 확인됩니다.
+    </div>
+  </div>
+
   <div class="kpis" style="grid-template-columns:repeat(3,1fr)">
     <div class="kpi"><div class="k">8월 매출 · 누계</div><div class="v t">1억 7,592만</div><div class="s">결제일 기준 · 8/1~21 · 175,922,000원<br><span style="color:var(--faint)">신청일 코호트 1억 2,289만</span></div></div>
     <div class="kpi"><div class="k">총 광고비 · 누계</div><div class="v">3,788만</div><div class="s">37,875,399원<br><span style="color:var(--faint)">텐핑 실소진 3,045,000원 포함</span></div></div>
@@ -1055,7 +1091,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   </div>
 
   <!-- 소재별 -->
-  <div class="sec-major"><span class="n">02</span><span class="t">소재별</span><span class="s">주차별 · 누적 · 코호트/결제일 병기</span></div>
+  <details class="acc"><summary>02 · 소재별<span class="sub">주차별 · 누적 · 코호트/결제일 병기</span></summary><div class="acc-body">
   <div class="cap">광고비·리드·CPL은 <b>메타 실측</b>이고, 매출은 <b>위 채널표와 동일하게 코호트/결제일을 병기</b>합니다 — 8월 탭의 모든 표가 같은 기준을 씁니다.
   <br><b>코호트</b>는 그 주에 <b>들어온 리드</b>가 만든 매출(소재 생사 판단), <b>결제일</b>은 그 주에 <b>결제된</b> 매출(경영·대시보드 일치)입니다. <b>ROAS는 결제일 매출 ÷ 그 주 광고비</b>이며, 결제일 오더가 없으면 “—”입니다.</div>
   <div class="wk-legend">※ <b>1주차 = 8/1~8/9</b> (8/1 포함) · <b>2주차 = 8/10~8/16</b> (KST 8/16 24시 마감)</div>
@@ -1159,7 +1195,8 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   <div class="gal" id="aug-gal"></div>
 
   <!-- 판단의 기록 -->
-  <div class="sec-major"><span class="n">03</span><span class="t">판단의 기록</span></div>
+  </div></details>
+  <details class="acc"><summary>03 · 판단의 기록<span class="sub">주차별 판단 로그</span></summary><div class="acc-body">
 
   <div class="log" style="margin-bottom:12px;background:#f0f8f4;border-color:#c8e4d8">
     <div class="li" style="margin-bottom:8px"><b>① 노트필기-방학점검이 8월 1주 진짜 위너 (1주차 코호트 ROAS 11.36).</b></div>
@@ -1189,7 +1226,8 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   </div>
 
   <!-- 조치 -->
-  <div class="sec-major"><span class="n">04</span><span class="t">판정에 따른 조치</span></div>
+  </div></details>
+  <details class="acc"><summary>04 · 판정에 따른 조치</summary><div class="acc-body">
   <div class="tbl-scroll" style="margin-bottom:24px">
   <table class="tbl">
     <thead><tr><th class="l">소재·채널</th><th class="l">판정 근거</th><th class="l">조치</th></tr></thead>
@@ -1204,6 +1242,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
     </tbody>
   </table>
   </div>
+  </div></details>
 
 </div>
 
