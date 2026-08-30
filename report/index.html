@@ -325,12 +325,13 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 
 <!-- ===== 5월 결산 ===== -->
 <div id="p-may" class="panel">
-  <div class="kpis">
+  <div class="kpis" style="grid-template-columns:repeat(3,1fr)">
+    <div class="kpi"><div class="k">5월 매출</div><div class="v t">8,835만</div><div class="s">88,350,000원<br><span style="color:var(--faint)">원장 기준 · 취소 반영</span></div></div>
     <div class="kpi"><div class="k">총 광고비</div><div class="v">1,265만</div><div class="s">12,646,141원</div></div>
-    <div class="kpi"><div class="k">총 DB</div><div class="v">815건</div><div class="s">CPL 13,627원</div></div>
     <div class="kpi"><div class="k">ROAS</div><div class="v t">6.97</div><div class="s">전채널 통합</div></div>
+    <div class="kpi"><div class="k">총 DB</div><div class="v">815건</div><div class="s">CPL 13,627원</div></div>
     <div class="kpi"><div class="k">오더</div><div class="v">25건</div><div class="s">결제일 기준</div></div>
-    <div class="kpi"><div class="k">5월 매출</div><div class="v">8,835만</div><div class="s">결제일 기준</div></div>
+    <div class="kpi" style="border-color:var(--red);border-width:1.5px"><div class="k" style="color:var(--red)">당월 취소</div><div class="v" style="color:var(--red)">291.2만</div><div class="s">1건 · 원장 확정</div></div>
   </div>
   <div class="knote">※ 당근 유채민 취소(291.2만) 제외 / ODI플랜 광고비 미기재 / 누적 매출 1억 돌파(5/27)</div>
 
@@ -413,12 +414,12 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 <div id="p-jun" class="panel">
 
   <div class="kpis" style="grid-template-columns:repeat(3,1fr)">
+    <div class="kpi"><div class="k">6월 매출</div><div class="v t">1억 5,063.6만</div><div class="s">150,636,000원<br><span style="color:var(--faint)">원장 기준 · 취소 반영</span></div></div>
     <div class="kpi"><div class="k">총 광고비</div><div class="v">3,469만</div><div class="s">34,693,402원</div></div>
+    <div class="kpi"><div class="k">ROAS</div><div class="v t">4.34</div><div class="s">결제일 기준<br><span style="color:var(--faint)">코호트 4.35</span></div></div>
     <div class="kpi"><div class="k">총 DB</div><div class="v">1,548건</div><div class="s">CPL 22,411원</div></div>
-    <div class="kpi"><div class="k">ROAS · 코호트</div><div class="v t">4.35</div><div class="s">6월 유입이 만든 매출</div></div>
-    <div class="kpi"><div class="k">ROAS · 결제일</div><div class="v">4.34</div><div class="s">원장 순매출 ÷ 광고비</div></div>
-    <div class="kpi"><div class="k">6월 매출</div><div class="v">1억 5,063.6만</div><div class="s">150,636,000원<br><span style="color:var(--faint)">원장 기준 · 오더 42건 · 취소 4,452.8만 반영</span></div></div>
-    <div class="kpi" style="border-color:var(--red);border-width:1.5px"><div class="k" style="color:var(--red)">당월 취소</div><div class="v" style="color:var(--red)">4,452.8만</div><div class="s">12건 · 원장 확정 (노션 미반영분 포함)</div></div>
+    <div class="kpi"><div class="k">오더</div><div class="v">42건</div><div class="s">결제일 기준</div></div>
+    <div class="kpi" style="border-color:var(--red);border-width:1.5px"><div class="k" style="color:var(--red)">당월 취소</div><div class="v" style="color:var(--red)">4,452.8만</div><div class="s">12건 · 원장 확정</div></div>
   </div>
   <div class="knote">
     ※ 광고비 전면 재검증 후 수치 (2026-07-11) · 카카오·네이버는 API 실측으로 교체 · 브랜드검색/GFA 분리 · 텐핑은 월별 ROAS 산출 제외(코호트 채널)
@@ -744,12 +745,12 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 <div id="p-jul" class="panel">
 
   <div class="kpis" style="grid-template-columns:repeat(3,1fr)">
-    <div class="kpi"><div class="k">7월 매출</div><div class="v t">2억 1,414만</div><div class="s">214,145,000원<br><span style="color:var(--faint)">원장 기준 · 취소 7,438만 반영</span></div></div>
-    <div class="kpi" style="border-color:var(--red);border-width:1.5px"><div class="k" style="color:var(--red)">당월 취소</div><div class="v" style="color:var(--red)">7,438만</div><div class="s">21건 · 원장 확정 (노션 미반영분 포함)</div></div>
-    <div class="kpi"><div class="k">ROAS · 코호트</div><div class="v">6.45</div><div class="s">7월 유입이 만든 매출</div></div>
-    <div class="kpi"><div class="k">총 광고비</div><div class="v">3,437만</div><div class="s">텐핑 신규충전 0</div></div>
-    <div class="kpi"><div class="k">총 DB</div><div class="v">1,836건</div><div class="s">7월 신청 코호트</div></div>
-    <div class="kpi"><div class="k">ROAS · 결제일</div><div class="v">6.23</div><div class="s">원장 순매출 ÷ 광고비</div></div>
+    <div class="kpi"><div class="k">7월 매출</div><div class="v t">2억 1,414.5만</div><div class="s">214,145,000원<br><span style="color:var(--faint)">원장 기준 · 취소 반영</span></div></div>
+    <div class="kpi"><div class="k">총 광고비</div><div class="v">3,437만</div><div class="s">34,370,000원</div></div>
+    <div class="kpi"><div class="k">ROAS</div><div class="v t">6.23</div><div class="s">결제일 기준<br><span style="color:var(--faint)">코호트 6.45</span></div></div>
+    <div class="kpi"><div class="k">총 DB</div><div class="v">1,836건</div><div class="s">CPL 18,720원</div></div>
+    <div class="kpi"><div class="k">오더</div><div class="v">62건</div><div class="s">결제일 기준</div></div>
+    <div class="kpi" style="border-color:var(--red);border-width:1.5px"><div class="k" style="color:var(--red)">당월 취소</div><div class="v" style="color:var(--red)">7,438.4만</div><div class="s">21건 · 원장 확정</div></div>
   </div>
   <div class="knote">
     ※ 광고비는 전 채널 API·실측(메타 MCP · 카카오 · 네이버SA · GFA 엑셀) · 브랜드검색 월정액 전액(완료월) · 텐핑은 누적 코호트 별도(02) · 매출·오더는 노션(결제 확정) 기준
@@ -938,12 +939,12 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   </div>
 
   <div class="kpis" style="grid-template-columns:repeat(3,1fr)">
-    <div class="kpi"><div class="k">8월 매출 · 누계</div><div class="v t">2억 3,095만</div><div class="s">원장 기준 · 취소 반영 · 230,949,500원<br><span style="color:var(--faint)">취소 34,102,000원 (9건)</span></div></div>
-    <div class="kpi"><div class="k">총 광고비 · 누계</div><div class="v">6,187만</div><div class="s">61,866,492원<br><span style="color:var(--faint)">텐핑 실소진 12,061,000원 포함</span></div></div>
-    <div class="kpi"><div class="k">ROAS</div><div class="v t">3.73</div><div class="s">원장 매출 ÷ 웹마 광고비<br><span style="color:var(--faint)">코호트(노션) 3.37 · 소재 판단용</span></div></div>
-    <div class="kpi"><div class="k">총 DB</div><div class="v">1,618건</div><div class="s">전 채널 합산 · 8/1~30</div></div>
-    <div class="kpi"><div class="k">오더</div><div class="v">66건</div><div class="s">원장 기준 · 취소 반영<br><span style="color:var(--faint)">신청일 코호트 53건</span></div></div>
-    <div class="kpi"><div class="k">메타 광고비</div><div class="v">4,195만</div><div class="s">41,947,029원 · 메타 실측 (8/1~30)</div></div>
+    <div class="kpi"><div class="k">8월 매출 · 누계</div><div class="v t">2억 3,095만</div><div class="s">230,949,500원<br><span style="color:var(--faint)">원장 기준(웹마) · 8/1~30 · 취소 반영</span></div></div>
+    <div class="kpi"><div class="k">총 광고비</div><div class="v">6,187만</div><div class="s">61,866,492원</div></div>
+    <div class="kpi"><div class="k">ROAS</div><div class="v t">3.73</div><div class="s">결제일 기준<br><span style="color:var(--faint)">코호트 3.37</span></div></div>
+    <div class="kpi"><div class="k">총 DB</div><div class="v">1,618건</div><div class="s">CPL 38,236원</div></div>
+    <div class="kpi"><div class="k">오더</div><div class="v">66건</div><div class="s">결제일 기준</div></div>
+    <div class="kpi" style="border-color:var(--red);border-width:1.5px"><div class="k" style="color:var(--red)">당월 취소</div><div class="v" style="color:var(--red)">3,410.2만</div><div class="s">9건 · 원장 확정</div></div>
   </div>
   <div class="knote">
     ※ <b>매출 2기준 병기</b> — <b>결제일 기준</b>(경영·대시보드 일치) = <b>175,922,000원</b> / <b>신청일 코호트</b>(소재 생사 판단) = <b>122,890,000원</b>.
