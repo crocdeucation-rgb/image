@@ -2089,7 +2089,7 @@ function chWk(w,btn){
   document.querySelectorAll('.chwk-btn').forEach(b=>b.classList.remove('on'));
   if(btn)btn.classList.add('on');
   document.querySelectorAll('#ch-tbody tr[data-wk]').forEach(tr=>{
-    tr.style.display = (w==='all' || tr.dataset.wk===w || tr.dataset.wk==='all') ? '' : 'none';
+    tr.style.display = (w==='all') ? '' : (tr.dataset.wk===w ? '' : 'none');
   });
 }
 (function(){var t=document.querySelector('.chwk-btn');if(t)chWk('4',t);})();
