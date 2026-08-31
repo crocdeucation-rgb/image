@@ -200,7 +200,7 @@ body{overflow-x:hidden}
 </div>
 <!-- 이번주/지난주 왕 -->
 <div class="kings" id="kings"></div>
-<div class="swipe-hint" id="kings-hint"></div><div class="swipe-label">← 밀어서 지난주·이달 TOP3 보기 →</div>
+<div class="swipe-hint" id="kings-hint"></div><div class="swipe-label">← 밀어서 이번주·지난주 왕 보기 →</div>
 <!-- 누적 매출 TOP3 (기간 토글) -->
 <div class="q3head"><span class="q3title">📊 누적 매출 TOP3</span><span class="q3tog"><button class="q3togbtn on" data-q="3" onclick="q3Period('3',this)">3개월</button><button class="q3togbtn" data-q="6" onclick="q3Period('6',this)">6개월</button></span></div>
 <div class="q3" id="q3"></div>
@@ -305,11 +305,11 @@ function renderAll(D){
         });
         return h+'</div>';
       }
-      kingsEl.innerHTML = kcard('🔥 이번주', '이번주 월~일', tw) + kcard('지난주', '지난주 월~일', lw)
-        + '<div class="kwrap"><h3>💰 이달 매출 TOP3</h3>'
+      kingsEl.innerHTML = '<div class="kwrap"><h3>💰 이달 매출 TOP3</h3>'
         + top3mini('상담', D.persons)
         + top3mini('사업', D.divpersons)
-        + '</div>';
+        + '</div>'
+        + kcard('🔥 이번주', '이번주 월~일', tw) + kcard('지난주', '지난주 월~일', lw);
     }
     // 3개월 TOP3
     var t3 = D.top3 || {};
