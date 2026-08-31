@@ -257,7 +257,9 @@ function renderAll(D){
   function cxTag(cxa, seg){
     if(!cxa || cxa<=0) return '';
     var t = CX_T[seg] || CX_T.sang;
-    if(cxa < t[0]) return '';                    // 최소 기준 미만 = 표시 안 함
+    // 임계 미만 = 취소액만 담백하게 표시 (💧 강조 없이, 회색). 정보는 남기되 강조는 안 함
+    if(cxa < t[0]) return '<span style="white-space:nowrap;color:#B6C2DC;font-size:10px;font-weight:600">취소 '+won(cxa)+'</span>';
+    // 임계 이상 = 💧 강조 (기준대로 3단계)
     var lv = cxa>=t[2] ? 3 : cxa>=t[1] ? 2 : 1;
     var c  = lv===3 ? '#E23A22' : lv===2 ? '#F0771A' : '#9AA6B8';
     var fw = lv===3 ? '800' : '700';
