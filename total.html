@@ -383,7 +383,10 @@ try{renderDukji(D);}catch(e){console.error('dukji',e);}
 /* ── 덕질 스탯 렌더 ── */
 window.__DK=null; window.__rm={period:'weekly',seg:'sang'}; window.__sg={scope:'team',period:'weekly'};
 function dwon(n){return (n||0).toLocaleString('ko-KR');}
-function eokman(n){n=n||0; if(n>=100000000)return (n/100000000).toFixed(1)+'억'; if(n>=10000)return Math.round(n/10000)+'만'; return dwon(n);}
+function eokman(n){n=n||0;
+  if(n>=100000000){var e=n/100000000;return (e%1===0?e.toFixed(0):e.toFixed(2))+'억';}
+  if(n>=10000){var m=n/10000;return (m%1===0?String(m):m.toFixed(1))+'만';}
+  return dwon(n);}
 function renderRisers(dk){
   var el=document.getElementById('d_risers'); if(!el)return;
   el.innerHTML=surgeBlk(dk.surge);
@@ -391,7 +394,12 @@ function renderRisers(dk){
 function surgeBlk(surge){
   surge = surge || {};
   var pd = window.__sg.period || 'weekly';
-  var tog = '<div class="drlbl">🚀 실시간 급등주'
+  // 주간이 지난주 폴백이면 라벨 (월~목엔 이번주가 얇아 지난주 확정 급등주를 보여줌)
+  var teamBasis = (surge.team&&surge.team.weeklyBasis) || 'this';
+  var perBasis = (surge.person&&surge.person.weekly&&surge.person.weekly.basis) || 'this';
+  var fbLabel = (pd==='weekly' && (teamBasis==='last' || perBasis==='last'))
+    ? '<span style="font-size:10px;font-weight:600;color:var(--v2);margin-left:6px">· 지난주 기준</span>' : '';
+  var tog = '<div class="drlbl">🚀 실시간 급등주'+fbLabel
     + '<span class="sgtog"><button class="sgbtn'+(pd==='weekly'?' on':'')+'" onclick="sgPeriod(\'weekly\')">주간</button>'
     + '<button class="sgbtn'+(pd==='monthly'?' on':'')+'" onclick="sgPeriod(\'monthly\')">월간</button></span></div>';
   // 팀
