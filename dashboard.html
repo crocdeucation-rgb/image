@@ -392,10 +392,7 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 
 <div class="section-label" style="margin-top:14px">담당자 × 소재 배정 <span class="badge" style="background:#e8faf6;color:#0a8a5c" id="heat-tab-label">이번달</span></div>
 <div id="heatmap-wrap"><div style="color:#aaa;text-align:center;padding:12px;font-size:11px">불러오는 중...</div></div>
-<div id="webma-dukji" class="wd-card" style="display:none">
-  <div class="wd-title">👑 웹마 덕질 스탯 <span class="wd-badge">이번주 vs 지난주</span></div>
-  <div id="webma-dukji-body"></div>
-</div>
+<!-- 웹마 덕질 스탯 제거 (team.html GROWTH CUP으로 이동) -->
 </div>
 
 <!-- 섹션2: 유입경로 분석 -->
@@ -924,10 +921,13 @@ function render() {
   const midtermRe = /노트필기_(관리부재|시간압박|학원무용|방법제시)_2608/;
   const midtermParts = campaigns.filter(c => midtermRe.test(c.name || ''));
   if (midtermParts.length) {
-    const merged = { name: 'ARA_노트필기_중간고사_2608', channel: '메타', db: 0, visit: 0, setting: 0, order: 0, spend: 0, sales: 0, roas: '' };
+    const merged = { name: 'ARA_노트필기_중간고사(위너테스트)', channel: '메타', db: 0, visit: 0, setting: 0, order: 0, spend: 0, sales: 0, roas: '' };
     midtermParts.forEach(c => { merged.db += c.db; merged.visit += c.visit; merged.setting += c.setting; merged.order += c.order; merged.spend += c.spend; merged.sales += c.sales; });
+    // [2026-09] 4종 소재는 '위너테스트 세트' 캠페인에서 돌아감 → 광고비를 위너테스트에서 가져와 매칭
+    const winner = campaigns.find(c => /위너테스트/.test(c.name || ''));
+    if (winner && winner.spend > 0) { merged.spend += winner.spend; merged.sales += winner.sales; }
     merged.roas = merged.spend > 0 ? (merged.sales / merged.spend).toFixed(2) : '';
-    campaigns = campaigns.filter(c => !midtermRe.test(c.name || ''));
+    campaigns = campaigns.filter(c => !midtermRe.test(c.name || '') && !/위너테스트/.test(c.name || ''));
     campaigns.push(merged);
   }
   // ON 지정 캠페인이 시트에 아직 없으면 빈 행으로라도 노출 (수치는 시트 반영 시 자동 대체)
