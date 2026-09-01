@@ -370,6 +370,7 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 <div class="tbl-scroll"><table class="funnel-table">
   <thead>
     <tr>
+      <th>순위</th>
       <th>담당자</th>
       <th>DB수</th>
       <th>방문수</th>
@@ -478,7 +479,7 @@ const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJ
     const LEDGER_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBUBxnTPPn_AebCqxIC8Q2x-5V3VuvIY6MM6QlgKVUUA7Bbjh3jMO7q6i4sDgQse-UKsNGe5Hxt7QF/pub?gid=431762866&single=true&output=csv';
     const CANCEL_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBUBxnTPPn_AebCqxIC8Q2x-5V3VuvIY6MM6QlgKVUUA7Bbjh3jMO7q6i4sDgQse-UKsNGe5Hxt7QF/pub?gid=128666314&single=true&output=csv';
 
-const ASSIGNEES = ['우혜림','김윤호','장윤호','박창건','김태석','김성윤','노영호','김원득','김우진','안준섭'];
+const ASSIGNEES = ['우혜림','김윤호','장윤호','박창건','김태석','김성윤','노영호','김원득','김우진','안준섭','김주환'];
 const ASSIGNEE_START_IDX = 46;
 const CAMPAIGN_START_IDX = 58;
 
@@ -705,28 +706,42 @@ function render() {
   const offset = funnelTab * 6 + 1;
   const tbody = document.getElementById('funnel-tbody');
   let totalDb=0, totalVisit=0, totalSetting=0, totalCancel=0, totalOrder=0, totalSalesNum=0, totalCost=0;
-  let rows = ASSIGNEES.map((name, i) => {
+  // [2026-09] 매출순 순위 + 전날(32열)/전월 변동
+  const _monthRank = (function(){
+    var a = ASSIGNEES.map((nm,i)=>{ var r=allRows[ASSIGNEE_START_IDX+i]||[]; return {name:nm, s:parseInt(((r[18]||'0')+'').replace(/[^0-9]/g,''))||0}; });
+    a.sort((x,y)=>y.s-x.s); var rk={}; a.forEach((x,idx)=>rk[x.name]=idx+1); return rk;
+  })();
+  let _dataArr = ASSIGNEES.map((name, i) => {
     const r = allRows[ASSIGNEE_START_IDX + i] || [];
-    const db      = parseInt(r[offset]   || '0') || 0;
-    const visit   = parseInt(r[offset+1] || '0') || 0;
-    const setting = parseInt(r[offset+2] || '0') || 0;
-    const cancel  = parseInt(r[offset+3] || '0') || 0;
-    const order   = parseInt(r[offset+4] || '0') || 0;
-    const sales   = r[offset+5] || '0원';
+    const db=parseInt(r[offset]||'0')||0, visit=parseInt(r[offset+1]||'0')||0, setting=parseInt(r[offset+2]||'0')||0;
+    const cancel=parseInt(r[offset+3]||'0')||0, order=parseInt(r[offset+4]||'0')||0, sales=r[offset+5]||'0원';
+    const salesNum=parseInt((sales+'').replace(/[^0-9]/g,''))||0;
+    const _co=19+funnelTab*3;
+    return {name:r[0]||name, db,visit,setting,cancel,order,sales,salesNum, cost:r[_co], iroas:parseFloat(r[_co+1])||0, eff:r[_co+2], yRank:+(r[31]||0)};
+  });
+  _dataArr.sort((a,b)=>b.salesNum-a.salesNum);
+  let rows = _dataArr.map((d, idx) => {
+    const rank=idx+1;
+    const db=d.db,visit=d.visit,setting=d.setting,cancel=d.cancel,order=d.order,sales=d.sales,salesNum=d.salesNum;
     totalDb += db; totalVisit += visit; totalSetting += setting; totalCancel += cancel; totalOrder += order;
-    const salesNum = parseInt((sales+'').replace(/[^0-9]/g,'')) || 0;
-    if (sales.includes('만원')) totalSalesNum += salesNum * 10000;
+    if ((sales+'').includes('만원')) totalSalesNum += salesNum * 10000;
     else totalSalesNum += salesNum;
     const cancelRate = visit ? Math.round(cancel/visit*100) : 0;
     const orderRate  = setting ? Math.round(order/setting*100) : 0;
     const _co = 19 + funnelTab*3;
-    totalCost += parseFloat(r[_co]||'0')||0;  // 원가(만원) 합계 — 소수점 보존
-    const costV  = r[_co] ? r[_co]+'만' : '-';
-    const iroasN = parseFloat(r[_co+1])||0;
+    totalCost += parseFloat(d.cost||'0')||0;
+    const costV  = d.cost ? d.cost+'만' : '-';
+    const iroasN = d.iroas||0;
+    const dDelta = d.yRank>0?(d.yRank-rank):0;
+    const mDelta = (_monthRank[d.name]||99)-rank;
+    const dv = dDelta>0?`<span style="color:#0f9d58;font-weight:800;font-size:10px">▲${dDelta}</span>`:dDelta<0?`<span style="color:#e11d48;font-weight:800;font-size:10px">▼${-dDelta}</span>`:`<span style="color:#bbc;font-size:10px">—</span>`;
+    const mv = mDelta>0?`<span style="color:#0f9d58;font-size:9px">전월▲${mDelta}</span>`:mDelta<0?`<span style="color:#e11d48;font-size:9px">전월▼${-mDelta}</span>`:'';
+    const medal = rank===1?'👑':rank===2?'🥈':rank===3?'🥉':`<b style="color:#8b93a2">${rank}</b>`;
     const iroasV = iroasN ? `${iroasN}<span class="rbar" style="width:${Math.min(iroasN*4,52)}px"></span>` : '-';
-    const effV   = r[_co+2] ? r[_co+2]+'만' : '-';
-    return `<tr>
-      <td class="name">${r[0] || name}</td>
+    const effV   = d.eff ? d.eff+'만' : '-';
+    return `<tr${rank<=3?' style="background:rgba(37,99,235,.04)"':''}>
+      <td class="num" style="white-space:nowrap">${medal} ${dv}${mv?'<br>'+mv:''}</td>
+      <td class="name">${d.name}</td>
       <td class="num db">${db}</td>
       <td class="num visit">${visit}</td>
       <td class="num" style="color:#2563eb">${setting}</td>
@@ -1062,11 +1077,14 @@ async function loadSchedule() {
       const nameHtml = pageId
         ? `<a class="visit-name" href="https://notion.so/${pageId}" target="_blank" rel="noopener">${nameEsc}</a>`
         : `<span class="visit-name">${nameEsc}</span>`;
+      const cohort = r[8] || '';   // [2026-09] 코호트: "8월·메타" 형태
+      const cohortHtml = cohort ? `<span class="visit-cohort" style="font-size:10px;color:#8b93a2;font-weight:600;margin-left:auto;white-space:nowrap">${escapeHtml(cohort)}</span>` : '';
       return `<div class="visit-item${isToday ? ' today' : ''}">
         <span class="visit-date">${isToday ? '오늘' : dateStr}</span>
         <span class="visit-time">${r[1] || '미정'}</span>
         ${nameHtml}
         <span class="visit-grade">${shortGrade(r[3])}</span>
+        ${cohortHtml}
         ${assigneeHtml}
       </div>`;
     }).join('');
