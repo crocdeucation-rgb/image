@@ -211,7 +211,7 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 
     <div class="card colwrap" style="flex:1;min-height:0;gap:0">
       <div class="ch">
-        <span class="t">담당자별 성과분석</span>
+        <span class="t">🏆 GROWTH CUP 순위 <span style="font-size:10px;font-weight:600;color:#8b93a2">매출×ROAS · 전월대비 ▲▼</span></span>
         <span class="tabs sp" id="pf-tabs">
           <span class="tab on" onclick="setPerfTab(0)">이번달</span>
           <span class="tab" onclick="setPerfTab(1)">지난달</span>
@@ -220,14 +220,14 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
       </div>
       <div class="pfwrap scroll" style="flex:1">
         <table class="pf">
-          <thead><tr><th>담당자</th><th>DB</th><th>방문</th><th>세팅</th><th>방취</th><th>오더</th><th>매출</th><th>방취율</th><th>오더율</th><th>ROAS</th><th>효율</th></tr></thead>
+          <thead><tr><th>순위</th><th>담당자</th><th>점수</th><th>DB</th><th>방문</th><th>세팅</th><th>오더</th><th>매출</th><th>ROAS</th><th>효율</th></tr></thead>
           <tbody id="pf-body"><tr><td colspan="11" class="empty">불러오는 중...</td></tr></tbody>
         </table>
       </div>
     </div>
-    <!-- 이번주 팀 성과 (좌측 밑으로 이동) -->
+    <!-- 덕질 스탯 (순위는 위 표에서, 여긴 재미 요소) -->
     <div class="card">
-      <div class="ch"><span class="t">🔥 이번주 팀 성과</span><span class="badge sp">이번주</span></div>
+      <div class="ch"><span class="t">🔥 덕질 스탯</span><span class="badge sp">이번주</span></div>
       <div class="hl" id="hl"></div>
     </div>
   </div>
@@ -241,7 +241,7 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
     <!-- 9월 업무 시스템 변경 (원문) -->
     <div class="card" style="background:linear-gradient(135deg,#1a2a4a,#2d3f5f);color:#fff">
       <div style="font-weight:800;font-size:15px;margin-bottom:10px;letter-spacing:-.3px">⚔️ 9월 한 달 업무 시스템 변경 <span style="opacity:.65;font-weight:600;font-size:12px">· 춘추전국시대</span></div>
-      <div style="font-size:13px;line-height:1.85;opacity:.96">
+      <div style="font-size:12px;line-height:1.75;opacity:.96;word-break:keep-all;overflow-wrap:break-word">
         <b style="color:#ffd966">1. 신규DB 담당자 자동지정 폐지</b><br>
         · 먼저 콜한 사람이 담당자가 본인이름으로 입력<br><br>
         <b style="color:#ffd966">2. 부재관리 변경</b><br>
@@ -426,35 +426,75 @@ async function loadSum(){
   renderHL(); renderPerf();
 }
 function renderHL(){
+  // [2026-09] 덕질 스탯 — 순위는 GROWTH CUP 표에서, 여긴 재미요소만
   var hl={};
   for(var i=0;i<summaryRows.length;i++){ if(summaryRows[i]&&summaryRows[i][0]==='주간하이라이트'){ for(var j=i+1;j<Math.min(i+7,summaryRows.length);j++){var r=summaryRows[j];if(!r||!r[0])break;hl[r[0]]={name:r[1]||'-',val:r[2]||'',extra:r[3]||''}} break; } }
-  var row=function(ic,lb,d,cls,note){var nm=(d&&d.name)?d.name:'-';var vl=(d&&d.val)?d.val:'';return '<div class="hlrow '+(cls||'')+'"><span class="ic">'+ic+'</span><span class="lb">'+lb+'</span><span class="nm">'+esc(nm)+'</span>'+(note?'<span class="no">'+esc(note)+'</span>':'')+'<span class="vl">'+esc(vl+'')+'</span></div>'};
-  var conv=(hl['전환왕']&&hl['전환왕'].extra)?hl['전환왕'].extra:'';
-  var soj=(hl['결번진단']&&hl['결번진단'].extra)?hl['결번진단'].extra:'';
+  // 급상승왕 = 이번달 점수 순위가 지난달 대비 제일 오른 사람
+  function rankOf(tab){var o=tab*6+1,c=19+tab*3,a=[];ASSIGNEES.forEach(function(nm,i){var r=summaryRows[ASSIGNEE_START_IDX+i]||[];var sn=parseInt(((r[o+5]||'0')+'').replace(/[^0-9]/g,''))||0;a.push({name:r[0]||nm,score:Math.round(sn*(+(r[c+1]||0)))});});a.sort(function(x,y){return y.score-x.score;});var rk={};a.forEach(function(x,idx){rk[x.name]=idx+1;});return rk;}
+  var curR=rankOf(0), prvR=rankOf(1), topRise=null, mx=0;
+  ASSIGNEES.forEach(function(nm){var d=(prvR[nm]||99)-(curR[nm]||99);if(d>mx){mx=d;topRise=nm;}});
+  // 부재회수(전환왕) = 전환누적 시트 → summary에 emit되면 읽음. 없으면 '집계 중'
+  var recovery=null;
+  for(var i=0;i<summaryRows.length;i++){ if(summaryRows[i]&&summaryRows[i][0]==='부재회수'){ recovery={name:summaryRows[i][1]||'-',val:summaryRows[i][2]||''}; break; } }
+  var row=function(ic,lb,nm,vl){return '<div class="hlrow"><span class="ic">'+ic+'</span><span class="lb">'+lb+'</span><span class="nm">'+esc(nm||'-')+'</span><span class="vl">'+esc(vl||'')+'</span></div>';};
   document.getElementById('hl').innerHTML =
-    row('🔥','매출왕',hl['매출왕']) + row('🏆','방문왕',hl['방문왕']) +
-    row('⚡','전환왕',hl['전환왕'],'',conv) +
-    row('⏳','홀딩회수',hl['홀딩회수'],'hold') +
-    row('🔄','결번왕ㅜ',hl['결번진단'],'warn',soj);
+      (topRise&&mx>0?row('🚀','급상승왕',topRise,'▲'+mx):row('🚀','급상승왕','-',''))
+    + row('🏆','방문왕',hl['방문왕']?hl['방문왕'].name:'-',hl['방문왕']?hl['방문왕'].val:'')
+    + row('⚡','전환왕',hl['전환왕']?hl['전환왕'].name:'-',hl['전환왕']?hl['전환왕'].val:'')
+    + row('⏳','홀딩회수',hl['홀딩회수']?hl['홀딩회수'].name:'-',hl['홀딩회수']?hl['홀딩회수'].val:'')
+    + row('🔄','부재회수',recovery?recovery.name:'집계 중',recovery?recovery.val:'내일부터');
 }
 function setPerfTab(i){perfTab=i;var ts=document.querySelectorAll('#pf-tabs .tab');for(var k=0;k<ts.length;k++)ts[k].classList.toggle('on',k===i);renderPerf()}
 function renderPerf(){
   if(!summaryRows.length)return;
   var off=perfTab*6+1, co=19+perfTab*3;
+  // [2026-09 GROWTH CUP] 담당자별 점수(매출×ROAS) 계산 → 순위 + 전월 대비 변동
+  function calcScores(tab){
+    var o=tab*6+1, c=19+tab*3, a=[];
+    ASSIGNEES.forEach(function(name,i){
+      var r=summaryRows[ASSIGNEE_START_IDX+i]||[];
+      var sn=parseInt(((r[o+5]||'0')+'').replace(/[^0-9]/g,''))||0;
+      var rn=+(r[c+1]||0);
+      a.push({name:r[0]||name, score:Math.round(sn*rn)});
+    });
+    a.sort(function(x,y){return y.score-x.score;});
+    var rk={}; a.forEach(function(x,idx){rk[x.name]=idx+1;});
+    return rk;
+  }
+  var prevRank = calcScores(1);   // 지난달 순위 (전월변동용)
   var tDb=0,tVs=0,tSe=0,tCa=0,tOd=0,tSales=0,tSpend=0;
-  var rows=ASSIGNEES.map(function(name,i){
+  // 담당자 데이터 수집 (점수 포함)
+  var data=ASSIGNEES.map(function(name,i){
     var r=summaryRows[ASSIGNEE_START_IDX+i]||[];
     var db=+(r[off]||0),vs=+(r[off+1]||0),se=+(r[off+2]||0),ca=+(r[off+3]||0),od=+(r[off+4]||0);
-    var sales=r[off+5]||'0원'; tDb+=db;tVs+=vs;tSe+=se;tCa+=ca;tOd+=od;
-    var salesNum=parseInt((sales+'').replace(/[^0-9]/g,''))||0; tSales+=salesNum;  // "2601만원" → 2601 합산
-    var roas=r[co+1]?(+r[co+1]).toFixed(2):'-', ef=r[co+2]?r[co+2]+'만':'-';
-    var roasNum=+(r[co+1]||0); if(roasNum>0&&salesNum>0) tSpend+=salesNum/roasNum;  // 광고비=매출/ROAS 역산 → 합계 ROAS용
-    var cr=vs?Math.round(ca/vs*100):0, or=se?Math.round(od/se*100):0;
-    return '<tr><td class="nm">'+esc(r[0]||name)+'</td><td class="db">'+db+'</td><td class="vs">'+vs+'</td><td class="se">'+se+'</td><td class="ca">'+ca+'</td><td class="od">'+od+'</td><td class="sl">'+esc(sales)+'</td><td class="rt" style="color:var(--red)">'+cr+'%</td><td class="rt">'+or+'%</td><td class="ro">'+roas+'</td><td class="ef">'+ef+'</td></tr>';
+    var sales=r[off+5]||'0원';
+    var salesNum=parseInt((sales+'').replace(/[^0-9]/g,''))||0;
+    var roasNum=+(r[co+1]||0);
+    return {name:r[0]||name, db:db,vs:vs,se:se,ca:ca,od:od, sales:sales, salesNum:salesNum, roas:roasNum,
+            ef:(r[co+2]?r[co+2]+'만':'-'), score:Math.round(salesNum*roasNum)};
   });
-  var tEf=tDb?Math.round(tSales/tDb*10)/10:0;  // 효율=DB당 매출(만원)
-  var tRoas=tSpend>0?(tSales/tSpend).toFixed(2):'-';  // 합계 ROAS = 총매출 ÷ 역산 총광고비 (매출0·ROAS0인 담당자 광고비는 산정 불가라 제외)
-  rows.push('<tr class="tot"><td class="nm">합계</td><td class="db">'+tDb+'</td><td class="vs">'+tVs+'</td><td class="se">'+tSe+'</td><td class="ca">'+tCa+'</td><td class="od">'+tOd+'</td><td class="sl">'+tSales.toLocaleString()+'만원</td><td class="rt" style="color:var(--red)">'+(tVs?Math.round(tCa/tVs*100):0)+'%</td><td class="rt">'+(tSe?Math.round(tOd/tSe*100):0)+'%</td><td class="ro">'+tRoas+'</td><td class="ef">'+tEf+'만</td></tr>');
+  // 점수순 정렬
+  data.sort(function(a,b){return b.score-a.score;});
+  var rows=data.map(function(d,idx){
+    tDb+=d.db;tVs+=d.vs;tSe+=d.se;tCa+=d.ca;tOd+=d.od;tSales+=d.salesNum;
+    if(d.roas>0&&d.salesNum>0) tSpend+=d.salesNum/d.roas;
+    var rank=idx+1;
+    var pRank=prevRank[d.name]||99, delta=pRank-rank;
+    var mv = delta>0?'<span style="color:#0f9d58;font-weight:800;font-size:10px">▲'+delta+'</span>'
+           : delta<0?'<span style="color:#e11d48;font-weight:800;font-size:10px">▼'+(-delta)+'</span>'
+           : '<span style="color:#bbc;font-size:10px">—</span>';
+    var medal = rank===1?'👑':rank===2?'🥈':rank===3?'🥉':'<b style="color:#8b93a2">'+rank+'</b>';
+    var cr=d.vs?Math.round(d.ca/d.vs*100):0, or=d.se?Math.round(d.od/d.se*100):0;
+    return '<tr'+(rank<=3?' style="background:rgba(91,95,224,.04)"':'')+'>'
+      +'<td class="rk" style="text-align:center;white-space:nowrap">'+medal+' '+mv+'</td>'
+      +'<td class="nm">'+esc(d.name)+'</td>'
+      +'<td class="sc" style="font-weight:800;color:#5b5fe0">'+(d.score?d.score.toLocaleString():'-')+'</td>'
+      +'<td class="db">'+d.db+'</td><td class="vs">'+d.vs+'</td><td class="se">'+d.se+'</td><td class="od">'+d.od+'</td>'
+      +'<td class="sl">'+esc(d.sales)+'</td><td class="ro">'+(d.roas?d.roas.toFixed(2):'-')+'</td><td class="ef">'+d.ef+'</td></tr>';
+  });
+  var tEf=tDb?Math.round(tSales/tDb*10)/10:0;
+  var tRoas=tSpend>0?(tSales/tSpend).toFixed(2):'-';
+  rows.push('<tr class="tot"><td class="rk"></td><td class="nm">합계</td><td class="sc"></td><td class="db">'+tDb+'</td><td class="vs">'+tVs+'</td><td class="se">'+tSe+'</td><td class="od">'+tOd+'</td><td class="sl">'+tSales.toLocaleString()+'만원</td><td class="ro">'+tRoas+'</td><td class="ef">'+tEf+'만</td></tr>');
   document.getElementById('pf-body').innerHTML=rows.join('');
 
   var sojCol=perfTab===1?29:(perfTab===2?30:28);
