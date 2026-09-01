@@ -211,7 +211,7 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 
     <div class="card colwrap" style="flex:1;min-height:0;gap:0">
       <div class="ch">
-        <span class="t">🏆 GROWTH CUP 순위 <span style="font-size:10px;font-weight:600;color:#8b93a2">매출×ROAS · 전월대비 ▲▼</span></span>
+        <span class="t">🏆 GROWTH CUP 순위 <span style="font-size:10px;font-weight:600;color:#8b93a2">점수=매출×ROAS · 매일 ▲▼</span></span>
         <span class="tabs sp" id="pf-tabs">
           <span class="tab on" onclick="setPerfTab(0)">이번달</span>
           <span class="tab" onclick="setPerfTab(1)">지난달</span>
@@ -238,8 +238,11 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
       <div class="ch"><span class="t">📋 지금 챙길 리드</span><span class="badge sp">실시간</span></div>
       <div class="scroll" id="situation" style="flex:1"><div class="empty">불러오는 중...</div></div>
     </div>
-    <!-- 9월 업무 시스템 변경 (원문) -->
-    <div class="card" style="background:linear-gradient(135deg,#1a2a4a,#2d3f5f);color:#fff">
+    <!-- 9월 업무 시스템 변경 (오디세이 배경 은은하게) -->
+    <div class="card" style="position:relative;overflow:hidden;background:linear-gradient(135deg,#1a2a4a,#2d3f5f);color:#fff;padding:20px 22px">
+      <!-- 오디세이 배경 이미지 (은은하게) — GitHub에 올린 오디세이 포스터 URL로 교체 가능 -->
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 70% 30%, rgba(90,120,160,.25), transparent 60%),radial-gradient(ellipse at 20% 80%, rgba(40,60,90,.3), transparent 55%);opacity:.6;pointer-events:none"></div>
+      <div style="position:relative;z-index:1">
       <div style="font-weight:800;font-size:15px;margin-bottom:10px;letter-spacing:-.3px">⚔️ 9월 한 달 업무 시스템 변경 <span style="opacity:.65;font-weight:600;font-size:12px">· 춘추전국시대</span></div>
       <div style="font-size:12px;line-height:1.75;opacity:.96;word-break:keep-all;overflow-wrap:break-word">
         <b style="color:#ffd966">1. 신규DB 담당자 자동지정 폐지</b><br>
@@ -253,8 +256,8 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
         · <span style="opacity:.85">(눈치 보지 말 것. 변경이 안 되면 신이사나 내가 강제 변경하겠음)</span>
       </div>
       <div style="font-size:12px;line-height:1.7;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.2);opacity:.9">
-        지금 DB 배정된 거 다 무시하시면 되고요. 신규인데 전화 안 들어간 건 그냥 각자 알아서 하시면 됩니다. 혼란스러워하지 마세요.<br>
-        <b style="color:#ffd966;font-size:14px">9월부터 춘추전국시대입니다.</b>
+        지금 DB 배정된 거 다 무시하시면 되고요. 신규인데 전화 안 들어간 건 그냥 각자 알아서 하시면 됩니다. 혼란스러워하지 마세요.
+      </div>
       </div>
     </div>
   </div>
@@ -268,11 +271,17 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
            alt="GROWTH CUP 9월" style="width:100%;height:auto;display:block" />
     </a>
     <!-- 바로가기 -->
-    <div style="display:flex;flex-direction:column;gap:8px">
+    <div style="display:flex;flex-direction:column;gap:10px">
       <a href="https://drive.google.com/drive/folders/1QpRfhW4EbVv62nPqspYWfZd-ZyIl0qcT?usp=sharing" target="_blank"
-         style="display:flex;align-items:center;gap:8px;background:var(--card2,#f0f2f8);border:0.5px solid var(--border,#e2e6ef);border-radius:10px;padding:14px 18px;text-decoration:none;color:var(--text,#333);font-weight:700;font-size:14px">🎙️ 녹취 아카이브</a>
+         style="display:block;background:var(--card2,#f0f2f8);border:0.5px solid var(--border,#e2e6ef);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--text,#333)">
+        <div style="font-weight:800;font-size:14px;margin-bottom:3px">🎙️ 녹취 아카이브</div>
+        <div style="font-size:11px;color:#8b93a2;line-height:1.5">우리 상담 녹취 모음 · 잘한 콜 들으며 스크립트·클로징 배우기</div>
+      </a>
       <a href="#" onclick="alert('노션 매뉴얼 URL 등록 예정');return false;"
-         style="display:flex;align-items:center;gap:8px;background:var(--card2,#f0f2f8);border:0.5px solid var(--border,#e2e6ef);border-radius:10px;padding:14px 18px;text-decoration:none;color:var(--text,#333);font-weight:700;font-size:14px">📖 리드관리 매뉴얼</a>
+         style="display:block;background:var(--card2,#f0f2f8);border:0.5px solid var(--border,#e2e6ef);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--text,#333)">
+        <div style="font-weight:800;font-size:14px;margin-bottom:3px">📖 리드관리 매뉴얼</div>
+        <div style="font-size:11px;color:#8b93a2;line-height:1.5">노션 상태 입력·부재/홀딩 처리·담당 변경 방법 등 업무 가이드</div>
+      </a>
     </div>
   </div>
 </div>
@@ -437,8 +446,21 @@ function renderHL(){
   var recovery=null;
   for(var i=0;i<summaryRows.length;i++){ if(summaryRows[i]&&summaryRows[i][0]==='부재회수'){ recovery={name:summaryRows[i][1]||'-',val:summaryRows[i][2]||''}; break; } }
   var row=function(ic,lb,nm,vl){return '<div class="hlrow"><span class="ic">'+ic+'</span><span class="lb">'+lb+'</span><span class="nm">'+esc(nm||'-')+'</span><span class="vl">'+esc(vl||'')+'</span></div>';};
+  // 담당자 데이터에서 DB왕·오더왕·매출왕 계산 (이달)
+  var _o=1;  // 이번달 offset
+  var _stat={db:{n:'-',v:0},od:{n:'-',v:0},sl:{n:'-',v:0}};
+  ASSIGNEES.forEach(function(nm,i){
+    var r=summaryRows[ASSIGNEE_START_IDX+i]||[];
+    var db=+(r[_o]||0), od=+(r[_o+4]||0), sl=parseInt(((r[_o+5]||'0')+'').replace(/[^0-9]/g,''))||0;
+    if(db>_stat.db.v){_stat.db={n:r[0]||nm,v:db};}
+    if(od>_stat.od.v){_stat.od={n:r[0]||nm,v:od};}
+    if(sl>_stat.sl.v){_stat.sl={n:r[0]||nm,v:sl};}
+  });
   document.getElementById('hl').innerHTML =
-      (topRise&&mx>0?row('🚀','급상승왕',topRise,'▲'+mx):row('🚀','급상승왕','-',''))
+      row('💰','매출왕',_stat.sl.n,_stat.sl.v?_stat.sl.v.toLocaleString()+'만':'-')
+    + row('🎯','오더왕',_stat.od.n,_stat.od.v?_stat.od.v+'건':'-')
+    + row('📥','DB왕',_stat.db.n,_stat.db.v?_stat.db.v+'건':'-')
+    + (topRise&&mx>0?row('🚀','급상승왕',topRise,'▲'+mx):row('🚀','급상승왕','-',''))
     + row('🏆','방문왕',hl['방문왕']?hl['방문왕'].name:'-',hl['방문왕']?hl['방문왕'].val:'')
     + row('⚡','전환왕',hl['전환왕']?hl['전환왕'].name:'-',hl['전환왕']?hl['전환왕'].val:'')
     + row('⏳','홀딩회수',hl['홀딩회수']?hl['홀딩회수'].name:'-',hl['홀딩회수']?hl['홀딩회수'].val:'')
