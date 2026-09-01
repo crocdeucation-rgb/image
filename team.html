@@ -286,7 +286,7 @@ const WORK_CSV_URL      = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRp14
 const WEBAPP_URL        = 'https://script.google.com/macros/s/AKfycbxu_6qC9WKTtVcAJJtoh_EfmvUbyzbkZFlTRC7uUr_dFmUYehON0Vhb3HdAwrTnF37w/exec';
 
 const MID_DAYS=4;
-const ASSIGNEES=['우혜림','김윤호','장윤호','박창건','김태석','김성윤','노영호','김원득','김우진','안준섭'];
+const ASSIGNEES=['우혜림','김윤호','장윤호','박창건','김태석','김성윤','노영호','김원득','김우진','안준섭','김주환'];
 const ASSIGNEE_START_IDX=46;
 const SOJ_KEYS=['노트릴스','노필릴스','채리','GT','원톱','5단계루틴','기초부족','MLST공부','MLST캐러셀','노트공부법','너만본다','CPA(텐핑)','카카오','Organic','네이버브랜드','기타'];
 const cmap={'우혜림':'hye','김윤호':'kim','장윤호':'jang','박창건':'park','김우진':'woo','김태석':'tae','김성윤':'sung','노영호':'noh','김원득':'won','안준섭':'ahn'};
@@ -471,7 +471,8 @@ function renderPerf(){
     var salesNum=parseInt((sales+'').replace(/[^0-9]/g,''))||0;
     var roasNum=+(r[co+1]||0);
     return {name:r[0]||name, db:db,vs:vs,se:se,ca:ca,od:od, sales:sales, salesNum:salesNum, roas:roasNum,
-            ef:(r[co+2]?r[co+2]+'만':'-'), score:Math.round(salesNum*roasNum)};
+            ef:(r[co+2]?r[co+2]+'만':'-'), score:Math.round(salesNum*roasNum),
+            yRank:+(r[31]||0)};   // 32열=전날순위(0=없음)
   });
   // 점수순 정렬
   data.sort(function(a,b){return b.score-a.score;});
@@ -479,14 +480,19 @@ function renderPerf(){
     tDb+=d.db;tVs+=d.vs;tSe+=d.se;tCa+=d.ca;tOd+=d.od;tSales+=d.salesNum;
     if(d.roas>0&&d.salesNum>0) tSpend+=d.salesNum/d.roas;
     var rank=idx+1;
-    var pRank=prevRank[d.name]||99, delta=pRank-rank;
-    var mv = delta>0?'<span style="color:#0f9d58;font-weight:800;font-size:10px">▲'+delta+'</span>'
-           : delta<0?'<span style="color:#e11d48;font-weight:800;font-size:10px">▼'+(-delta)+'</span>'
+    var pRank=prevRank[d.name]||99, mDelta=pRank-rank;   // 전월 대비
+    var dDelta = (d.yRank>0) ? (d.yRank-rank) : 0;         // 전날 대비 (32열)
+    // 전날 대비 (주 표시) — 매일 오르내림
+    var dv = dDelta>0?'<span style="color:#0f9d58;font-weight:800;font-size:10px">▲'+dDelta+'</span>'
+           : dDelta<0?'<span style="color:#e11d48;font-weight:800;font-size:10px">▼'+(-dDelta)+'</span>'
            : '<span style="color:#bbc;font-size:10px">—</span>';
+    // 전월 대비 (부가, 작게)
+    var mv = mDelta>0?'<span style="color:#0f9d58;font-size:9px">전월▲'+mDelta+'</span>'
+           : mDelta<0?'<span style="color:#e11d48;font-size:9px">전월▼'+(-mDelta)+'</span>':'';
     var medal = rank===1?'👑':rank===2?'🥈':rank===3?'🥉':'<b style="color:#8b93a2">'+rank+'</b>';
     var cr=d.vs?Math.round(d.ca/d.vs*100):0, or=d.se?Math.round(d.od/d.se*100):0;
     return '<tr'+(rank<=3?' style="background:rgba(91,95,224,.04)"':'')+'>'
-      +'<td class="rk" style="text-align:center;white-space:nowrap">'+medal+' '+mv+'</td>'
+      +'<td class="rk" style="text-align:center;white-space:nowrap">'+medal+' '+dv+(mv?'<br>'+mv:'')+'</td>'
       +'<td class="nm">'+esc(d.name)+'</td>'
       +'<td class="sc" style="font-weight:800;color:#5b5fe0">'+(d.score?d.score.toLocaleString():'-')+'</td>'
       +'<td class="db">'+d.db+'</td><td class="vs">'+d.vs+'</td><td class="se">'+d.se+'</td><td class="od">'+d.od+'</td>'
