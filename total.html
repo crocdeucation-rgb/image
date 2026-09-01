@@ -539,17 +539,18 @@ window.clPeriod=function(cl,btn){ window.__cl=cl; document.querySelectorAll('.dt
 (async function(){
   try{
     var res = await fetch(TOTAL_CSV + "&_=" + Date.now());
-    var text = await res.text();
-    // total_data A1 = JSON 문자열 (CSV로 나오면 따옴표 감싸질 수 있음)
-    text = text.trim();
-    // Google CSV: JSON 전체를 "..."로 감싸고 내부 "를 ""로 이스케이프함
-    // 1) 앞뒤를 감싼 바깥 큰따옴표 제거
-    if(text.charAt(0)==='"' && text.charAt(text.length-1)==='"'){
-      text = text.substring(1, text.length-1);
+    var raw = await res.text();
+    // [2026-09] total_data는 45000자씩 A1,A2,A3...로 분할 저장됨. CSV는 셀당 한 줄(row).
+    //   각 행의 바깥 따옴표 벗기고 "" → " 복원한 뒤 전부 이어붙여 원본 JSON 복원.
+    function uncsv(line){
+      var t = line.trim();
+      if(t.charAt(0)==='"' && t.charAt(t.length-1)==='"') t = t.substring(1, t.length-1);
+      return t.split('""').join('"');
     }
-    // 2) "" → " 복원
-    text = text.split('""').join('"');
-    // 3) JSON 본문만 ({ ... })
+    // CSV 행 분리 — 셀 안에 개행이 없다는 전제(우리 JSON은 개행 없이 stringify됨)
+    var lines = raw.replace(/\r/g,'').split('\n').filter(function(l){ return l.trim()!==''; });
+    var text = lines.map(uncsv).join('');
+    // JSON 본문만 ({ ... })
     var a = text.indexOf('{'), b = text.lastIndexOf('}');
     if(a>=0 && b>a){ text = text.substring(a, b+1); }
     var D = JSON.parse(text);
