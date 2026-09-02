@@ -184,6 +184,8 @@ body{overflow-x:hidden}
 .dbmuted{color:#B6C2DC}
 @media(max-width:820px){.dukji-two{grid-template-columns:1fr}}
 .clutch-two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+/* [2026-09] 종결달(과거월)엔 라이브 전용 지표 숨김 — 급등주·순위변동·커리어하이·누적TOP3 */
+body.is-closed .live-only{display:none !important}
 .cl-gauge{width:92px;height:5px;background:var(--barbg);border-radius:3px;margin:3px 0 2px auto;overflow:hidden}
 .cl-gauge-fill{height:100%;background:linear-gradient(90deg,var(--v1),var(--v2));border-radius:3px}
 @media(max-width:820px){.clutch-two{grid-template-columns:1fr;gap:10px}}
@@ -201,14 +203,14 @@ body{overflow-x:hidden}
 <!-- 이번주/지난주 왕 -->
 <div class="kings" id="kings"></div>
 <div class="swipe-hint" id="kings-hint"></div><div class="swipe-label">← 밀어서 이번주·지난주 왕 보기 →</div>
-<!-- 누적 매출 TOP3 (기간 토글) -->
-<div class="q3head"><span class="q3title">📊 누적 매출 TOP3</span><span class="q3tog"><button class="q3togbtn on" data-q="3" onclick="q3Period('3',this)">3개월</button><button class="q3togbtn" data-q="6" onclick="q3Period('6',this)">6개월</button></span></div>
-<div class="q3" id="q3"></div>
-<div class="swipe-hint" id="q3-hint"></div><div class="swipe-label">← 밀어서 지점·상담·사업 보기 →</div>
+<!-- 누적 매출 TOP3 (기간 토글) — 라이브 전용(현재월 시점 누적이라 종결달엔 의미없음) -->
+<div class="q3head live-only"><span class="q3title">📊 누적 매출 TOP3</span><span class="q3tog"><button class="q3togbtn on" data-q="3" onclick="q3Period('3',this)">3개월</button><button class="q3togbtn" data-q="6" onclick="q3Period('6',this)">6개월</button></span></div>
+<div class="q3 live-only" id="q3"></div>
+<div class="swipe-hint live-only" id="q3-hint"></div><div class="swipe-label live-only">← 밀어서 지점·상담·사업 보기 →</div>
 <!-- 덕질 스탯 -->
 <div class="dukji-wrap">
 <div class="dsect-hd">👑 덕질 스탯</div>
-<div class="dukji-two">
+<div class="dukji-two live-only">
 <div class="dcard"><h3>🚀 실시간 급등주 <span class="dsub">팀·개인 / 주간·월간</span></h3><div id="d_risers"></div></div>
 <div class="dcard"><h3>🏆 커리어하이 <span class="dsub">올해 최고 기록 갱신</span></h3><div id="d_records"></div></div>
 </div>
@@ -217,7 +219,7 @@ body{overflow-x:hidden}
 <div class="dtog"><button class="dtogbtn on" data-cl="m3" onclick="clPeriod('m3',this)">3개월</button><button class="dtogbtn" data-cl="month" onclick="clPeriod('month',this)">이달</button></div></div>
 <div class="clutch-two"><div><div class="drsub2">상담</div><div id="d_clutch_sang"></div></div><div><div class="drsub2">사업</div><div id="d_clutch_saup"></div></div></div>
 </div>
-<div class="panel dpanel">
+<div class="panel dpanel live-only">
 <div class="dhd"><h3>📈 순위 변동 <span class="dsub" id="rm_basis">· 전주 대비</span></h3>
 <div class="dtog"><button class="dtogbtn on" data-p="weekly" onclick="rmPeriod('weekly',this)">주간</button><button class="dtogbtn" data-p="monthly" onclick="rmPeriod('monthly',this)">월간</button><span class="dsp"></span><button class="dtogbtn seg on" data-s="sang" onclick="rmSeg('sang',this)">상담</button><button class="dtogbtn seg" data-s="saup" onclick="rmSeg('saup',this)">사업</button></div></div>
 <div id="d_rank"></div>
@@ -252,6 +254,11 @@ var BRANCH_HEAD = {
 };
 function renderAll(D){
   window.__D = D;
+  // [2026-09] 라이브(현재월) vs 종결(과거월) — buildTotalData가 보내는 D.isLive 사용.
+  //   종결달은 실시간 지표(급등주·순위변동·커리어하이·3/6개월 누적) 숨기고 그달 결산만.
+  var _isLive = (D.isLive !== false);
+  document.body.classList.toggle('is-closed', !_isLive);
+  document.body.classList.toggle('is-live', _isLive);
   // [작업5] 딱지 — 👑 부문 매출 1위(isTop) · 🌱 입사 6개월내 재직(D.newbie)
   function tags(name, isTop){
     var s='';
@@ -314,11 +321,12 @@ function renderAll(D){
         });
         return h+'</div>';
       }
-      kingsEl.innerHTML = '<div class="kwrap"><h3>💰 이달 매출 TOP3</h3>'
+      var _live = (D.isLive !== false);
+      kingsEl.innerHTML = '<div class="kwrap"><h3>💰 '+(_live?'이달':'그달')+' 매출 TOP3</h3>'
         + top3mini('상담', D.persons)
         + top3mini('사업', D.divpersons)
         + '</div>'
-        + kcard('🔥 이번주', '이번주 월~일', tw) + kcard('지난주', '지난주 월~일', lw);
+        + (_live ? (kcard('🔥 이번주', '이번주 월~일', tw) + kcard('지난주', '지난주 월~일', lw)) : '');
     }
     // 3개월 TOP3
     var t3 = D.top3 || {};
@@ -543,8 +551,17 @@ function renderClutch(){
   if(p)p.innerHTML=clutchRows(c.saup);
 }
 window.clPeriod=function(cl,btn){ window.__cl=cl; document.querySelectorAll('.dtogbtn[data-cl]').forEach(function(b){b.classList.remove('on');}); btn.classList.add('on'); renderClutch(); };
+window.__monthCache = {};   // [2026-09] 월별 데이터 캐시 — 재클릭 시 fetch 안 하고 즉시 렌더
 async function loadMonth(key){
   try{
+    // 캐시 히트 → fetch 없이 즉시 렌더 (로딩 10초 제거)
+    if(window.__monthCache[key]){
+      var Dc = window.__monthCache[key];
+      window.__D = Dc; window.__monthKey = key;
+      renderAll(Dc);
+      document.querySelectorAll('.mo-sel-btn').forEach(function(x){ x.classList.toggle('on', x.dataset.mo===key); });
+      return;
+    }
     var gid = MONTH_GIDS[key] || MONTH_GIDS['현재'];
     var url = CSV_BASE + gid;
     var res = await fetch(url + "&_=" + Date.now());
@@ -559,6 +576,7 @@ async function loadMonth(key){
     var a = text.indexOf('{'), b = text.lastIndexOf('}');
     if(a>=0 && b>a){ text = text.substring(a, b+1); }
     var D = JSON.parse(text);
+    window.__monthCache[key] = D;   // 캐시 저장
     window.__D = D;
     window.__monthKey = key;
     renderAll(D);
