@@ -494,8 +494,18 @@ const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJ
     const CANCEL_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBUBxnTPPn_AebCqxIC8Q2x-5V3VuvIY6MM6QlgKVUUA7Bbjh3jMO7q6i4sDgQse-UKsNGe5Hxt7QF/pub?gid=128666314&single=true&output=csv';
 
 const ASSIGNEES = ['우혜림','김윤호','장윤호','박창건','김태석','김성윤','노영호','김원득','김우진','안준섭','김주환'];
-const ASSIGNEE_START_IDX = 46;
-const CAMPAIGN_START_IDX = 58;
+// [2026-09-02] 담당자 수 변동(김주환 추가 등)에도 안 깨지게 — 고정 행번호 대신 라벨로 탐색.
+//   시트 '담당자' 헤더 다음행 = 담당자 데이터 시작 / '캠페인' 헤더 = 캠페인 블록 시작.
+//   (옛 고정값 46/58은 담당자 10명 기준. 11명 되며 캠페인이 60으로 밀려 0으로 뜬 사건 방지.)
+let ASSIGNEE_START_IDX = 46;   // 동적 계산됨 (loadData에서)
+let CAMPAIGN_START_IDX = 58;   // 동적 계산됨 (loadData에서)
+function recalcIdx(){
+  for (let i = 0; i < allRows.length; i++) {
+    const c0 = allRows[i] && allRows[i][0];
+    if (c0 === '담당자')  ASSIGNEE_START_IDX = i + 1;   // 헤더 다음행 = 데이터 시작
+    if (c0 === '캠페인')  CAMPAIGN_START_IDX = i;       // 캠페인 헤더행 (텐핑코호트 탐색은 여기부터)
+  }
+}
 
 // 광고 집행상태 — 시트 캠페인명과 한 글자도 다르면 매칭 실패하므로 원문 그대로 유지할 것
 const OFF_CAMPAIGNS = [
@@ -631,6 +641,7 @@ async function loadData() {
     const res = await fetch(CSV_URL);
     const text = await res.text();
     allRows = parseCSV(text);
+    recalcIdx();
     render();
     renderWebmaDukji();
     const now = new Date();
@@ -919,6 +930,8 @@ function render() {
   for (let i = CAMPAIGN_START_IDX; i < allRows.length; i++) {
     const r = allRows[i];
     if (!r || !r[0]) break;
+    if (r[0] === '캠페인') continue;   // 헤더행 스킵 (CAMPAIGN_START_IDX가 헤더행을 가리킴)
+    if (r[0] === '텐핑코호트') break;  // 캠페인 블록 끝 = 다음 블록 시작에서 멈춤
     const p = routeTab;
     // 광고비/매출/ROAS: 지난달[14,15,16] 이번달[17,18,19]. 전체(p=2)는 없음 → 이번달로 대체 안 함(0)
     const effIdx = p === 0 ? [17,18,19] : p === 1 ? [14,15,16] : null;
