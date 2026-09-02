@@ -463,6 +463,23 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 
 <script>
 let allRows = [];
+// [2026-09-02] CSV 안전 파서 — 따옴표("...") 안의 콤마는 구분자로 안 셈.
+//   원인: getLeadStats가 매출을 "23,838.6만원"처럼 천단위 콤마로 저장하면
+//   단순 split(',')이 셀을 쪼개 그 행 뒤 컬럼이 전부 밀림 → ROAS 오독(우혜림 838 사건).
+//   getLeadStats won()에서 콤마를 뺐지만, 어떤 콤마 값이 와도 안 깨지게 파서로 이중 방어.
+function parseCSV(text){
+  return text.trim().split('\n').map(function(line){
+    var out=[], cur='', q=false;
+    for(var i=0;i<line.length;i++){
+      var c=line[i];
+      if(c==='"'){ q=!q; }
+      else if(c===',' && !q){ out.push(cur.trim()); cur=''; }
+      else cur+=c;
+    }
+    out.push(cur.trim());
+    return out;
+  });
+}
 function setView(v){
   document.body.classList.toggle('personal-view', v==='personal');
   document.querySelectorAll('.view-toggle button').forEach((b,i)=>b.classList.toggle('on',(v==='admin')===(i===0)));
@@ -558,7 +575,7 @@ async function loadCancel() {
   try {
     const res = await fetch(CANCEL_CSV_URL);
     const text = await res.text();
-    const rows = text.trim().split('\n').map(r => r.split(',').map(c => c.trim()));
+    const rows = parseCSV(text);
     rows.shift();
     // 취소요약_전체 컬럼: 날짜(0)|학생(1)|학년(2)|취소액(3)|담당자(4) — 전부 cancel
     cancelData.rows = rows.filter(r => r[0] && (parseFloat(r[3])||0) > 0);
@@ -613,7 +630,7 @@ async function loadData() {
     document.getElementById('updated').textContent = '불러오는 중...';
     const res = await fetch(CSV_URL);
     const text = await res.text();
-    allRows = text.trim().split('\n').map(r => r.split(',').map(c => c.trim()));
+    allRows = parseCSV(text);
     render();
     renderWebmaDukji();
     const now = new Date();
@@ -1047,7 +1064,7 @@ async function loadSchedule() {
   try {
     const res = await fetch(SCHEDULE_CSV_URL);
     const text = await res.text();
-    const rows = text.trim().split('\n').map(r => r.split(',').map(c => c.trim()));
+    const rows = parseCSV(text);
     rows.shift();
     const today = new Date();
     today.setHours(0,0,0,0);
