@@ -203,13 +203,19 @@ body.is-closed .live-only{display:none !important}
 <!-- 이번주/지난주 왕 -->
 <div class="kings" id="kings"></div>
 <div class="swipe-hint" id="kings-hint"></div><div class="swipe-label">← 밀어서 이번주·지난주 왕 보기 →</div>
+<!-- [2026-09] 지점 매출순·상담/사업 개인 TOP — 위로 이동 (매출TOP3 바로 다음) -->
+<div class="panel">
+<div class="tabs"><button class="tabbtn on" onclick="sw(0,this)">상담 지점 매출순</button><button class="tabbtn" onclick="sw(3,this)">상담 개인 TOP</button><button class="tabbtn" onclick="sw(4,this)">사업 개인 TOP</button></div>
+<div id="body"></div>
+<div class="note" id="note" style="display:none">지점별/개인별 매출 순위 · 매일 갱신</div>
+</div>
 <!-- 누적 매출 TOP3 (기간 토글) — 라이브 전용(현재월 시점 누적이라 종결달엔 의미없음) -->
 <div class="q3head live-only"><span class="q3title">📊 누적 매출 TOP3</span><span class="q3tog"><button class="q3togbtn on" data-q="3" onclick="q3Period('3',this)">3개월</button><button class="q3togbtn" data-q="6" onclick="q3Period('6',this)">6개월</button></span></div>
 <div class="q3 live-only" id="q3"></div>
 <div class="swipe-hint live-only" id="q3-hint"></div><div class="swipe-label live-only">← 밀어서 지점·상담·사업 보기 →</div>
 <!-- 덕질 스탯 -->
 <div class="dukji-wrap">
-<div class="dsect-hd">👑 덕질 스탯</div>
+<div class="dsect-hd live-only">👑 덕질 스탯</div>
 <div class="dukji-two live-only">
 <div class="dcard"><h3>🚀 실시간 급등주 <span class="dsub">팀·개인 / 주간·월간</span></h3><div id="d_risers"></div></div>
 <div class="dcard"><h3>🏆 커리어하이 <span class="dsub">올해 최고 기록 갱신</span></h3><div id="d_records"></div></div>
@@ -224,16 +230,11 @@ body.is-closed .live-only{display:none !important}
 <div class="dtog"><button class="dtogbtn on" data-p="weekly" onclick="rmPeriod('weekly',this)">주간</button><button class="dtogbtn" data-p="monthly" onclick="rmPeriod('monthly',this)">월간</button><span class="dsp"></span><button class="dtogbtn seg on" data-s="sang" onclick="rmSeg('sang',this)">상담</button><button class="dtogbtn seg" data-s="saup" onclick="rmSeg('saup',this)">사업</button></div></div>
 <div id="d_rank"></div>
 </div>
-<div class="panel dpanel">
+<div class="panel dpanel live-only">
 <div class="dhd"><h3>🏢 지점 추이 <span class="dsub">월별 추이 · 매출·세팅</span></h3></div>
 <div class="dchips" id="d_chips"></div>
 <div id="d_chart"></div>
 </div>
-</div>
-<div class="panel">
-<div class="tabs"><button class="tabbtn on" onclick="sw(0,this)">상담 지점 매출순</button><button class="tabbtn" onclick="sw(3,this)">상담 개인 TOP</button><button class="tabbtn" onclick="sw(4,this)">사업 개인 TOP</button></div>
-<div id="body"></div>
-<div class="note" id="note" style="display:none">지점별/개인별 매출 순위 · 매일 갱신</div>
 </div>
 <div class="ft">소스 = 총매출_전사 (매일 갱신) · 당월 취소 = 특이사항 파싱 · 수호웹마는 수호에듀 포함 · 웹마케팅은 전사 합계 포함/지점순위 분리</div>
 </div>
