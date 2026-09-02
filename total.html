@@ -186,6 +186,25 @@ body{overflow-x:hidden}
 .clutch-two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 /* [2026-09] 종결달(과거월)엔 라이브 전용 지표 숨김 — 급등주·순위변동·커리어하이·누적TOP3 */
 body.is-closed .live-only{display:none !important}
+body.is-live .closed-only{display:none !important}
+/* [2026-09] MVP 시상식 (종결달 전용) */
+.mvp-hd{display:flex;align-items:baseline;gap:10px;margin:6px 0 14px;padding:0 2px}
+.mvp-title{font-size:20px;font-weight:900;color:#1B2436}
+.mvp-sub{font-size:12px;color:#8A94A6;font-weight:700}
+.mvp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(238px,1fr));gap:12px;margin-bottom:22px}
+.aw-card{background:linear-gradient(160deg,#ffffff,#f7f5ff);border:1px solid #E7E3FA;border-radius:16px;padding:15px 17px;box-shadow:0 4px 16px rgba(112,72,232,.06)}
+.aw-top{display:flex;align-items:center;gap:10px;margin-bottom:11px;padding-bottom:10px;border-bottom:1px dashed #E7E3FA}
+.aw-ic{font-size:25px;line-height:1}
+.aw-cn{font-size:15px;font-weight:900;color:#4A2F9E}
+.aw-cd{font-size:11px;color:#8A94A6;font-weight:600;margin-top:1px}
+.aw-body{display:flex;flex-direction:column;gap:7px}
+.aw-slot{display:flex;align-items:center;gap:7px;padding:6px 9px;border-radius:9px;background:rgba(112,72,232,.045)}
+.aw-seg{font-size:10px;font-weight:800;color:#7048E8;background:#EEE9FF;padding:2px 6px;border-radius:6px;flex-shrink:0}
+.aw-nm{font-size:14px;font-weight:800;color:#1B2436}
+.aw-tm{font-size:11px;color:#8A94A6;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.aw-val{margin-left:auto;font-size:13px;font-weight:900;color:#7048E8;flex-shrink:0}
+.aw-slot.aw-empty{opacity:.45}
+.aw-noname{font-size:12px;color:#B0B8C4;font-weight:600}
 .cl-gauge{width:92px;height:5px;background:var(--barbg);border-radius:3px;margin:3px 0 2px auto;overflow:hidden}
 .cl-gauge-fill{height:100%;background:linear-gradient(90deg,var(--v1),var(--v2));border-radius:3px}
 @media(max-width:820px){.clutch-two{grid-template-columns:1fr;gap:10px}}
@@ -200,6 +219,8 @@ body.is-closed .live-only{display:none !important}
 <div class="card web"><div class="ct"><span class="dot"></span>웹마케팅</div><div class="v" id="w_s"></div><div class="r"><div>세팅<b id="w_set"></b></div><div>오더<b id="w_ord"></b></div><div>오더율<b id="w_r"></b></div><div class="cx">취소<b id="w_cx"></b></div></div></div>
 <div class="card sang"><div class="ct"><span class="dot"></span>상담지점</div><div class="v" id="s_s"></div><div class="r"><div>세팅<b id="s_set"></b></div><div>오더<b id="s_ord"></b></div><div>오더율<b id="s_r"></b></div><div class="cx">취소<b id="s_cx"></b></div></div></div></div>
 </div>
+<!-- [2026-09] MVP 시상식 — 종결달 전용 (트로피 5종) -->
+<div id="mvp-awards" class="closed-only"></div>
 <!-- 이번주/지난주 왕 -->
 <div class="kings" id="kings"></div>
 <div class="swipe-hint" id="kings-hint"></div><div class="swipe-label">← 밀어서 이번주·지난주 왕 보기 →</div>
@@ -253,6 +274,55 @@ var BRANCH_HEAD = {
   '수호에듀':11, '마곡지점':7, '더온에듀':8, '수원지점':5,
   '파인더루원':5, '스카이에듀':3
 };
+// [2026-09] MVP 시상식 — 종결달 트로피 5종. Phase2(이모지/저격)용 data-target 후크 심음.
+function renderAwards(D){
+  var el = document.getElementById('mvp-awards');
+  if(!el) return;
+  if(D.isLive !== false){ el.innerHTML=''; return; }   // 라이브(현재월)는 시상식 없음
+  function won(n){ return (n||0).toLocaleString('ko-KR'); }
+  var mk = window.__monthKey || '';
+  var mLabel = mk.replace('2026-','').replace(/^0/,'') + '월';
+  var dk = D.dukji || {};
+  var cl = (dk.clutch && dk.clutch.month) || {};
+  var rc = dk.records || {};
+  var tt = dk.tteok || {};
+  var P = D.persons || [], DP = D.divpersons || [], BR = D.branches || [];
+
+  // 수상자 1명 렌더 + data-target 후크 (트로피키:월:이름)
+  function win(x, tkey, valHtml, seg){
+    if(!x) return '<div class="aw-slot aw-empty">'+(seg?'<span class="aw-seg">'+seg+'</span>':'')+'<span class="aw-noname">해당 없음</span></div>';
+    return '<div class="aw-slot" data-target="'+tkey+':'+mk+':'+x.name+'">'
+      + (seg?'<span class="aw-seg">'+seg+'</span>':'')
+      + '<span class="aw-nm">'+x.name+'</span>'
+      + (x.team?'<span class="aw-tm">'+x.team+'</span>':'')
+      + '<span class="aw-val">'+valHtml+'</span></div>';
+  }
+  function pct(x){ return x ? Math.round(x.ratio*100)+'%' : '-'; }
+  function mult(x){ return x ? x.mult.toFixed(1)+'배' : '-'; }
+
+  var cards = [
+    { icon:'🏆', name:'이달의 MVP', desc:'매출 1위',
+      body: win(P[0],'mvp-sang', won(P[0]&&P[0].sales)+'원','상담')
+          + win(DP[0],'mvp-saup', won(DP[0]&&DP[0].sales)+'원','사업') },
+    { icon:'🔥', name:'떡상왕', desc:'전월 대비 최고 성장',
+      body: win(tt.sang&&tt.sang[0],'tteok-sang', mult(tt.sang&&tt.sang[0]),'상담')
+          + win(tt.saup&&tt.saup[0],'tteok-saup', mult(tt.saup&&tt.saup[0]),'사업') },
+    { icon:'⚾', name:'클러치왕', desc:'막판(25일~) 뒤집기',
+      body: win(cl.sang&&cl.sang[0],'clutch-sang', pct(cl.sang&&cl.sang[0]),'상담')
+          + win(cl.saup&&cl.saup[0],'clutch-saup', pct(cl.saup&&cl.saup[0]),'사업') },
+    { icon:'🎖️', name:'커리어하이', desc:'역대 최고월 갱신',
+      body: win(rc.sang&&rc.sang[0],'career-sang', (rc.sang&&rc.sang[0]?won(rc.sang[0].aug)+'원':'-'),'상담')
+          + win(rc.saup&&rc.saup[0],'career-saup', (rc.saup&&rc.saup[0]?won(rc.saup[0].aug)+'원':'-'),'사업') },
+    { icon:'🏅', name:'최고의 팀', desc:'지점 매출 1위',
+      body: win(BR[0],'team', won(BR[0]&&BR[0].sales)+'원','') },
+  ];
+
+  var h = '<div class="mvp-hd"><span class="mvp-title">🏆 '+mLabel+'의 수상자</span><span class="mvp-sub">시즌 결산 MVP</span></div><div class="mvp-grid">';
+  cards.forEach(function(c){
+    h += '<div class="aw-card"><div class="aw-top"><span class="aw-ic">'+c.icon+'</span><div><div class="aw-cn">'+c.name+'</div><div class="aw-cd">'+c.desc+'</div></div></div><div class="aw-body">'+c.body+'</div></div>';
+  });
+  el.innerHTML = h + '</div>';
+}
 function renderAll(D){
   window.__D = D;
   // [2026-09] 라이브(현재월) vs 종결(과거월) — buildTotalData가 보내는 D.isLive 사용.
@@ -260,6 +330,7 @@ function renderAll(D){
   var _isLive = (D.isLive !== false);
   document.body.classList.toggle('is-closed', !_isLive);
   document.body.classList.toggle('is-live', _isLive);
+  renderAwards(D);   // [2026-09] 종결달 MVP 시상식 (라이브면 함수 내부에서 스킵)
   // [작업5] 딱지 — 👑 부문 매출 1위(isTop) · 🌱 입사 6개월내 재직(D.newbie)
   function tags(name, isTop){
     var s='';
