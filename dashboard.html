@@ -790,6 +790,7 @@ function render() {
   const totSalesFallback = totalSalesNum >= 10000 ? manWon(totalSalesNum) + '원' : totalSalesNum + '원';
   const totSalesStr = funnelTab === 0 ? (r12[1] || totSalesFallback) : funnelTab === 1 ? (r13[1] || totSalesFallback) : totSalesFallback;
   rows.push(`<tr class="total">
+    <td class="num"></td>
     <td class="name">합계</td>
     <td class="num db">${totalDb}</td>
     <td class="num visit">${totalVisit}</td>
