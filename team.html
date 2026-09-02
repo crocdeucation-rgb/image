@@ -150,29 +150,22 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
   .top .rf{font-size:11px;padding:5px 10px;white-space:nowrap;flex-shrink:0}
   /* ② [2026-08-21 개정] 담당자 성과표 → 카드 2열 (가로스크롤 폐지, 핵심 7지표만) */
   .pfwrap{min-width:0;overflow-x:hidden}
-  .pf{display:block;width:100%;min-width:0;font-size:12px;white-space:normal}
-  .pf thead{display:none}
-  .pf tbody{display:block}
-  .pf tr{display:flex;flex-wrap:wrap;align-items:center;min-width:0;white-space:normal;background:#fff;border:1px solid #eef0f3;border-radius:10px;padding:10px 12px;box-shadow:0 1px 3px rgba(0,0,0,.04);margin-bottom:6px;gap:2px 0}
-  .pf tr.tot{background:#f6f8ff;border-color:#e3e9f7}
-  .pf td{border:none}
-  .pf td.ca,.pf td.rt{display:none}            /* 방취·방취율·오더율 모바일 숨김 */
-  /* 순위(메달+변동) + 이름 = 한 줄 헤더 */
-  .pf td.rk{flex:0 0 auto;font-size:13px;font-weight:800;padding:0 8px 0 0;order:0}
-  .pf td.nm{flex:1 1 auto;font-size:15px;font-weight:800;text-align:left;padding:0;order:1}
-  .pf td.sc{flex:0 0 auto;font-size:14px;font-weight:800;color:#5b5fe0;text-align:right;padding:0;order:2}
-  .pf td.rk::after{content:'';display:none}
-  /* 지표 = 이름 밑에 가로로 (라벨 붙여서) */
-  .pf td.db,.pf td.vs,.pf td.se,.pf td.od,.pf td.ro,.pf td.ef{flex:1 1 30%;display:inline-block;padding:6px 1px 0;vertical-align:top;text-align:left;font-size:12.5px;order:5}
-  .pf td.sl{flex:1 1 100%;padding:6px 1px 0;text-align:left;font-size:14px;font-weight:800;order:4;border-top:1px solid #f2f4f7;margin-top:4px}
-  .pf td.db::before,.pf td.vs::before,.pf td.se::before,.pf td.od::before,.pf td.sl::before,.pf td.ro::before,.pf td.ef::before{display:block;font-size:9px;color:#9aa2ae;font-weight:600;margin-bottom:1px}
-  .pf td.db::before{content:'DB'}
-  .pf td.vs::before{content:'방문'}
-  .pf td.se::before{content:'세팅'}
-  .pf td.od::before{content:'오더'}
-  .pf td.sl::before{content:'매출'}
-  .pf td.ro::before{content:'ROAS'}
-  .pf td.ef::before{content:'효율'}
+  /* [2026-09] 순위판 = 모바일도 표 그대로 (dashboard 방식·촘촘). 카드 변환 폐지 */
+  .pf{display:table;width:100%;min-width:0;font-size:11px;white-space:nowrap}
+  .pf thead{display:table-header-group}
+  .pf tbody{display:table-row-group}
+  .pf tr{display:table-row;background:none;border:none;border-radius:0;padding:0;box-shadow:none;margin:0}
+  .pf tr.tot{background:#f6f8ff}
+  .pf th,.pf td{display:table-cell;padding:6px 3px;text-align:center;vertical-align:middle;border-bottom:1px solid #f2f4f7}
+  .pf th{font-size:9.5px;color:#8b93a2;font-weight:700;background:#f7f8fb;position:sticky;top:0}
+  .pf td.rk{white-space:nowrap;font-size:10.5px;text-align:center}
+  .pf td.nm{text-align:left;font-weight:800;font-size:12px;padding-left:6px;white-space:nowrap}
+  .pf td.sc{font-weight:800;color:#5b5fe0}
+  .pf td.sl{color:var(--purple);font-weight:700;font-size:10px}
+  .pf td.ca,.pf td.rt{display:none}   /* 방취·방취율·오더율만 숨김 */
+  .pf td::before{display:none!important} /* 라벨 접두사 제거 (헤더 있음) */
+  /* 순위판만 가로 스크롤 (열 많아 넘칠 때) */
+  .card .scroll:has(.pf), #situation{overflow-x:auto;-webkit-overflow-scrolling:touch}
   /* 매출 요약 카드도 2열 (우측 잘림 방지) */
   .sales{grid-template-columns:repeat(2,1fr)}
   .sales .sc .v{font-size:12.5px;letter-spacing:-.03em;line-height:1.25}
