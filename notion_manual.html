@@ -192,7 +192,7 @@
     <p class="desc">리드 하나가 들어와서 처리되는 순서입니다.</p>
     <div class="flow">
       <div class="fstep"><div class="fk">최초</div><div class="ft">신규 유입</div><div class="fd">자동 등록 + 슬랙 알림</div></div>
-      <div class="fstep"><div class="fk">STEP 1</div><div class="ft">담당자 자동배정</div><div class="fd">슬랙으로 @멘션 알림</div></div>
+      <div class="fstep"><div class="fk">STEP 1</div><div class="ft">먼저 콜 = 임자</div><div class="fd">본인 이름 직접 입력</div></div>
       <div class="fstep"><div class="fk">STEP 2</div><div class="ft">통화 후 내용 입력</div><div class="fd">규칙대로 메모</div></div>
       <div class="fstep"><div class="fk">STEP 3</div><div class="ft">자동 파싱</div><div class="fd">상태·일정·매출 정리</div></div>
     </div>
@@ -333,7 +333,7 @@
   <!-- 6. 수동 처리 -->
   <div class="sec">
     <h2><span class="sec-n">6</span>직접 해야 하는 것 (자동 안 됨)</h2>
-    <p class="desc">담당자 배정까지 자동이 됐지만, 방문 취소만은 손으로 처리합니다.</p>
+    <p class="desc">9월부터 담당자는 먼저 콜한 사람이 직접 입력해요. 방문 취소도 손으로 처리합니다.</p>
     <ol class="steps">
       <li><b>방문 취소</b> — 잡혔던 방문이 <b>완전히 취소</b>되면: ① 노션 <code>방문 일정</code> 칸의 날짜를 <b>우클릭 → 삭제</b> → ② 상태를 <b>'방문취소'로 직접 변경</b>하세요. (이건 자동 안 됨)<br><span style="color:var(--sub);font-size:12px">※ 날짜만 바뀐 '연기'는 취소가 아닙니다 — 위 5번처럼 새 날짜를 다시 쓰세요.</span></li>
     </ol>
@@ -386,7 +386,7 @@
 
     <div style="margin-top:12px;background:var(--teal-tint);border:1px solid #BCEDE4;border-radius:12px;padding:15px 17px">
       <div style="font-size:12.5px;font-weight:700;color:var(--teal-d);margin-bottom:8px">🙋 내 리드 · 내 것만 보기</div>
-      <div style="font-size:12.5px;color:var(--sub);line-height:1.65">상단 <b style="color:var(--ink)">'내 리드'</b>를 누르면 <b style="color:var(--ink)">본인에게 배정된 리드만</b> 모아서 봅니다. 담당자 자동배정과 연결돼 있어, 슬랙에서 @멘션 받은 리드가 여기 모여요.</div>
+      <div style="font-size:12.5px;color:var(--sub);line-height:1.65">상단 <b style="color:var(--ink)">'내 리드'</b>를 누르면 <b style="color:var(--ink)">본인 이름을 입력한 리드만</b> 모아서 봅니다. 먼저 콜하고 담당자_P에 본인 이름 넣으면 여기 모여요.</div>
     </div>
   </div>
 
@@ -417,20 +417,21 @@
         <span class="pn-badge bg-hot">MAJOR</span>
         <span class="pn-date">2026.08.03</span>
       </div>
-      <div class="pn-title">담당자 자동배정 · 슬랙 멘션 알림 · 내 리드</div>
+      <div class="pn-title">⚔️ 9월 선점제 · 먼저 콜한 사람이 임자</div>
 
       <div class="pn-grp">
-        <div class="pn-gl">🤖 담당자 자동배정</div>
+        <div class="pn-gl">🎯 담당자 선점 (자동배정 폐지)</div>
         <ul class="pn-list">
-          <li>이제 리드가 들어오면 <em>담당자가 자동으로 정해집니다</em>. 손으로 지정 안 해도 돼요.</li>
-          <li>신규 번호는 <em>순번대로</em>, 중복(재신청)은 <em>이전 담당자에게 그대로 승계</em>됩니다.</li>
+          <li><em>9월부터 자동배정이 없어졌어요.</em> 리드가 들어오면 담당자는 <em>빈칸</em>입니다.</li>
+          <li><em>먼저 콜한 사람이 담당자_P에 본인 이름을 직접 입력</em>하세요. 먼저 콜한 사람이 임자예요.</li>
+          <li>지금 배정돼 있던 건 다 무시하시면 됩니다.</li>
         </ul>
       </div>
 
       <div class="pn-grp">
-        <div class="pn-gl">🔔 슬랙 멘션 알림</div>
+        <div class="pn-gl">🔔 슬랙 도착 알림</div>
         <ul class="pn-list">
-          <li>배정되면 리드알림 채널에 <em>🔔 배정 → @담당자</em>로 알려드립니다. 멘션이 오면 그 리드가 내 것.</li>
+          <li>리드알림 채널에 <em>새 리드가 도착하면 알림</em>이 옵니다 (이름·전화·소재). 배정 멘션은 없어요 — 먼저 잡는 사람이 임자.</li>
         </ul>
       </div>
 
