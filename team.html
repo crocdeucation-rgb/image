@@ -126,6 +126,10 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 @media (max-width:1240px){
   .board{grid-template-columns:minmax(0,1fr);height:auto}
   .colwrap,.mid{min-height:0}
+  /* 모바일: 카드가 빈 공간 늘리지 않게 (하단 여백 제거) */
+  .board .card.colwrap,.board .card[style*="flex:1"]{flex:0 1 auto!important}
+  .scroll{max-height:none!important;overflow:visible}
+  #situation.scroll{max-height:420px;overflow-y:auto}
   .sec-nav{display:flex}
   .sec{display:none}
   .colwrap.sec.on{display:flex}   /* .colwrap은 flex 컨테이너 */
@@ -148,16 +152,19 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
   .pfwrap{min-width:0;overflow-x:hidden}
   .pf{display:block;width:100%;min-width:0;font-size:12px;white-space:normal}
   .pf thead{display:none}
-  .pf tbody{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:6px;align-items:start}
-  .pf tr{display:block;min-width:0;overflow:hidden;white-space:normal;background:#fff;border:1px solid #eef0f3;border-radius:10px;padding:9px 11px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-  .pf tr.tot{grid-column:1/-1;background:#f6f8ff;border-color:#e3e9f7;display:flex;flex-wrap:wrap;align-items:flex-start}
-  .pf tr.tot td.nm{flex:0 0 100%}
-  .pf tr.tot td.db,.pf tr.tot td.vs,.pf tr.tot td.se,.pf tr.tot td.od,.pf tr.tot td.sl,.pf tr.tot td.ro,.pf tr.tot td.ef{width:auto;flex:1 1 22%;min-width:70px}
+  .pf tbody{display:block}
+  .pf tr{display:flex;flex-wrap:wrap;align-items:center;min-width:0;white-space:normal;background:#fff;border:1px solid #eef0f3;border-radius:10px;padding:10px 12px;box-shadow:0 1px 3px rgba(0,0,0,.04);margin-bottom:6px;gap:2px 0}
+  .pf tr.tot{background:#f6f8ff;border-color:#e3e9f7}
   .pf td{border:none}
-  .pf td.ca,.pf td.rt{display:none}            /* 방취·방취율·오더율 모바일 숨김 (PC 표엔 유지) */
-  .pf td.nm{display:block;width:100%;font-size:13px;font-weight:800;padding:0 0 6px;margin-bottom:6px;border-bottom:1px solid #f0f2f5;text-align:left}
-  .pf td.db,.pf td.vs,.pf td.se,.pf td.od,.pf td.ro,.pf td.ef{display:inline-block;width:48%;padding:3px 1px;vertical-align:top;text-align:left}
-  .pf td.sl{display:block;width:100%;padding:5px 1px 2px;text-align:left;font-size:13px}
+  .pf td.ca,.pf td.rt{display:none}            /* 방취·방취율·오더율 모바일 숨김 */
+  /* 순위(메달+변동) + 이름 = 한 줄 헤더 */
+  .pf td.rk{flex:0 0 auto;font-size:13px;font-weight:800;padding:0 8px 0 0;order:0}
+  .pf td.nm{flex:1 1 auto;font-size:15px;font-weight:800;text-align:left;padding:0;order:1}
+  .pf td.sc{flex:0 0 auto;font-size:14px;font-weight:800;color:#5b5fe0;text-align:right;padding:0;order:2}
+  .pf td.rk::after{content:'';display:none}
+  /* 지표 = 이름 밑에 가로로 (라벨 붙여서) */
+  .pf td.db,.pf td.vs,.pf td.se,.pf td.od,.pf td.ro,.pf td.ef{flex:1 1 30%;display:inline-block;padding:6px 1px 0;vertical-align:top;text-align:left;font-size:12.5px;order:5}
+  .pf td.sl{flex:1 1 100%;padding:6px 1px 0;text-align:left;font-size:14px;font-weight:800;order:4;border-top:1px solid #f2f4f7;margin-top:4px}
   .pf td.db::before,.pf td.vs::before,.pf td.se::before,.pf td.od::before,.pf td.sl::before,.pf td.ro::before,.pf td.ef::before{display:block;font-size:9px;color:#9aa2ae;font-weight:600;margin-bottom:1px}
   .pf td.db::before{content:'DB'}
   .pf td.vs::before{content:'방문'}
