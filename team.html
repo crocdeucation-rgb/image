@@ -428,7 +428,21 @@ async function loadVisit(){
 function sg(g){if(!g)return'';if(g.indexOf('초')>=0){var m=g.match(/\d+/);return m?'초'+m[0]:'초'}if(g.indexOf('중')>=0){var m=g.match(/\d+/);return m?'중'+m[0]:'중'}if(g.indexOf('고')>=0){var m=g.match(/\d+/);return m?'고'+m[0]:'고'}return g}
 
 /* ── 요약 ── */
+// [2026-09] 순위이력 시트 (대쉬보드 1bkK, gid=690549750). G~K블록=매출×ROAS(팀용) 어제순위.
+const RANK_CSV_URL = 'https://docs.google.com/spreadsheets/d/1bkKxvdFlEgP8EoNjMmLzemFfRjJIfhc3EyIJI5v3Eo8/gviz/tq?tqx=out:csv&headers=0&gid=690549750';
+var YRANK_MAP = {};   // {이름: 어제순위}
+async function loadYRank(){
+  try{
+    var rows = await csv(RANK_CSV_URL);
+    // G~K = 인덱스 6~10 (G:이름 6 / H:어제순위 7). 헤더행 스킵.
+    rows.forEach(function(r){
+      var nm = (r[6]||'').trim();
+      if(nm && nm!=='담당자') YRANK_MAP[nm] = parseInt(r[7]||'0')||0;
+    });
+  }catch(e){ YRANK_MAP={}; }
+}
 async function loadSum(){
+  await loadYRank();
   try{ summaryRows=await csv(SUMMARY_CSV_URL); }
   catch(e){ document.getElementById('hl').innerHTML='<div class="empty">성과 로드 실패</div>'; return; }
   const r12=summaryRows[11]||[], r13=summaryRows[12]||[];
@@ -500,7 +514,7 @@ function renderPerf(){
     var roasNum=+(r[co+1]||0);
     return {name:r[0]||name, db:db,vs:vs,se:se,ca:ca,od:od, sales:sales, salesNum:salesNum, roas:roasNum,
             ef:(r[co+2]?r[co+2]+'만':'-'), score:Math.round(salesNum*roasNum),
-            yRank:+(r[31]||0)};   // 32열=전날순위(0=없음)
+            yRank:(YRANK_MAP[r[0]||name]||0)};   // [2026-09] 어제순위 = 순위이력 G~K(매출×ROAS)
   });
   // 점수순 정렬
   data.sort(function(a,b){return b.score-a.score;});
