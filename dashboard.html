@@ -574,7 +574,22 @@ function renderWebmaDukji(){
 }
 
 async function loadAll() {
+  await loadYRank();
   await Promise.all([loadData(), loadSchedule(), loadCancel()]);
+}
+
+// [2026-09] 순위이력 시트 (대쉬보드 1bkK, gid=690549750). A~E블록=7:3 가중합(대쉬보드용) 어제순위.
+const RANK_CSV_URL = 'https://docs.google.com/spreadsheets/d/1bkKxvdFlEgP8EoNjMmLzemFfRjJIfhc3EyIJI5v3Eo8/gviz/tq?tqx=out:csv&headers=0&gid=690549750';
+let YRANK_MAP = {};
+async function loadYRank(){
+  try{
+    const res = await fetch(RANK_CSV_URL);
+    const rows = parseCSV(await res.text());
+    rows.forEach(function(r){
+      const nm = (r[0]||'').trim();          // A:이름 / B:어제순위
+      if(nm && nm!=='담당자') YRANK_MAP[nm] = parseInt(r[1]||'0')||0;
+    });
+  }catch(e){ YRANK_MAP={}; }
 }
 
 let cancelData = { rows: [] };  // 원장 취소 데이터 캐시
@@ -743,7 +758,7 @@ function render() {
     const salesNum=parseInt((sales+'').replace(/[^0-9]/g,''))||0;
     const _co=19+funnelTab*3;
     const vcoh = (funnelTab===0) ? (r[32]||'') : '';   // 방문코호트M(33열=idx32), 이번달 탭만
-    return {name:r[0]||name, db,visit,setting,cancel,order,sales,salesNum, cost:r[_co], iroas:parseFloat(r[_co+1])||0, eff:r[_co+2], yRank:+(r[31]||0), vcoh:vcoh};
+    return {name:r[0]||name, db,visit,setting,cancel,order,sales,salesNum, cost:r[_co], iroas:parseFloat(r[_co+1])||0, eff:r[_co+2], yRank:(YRANK_MAP[r[0]||name]||0), vcoh:vcoh};
   });
   _dataArr.sort((a,b)=>b.salesNum-a.salesNum);
   let rows = _dataArr.map((d, idx) => {
