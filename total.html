@@ -924,7 +924,7 @@ function pcTrendSvg(series,closedM,mode){
   s.forEach(function(x,i){var xx=px(i);svg+='<text x="'+xx+'" y="'+(H-6)+'" text-anchor="middle" class="pc-txlbl">'+x.m+'</text>';});
   svg+='<polyline points="'+pts+'" fill="none" stroke="'+col+'" stroke-width="2" stroke-linejoin="round"/>';
   var hiI=-1,hiV=-1; s.forEach(function(x,i){if(x[key]!=null&&x[key]>hiV){hiV=x[key];hiI=i;}});
-  s.forEach(function(x,i){if(x[key]==null)return;var xx=px(i),yy=py(x[key]);var hi=(i===hiI);svg+='<circle cx="'+xx+'" cy="'+yy+'" r="'+(hi?3.8:2.6)+'" fill="'+col+'"/>';if(hi)svg+='<text x="'+xx+'" y="'+(yy-7)+'" text-anchor="middle" class="pc-tval" style="fill:'+col+'">'+(mode==='set'?x[key]+'건':pcEok(x[key]))+'</text>';});
+  s.forEach(function(x,i){if(x[key]==null)return;var xx=px(i),yy=py(x[key]);var hi=(i===hiI);svg+='<circle cx="'+xx+'" cy="'+yy+'" r="'+(hi?3.8:2.6)+'" fill="'+col+'"/>';svg+='<text x="'+xx+'" y="'+(yy-7)+'" text-anchor="middle" class="pc-tval" style="fill:'+col+';font-size:8.5px'+(hi?';font-weight:900':'')+'">'+(mode==='set'?x[key]+'건':pcEok(x[key]))+'</text>';});
   svg+='</svg>';
   return svg;
 }
@@ -991,6 +991,7 @@ function openCard(name){
   document.getElementById('pcBody').innerHTML=html;
   window.__pcTrendMode='sales';
   renderSocial(name);
+  document.body.appendChild(document.getElementById('pcModal'));
   document.getElementById('pcModal').classList.add('on');
   document.body.style.overflow='hidden';
 }
