@@ -55,6 +55,184 @@ tr.sum td{border-top:2px solid var(--line);font-weight:900;background:#FAFBFF}
 <div class="chips wgrid"><div>상담<b>87</b></div><div>사업<b>21</b></div><div>강사<b>43</b></div><div>코칭<b>24</b></div></div></div>
 </div>
 
+
+<!-- ═══ 면접 현황 대시보드 v2 (종결/예정) ═══ -->
+<style id="araon-interview-style">
+.iv-wrap{background:var(--pan);border-radius:14px;padding:20px 22px;box-shadow:0 2px 8px rgba(27,36,54,.05);margin-bottom:14px}
+.iv-hd{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.iv-hd h2{font-size:16px;font-weight:800;display:flex;align-items:center;gap:8px;margin:0}
+.iv-hd .sub{font-size:12px;color:var(--soft);font-weight:500}
+.iv-tabs{display:inline-flex;gap:5px}
+.iv-tab{background:var(--barbg);border:none;color:var(--soft);font-family:inherit;font-weight:700;font-size:12px;padding:6px 14px;border-radius:20px;cursor:pointer}
+.iv-tab.on{background:var(--v1);color:#fff}
+/* 퍼널 */
+.iv-funnel{display:flex;align-items:stretch;gap:6px;margin-bottom:16px}
+.iv-fstep{flex:1;background:#F7F9FC;border-radius:11px;padding:12px 8px;text-align:center;position:relative}
+.iv-fstep .l{font-size:11px;color:var(--soft);font-weight:600}
+.iv-fstep .v{font-size:24px;font-weight:900;margin-top:3px;letter-spacing:-.5px}
+.iv-fstep.f0 .v{color:#4C6EF5}.iv-fstep.f1 .v{color:#1D9E75}.iv-fstep.f2 .v{color:#7048E8}.iv-fstep.f3 .v{color:#BA7517}
+.iv-frate{font-size:10px;color:#B6C2DC;font-weight:700;margin-top:2px}
+.iv-farrow{display:flex;align-items:center;color:#D0D8E6;font-weight:900;font-size:15px}
+@media(max-width:640px){.iv-funnel{flex-wrap:wrap}.iv-fstep{flex:1 1 40%}.iv-farrow{display:none}}
+/* 사이트+그룹 요약 한 줄 */
+.iv-mini{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.iv-chip{background:#fff;border:1px solid var(--line);border-radius:20px;padding:6px 13px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px}
+.iv-chip .dot{width:8px;height:8px;border-radius:50%}
+.iv-chip.jk .dot{background:#BA7517}.iv-chip.am .dot{background:#1971C2}
+.iv-chip b{color:var(--v2)}
+.iv-chip .g{color:var(--soft);font-weight:600}
+/* 섹션 제목 */
+.iv-sect{font-size:13px;font-weight:800;margin:18px 0 10px;display:flex;align-items:center;gap:7px}
+.iv-sect.done{color:#1D9E75}.iv-sect.plan{color:var(--v1)}
+.iv-sect .cnt{font-size:11px;font-weight:700;color:var(--soft);background:var(--barbg);padding:1px 9px;border-radius:10px}
+/* 일자 그룹 */
+.iv-day{margin-bottom:14px}
+.iv-day-hd{font-size:12px;font-weight:800;color:var(--ink);margin-bottom:7px;display:flex;align-items:center;gap:6px}
+.iv-day-hd .wd{color:var(--soft);font-weight:600}
+.iv-day-hd .n{margin-left:auto;font-size:11px;color:var(--soft);font-weight:600}
+.iv-day-hd.today .n{color:#E23A22;font-weight:800}
+.iv-day-hd .todaytag{background:#FBE9E7;color:#E23A22;font-size:10px;font-weight:800;padding:1px 7px;border-radius:6px}
+/* 면접 카드(종결) */
+.iv-item{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:10px;background:#FAFBFD;margin-bottom:5px}
+.iv-item .tm{font-size:11px;color:var(--soft);font-weight:700;min-width:38px;padding-top:2px}
+.iv-item .body{flex:1;min-width:0}
+.iv-item .top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.iv-nm{font-weight:800;font-size:13px;color:var(--ink)}
+.iv-tag{font-size:10px;font-weight:800;padding:1px 6px;border-radius:5px}
+.iv-tag.jk{background:#FFF4E6;color:#BA7517}.iv-tag.am{background:#E7F5FF;color:#1971C2}
+.iv-tag.ara{background:#EEF0FF;color:#4C6EF5}.iv-tag.ssm{background:#F3EEFF;color:#7048E8}.iv-tag.op{background:#E6F7EE;color:#1D9E75}
+.iv-job{font-size:11px;color:var(--soft);font-weight:600}
+/* 결과 플로우 */
+.iv-flow{display:flex;align-items:center;gap:5px;margin-top:5px;flex-wrap:wrap;font-size:11px}
+.iv-fp{font-weight:800;padding:2px 9px;border-radius:7px;display:inline-flex;align-items:center;gap:3px}
+.iv-fp.at{background:#E6F7EE;color:#1D9E75}
+.iv-fp.ns{background:#FBE9E7;color:#E23A22}
+.iv-fp.ps{background:#F3EEFF;color:#7048E8}
+.iv-fp.fa{background:#F1F3F5;color:#868E96}
+.iv-fp.edu{background:#FFF4E6;color:#BA7517}
+.iv-arw{color:#C9D2E0;font-weight:900}
+.iv-memo{font-size:11px;color:var(--soft);margin-top:4px;line-height:1.4;padding-left:1px}
+.iv-memo::before{content:'💬 ';opacity:.6}
+/* 예정 아이템(간결) */
+.iv-plan-item{display:flex;align-items:center;gap:9px;padding:7px 12px;border-radius:9px;margin-bottom:4px}
+.iv-plan-item:hover{background:#F7F9FC}
+.iv-plan-item .tm{font-size:11px;color:var(--soft);font-weight:700;min-width:38px}
+.iv-plan-item .nm{font-weight:700;font-size:13px}
+.iv-plan-item .memo{margin-left:auto;font-size:11px;color:var(--soft);max-width:200px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+</style>
+
+<div class="iv-wrap">
+  <div class="iv-hd">
+    <div><h2>🗓️ 면접 현황 <span class="sub">잡코리아·알바몬 · 아라/쌤이다/운영센터</span></h2></div>
+    <div class="iv-tabs" id="iv_tabs"></div>
+  </div>
+  <div class="iv-funnel" id="iv_funnel"></div>
+  <div class="iv-mini" id="iv_mini"></div>
+  <div id="iv_done_wrap"></div>
+  <div id="iv_plan_wrap"></div>
+</div>
+
+<script>
+var INTERVIEW = {"2026-08": {"funnel": {"total": 7, "attend": 5, "pass": 2, "edu": 2, "noshow": 2}, "sites": {"잡코리아": {"total": 4, "attend": 3, "pass": 1}, "알바몬": {"total": 3, "attend": 2, "pass": 1}}, "groups": {"쌤이다": {"total": 3, "pass": 1}, "아라": {"total": 4, "pass": 1}}, "done": [{"date": "08/31", "wday": "월", "time": "17:00", "job": "강사", "grp": "쌤이다", "site": "잡코리아", "name": "김예진(만37)", "attend": "참석", "pass": "불합격", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "08/31", "wday": "월", "time": "12:00", "job": "상담부", "grp": "아라", "site": "알바몬", "name": "이지수(만25)", "attend": "불참", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": "*연락두절"}, {"date": "08/28", "wday": "금", "time": "17:30", "job": "상담부", "grp": "아라", "site": "잡코리아", "name": "명혜민(만30)", "attend": "불참", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": "*확콜하니 그제서야 못간다 ㅠ"}, {"date": "08/28", "wday": "금", "time": "12:00", "job": "강사", "grp": "쌤이다", "site": "잡코리아", "name": "안중현(만29)", "attend": "참석", "pass": "합격", "eduDate": "09/02", "eduTime": "18:10", "eduWho": "신우성", "memo": "*9/2, 9/4(18:30~) 교육예정"}, {"date": "08/27", "wday": "목", "time": "17:30", "job": "상담부", "grp": "아라", "site": "알바몬", "name": "전지은(만19)", "attend": "참석", "pass": "불합격", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "08/27", "wday": "목", "time": "17:30", "job": "상담부", "grp": "아라", "site": "알바몬", "name": "이준석(만26)", "attend": "참석", "pass": "합격", "eduDate": "08/31", "eduTime": "17:00", "eduWho": "우혜림", "memo": "*마곡에서 신입교육(1일) + 실업무투입교육 (3일) 완료 -> 마포연합센터소속으로 재직"}, {"date": "08/26", "wday": "수", "time": "14:30", "job": "강사", "grp": "쌤이다", "site": "잡코리아", "name": "김기원(만30)", "attend": "참석", "pass": "불합격", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}], "plan": []}, "2026-09": {"funnel": {"total": 22, "attend": 5, "pass": 3, "edu": 1, "noshow": 5}, "sites": {"잡코리아": {"total": 10, "attend": 3, "pass": 1}, "알바몬": {"total": 12, "attend": 2, "pass": 2}}, "groups": {"쌤이다": {"total": 5, "pass": 0}, "아라": {"total": 13, "pass": 3}, "운영센터": {"total": 4, "pass": 0}}, "done": [{"date": "09/03", "wday": "목", "time": "17:30", "job": "상담부", "grp": "아라", "site": "잡코리아", "name": "장우진(만29)", "attend": "참석", "pass": "불합격", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "09/03", "wday": "목", "time": "17:30", "job": "상담부", "grp": "아라", "site": "잡코리아", "name": "원미영(만36)", "attend": "불참", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": "*확콜이후 불참연락됨"}, {"date": "09/03", "wday": "목", "time": "17:30", "job": "상담부", "grp": "아라", "site": "알바몬", "name": "구자헌(만21)", "attend": "불참", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": "*연락두절"}, {"date": "09/03", "wday": "목", "time": "17:30", "job": "상담부", "grp": "아라", "site": "알바몬", "name": "최슬기(만32)", "attend": "참석", "pass": "합격", "eduDate": "09/07", "eduTime": "11:30", "eduWho": "우혜림", "memo": "*최종파트로 일하기로하여 부평지점 배정예정"}, {"date": "09/03", "wday": "목", "time": "14:30", "job": "사업부", "grp": "아라", "site": "잡코리아", "name": "김민섭(만30)", "attend": "참석", "pass": "합격", "eduDate": "", "eduTime": "", "eduWho": "", "memo": "*9월말교육예정(에듀플렉스 회원관리 인수인계)"}, {"date": "09/02", "wday": "수", "time": "14:30", "job": "강사", "grp": "쌤이다", "site": "잡코리아", "name": "서유미(만35)", "attend": "참석", "pass": "불합격", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "09/02", "wday": "수", "time": "12:00", "job": "상담부", "grp": "아라", "site": "알바몬", "name": "김보라(만29)", "attend": "참석", "pass": "합격", "eduDate": "", "eduTime": "", "eduWho": "", "memo": "*마곡or마포 희망 / 결혼식이후 교육일정 잡기"}, {"date": "09/02", "wday": "수", "time": "12:00", "job": "상담부", "grp": "아라", "site": "잡코리아", "name": "김현민(만25)", "attend": "불참", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": "*연락두절"}, {"date": "09/01", "wday": "화", "time": "14:30", "job": "강사", "grp": "쌤이다", "site": "잡코리아", "name": "안보화(만41)", "attend": "불참", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": "*불참연락옴"}, {"date": "09/01", "wday": "화", "time": "12:00", "job": "강사", "grp": "쌤이다", "site": "잡코리아", "name": "고민지(만38)", "attend": "불참", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": "*불참연락옴"}], "plan": [{"date": "09/04", "wday": "금", "time": "12:00", "job": "상담부", "grp": "아라", "site": "알바몬", "name": "이후범", "attend": "", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "09/04", "wday": "금", "time": "12:00", "job": "상담부", "grp": "아라", "site": "알바몬", "name": "이승훈(만24)", "attend": "", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "09/04", "wday": "금", "time": "16:00", "job": "코칭", "grp": "운영센터", "site": "알바몬", "name": "윤준성(27)", "attend": "", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "09/04", "wday": "금", "time": "17:00", "job": "사업부", "grp": "아라", "site": "잡코리아", "name": "정근중(만34)", "attend": "", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "09/07", "wday": "월", "time": "12:00", "job": "상담부", "grp": "아라", "site": "알바몬", "name": "김동후(만24)", "attend": "", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "09/07", "wday": "월", "time": "12:00", "job": "상담부", "grp": "아라", "site": "알바몬", "name": "이윤아(만27)", "attend": "", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": "*마포or마곡 희망"}, {"date": "09/07", "wday": "월", "time": "14:30", "job": "강사", "grp": "쌤이다", "site": "잡코리아", "name": "김정연(만37)", "attend": "", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "09/07", "wday": "월", "time": "15:00", "job": "강사", "grp": "운영센터", "site": "알바몬", "name": "전주연(23)", "attend": "", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "09/07", "wday": "월", "time": "15:00", "job": "강사", "grp": "운영센터", "site": "알바몬", "name": "양지은(24)", "attend": "", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "09/07", "wday": "월", "time": "16:00", "job": "강사", "grp": "쌤이다", "site": "잡코리아", "name": "최정민(만31)", "attend": "", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "09/07", "wday": "월", "time": "17:00", "job": "강사", "grp": "운영센터", "site": "알바몬", "name": "오현서(20)", "attend": "", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "09/08", "wday": "화", "time": "17:30", "job": "상담부", "grp": "아라", "site": "알바몬", "name": "김규원(만22)", "attend": "", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}]}};
+window.__ivMonth='2026-09';
+function ivGrpCls(g){ return g==='아라'?'ara':g==='쌤이다'?'ssm':'op'; }
+function ivRate(a,b){ return b>0?Math.round(a/b*100)+'%':'-'; }
+function ivToday(){ var d=new Date(); return ('0'+(d.getMonth()+1)).slice(-2)+'/'+('0'+d.getDate()).slice(-2); }
+function ivRender(){
+  var mo=window.__ivMonth, D=INTERVIEW[mo]; if(!D) return;
+  var f=D.funnel;
+  // 퍼널
+  document.getElementById('iv_funnel').innerHTML=
+     '<div class="iv-fstep f0"><div class="l">면접</div><div class="v">'+f.total+'</div></div>'
+    +'<div class="iv-farrow">›</div>'
+    +'<div class="iv-fstep f1"><div class="l">참석</div><div class="v">'+f.attend+'</div><div class="iv-frate">'+ivRate(f.attend,f.total)+'</div></div>'
+    +'<div class="iv-farrow">›</div>'
+    +'<div class="iv-fstep f2"><div class="l">합격</div><div class="v">'+f.pass+'</div><div class="iv-frate">'+ivRate(f.pass,f.attend)+'</div></div>'
+    +'<div class="iv-farrow">›</div>'
+    +'<div class="iv-fstep f3"><div class="l">교육</div><div class="v">'+f.edu+'</div><div class="iv-frate">'+ivRate(f.edu,f.pass)+'</div></div>';
+  // 미니 요약 (사이트 + 그룹)
+  var mh='';
+  [['잡코리아','jk'],['알바몬','am']].forEach(function(s){
+    var d=D.sites[s[0]]; if(!d) return;
+    mh+='<div class="iv-chip '+s[1]+'"><span class="dot"></span>'+s[0]+' 면접 <b>'+d.total+'</b> · 합격 <b>'+d.pass+'</b></div>';
+  });
+  ['아라','쌤이다','운영센터'].forEach(function(g){
+    var d=D.groups[g]; if(!d) return;
+    mh+='<div class="iv-chip"><span class="g">'+g+'</span> <b>'+d.total+'</b>건</div>';
+  });
+  document.getElementById('iv_mini').innerHTML=mh;
+  // 종결 (일자별 묶기)
+  var doneWrap=document.getElementById('iv_done_wrap');
+  if(D.done.length){
+    var byDay={}; var order=[];
+    D.done.forEach(function(x){ if(!byDay[x.date]){byDay[x.date]=[];order.push(x.date);} byDay[x.date].push(x); });
+    var dh='<div class="iv-sect done">✅ 종결된 면접 <span class="cnt">'+D.done.length+'건</span></div>';
+    order.forEach(function(day){
+      var items=byDay[day];
+      dh+='<div class="iv-day"><div class="iv-day-hd">'+day+' <span class="wd">('+items[0].wday+')</span><span class="n">'+items.length+'건</span></div>';
+      items.forEach(function(x){
+        var siteCls=x.site==='잡코리아'?'jk':'am';
+        // 결과 플로우
+        var flow='';
+        if(x.attend==='참석'){
+          flow+='<span class="iv-fp at">참석</span><span class="iv-arw">→</span>';
+          if(x.pass==='합격'){
+            flow+='<span class="iv-fp ps">합격</span>';
+            if(x.eduDate){ flow+='<span class="iv-arw">→</span><span class="iv-fp edu">🎓 '+x.eduDate+(x.eduWho?' '+x.eduWho:'')+'</span>'; }
+          } else if(x.pass==='불합격'){ flow+='<span class="iv-fp fa">불합격</span>'; }
+          else { flow+='<span class="iv-fp fa">결과대기</span>'; }
+        } else if(x.attend==='불참'){
+          flow='<span class="iv-fp ns">불참</span>';
+        }
+        dh+='<div class="iv-item"><div class="tm">'+x.time+'</div><div class="body">'
+          +'<div class="top"><span class="iv-nm">'+x.name+'</span>'
+          +'<span class="iv-tag '+siteCls+'">'+x.site+'</span>'
+          +'<span class="iv-tag '+ivGrpCls(x.grp)+'">'+x.grp+'</span>'
+          +'<span class="iv-job">'+x.job+'</span></div>'
+          +'<div class="iv-flow">'+flow+'</div>'
+          +(x.memo?'<div class="iv-memo">'+x.memo+'</div>':'')
+          +'</div></div>';
+      });
+      dh+='</div>';
+    });
+    doneWrap.innerHTML=dh;
+  } else doneWrap.innerHTML='';
+  // 예정
+  var planWrap=document.getElementById('iv_plan_wrap');
+  if(D.plan.length){
+    var byDay2={}, order2=[];
+    D.plan.forEach(function(x){ if(!byDay2[x.date]){byDay2[x.date]=[];order2.push(x.date);} byDay2[x.date].push(x); });
+    var today=ivToday();
+    var ph='<div class="iv-sect plan">📅 예정 면접 <span class="cnt">'+D.plan.length+'건</span></div>';
+    order2.forEach(function(day){
+      var items=byDay2[day];
+      var isToday=(day===today);
+      ph+='<div class="iv-day"><div class="iv-day-hd'+(isToday?' today':'')+'">'+day+' <span class="wd">('+items[0].wday+')</span>'
+        +(isToday?'<span class="todaytag">오늘</span>':'')+'<span class="n">'+items.length+'건 예정</span></div>';
+      items.forEach(function(x){
+        var siteCls=x.site==='잡코리아'?'jk':'am';
+        ph+='<div class="iv-plan-item"><span class="tm">'+x.time+'</span>'
+          +'<span class="nm">'+x.name+'</span>'
+          +'<span class="iv-tag '+siteCls+'">'+x.site+'</span>'
+          +'<span class="iv-tag '+ivGrpCls(x.grp)+'">'+x.grp+'</span>'
+          +'<span class="iv-job">'+x.job+'</span>'
+          +(x.memo?'<span class="memo">'+x.memo+'</span>':'')+'</div>';
+      });
+      ph+='</div>';
+    });
+    planWrap.innerHTML=ph;
+  } else planWrap.innerHTML='';
+  document.querySelectorAll('.iv-tab').forEach(function(b){ b.classList.toggle('on', b.dataset.mo===mo); });
+}
+(function(){
+  var order=Object.keys(INTERVIEW).sort().reverse();
+  var label={'2026-08':'8월','2026-09':'9월','2026-10':'10월','2026-11':'11월','2026-12':'12월'};
+  var th=''; order.forEach(function(k){ th+='<button class="iv-tab'+(k===window.__ivMonth?' on':'')+'" data-mo="'+k+'" onclick="window.__ivMonth=\''+k+'\';ivRender();">'+(label[k]||k)+'</button>'; });
+  document.getElementById('iv_tabs').innerHTML=th;
+  ivRender();
+})();
+</script>
+<!-- ═══ 면접 현황 대시보드 v2 끝 ═══ -->
 <div class="row2"><div class="panel"><h2><span class="dot" style="background:var(--amber)"></span>잡코리아 통합증원</h2><div class="sub">Excellent 채용관 (PC+M) · 직무별</div>
 <div class="sx"><table><thead><tr><th>직무</th><th>공고비</th><th>면접통보</th><th>면접참여</th></tr></thead><tbody id="jk_b"></tbody></table></div></div><div class="panel"><h2><span class="dot" style="background:var(--teal)"></span>운영센터</h2><div class="sub">주차별 · 화상수업강사/코칭 · 공고: 슈퍼점프 8회(1일)</div>
 <div class="totbar">
