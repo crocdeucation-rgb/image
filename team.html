@@ -522,19 +522,19 @@ function renderPerf(){
     tDb+=d.db;tVs+=d.vs;tSe+=d.se;tCa+=d.ca;tOd+=d.od;tSales+=d.salesNum;
     if(d.roas>0&&d.salesNum>0) tSpend+=d.salesNum/d.roas;
     var rank=idx+1;
-    var pRank=prevRank[d.name]||99, mDelta=pRank-rank;   // 전월 대비
-    var dDelta = (d.yRank>0) ? (d.yRank-rank) : 0;         // 전날 대비 (32열)
-    // 전날 대비 (주 표시) — 매일 오르내림
-    var dv = dDelta>0?'<span style="color:#0f9d58;font-weight:800;font-size:10px">▲'+dDelta+'</span>'
-           : dDelta<0?'<span style="color:#e11d48;font-weight:800;font-size:10px">▼'+(-dDelta)+'</span>'
-           : '<span style="color:#bbc;font-size:10px">—</span>';
-    // 전월 대비 (부가, 작게)
-    var mv = mDelta>0?'<span style="color:#0f9d58;font-size:9px">전월▲'+mDelta+'</span>'
-           : mDelta<0?'<span style="color:#e11d48;font-size:9px">전월▼'+(-mDelta)+'</span>':'';
+    var dDelta = (d.yRank>0) ? (d.yRank-rank) : 0;         // 전날 대비 (순위이력 어제순위)
+    // [2026-09] op.gg 스타일 순위 변동 — 어제→오늘 (전월 제거)
+    var dv;
+    if(d.yRank>0 && dDelta>0)      dv='<span style="color:#0f9d58;font-weight:800;font-size:10px">▲'+dDelta+'</span><span style="color:#9aa3b0;font-size:9px"> 어제'+d.yRank+'위</span>';
+    else if(d.yRank>0 && dDelta<0) dv='<span style="color:#e11d48;font-weight:800;font-size:10px">▼'+(-dDelta)+'</span><span style="color:#9aa3b0;font-size:9px"> 어제'+d.yRank+'위</span>';
+    else if(d.yRank>0)             dv='<span style="color:#9aa3b0;font-size:10px">—</span>';
+    else if(rank>0)                dv='<span style="color:#5b5fe0;font-weight:800;font-size:9px">NEW</span>';
+    else                           dv='';
+    var mv='';   // 전월 표시 제거 (어제 대비만)
     var medal = rank===1?'👑':rank===2?'🥈':rank===3?'🥉':'<b style="color:#8b93a2">'+rank+'</b>';
     var cr=d.vs?Math.round(d.ca/d.vs*100):0, or=d.se?Math.round(d.od/d.se*100):0;
     return '<tr'+(rank<=3?' style="background:rgba(91,95,224,.04)"':'')+'>'
-      +'<td class="rk" style="text-align:center;white-space:nowrap">'+medal+' '+dv+(mv?'<br>'+mv:'')+'</td>'
+      +'<td class="rk" style="text-align:center;white-space:nowrap;line-height:1.5">'+medal+'<br>'+dv+'</td>'
       +'<td class="nm">'+esc(d.name)+'</td>'
       +'<td class="sc" style="font-weight:800;color:#5b5fe0">'+(d.score?d.score.toLocaleString():'-')+'</td>'
       +'<td class="db">'+d.db+'</td><td class="vs">'+d.vs+'</td><td class="se">'+d.se+'</td><td class="od">'+d.od+'</td>'
