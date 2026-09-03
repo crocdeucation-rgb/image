@@ -569,7 +569,7 @@ var ip=w>=18;var _c=cxTag(x.cxa,seg);var cx=_c?'<br>'+_c:'';
 h+='<div class="bar"><div class="rk'+(i<3?' t':'')+'">'+(i+1)+'</div><div class="nm">'+x.name+tags(x.name,i===0)+'<span class="s">'+x.team+'</span></div><div class="track"><div class="fill" style="width:'+w+'%">'+(ip?'<span>'+won(x.sales)+'</span>':'')+'</div>'+(ip?'':'<span class="outlbl">'+won(x.sales)+'</span>')+'</div><div class="meta">세팅 <b>'+x.set+'</b> · 오더 <b>'+x.ord+'</b>'+cx+'</div></div>';});return h;}
 window.sw=function(i,btn){var D=window.__D;document.querySelectorAll('.tabbtn').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');
 document.getElementById('note').style.display=(i===2||i===4)?'block':'none';
-document.getElementById('body').innerHTML=i===0?barsBr(D.branches,false):i===2?barsDv(D.divs):i===3?barsP(D.persons,'sang'):barsP(D.divpersons,'saup');}
+document.getElementById('body').innerHTML=i===0?barsBr(D.branches,false):i===2?barsDv(D.divs):i===3?barsP(D.persons,'sang'):barsP(D.divpersons,'saup');setTimeout(attachCardClicks,50);}
 document.getElementById('body').innerHTML=barsBr(D.branches,false);
 try{renderDukji(D);}catch(e){console.error('dukji',e);}
 }
