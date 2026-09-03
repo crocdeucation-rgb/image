@@ -180,6 +180,7 @@ async function loadSheet(cfg){
         cRank=idx(H,['직급']), cGroup=idx(H,[cfg.group]), cJae=idx(H,['재직']),
         cNote=cfg.note?idx(H,[cfg.note]):-1;
     var members=[], ipsa=0, toesa=0;
+    var _30ago = new Date(); _30ago.setDate(_30ago.getDate()-30); _30ago.setHours(0,0,0,0);
     for(var r=hi+1;r<rows.length;r++){
       var row=rows[r]; var name=(row[cName]||'').trim();
       if(!name) continue;
@@ -189,10 +190,17 @@ async function loadSheet(cfg){
       var isJae = cfg.retireBy==='재직' ? (jaev==='재직') : (!outv);
       var inYm = ym(cIn>=0?row[cIn]:'');
       var outYm = outv ? ym(outv) : '';
-      var isNew = (inYm==='2026-08');
+      // 입사일 원본(YYYY-MM-DD)을 Date로 파싱 — NEW 뱃지 30일 판정용
+      var _inDate = (function(){
+        var s=String(cIn>=0?row[cIn]:'').trim();
+        var m=s.match(/(\d{4})[-.\/]\s*(\d{1,2})[-.\/]\s*(\d{1,2})/);
+        return m ? new Date(+m[1],+m[2]-1,+m[3]) : null;
+      })();
+      var isNew = !!(_inDate && _inDate >= _30ago);   // NEW 뱃지: 입사 30일 이내
+      var isNewMonth = (inYm==='2026-08');            // 상단 '8월 입사' 카운트용 (월 기준 유지)
       var isOutThisMonth = (outYm==='2026-08');
       // 8월 입퇴사 카운트
-      if(isNew) ipsa++;
+      if(isNewMonth) ipsa++;
       if(isOutThisMonth) toesa++;
       // 재직자 OR 이번달 퇴사자만 명단에 (옛날 퇴사자는 제외)
       if(!isJae && !isOutThisMonth) continue;
