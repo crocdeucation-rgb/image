@@ -993,9 +993,10 @@ function openCard(name){
   renderSocial(name);
   document.body.appendChild(document.getElementById('pcModal'));
   document.getElementById('pcModal').classList.add('on');
+  try{ parent.postMessage({t:'cardOpen'}, '*'); }catch(e){}
   document.body.style.overflow='hidden';
 }
-function closeCard(){ document.getElementById('pcModal').classList.remove('on'); document.body.style.overflow=''; window.__curCardName=null; if(window.__likeUnsub){window.__likeUnsub();window.__likeUnsub=null;} if(window.__cmtUnsub){window.__cmtUnsub();window.__cmtUnsub=null;} }
+function closeCard(){ document.getElementById('pcModal').classList.remove('on'); try{ parent.postMessage({t:'cardClose'}, '*'); }catch(e){} document.body.style.overflow=''; window.__curCardName=null; if(window.__likeUnsub){window.__likeUnsub();window.__likeUnsub=null;} if(window.__cmtUnsub){window.__cmtUnsub();window.__cmtUnsub=null;} }
 
 /* ── 소셜(좋아요·댓글) 렌더 + Firestore 실시간 ── */
 function renderSocial(name){

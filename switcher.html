@@ -35,7 +35,9 @@
 <script>
   var FRAMES={total:{src:'total.html?v=828c',h:900},hire:{src:'hire.html?v=828c',h:900},hr:{src:'hr.html?v=828c',h:780},web:{src:'dashboard.html?v=828c',h:1700}};
   var frame=document.getElementById('frame');
+  var _cardOverlay=false;   // 카드 모달 오버레이 중 높이 자동조정 중단
   function fitHeight(){
+    if(_cardOverlay) return;   // 오버레이 중에는 height 100vh 유지
     try{
       var doc=frame.contentWindow.document;
       var h=Math.max(doc.body.scrollHeight, doc.documentElement.scrollHeight);
@@ -63,7 +65,27 @@
 
   window.addEventListener('message',function(e){
     if(e.data&&(e.data.t==='dashH'||e.data.t==='frameH')&&e.data.h>0){
-      frame.style.height=(e.data.h+10)+'px';
+      if(!_cardOverlay) frame.style.height=(e.data.h+10)+'px';
+    }
+    // 개인카드 모달: iframe을 화면 고정 오버레이로 전환 (모달이 진짜 뷰포트 기준이 되도록)
+    if(e.data && e.data.t==='cardOpen'){
+      if(frame && !_cardOverlay){
+        _cardOverlay=true;
+        frame.dataset.prevStyle = frame.getAttribute('style')||'';
+        frame.style.position='fixed';
+        frame.style.top='0'; frame.style.left='0';
+        frame.style.width='100%'; frame.style.height='100vh';
+        frame.style.zIndex='9999';
+        document.body.style.overflow='hidden';
+      }
+    }
+    if(e.data && e.data.t==='cardClose'){
+      if(frame && _cardOverlay){
+        _cardOverlay=false;
+        frame.setAttribute('style', frame.dataset.prevStyle||'');
+        document.body.style.overflow='';
+        fitHeight();
+      }
     }
   });
   function go(btn){
