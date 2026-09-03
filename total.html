@@ -213,17 +213,20 @@ body.is-live .closed-only{display:none !important}
 .pc-clickable{cursor:pointer;transition:.12s}
 .pc-clickable:hover{opacity:.65}
 /* 모달 */
-.pc-modal-bg{position:fixed;inset:0;background:rgba(15,20,34,.55);backdrop-filter:blur(3px);z-index:9998;display:none;align-items:flex-start;justify-content:center;padding:34px 14px;overflow-y:auto}
+.pc-modal-bg{position:fixed;inset:0;background:rgba(15,20,34,.55);backdrop-filter:blur(3px);z-index:9998;display:none;align-items:center;justify-content:center;padding:20px 14px}
 .pc-modal-bg.on{display:flex}
+.pcard{max-height:92vh;overflow-y:auto}
 .pcard{width:400px;max-width:100%;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(15,20,34,.4);position:relative;animation:pcpop .22s cubic-bezier(.2,.9,.3,1.2)}
 @keyframes pcpop{from{transform:translateY(14px) scale(.97);opacity:0}to{transform:none;opacity:1}}
 .pc-close{position:absolute;top:12px;right:12px;z-index:5;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.4);color:#fff;font-size:16px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center}
 .pc-hd{padding:20px 20px 16px;position:relative;overflow:hidden}
 .pc-hd.t-A,.pc-hd.t-B{background:linear-gradient(135deg,#4C6EF5,#5C7CFA)}
-.pc-hd.t-C,.pc-hd.t-D,.pc-hd.t-F{background:linear-gradient(135deg,#7A8699,#95A0B2)}
+.pc-hd.t-C,.pc-hd.t-D,.pc-hd.t-E,.pc-hd.t-F{background:linear-gradient(135deg,#7A8699,#95A0B2)}
 .pc-hd.t-S{background:linear-gradient(135deg,#7048E8,#4C6EF5)}
 .pc-hd.t-SS{background:linear-gradient(135deg,#8B3DE8,#5A3AE0)}
 .pc-hd.t-SSS{background:linear-gradient(120deg,#3A1D8A,#7048E8 35%,#E9A100 68%,#7048E8 100%);background-size:220% 220%;animation:holo 6s ease infinite}
+.pc-hd.t-NEW{background:linear-gradient(135deg,#1BA97A,#20C997)}
+.pc-hd.t-NEW .pc-tier-badge{font-size:16px;letter-spacing:0}
 @keyframes holo{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 .pc-hd::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:22px 22px;pointer-events:none}
 .pc-hd.t-SSS::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.5) 0,transparent 8px),radial-gradient(circle at 78% 22%,rgba(255,255,255,.4) 0,transparent 6px),radial-gradient(circle at 62% 68%,rgba(255,255,255,.35) 0,transparent 5px),radial-gradient(circle at 88% 60%,rgba(255,255,255,.3) 0,transparent 4px);animation:spark 3s ease-in-out infinite;pointer-events:none}
@@ -832,8 +835,8 @@ var HOF_GID='500572718';
 })();
 
 /* ── 티어 기준 (전월 매출) ── */
-var PC_TIER_SANG=[{t:'SSS',v:40000000},{t:'SS',v:30000000},{t:'S',v:25000000},{t:'A',v:20000000},{t:'B',v:15000000},{t:'C',v:10000000},{t:'D',v:7000000}];
-var PC_TIER_SAUP=[{t:'SSS',v:90000000},{t:'SS',v:55000000},{t:'S',v:45000000},{t:'A',v:35000000},{t:'B',v:25000000},{t:'C',v:18000000},{t:'D',v:12000000}];
+var PC_TIER_SANG=[{t:'SSS',v:40000000},{t:'SS',v:35000000},{t:'S',v:30000000},{t:'A',v:25000000},{t:'B',v:20000000},{t:'C',v:15000000},{t:'D',v:10000000},{t:'E',v:7000000},{t:'F',v:5000000}];
+var PC_TIER_SAUP=[{t:'SSS',v:90000000},{t:'SS',v:80000000},{t:'S',v:70000000},{t:'A',v:60000000},{t:'B',v:50000000},{t:'C',v:40000000},{t:'D',v:30000000},{t:'E',v:20000000},{t:'F',v:15000000}];
 function pcTierOf(s,useF){var T=useF?PC_TIER_SAUP:PC_TIER_SANG;for(var i=0;i<T.length;i++){if(s>=T[i].v)return T[i].t;}return 'F';}
 function pcNextTier(s,useF){var T=useF?PC_TIER_SAUP:PC_TIER_SANG;for(var i=T.length-1;i>=0;i--){if(s<T[i].v)return {t:T[i].t,need:T[i].v-s,base:(i<T.length-1?T[i+1].v:0),to:T[i].v};}return null;}
 var PC_TROPHY={'MVP':{ic:'🏆',cls:'mvp',lbl:'MVP'},'떡상왕':{ic:'🚀',cls:'tteok',lbl:'떡상왕'},'커리어하이':{ic:'🎖️',cls:'career',lbl:'커리어하이'},'최고의팀':{ic:'🥇',cls:'team',lbl:'최고의팀'}};
@@ -869,6 +872,7 @@ function pcPraise(p,useF,closedM){
     var bestM=0,bestV=0; (p.series||[]).forEach(function(x){if(x.sales!=null&&x.sales>bestV){bestV=x.sales;bestM=x.m;}});
     return {slump:true, txt:'🌙 잠깐 숨 고르는 중 · 리즈시절 '+PC_MON[bestM]+' '+pcEok(ch)};
   }
+  if(lastSales<=0){ return {slump:false, txt:'🌱 새로 합류한 기대주'}; }
   var out=[];
   var t=pcTierOf(lastSales,useF);
   var streak=0; for(var i=s.length-1;i>0;i--){ if(s[i].sales>s[i-1].sales) streak++; else break; }
@@ -940,7 +944,7 @@ function openCard(name){
   window.__curCardName=name;
   var p=f.p, useF=f.useF, closedM=pcClosedMonth();
   var closedSales=0; (p.series||[]).forEach(function(x){ if(x.m===closedM && x.sales!=null) closedSales=x.sales; });
-  var tier=closedSales>0?pcTierOf(closedSales,useF):'F';
+  var tier=closedSales>0?pcTierOf(closedSales,useF):'NEW';
   // 트로피
   var hof=(window.__HOF&&window.__HOF[name])||[];
   var order={'MVP':0,'떡상왕':1,'커리어하이':2,'최고의팀':3};
@@ -1059,26 +1063,28 @@ window.pcDelComment=function(id){
 function attachCardClicks(){
   var D=window.__liveD||window.__D;
   if(!D||!D.personCards)return;
-  // personCards의 모든 이름 집합
   var names={};
   (D.personCards.sang||[]).forEach(function(x){names[x.name]=1;});
   (D.personCards.saup||[]).forEach(function(x){names[x.name]=1;});
-  // 이름이 들어가는 요소 셀렉터들
-  var sels=['.q3nm','.kname','.rknm','.drnm','.aw-nm','.pc-nm'];
-  sels.forEach(function(sel){
-    document.querySelectorAll(sel).forEach(function(el){
-      if(el.__pcBound)return;
-      // 요소 텍스트에서 이름 추출 (첫 토큰이 이름인 경우가 많음)
-      var raw=el.textContent.trim();
-      // 이름 매칭: names 중 raw가 시작하는 것
-      var matched=null;
-      for(var nm in names){ if(raw===nm || raw.indexOf(nm)===0){ matched=nm; break; } }
-      if(matched){
-        el.classList.add('pc-clickable');
-        el.__pcBound=true;
-        el.addEventListener('click',function(ev){ ev.stopPropagation(); openCard(matched); });
-      }
-    });
+  // 이름 후보 요소: class 있는 것 + 이달TOP3의 <b>(부모가 특정 스타일)
+  var sels=['.q3nm','.kname','.rknm','.drnm','.aw-nm','.pc-nm','.nm'];
+  var els=[];
+  sels.forEach(function(sel){ document.querySelectorAll(sel).forEach(function(el){els.push(el);}); });
+  // 이달 매출 TOP3 = kings 안의 <b style*="color:#1B2436"> (class 없음)
+  document.querySelectorAll('#kings b').forEach(function(el){ els.push(el); });
+  els.forEach(function(el){
+    if(el.__pcBound)return;
+    // 첫 텍스트노드만(자식 span 제외) 기준으로 이름 추출
+    var raw=(el.childNodes[0]&&el.childNodes[0].nodeType===3)?el.childNodes[0].textContent.trim():el.textContent.trim();
+    var matched=null;
+    // 정확 일치 우선, 없으면 시작일치
+    if(names[raw]) matched=raw;
+    else { for(var nm in names){ if(raw.indexOf(nm)===0){ matched=nm; break; } } }
+    if(matched){
+      el.classList.add('pc-clickable');
+      el.__pcBound=true;
+      el.addEventListener('click',function(ev){ ev.stopPropagation(); openCard(matched); });
+    }
   });
 }
 window.attachCardClicks=attachCardClicks;
