@@ -774,14 +774,18 @@ function render() {
     const costV  = d.cost ? d.cost+'만' : '-';
     const iroasN = d.iroas||0;
     const dDelta = d.yRank>0?(d.yRank-rank):0;
-    const mDelta = (_monthRank[d.name]||99)-rank;
-    const dv = dDelta>0?`<span style="color:#0f9d58;font-weight:800;font-size:10px">▲${dDelta}</span>`:dDelta<0?`<span style="color:#e11d48;font-weight:800;font-size:10px">▼${-dDelta}</span>`:`<span style="color:#bbc;font-size:10px">—</span>`;
-    const mv = mDelta>0?`<span style="color:#0f9d58;font-size:9px">전월▲${mDelta}</span>`:mDelta<0?`<span style="color:#e11d48;font-size:9px">전월▼${-mDelta}</span>`:'';
+    // [2026-09] op.gg 스타일 순위 변동 — 어제→오늘 (전월 제거)
+    let dv;
+    if(d.yRank>0 && dDelta>0)      dv=`<span style="color:#0f9d58;font-weight:800;font-size:10px">▲${dDelta}</span><span style="color:#9aa3b0;font-size:9px"> 어제${d.yRank}위</span>`;
+    else if(d.yRank>0 && dDelta<0) dv=`<span style="color:#e11d48;font-weight:800;font-size:10px">▼${-dDelta}</span><span style="color:#9aa3b0;font-size:9px"> 어제${d.yRank}위</span>`;
+    else if(d.yRank>0)             dv=`<span style="color:#9aa3b0;font-size:10px">—</span>`;
+    else                           dv=`<span style="color:#2563eb;font-weight:800;font-size:9px">NEW</span>`;
+    const mv = '';   // 전월 표시 제거
     const medal = rank===1?'👑':rank===2?'🥈':rank===3?'🥉':`<b style="color:#8b93a2">${rank}</b>`;
     const iroasV = iroasN ? `${iroasN}<span class="rbar" style="width:${Math.min(iroasN*4,52)}px"></span>` : '-';
     const effV   = d.eff ? d.eff+'만' : '-';
     return `<tr${rank<=3?' style="background:rgba(37,99,235,.04)"':''}>
-      <td class="num" style="white-space:nowrap">${medal} ${dv}${mv?'<br>'+mv:''}</td>
+      <td class="num" style="white-space:nowrap;line-height:1.5">${medal}<br>${dv}</td>
       <td class="name">${d.name}</td>
       <td class="num db">${db}</td>
       <td class="num visit">${visit}${d.vcoh ? '<div style="font-size:8px;color:#94a3b8;font-weight:600;line-height:1.2;margin-top:1px">'+d.vcoh.split(';').map(function(x){return x.replace(':','');}).join('·')+'</div>' : ''}</td>
