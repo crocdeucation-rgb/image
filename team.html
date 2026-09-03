@@ -434,10 +434,11 @@ var YRANK_MAP = {};   // {이름: 어제순위}
 async function loadYRank(){
   try{
     var rows = await csv(RANK_CSV_URL);
-    // G~K = 인덱스 6~10 (G:이름 6 / H:어제순위 7). 헤더행 스킵.
+    // G~K = 인덱스 6~10 (G:이름 6 / H:어제순위 7). gviz 큰따옴표 제거 필수.
+    function unq(s){ return String(s||'').replace(/^"|"$/g,'').trim(); }
     rows.forEach(function(r){
-      var nm = (r[6]||'').trim();
-      if(nm && nm!=='담당자') YRANK_MAP[nm] = parseInt(r[7]||'0')||0;
+      var nm = unq(r[6]);
+      if(nm && nm!=='담당자') YRANK_MAP[nm] = parseInt(unq(r[7])||'0')||0;
     });
   }catch(e){ YRANK_MAP={}; }
 }
