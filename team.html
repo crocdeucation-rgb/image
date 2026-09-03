@@ -521,17 +521,18 @@ function renderPerf(){
   var rows=data.map(function(d,idx){
     tDb+=d.db;tVs+=d.vs;tSe+=d.se;tCa+=d.ca;tOd+=d.od;tSales+=d.salesNum;
     if(d.roas>0&&d.salesNum>0) tSpend+=d.salesNum/d.roas;
-    var rank=idx+1;
-    var dDelta = (d.yRank>0) ? (d.yRank-rank) : 0;         // 전날 대비 (순위이력 어제순위)
+    var hasRank = d.score>0;                // [2026-09] 오늘 순위 자격 = 매출×ROAS>0
+    var rank = hasRank ? idx+1 : 0;         // 매출0 = 순위 없음(0)
+    var dDelta = (hasRank && d.yRank>0) ? (d.yRank-rank) : 0;
     // [2026-09] op.gg 스타일 순위 변동 — 어제→오늘 (전월 제거)
     var dv;
-    if(d.yRank>0 && dDelta>0)      dv='<span style="color:#0f9d58;font-weight:800;font-size:10px">▲'+dDelta+'</span><span style="color:#9aa3b0;font-size:9px"> 어제'+d.yRank+'위</span>';
+    if(!hasRank)                   dv='';   // 오늘 순위 없음 → 아무 표시 안 함
+    else if(d.yRank>0 && dDelta>0) dv='<span style="color:#0f9d58;font-weight:800;font-size:10px">▲'+dDelta+'</span><span style="color:#9aa3b0;font-size:9px"> 어제'+d.yRank+'위</span>';
     else if(d.yRank>0 && dDelta<0) dv='<span style="color:#e11d48;font-weight:800;font-size:10px">▼'+(-dDelta)+'</span><span style="color:#9aa3b0;font-size:9px"> 어제'+d.yRank+'위</span>';
     else if(d.yRank>0)             dv='<span style="color:#9aa3b0;font-size:10px">—</span>';
-    else if(rank>0)                dv='<span style="color:#5b5fe0;font-weight:800;font-size:9px">NEW</span>';
-    else                           dv='';
-    var mv='';   // 전월 표시 제거 (어제 대비만)
-    var medal = rank===1?'👑':rank===2?'🥈':rank===3?'🥉':'<b style="color:#8b93a2">'+rank+'</b>';
+    else                          dv='<span style="color:#5b5fe0;font-weight:800;font-size:9px">NEW</span>';   // 오늘 순위O + 어제 순위X
+    var mv='';
+    var medal = !hasRank ? '<b style="color:#c2c8d2">'+(idx+1)+'</b>' : rank===1?'👑':rank===2?'🥈':rank===3?'🥉':'<b style="color:#8b93a2">'+rank+'</b>';
     var cr=d.vs?Math.round(d.ca/d.vs*100):0, or=d.se?Math.round(d.od/d.se*100):0;
     return '<tr'+(rank<=3?' style="background:rgba(91,95,224,.04)"':'')+'>'
       +'<td class="rk" style="text-align:center;white-space:nowrap;line-height:1.5">'+medal+'<br>'+dv+'</td>'
