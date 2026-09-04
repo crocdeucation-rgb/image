@@ -66,19 +66,24 @@ td.nm{font-weight:700}td.dt{text-align:right;color:var(--soft);font-variant-nume
 @media(max-width:600px){.grid{grid-template-columns:1fr}}
 </style></head><body><div class="wrap">
 <div class="hd"><div class="k">HR 인사기록</div><h1>인사기록</h1>
-<div class="m">2026년 8월 기준 · 재직 현황 · 입퇴사 흐름</div></div>
+<div class="m" id="hr_sub">재직 현황 · 입퇴사 흐름</div></div>
 <div class="mask"><i class="ti ti-lock"></i> 개인정보 보호 — 주민번호·계좌·연락처·주소·생년월일·특이사항 전부 제외 · 이름·부서·직급·입사일만 표시</div>
 <div class="hero"><div><div class="l">전체 재직 인원</div><div class="v" id="h_tot"></div></div>
-<div class="io"><div class="in">8월 입사<b id="h_in"></b></div><div class="out">8월 퇴사<b id="h_out"></b></div></div></div>
+<div class="io"><div class="in"><span id="h_in_lbl">이번달</span> 입사<b id="h_in"></b></div><div class="out"><span id="h_out_lbl">이번달</span> 퇴사<b id="h_out"></b></div></div></div>
 <div class="four" id="cards"></div>
 <div class="panel">
 <div class="tabs" id="tabs"></div>
 <div class="cnt" id="cnt"></div>
 <div id="body"></div></div>
-<div class="ft">소스 = 인사기록카드(수업·코칭) · 사업부 인사 · 파트타이머 · 2026년 8월 기준<br>파트타이머는 재직자만 · 신상정보 일체 제외 · 매주(또는 매월) 엑셀 갱신</div>
+<div class="ft">소스 = 인사기록카드(수업·코칭) · 사업부 인사 · 파트타이머 · 현재 재직 기준<br>파트타이머는 재직자만 · 신상정보 일체 제외 · 매주(또는 매월) 엑셀 갱신</div>
 </div>
 <script>
 // ── 인사 4개 시트 CSV (월 1회 갱신, 시트가 소스) ──
+// [2026-09] 현재월 자동 (매월 수정 불필요)
+var __now=new Date();
+var __curYm=__now.getFullYear()+'-'+('0'+(__now.getMonth()+1)).slice(-2);
+var __curMoLabel=(__now.getMonth()+1)+'월';
+var __curYmLabel=__now.getFullYear()+'년 '+(__now.getMonth()+1)+'월';
 const CSV = {
   상담: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQsnuROsI7L8HP80yoRQCuaAkcoPnVcK9TY1U2Z-B8AVHmz_Y7rO4_aUBLsgu91bJGj63xJFmNrnPaJ/pub?gid=120536013&single=true&output=csv',
   사업: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTOyHCwLPcRpL2wumHbbZCSuzSZJJw7zaGeARW2I9JjWbX-lA0Uf6mVO5n4JHIKfaAzeSrOFEvjvdKi/pub?gid=1502260628&single=true&output=csv',
@@ -200,8 +205,8 @@ async function loadSheet(cfg){
         return m ? new Date(+m[1],+m[2]-1,+m[3]) : null;
       })();
       var isNew = !!(_inDate && _inDate >= _30ago);   // NEW 뱃지: 입사 30일 이내
-      var isNewMonth = (inYm==='2026-08');            // 상단 '8월 입사' 카운트용 (월 기준 유지)
-      var isOutThisMonth = (outYm==='2026-08');
+      var isNewMonth = (inYm===__curYm);            // [현재월 자동] 이번달 입사 카운트
+      var isOutThisMonth = (outYm===__curYm);       // [현재월 자동] 이번달 퇴사
       // 8월 입퇴사 카운트
       if(isNewMonth) ipsa++;
       if(isOutThisMonth) toesa++;
@@ -236,6 +241,10 @@ async function boot(){
   var ti=results.reduce(function(a,r){return a+r.ipsa;},0);
   var to=results.reduce(function(a,r){return a+r.toesa;},0);
   document.getElementById('h_tot').innerHTML=total+'<small style="font-size:16px;color:#B6C2DC"> 명</small>';
+  // [현재월 자동] 부제·라벨 갱신
+  var _sub=document.getElementById('hr_sub'); if(_sub)_sub.textContent=__curYmLabel+' 기준 · 재직 현황 · 입퇴사 흐름';
+  var _il=document.getElementById('h_in_lbl'); if(_il)_il.textContent=__curMoLabel;
+  var _ol=document.getElementById('h_out_lbl'); if(_ol)_ol.textContent=__curMoLabel;
   document.getElementById('h_in').textContent=ti+'명';
   document.getElementById('h_out').textContent=to+'명';
 
