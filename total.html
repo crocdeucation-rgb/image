@@ -278,6 +278,7 @@ body.is-live .closed-only{display:none !important}
 .bgd.up{background:#FFEEE6;color:#C4501A}
 .bgd.near{background:#EEF0FF;color:#3B4F9E}
 .bgd.champ{background:#F3EEFF;color:#6A3FD0}
+.bgd.leading{background:#FFEEE6;color:#E23A22}
 .bgd.slump{background:#F0EDFF;color:#6A3FD0}
 .tr-list{display:flex;flex-direction:column;gap:5px}
 .trp{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:9px;font-size:12.5px;font-weight:700;border:1px solid}
@@ -1015,7 +1016,9 @@ function pcPraise(p,useF,closedM){
   else if(t==='SS') out.push('⭐ SS급 실력자');
   else if(t==='S') out.push('✨ S급 정예');
   else if(t==='A'||t==='B') out.push('💪 든든한 주력');
-  if(p.champMonths&&p.champMonths.length) out.push('👑 월간 챔피언 '+p.champMonths.length+'회');
+  var _cs=pcChampSplit(p);
+  if(_cs.done.length) out.push('👑 월간 챔피언 '+_cs.done.length+'회');
+  else if(_cs.cur) out.push('🔥 이달 1등 달리는 중');
   if(streak>=2) out.push('📈 '+streak+'개월 연속 우상향');
   if(nearCH) out.push('🎯 커리어하이 눈앞');
   var hof=(window.__HOF&&window.__HOF[p.name])||[];
@@ -1025,6 +1028,13 @@ function pcPraise(p,useF,closedM){
   if(D&&D.newbie&&D.newbie[p.name]) out.push('🌱 신입 기대주');
   if(!out.length) out.push('💪 꾸준한 팀의 기둥');
   return {slump:false, txt:out.slice(0,2).join(' · ')};
+}
+
+/* ── [2026-09] 챔피언 분리 — 종결달 1위(done) vs 현재월 진행중 1위(cur) ──
+   champMonths에 미종결 현재월이 섞여 HOF MVP 트로피와 어긋나던 문제 보정. */
+function pcChampSplit(p){
+  var curM=new Date().getMonth()+1, champs=(p&&p.champMonths)||[];
+  return { done: champs.filter(function(m){return m!==curM;}), cur: champs.indexOf(curM)>=0 };
 }
 
 /* ── 뱃지 ── */
@@ -1037,7 +1047,14 @@ function pcBadges(p,closedM){
   if(D&&D.newbie&&D.newbie[p.name]) b.push({cls:'new',i:'🌱',t:'새싹'});
   if(s.length>=2 && s[s.length-1].sales>s[s.length-2].sales) b.push({cls:'up',i:'🔥',t:'상승중'});
   if(ch>0 && lastSales>=ch*0.9 && lastSales<ch) b.push({cls:'near',i:'🎯',t:'커하 근접'});
-  if(p.champMonths&&p.champMonths.length) b.push({cls:'champ',i:'⚡',t:'챔피언 '+p.champMonths.length});
+  // [2026-09] 챔피언 분리 — 종결달 1위만 '챔피언'(HOF MVP 트로피와 일치),
+  //   현재월(진행중) 1위는 '이달 1등 ING'로 별도 표기.
+  var curM = new Date().getMonth()+1;
+  var champs = p.champMonths || [];
+  var doneChamps = champs.filter(function(m){return m !== curM;});
+  var isCurLeader = champs.indexOf(curM) >= 0;
+  if(doneChamps.length) b.push({cls:'champ',i:'⚡',t:'챔피언 '+doneChamps.length});
+  if(isCurLeader) b.push({cls:'leading',i:'🔥',t:'이달 1등 ING'});
   if(isSlump) b.push({cls:'slump',i:'💜',t:'리즈 보유'});
   return b;
 }
@@ -1100,6 +1117,7 @@ function openCard(name){
       if(s.sales>runMax) runMax=s.sales;
     }
   });
+  var _champ=pcChampSplit(p);   // [2026-09] 종결달/현재월 챔피언 분리
   // 딱지
   var D=window.__liveD||window.__D;
   var tags=''; if(D&&D.newbie&&D.newbie[name])tags+='<span class="pc-tags">🌱</span>';
@@ -1128,7 +1146,7 @@ function openCard(name){
     +'<div class="pc-st"><div class="l">최고의 달</div><div class="v">'+(best.m?PC_MON[best.m]+' '+pcEok(best.sales):'-')+'</div></div>'
     +'</div>'
     +'<div class="pc-subst"><span>커리어하이 <b>'+pcEok(p.careerHigh)+'</b></span>'+(highCount?'<span>신기록 경신 <b>'+highCount+'회</b></span>':'')
-    +(p.champMonths&&p.champMonths.length?'<span>챔피언 <b>'+p.champMonths.length+'회</b></span>':'')+'</div>'
+    +(_champ.done.length?'<span>챔피언 <b>'+_champ.done.length+'회</b></span>':'')+(_champ.cur?'<span>이달 1등 <b>ING</b></span>':'')+'</div>'
     +'<div class="pc-trend"><div class="pc-sec-t" style="padding:2px 6px">📈 연간 추이 <span style="font-weight:600;color:#B6C2DC">·'+PC_MON[closedM]+'까지</span></div>'
       +'<div class="pc-tabs"><button class="pc-tab on" onclick="pcSwitchTrend(\'sales\',this)">매출</button><button class="pc-tab" onclick="pcSwitchTrend(\'set\',this)">세팅</button></div>'
       +'<div id="pcTrendWrap">'+pcTrendSvg(p.series,closedM,'sales')+'</div>'
