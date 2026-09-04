@@ -56,6 +56,9 @@ td.nm{font-weight:700}td.dt{text-align:right;color:var(--soft);font-variant-nume
 .subcnt{color:#B6C2DC;font-weight:600;margin-left:3px}
 .sublead{color:#7048E8;font-weight:700;font-size:11px;margin-left:4px}
 .bg-new{background:#E6F7EE;color:#20A56D;font-size:10px;font-weight:800;padding:1px 6px;border-radius:6px;margin-left:5px}
+.bg-role{background:#F0F2F7;color:#6B7688;font-size:10px;font-weight:800;padding:1px 6px;border-radius:6px;margin-left:5px}
+.bg-role.pp{background:#EFE9FD;color:#6741D9}
+.groledet{color:#B6C2DC;font-size:11px;font-weight:600;margin-left:5px}
 .bg-out{background:#FBE9E7;color:#E23A22;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:5px}
 .mrow.out{opacity:.5}
 .mrow.out .mnm{text-decoration:line-through;color:#8A94A6}
@@ -159,7 +162,7 @@ var SUB_LEAD = {
 };
 // 팀 라벨 (A → 코칭A)
 var TEAMLABEL = {
-  '코칭': function(t){ return t==='미구분'?'미구분':'코칭'+t; }
+  '코칭': function(t){ return t==='미구분'?'운영지원':'코칭'+t; }
 };
 
 var SHEETS = [
@@ -245,6 +248,14 @@ async function boot(){
   render(results[0].key);
 }
 
+// 운영지원 역할 태그 (특이사항 → 뱃지)
+function roleTags(note){
+  var s=String(note||''), u=s.toUpperCase(), out=[];
+  if(s.indexOf('출첵')>=0) out.push('출첵');
+  if(s.indexOf('개통')>=0 || u.indexOf('A/S')>=0) out.push('개통AS');
+  return out;
+}
+
 function render(key){
   var g=STATE[key]; var arr=g.members.slice();
   var wonMap = WONJANG[key] || {};
@@ -263,9 +274,11 @@ function render(key){
     var badge = '';
     if(x.isOut) badge = '<span class="bg-out">퇴사</span>';
     else if(x.isNew) badge = '<span class="bg-new">NEW</span>';
+    var roleHtml = (key==='코칭' && (x.sub||'')==='미구분' && !x.isOut)
+      ? roleTags(x.note).map(function(t){ return '<span class="bg-role'+(t==='개통AS'?' pp':'')+'">'+t+'</span>'; }).join('') : '';
     var cls = x.isOut ? 'mrow out' : 'mrow';
     var dt = x.isOut ? (x.outYm+' 퇴사') : x.in;
-    return '<div class="'+cls+'"><span class="mnm">'+x.name+noteHtml+badge+'</span>'+rankHtml+'<span class="mdt">'+dt+'</span></div>';
+    return '<div class="'+cls+'"><span class="mnm">'+x.name+noteHtml+roleHtml+badge+'</span>'+rankHtml+'<span class="mdt">'+dt+'</span></div>';
   }
 
   var h='<div class="grid">';
@@ -306,9 +319,16 @@ function render(key){
       var mem=groups[sub];
       mem.sort(function(a,b){ if(a.isOut!==b.isOut)return a.isOut?1:-1; return (a.in||'')<(b.in||'')?-1:1; });
       var label = teamLabelFn(sub);
+      var roleDet='';
+      if(key==='코칭' && sub==='미구분'){
+        var _cc=0,_as=0;
+        mem.forEach(function(m){ if(m.isOut)return; var _t=roleTags(m.note); if(_t.indexOf('출첵')>=0)_cc++; if(_t.indexOf('개통AS')>=0)_as++; });
+        var _p=[]; if(_cc)_p.push('출첵'+_cc); if(_as)_p.push('개통AS'+_as);
+        if(_p.length) roleDet='<span class="groledet">· '+_p.join('·')+'</span>';
+      }
       var won = wonMap[sub];
       var wonHtml = won ? '<span class="c-won">원장 '+won+'</span>' : '';
-      h+='<div class="gcard"><div class="ghd"><span class="gnm">'+label+'</span>'+wonHtml+'<span class="gcnt">'+mem.filter(function(m){return !m.isOut;}).length+'</span></div><div class="gbody">';
+      h+='<div class="gcard"><div class="ghd"><span class="gnm">'+label+'</span>'+roleDet+wonHtml+'<span class="gcnt">'+mem.filter(function(m){return !m.isOut;}).length+'</span></div><div class="gbody">';
       mem.forEach(function(x){ h+=memRow(x); });
       h+='</div></div>';
     });
