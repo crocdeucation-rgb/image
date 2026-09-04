@@ -803,8 +803,18 @@ function renderClutch(){
   var s=document.getElementById('d_clutch_sang'), p=document.getElementById('d_clutch_saup');
   if(s)s.innerHTML=clutchRows(c.sang);
   if(p)p.innerHTML=clutchRows(c.saup);
+  // [2026-09] 클러치 이름(.drnm)은 렌더마다 새로 그려져 기존 클릭 바인딩이 사라진다 → 재부착.
+  //   personCards가 아직 없으면 attachCardClicks가 조기 return 하므로 지연 재시도까지 포함.
+  pcReattach();
 }
-window.clPeriod=function(cl,btn){ window.__cl=cl; document.querySelectorAll('.dtogbtn[data-cl]').forEach(function(b){b.classList.remove('on');}); btn.classList.add('on'); renderClutch(); };
+/* 이름 클릭 재부착 — 즉시 + 지연(개인카드 데이터 늦게 도착 대비) */
+function pcReattach(){
+  // attachCardClicks는 아래쪽 <script>에서 정의된다 → 없으면 지연 호출로만 처리.
+  if(window.attachCardClicks) window.attachCardClicks();
+  setTimeout(function(){ if(window.attachCardClicks) window.attachCardClicks(); }, 400);
+}
+window.pcReattach=pcReattach;
+window.clPeriod=function(cl,btn){ window.__cl=cl; document.querySelectorAll('.dtogbtn[data-cl]').forEach(function(b){b.classList.remove('on');}); btn.classList.add('on'); renderClutch(); pcReattach(); };
 window.__monthCache = {};   // [2026-09] 월별 데이터 캐시 — 재클릭 시 fetch 안 하고 즉시 렌더
 async function loadMonth(key){
   try{
