@@ -309,6 +309,7 @@ body.is-live .closed-only{display:none !important}
 .trp.tteok{background:#FFEEE6;border-color:#FBC9AE;color:#C4501A}
 .trp.career{background:#EAF7F0;border-color:#B4E0C8;color:#1B7A4A}
 .trp.team{background:#EEF0FF;border-color:#C5CDF5;color:#3B4F9E}
+.trp.blue{background:linear-gradient(135deg,#e8f0ff,#d4e4ff);color:#1D4ED8;border-color:#93B4E8}
 .pc-social{border-top:1px solid #E3E8F0;padding:13px 18px 16px;background:#FAFBFD}
 .pc-react{display:flex;align-items:center;gap:16px;margin-bottom:12px}
 .pc-like{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;font-weight:800;color:#6B7688;background:none;border:none;font-family:inherit}
@@ -971,16 +972,7 @@ var ALLOW_NAME={
   'mjhsingle@gmail.com':{name:'문정현',rank:'주임'},
   'qkfka3090@gmail.com':{name:'이승엽',rank:'주임'},
   'ggh0305@gmail.com':{name:'고국희',rank:'사원'},
-  'ahlee.sep@gmail.com':{name:'이아현',rank:'사원'},
-  'xpxmfltm5678@gmail.com':{name:'윤지환',rank:'주임'},
-  'alsk102qpwoal@gmail.com':{name:'김준수',rank:'주임'},
-  'minsung32383238@gmail.com':{name:'김민성',rank:'주임'},
-  'happy1004elle@gmail.com':{name:'김예원',rank:'주임'},
-  'gh3541@gmail.com':{name:'박건휘',rank:'대리'},
-  'ghtn1346@gmail.com':{name:'김예림',rank:'주임'},
-  'uss20182@gmail.com':{name:'이태희',rank:'주임'},
-  'dltjrgjs56@gmail.com':{name:'이석헌',rank:'주임'},
-  'hr3213@gmail.com':{name:'이상민',rank:'주임'}
+  'ahlee.sep@gmail.com':{name:'이아현',rank:'사원'}
 };
 _fauth.onAuthStateChanged(function(u){
   if(u && ALLOW_NAME[u.email]){ _me={email:u.email, name:ALLOW_NAME[u.email].name, rank:ALLOW_NAME[u.email].rank}; }
@@ -1099,7 +1091,7 @@ var PC_TIER_SANG=[{t:'SSS',v:40000000},{t:'SS',v:35000000},{t:'S',v:30000000},{t
 var PC_TIER_SAUP=[{t:'SSS',v:90000000},{t:'SS',v:80000000},{t:'S',v:70000000},{t:'A',v:60000000},{t:'B',v:50000000},{t:'C',v:40000000},{t:'D',v:30000000},{t:'E',v:20000000},{t:'F',v:15000000}];
 function pcTierOf(s,useF){var T=useF?PC_TIER_SAUP:PC_TIER_SANG;for(var i=0;i<T.length;i++){if(s>=T[i].v)return T[i].t;}return 'F';}
 function pcNextTier(s,useF){var T=useF?PC_TIER_SAUP:PC_TIER_SANG;for(var i=T.length-1;i>=0;i--){if(s<T[i].v)return {t:T[i].t,need:T[i].v-s,base:(i<T.length-1?T[i+1].v:0),to:T[i].v};}return null;}
-var PC_TROPHY={'MVP':{ic:'🏆',cls:'mvp',lbl:'MVP'},'떡상왕':{ic:'🚀',cls:'tteok',lbl:'떡상왕'},'커리어하이':{ic:'🎖️',cls:'career',lbl:'커리어하이'},'최고의지점':{ic:'🥇',cls:'team',lbl:'최고의지점'}};
+var PC_TROPHY={'MVP':{ic:'🏆',cls:'mvp',lbl:'MVP'},'블루리본':{ic:'🎗️',cls:'blue',lbl:'블루리본'},'떡상왕':{ic:'🚀',cls:'tteok',lbl:'떡상왕'},'커리어하이':{ic:'🎖️',cls:'career',lbl:'커리어하이'},'최고의지점':{ic:'🥇',cls:'team',lbl:'최고의지점'}};
 var PC_MON=['','1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
 function pcWon(n){return (n||0).toLocaleString('ko-KR');}
 function pcEok(n){n=n||0;if(n>=100000000){var e=n/100000000;return (e%1===0?e.toFixed(0):e.toFixed(2))+'억';}if(n>=10000){var m=n/10000;return (m%1===0?String(m):Math.round(m))+'만';}return pcWon(n);}
@@ -1229,7 +1221,7 @@ function openCard(name){
   var tier=closedSales>0?pcTierOf(closedSales,useF):'NEW';
   // 트로피
   var hof=(window.__HOF&&window.__HOF[name])||[];
-  var order={'MVP':0,'떡상왕':1,'커리어하이':2,'최고의지점':3};
+  var order={'MVP':0,'블루리본':1,'떡상왕':2,'커리어하이':3,'최고의지점':4};
   var trs=hof.slice().sort(function(a,b){if(order[a.type]!==order[b.type])return order[a.type]-order[b.type];return b.m.localeCompare(a.m);});
   // 최고의달
   var best={m:0,sales:0}; (p.series||[]).forEach(function(x){if(x.sales!=null&&x.sales>best.sales)best={m:x.m,sales:x.sales};});
@@ -1359,7 +1351,7 @@ function nameBadges(name){
   var d=new Date(), y=d.getFullYear(), pm=d.getMonth();  // getMonth()는 0-based라 그 값이 곧 직전달(1-based)
   if(pm===0){ y-=1; pm=12; }                             // 1월이면 전년 12월
   var closed=y+'-'+('0'+pm).slice(-2);
-  var icons={'MVP':'🏆','떡상왕':'🚀','커리어하이':'🎖️','최고의지점':'🥇'};
+  var icons={'MVP':'🏆','블루리본':'🎗️','떡상왕':'🚀','커리어하이':'🎖️','최고의지점':'🥇'};
   var out=[];
   hof.filter(function(t){return t.type==='MVP';}).sort(function(a,b){return a.m.localeCompare(b.m);})
      .forEach(function(t){out.push('🏆'+parseInt(t.m.slice(5),10));});
