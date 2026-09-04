@@ -1052,14 +1052,11 @@ function pcBadges(p,closedM){
   if(D&&D.newbie&&D.newbie[p.name]) b.push({cls:'new',i:'🌱',t:'새싹'});
   if(s.length>=2 && s[s.length-1].sales>s[s.length-2].sales) b.push({cls:'up',i:'🔥',t:'상승중'});
   if(ch>0 && lastSales>=ch*0.9 && lastSales<ch) b.push({cls:'near',i:'🎯',t:'커하 근접'});
-  // [2026-09] 챔피언 분리 — 종결달 1위만 '챔피언'(HOF MVP 트로피와 일치),
-  //   현재월(진행중) 1위는 '이달 1등 ING'로 별도 표기.
+  // [2026-09] 종결달 1위는 MVP 트로피(🏆)와 동일 정보라 뱃지에서 제외.
+  //   아직 트로피가 없는 '진행중인 현재월 1위'만 별도 표기.
   var curM = new Date().getMonth()+1;
   var champs = p.champMonths || [];
-  var doneChamps = champs.filter(function(m){return m !== curM;});
-  var isCurLeader = champs.indexOf(curM) >= 0;
-  if(doneChamps.length) b.push({cls:'champ',i:'⚡',t:'챔피언 '+doneChamps.length});
-  if(isCurLeader) b.push({cls:'leading',i:'🔥',t:'이달 1등 ING'});
+  if(champs.indexOf(curM) >= 0) b.push({cls:'leading',i:'🔥',t:'이달 1등 ING'});
   if(isSlump) b.push({cls:'slump',i:'💜',t:'리즈 보유'});
   return b;
 }
@@ -1122,7 +1119,6 @@ function openCard(name){
       if(s.sales>runMax) runMax=s.sales;
     }
   });
-  var _champ=pcChampSplit(p);   // [2026-09] 종결달/현재월 챔피언 분리
   // 딱지
   var D=window.__liveD||window.__D;
   var tags=''; if(D&&D.newbie&&D.newbie[name])tags+='<span class="pc-tags">🌱</span>';
@@ -1151,7 +1147,7 @@ function openCard(name){
     +'<div class="pc-st"><div class="l">최고의 달</div><div class="v">'+(best.m?PC_MON[best.m]+' '+pcEok(best.sales):'-')+'</div></div>'
     +'</div>'
     +'<div class="pc-subst"><span>커리어하이 <b>'+pcEok(p.careerHigh)+'</b></span>'+(highCount?'<span>신기록 경신 <b>'+highCount+'회</b></span>':'')
-    +(_champ.done.length?'<span>챔피언 <b>'+_champ.done.length+'회</b></span>':'')+(_champ.cur?'<span>이달 1등 <b>ING</b></span>':'')+'</div>'
+    +'</div>'
     +'<div class="pc-trend"><div class="pc-sec-t" style="padding:2px 6px">📈 연간 추이 <span style="font-weight:600;color:#B6C2DC">·'+PC_MON[closedM]+'까지</span></div>'
       +'<div class="pc-tabs"><button class="pc-tab on" onclick="pcSwitchTrend(\'sales\',this)">매출</button><button class="pc-tab" onclick="pcSwitchTrend(\'set\',this)">세팅</button></div>'
       +'<div id="pcTrendWrap">'+pcTrendSvg(p.series,closedM,'sales')+'</div>'
