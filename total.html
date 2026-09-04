@@ -298,6 +298,79 @@ body.is-live .closed-only{display:none !important}
 .pc-next.max .pc-next-fill{background:linear-gradient(90deg,#E9A100,#FFCB2E)}
 .pc-badges{display:flex;flex-wrap:wrap;gap:6px}
 .bgd{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;background:#EDF1F8;color:#1B2436}
+/* ── ⚔️ 비교(VERSUS) ── */
+.pc-cmpbtn{margin:2px 18px 16px;display:flex;align-items:center;justify-content:center;gap:7px;width:calc(100% - 36px);padding:12px;border:none;border-radius:13px;background:linear-gradient(135deg,#1B2436,#2B3A55);color:#fff;font-size:13px;font-weight:900;font-family:inherit;cursor:pointer;letter-spacing:-.3px;box-shadow:0 4px 14px rgba(27,36,54,.25)}
+.pc-cmpbtn:active{transform:scale(.98)}
+.vs-bg{position:fixed;inset:0;background:rgba(10,14,24,.72);backdrop-filter:blur(4px);z-index:9999;display:none;align-items:flex-start;justify-content:center;padding:20px 12px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.vs-bg.on{display:flex}
+.vs-wrap{width:820px;max-width:100%;margin:auto 0}
+.vs-close{position:sticky;top:0;z-index:30;width:34px;height:34px;margin:0 0 -6px auto;border-radius:50%;background:rgba(27,36,54,.6);border:1px solid rgba(255,255,255,.4);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+/* 상단 두 카드 헤더 */
+.vs-heads{display:grid;grid-template-columns:1fr 46px 1fr;gap:0;align-items:stretch}
+.vs-mini{border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 12px 34px rgba(10,14,24,.4);transition:transform .32s cubic-bezier(.2,.9,.3,1.2)}
+.vs-mini.slideL{transform:translateX(-6px)}
+.vs-mh{padding:16px 14px 13px;position:relative;overflow:hidden}
+.vs-mh.t-A,.vs-mh.t-B{background:linear-gradient(135deg,#4C6EF5,#5C7CFA)}
+.vs-mh.t-C,.vs-mh.t-D,.vs-mh.t-E,.vs-mh.t-F{background:linear-gradient(135deg,#7A8699,#95A0B2)}
+.vs-mh.t-S{background:linear-gradient(135deg,#7048E8,#4C6EF5)}
+.vs-mh.t-SS{background:linear-gradient(135deg,#8B3DE8,#5A3AE0)}
+.vs-mh.t-SSS{background:linear-gradient(120deg,#3A1D8A,#7048E8 35%,#E9A100 68%,#7048E8 100%);background-size:220% 220%;animation:holo 6s ease infinite}
+.vs-mh.t-NEW{background:linear-gradient(135deg,#1BA97A,#20C997)}
+.vs-mh::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:20px 20px;pointer-events:none}
+.vs-mav{width:46px;height:46px;border-radius:13px;background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#fff;margin-bottom:8px}
+.vs-mnm{font-size:17px;font-weight:900;color:#fff;letter-spacing:-.4px}
+.vs-mmeta{font-size:10.5px;color:rgba(255,255,255,.85);font-weight:600;margin-top:2px}
+.vs-mtier{position:absolute;top:14px;right:14px;text-align:center}
+.vs-mtier .b{font-size:22px;font-weight:900;color:#fff;line-height:1}
+.vs-mtier .l{font-size:7.5px;color:rgba(255,255,255,.75);font-weight:800;letter-spacing:1px}
+.vs-swords{display:flex;align-items:center;justify-content:center;font-size:22px}
+/* 빈 슬롯 */
+.vs-empty{border:2.5px dashed #C4CEDE;border-radius:16px;background:rgba(255,255,255,.04);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:150px;cursor:pointer;color:#8A97AC;gap:6px}
+.vs-empty .plus{width:52px;height:52px;border-radius:50%;border:2.5px solid #C4CEDE;display:flex;align-items:center;justify-content:center;font-size:30px;color:#8A97AC;font-weight:300}
+.vs-empty .et{font-size:12px;font-weight:800}
+/* 검색 패널 */
+.vs-search{background:#fff;border-radius:16px;padding:14px;box-shadow:0 12px 34px rgba(10,14,24,.4);min-height:150px}
+.vs-search input{width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid #DCE3EE;border-radius:10px;font-size:13px;font-family:inherit;outline:none;margin-bottom:10px}
+.vs-search input:focus{border-color:#7048E8}
+.vs-list{max-height:230px;overflow-y:auto;display:flex;flex-direction:column;gap:3px}
+.vs-opt{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:700;color:#1B2436}
+.vs-opt:hover{background:#F2F5FA}
+.vs-opt .t{font-size:10px;color:#8A97AC;font-weight:600}
+.vs-opt .s{font-size:11px;font-weight:800;color:#7048E8}
+/* 대결 본문 */
+.vs-body{background:#fff;border-radius:16px;margin-top:12px;overflow:hidden;box-shadow:0 12px 34px rgba(10,14,24,.35)}
+.vs-score{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:16px;background:linear-gradient(135deg,#0F1626,#1E2C48);color:#fff}
+.vs-score .sc{font-size:34px;font-weight:900;text-align:center;letter-spacing:-1px}
+.vs-score .sc.win{color:#FFCB2E}
+.vs-score .nm{font-size:13px;font-weight:800;text-align:center;opacity:.9}
+.vs-score .mid{padding:0 14px;font-size:12px;font-weight:800;color:#8FA0BE;text-align:center}
+.vs-champ{padding:11px;text-align:center;font-size:13px;font-weight:900;color:#fff;background:linear-gradient(135deg,#7048E8,#4C6EF5)}
+.vs-champ.tie{background:linear-gradient(135deg,#7A8699,#95A0B2)}
+.vs-row{padding:11px 16px;border-bottom:1px solid #EEF2F7}
+.vs-rt{font-size:10.5px;font-weight:800;color:#8A97AC;text-align:center;margin-bottom:7px;letter-spacing:.3px}
+.vs-gg{display:grid;grid-template-columns:1fr 20px 1fr;align-items:center;gap:8px}
+.vs-val{font-size:13px;font-weight:900;color:#1B2436}
+.vs-val.l{text-align:right}
+.vs-val.r{text-align:left}
+.vs-val.lose{color:#B6C2DC}
+.vs-bar{height:9px;border-radius:5px;background:#EDF1F8;overflow:hidden;position:relative}
+.vs-bar .f{position:absolute;top:0;bottom:0;background:linear-gradient(90deg,#4C6EF5,#7048E8);border-radius:5px}
+.vs-bar.l .f{right:0}.vs-bar.r .f{left:0}
+.vs-bar.win .f{background:linear-gradient(90deg,#E9A100,#FFCB2E)}
+.vs-wc{font-size:11px;text-align:center;color:#C4CEDE;font-weight:800}
+.vs-wc.on{color:#E9A100}
+/* 월별 미니 대결 */
+.vs-months{padding:12px 16px 16px}
+.vs-mrow{display:grid;grid-template-columns:30px 1fr 20px 1fr;align-items:center;gap:7px;padding:4px 0;font-size:11px}
+.vs-mrow .mo{font-weight:800;color:#6B7688}
+.vs-mrow .v{font-weight:800}
+.vs-mrow .v.l{text-align:right}.vs-mrow .v.r{text-align:left}
+.vs-mrow .v.w{color:#E9A100}
+.vs-mrow .v.d{color:#C4CEDE}
+.vs-mrow .sw{text-align:center;font-size:10px}
+@media(max-width:560px){
+  .vs-mnm{font-size:15px}.vs-score .sc{font-size:28px}.vs-mav{width:40px;height:40px;font-size:17px}
+}
 .bgd .i{font-size:12px}
 .bgd.new{background:#EAF7F0;color:#1B7A4A}
 .bgd.crown{background:#FFF6E0;color:#9A7300}
@@ -977,6 +1050,13 @@ window.loadMonth = loadMonth;
   <div class="pcard" id="pcBody"></div>
 </div>
 
+<div class="vs-bg" id="vsModal" onclick="if(event.target===this)closeVersus()">
+  <div class="vs-wrap">
+    <button class="vs-close" onclick="closeVersus()">✕</button>
+    <div id="vsInner"></div>
+  </div>
+</div>
+
 
 <!-- ②-b  </body> 앞에 붙일 SCRIPT (Firebase SDK 포함) ──────────── -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -1435,6 +1515,7 @@ function openCard(name){
     +nextHtml
     +'<div class="pc-sec"><div class="pc-sec-t">🏅 뱃지</div><div class="pc-badges">'+bgHtml+'</div></div>'
     +trHtml
+    +(useF?'':'<button class="pc-cmpbtn" onclick="openVersus(\''+name.replace(/'/g,"")+'\')">⚔️ 다른 선수와 비교하기</button>')
     +'<div class="pc-social" id="pcSocial"></div>';
   document.getElementById('pcBody').innerHTML=html;
   window.__pcTrendMode='sales';
@@ -1445,6 +1526,148 @@ function openCard(name){
   document.body.style.overflow='hidden';
 }
 function closeCard(){ document.getElementById('pcModal').classList.remove('on'); try{ parent.postMessage({t:'cardClose'}, '*'); }catch(e){} document.body.style.overflow=''; window.__curCardName=null; if(window.__likeUnsub){window.__likeUnsub();window.__likeUnsub=null;} if(window.__cmtUnsub){window.__cmtUnsub();window.__cmtUnsub=null;} pcRestoreScroll(); }
+
+/* ══════ ⚔️ 비교(VERSUS) — 상담부 카드끼리 시즌 대결 ══════ */
+window.__vsLeft=null;   // 왼쪽(내) 카드 이름
+window.__vsRight=null;  // 오른쪽(상대) 이름
+/* 사람의 대결용 스탯 뽑기 */
+function vsStats(name){
+  var f=pcFind(name); if(!f) return null;
+  var p=f.p, useF=f.useF, closedM=pcClosedMonth();
+  var monthly={}; (p.series||[]).forEach(function(x){ if(x.m<=closedM && x.sales!=null) monthly[x.m]=x.sales; });
+  var closedSales=monthly[closedM]||0;
+  var hof=(window.__HOF&&window.__HOF[name])||[];
+  var trophy=hof.length;
+  var mvp=hof.filter(function(x){return x.type==='MVP';}).length;
+  return {
+    name:name, useF:useF, team:p.team||'', rank:p.rank||'',
+    tier:closedSales>0?pcTierOf(closedSales,useF):'NEW',
+    monthly:monthly, total:p.total||0, careerHigh:p.careerHigh||0,
+    trophy:trophy, mvp:mvp, closedSales:closedSales
+  };
+}
+/* 비교 진입 — 내 카드에서 호출 */
+window.openVersus=function(name){
+  window.__vsLeft=name; window.__vsRight=null;
+  closeCard();
+  document.getElementById('vsModal').classList.add('on');
+  document.body.style.overflow='hidden';
+  renderVersus();
+};
+window.closeVersus=function(){
+  document.getElementById('vsModal').classList.remove('on');
+  document.body.style.overflow='';
+  window.__vsLeft=null; window.__vsRight=null;
+};
+/* 미니 카드 헤더 HTML */
+function vsMiniHead(st, slide){
+  return '<div class="vs-mini'+(slide?' slideL':'')+'"><div class="vs-mh t-'+st.tier+'">'
+    +'<div class="vs-mtier"><div class="b">'+st.tier+'</div><div class="l">TIER</div></div>'
+    +'<div class="vs-mav">'+st.name.charAt(0)+'</div>'
+    +'<div class="vs-mnm">'+st.name+'</div>'
+    +'<div class="vs-mmeta">'+(st.rank?st.rank+' · ':'')+(st.team||'소속 미정')+'</div>'
+    +'</div></div>';
+}
+/* 상대 선택 빈 슬롯 */
+function vsEmptySlot(){
+  return '<div class="vs-search" id="vsSearch">'
+    +'<input id="vsQuery" placeholder="이름 검색..." oninput="vsFilterList(this.value)" autocomplete="off">'
+    +'<div class="vs-list" id="vsOptList"></div></div>';
+}
+/* 상담부 전체 후보 리스트 (본인·이미 선택 제외) */
+function vsCandidates(){
+  var D=window.__liveD||window.__D; if(!D||!D.personCards) return [];
+  var arr=(D.personCards.sang||[]).slice();
+  arr.sort(function(a,b){return (b.total||0)-(a.total||0);});
+  return arr.filter(function(x){ return x.name!==window.__vsLeft; });
+}
+window.vsFilterList=function(q){
+  q=(q||'').trim();
+  var box=document.getElementById('vsOptList'); if(!box) return;
+  var list=vsCandidates().filter(function(x){ return !q || x.name.indexOf(q)>=0 || (x.team||'').indexOf(q)>=0; });
+  if(!list.length){ box.innerHTML='<div style="padding:12px;text-align:center;font-size:12px;color:#8A97AC">검색 결과 없음</div>'; return; }
+  box.innerHTML=list.slice(0,40).map(function(x){
+    return '<div class="vs-opt" onclick="vsPick(\''+x.name.replace(/'/g,"")+'\')"><span><b>'+x.name+'</b> <span class="t">'+(x.team||'')+'</span></span><span class="s">'+pcEok(x.total||0)+'</span></div>';
+  }).join('');
+};
+window.vsPick=function(name){ window.__vsRight=name; renderVersus(); };
+/* 게이지 한 줄 (높은 쪽 하이라이트) */
+function vsGauge(label, lv, rv, fmt){
+  var mx=Math.max(lv,rv,1);
+  var lw=Math.round(lv/mx*100), rw=Math.round(rv/mx*100);
+  var lWin=lv>rv, rWin=rv>lv, tie=(lv===rv);
+  var f=fmt||function(v){return pcEok(v);};
+  return '<div class="vs-row"><div class="vs-rt">'+label+'</div><div class="vs-gg">'
+    +'<div class="vs-val l'+(lWin?'':' lose')+'">'+f(lv)+'</div>'
+    +'<div class="vs-wc'+(lWin?' on':'')+'">'+(lWin?'◀':'')+'</div>'
+    +'<div class="vs-val r'+(rWin?'':' lose')+'">'+f(rv)+'</div>'
+    +'</div>'
+    +'<div class="vs-gg" style="margin-top:5px">'
+    +'<div class="vs-bar l'+(lWin?' win':'')+'"><div class="f" style="width:'+lw+'%"></div></div>'
+    +'<div></div>'
+    +'<div class="vs-bar r'+(rWin?' win':'')+'"><div class="f" style="width:'+rw+'%"></div></div>'
+    +'</div></div>';
+}
+/* 메인 렌더 */
+function renderVersus(){
+  var L=vsStats(window.__vsLeft);
+  var el=document.getElementById('vsInner');
+  if(!L){ el.innerHTML='<div style="color:#fff;text-align:center;padding:40px">카드를 불러올 수 없습니다.</div>'; return; }
+  // 상대 미선택 → 왼쪽카드 + 빈슬롯
+  if(!window.__vsRight){
+    el.innerHTML='<div class="vs-heads">'
+      + vsMiniHead(L,true)
+      + '<div class="vs-swords">⚔️</div>'
+      + vsEmptySlot()
+      + '</div>';
+    vsFilterList('');
+    setTimeout(function(){ var q=document.getElementById('vsQuery'); if(q)q.focus(); },100);
+    return;
+  }
+  var R=vsStats(window.__vsRight);
+  if(!R){ window.__vsRight=null; renderVersus(); return; }
+  // 월별 대결 (1~closedM, 둘 중 하나라도 값 있는 달만)
+  var cm=pcClosedMonth(); var mrows=''; var lScore=0,rScore=0;
+  for(var m=1;m<=cm;m++){
+    var lv=L.monthly[m], rv=R.monthly[m];
+    if(lv==null && rv==null) continue;
+    lv=lv||0; rv=rv||0;
+    var lw=lv>rv, rw=rv>lv;
+    if(lw)lScore++; if(rw)rScore++;
+    mrows+='<div class="vs-mrow"><span class="mo">'+PC_MON[m]+'</span>'
+      +'<span class="v l '+(lw?'w':(lv?'':'d'))+'">'+(lv?pcEok(lv):'-')+'</span>'
+      +'<span class="sw">'+(lw?'◀':(rw?'▶':'·'))+'</span>'
+      +'<span class="v r '+(rw?'w':(rv?'':'d'))+'">'+(rv?pcEok(rv):'-')+'</span></div>';
+  }
+  // 종합 승자 = 월별 승수 우선, 동률이면 누적매출
+  var champ, champTie=false;
+  if(lScore>rScore) champ=L.name;
+  else if(rScore>lScore) champ=R.name;
+  else { if(L.total>R.total)champ=L.name; else if(R.total>L.total)champ=R.name; else {champ=null;champTie=true;} }
+  var html='<div class="vs-heads">'
+    + vsMiniHead(L,false)
+    + '<div class="vs-swords">⚔️</div>'
+    + vsMiniHead(R,false)
+    + '</div>';
+  html+='<div class="vs-body">';
+  // 시즌 스코어
+  html+='<div class="vs-score">'
+    +'<div><div class="sc'+(lScore>rScore?' win':'')+'">'+lScore+'</div><div class="nm">'+L.name+'</div></div>'
+    +'<div class="mid">월별<br>시즌 스코어</div>'
+    +'<div><div class="sc'+(rScore>lScore?' win':'')+'">'+rScore+'</div><div class="nm">'+R.name+'</div></div></div>';
+  // 종합 승자
+  html+='<div class="vs-champ'+(champTie?' tie':'')+'">'+(champTie?'🤝 종합 무승부':('🏆 종합 '+champ+' 승'))+'</div>';
+  // 게이지 대결
+  html+=vsGauge('올해 누적매출', L.total, R.total);
+  html+=vsGauge('커리어하이', L.careerHigh, R.careerHigh);
+  html+=vsGauge('이달 매출', L.closedSales, R.closedSales);
+  html+=vsGauge('트로피 수', L.trophy, R.trophy, function(v){return v+'개';});
+  html+=vsGauge('명예의전당 MVP', L.mvp, R.mvp, function(v){return v+'회';});
+  // 월별 상세
+  html+='<div class="vs-months"><div class="vs-rt" style="margin-bottom:8px">📅 월별 매출 대결</div>'+mrows+'</div>';
+  html+='</div>';
+  el.innerHTML=html;
+}
 
 /* ── 소셜(좋아요·댓글) 렌더 + Firestore 실시간 ── */
 function renderSocial(name){
