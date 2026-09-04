@@ -310,6 +310,10 @@ body.is-live .closed-only{display:none !important}
 .trp.career{background:#EAF7F0;border-color:#B4E0C8;color:#1B7A4A}
 .trp.team{background:#EEF0FF;border-color:#C5CDF5;color:#3B4F9E}
 .trp.blue{background:linear-gradient(135deg,#e8f0ff,#d4e4ff);color:#1D4ED8;border-color:#93B4E8}
+.trp.master{background:linear-gradient(135deg,#dbe4ff,#b8caff);color:#1E3A8A;border-color:#5B7FD4;box-shadow:0 2px 8px rgba(30,58,138,.18)}
+.trp.grand{background:linear-gradient(135deg,#c7d6ff,#9fb8f5);color:#152C6B;border:1.5px solid #D4AF37;box-shadow:0 2px 10px rgba(21,44,107,.22)}
+.trp.royal{background:linear-gradient(120deg,#1E3A8A,#4C6EF5 35%,#7048E8 60%,#D4AF37 100%);background-size:220% 220%;animation:ribHolo 6s ease infinite;color:#fff;border:1.5px solid #D4AF37;box-shadow:0 3px 14px rgba(112,72,232,.35)}
+@keyframes ribHolo{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 .pc-social{border-top:1px solid #E3E8F0;padding:13px 18px 16px;background:#FAFBFD}
 .pc-react{display:flex;align-items:center;gap:16px;margin-bottom:12px}
 .pc-like{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;font-weight:800;color:#6B7688;background:none;border:none;font-family:inherit}
@@ -1108,7 +1112,7 @@ var PC_TIER_SANG=[{t:'SSS',v:40000000},{t:'SS',v:35000000},{t:'S',v:30000000},{t
 var PC_TIER_SAUP=[{t:'SSS',v:90000000},{t:'SS',v:80000000},{t:'S',v:70000000},{t:'A',v:60000000},{t:'B',v:50000000},{t:'C',v:40000000},{t:'D',v:30000000},{t:'E',v:20000000},{t:'F',v:15000000}];
 function pcTierOf(s,useF){var T=useF?PC_TIER_SAUP:PC_TIER_SANG;for(var i=0;i<T.length;i++){if(s>=T[i].v)return T[i].t;}return 'F';}
 function pcNextTier(s,useF){var T=useF?PC_TIER_SAUP:PC_TIER_SANG;for(var i=T.length-1;i>=0;i--){if(s<T[i].v)return {t:T[i].t,need:T[i].v-s,base:(i<T.length-1?T[i+1].v:0),to:T[i].v};}return null;}
-var PC_TROPHY={'MVP':{ic:'🏆',cls:'mvp',lbl:'MVP'},'블루리본':{ic:'🎗️',cls:'blue',lbl:'블루리본'},'떡상왕':{ic:'🚀',cls:'tteok',lbl:'떡상왕'},'커리어하이':{ic:'🎖️',cls:'career',lbl:'커리어하이'},'최고의지점':{ic:'🥇',cls:'team',lbl:'최고의지점'}};
+var PC_TROPHY={'MVP':{ic:'🏆',cls:'mvp',lbl:'MVP'},'블루리본':{ic:'🎗️',cls:'blue',lbl:'블루리본'},'마스터리본':{ic:'🔷',cls:'master',lbl:'마스터리본'},'그랜드리본':{ic:'💠',cls:'grand',lbl:'그랜드리본'},'로얄리본':{ic:'👑',cls:'royal',lbl:'로얄리본'},'떡상왕':{ic:'🚀',cls:'tteok',lbl:'떡상왕'},'커리어하이':{ic:'🎖️',cls:'career',lbl:'커리어하이'},'최고의지점':{ic:'🥇',cls:'team',lbl:'최고의지점'}};
 var PC_MON=['','1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
 function pcWon(n){return (n||0).toLocaleString('ko-KR');}
 function pcEok(n){n=n||0;if(n>=100000000){var e=n/100000000;return (e%1===0?e.toFixed(0):e.toFixed(2))+'억';}if(n>=10000){var m=n/10000;return (m%1===0?String(m):Math.round(m))+'만';}return pcWon(n);}
@@ -1238,7 +1242,7 @@ function openCard(name){
   var tier=closedSales>0?pcTierOf(closedSales,useF):'NEW';
   // 트로피
   var hof=(window.__HOF&&window.__HOF[name])||[];
-  var order={'MVP':0,'블루리본':1,'떡상왕':2,'커리어하이':3,'최고의지점':4};
+  var order={'MVP':0,'로얄리본':1,'그랜드리본':2,'마스터리본':3,'블루리본':4,'떡상왕':5,'커리어하이':6,'최고의지점':7};
   var trs=hof.slice().sort(function(a,b){if(order[a.type]!==order[b.type])return order[a.type]-order[b.type];return b.m.localeCompare(a.m);});
   // 최고의달
   var best={m:0,sales:0}; (p.series||[]).forEach(function(x){if(x.sales!=null&&x.sales>best.sales)best={m:x.m,sales:x.sales};});
@@ -1368,7 +1372,7 @@ function nameBadges(name){
   var d=new Date(), y=d.getFullYear(), pm=d.getMonth();  // getMonth()는 0-based라 그 값이 곧 직전달(1-based)
   if(pm===0){ y-=1; pm=12; }                             // 1월이면 전년 12월
   var closed=y+'-'+('0'+pm).slice(-2);
-  var icons={'MVP':'🏆','블루리본':'🎗️','떡상왕':'🚀','커리어하이':'🎖️','최고의지점':'🥇'};
+  var icons={'MVP':'🏆','블루리본':'🎗️','마스터리본':'🔷','그랜드리본':'💠','로얄리본':'👑','떡상왕':'🚀','커리어하이':'🎖️','최고의지점':'🥇'};
   var out=[];
   hof.filter(function(t){return t.type==='MVP';}).sort(function(a,b){return a.m.localeCompare(b.m);})
      .forEach(function(t){out.push('🏆'+parseInt(t.m.slice(5),10));});
