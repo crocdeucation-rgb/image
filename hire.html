@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>증원현황 · 통합채용TF</title>
+<title>통합채용TF</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <style>
 
@@ -108,6 +108,9 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .cal-empty{font-size:10px;color:#C8D0DC;text-align:center;padding:8px 0}
 
 /* 범례 */
+.cal-swipe-hint{display:none;justify-content:center;gap:5px;margin-top:10px}
+.cal-swipe-hint .sd{width:6px;height:6px;border-radius:50%;background:#D0D8E6;transition:.2s}
+.cal-swipe-hint .sd.on{background:#E23A22;width:18px;border-radius:3px}
 .cal-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;font-size:11px;color:var(--soft);font-weight:600}
 .cal-legend .lg{display:inline-flex;align-items:center;gap:5px}
 .cal-legend .d{width:9px;height:3px;border-radius:2px}
@@ -115,6 +118,13 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 
 /* 모바일 = 세로 카드 */
 @media(max-width:768px){
+  /* 모바일 = 좌우 스와이프 캐러셀 (오늘부터) */
+  .cal-grid{display:flex !important;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;gap:10px;padding-bottom:8px;grid-template-columns:none !important}
+  .cal-grid::-webkit-scrollbar{height:0}
+  .cal-col{flex:0 0 86%;scroll-snap-align:center;min-height:200px !important;display:block !important}
+  .cal-col.empty-mo{display:block !important}   /* 스와이프라 빈 날도 표시(순서 유지) */
+  .cal-swipe-hint{display:flex !important}
+
   .wrap{padding:16px 12px 40px}
   .cal-grid{grid-template-columns:1fr;gap:9px}
   .cal-col{min-height:0;padding:11px 13px}
@@ -256,6 +266,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
     </div>
   </div>
   <div id="cal_grid"></div>
+  <div class="cal-swipe-hint" id="cal_hint"></div>
   <div class="cal-legend">
     <span class="lg"><span class="d 상담부"></span>상담부</span>
     <span class="lg"><span class="d 강사"></span>강사</span>
@@ -499,6 +510,30 @@ function renderCal(){
   });
   h+='</div>';
   document.getElementById('cal_grid').innerHTML=h;
+  // [모바일] 오늘 컬럼으로 자동 스크롤 + 스와이프 힌트
+  setTimeout(function(){
+    var grid=document.getElementById('cal_grid'), hint=document.getElementById('cal_hint');
+    if(!grid) return;
+    var cols=grid.querySelectorAll('.cal-col');
+    var isMobile=window.matchMedia('(max-width:768px)').matches;
+    if(!isMobile){ if(hint)hint.innerHTML=''; return; }
+    // 힌트 dot
+    if(hint){ var dh=''; for(var i=0;i<cols.length;i++) dh+='<span class="sd"></span>'; hint.innerHTML=dh; }
+    // 오늘 컬럼 인덱스
+    var tdIdx=-1; days.forEach(function(d,i){ if(ymd(d)===td) tdIdx=i; });
+    if(tdIdx<0) tdIdx=0;
+    // 오늘로 스크롤
+    if(cols[tdIdx]){ grid.scrollLeft = cols[tdIdx].offsetLeft - grid.offsetLeft - 12; }
+    // 스크롤 시 dot 갱신
+    function updDot(){
+      var ci=Math.round(grid.scrollLeft/(grid.scrollWidth/cols.length));
+      var sds=hint?hint.querySelectorAll('.sd'):[];
+      sds.forEach(function(x,i){ x.classList.toggle('on', i===ci); });
+    }
+    grid.onscroll=updDot; updDot();
+    // 초기 dot을 오늘로
+    if(hint){ var sds=hint.querySelectorAll('.sd'); sds.forEach(function(x,i){x.classList.toggle('on',i===tdIdx);}); }
+  }, 60);
 }
 
 // ── 상세 모달 ──
