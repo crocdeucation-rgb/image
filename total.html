@@ -1055,7 +1055,10 @@ function notifStart(){
   // 카드 댓글 구독
   var u2=_fdb.collection('cardComments').doc(myName).collection('items').orderBy('ts','desc').limit(50)
     .onSnapshot(function(qs){ notifMerge('comment', qs); }, function(e){console.warn('notif cmt',e);});
-  window.__notifUnsubs=[u1,u2];
+  // 좋아요 구독 (cardLikes/{내이름} 문서의 users 맵에서 이름·ts 추출)
+  var u3=_fdb.collection('cardLikes').doc(myName)
+    .onSnapshot(function(doc){ notifMergeLikes(doc); }, function(e){console.warn('notif like',e);});
+  window.__notifUnsubs=[u1,u2,u3];
 }
 function notifMerge(type, qs){
   // 같은 type 기존 항목 제거 후 새로 채움
@@ -1069,6 +1072,24 @@ function notifMerge(type, qs){
       type:type, from:(v.who||v.name||'익명'), rank:v.rank||'', text:v.text||'', ms:ms
     });
   });
+  window.__notifItems.sort(function(a,b){return b.ms-a.ms;});
+  notifRender();
+}
+function notifMergeLikes(doc){
+  // cardLikes/{내이름} = {count, users:{이메일:{name,rank,ts}|true}}
+  window.__notifItems=window.__notifItems.filter(function(x){return x.type!=='like';});
+  var d=doc.exists?doc.data():null;
+  if(d && d.users){
+    Object.keys(d.users).forEach(function(em){
+      if(_me && em===_me.email) return;   // 본인 제외
+      var v=d.users[em];
+      // 하위호환: 옛 데이터는 v===true (이름·ts 없음) → ms=0(항상 읽음처리, 이름 '누군가')
+      var nm=(v&&v.name)?v.name:'누군가';
+      var rk=(v&&v.rank)?v.rank:'';
+      var ms=(v&&v.ts)?v.ts:0;
+      window.__notifItems.push({ type:'like', from:nm, rank:rk, text:'', ms:ms });
+    });
+  }
   window.__notifItems.sort(function(a,b){return b.ms-a.ms;});
   notifRender();
 }
@@ -1089,8 +1110,8 @@ function notifRender(){
   if(!items.length){ list.innerHTML='<div class="notif-empty">아직 받은 알림이 없어요 🌱</div>'; return; }
   list.innerHTML=items.slice(0,50).map(function(x){
     var isUnread=x.ms>seen;
-    var ic=x.type==='birthday'?'🎂':'💬';
-    var act=x.type==='birthday'?'생일을 축하했어요':'응원 댓글을 남겼어요';
+    var ic=x.type==='birthday'?'🎂':(x.type==='like'?'❤️':'💬');
+    var act=x.type==='birthday'?'생일을 축하했어요':(x.type==='like'?'내 카드에 좋아요를 눌렀어요':'응원 댓글을 남겼어요');
     var esc=function(t){return String(t||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');};
     return '<div class="notif-item'+(isUnread?' unread':'')+'">'
       +'<span class="notif-ic">'+ic+'</span>'
@@ -1438,7 +1459,7 @@ function renderSocial(name){
   if(window.__likeUnsub)window.__likeUnsub();
   window.__likeUnsub=_fdb.collection('cardLikes').doc(name).onSnapshot(function(doc){
     var d=doc.exists?doc.data():{count:0,users:{}};
-    var cnt=d.count||0, mine=(_me&&d.users&&d.users[_me.email]);
+    var cnt=d.count||0, mine=(_me&&d.users&&!!d.users[_me.email]);
     var btn=document.getElementById('pcLikeBtn'), c=document.getElementById('pcLikeCnt');
     if(c)c.textContent=cnt;
     if(btn){ btn.classList.toggle('on',!!mine); btn.querySelector('.h').textContent=mine?'❤️':'🤍'; }
@@ -1464,7 +1485,7 @@ window.pcToggleLike=function(){
       var d=doc.exists?doc.data():{count:0,users:{}};
       if(!d.users)d.users={};
       if(d.users[_me.email]){ delete d.users[_me.email]; d.count=Math.max(0,(d.count||0)-1); }
-      else { d.users[_me.email]=true; d.count=(d.count||0)+1; }
+      else { d.users[_me.email]={name:_me.name, rank:_me.rank||'', ts:Date.now()}; d.count=(d.count||0)+1; }
       tx.set(ref,d);
     });
   }).catch(function(e){ alert('좋아요 실패: '+e.message); });
