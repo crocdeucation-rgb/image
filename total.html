@@ -371,6 +371,45 @@ body.is-live .closed-only{display:none !important}
 @media(max-width:560px){
   .vs-mnm{font-size:15px}.vs-score .sc{font-size:28px}.vs-mav{width:40px;height:40px;font-size:17px}
 }
+/* ── 🔍 기간조회(FINDER) ── */
+.fd-bg{position:fixed;inset:0;background:rgba(10,14,24,.72);backdrop-filter:blur(4px);z-index:9999;display:none;align-items:flex-start;justify-content:center;padding:16px 12px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.fd-bg.on{display:flex}
+.fd-wrap{width:760px;max-width:100%;background:#F4F6FA;border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(10,14,24,.5);margin:auto 0}
+.fd-hd{background:linear-gradient(135deg,#0F1626,#1E2C48);color:#fff;padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
+.fd-hd .t{font-size:16px;font-weight:900;letter-spacing:-.3px}
+.fd-hd .x{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:16px;cursor:pointer}
+.fd-ctrl{padding:14px 18px;background:#fff;border-bottom:1px solid #E7ECF3}
+.fd-lbl{font-size:10.5px;font-weight:800;color:#8A97AC;margin:10px 0 6px;letter-spacing:.3px}
+.fd-lbl:first-child{margin-top:0}
+.fd-chips{display:flex;flex-wrap:wrap;gap:6px}
+.fd-chip{font-size:12px;font-weight:800;padding:6px 13px;border-radius:16px;border:1.5px solid #DCE3EE;background:#fff;color:#6B7688;cursor:pointer;font-family:inherit}
+.fd-chip.on{background:#7048E8;border-color:#7048E8;color:#fff}
+.fd-dates{display:flex;align-items:center;gap:7px;margin-top:8px;flex-wrap:wrap}
+.fd-dates input{padding:7px 10px;border:1.5px solid #DCE3EE;border-radius:9px;font-size:12.5px;font-family:inherit;outline:none}
+.fd-dates input:focus{border-color:#7048E8}
+.fd-dates .sep{color:#8A97AC;font-weight:800}
+.fd-srch{width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid #DCE3EE;border-radius:10px;font-size:13px;font-family:inherit;outline:none;margin-top:8px}
+.fd-srch:focus{border-color:#7048E8}
+/* 요약 */
+.fd-sum{padding:14px 18px;background:#fff;border-bottom:1px solid #E7ECF3}
+.fd-sum-main{font-size:11px;color:#8A97AC;font-weight:700}
+.fd-sum-val{font-size:30px;font-weight:900;color:#1B2436;letter-spacing:-1px;margin-top:2px}
+.fd-sum-cmp{font-size:12px;font-weight:800;margin-left:8px}
+.fd-sum-cmp.up{color:#E23A22}.fd-sum-cmp.dn{color:#2B7FFF}
+.fd-sum-sub{display:flex;gap:16px;margin-top:8px;font-size:12px;color:#6B7688;font-weight:600;flex-wrap:wrap}
+.fd-sum-sub b{color:#1B2436;font-weight:900}
+.fd-sum-sub .cx{color:#E23A22}
+/* 목록 */
+.fd-list{max-height:44vh;overflow-y:auto;padding:6px 10px 14px}
+.fd-grp{font-size:10.5px;font-weight:800;color:#8A97AC;padding:12px 8px 5px;letter-spacing:.3px}
+.fd-item{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;padding:9px 11px;border-radius:9px;background:#fff;margin:3px 0;border:1px solid #EEF2F7;cursor:pointer;transition:.1s}
+.fd-item:hover{border-color:#C9B6F5;background:#FBF9FF}
+.fd-item .nm{font-size:13px;font-weight:800;color:#1B2436}
+.fd-item .nm .tm{font-size:10.5px;color:#8A97AC;font-weight:600;margin-left:5px}
+.fd-item .met{font-size:11px;color:#6B7688;font-weight:600;text-align:right}
+.fd-item .met b{color:#7048E8;font-weight:900;font-size:13px}
+.fd-empty{text-align:center;padding:30px;color:#8A97AC;font-size:13px;font-weight:700}
+.fd-loading{text-align:center;padding:40px;color:#8A97AC;font-size:13px;font-weight:700}
 .bgd .i{font-size:12px}
 .bgd.new{background:#EAF7F0;color:#1B7A4A}
 .bgd.crown{background:#FFF6E0;color:#9A7300}
@@ -463,14 +502,34 @@ body.is-live .closed-only{display:none !important}
 .bdw-login .who{font-size:11px;color:#B08090;font-weight:600}
 .bdw-login .who b{color:#E94078}
 .bdw-login .who a{color:#E94078;cursor:pointer;margin-left:6px;text-decoration:underline}
-/* [2026-09] 알림 벨 — 로그인 시 우측 상단 고정 */
-.notif-bell{position:fixed;top:14px;right:16px;z-index:9997;width:44px;height:44px;border-radius:50%;background:#fff;border:1px solid #E3E8F0;box-shadow:0 3px 12px rgba(27,36,54,.12);cursor:pointer;display:none;align-items:center;justify-content:center;font-size:20px;transition:.15s}
-.notif-bell:hover{transform:scale(1.06)}
-.notif-bell.show{display:flex}
-.notif-badge{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:#E23A22;color:#fff;font-size:10px;font-weight:800;display:none;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(226,58,34,.4)}
-.notif-badge.show{display:flex;animation:notifpop .3s cubic-bezier(.2,.9,.3,1.4)}
+/* [2026-09] 우측 상단 네비 — 애플st 라인아이콘+텍스트 (내카드·검색·알림) */
+.topnav{position:fixed;top:14px;right:16px;z-index:9997;display:flex;align-items:center;gap:2px;background:rgba(255,255,255,.82);backdrop-filter:blur(12px);border:1px solid rgba(20,28,46,.06);border-radius:14px;padding:4px;box-shadow:0 4px 16px rgba(20,28,46,.08)}
+.tnav-btn{position:relative;display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border:none;background:transparent;border-radius:10px;color:#3A4356;font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;transition:.13s;white-space:nowrap}
+.tnav-btn:hover{background:rgba(20,28,46,.06);color:#0F1626}
+.tnav-btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.tnav-btn.hidden{display:none}
+.tnav-btn.dim{color:#A6AFC0;cursor:default}
+.tnav-btn.dim:hover{background:transparent;color:#A6AFC0}
+.tnav-sep{width:1px;height:18px;background:rgba(20,28,46,.1);margin:0 2px}
+.tnav-badge{position:absolute;top:0;right:2px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#E23A22;color:#fff;font-size:9.5px;font-weight:800;display:none;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(226,58,34,.4)}
+.tnav-badge.show{display:flex;animation:notifpop .3s cubic-bezier(.2,.9,.3,1.4)}
 @keyframes notifpop{from{transform:scale(0)}to{transform:scale(1)}}
-.notif-panel{position:fixed;top:66px;right:16px;z-index:9998;width:320px;max-width:calc(100vw - 32px);max-height:70vh;overflow-y:auto;background:#fff;border-radius:16px;box-shadow:0 16px 48px rgba(27,36,54,.25);border:1px solid #E3E8F0;display:none;animation:notifslide .2s cubic-bezier(.2,.9,.3,1.1)}
+@media(max-width:600px){
+  /* 모바일: 햄버거 하나 → 드롭다운 */
+  .topnav{gap:0;padding:0;background:none;border:none;box-shadow:none}
+  .topnav .tnav-btn{display:none}
+  .tnav-burger{display:flex !important}
+  .topnav.open{flex-direction:column;align-items:stretch;gap:2px;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border:1px solid rgba(20,28,46,.08);border-radius:14px;padding:5px;box-shadow:0 8px 28px rgba(20,28,46,.16);min-width:150px}
+  .topnav.open .tnav-btn:not(.hidden){display:inline-flex;font-size:13px;justify-content:flex-start;height:40px}
+  .topnav.open .tnav-btn svg{width:17px;height:17px}
+  .topnav.open .tnav-burger{align-self:flex-end;margin-bottom:2px}
+}
+.tnav-burger{display:none;position:relative;align-items:center;justify-content:center;width:38px;height:38px;border:none;background:transparent;border-radius:10px;color:#3A4356;cursor:pointer}
+.tnav-burger svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.9;fill:none;stroke-linecap:round}
+.tnav-burger:hover{background:rgba(20,28,46,.06)}
+.tnav-burger .bdot{position:absolute;top:5px;right:6px;width:8px;height:8px;border-radius:50%;background:#E23A22;display:none}
+.tnav-burger .bdot.show{display:block}
+.notif-panel{position:fixed;top:60px;right:16px;z-index:9998;width:320px;max-width:calc(100vw - 32px);max-height:70vh;overflow-y:auto;background:#fff;border-radius:16px;box-shadow:0 16px 48px rgba(27,36,54,.25);border:1px solid #E3E8F0;display:none;animation:notifslide .2s cubic-bezier(.2,.9,.3,1.1)}
 .notif-panel.show{display:block}
 @keyframes notifslide{from{transform:translateY(-8px);opacity:0}to{transform:none;opacity:1}}
 .notif-hd{padding:14px 16px 10px;border-bottom:1px solid #F1F4F9;font-size:14px;font-weight:900;color:#1B2436;display:flex;align-items:center;justify-content:space-between}
@@ -487,7 +546,24 @@ body.is-live .closed-only{display:none !important}
 .notif-empty{padding:26px 16px;text-align:center;font-size:12.5px;color:#B6C2DC}
 </style>
 </head><body>
-<div class="notif-bell" id="notifBell" onclick="notifToggle()">🔔<span class="notif-badge" id="notifBadge">0</span></div>
+<div class="topnav" id="topnav">
+  <button class="tnav-burger" id="tnavBurger" onclick="toggleNav(event)">
+    <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    <span class="bdot" id="burgerDot"></span>
+  </button>
+  <button class="tnav-btn hidden" id="myCardBtn" onclick="navClose();openMyCard()">
+    <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><circle cx="8.5" cy="11" r="2"/><path d="M14 10h4M14 13.5h4M5.5 16c.6-1.5 2-2.2 3-2.2s2.4.7 3 2.2"/></svg>
+    <span>내 카드</span>
+  </button>
+  <button class="tnav-btn" id="searchBtn" onclick="navClose();openFinder()">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.2-3.2"/></svg>
+    <span>검색</span>
+  </button>
+  <button class="tnav-btn hidden" id="notifBell" onclick="navClose();notifToggle()">
+    <svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.5 20a2 2 0 0 0 3 0"/></svg>
+    <span>알림</span><span class="tnav-badge" id="notifBadge">0</span>
+  </button>
+</div>
 <div class="notif-panel" id="notifPanel"><div class="notif-hd">🔔 내 알림 <span class="clr" onclick="notifMarkAllSeen()">모두 읽음</span></div><div class="notif-list" id="notifList"></div></div>
 <div class="wrap">
 <div id="birthday-bar" class="birthday-bar" style="display:none"></div>
@@ -1057,6 +1133,14 @@ window.loadMonth = loadMonth;
   </div>
 </div>
 
+<div class="fd-bg" id="fdModal" onclick="if(event.target===this)closeFinder()">
+  <div class="fd-wrap">
+    <div class="fd-hd"><span class="t">🔍 실적 조회</span><button class="x" onclick="closeFinder()">✕</button></div>
+    <div id="fdCtrl"></div>
+    <div id="fdResult"></div>
+  </div>
+</div>
+
 
 <!-- ②-b  </body> 앞에 붙일 SCRIPT (Firebase SDK 포함) ──────────── -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -1122,8 +1206,9 @@ window.__notifUnsubs = [];
 function notifTeardown(){ window.__notifUnsubs.forEach(function(u){try{u();}catch(e){}}); window.__notifUnsubs=[]; window.__notifItems=[]; }
 function notifStart(){
   notifTeardown();
-  if(!_me){ document.getElementById('notifBell').classList.remove('show'); return; }
-  document.getElementById('notifBell').classList.add('show');
+  updateMyCardBtn();   // [2026-09] 내 카드 버튼 표시 갱신
+  if(!_me){ document.getElementById('notifBell').classList.add('hidden'); return; }
+  document.getElementById('notifBell').classList.remove('hidden');
   var myName=_me.name;
   // lastSeen 로드 (Firestore 우선, 실패 시 localStorage)
   _fdb.collection('notifSeen').doc(_me.email).get().then(function(d){
@@ -1190,6 +1275,7 @@ function notifRender(){
   var unread=items.filter(function(x){return x.ms>seen;}).length;
   var badge=document.getElementById('notifBadge');
   if(badge){ badge.textContent=unread>99?'99+':unread; badge.classList.toggle('show', unread>0); }
+  var bdot=document.getElementById('burgerDot'); if(bdot) bdot.classList.toggle('show', unread>0);
   var list=document.getElementById('notifList'); if(!list) return;
   if(!items.length){ list.innerHTML='<div class="notif-empty">아직 받은 알림이 없어요 🌱</div>'; return; }
   list.innerHTML=items.slice(0,50).map(function(x){
@@ -1526,6 +1612,235 @@ function openCard(name){
   document.body.style.overflow='hidden';
 }
 function closeCard(){ document.getElementById('pcModal').classList.remove('on'); try{ parent.postMessage({t:'cardClose'}, '*'); }catch(e){} document.body.style.overflow=''; window.__curCardName=null; if(window.__likeUnsub){window.__likeUnsub();window.__likeUnsub=null;} if(window.__cmtUnsub){window.__cmtUnsub();window.__cmtUnsub=null;} pcRestoreScroll(); }
+
+/* ══════ 🔍 기간조회(FINDER) — 원장 직접 필터 ══════ */
+var LEDGER_GID='698799247';   // total 시트 '데일리 실적' 탭
+window.__ledger=null;         // 파싱된 원장 행 배열 (캐시)
+window.__fdState={ period:'yesterday', from:null, to:null, org:'all', status:'order', grade:'all', q:'' };
+/* 진짜 CSV 파서 (따옴표 안 콤마·개행 처리) */
+function fdParseCSV(text){
+  var rows=[], row=[], cur='', q=false;
+  text=text.replace(/\r/g,'');
+  for(var i=0;i<text.length;i++){
+    var c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=c; }
+    else { if(c==='"')q=true; else if(c===','){row.push(cur);cur='';} else if(c==='\n'){row.push(cur);rows.push(row);row=[];cur='';} else cur+=c; }
+  }
+  if(cur!==''||row.length){ row.push(cur); rows.push(row); }
+  return rows;
+}
+function fdNum(v){ var n=parseFloat(String(v||'').replace(/[^0-9.\-]/g,'')); return isNaN(n)?0:n; }
+/* 날짜 파싱 — '2026-09-01' 또는 '09월 01일' → {y,m,d} (연도 없으면 올해) */
+function fdDate(v){
+  v=String(v||'').trim(); if(!v) return null;
+  var m1=v.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if(m1) return {y:+m1[1],m:+m1[2],d:+m1[3]};
+  var m2=v.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*일/);
+  if(m2) return {y:new Date().getFullYear(),m:+m2[1],d:+m2[2]};
+  return null;
+}
+function fdKey(dt){ return dt? (dt.y*10000+dt.m*100+dt.d):0; }
+/* 원장 로딩 */
+async function fdLoadLedger(){
+  if(window.__ledger) return window.__ledger;
+  var url="https://docs.google.com/spreadsheets/d/1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU/gviz/tq?tqx=out:csv&headers=0&gid="+LEDGER_GID+"&_="+Date.now();
+  var res=await fetch(url); var raw=await res.text();
+  var rows=fdParseCSV(raw);
+  // 헤더행 찾기 (첫 칸에 '날짜')
+  var hi=0; for(var i=0;i<Math.min(rows.length,4);i++){ if((rows[i][0]||'').indexOf('날짜')>=0){hi=i;break;} }
+  var out=[];
+  for(var r=hi+1;r<rows.length;r++){
+    var row=rows[r]; var dt=fdDate(row[0]); if(!dt) continue;
+    var sang=(row[1]||'').trim(); if(!sang) continue;
+    out.push({
+      dt:dt, key:fdKey(dt),
+      sang:sang,                       // B 상담(카드 주체)
+      student:(row[2]||'').trim(),     // C 학생
+      sales:fdNum(row[3])*1000,        // D 매출 raw×1000
+      team:(row[7]||'').trim(),        // H 팀구분(지점)
+      grade:(row[8]||'').trim(),       // I 학년
+      cancelAmt:fdNum(row[15])*1000,   // P 취소매출
+      state:(row[17]||'').trim(),      // R order/hold/cancel
+      gubun:(row[6]||'').trim(),       // G 정상/기타
+      nopo:(row[18]||'').trim(),       // S 포함/제외
+      isWeb:(sang==='웹마케팅팀')
+    });
+  }
+  window.__ledger=out;
+  return out;
+}
+/* 조직 판별 → 표시 그룹키 */
+function fdOrgOf(r){ return r.isWeb ? '웹마케팅' : fdBranch(r.team); }
+/* [2026-09] 팀구분(H열 raw) → 지점 그룹 (buildTotalData _h2branch 이식) */
+function fdBranch(h){
+  h=String(h||'').trim();
+  if(h.indexOf('부평')===0) return '부평지점';
+  if(h.indexOf('메이킷위드')===0) return '메이킷위드';
+  if(h.indexOf('스카이에듀')===0) return '스카이에듀';
+  if(h.indexOf('수호에듀')===0) return '수호에듀';
+  if(h.indexOf('더온에듀')===0) return '더온에듀';
+  if(h.indexOf('가산연합')===0) return '가산연합센터';
+  if(h.indexOf('마포연합')===0) return '마포연합센터';
+  if(h==='파인더'||h.indexOf('파인더상암')===0) return '파인더루원';
+  if(h.indexOf('마곡')===0) return '마곡지점';
+  if(h.indexOf('수원')===0) return '수원지점';
+  return h||'기타';
+}
+/* 기간 범위 계산 → {fromKey,toKey,label} */
+function fdRange(){
+  var s=window.__fdState, now=new Date();
+  var y=now.getFullYear(),m=now.getMonth()+1,d=now.getDate();
+  function k(yy,mm,dd){return yy*10000+mm*100+dd;}
+  function ymd(dobj){return {y:dobj.getFullYear(),m:dobj.getMonth()+1,d:dobj.getDate()};}
+  if(s.period==='today'){ return {from:k(y,m,d),to:k(y,m,d),label:'오늘'}; }
+  if(s.period==='yesterday'){ var yd=new Date(now);yd.setDate(d-1);var o=ymd(yd);return {from:k(o.y,o.m,o.d),to:k(o.y,o.m,o.d),label:'어제'}; }
+  if(s.period==='week'){ var wd=now.getDay()||7; var mon=new Date(now);mon.setDate(d-(wd-1));var o=ymd(mon);return {from:k(o.y,o.m,o.d),to:k(y,m,d),label:'이번주'}; }
+  if(s.period==='month'){ return {from:k(y,m,1),to:k(y,m,d),label:'이번달'}; }
+  if(s.period==='custom'){
+    var f=s.from?fdDate(s.from):null, t=s.to?fdDate(s.to):null;
+    if(f&&t) return {from:fdKey(f),to:fdKey(t),label:s.from+'~'+s.to};
+    return {from:0,to:99999999,label:'전체'};
+  }
+  return {from:k(y,m,d),to:k(y,m,d),label:'오늘'};
+}
+/* 비교기간(전일/전주) 범위 */
+function fdPrevRange(rg){
+  var s=window.__fdState;
+  if(s.period==='yesterday'||s.period==='today'){ // 하루 → 전날
+    var dt=String(rg.from); var yy=+dt.slice(0,4),mm=+dt.slice(4,6),dd=+dt.slice(6,8);
+    var pv=new Date(yy,mm-1,dd-1); var pk=pv.getFullYear()*10000+(pv.getMonth()+1)*100+pv.getDate();
+    return {from:pk,to:pk,label:'전일'};
+  }
+  if(s.period==='week'){ // 전주 (from-7 ~ to-7)
+    function shift(k7){var yy=+String(k7).slice(0,4),mm=+String(k7).slice(4,6),dd=+String(k7).slice(6,8);var p=new Date(yy,mm-1,dd-7);return p.getFullYear()*10000+(p.getMonth()+1)*100+p.getDate();}
+    return {from:shift(rg.from),to:shift(rg.to),label:'전주'};
+  }
+  return null;
+}
+/* 필터+집계 → {sales,ord,set,cx,cxCnt,byPerson:{name:{sales,ord,set,team}}} */
+function fdAggregate(rg){
+  var s=window.__fdState, rows=window.__ledger||[];
+  var acc={sales:0,ord:0,set:0,cx:0,cxCnt:0,byPerson:{}};
+  rows.forEach(function(r){
+    if(r.isWeb) return;   // [2026-09] 웹마는 조회 제외 (개인구분 불가 → 상담부 지점만)
+    if(r.key<rg.from||r.key>rg.to) return;
+    // 지점 필터 (all=전체 지점)
+    if(s.org!=='all' && fdBranch(r.team)!==s.org) return;
+    // 학년 필터
+    if(s.grade!=='all' && r.grade!==s.grade) return;
+    // 검색
+    if(s.q){ var q=s.q; if(r.sang.indexOf(q)<0 && (r.team||'').indexOf(q)<0 && (r.student||'').indexOf(q)<0) return; }
+    var isOrd=(r.state==='order' && r.sales>0);
+    var isSet=(r.state==='order'||r.state==='hold') && r.gubun!=='기타' && r.nopo!=='제외';
+    var isCx=(r.state==='cancel');
+    // 상태 필터
+    if(s.status==='order' && !isOrd) return;
+    if(s.status==='set' && !isSet) return;
+    if(s.status==='cancel' && !isCx) return;
+    if(isOrd){ acc.sales+=r.sales; acc.ord++; }
+    if(isSet) acc.set++;
+    if(isCx){ acc.cx+=r.cancelAmt; acc.cxCnt++; }
+    // 개인별 (웹마는 상담='웹마케팅팀'이라 학생 대신 팀으로 묶임 → 표시만)
+    var pk=r.sang;
+    if(!acc.byPerson[pk]) acc.byPerson[pk]={name:pk,sales:0,ord:0,set:0,team:fdOrgOf(r)};
+    if(isOrd){ acc.byPerson[pk].sales+=r.sales; acc.byPerson[pk].ord++; }
+    if(isSet) acc.byPerson[pk].set++;
+  });
+  return acc;
+}
+window.openFinder=async function(){
+  document.getElementById('fdModal').classList.add('on');
+  document.body.style.overflow='hidden';
+  document.getElementById('fdResult').innerHTML='<div class="fd-loading">원장 불러오는 중...</div>';
+  fdRenderCtrl();
+  try{ await fdLoadLedger(); fdRun(); }
+  catch(e){ document.getElementById('fdResult').innerHTML='<div class="fd-empty">원장 로드 실패: '+e+'<br>시트 공유(링크 있는 사람=뷰어) 확인 필요</div>'; }
+};
+window.closeFinder=function(){ document.getElementById('fdModal').classList.remove('on'); document.body.style.overflow=''; };
+/* 컨트롤 UI */
+function fdRenderCtrl(){
+  var s=window.__fdState;
+  var periods=[['yesterday','어제'],['today','오늘'],['week','이번주'],['month','이번달'],['custom','직접']];
+  var stats=[['order','오더(매출)'],['set','세팅'],['cancel','취소']];
+  // 학년 옵션은 원장에서
+  var grades=['all']; if(window.__ledger){ var gs={}; window.__ledger.forEach(function(r){if(r.grade)gs[r.grade]=1;}); grades=grades.concat(Object.keys(gs).sort()); }
+  var gradeChips=grades.map(function(g){return '<button class="fd-chip'+(s.grade===g?' on':'')+'" onclick="fdSet(\'grade\',\''+g+'\')">'+(g==='all'?'전체':g)+'</button>';}).join('');
+  var h='<div class="fd-ctrl">';
+  h+='<div class="fd-lbl">기간</div><div class="fd-chips">'+periods.map(function(p){return '<button class="fd-chip'+(s.period===p[0]?' on':'')+'" onclick="fdSet(\'period\',\''+p[0]+'\')">'+p[1]+'</button>';}).join('')+'</div>';
+  if(s.period==='custom'){ h+='<div class="fd-dates"><input type="date" id="fdFrom" value="'+(s.from||'')+'" onchange="fdSet(\'from\',this.value)"><span class="sep">~</span><input type="date" id="fdTo" value="'+(s.to||'')+'" onchange="fdSet(\'to\',this.value)"></div>'; }
+  // 지점 드롭다운 (원장에서 그룹핑, 웹마 제외)
+  var brs={}; if(window.__ledger){ window.__ledger.forEach(function(r){ if(!r.isWeb){ var b=fdBranch(r.team); if(b&&b!=='기타')brs[b]=1; } }); }
+  var brList=Object.keys(brs).sort();
+  var brOpts='<option value="all"'+(s.org==='all'?' selected':'')+'>전체 지점</option>'+brList.map(function(b){return '<option value="'+b+'"'+(s.org===b?' selected':'')+'>'+b+'</option>';}).join('');
+  h+='<div class="fd-lbl">지점</div><select class="fd-srch" style="margin-top:0" onchange="fdSet(\'org\',this.value)">'+brOpts+'</select>';
+  h+='<div class="fd-lbl">상태</div><div class="fd-chips">'+stats.map(function(o){return '<button class="fd-chip'+(s.status===o[0]?' on':'')+'" onclick="fdSet(\'status\',\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'</div>';
+  h+='<div class="fd-lbl">학년</div><div class="fd-chips">'+gradeChips+'</div>';
+  h+='<input class="fd-srch" placeholder="🔍 이름·학생 검색" value="'+(s.q||'')+'" oninput="fdSet(\'q\',this.value)">';
+  h+='</div>';
+  document.getElementById('fdCtrl').innerHTML=h;
+}
+window.fdSet=function(k,v){ window.__fdState[k]=v; fdRenderCtrl(); if(window.__ledger)fdRun(); };
+/* 실행+렌더 */
+function fdRun(){
+  var rg=fdRange();
+  var acc=fdAggregate(rg);
+  // 비교
+  var cmpHtml='';
+  var prg=fdPrevRange(rg);
+  if(prg && window.__fdState.status==='order'){
+    var pacc=fdAggregate(prg);
+    var diff=acc.sales-pacc.sales;
+    var pct=pacc.sales>0?Math.round(diff/pacc.sales*100):(acc.sales>0?100:0);
+    var up=diff>=0;
+    cmpHtml='<span class="fd-sum-cmp '+(up?'up':'dn')+'">'+(up?'▲':'▼')+' '+pcEok(Math.abs(diff))+' ('+(up?'+':'')+pct+'% vs '+prg.label+')</span>';
+  }
+  var statLbl=window.__fdState.status==='order'?'매출':(window.__fdState.status==='set'?'세팅':'취소');
+  var mainVal=window.__fdState.status==='cancel'?pcEok(acc.cx):(window.__fdState.status==='set'?acc.set+'건':pcEok(acc.sales));
+  var h='<div class="fd-sum"><div class="fd-sum-main">'+rg.label+' · '+statLbl+'</div>';
+  h+='<div class="fd-sum-val">'+mainVal+cmpHtml+'</div>';
+  h+='<div class="fd-sum-sub"><span>오더 <b>'+acc.ord+'</b>건</span><span>세팅 <b>'+acc.set+'</b>건</span>';
+  if(acc.cxCnt) h+='<span class="cx">취소 <b>'+acc.cxCnt+'</b>건 · '+pcEok(acc.cx)+'</span>';
+  h+='</div></div>';
+  // 개인별 목록 (매출순)
+  var arr=Object.keys(acc.byPerson).map(function(k){return acc.byPerson[k];});
+  var sortKey=window.__fdState.status==='set'?'set':'sales';
+  arr.sort(function(a,b){return (b[sortKey]||0)-(a[sortKey]||0);});
+  arr=arr.filter(function(x){return (x.sales>0||x.ord>0||x.set>0);});
+  var listHtml;
+  if(!arr.length){ listHtml='<div class="fd-empty">해당 조건에 데이터가 없어요</div>'; }
+  else{
+    listHtml=arr.map(function(x){
+      var clickable=!x.name.startsWith('웹마') && pcFind(x.name);
+      var oc=clickable?' onclick="closeFinder();openCard(\''+x.name.replace(/'/g,"")+'\')"':'';
+      return '<div class="fd-item"'+oc+'><div class="nm">'+x.name+'<span class="tm">'+(x.team||'')+'</span></div>'
+        +'<div class="met"><b>'+pcEok(x.sales)+'</b> · 오더 '+x.ord+' · 세팅 '+x.set+'</div></div>';
+    }).join('');
+  }
+  h+='<div class="fd-list"><div class="fd-grp">개인별 ('+arr.length+'명) · 이름 클릭 시 카드</div>'+listHtml+'</div>';
+  document.getElementById('fdResult').innerHTML=h;
+}
+
+/* ══════ 🪪 내 카드 보기 (로그인 시) ══════ */
+/* [2026-09] 모바일 햄버거 네비 토글 */
+window.toggleNav=function(e){ if(e)e.stopPropagation(); document.getElementById('topnav').classList.toggle('open'); };
+document.addEventListener('click',function(e){ var nv=document.getElementById('topnav'); if(nv&&nv.classList.contains('open')&&!nv.contains(e.target)) nv.classList.remove('open'); });
+/* 메뉴 항목 누르면 드롭다운 닫기 (모바일) */
+function navClose(){ var nv=document.getElementById('topnav'); if(nv)nv.classList.remove('open'); }
+function updateMyCardBtn(){
+  var btn=document.getElementById('myCardBtn'); if(!btn) return;
+  if(!_me){ btn.classList.add('hidden'); return; }
+  btn.classList.remove('hidden');
+  var lbl=btn.querySelector('span');
+  var f=pcFind(_me.name);
+  if(f){ btn.classList.remove('dim'); if(lbl)lbl.textContent='내 카드'; }
+  else { btn.classList.add('dim'); if(lbl)lbl.textContent='카드 준비중'; }
+}
+window.openMyCard=function(){
+  if(!_me){ if(window.pcLogin)pcLogin(); return; }
+  var f=pcFind(_me.name);
+  if(!f){ alert('아직 '+_me.name+'님의 실적 카드가 없어요. 첫 실적이 등록되면 카드가 생성됩니다.'); return; }
+  openCard(_me.name);
+};
 
 /* ══════ ⚔️ 비교(VERSUS) — 상담부 카드끼리 시즌 대결 ══════ */
 window.__vsLeft=null;   // 왼쪽(내) 카드 이름
