@@ -121,7 +121,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
   /* 모바일 = 좌우 스와이프 캐러셀 */
   #cal_grid{display:flex !important;overflow-x:scroll !important;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;gap:10px;padding-bottom:8px;grid-template-columns:none !important}
   .cal-grid::-webkit-scrollbar{height:0}
-  .cal-col{flex:0 0 92%;scroll-snap-align:center;min-height:340px !important;display:block !important;padding:14px 15px !important}
+  .cal-col{flex:0 0 92%;scroll-snap-align:center;min-height:0 !important;height:auto;align-self:flex-start;display:block !important;padding:14px 15px !important}
   .cal-col.empty-mo{display:block !important}   /* 스와이프라 빈 날도 표시(순서 유지) */
   .cal-swipe-hint{display:flex !important}
 
