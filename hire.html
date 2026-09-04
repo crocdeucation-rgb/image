@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>통합채용TF</title>
+<title>증원현황 · 증원현황</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <style>
 
@@ -50,7 +50,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 
 /* PC = 7열 그리드 */
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
-.cal-col{background:#FAFBFD;border:1px solid var(--line);border-radius:12px;padding:9px 8px;min-height:110px}
+.cal-col{background:#FAFBFD;border:1px solid var(--line);border-radius:12px;padding:9px 8px;min-height:64px}
 .cal-col.today{background:#FFF5F3;border-color:#F3B5AA;border-width:1.5px}
 .cal-col.weekend .cal-dnum{color:#B6C2DC}
 .cal-dhd{text-align:center;margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid #EDF1F7}
@@ -121,7 +121,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
   /* 모바일 = 좌우 스와이프 캐러셀 (오늘부터) */
   .cal-grid{display:flex !important;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;gap:10px;padding-bottom:8px;grid-template-columns:none !important}
   .cal-grid::-webkit-scrollbar{height:0}
-  .cal-col{flex:0 0 86%;scroll-snap-align:center;min-height:200px !important;display:block !important}
+  .cal-col{flex:0 0 86%;scroll-snap-align:center;min-height:auto !important;height:auto;display:block !important;align-self:flex-start}
   .cal-col.empty-mo{display:block !important}   /* 스와이프라 빈 날도 표시(순서 유지) */
   .cal-swipe-hint{display:flex !important}
 
@@ -252,7 +252,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .dp-hire-none{font-size:11px;color:#B6C2DC}
 .ft{text-align:center;font-size:11px;color:var(--soft);margin-top:20px;line-height:1.8}
 </style></head><body><div class="wrap">
-<div class="hd"><div class="k">채용 · 통합채용TF</div><h1>통합증원현황</h1>
+<div class="hd"><div class="k">채용 · 증원현황</div><h1>통합채용TF</h1>
 <div class="m">전부서 통합 면접 (엄현호 이사) · 운영센터 코칭 별도 · <span id="upd">불러오는 중…</span></div></div>
 
 <div class="cal-wrap">
@@ -511,29 +511,36 @@ function renderCal(){
   h+='</div>';
   document.getElementById('cal_grid').innerHTML=h;
   // [모바일] 오늘 컬럼으로 자동 스크롤 + 스와이프 힌트
-  setTimeout(function(){
+  var _todayIdx=-1; days.forEach(function(d,i){ if(ymd(d)===td) _todayIdx=i; });
+  function scrollToToday(){
     var grid=document.getElementById('cal_grid'), hint=document.getElementById('cal_hint');
     if(!grid) return;
-    var cols=grid.querySelectorAll('.cal-col');
     var isMobile=window.matchMedia('(max-width:768px)').matches;
+    var cols=grid.querySelectorAll('.cal-col');
     if(!isMobile){ if(hint)hint.innerHTML=''; return; }
     // 힌트 dot
-    if(hint){ var dh=''; for(var i=0;i<cols.length;i++) dh+='<span class="sd"></span>'; hint.innerHTML=dh; }
-    // 오늘 컬럼 인덱스
-    var tdIdx=-1; days.forEach(function(d,i){ if(ymd(d)===td) tdIdx=i; });
-    if(tdIdx<0) tdIdx=0;
-    // 오늘로 스크롤
-    if(cols[tdIdx]){ grid.scrollLeft = cols[tdIdx].offsetLeft - grid.offsetLeft - 12; }
-    // 스크롤 시 dot 갱신
-    function updDot(){
-      var ci=Math.round(grid.scrollLeft/(grid.scrollWidth/cols.length));
-      var sds=hint?hint.querySelectorAll('.sd'):[];
-      sds.forEach(function(x,i){ x.classList.toggle('on', i===ci); });
+    if(hint){ var dh=''; for(var i=0;i<cols.length;i++) dh+='<span class="sd'+(i===_todayIdx?' on':'')+'"></span>'; hint.innerHTML=dh; }
+    var tdIdx=_todayIdx<0?0:_todayIdx;
+    // 오늘 컬럼으로 스크롤 (offsetLeft 직접 — scroll-behavior 없이 즉시)
+    if(cols[tdIdx]){
+      var target=cols[tdIdx].offsetLeft - (grid.clientWidth - cols[tdIdx].clientWidth)/2;
+      grid.scrollLeft = Math.max(0, target);
     }
-    grid.onscroll=updDot; updDot();
-    // 초기 dot을 오늘로
-    if(hint){ var sds=hint.querySelectorAll('.sd'); sds.forEach(function(x,i){x.classList.toggle('on',i===tdIdx);}); }
-  }, 60);
+    // dot 갱신
+    if(!grid._dotBound){
+      grid._dotBound=true;
+      grid.addEventListener('scroll', function(){
+        var h=document.getElementById('cal_hint'); if(!h)return;
+        var cs=grid.querySelectorAll('.cal-col');
+        var ci=Math.round(grid.scrollLeft/(grid.scrollWidth/cs.length));
+        h.querySelectorAll('.sd').forEach(function(x,i){ x.classList.toggle('on', i===ci); });
+      });
+    }
+  }
+  // 렌더 완료 후 여러 번 시도 (모바일 레이아웃 잡히는 타이밍 대비)
+  requestAnimationFrame(scrollToToday);
+  setTimeout(scrollToToday, 100);
+  setTimeout(scrollToToday, 350);
 }
 
 // ── 상세 모달 ──
