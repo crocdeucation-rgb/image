@@ -520,7 +520,9 @@ window.openIv=function(date,name){
   h+='<div class="ivm-row"><span class="ivm-lbl">참석</span><span class="ivm-val '+(iv.attend.indexOf('불참')>=0?'ns':iv.attend.indexOf('참석')>=0?'at':'')+'">'+(esc(iv.attend)||'-')+'</span></div>';
   h+='<div class="ivm-row"><span class="ivm-lbl">결과</span><span class="ivm-val '+(iv.pass.indexOf('불합격')>=0?'fa':iv.pass.indexOf('합격')>=0?'ps':'')+'">'+(esc(iv.pass)||'-')+'</span></div>';
   if(iv.eduDate){
-    h+='<div class="ivm-row"><span class="ivm-lbl">교육</span><span class="ivm-val">'+esc(iv.eduDate.slice(5).replace('-','/'))+(iv.eduTime?' '+esc(iv.eduTime):'')+(iv.eduWho?' · '+esc(iv.eduWho):'')+'</span></div>';
+    var _ed=parseDate(iv.eduDate);
+    var _edStr=_ed?((_ed.getMonth()+1)+'/'+_ed.getDate()):esc(iv.eduDate);
+    h+='<div class="ivm-row"><span class="ivm-lbl">교육</span><span class="ivm-val">'+_edStr+(iv.eduTime?' '+esc(iv.eduTime):'')+(iv.eduWho?' · '+esc(iv.eduWho):'')+'</span></div>';
   }
   if(iv.memo){ h+='<div class="ivm-memo">'+esc(iv.memo)+'</div>'; }
   h+='</div>';
