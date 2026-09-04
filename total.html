@@ -384,8 +384,33 @@ body.is-live .closed-only{display:none !important}
 .bdw-login .who{font-size:11px;color:#B08090;font-weight:600}
 .bdw-login .who b{color:#E94078}
 .bdw-login .who a{color:#E94078;cursor:pointer;margin-left:6px;text-decoration:underline}
+/* [2026-09] 알림 벨 — 로그인 시 우측 상단 고정 */
+.notif-bell{position:fixed;top:14px;right:16px;z-index:9997;width:44px;height:44px;border-radius:50%;background:#fff;border:1px solid #E3E8F0;box-shadow:0 3px 12px rgba(27,36,54,.12);cursor:pointer;display:none;align-items:center;justify-content:center;font-size:20px;transition:.15s}
+.notif-bell:hover{transform:scale(1.06)}
+.notif-bell.show{display:flex}
+.notif-badge{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:#E23A22;color:#fff;font-size:10px;font-weight:800;display:none;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(226,58,34,.4)}
+.notif-badge.show{display:flex;animation:notifpop .3s cubic-bezier(.2,.9,.3,1.4)}
+@keyframes notifpop{from{transform:scale(0)}to{transform:scale(1)}}
+.notif-panel{position:fixed;top:66px;right:16px;z-index:9998;width:320px;max-width:calc(100vw - 32px);max-height:70vh;overflow-y:auto;background:#fff;border-radius:16px;box-shadow:0 16px 48px rgba(27,36,54,.25);border:1px solid #E3E8F0;display:none;animation:notifslide .2s cubic-bezier(.2,.9,.3,1.1)}
+.notif-panel.show{display:block}
+@keyframes notifslide{from{transform:translateY(-8px);opacity:0}to{transform:none;opacity:1}}
+.notif-hd{padding:14px 16px 10px;border-bottom:1px solid #F1F4F9;font-size:14px;font-weight:900;color:#1B2436;display:flex;align-items:center;justify-content:space-between}
+.notif-hd .clr{font-size:11px;color:#8A94A6;font-weight:600;cursor:pointer}
+.notif-list{padding:6px 0}
+.notif-item{padding:10px 16px;display:flex;gap:10px;align-items:flex-start;border-bottom:1px solid #F7F9FC}
+.notif-item.unread{background:#FFF6F5}
+.notif-ic{font-size:18px;flex-shrink:0;line-height:1.3}
+.notif-tx{flex:1;font-size:12.5px;line-height:1.45;color:#3A4456}
+.notif-tx b{color:#1B2436;font-weight:800}
+.notif-tx .msg{color:#6B7688;display:block;margin-top:2px}
+.notif-tx .tm{color:#B6C2DC;font-size:10.5px;display:block;margin-top:2px}
+.notif-dot{width:7px;height:7px;border-radius:50%;background:#E23A22;flex-shrink:0;margin-top:5px}
+.notif-empty{padding:26px 16px;text-align:center;font-size:12.5px;color:#B6C2DC}
 </style>
-</head><body><div class="wrap">
+</head><body>
+<div class="notif-bell" id="notifBell" onclick="notifToggle()">🔔<span class="notif-badge" id="notifBadge">0</span></div>
+<div class="notif-panel" id="notifPanel"><div class="notif-hd">🔔 내 알림 <span class="clr" onclick="notifMarkAllSeen()">모두 읽음</span></div><div class="notif-list" id="notifList"></div></div>
+<div class="wrap">
 <div id="birthday-bar" class="birthday-bar" style="display:none"></div>
 <div class="hd"><div class="k">전부서 실적</div><h1>전체실적 대시보드</h1>
 <div class="m">취소 반영 확정 · 미납 포함/취소 제외/연장 포함 · 매일 갱신</div></div>
@@ -1001,7 +1026,102 @@ _fauth.onAuthStateChanged(function(u){
   else { _me=null; }
   if(window.__curCardName) renderSocial(window.__curCardName);  // 카드 열려있으면 소셜 갱신
   if(window.__curBday) renderBdwCard();   // [2026-09] 생일 모달 열려있으면 로그인 상태 즉시 반영
+  if(typeof notifStart==='function') notifStart();   // [2026-09] 알림 로드/재시작
 });
+
+/* ── [2026-09] 알림 시스템 ──
+   내 이름 앞으로 온 생일축하(birthdayWishes) + 카드댓글(cardComments)을 모아
+   우측 상단 벨에 표시. 안읽음 = lastSeen(notifSeen/{내이메일}) 이후 도착분. */
+window.__notifItems = [];   // {type,from,rank,text,ts,ms}
+window.__notifSeen = 0;     // lastSeen (밀리초)
+window.__notifUnsubs = [];
+function notifTeardown(){ window.__notifUnsubs.forEach(function(u){try{u();}catch(e){}}); window.__notifUnsubs=[]; window.__notifItems=[]; }
+function notifStart(){
+  notifTeardown();
+  if(!_me){ document.getElementById('notifBell').classList.remove('show'); return; }
+  document.getElementById('notifBell').classList.add('show');
+  var myName=_me.name;
+  // lastSeen 로드 (Firestore 우선, 실패 시 localStorage)
+  _fdb.collection('notifSeen').doc(_me.email).get().then(function(d){
+    var fv=(d.exists&&d.data().ts)?(d.data().ts.toMillis?d.data().ts.toMillis():d.data().ts):0;
+    var lv=parseInt(localStorage.getItem('notifSeen_'+_me.email)||'0',10);
+    window.__notifSeen=Math.max(fv,lv); notifRender();
+  }).catch(function(){
+    window.__notifSeen=parseInt(localStorage.getItem('notifSeen_'+_me.email)||'0',10); notifRender();
+  });
+  // 생일 축하 구독
+  var u1=_fdb.collection('birthdayWishes').doc(myName).collection('items').orderBy('ts','desc').limit(50)
+    .onSnapshot(function(qs){ notifMerge('birthday', qs); }, function(e){console.warn('notif bday',e);});
+  // 카드 댓글 구독
+  var u2=_fdb.collection('cardComments').doc(myName).collection('items').orderBy('ts','desc').limit(50)
+    .onSnapshot(function(qs){ notifMerge('comment', qs); }, function(e){console.warn('notif cmt',e);});
+  window.__notifUnsubs=[u1,u2];
+}
+function notifMerge(type, qs){
+  // 같은 type 기존 항목 제거 후 새로 채움
+  window.__notifItems=window.__notifItems.filter(function(x){return x.type!==type;});
+  qs.forEach(function(d){
+    var v=d.data();
+    var ms=(v.ts&&v.ts.toMillis)?v.ts.toMillis():0;
+    // 본인이 본인한테 쓴 건 제외
+    if(_me && v.email===_me.email) return;
+    window.__notifItems.push({
+      type:type, from:(v.who||v.name||'익명'), rank:v.rank||'', text:v.text||'', ms:ms
+    });
+  });
+  window.__notifItems.sort(function(a,b){return b.ms-a.ms;});
+  notifRender();
+}
+function notifTimeAgo(ms){
+  if(!ms) return '';
+  var diff=Date.now()-ms, mn=Math.floor(diff/60000);
+  if(mn<1) return '방금'; if(mn<60) return mn+'분 전';
+  var h=Math.floor(mn/60); if(h<24) return h+'시간 전';
+  var dd=Math.floor(h/24); if(dd<7) return dd+'일 전';
+  var d=new Date(ms); return (d.getMonth()+1)+'/'+d.getDate();
+}
+function notifRender(){
+  var items=window.__notifItems, seen=window.__notifSeen;
+  var unread=items.filter(function(x){return x.ms>seen;}).length;
+  var badge=document.getElementById('notifBadge');
+  if(badge){ badge.textContent=unread>99?'99+':unread; badge.classList.toggle('show', unread>0); }
+  var list=document.getElementById('notifList'); if(!list) return;
+  if(!items.length){ list.innerHTML='<div class="notif-empty">아직 받은 알림이 없어요 🌱</div>'; return; }
+  list.innerHTML=items.slice(0,50).map(function(x){
+    var isUnread=x.ms>seen;
+    var ic=x.type==='birthday'?'🎂':'💬';
+    var act=x.type==='birthday'?'생일을 축하했어요':'응원 댓글을 남겼어요';
+    var esc=function(t){return String(t||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');};
+    return '<div class="notif-item'+(isUnread?' unread':'')+'">'
+      +'<span class="notif-ic">'+ic+'</span>'
+      +'<span class="notif-tx"><b>'+esc(x.from)+(x.rank?' '+x.rank+'님':'')+'</b>이 '+act
+      +(x.text?'<span class="msg">"'+esc(x.text)+'"</span>':'')
+      +'<span class="tm">'+notifTimeAgo(x.ms)+'</span></span>'
+      +(isUnread?'<span class="notif-dot"></span>':'')+'</div>';
+  }).join('');
+}
+window.notifToggle=function(){
+  var p=document.getElementById('notifPanel');
+  var opening=!p.classList.contains('show');
+  p.classList.toggle('show');
+  if(opening) notifMarkAllSeen();   // 열면 읽음 처리
+};
+window.notifMarkAllSeen=function(){
+  var now=Date.now();
+  window.__notifSeen=now;
+  localStorage.setItem('notifSeen_'+_me.email, String(now));
+  if(_me) _fdb.collection('notifSeen').doc(_me.email).set({ts:firebase.firestore.FieldValue.serverTimestamp()}).catch(function(){});
+  notifRender();
+};
+// 패널 밖 클릭 시 닫기
+document.addEventListener('click', function(e){
+  var p=document.getElementById('notifPanel'), b=document.getElementById('notifBell');
+  if(p&&p.classList.contains('show') && !p.contains(e.target) && b && !b.contains(e.target)){ p.classList.remove('show'); }
+});
+// 로그인 상태 바뀔 때 알림 재시작 (onAuthStateChanged에 훅)
+(function(){
+  var _origAuth=_fauth.onAuthStateChanged;
+})();
 function pcLogin(){ var p=new firebase.auth.GoogleAuthProvider(); _fauth.signInWithPopup(p).catch(function(e){ alert('로그인 실패: '+e.message); }); }
 function pcLogout(){ _fauth.signOut(); }
 /* ── 모달 열고/닫을 때 스크롤 위치 보존 ──
