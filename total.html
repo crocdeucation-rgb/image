@@ -731,7 +731,12 @@ function renderTrend(){
 }
 window.selBranch=function(i,btn){document.querySelectorAll('.dchip').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');drawChart(i);};
 function drawChart(i){
-  var dk=window.__DK; var bt=dk.branchTrend; var b=bt.branches[i]; var s=b.series;
+  var dk=window.__DK; var bt=dk.branchTrend; var b=bt.branches[i];
+  // [2026-09] 개인 추이(pcTrendSvg)와 동일하게 종결달(현재월-1)까지만 표시.
+  //   진행중인 현재월이 섞이면 그래프가 뚝 떨어져 보임.
+  var _cm=new Date().getMonth()+1, _closedM=(_cm>1?_cm-1:12);
+  var s=(b.series||[]).filter(function(x){return x.m<=_closedM;});
+  if(!s.length){ document.getElementById('d_chart').innerHTML='<div class="drnone">추이 없음</div>'; return; }
   var W=1500,H=300,padL=24,padR=24,padT=32,padB=40,iw=W-padL-padR,ih=H-padT-padB,n=s.length;
   var maxS=Math.max.apply(null,s.map(function(x){return x.sales||0;}))||1;
   var maxSet=Math.max.apply(null,s.map(function(x){return x.set||0;}))||1;
