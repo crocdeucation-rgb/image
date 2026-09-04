@@ -324,6 +324,38 @@ body.is-live .closed-only{display:none !important}
 .birthday-bar .bd-item.t{background:linear-gradient(135deg,#FFE0EC,#FFF0F5);border-color:#FF6B9D;color:#E94078;font-weight:800}
 @media(max-width:600px){.birthday-bar .bd-list{width:100%;margin-left:0}}
 .name-badges{font-size:10px;margin-left:5px;letter-spacing:0;white-space:nowrap;opacity:.9}
+.bd-item{cursor:pointer;transition:.12s}
+.bd-item:hover{transform:translateY(-2px);box-shadow:0 3px 8px rgba(233,64,120,.2)}
+.bdw-bg{position:fixed;inset:0;background:rgba(60,20,40,.5);backdrop-filter:blur(3px);z-index:9999;display:none;align-items:center;justify-content:center;padding:16px}
+.bdw-bg.on{display:flex}
+.bdw{width:380px;max-width:100%;max-height:88vh;overflow-y:auto;background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(60,20,40,.4);position:relative;animation:bdwpop .22s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes bdwpop{from{transform:translateY(14px) scale(.97);opacity:0}to{transform:none;opacity:1}}
+.bdw-hd{background:linear-gradient(120deg,#FF6B9D,#F76707);padding:22px 22px 18px;position:relative;overflow:hidden;text-align:center}
+.bdw-hd::before{content:'🎈';position:absolute;top:8px;left:16px;font-size:24px;opacity:.6;transform:rotate(-12deg)}
+.bdw-hd::after{content:'✨';position:absolute;bottom:10px;right:20px;font-size:16px;opacity:.7}
+.bdw-cake{font-size:38px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.2))}
+.bdw-name{font-size:22px;font-weight:900;color:#fff;margin-top:6px;letter-spacing:-.5px}
+.bdw-date{font-size:13px;font-weight:700;color:rgba(255,255,255,.9);margin-top:2px}
+.bdw-team{font-size:12px;color:rgba(255,255,255,.8);font-weight:600;margin-top:2px}
+.bdw-close{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.4);color:#fff;font-size:16px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;z-index:2}
+.bdw-body{padding:16px 20px 18px}
+.bdw-sec{font-size:12px;font-weight:800;color:#9A6D7A;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.bdw-sec .cnt{background:#FFF0F5;color:#E94078;font-size:11px;font-weight:800;padding:1px 8px;border-radius:10px}
+.bdw-wishes{display:flex;flex-direction:column;gap:9px;margin-bottom:12px;max-height:240px;overflow-y:auto}
+.bdw-wish{background:#FFF6F9;border:1px solid #FFE0EC;border-radius:11px;padding:9px 12px;font-size:12.5px;line-height:1.45}
+.bdw-wish b{font-weight:800;color:#E94078;margin-right:5px}
+.bdw-wish .tx{color:#5A4048}
+.bdw-wish .del{color:#D0A0B0;font-size:11px;cursor:pointer;margin-left:5px}
+.bdw-empty{font-size:12px;color:#C9A0B0;text-align:center;padding:14px}
+.bdw-in{display:flex;gap:7px}
+.bdw-in input{flex:1;border:1.5px solid #FFE0EC;border-radius:20px;padding:9px 14px;font-family:inherit;font-size:12.5px;outline:none}
+.bdw-in input:focus{border-color:#FF6B9D}
+.bdw-in button{background:linear-gradient(135deg,#FF6B9D,#E94078);color:#fff;border:none;border-radius:20px;padding:0 16px;font-family:inherit;font-weight:800;font-size:12.5px;cursor:pointer}
+.bdw-login{text-align:center;margin-top:10px}
+.bdw-login button{background:#fff;border:1px solid #FFE0EC;border-radius:20px;padding:8px 16px;font-family:inherit;font-weight:700;font-size:12px;cursor:pointer;color:#9A6D7A}
+.bdw-login .who{font-size:11px;color:#B08090;font-weight:600}
+.bdw-login .who b{color:#E94078}
+.bdw-login .who a{color:#E94078;cursor:pointer;margin-left:6px;text-decoration:underline}
 </style>
 </head><body><div class="wrap">
 <div id="birthday-bar" class="birthday-bar" style="display:none"></div>
@@ -451,7 +483,9 @@ function renderBirthdays(D){
   var todays=bd.filter(function(x){return x.today;});
   var h='<span class="bd-cake">🎂</span><span class="bd-ttl">이달의 생일</span>';
   if(todays.length){ h+='<span class="bd-today">🎉 오늘 '+todays.map(function(x){return x.name;}).join('·')+' 생일!</span>'; }
-  h+='<div class="bd-list">'+bd.map(function(x){ return '<span class="bd-item'+(x.today?' t':'')+'">'+x.name+' <b>'+x.mo+'/'+x.dy+'</b></span>'; }).join('')+'</div>';
+  // 이름/팀은 onclick 속성에 들어가므로 한글·영숫자·공백·._- 만 허용(따옴표/역슬래시/꺾쇠 제거)
+  var bdSafe=function(s){ return String(s||'').replace(/[^0-9A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ ._-]/g,''); };
+  h+='<div class="bd-list">'+bd.map(function(x){ return '<span class="bd-item'+(x.today?' t':'')+'" onclick="openBirthday(\''+bdSafe(x.name)+'\','+x.mo+','+x.dy+',\''+bdSafe(x.team)+'\')">'+x.name+' <b>'+x.mo+'/'+x.dy+'</b></span>'; }).join('')+'</div>';
   el.innerHTML=h;
 }
 function renderAll(D){
@@ -844,9 +878,68 @@ _fauth.onAuthStateChanged(function(u){
   else if(u){ _me={email:u.email, name:(u.displayName||u.email.split('@')[0]), rank:''}; }
   else { _me=null; }
   if(window.__curCardName) renderSocial(window.__curCardName);  // 카드 열려있으면 소셜 갱신
+  if(window.__curBday) renderBdwCard();   // [2026-09] 생일 모달 열려있으면 로그인 상태 즉시 반영
 });
 function pcLogin(){ var p=new firebase.auth.GoogleAuthProvider(); _fauth.signInWithPopup(p).catch(function(e){ alert('로그인 실패: '+e.message); }); }
 function pcLogout(){ _fauth.signOut(); }
+window.__curBday=null;
+function openBirthday(name, mo, dy, team){
+  window.__curBday={name:name, mo:mo, dy:dy, team:team||''};
+  renderBdwCard();
+  document.getElementById('bdwModal').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+function closeBirthday(){
+  document.getElementById('bdwModal').classList.remove('on');
+  document.body.style.overflow='';
+  window.__curBday=null;
+  if(window.__bdwUnsub){window.__bdwUnsub();window.__bdwUnsub=null;}
+}
+function renderBdwCard(){
+  var b=window.__curBday; if(!b)return;
+  var canWrite=!!_me;
+  var loginRow=canWrite
+    ? '<div class="bdw-login"><span class="who">👤 <b>'+_me.name+'</b> '+(_me.rank||'')+'님 <a onclick="pcLogout()">로그아웃</a></span></div>'
+    : '<div class="bdw-login"><button onclick="pcLogin()">🔒 로그인하고 축하 남기기</button></div>';
+  var html='<button class="bdw-close" onclick="closeBirthday()">✕</button>'
+    +'<div class="bdw-hd"><div class="bdw-cake">🎂</div><div class="bdw-name">'+b.name+'</div>'
+    +'<div class="bdw-date">'+b.mo+'월 '+b.dy+'일 생일</div>'
+    +(b.team?'<div class="bdw-team">'+b.team+'</div>':'')+'</div>'
+    +'<div class="bdw-body">'
+    +'<div class="bdw-sec">🎉 축하 메시지 <span class="cnt" id="bdw_cnt">0</span></div>'
+    +'<div class="bdw-wishes" id="bdw_wishes"></div>'
+    +(canWrite?'<div class="bdw-in"><input id="bdw_input" placeholder="'+b.name+'님께 축하 한마디..." onkeydown="if(event.key===\'Enter\')bdwSend()"><button onclick="bdwSend()">축하</button></div>':'')
+    +loginRow
+    +'</div>';
+  document.getElementById('bdwBody').innerHTML=html;
+  // Firestore 실시간 (연도별로 분리: 2026 생일)
+  var key=b.name;
+  if(window.__bdwUnsub)window.__bdwUnsub();
+  window.__bdwUnsub=_fdb.collection('birthdayWishes').doc(key).collection('items').orderBy('ts','asc').onSnapshot(function(qs){
+    var arr=[]; qs.forEach(function(d){arr.push(Object.assign({id:d.id},d.data()));});
+    var box=document.getElementById('bdw_wishes'), cc=document.getElementById('bdw_cnt');
+    if(cc)cc.textContent=arr.length;
+    if(box){ box.innerHTML=arr.length?arr.map(function(w){
+      var canDel=_me&&(_me.email===w.email||_me.email==='crocdeucation@gmail.com');
+      return '<div class="bdw-wish"><b>'+(w.who||'익명')+(w.rank?' '+w.rank+'님':'')+'</b><span class="tx">'+bdwEsc(w.text)+'</span>'+(canDel?'<span class="del" onclick="bdwDel(\''+w.id+'\')">삭제</span>':'')+'</div>';
+    }).join(''):'<div class="bdw-empty">첫 축하를 남겨보세요 🎉</div>'; }
+  },function(e){console.warn('bdw snap',e);});
+}
+function bdwEsc(s){return String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+window.bdwSend=function(){
+  if(!_me){ pcLogin(); return; }
+  var inp=document.getElementById('bdw_input'); if(!inp)return;
+  var txt=inp.value.trim(); if(!txt)return;
+  var b=window.__curBday;
+  _fdb.collection('birthdayWishes').doc(b.name).collection('items').add({
+    who:_me.name, rank:_me.rank||'', email:_me.email, text:txt, ts:firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(){ inp.value=''; }).catch(function(e){ alert('실패: '+e.message); });
+};
+window.bdwDel=function(id){
+  var b=window.__curBday;
+  if(!confirm('삭제할까요?'))return;
+  _fdb.collection('birthdayWishes').doc(b.name).collection('items').doc(id).delete().catch(function(e){alert('실패: '+e.message);});
+};
 
 /* ── 명예의전당 로드 (최초 1회) ── */
 window.__HOF=null;
@@ -1178,4 +1271,7 @@ window.attachCardClicks=attachCardClicks;
 // 최초 진입 시에도
 setTimeout(function(){ if(window.__D&&window.__D.personCards)window.__liveD=window.__D; attachCardClicks(); }, 1200);
 </script>
+<div class="bdw-bg" id="bdwModal" onclick="if(event.target===this)closeBirthday()">
+  <div class="bdw" id="bdwBody"></div>
+</div>
 </body></html>
