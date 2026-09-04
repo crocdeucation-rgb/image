@@ -239,6 +239,14 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
       <button class="cal-navbtn" onclick="calMove(1)">›</button>
     </div>
   </div>
+  <div id="cal_grid"></div>
+  <div class="cal-legend">
+    <span class="lg"><span class="d 상담부"></span>상담부</span>
+    <span class="lg"><span class="d 강사"></span>강사</span>
+    <span class="lg"><span class="d 사업부"></span>사업부</span>
+    <span class="lg"><span class="d 코칭"></span>코칭</span>
+  </div>
+</div>
 
 <!-- ② 채용 효율 CAC -->
 <div class="cac-wrap">
@@ -535,8 +543,10 @@ function cacRender(){
   });
   var t=D.total;
   var pass=passCountByMonth(mo);   // 면접 시트(예정·합격·교육대기)
-  // 교육완료 = 이미 합격한 사람 → 합격 수는 최소 교육완료 이상. 시트 합격이 더 많으면 시트값.
-  var passTotal = Math.max(pass.total, t.edu||0);
+  // 채널별 합격 = max(면접시트 합격, 그 채널 교육완료). 교육 간 사람은 무조건 합격.
+  var jkPass = Math.max(pass.jk, jk.edu);
+  var amPass = Math.max(pass.am, am.edu);
+  var passTotal = jkPass + amPass;   // 전체 = 채널 합 (total·채널합 일치)
   var passCac = passTotal>0 ? Math.round(t.gonggo/passTotal) : 0;
   var eduCac  = t.edu>0 ? Math.round(t.gonggo/t.edu) : 0;
   // 한줄 요약 — 파이프라인 전체 (예정→합격→교육대기→완료). 0명만 덩그러니 X
@@ -560,7 +570,7 @@ function cacRender(){
       +'<div class="cac-funnel">이력 <b>'+c.iry+'</b><span class="arw">→</span>통보 <b>'+c.mt+'</b><span class="arw">→</span>참여 <b>'+c.mc+'</b><span class="arw">→</span>합격 <b>'+pc+'</b><span class="arw">→</span>🎓 <b>'+c.edu+'</b></div></div>';
   }
   document.getElementById('cac_chans').innerHTML=
-    chanCard('jk','잡코리아','💼 경력·정착형',jk,Math.max(pass.jk,jk.edu))+chanCard('am','알바몬','⚡ 빠른충원',am,Math.max(pass.am,am.edu));
+    chanCard('jk','잡코리아','💼 경력·정착형',jk,jkPass)+chanCard('am','알바몬','⚡ 빠른충원',am,amPass);
   // 탭 활성
   document.querySelectorAll('.cac-tab').forEach(function(b){ b.classList.toggle('on', b.dataset.mo===mo); });
 }
