@@ -323,6 +323,7 @@ body.is-live .closed-only{display:none !important}
 .birthday-bar .bd-item b{color:#E94078;font-weight:800}
 .birthday-bar .bd-item.t{background:linear-gradient(135deg,#FFE0EC,#FFF0F5);border-color:#FF6B9D;color:#E94078;font-weight:800}
 @media(max-width:600px){.birthday-bar .bd-list{width:100%;margin-left:0}}
+.name-badges{font-size:10px;margin-left:5px;letter-spacing:0;white-space:nowrap;opacity:.9}
 </style>
 </head><body><div class="wrap">
 <div id="birthday-bar" class="birthday-bar" style="display:none"></div>
@@ -859,6 +860,7 @@ var HOF_GID='500572718';
     var a=text.indexOf('{'),b=text.lastIndexOf('}');
     if(a>=0&&b>a)text=text.substring(a,b+1);
     window.__HOF=JSON.parse(text);
+    if(window.attachCardClicks) window.attachCardClicks();   // [2026-09] HOF 늦게 도착 → 뱃지 재부착
   }).catch(function(e){ console.warn('HOF 로드 실패',e); window.__HOF={}; });
 })();
 
@@ -986,6 +988,14 @@ function openCard(name){
   var trs=hof.slice().sort(function(a,b){if(order[a.type]!==order[b.type])return order[a.type]-order[b.type];return b.m.localeCompare(a.m);});
   // 최고의달
   var best={m:0,sales:0}; (p.series||[]).forEach(function(x){if(x.sales!=null&&x.sales>best.sales)best={m:x.m,sales:x.sales};});
+  // [2026-09] 나의 기록 — series로 신기록 경신 횟수(첫 기록은 경신 아님)
+  var highCount=0, runMax=0;
+  (p.series||[]).forEach(function(s){
+    if(s.sales!=null && s.sales>0){
+      if(runMax>0 && s.sales>runMax) highCount++;
+      if(s.sales>runMax) runMax=s.sales;
+    }
+  });
   // 딱지
   var D=window.__liveD||window.__D;
   var tags=''; if(D&&D.newbie&&D.newbie[name])tags+='<span class="pc-tags">🌱</span>';
@@ -1013,7 +1023,7 @@ function openCard(name){
     +'<div class="pc-st"><div class="l">올해 누적</div><div class="v">'+pcEok(p.total)+'</div></div>'
     +'<div class="pc-st"><div class="l">최고의 달</div><div class="v">'+(best.m?PC_MON[best.m]+' '+pcEok(best.sales):'-')+'</div></div>'
     +'</div>'
-    +'<div class="pc-subst"><span>커리어하이 <b>'+pcEok(p.careerHigh)+'</b></span>'
+    +'<div class="pc-subst"><span>커리어하이 <b>'+pcEok(p.careerHigh)+'</b></span>'+(highCount?'<span>신기록 경신 <b>'+highCount+'회</b></span>':'')
     +(p.champMonths&&p.champMonths.length?'<span>챔피언 <b>'+p.champMonths.length+'회</b></span>':'')+'</div>'
     +'<div class="pc-trend"><div class="pc-sec-t" style="padding:2px 6px">📈 연간 추이 <span style="font-weight:600;color:#B6C2DC">·'+PC_MON[closedM]+'까지</span></div>'
       +'<div class="pc-tabs"><button class="pc-tab on" onclick="pcSwitchTrend(\'sales\',this)">매출</button><button class="pc-tab" onclick="pcSwitchTrend(\'set\',this)">세팅</button></div>'
@@ -1096,6 +1106,23 @@ window.pcDelComment=function(id){
   _fdb.collection('cardComments').doc(name).collection('items').doc(id).delete().catch(function(e){ alert('삭제 실패: '+e.message); });
 };
 
+/* ── [2026-09] 명예의전당 뱃지 (목록용) ──
+   MVP=영구 누적 · 떡상왕/커리어하이/최고의지점=직전 종결달만. 목록은 최대 3개+N. */
+function nameBadges(name){
+  var hof=(window.__HOF&&window.__HOF[name])||[];
+  if(!hof.length) return '';
+  var d=new Date(), y=d.getFullYear(), pm=d.getMonth();  // getMonth()는 0-based라 그 값이 곧 직전달(1-based)
+  if(pm===0){ y-=1; pm=12; }                             // 1월이면 전년 12월
+  var closed=y+'-'+('0'+pm).slice(-2);
+  var icons={'MVP':'🏆','떡상왕':'🚀','커리어하이':'🎖️','최고의지점':'🥇'};
+  var out=[];
+  hof.filter(function(t){return t.type==='MVP';}).sort(function(a,b){return a.m.localeCompare(b.m);})
+     .forEach(function(t){out.push('🏆'+parseInt(t.m.slice(5),10));});
+  hof.filter(function(t){return t.type!=='MVP'&&t.m===closed;})
+     .forEach(function(t){out.push((icons[t.type]||'🏅')+parseInt(t.m.slice(5),10));});
+  if(out.length>3){ var extra=out.length-3; out=out.slice(0,3); out.push('+'+extra); }
+  return out.length?'<span class="name-badges">'+out.join(' ')+'</span>':'';
+}
 /* ── 이름에 클릭 달기 (후처리) ── */
 function attachCardClicks(){
   var D=window.__liveD||window.__D;
@@ -1110,17 +1137,27 @@ function attachCardClicks(){
   // 이달 매출 TOP3 = kings 안의 <b style*="color:#1B2436"> (class 없음)
   document.querySelectorAll('#kings b').forEach(function(el){ els.push(el); });
   els.forEach(function(el){
-    if(el.__pcBound)return;
     // 첫 텍스트노드만(자식 span 제외) 기준으로 이름 추출
     var raw=(el.childNodes[0]&&el.childNodes[0].nodeType===3)?el.childNodes[0].textContent.trim():el.textContent.trim();
     var matched=null;
     // 정확 일치 우선, 없으면 시작일치
     if(names[raw]) matched=raw;
     else { for(var nm in names){ if(raw.indexOf(nm)===0){ matched=nm; break; } } }
-    if(matched){
+    if(!matched) return;
+    if(!el.__pcBound){
       el.classList.add('pc-clickable');
       el.__pcBound=true;
       el.addEventListener('click',function(ev){ ev.stopPropagation(); openCard(matched); });
+    }
+    // [2026-09] 명예의전당 뱃지 — 개인카드(.pc-nm)는 전용 트로피 섹션이 있어 제외.
+    //   __HOF는 늦게 로드되므로 아직 못 붙였으면 다음 호출 때 다시 시도.
+    if(!el.__pcBadged && !el.classList.contains('pc-nm')){
+      var bh=nameBadges(matched);
+      if(bh){
+        el.__pcBadged=true;
+        if(el.children.length && el.childNodes[0] && el.childNodes[0].nodeType===3) el.children[0].insertAdjacentHTML('beforebegin', bh);
+        else el.insertAdjacentHTML('beforeend', bh);
+      }
     }
   });
 }
