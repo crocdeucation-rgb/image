@@ -430,7 +430,7 @@ function renderAwards(D){
     { icon:'🎖️', name:'커리어하이', desc:'역대 최고월 갱신',
       body: win(rc.sang&&rc.sang[0],'career-sang', (rc.sang&&rc.sang[0]?won(rc.sang[0].aug)+'원':'-'),'상담')
           + win(rc.saup&&rc.saup[0],'career-saup', (rc.saup&&rc.saup[0]?won(rc.saup[0].aug)+'원':'-'),'사업') },
-    { icon:'🏅', name:'최고의 팀', desc:'지점 매출 1위',
+    { icon:'🏅', name:'최고의 지점', desc:'지점 매출 1위',
       body: win(BR[0],'team', won(BR[0]&&BR[0].sales)+'원','') },
   ];
 
@@ -867,7 +867,7 @@ var PC_TIER_SANG=[{t:'SSS',v:40000000},{t:'SS',v:35000000},{t:'S',v:30000000},{t
 var PC_TIER_SAUP=[{t:'SSS',v:90000000},{t:'SS',v:80000000},{t:'S',v:70000000},{t:'A',v:60000000},{t:'B',v:50000000},{t:'C',v:40000000},{t:'D',v:30000000},{t:'E',v:20000000},{t:'F',v:15000000}];
 function pcTierOf(s,useF){var T=useF?PC_TIER_SAUP:PC_TIER_SANG;for(var i=0;i<T.length;i++){if(s>=T[i].v)return T[i].t;}return 'F';}
 function pcNextTier(s,useF){var T=useF?PC_TIER_SAUP:PC_TIER_SANG;for(var i=T.length-1;i>=0;i--){if(s<T[i].v)return {t:T[i].t,need:T[i].v-s,base:(i<T.length-1?T[i+1].v:0),to:T[i].v};}return null;}
-var PC_TROPHY={'MVP':{ic:'🏆',cls:'mvp',lbl:'MVP'},'떡상왕':{ic:'🚀',cls:'tteok',lbl:'떡상왕'},'커리어하이':{ic:'🎖️',cls:'career',lbl:'커리어하이'},'최고의팀':{ic:'🥇',cls:'team',lbl:'최고의팀'}};
+var PC_TROPHY={'MVP':{ic:'🏆',cls:'mvp',lbl:'MVP'},'떡상왕':{ic:'🚀',cls:'tteok',lbl:'떡상왕'},'커리어하이':{ic:'🎖️',cls:'career',lbl:'커리어하이'},'최고의지점':{ic:'🥇',cls:'team',lbl:'최고의지점'}};
 var PC_MON=['','1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
 function pcWon(n){return (n||0).toLocaleString('ko-KR');}
 function pcEok(n){n=n||0;if(n>=100000000){var e=n/100000000;return (e%1===0?e.toFixed(0):e.toFixed(2))+'억';}if(n>=10000){var m=n/10000;return (m%1===0?String(m):Math.round(m))+'만';}return pcWon(n);}
@@ -971,11 +971,18 @@ function openCard(name){
   if(!f){ return; }  // personCards에 없으면 무시(지점명 등)
   window.__curCardName=name;
   var p=f.p, useF=f.useF, closedM=pcClosedMonth();
+  // [2026-09] 소속 미정 버그 — personCards.sang은 team이 빈값이라
+  //   persons/divpersons(branchOf로 team 채워짐)에서 이름으로 조인해 보정.
+  var liveD = window.__liveD || window.__D;
+  if((!p.team || p.team==='') && liveD){
+    var arr = useF ? (liveD.divpersons||[]) : (liveD.persons||[]);
+    for(var i=0;i<arr.length;i++){ if(arr[i].name===p.name){ p.team=arr[i].team; break; } }
+  }
   var closedSales=0; (p.series||[]).forEach(function(x){ if(x.m===closedM && x.sales!=null) closedSales=x.sales; });
   var tier=closedSales>0?pcTierOf(closedSales,useF):'NEW';
   // 트로피
   var hof=(window.__HOF&&window.__HOF[name])||[];
-  var order={'MVP':0,'떡상왕':1,'커리어하이':2,'최고의팀':3};
+  var order={'MVP':0,'떡상왕':1,'커리어하이':2,'최고의지점':3};
   var trs=hof.slice().sort(function(a,b){if(order[a.type]!==order[b.type])return order[a.type]-order[b.type];return b.m.localeCompare(a.m);});
   // 최고의달
   var best={m:0,sales:0}; (p.series||[]).forEach(function(x){if(x.sales!=null&&x.sales>best.sales)best={m:x.m,sales:x.sales};});
