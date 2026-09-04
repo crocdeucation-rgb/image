@@ -1,546 +1,348 @@
 <!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>증원현황</title>
+<title>면접 캘린더</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <style>
 :root{--bg:#F1F4F9;--ink:#1B2436;--soft:#6B7688;--line:#E3E8F0;--pan:#fff;--v1:#4C6EF5;--v2:#7048E8;--teal:#1D9E75;--amber:#BA7517;--red:#E23A22;--barbg:#EDF1F8}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1560px;margin:0 auto;padding:24px 24px 60px}
+.wrap{max-width:1560px;margin:0 auto;padding:20px 20px 60px}
 .hd .k{font-size:12px;letter-spacing:2px;color:var(--v1);font-weight:800}
-.hd h1{font-size:24px;font-weight:800;margin-top:6px}.hd .m{font-size:12px;color:var(--soft);margin-top:7px}
-.hero{background:linear-gradient(120deg,#4C6EF5,#7048E8);border-radius:18px;padding:22px 28px;color:#fff;margin:14px 0}
-.hero .lb{font-size:13px;opacity:.85;font-weight:600}
-.hero .chips{display:flex;gap:30px;margin-top:12px;flex-wrap:wrap}
-.hero .chips div{font-size:12px;opacity:.85}.hero .chips b{display:block;font-size:24px;font-weight:900;margin-top:2px}
-.hero .chips .cx b{color:#FFD9D2}
-.panel{background:var(--pan);border-radius:14px;padding:20px 22px;box-shadow:0 2px 8px rgba(27,36,54,.05);margin-bottom:14px}
-.panel h2{font-size:16px;font-weight:800;margin-bottom:3px;display:flex;align-items:center;gap:8px}
-.panel .sub{font-size:12px;color:var(--soft);margin-bottom:14px}
-.dot{width:10px;height:10px;border-radius:50%}
-.totbar{display:flex;gap:0;background:#F7F9FC;border-radius:12px;overflow:hidden;margin-bottom:14px}
-.tb{flex:1;padding:13px;text-align:center;border-right:1px solid var(--line)}.tb:last-child{border-right:0}
-.tb .l{font-size:12px;color:var(--soft)}.tb .v{font-size:19px;font-weight:900;margin-top:3px}.tb .v small{font-size:11px;color:var(--soft)}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{white-space:nowrap;text-align:right;font-size:11px;color:var(--soft);font-weight:700;padding:9px 8px;border-bottom:1px solid var(--line)}
-th:first-child{text-align:left}
-td{padding:10px 8px;border-bottom:1px solid #F2F4F7;text-align:right;font-variant-numeric:tabular-nums}
-td.nm{text-align:left;font-weight:700}td.z{color:#C2C8D2}td,th{white-space:nowrap}
-td.ts2{white-space:normal}
-.jsub{white-space:normal;font-size:11px;color:var(--soft);font-weight:500;margin-top:3px;line-height:1.4}
-.is2{text-align:left;color:#1D9E75;font-size:11px;font-weight:500;white-space:normal;word-break:keep-all;line-height:1.5;max-width:230px}
-.ts3{text-align:left;color:#98A0AE;font-size:11px;font-weight:500;white-space:normal;word-break:keep-all;line-height:1.5;max-width:200px;text-decoration:line-through;text-decoration-color:#C2C8D2}
-td.ts2{text-align:left;color:#98A0AE;font-size:11px;font-weight:500;white-space:normal;word-break:keep-all;line-height:1.5;text-decoration:line-through;text-decoration-color:#C2C8D2;max-width:200px}
-td.ts{text-align:right;color:#98A0AE;font-weight:500;font-size:12px;text-decoration:line-through;text-decoration-color:#C2C8D2}
-tr.sum td{border-top:2px solid var(--line);font-weight:900;background:#FAFBFF}
-.ft{text-align:center;font-size:11px;color:var(--soft);margin-top:20px;line-height:1.8}
-@media(max-width:820px){.hero .chips{gap:18px}.totbar{flex-wrap:wrap}.tb{flex:1 1 45%}}@media(max-width:480px){body{overflow-x:hidden}.sx>table{min-width:560px}.sx{overflow-x:auto}.sx table,div[style*="overflow-x"] table{min-width:560px}.sub{line-height:1.6}td{padding:8px 5px;font-size:12px}th{font-size:10px;padding:8px 5px}td.ts2{white-space:normal}.wrap{padding:16px 12px 40px}.hero{padding:18px 16px}.hero .big{font-size:30px;letter-spacing:-1px}.hero .chips{gap:14px}.hero .chips b{font-size:16px}.panel{padding:16px 14px}.hd h1{font-size:21px}.headbar{flex-wrap:wrap}.hb{flex:1 1 45%;padding:11px}.hb .v{font-size:19px}.card{padding:15px 16px}.al{padding:14px}.al .v{font-size:24px}}
-.sx{overflow-x:auto;-webkit-overflow-scrolling:touch;min-width:0;max-width:100%}
-.sx>table{min-width:560px}
-.scrollbox{max-height:360px;overflow-y:auto}
-.scrollbox thead th{position:sticky;top:0;background:var(--pan);z-index:2}
-.hero2{display:grid;grid-template-columns:1.5fr 1fr;gap:20px;align-items:start}
-.hero2 .hR{border-left:1px solid rgba(255,255,255,.25);padding-left:20px}
-.hero2 .wgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px}
-@media(max-width:900px){.hero2{grid-template-columns:1fr}.hero2 .hR{border-left:0;border-top:1px solid rgba(255,255,255,.25);padding-left:0;padding-top:14px;margin-top:6px}}
-</style></head><body><div class="wrap">
-<div class="hd"><div class="k">채용·증원</div><h1>증원현황</h1>
-<div class="m">2026년 8월 (8/3~8/30) · 운영센터 · 상담부 · 잡코리아 · 매주 토요일 입력</div></div>
+.hd h1{font-size:22px;font-weight:800;margin-top:5px}
+.hd .m{font-size:12px;color:var(--soft);margin-top:6px}
 
-<div class="hero hero2">
-<div class="hL"><div class="lb">8월 누적 채용 지표 (3소스 합산)</div>
-<div class="chips"><div>총 공고비<b id="t_g"></b></div><div>이력서<b id="t_i"></b></div><div>면접통보<b id="t_m"></b></div><div>면접참여<b id="t_c"></b></div><div>교육참여<b id="t_e"></b></div><div class="cx">퇴사<b id="t_t"></b></div></div></div>
-<div class="hR"><div class="lb">현재 총원</div>
-<div class="chips wgrid"><div>상담<b>87</b></div><div>사업<b>21</b></div><div>강사<b>43</b></div><div>코칭<b>24</b></div></div></div>
-</div>
+/* ── 오늘의 면접 (메인) ── */
+.today-hero{background:linear-gradient(125deg,#4C6EF5,#7048E8);border-radius:20px;padding:22px 24px;color:#fff;margin:14px 0}
+.th-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.th-date{font-size:20px;font-weight:900}
+.th-wd{font-size:14px;font-weight:700;opacity:.85}
+.th-live{font-size:11px;font-weight:800;background:rgba(255,255,255,.22);padding:3px 10px;border-radius:20px;margin-left:auto}
+.th-sub{font-size:12.5px;opacity:.8;font-weight:600;margin-bottom:16px}
+.th-list{display:flex;flex-direction:column;gap:8px}
+.th-item{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.16);border-radius:13px;padding:12px 15px;cursor:pointer;transition:.12s}
+.th-item:hover{background:rgba(255,255,255,.2)}
+.th-tm{font-size:16px;font-weight:900;min-width:52px;letter-spacing:-.5px}
+.th-body{flex:1;min-width:0}
+.th-nm{font-size:15px;font-weight:800;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.th-tags{display:flex;gap:5px;margin-top:4px;flex-wrap:wrap}
+.th-tag{font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:6px;background:rgba(255,255,255,.9);color:#3B4F9E}
+.th-tag.site{background:rgba(255,255,255,.25);color:#fff}
+.th-status{font-size:12px;font-weight:800;padding:4px 11px;border-radius:9px;white-space:nowrap;flex-shrink:0}
+.th-status.wait{background:rgba(255,255,255,.22);color:#fff}
+.th-status.at{background:#E6F7EE;color:#1B7A4A}
+.th-status.ns{background:#FBE0DC;color:#C0341E}
+.th-status.ps{background:#F0E9FF;color:#5A3AD0}
+.th-status.fa{background:rgba(255,255,255,.15);color:rgba(255,255,255,.8)}
+.th-none{background:rgba(255,255,255,.12);border-radius:13px;padding:20px;text-align:center;font-size:14px;font-weight:700}
+.th-none small{display:block;font-size:12px;opacity:.75;font-weight:600;margin-top:5px}
 
+/* ── 주간 캘린더 ── */
+.cal-wrap{background:var(--pan);border-radius:16px;padding:18px 20px;box-shadow:0 2px 8px rgba(27,36,54,.05)}
+.cal-hd{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.cal-hd h2{font-size:15px;font-weight:800;display:flex;align-items:center;gap:8px;margin:0}
+.cal-nav{display:inline-flex;align-items:center;gap:8px}
+.cal-navbtn{background:var(--barbg);border:none;color:var(--soft);font-weight:800;font-size:14px;width:30px;height:30px;border-radius:9px;cursor:pointer}
+.cal-navbtn:hover{background:var(--v1);color:#fff}
+.cal-navbtn:disabled{opacity:.3;cursor:default}
+.cal-range{font-size:13px;font-weight:800;min-width:120px;text-align:center}
+.cal-today-btn{background:var(--barbg);border:none;color:var(--v1);font-weight:800;font-size:12px;padding:6px 13px;border-radius:20px;cursor:pointer}
+.cal-today-btn:hover{background:var(--v1);color:#fff}
 
+/* PC = 7열 그리드 */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.cal-col{background:#FAFBFD;border:1px solid var(--line);border-radius:12px;padding:9px 8px;min-height:110px}
+.cal-col.today{background:#FFF5F3;border-color:#F3B5AA;border-width:1.5px}
+.cal-col.weekend .cal-dnum{color:#B6C2DC}
+.cal-dhd{text-align:center;margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid #EDF1F7}
+.cal-wd{font-size:10.5px;font-weight:700;color:var(--soft)}
+.cal-dnum{font-size:17px;font-weight:900;margin-top:2px;letter-spacing:-.5px}
+.cal-col.today .cal-wd,.cal-col.today .cal-dnum{color:#E23A22}
+.cal-col.today .cal-dhd{border-color:#F3C9C0}
+.cal-todaytag{display:inline-block;font-size:8.5px;font-weight:800;background:#E23A22;color:#fff;padding:1px 6px;border-radius:5px;margin-top:3px}
+.cal-ivs{display:flex;flex-direction:column;gap:4px}
+.cal-iv{background:#fff;border:1px solid #E7ECF4;border-left-width:3px;border-radius:7px;padding:5px 7px;cursor:pointer;transition:.1s}
+.cal-iv:hover{border-color:var(--v1);box-shadow:0 2px 6px rgba(76,110,245,.12)}
+.cal-iv.job-상담부{border-left-color:#4C6EF5}
+.cal-iv.job-강사{border-left-color:#1D9E75}
+.cal-iv.job-사업부{border-left-color:#7048E8}
+.cal-iv.job-코칭{border-left-color:#BA7517}
+.cal-iv-tm{font-size:10px;font-weight:800;color:var(--soft)}
+.cal-iv-nm{font-size:12px;font-weight:800;color:var(--ink);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-iv-tag{font-size:9px;font-weight:700;color:#8A94A6;margin-top:2px}
+.cal-iv-mgr{font-size:9px;font-weight:700;color:#7048E8;margin-top:1px}
+.cal-iv.done{opacity:.62}
+.cal-iv.done .cal-iv-nm{color:#8A94A6}
+.cal-iv-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:3px;vertical-align:middle}
+.cal-iv-dot.at{background:#1D9E75}.cal-iv-dot.ns{background:#E23A22}.cal-iv-dot.ps{background:#7048E8}
+.cal-empty{font-size:10px;color:#C8D0DC;text-align:center;padding:8px 0}
 
-<!-- 부서별 채용 통합 (알바몬+잡코리아) -->
-<style id="araon-dept-style">
-.dp-wrap{background:var(--pan);border-radius:14px;padding:20px 22px;box-shadow:0 2px 8px rgba(27,36,54,.05);margin-bottom:14px}
-.dp-hd{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px}
-.dp-hd h2{font-size:16px;font-weight:800;display:flex;align-items:center;gap:8px;margin:0}
-.dp-hd .sub{font-size:12px;color:var(--soft);font-weight:500}
-.dp-tabs{display:inline-flex;gap:5px}
-.dp-tab{background:var(--barbg);border:none;color:var(--soft);font-family:inherit;font-weight:700;font-size:12px;padding:6px 14px;border-radius:20px;cursor:pointer}
-.dp-tab.on{background:var(--v1);color:#fff}
-.dp-total{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);border-radius:12px;overflow:hidden;margin-bottom:16px}
-.dp-tc{background:#fff;padding:12px 8px;text-align:center}
-.dp-tc .l{font-size:11px;color:var(--soft);font-weight:600}
-.dp-tc .v{font-size:19px;font-weight:900;margin-top:3px;letter-spacing:-.5px}
-.dp-tc .v.g{color:var(--v2)}
-.dp-tc .bd{font-size:9.5px;color:#8A94A6;font-weight:600;margin-top:4px;line-height:1.5}
-@media(max-width:820px){.dp-total{grid-template-columns:repeat(3,1fr)}}
-.dp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-@media(max-width:820px){.dp-grid{grid-template-columns:1fr}}
-.dp-card{border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.dp-card-hd{display:flex;align-items:center;gap:8px;padding:11px 14px;background:#F7F9FC;border-bottom:1px solid var(--line)}
-.dp-dot{width:9px;height:9px;border-radius:50%}
-.dp-card.상담부 .dp-dot{background:#4C6EF5}.dp-card.사업부 .dp-dot{background:#7048E8}
-.dp-card.강사 .dp-dot{background:#1D9E75}.dp-card.코칭 .dp-dot{background:#BA7517}
-.dp-name{font-weight:800;font-size:14px}
-.dp-sum{margin-left:auto;font-size:12px;color:var(--v2);font-weight:800}
-.dp-body{padding:10px 14px}
-.dp-src{padding:8px 0}
-.dp-src+.dp-src{border-top:1px solid #F4F6FA}
-.dp-src-top{display:flex;align-items:center;gap:8px}
-.dp-src-tag{font-size:10px;font-weight:800;padding:2px 8px;border-radius:6px;min-width:52px;text-align:center;flex-shrink:0}
-.dp-src-tag.am{background:#E7F5FF;color:#1971C2}
-.dp-src-tag.jk{background:#FFF4E6;color:#BA7517}
-.dp-src-prod{font-size:11px;color:var(--soft);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.dp-src-gonggo{margin-left:auto;font-weight:800;font-size:12px;color:var(--ink);white-space:nowrap}
-.dp-src-meta{color:var(--soft);font-size:11px;margin-top:3px;padding-left:60px}
-.dp-src-meta b{color:var(--ink);font-weight:800}
-.dp-src.none .dp-src-prod,.dp-src.none .dp-src-gonggo{color:#C2C8D2}
-.dp-tot-row{display:flex;align-items:center;gap:8px;padding:9px 0 3px;margin-top:4px;border-top:2px solid var(--line);font-size:12.5px}
-.dp-tot-row .lbl{font-weight:800;color:var(--v2)}
-.dp-tot-row .meta{color:var(--soft);font-size:11.5px;margin-left:2px}
-.dp-tot-row .meta b{color:var(--ink);font-weight:800}
-.dp-tot-row .g{margin-left:auto;font-weight:900;color:var(--v2)}
-/* 입퇴사 */
-.dp-hire{margin-top:8px;padding-top:9px;border-top:1px dashed var(--line)}
-.dp-hire-top{display:flex;align-items:center;gap:10px;font-size:12px;margin-bottom:6px}
-.dp-hire-top .hl{font-weight:800;color:var(--ink)}
-.dp-hire-top .in{color:#20A56D;font-weight:800}
-.dp-hire-top .out{color:#E23A22;font-weight:800}
-.dp-jj{display:flex;flex-wrap:wrap;gap:5px}
-.dp-jj-item{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:6px;background:#F4F6FA;color:var(--soft)}
-.dp-jj-item b.p{color:#20A56D}.dp-jj-item b.m{color:#E23A22}.dp-jj-item b.z{color:#B6C2DC}
-.dp-hire-none{font-size:11px;color:#B6C2DC}
-</style>
-
-<div class="dp-wrap">
-  <div class="dp-hd">
-    <div><h2>🏢 부서별 채용 통합 <span class="sub">알바몬 + 잡코리아 합산 · 입퇴사 포함</span></h2></div>
-    <div class="dp-tabs" id="dp_tabs"></div>
-  </div>
-  <div class="dp-total" id="dp_total"></div>
-  <div class="dp-grid" id="dp_grid"></div>
-</div>
-
-<script>
-var HIRE_DEPT = {"8월": {"depts": {"상담부": {"am": {"gonggo": 1546872, "iryeok": 205, "myeontong": 78, "myeoncham": 28, "edu": 17}, "amProd": "M 지역 Special 결합", "jk": {"gonggo": 519600, "iryeok": 10, "myeontong": 1, "myeoncham": 0, "edu": 0}, "jkProd": "Excellent 채용관 (PC+M)", "tot": {"gonggo": 2066472, "iryeok": 215, "myeontong": 79, "myeoncham": 28, "edu": 17}, "hire": {"jijum": [{"nm": "마포연합센터", "in": 4, "out": 2}, {"nm": "가산연합센터", "in": 6, "out": 2}, {"nm": "마곡지점", "in": 1, "out": 4}, {"nm": "부평지점", "in": 2, "out": 1}, {"nm": "메이킷위드", "in": 2, "out": 2}, {"nm": "파인더루원", "in": 0, "out": 0}], "tin": 15, "tout": 11}}, "사업부": {"am": null, "amProd": "", "jk": {"gonggo": 692800, "iryeok": 19, "myeontong": 0, "myeoncham": 0, "edu": 0}, "jkProd": "Excellent 채용관 (PC+M)", "tot": {"gonggo": 692800, "iryeok": 19, "myeontong": 0, "myeoncham": 0, "edu": 0}}, "강사": {"am": {"gonggo": 45760, "iryeok": 16, "myeontong": 7, "myeoncham": 3, "edu": 1}, "amProd": "슈퍼점프 8회(1일)", "jk": {"gonggo": 692800, "iryeok": 28, "myeontong": 3, "myeoncham": 2, "edu": 0}, "jkProd": "Excellent 채용관 (PC+M)", "tot": {"gonggo": 738560, "iryeok": 44, "myeontong": 10, "myeoncham": 5, "edu": 1}}, "코칭": {"am": {"gonggo": 45760, "iryeok": 101, "myeontong": 12, "myeoncham": 4, "edu": 2}, "amProd": "슈퍼점프 8회(1일)", "jk": null, "jkProd": "", "tot": {"gonggo": 45760, "iryeok": 101, "myeontong": 12, "myeoncham": 4, "edu": 2}}}, "total": {"gonggo": 3543592, "iryeok": 379, "myeontong": 101, "myeoncham": 37, "edu": 20}, "breakdown": {"myeontong": {"상담부": 79, "사업부": 0, "강사": 10, "코칭": 12}, "myeoncham": {"상담부": 28, "사업부": 0, "강사": 5, "코칭": 4}, "edu": {"상담부": 17, "사업부": 0, "강사": 1, "코칭": 2}, "iryeok": {"상담부": 215, "사업부": 19, "강사": 44, "코칭": 101}}}, "9월": {"depts": {"상담부": {"am": {"gonggo": 45760, "iryeok": 0, "myeontong": 0, "myeoncham": 0, "edu": 0}, "amProd": "슈퍼점프 8회(1일)", "jk": {"gonggo": 866000, "iryeok": 0, "myeontong": 2, "myeoncham": 0, "edu": 0}, "jkProd": "Excellent 채용관 (PC+M)", "tot": {"gonggo": 911760, "iryeok": 0, "myeontong": 2, "myeoncham": 0, "edu": 0}, "hire": {"jijum": [], "tin": 0, "tout": 0}}, "사업부": {"am": null, "amProd": "", "jk": {"gonggo": 0, "iryeok": 0, "myeontong": 2, "myeoncham": 1, "edu": 0}, "jkProd": "X", "tot": {"gonggo": 0, "iryeok": 0, "myeontong": 2, "myeoncham": 1, "edu": 0}}, "강사": {"am": null, "amProd": "", "jk": {"gonggo": 692800, "iryeok": 0, "myeontong": 3, "myeoncham": 2, "edu": 0}, "jkProd": "Excellent 채용관 (PC+M)", "tot": {"gonggo": 692800, "iryeok": 0, "myeontong": 3, "myeoncham": 2, "edu": 0}}, "코칭": {"am": null, "amProd": "", "jk": null, "jkProd": "", "tot": {"gonggo": 0, "iryeok": 0, "myeontong": 0, "myeoncham": 0, "edu": 0}}}, "total": {"gonggo": 1604560, "iryeok": 0, "myeontong": 7, "myeoncham": 3, "edu": 0}, "breakdown": {"myeontong": {"상담부": 2, "사업부": 2, "강사": 3, "코칭": 0}, "myeoncham": {"상담부": 0, "사업부": 1, "강사": 2, "코칭": 0}, "edu": {"상담부": 0, "사업부": 0, "강사": 0, "코칭": 0}, "iryeok": {"상담부": 0, "사업부": 0, "강사": 0, "코칭": 0}}}};
-window.__dpMonth='9월';
-function dpWon(n){return (n||0).toLocaleString('ko-KR');}
-function dpBd(obj){ // 부서별 분해 문자열
-  var o=['상담부','사업부','강사','코칭'].map(function(d){return (obj[d]||0);});
-  return '상담'+o[0]+'·사업'+o[1]+'·강사'+o[2]+'·코칭'+o[3];
-}
-function dpRender(){
-  var mo=window.__dpMonth, D=HIRE_DEPT[mo]; if(!D) return;
-  var t=D.total, bd=D.breakdown;
-  document.getElementById('dp_total').innerHTML=
-     '<div class="dp-tc"><div class="l">총 공고비</div><div class="v g">'+dpWon(t.gonggo)+'</div></div>'
-    +'<div class="dp-tc"><div class="l">이력서</div><div class="v">'+t.iryeok+'</div><div class="bd">'+dpBd(bd.iryeok)+'</div></div>'
-    +'<div class="dp-tc"><div class="l">면접통보</div><div class="v">'+t.myeontong+'</div><div class="bd">'+dpBd(bd.myeontong)+'</div></div>'
-    +'<div class="dp-tc"><div class="l">면접참여</div><div class="v">'+t.myeoncham+'</div><div class="bd">'+dpBd(bd.myeoncham)+'</div></div>'
-    +'<div class="dp-tc"><div class="l">교육참여</div><div class="v">'+t.edu+'</div><div class="bd">'+dpBd(bd.edu)+'</div></div>';
-  var order=['상담부','사업부','강사','코칭'];
-  var gh='';
-  order.forEach(function(d){
-    var v=D.depts[d]; if(!v) return;
-    function srcRow(cls,label,s,prod){
-      var empty=(!s || (s.gonggo===0 && s.iryeok===0 && s.myeontong===0));
-      if(empty){
-        return '<div class="dp-src none"><div class="dp-src-top"><span class="dp-src-tag '+cls+'">'+label+'</span><span class="dp-src-prod">이번 달 없음</span></div></div>';
-      }
-      return '<div class="dp-src"><div class="dp-src-top"><span class="dp-src-tag '+cls+'">'+label+'</span>'
-        +'<span class="dp-src-prod">'+(prod||'')+'</span>'
-        +'<span class="dp-src-gonggo">'+dpWon(s.gonggo)+'</span></div>'
-        +'<div class="dp-src-meta">이력 <b>'+s.iryeok+'</b> · 통보 <b>'+s.myeontong+'</b> · 참여 <b>'+s.myeoncham+'</b> · 교육 <b>'+s.edu+'</b></div></div>';
-    }
-    var body = '';
-    // 사업부는 알바몬 줄 없음 (안 냄)
-    if(d!=='사업부') body += srcRow('am','알바몬',v.am,v.amProd);
-    body += srcRow('jk','잡코리아',v.jk,v.jkProd);
-    body += '<div class="dp-tot-row"><span class="lbl">합계</span>'
-        +'<span class="meta">이력 <b>'+v.tot.iryeok+'</b> · 통보 <b>'+v.tot.myeontong+'</b> · 참여 <b>'+v.tot.myeoncham+'</b> · 교육 <b>'+v.tot.edu+'</b></span>'
-        +'<span class="g">'+dpWon(v.tot.gonggo)+'</span></div>';
-    // 상담부 지점별 입퇴사
-    if(v.hire){
-      var hh='<div class="dp-hire"><div class="dp-hire-top"><span class="hl">👥 입퇴사</span>';
-      if(v.hire.jijum && v.hire.jijum.length){
-        hh+='<span class="in">입사 '+v.hire.tin+'</span><span class="out">퇴사 '+v.hire.tout+'</span></div>';
-        hh+='<div class="dp-jj">';
-        v.hire.jijum.forEach(function(j){
-          var net=j.in-j.out;
-          var netCls=net>0?'p':net<0?'m':'z';
-          var netStr=(net>0?'+':'')+net;
-          hh+='<div class="dp-jj-item">'+j.nm.replace('센터','').replace('지점','')+' <b class="'+netCls+'">'+netStr+'</b></div>';
-        });
-        hh+='</div>';
-      } else {
-        hh+='</div><div class="dp-hire-none">이번 달 입퇴사 집계 전</div>';
-      }
-      hh+='</div>';
-      body += hh;
-    }
-    gh+='<div class="dp-card '+d+'"><div class="dp-card-hd"><span class="dp-dot"></span><span class="dp-name">'+d+'</span>'
-      +'<span class="dp-sum">공고 '+dpWon(v.tot.gonggo)+'</span></div><div class="dp-body">'+body+'</div></div>';
-  });
-  document.getElementById('dp_grid').innerHTML=gh;
-  document.querySelectorAll('.dp-tab').forEach(function(b){ b.classList.toggle('on', b.dataset.mo===mo); });
-}
-(function(){
-  var order=Object.keys(HIRE_DEPT).sort().reverse();
-  var th=''; order.forEach(function(k){ th+='<button class="dp-tab'+(k===window.__dpMonth?' on':'')+'" data-mo="'+k+'" onclick="window.__dpMonth=\''+k+'\';dpRender();">'+k+'</button>'; });
-  document.getElementById('dp_tabs').innerHTML=th;
-  dpRender();
-})();
-</script>
-
-<!-- ═══ 면접 현황 대시보드 v2 (종결/예정) ═══ -->
-<style id="araon-interview-style">
-.iv-wrap{background:var(--pan);border-radius:14px;padding:20px 22px;box-shadow:0 2px 8px rgba(27,36,54,.05);margin-bottom:14px}
-.iv-hd{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px}
-.iv-hd h2{font-size:16px;font-weight:800;display:flex;align-items:center;gap:8px;margin:0}
-.iv-hd .sub{font-size:12px;color:var(--soft);font-weight:500}
-.iv-tabs{display:inline-flex;gap:5px}
-.iv-tab{background:var(--barbg);border:none;color:var(--soft);font-family:inherit;font-weight:700;font-size:12px;padding:6px 14px;border-radius:20px;cursor:pointer}
-.iv-tab.on{background:var(--v1);color:#fff}
-/* 퍼널 */
-.iv-funnel{display:flex;align-items:stretch;gap:6px;margin-bottom:16px}
-.iv-fstep{flex:1;background:#F7F9FC;border-radius:11px;padding:12px 8px;text-align:center;position:relative}
-.iv-fstep .l{font-size:11px;color:var(--soft);font-weight:600}
-.iv-fstep .v{font-size:24px;font-weight:900;margin-top:3px;letter-spacing:-.5px}
-.iv-fstep.f0 .v{color:#4C6EF5}.iv-fstep.f1 .v{color:#1D9E75}.iv-fstep.f2 .v{color:#7048E8}.iv-fstep.f3 .v{color:#BA7517}
-.iv-frate{font-size:10px;color:#B6C2DC;font-weight:700;margin-top:2px}
-.iv-farrow{display:flex;align-items:center;color:#D0D8E6;font-weight:900;font-size:15px}
-@media(max-width:640px){.iv-funnel{flex-wrap:wrap}.iv-fstep{flex:1 1 40%}.iv-farrow{display:none}}
-/* 사이트+그룹 요약 한 줄 */
-.iv-mini{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
-.iv-chip{background:#fff;border:1px solid var(--line);border-radius:20px;padding:6px 13px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px}
-.iv-chip .dot{width:8px;height:8px;border-radius:50%}
-.iv-chip.jk .dot{background:#BA7517}.iv-chip.am .dot{background:#1971C2}
-.iv-chip b{color:var(--v2)}
-.iv-chip .g{color:var(--soft);font-weight:600}
-/* 섹션 제목 */
-.iv-sect{font-size:13px;font-weight:800;margin:18px 0 10px;display:flex;align-items:center;gap:7px}
-.iv-sect.done{color:#1D9E75}.iv-sect.plan{color:var(--v1)}
-.iv-sect .cnt{font-size:11px;font-weight:700;color:var(--soft);background:var(--barbg);padding:1px 9px;border-radius:10px}
-/* 일자 그룹 */
-.iv-day{margin-bottom:14px}
-.iv-day-hd{font-size:12px;font-weight:800;color:var(--ink);margin-bottom:7px;display:flex;align-items:center;gap:6px}
-.iv-day-hd .wd{color:var(--soft);font-weight:600}
-.iv-day-hd .n{margin-left:auto;font-size:11px;color:var(--soft);font-weight:600}
-.iv-day-hd.today .n{color:#E23A22;font-weight:800}
-.iv-day-hd .todaytag{background:#FBE9E7;color:#E23A22;font-size:10px;font-weight:800;padding:1px 7px;border-radius:6px}
-/* 면접 카드(종결) */
-.iv-item{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:10px;background:#FAFBFD;margin-bottom:5px}
-.iv-item .tm{font-size:11px;color:var(--soft);font-weight:700;min-width:38px;padding-top:2px}
-.iv-item .body{flex:1;min-width:0}
-.iv-item .top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.iv-nm{font-weight:800;font-size:13px;color:var(--ink)}
-.iv-tag{font-size:10px;font-weight:800;padding:1px 6px;border-radius:5px}
-.iv-tag.jk{background:#FFF4E6;color:#BA7517}.iv-tag.am{background:#E7F5FF;color:#1971C2}
-.iv-tag.ara{background:#EEF0FF;color:#4C6EF5}.iv-tag.ssm{background:#F3EEFF;color:#7048E8}.iv-tag.op{background:#E6F7EE;color:#1D9E75}
-.iv-job{font-size:11px;color:var(--soft);font-weight:600}
-/* 결과 플로우 */
-.iv-flow{display:flex;align-items:center;gap:5px;margin-top:5px;flex-wrap:wrap;font-size:11px}
-.iv-fp{font-weight:800;padding:2px 9px;border-radius:7px;display:inline-flex;align-items:center;gap:3px}
-.iv-fp.at{background:#E6F7EE;color:#1D9E75}
-.iv-fp.ns{background:#FBE9E7;color:#E23A22}
-.iv-fp.ps{background:#F3EEFF;color:#7048E8}
-.iv-fp.fa{background:#F1F3F5;color:#868E96}
-.iv-fp.edu{background:#FFF4E6;color:#BA7517}
-.iv-arw{color:#C9D2E0;font-weight:900}
-.iv-memo{font-size:11px;color:var(--soft);margin-top:4px;line-height:1.4;padding-left:1px}
-.iv-memo::before{content:'💬 ';opacity:.6}
-/* 예정 아이템(간결) */
-.iv-plan-item{display:flex;align-items:center;gap:9px;padding:7px 12px;border-radius:9px;margin-bottom:4px}
-.iv-plan-item:hover{background:#F7F9FC}
-.iv-plan-item .tm{font-size:11px;color:var(--soft);font-weight:700;min-width:38px}
-.iv-plan-item .nm{font-weight:700;font-size:13px}
-.iv-plan-item .memo{margin-left:auto;font-size:11px;color:var(--soft);max-width:200px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-</style>
-
-<div class="iv-wrap">
-  <div class="iv-hd">
-    <div><h2>🗓️ 면접 현황 <span class="sub">잡코리아·알바몬 · 아라/쌤이다/운영센터</span></h2></div>
-    <div class="iv-tabs" id="iv_tabs"></div>
-  </div>
-  <div class="iv-funnel" id="iv_funnel"></div>
-  <div class="iv-mini" id="iv_mini"></div>
-  <div id="iv_done_wrap"></div>
-  <div id="iv_plan_wrap"></div>
-</div>
-
-<script>
-var INTERVIEW = {"2026-08": {"funnel": {"total": 7, "attend": 5, "pass": 2, "edu": 2, "noshow": 2}, "sites": {"잡코리아": {"total": 4, "attend": 3, "pass": 1}, "알바몬": {"total": 3, "attend": 2, "pass": 1}}, "groups": {"쌤이다": {"total": 3, "pass": 1}, "아라": {"total": 4, "pass": 1}}, "done": [{"date": "08/31", "wday": "월", "time": "17:00", "job": "강사", "grp": "쌤이다", "site": "잡코리아", "name": "김예진(만37)", "attend": "참석", "pass": "불합격", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "08/31", "wday": "월", "time": "12:00", "job": "상담부", "grp": "아라", "site": "알바몬", "name": "이지수(만25)", "attend": "불참", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": "*연락두절"}, {"date": "08/28", "wday": "금", "time": "17:30", "job": "상담부", "grp": "아라", "site": "잡코리아", "name": "명혜민(만30)", "attend": "불참", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": "*확콜하니 그제서야 못간다 ㅠ"}, {"date": "08/28", "wday": "금", "time": "12:00", "job": "강사", "grp": "쌤이다", "site": "잡코리아", "name": "안중현(만29)", "attend": "참석", "pass": "합격", "eduDate": "09/02", "eduTime": "18:10", "eduWho": "신우성", "memo": "*9/2, 9/4(18:30~) 교육예정"}, {"date": "08/27", "wday": "목", "time": "17:30", "job": "상담부", "grp": "아라", "site": "알바몬", "name": "전지은(만19)", "attend": "참석", "pass": "불합격", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "08/27", "wday": "목", "time": "17:30", "job": "상담부", "grp": "아라", "site": "알바몬", "name": "이준석(만26)", "attend": "참석", "pass": "합격", "eduDate": "08/31", "eduTime": "17:00", "eduWho": "우혜림", "memo": "*마곡에서 신입교육(1일) + 실업무투입교육 (3일) 완료 -> 마포연합센터소속으로 재직"}, {"date": "08/26", "wday": "수", "time": "14:30", "job": "강사", "grp": "쌤이다", "site": "잡코리아", "name": "김기원(만30)", "attend": "참석", "pass": "불합격", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}], "plan": []}, "2026-09": {"funnel": {"total": 22, "attend": 5, "pass": 3, "edu": 1, "noshow": 5}, "sites": {"잡코리아": {"total": 10, "attend": 3, "pass": 1}, "알바몬": {"total": 12, "attend": 2, "pass": 2}}, "groups": {"쌤이다": {"total": 5, "pass": 0}, "아라": {"total": 13, "pass": 3}, "운영센터": {"total": 4, "pass": 0}}, "done": [{"date": "09/03", "wday": "목", "time": "17:30", "job": "상담부", "grp": "아라", "site": "잡코리아", "name": "장우진(만29)", "attend": "참석", "pass": "불합격", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "09/03", "wday": "목", "time": "17:30", "job": "상담부", "grp": "아라", "site": "잡코리아", "name": "원미영(만36)", "attend": "불참", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": "*확콜이후 불참연락됨"}, {"date": "09/03", "wday": "목", "time": "17:30", "job": "상담부", "grp": "아라", "site": "알바몬", "name": "구자헌(만21)", "attend": "불참", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": "*연락두절"}, {"date": "09/03", "wday": "목", "time": "17:30", "job": "상담부", "grp": "아라", "site": "알바몬", "name": "최슬기(만32)", "attend": "참석", "pass": "합격", "eduDate": "09/07", "eduTime": "11:30", "eduWho": "우혜림", "memo": "*최종파트로 일하기로하여 부평지점 배정예정"}, {"date": "09/03", "wday": "목", "time": "14:30", "job": "사업부", "grp": "아라", "site": "잡코리아", "name": "김민섭(만30)", "attend": "참석", "pass": "합격", "eduDate": "", "eduTime": "", "eduWho": "", "memo": "*9월말교육예정(에듀플렉스 회원관리 인수인계)"}, {"date": "09/02", "wday": "수", "time": "14:30", "job": "강사", "grp": "쌤이다", "site": "잡코리아", "name": "서유미(만35)", "attend": "참석", "pass": "불합격", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "09/02", "wday": "수", "time": "12:00", "job": "상담부", "grp": "아라", "site": "알바몬", "name": "김보라(만29)", "attend": "참석", "pass": "합격", "eduDate": "", "eduTime": "", "eduWho": "", "memo": "*마곡or마포 희망 / 결혼식이후 교육일정 잡기"}, {"date": "09/02", "wday": "수", "time": "12:00", "job": "상담부", "grp": "아라", "site": "잡코리아", "name": "김현민(만25)", "attend": "불참", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": "*연락두절"}, {"date": "09/01", "wday": "화", "time": "14:30", "job": "강사", "grp": "쌤이다", "site": "잡코리아", "name": "안보화(만41)", "attend": "불참", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": "*불참연락옴"}, {"date": "09/01", "wday": "화", "time": "12:00", "job": "강사", "grp": "쌤이다", "site": "잡코리아", "name": "고민지(만38)", "attend": "불참", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": "*불참연락옴"}], "plan": [{"date": "09/04", "wday": "금", "time": "12:00", "job": "상담부", "grp": "아라", "site": "알바몬", "name": "이후범", "attend": "", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "09/04", "wday": "금", "time": "12:00", "job": "상담부", "grp": "아라", "site": "알바몬", "name": "이승훈(만24)", "attend": "", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "09/04", "wday": "금", "time": "16:00", "job": "코칭", "grp": "운영센터", "site": "알바몬", "name": "윤준성(27)", "attend": "", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "09/04", "wday": "금", "time": "17:00", "job": "사업부", "grp": "아라", "site": "잡코리아", "name": "정근중(만34)", "attend": "", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "09/07", "wday": "월", "time": "12:00", "job": "상담부", "grp": "아라", "site": "알바몬", "name": "김동후(만24)", "attend": "", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "09/07", "wday": "월", "time": "12:00", "job": "상담부", "grp": "아라", "site": "알바몬", "name": "이윤아(만27)", "attend": "", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": "*마포or마곡 희망"}, {"date": "09/07", "wday": "월", "time": "14:30", "job": "강사", "grp": "쌤이다", "site": "잡코리아", "name": "김정연(만37)", "attend": "", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "09/07", "wday": "월", "time": "15:00", "job": "강사", "grp": "운영센터", "site": "알바몬", "name": "전주연(23)", "attend": "", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "09/07", "wday": "월", "time": "15:00", "job": "강사", "grp": "운영센터", "site": "알바몬", "name": "양지은(24)", "attend": "", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "09/07", "wday": "월", "time": "16:00", "job": "강사", "grp": "쌤이다", "site": "잡코리아", "name": "최정민(만31)", "attend": "", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "09/07", "wday": "월", "time": "17:00", "job": "강사", "grp": "운영센터", "site": "알바몬", "name": "오현서(20)", "attend": "", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}, {"date": "09/08", "wday": "화", "time": "17:30", "job": "상담부", "grp": "아라", "site": "알바몬", "name": "김규원(만22)", "attend": "", "pass": "", "eduDate": "", "eduTime": "", "eduWho": "", "memo": ""}]}};
-window.__ivMonth='2026-09';
-function ivGrpCls(g){ return g==='아라'?'ara':g==='쌤이다'?'ssm':'op'; }
-function ivRate(a,b){ return b>0?Math.round(a/b*100)+'%':'-'; }
-function ivToday(){ var d=new Date(); return ('0'+(d.getMonth()+1)).slice(-2)+'/'+('0'+d.getDate()).slice(-2); }
-function ivRender(){
-  var mo=window.__ivMonth, D=INTERVIEW[mo]; if(!D) return;
-  var f=D.funnel;
-  // 퍼널
-  document.getElementById('iv_funnel').innerHTML=
-     '<div class="iv-fstep f0"><div class="l">면접</div><div class="v">'+f.total+'</div></div>'
-    +'<div class="iv-farrow">›</div>'
-    +'<div class="iv-fstep f1"><div class="l">참석</div><div class="v">'+f.attend+'</div><div class="iv-frate">'+ivRate(f.attend,f.total)+'</div></div>'
-    +'<div class="iv-farrow">›</div>'
-    +'<div class="iv-fstep f2"><div class="l">합격</div><div class="v">'+f.pass+'</div><div class="iv-frate">'+ivRate(f.pass,f.attend)+'</div></div>'
-    +'<div class="iv-farrow">›</div>'
-    +'<div class="iv-fstep f3"><div class="l">교육</div><div class="v">'+f.edu+'</div><div class="iv-frate">'+ivRate(f.edu,f.pass)+'</div></div>';
-  // 미니 요약 (사이트 + 그룹)
-  var mh='';
-  [['잡코리아','jk'],['알바몬','am']].forEach(function(s){
-    var d=D.sites[s[0]]; if(!d) return;
-    mh+='<div class="iv-chip '+s[1]+'"><span class="dot"></span>'+s[0]+' 면접 <b>'+d.total+'</b> · 합격 <b>'+d.pass+'</b></div>';
-  });
-  ['아라','쌤이다','운영센터'].forEach(function(g){
-    var d=D.groups[g]; if(!d) return;
-    mh+='<div class="iv-chip"><span class="g">'+g+'</span> <b>'+d.total+'</b>건</div>';
-  });
-  document.getElementById('iv_mini').innerHTML=mh;
-  doneWrap.innerHTML='';
-  planWrap.innerHTML='';
-  document.querySelectorAll('.iv-tab').forEach(function(b){ b.classList.toggle('on', b.dataset.mo===mo); });
-}
-(function(){
-  var order=Object.keys(INTERVIEW).sort().reverse();
-  var label={'2026-08':'8월','2026-09':'9월','2026-10':'10월','2026-11':'11월','2026-12':'12월'};
-  var th=''; order.forEach(function(k){ th+='<button class="iv-tab'+(k===window.__ivMonth?' on':'')+'" data-mo="'+k+'" onclick="window.__ivMonth=\''+k+'\';ivRender();">'+(label[k]||k)+'</button>'; });
-  document.getElementById('iv_tabs').innerHTML=th;
-  ivRender();
-})();
-</script>
-<!-- ═══ 면접 현황 대시보드 v2 끝 ═══ -->
-
-<!-- 채용 파이프라인 간트 (주간) -->
-<style id="araon-gantt-style">
-.gt-wrap{background:var(--pan);border-radius:14px;padding:20px 22px;box-shadow:0 2px 8px rgba(27,36,54,.05);margin-bottom:14px}
-.gt-hd{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px}
-.gt-hd h2{font-size:16px;font-weight:800;display:flex;align-items:center;gap:8px;margin:0}
-.gt-hd .sub{font-size:12px;color:var(--soft);font-weight:500}
-.gt-nav{display:inline-flex;align-items:center;gap:8px}
-.gt-navbtn{background:var(--barbg);border:none;color:var(--soft);font-family:inherit;font-weight:800;font-size:13px;width:28px;height:28px;border-radius:8px;cursor:pointer}
-.gt-navbtn:hover{background:var(--v1);color:#fff}
-.gt-navbtn:disabled{opacity:.3;cursor:default}
-.gt-week{font-size:13px;font-weight:800;color:var(--ink);min-width:130px;text-align:center}
 /* 범례 */
-.gt-legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;font-size:11px;color:var(--soft);font-weight:600}
-.gt-legend .lg{display:inline-flex;align-items:center;gap:5px}
-.gt-legend .d{width:9px;height:9px;border-radius:50%}
-.gt-legend .면접{background:#4C6EF5}.gt-legend .참석{background:#1D9E75}.gt-legend .합격{background:#7048E8}.gt-legend .교육{background:#BA7517}.gt-legend .이탈{background:#E23A22}
-/* PC 간트 */
-.gt-chart{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.gt-inner{min-width:680px}
-.gt-daygrid{display:grid;grid-template-columns:150px repeat(7,1fr);border-bottom:2px solid var(--line);padding-bottom:6px;margin-bottom:4px}
-.gt-daygrid .gt-corner{font-size:11px;color:var(--soft);font-weight:700;display:flex;align-items:flex-end;padding-bottom:2px}
-.gt-dcol{text-align:center;font-size:11px;font-weight:700;color:var(--soft)}
-.gt-dcol .wd{color:#B6C2DC}
-.gt-dcol.today{color:#E23A22}
-.gt-dcol.today .wd{color:#E23A22}
-.gt-row{display:grid;grid-template-columns:150px 1fr;align-items:center;padding:5px 0;border-bottom:1px solid #F4F6FA;min-height:34px}
-.gt-row:hover{background:#FAFBFD}
-.gt-person{display:flex;flex-direction:column;gap:1px;padding-right:8px;min-width:0}
-.gt-pname{font-weight:800;font-size:13px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.gt-pmeta{font-size:10px;color:var(--soft);display:flex;gap:4px;align-items:center;flex-wrap:wrap}
-.gt-tag{font-size:9px;font-weight:800;padding:0 5px;border-radius:4px}
-.gt-tag.jk{background:#FFF4E6;color:#BA7517}.gt-tag.am{background:#E7F5FF;color:#1971C2}
-.gt-tag.ara{background:#EEF0FF;color:#4C6EF5}.gt-tag.ssm{background:#F3EEFF;color:#7048E8}.gt-tag.op{background:#E6F7EE;color:#1D9E75}
-/* 플로우 트랙 (7일 그리드) */
-.gt-track{position:relative;height:26px;display:grid;grid-template-columns:repeat(7,1fr)}
-.gt-cell{border-left:1px solid #F1F4F8;position:relative}
-.gt-cell:first-child{border-left:none}
-/* 플로우 선 (absolute) */
-.gt-line{position:absolute;top:50%;height:3px;transform:translateY(-50%);border-radius:2px;z-index:1}
-.gt-node{position:absolute;top:50%;width:11px;height:11px;border-radius:50%;transform:translate(-50%,-50%);z-index:2;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.15)}
-.gt-node.면접{background:#4C6EF5}.gt-node.참석{background:#1D9E75}.gt-node.합격{background:#7048E8}
-.gt-node.교육{background:#BA7517;width:15px;height:15px}
-.gt-node.fail{background:#E23A22}
-.gt-node.plan{background:#fff;border:2px solid #B6C2DC}
-.gt-node.wait{background:#fff;border:2px dashed #BA7517}
-.gt-nlabel{position:absolute;top:-13px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:800;white-space:nowrap;z-index:3}
-.gt-flag{position:absolute;top:50%;transform:translate(-50%,-50%);font-size:12px;z-index:3}
-/* 상태 뱃지 (오른쪽 끝) */
-.gt-final{position:absolute;top:50%;right:2px;transform:translateY(-50%);font-size:10px;font-weight:800;padding:1px 7px;border-radius:6px;z-index:4;white-space:nowrap}
-.gt-final.교육{background:#FFF4E6;color:#BA7517}.gt-final.합격{background:#F3EEFF;color:#7048E8}
-.gt-final.불합격{background:#FBE9E7;color:#E23A22}.gt-final.불참{background:#FBE9E7;color:#E23A22}
-.gt-final.예정{background:#EEF1F6;color:#8A94A6}.gt-final.결과대기{background:#FFF9E6;color:#BA7517}
-.gt-memo{font-size:10px;color:var(--soft);grid-column:2;padding:1px 0 3px 2px;line-height:1.3}
-.gt-empty{text-align:center;color:#B6C2DC;padding:20px;font-size:13px}
-/* 부서 섹션 */
-.gt-dept{margin:14px 0 6px}
-.gt-dept:first-of-type{margin-top:4px}
-.gt-dept-hd{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;margin-bottom:6px;padding:6px 10px;border-radius:8px}
-.gt-dept-hd.상담부{background:#EEF0FF;color:#3B4F9E}
-.gt-dept-hd.강사{background:#E6F7EE;color:#1B7A4A}
-.gt-dept-hd.사업부{background:#F3EEFF;color:#6A3FD0}
-.gt-dept-hd.코칭{background:#FFF4E6;color:#BA7517}
-.gt-dept-hd .cnt{margin-left:auto;font-size:11px;font-weight:700;opacity:.7}
+.cal-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;font-size:11px;color:var(--soft);font-weight:600}
+.cal-legend .lg{display:inline-flex;align-items:center;gap:5px}
+.cal-legend .d{width:9px;height:3px;border-radius:2px}
+.cal-legend .상담부{background:#4C6EF5}.cal-legend .강사{background:#1D9E75}.cal-legend .사업부{background:#7048E8}.cal-legend .코칭{background:#BA7517}
 
-/* 모바일 = 세로 리스트로 폴백 */
-/* 모바일 = 카드형 */
-.gt-mcard{display:none}
+/* 모바일 = 세로 카드 */
 @media(max-width:768px){
-  .gt-daygrid{display:none}
-  .gt-inner{min-width:0}
-  .gt-row{display:none}
-  .gt-mcard{display:block;background:#FAFBFD;border:1px solid var(--line);border-radius:11px;padding:12px 14px;margin-bottom:8px}
-  .gt-mc-top{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:8px}
-  .gt-mc-time{font-size:11px;color:var(--soft);font-weight:700}
-  .gt-mc-name{font-weight:800;font-size:14px;color:var(--ink)}
-  .gt-mc-flow{display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:11px;font-weight:800;margin-bottom:6px}
-  .gt-mstep{padding:3px 10px;border-radius:7px;display:inline-flex;align-items:center;gap:3px}
-  .gt-mstep.면접{background:#EEF0FF;color:#4C6EF5}.gt-mstep.참석{background:#E6F7EE;color:#1D9E75}
-  .gt-mstep.합격{background:#F3EEFF;color:#7048E8}.gt-mstep.교육{background:#FFF4E6;color:#BA7517}
-  .gt-mstep.fail{background:#FBE9E7;color:#E23A22}.gt-mstep.plan{background:#EEF1F6;color:#8A94A6}
-  .gt-marw{color:#C9D2E0;font-weight:900}
-  .gt-mc-final{font-size:11px;font-weight:800;padding:2px 9px;border-radius:7px;display:inline-block}
-  .gt-mc-final.교육{background:#FFF4E6;color:#BA7517}.gt-mc-final.합격{background:#F3EEFF;color:#7048E8}
-  .gt-mc-final.불합격,.gt-mc-final.불참{background:#FBE9E7;color:#E23A22}
-  .gt-mc-final.예정{background:#EEF1F6;color:#8A94A6}.gt-mc-final.결과대기{background:#FFF9E6;color:#BA7517}
-  .gt-mc-memo{font-size:11px;color:var(--soft);margin-top:6px;line-height:1.4}
-  .gt-mday{font-size:12px;font-weight:800;color:var(--ink);margin:12px 0 7px;padding-bottom:5px;border-bottom:1px solid var(--line)}
-  .gt-mday .wd{color:var(--soft);font-weight:600}
-  .gt-mday.today{color:#E23A22}
-  .gt-mday .todaytag{background:#FBE9E7;color:#E23A22;font-size:10px;font-weight:800;padding:1px 7px;border-radius:6px;margin-left:5px}
-  .gt-chart{overflow-x:visible}
+  .wrap{padding:16px 12px 40px}
+  .cal-grid{grid-template-columns:1fr;gap:9px}
+  .cal-col{min-height:0;padding:11px 13px}
+  .cal-col.empty-mo{display:none}   /* 모바일: 면접 없는 날 숨김 */
+  .cal-dhd{display:flex;align-items:center;gap:8px;text-align:left;margin-bottom:8px;padding-bottom:7px}
+  .cal-wd{font-size:12px}
+  .cal-dnum{font-size:15px;margin-top:0}
+  .cal-dnum::after{content:'일';font-size:11px;font-weight:700;color:var(--soft);margin-left:1px}
+  .cal-todaytag{margin-top:0;margin-left:auto}
+  .cal-ivs{gap:6px}
+  .cal-iv{padding:8px 11px;display:flex;align-items:center;gap:9px}
+  .cal-iv-tm{min-width:42px}
+  .cal-iv-nm{font-size:13px;margin-top:0}
+  .cal-iv-tag{margin-top:0;margin-left:auto}
 }
-</style>
 
-<div class="gt-wrap">
-  <div class="gt-hd">
-    <div><h2>📊 채용 파이프라인 <span class="sub">면접→참석→합격→교육 · 주간</span></h2></div>
-    <div class="gt-nav">
-      <button class="gt-navbtn" id="gt_prev" onclick="gtMove(-1)">‹</button>
-      <span class="gt-week" id="gt_week"></span>
-      <button class="gt-navbtn" id="gt_next" onclick="gtMove(1)">›</button>
+/* 상세 모달 */
+.iv-modal-bg{position:fixed;inset:0;background:rgba(15,20,34,.5);backdrop-filter:blur(3px);z-index:9998;display:none;align-items:center;justify-content:center;padding:16px}
+.iv-modal-bg.on{display:flex}
+.iv-card{width:380px;max-width:100%;max-height:88vh;overflow-y:auto;background:#fff;border-radius:18px;box-shadow:0 20px 60px rgba(15,20,34,.4);animation:ivpop .2s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes ivpop{from{transform:translateY(12px) scale(.97);opacity:0}to{transform:none;opacity:1}}
+.ivm-hd{padding:20px 22px 16px;color:#fff;position:relative}
+.ivm-hd.job-상담부{background:linear-gradient(135deg,#4C6EF5,#5C7CFA)}
+.ivm-hd.job-강사{background:linear-gradient(135deg,#1D9E75,#20B884)}
+.ivm-hd.job-사업부{background:linear-gradient(135deg,#7048E8,#8B5CF6)}
+.ivm-hd.job-코칭{background:linear-gradient(135deg,#BA7517,#E09A2E)}
+.ivm-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.4);color:#fff;font-size:15px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center}
+.ivm-nm{font-size:22px;font-weight:900}
+.ivm-when{font-size:13px;font-weight:700;opacity:.9;margin-top:4px}
+.ivm-tags{display:flex;gap:6px;margin-top:11px;flex-wrap:wrap}
+.ivm-tag{font-size:11px;font-weight:800;padding:3px 10px;border-radius:7px;background:rgba(255,255,255,.22)}
+.ivm-body{padding:16px 22px 20px}
+.ivm-row{display:flex;padding:9px 0;border-bottom:1px solid #F2F4F7;font-size:13px}
+.ivm-row:last-child{border-bottom:none}
+.ivm-lbl{width:80px;color:var(--soft);font-weight:600;flex-shrink:0}
+.ivm-val{font-weight:700;color:var(--ink)}
+.ivm-val.at{color:#1B7A4A}.ivm-val.ns{color:#C0341E}.ivm-val.ps{color:#5A3AD0}.ivm-val.fa{color:#C0341E}
+.ivm-memo{background:#F7F9FC;border-radius:10px;padding:11px 13px;font-size:12.5px;line-height:1.5;color:#3A4456;margin-top:12px}
+.ivm-memo::before{content:'💬 ';opacity:.6}
+
+.ft{text-align:center;font-size:11px;color:var(--soft);margin-top:20px;line-height:1.8}
+.err{background:#FFF6F5;border:1px solid #F5D0CC;border-radius:10px;padding:14px;font-size:13px;color:#C0341E;margin:14px 0}
+</style></head><body><div class="wrap">
+<div class="hd"><div class="k">채용 · 면접</div><h1>면접 캘린더</h1>
+<div class="m" id="upd">불러오는 중…</div></div>
+
+<div class="cal-wrap">
+  <div class="cal-hd">
+    <h2 id="cal_title">🗓️ 이번주 면접</h2>
+    <div class="cal-nav">
+      <button class="cal-today-btn" onclick="calToday()">오늘</button>
+      <button class="cal-navbtn" onclick="calMove(-1)">‹</button>
+      <span class="cal-range" id="cal_range"></span>
+      <button class="cal-navbtn" onclick="calMove(1)">›</button>
     </div>
   </div>
-  <div class="gt-legend">
-    <span class="lg"><span class="d 면접"></span>면접</span>
-    <span class="lg"><span class="d 참석"></span>참석</span>
-    <span class="lg"><span class="d 합격"></span>합격</span>
-    <span class="lg"><span class="d 교육"></span>교육🎓</span>
-    <span class="lg"><span class="d 이탈"></span>이탈</span>
+  <div id="cal_grid"></div>
+  <div class="cal-legend">
+    <span class="lg"><span class="d 상담부"></span>상담부</span>
+    <span class="lg"><span class="d 강사"></span>강사</span>
+    <span class="lg"><span class="d 사업부"></span>사업부</span>
+    <span class="lg"><span class="d 코칭"></span>코칭</span>
   </div>
-  <div class="gt-chart"><div class="gt-inner" id="gt_inner"></div></div>
 </div>
+<div class="ft">소스 = 면접일정 시트 (실시간) · 연락처 등 개인정보 제외 · 이름·시간·직무·유입만 표시</div>
+</div>
+
+<div class="iv-modal-bg" id="ivModal" onclick="if(event.target===this)closeIv()"><div class="iv-card" id="ivBody"></div></div>
 
 <script>
-var GANTT = {"2026-08-24": {"days": [{"date": "2026-08-24", "wd": "월"}, {"date": "2026-08-25", "wd": "화"}, {"date": "2026-08-26", "wd": "수"}, {"date": "2026-08-27", "wd": "목"}, {"date": "2026-08-28", "wd": "금"}, {"date": "2026-08-29", "wd": "토"}, {"date": "2026-08-30", "wd": "일"}], "depts": {"상담부": [{"name": "전지은(만19)", "job": "상담부", "grp": "아라", "site": "알바몬", "dept": "상담부", "date": "2026-08-27", "time": "17:30", "week": "2026-08-24", "interviewDate": "2026-08-27", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-08-27", "state": "done"}, {"k": "참석", "date": "2026-08-27", "state": "done"}, {"k": "합격", "date": "2026-08-27", "state": "fail"}], "final": "불합격", "memo": ""}, {"name": "이준석(만26)", "job": "상담부", "grp": "아라", "site": "알바몬", "dept": "상담부", "date": "2026-08-27", "time": "17:30", "week": "2026-08-24", "interviewDate": "2026-08-27", "eduDate": "2026-08-31", "eduWho": "우혜림", "stages": [{"k": "면접", "date": "2026-08-27", "state": "done"}, {"k": "참석", "date": "2026-08-27", "state": "done"}, {"k": "합격", "date": "2026-08-27", "state": "done"}, {"k": "교육", "date": "2026-08-31", "state": "done", "who": "우혜림"}], "final": "교육", "memo": "*마곡에서 신입교육(1일) + 실업무투입교육 (3일) 완료 -> 마포연합센터소속으로 재직"}, {"name": "명혜민(만30)", "job": "상담부", "grp": "아라", "site": "잡코리아", "dept": "상담부", "date": "2026-08-28", "time": "17:30", "week": "2026-08-24", "interviewDate": "2026-08-28", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-08-28", "state": "done"}, {"k": "참석", "date": "2026-08-28", "state": "fail"}], "final": "불참", "memo": "*확콜하니 그제서야 못간다 ㅠ"}], "강사": [{"name": "김기원(만30)", "job": "강사", "grp": "쌤이다", "site": "잡코리아", "dept": "강사", "date": "2026-08-26", "time": "14:30", "week": "2026-08-24", "interviewDate": "2026-08-26", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-08-26", "state": "done"}, {"k": "참석", "date": "2026-08-26", "state": "done"}, {"k": "합격", "date": "2026-08-26", "state": "fail"}], "final": "불합격", "memo": ""}, {"name": "안중현(만29)", "job": "강사", "grp": "쌤이다", "site": "잡코리아", "dept": "강사", "date": "2026-08-28", "time": "12:00", "week": "2026-08-24", "interviewDate": "2026-08-28", "eduDate": "2026-09-02", "eduWho": "신우성", "stages": [{"k": "면접", "date": "2026-08-28", "state": "done"}, {"k": "참석", "date": "2026-08-28", "state": "done"}, {"k": "합격", "date": "2026-08-28", "state": "done"}, {"k": "교육", "date": "2026-09-02", "state": "done", "who": "신우성"}], "final": "교육", "memo": "*9/2, 9/4(18:30~) 교육예정"}]}}, "2026-08-31": {"days": [{"date": "2026-08-31", "wd": "월"}, {"date": "2026-09-01", "wd": "화"}, {"date": "2026-09-02", "wd": "수"}, {"date": "2026-09-03", "wd": "목"}, {"date": "2026-09-04", "wd": "금"}, {"date": "2026-09-05", "wd": "토"}, {"date": "2026-09-06", "wd": "일"}], "depts": {"상담부": [{"name": "이지수(만25)", "job": "상담부", "grp": "아라", "site": "알바몬", "dept": "상담부", "date": "2026-08-31", "time": "12:00", "week": "2026-08-31", "interviewDate": "2026-08-31", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-08-31", "state": "done"}, {"k": "참석", "date": "2026-08-31", "state": "fail"}], "final": "불참", "memo": "*연락두절"}, {"name": "김보라(만29)", "job": "상담부", "grp": "아라", "site": "알바몬", "dept": "상담부", "date": "2026-09-02", "time": "12:00", "week": "2026-08-31", "interviewDate": "2026-09-02", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-09-02", "state": "done"}, {"k": "참석", "date": "2026-09-02", "state": "done"}, {"k": "합격", "date": "2026-09-02", "state": "done"}, {"k": "교육", "date": "", "state": "wait"}], "final": "합격", "memo": "*마곡or마포 희망 / 결혼식이후 교육일정 잡기"}, {"name": "김현민(만25)", "job": "상담부", "grp": "아라", "site": "잡코리아", "dept": "상담부", "date": "2026-09-02", "time": "12:00", "week": "2026-08-31", "interviewDate": "2026-09-02", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-09-02", "state": "done"}, {"k": "참석", "date": "2026-09-02", "state": "fail"}], "final": "불참", "memo": "*연락두절"}, {"name": "장우진(만29)", "job": "상담부", "grp": "아라", "site": "잡코리아", "dept": "상담부", "date": "2026-09-03", "time": "17:30", "week": "2026-08-31", "interviewDate": "2026-09-03", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-09-03", "state": "done"}, {"k": "참석", "date": "2026-09-03", "state": "done"}, {"k": "합격", "date": "2026-09-03", "state": "fail"}], "final": "불합격", "memo": ""}, {"name": "원미영(만36)", "job": "상담부", "grp": "아라", "site": "잡코리아", "dept": "상담부", "date": "2026-09-03", "time": "17:30", "week": "2026-08-31", "interviewDate": "2026-09-03", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-09-03", "state": "done"}, {"k": "참석", "date": "2026-09-03", "state": "fail"}], "final": "불참", "memo": "*확콜이후 불참연락됨"}, {"name": "구자헌(만21)", "job": "상담부", "grp": "아라", "site": "알바몬", "dept": "상담부", "date": "2026-09-03", "time": "17:30", "week": "2026-08-31", "interviewDate": "2026-09-03", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-09-03", "state": "done"}, {"k": "참석", "date": "2026-09-03", "state": "fail"}], "final": "불참", "memo": "*연락두절"}, {"name": "최슬기(만32)", "job": "상담부", "grp": "아라", "site": "알바몬", "dept": "상담부", "date": "2026-09-03", "time": "17:30", "week": "2026-08-31", "interviewDate": "2026-09-03", "eduDate": "2026-09-07", "eduWho": "우혜림", "stages": [{"k": "면접", "date": "2026-09-03", "state": "done"}, {"k": "참석", "date": "2026-09-03", "state": "done"}, {"k": "합격", "date": "2026-09-03", "state": "done"}, {"k": "교육", "date": "2026-09-07", "state": "done", "who": "우혜림"}], "final": "교육", "memo": "*최종파트로 일하기로하여 부평지점 배정예정"}, {"name": "이후범", "job": "상담부", "grp": "아라", "site": "알바몬", "dept": "상담부", "date": "2026-09-04", "time": "12:00", "week": "2026-08-31", "interviewDate": "2026-09-04", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-09-04", "state": "plan"}], "final": "예정", "memo": ""}, {"name": "이승훈(만24)", "job": "상담부", "grp": "아라", "site": "알바몬", "dept": "상담부", "date": "2026-09-04", "time": "12:00", "week": "2026-08-31", "interviewDate": "2026-09-04", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-09-04", "state": "plan"}], "final": "예정", "memo": ""}], "강사": [{"name": "김예진(만37)", "job": "강사", "grp": "쌤이다", "site": "잡코리아", "dept": "강사", "date": "2026-08-31", "time": "17:00", "week": "2026-08-31", "interviewDate": "2026-08-31", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-08-31", "state": "done"}, {"k": "참석", "date": "2026-08-31", "state": "done"}, {"k": "합격", "date": "2026-08-31", "state": "fail"}], "final": "불합격", "memo": ""}, {"name": "고민지(만38)", "job": "강사", "grp": "쌤이다", "site": "잡코리아", "dept": "강사", "date": "2026-09-01", "time": "12:00", "week": "2026-08-31", "interviewDate": "2026-09-01", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-09-01", "state": "done"}, {"k": "참석", "date": "2026-09-01", "state": "fail"}], "final": "불참", "memo": "*불참연락옴"}, {"name": "안보화(만41)", "job": "강사", "grp": "쌤이다", "site": "잡코리아", "dept": "강사", "date": "2026-09-01", "time": "14:30", "week": "2026-08-31", "interviewDate": "2026-09-01", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-09-01", "state": "done"}, {"k": "참석", "date": "2026-09-01", "state": "fail"}], "final": "불참", "memo": "*불참연락옴"}, {"name": "서유미(만35)", "job": "강사", "grp": "쌤이다", "site": "잡코리아", "dept": "강사", "date": "2026-09-02", "time": "14:30", "week": "2026-08-31", "interviewDate": "2026-09-02", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-09-02", "state": "done"}, {"k": "참석", "date": "2026-09-02", "state": "done"}, {"k": "합격", "date": "2026-09-02", "state": "fail"}], "final": "불합격", "memo": ""}], "사업부": [{"name": "김민섭(만30)", "job": "사업부", "grp": "아라", "site": "잡코리아", "dept": "사업부", "date": "2026-09-03", "time": "14:30", "week": "2026-08-31", "interviewDate": "2026-09-03", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-09-03", "state": "done"}, {"k": "참석", "date": "2026-09-03", "state": "done"}, {"k": "합격", "date": "2026-09-03", "state": "done"}, {"k": "교육", "date": "", "state": "wait"}], "final": "합격", "memo": "*9월말교육예정(에듀플렉스 회원관리 인수인계)"}, {"name": "정근중(만34)", "job": "사업부", "grp": "아라", "site": "잡코리아", "dept": "사업부", "date": "2026-09-04", "time": "17:00", "week": "2026-08-31", "interviewDate": "2026-09-04", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-09-04", "state": "plan"}], "final": "예정", "memo": ""}], "코칭": [{"name": "윤준성(27)", "job": "코칭", "grp": "운영센터", "site": "알바몬", "dept": "코칭", "date": "2026-09-04", "time": "16:00", "week": "2026-08-31", "interviewDate": "2026-09-04", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-09-04", "state": "plan"}], "final": "예정", "memo": ""}]}}, "2026-09-07": {"days": [{"date": "2026-09-07", "wd": "월"}, {"date": "2026-09-08", "wd": "화"}, {"date": "2026-09-09", "wd": "수"}, {"date": "2026-09-10", "wd": "목"}, {"date": "2026-09-11", "wd": "금"}, {"date": "2026-09-12", "wd": "토"}, {"date": "2026-09-13", "wd": "일"}], "depts": {"상담부": [{"name": "김동후(만24)", "job": "상담부", "grp": "아라", "site": "알바몬", "dept": "상담부", "date": "2026-09-07", "time": "12:00", "week": "2026-09-07", "interviewDate": "2026-09-07", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-09-07", "state": "plan"}], "final": "예정", "memo": ""}, {"name": "이윤아(만27)", "job": "상담부", "grp": "아라", "site": "알바몬", "dept": "상담부", "date": "2026-09-07", "time": "12:00", "week": "2026-09-07", "interviewDate": "2026-09-07", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-09-07", "state": "plan"}], "final": "예정", "memo": "*마포or마곡 희망"}, {"name": "김규원(만22)", "job": "상담부", "grp": "아라", "site": "알바몬", "dept": "상담부", "date": "2026-09-08", "time": "17:30", "week": "2026-09-07", "interviewDate": "2026-09-08", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-09-08", "state": "plan"}], "final": "예정", "memo": ""}], "강사": [{"name": "김정연(만37)", "job": "강사", "grp": "쌤이다", "site": "잡코리아", "dept": "강사", "date": "2026-09-07", "time": "14:30", "week": "2026-09-07", "interviewDate": "2026-09-07", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-09-07", "state": "plan"}], "final": "예정", "memo": ""}, {"name": "전주연(23)", "job": "강사", "grp": "운영센터", "site": "알바몬", "dept": "강사", "date": "2026-09-07", "time": "15:00", "week": "2026-09-07", "interviewDate": "2026-09-07", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-09-07", "state": "plan"}], "final": "예정", "memo": ""}, {"name": "양지은(24)", "job": "강사", "grp": "운영센터", "site": "알바몬", "dept": "강사", "date": "2026-09-07", "time": "15:00", "week": "2026-09-07", "interviewDate": "2026-09-07", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-09-07", "state": "plan"}], "final": "예정", "memo": ""}, {"name": "최정민(만31)", "job": "강사", "grp": "쌤이다", "site": "잡코리아", "dept": "강사", "date": "2026-09-07", "time": "16:00", "week": "2026-09-07", "interviewDate": "2026-09-07", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-09-07", "state": "plan"}], "final": "예정", "memo": ""}, {"name": "오현서(20)", "job": "강사", "grp": "운영센터", "site": "알바몬", "dept": "강사", "date": "2026-09-07", "time": "17:00", "week": "2026-09-07", "interviewDate": "2026-09-07", "eduDate": "", "eduWho": "", "stages": [{"k": "면접", "date": "2026-09-07", "state": "plan"}], "final": "예정", "memo": ""}]}}};
-var GT_WEEKS = Object.keys(GANTT).sort();
-// 오늘이 포함된 주를 기본값 (없으면 최신)
-window.__gtIdx = (function(){
-  var t=gtToday();
-  for(var i=0;i<GT_WEEKS.length;i++){
-    var W=GANTT[GT_WEEKS[i]];
-    if(W && W.days && W.days[0].date<=t && t<=W.days[6].date) return i;
+// ── 면접일정 시트 (publish CSV) ──
+var CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSz4NSoTmHTebOTpuiy3qbJIRe_vFbC9jf9A4QGDEMlZC4aatoIkEaMqIQspaCNI3scpFhu5TEQEyPA/pub?output=csv";
+
+// CSV 파서 (따옴표 대응)
+function parseCSV(text){
+  var rows=[],row=[],cur='',q=false;
+  for(var i=0;i<text.length;i++){var c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=c; }
+    else { if(c==='"')q=true; else if(c===','){row.push(cur);cur='';} else if(c==='\n'){row.push(cur);rows.push(row);row=[];cur='';} else if(c==='\r'){} else cur+=c; }
   }
-  return GT_WEEKS.length-1;
-})();
-var GT_STAGE_ORDER=['면접','참석','합격','교육'];
-function gtGrpCls(g){return g==='아라'?'ara':g==='쌤이다'?'ssm':'op';}
-function gtToday(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
-function gtDayIdx(days,dstr){ for(var i=0;i<days.length;i++){ if(days[i].date===dstr) return i; } return -1; }
+  if(cur!==''||row.length){row.push(cur);rows.push(row);}
+  return rows;
+}
 
-function gtRender(){
-  var mon=GT_WEEKS[window.__gtIdx], W=GANTT[mon];
-  if(!W){ return; }
-  var days=W.days, depts=W.depts;
-  var s=days[0].date.slice(5).replace('-','/'), e=days[6].date.slice(5).replace('-','/');
-  document.getElementById('gt_week').textContent=s+' ~ '+e;
-  document.getElementById('gt_prev').disabled=(window.__gtIdx<=0);
-  document.getElementById('gt_next').disabled=(window.__gtIdx>=GT_WEEKS.length-1);
-  var today=gtToday();
-  function cx(idx){ return (idx+0.5)/7*100; }
+// "8/26(수)" or "2026-08-26" → Date (올해 기준)
+function parseDate(s){
+  s=String(s||'').trim();
+  var m=s.match(/(\d{4})[-.\/](\d{1,2})[-.\/](\d{1,2})/);
+  if(m) return new Date(+m[1],+m[2]-1,+m[3]);
+  m=s.match(/(\d{1,2})\s*[\/월.]\s*(\d{1,2})/);   // 8/26 or 8월26
+  if(m){ var y=new Date().getFullYear(); return new Date(y,+m[1]-1,+m[2]); }
+  return null;
+}
+function ymd(d){ return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+function todayYmd(){ return ymd(new Date()); }
+var WD=['일','월','화','수','목','금','토'];
+// 직무 정규화 (강사(쌤이다) → 강사)
+function jobNorm(s){ s=String(s||''); if(s.indexOf('상담')>=0)return '상담부'; if(s.indexOf('사업')>=0)return '사업부'; if(s.indexOf('코칭')>=0)return '코칭'; if(s.indexOf('강사')>=0)return '강사'; return s||'기타'; }
+// [면접관 규칙] 운영센터+알바몬+코칭 = 운영센터 면접 / 나머지 전부 = 엄현호 이사
+function interviewerOf(iv){
+  // 시트 면접관 열(H) 값이 있으면 그대로 사용
+  if(iv.interviewer) return iv.interviewer;
+  // 폴백 규칙: 코칭+알바몬 = 운영센터 / 그 외 = 엄현호 이사
+  var site=String(iv.site||'').trim(), job=String(iv.job||'').trim();
+  if(job==='코칭' && site.indexOf('알바몬')>=0) return '운영센터';
+  return '엄현호 이사';
+}
+// 참석/합격 상태 → {cls,label}
+function statusOf(iv){
+  var at=String(iv.attend||'').trim(), pass=String(iv.pass||'').trim();
+  if(!at && !pass) return {cls:'wait',label:'예정'};
+  if(at.indexOf('불참')>=0||at.indexOf('노쇼')>=0) return {cls:'ns',label:'불참'};
+  if(pass.indexOf('불합격')>=0) return {cls:'fa',label:'불합격'};
+  if(pass.indexOf('합격')>=0){ return iv.eduDate?{cls:'ps',label:'교육예정'}:{cls:'ps',label:'합격'}; }
+  if(at.indexOf('참석')>=0) return {cls:'at',label:'참석·결과대기'};
+  return {cls:'wait',label:'예정'};
+}
 
-  var h='';
-  var deptOrder=['상담부','강사','사업부','코칭'];
-  var anyDept=false;
-  deptOrder.forEach(function(dept){
-    var ppl=depts[dept];
-    if(!ppl || !ppl.length) return;
-    anyDept=true;
-    // 부서 헤더
-    h+='<div class="gt-dept"><div class="gt-dept-hd '+dept+'">'+dept+'<span class="cnt">'+ppl.length+'명</span></div>';
-    // 요일 헤더 (부서마다)
-    h+='<div class="gt-daygrid"><div class="gt-corner">지원자</div>';
-    days.forEach(function(d){
-      var isT=(d.date===today);
-      h+='<div class="gt-dcol'+(isT?' today':'')+'">'+d.date.slice(8)+'<br><span class="wd">'+d.wd+'</span></div>';
+var IVS=[];   // 전체 면접 (파싱됨)
+var __weekStart=null;   // 현재 보는 주 월요일
+
+function boot(){
+  fetch(CSV_URL+'&_='+Date.now()).then(function(r){return r.text();}).then(function(txt){
+    var rows=parseCSV(txt).filter(function(r){return r.some(function(c){return (c||'').trim();});});
+    // 헤더행 찾기 (이름 포함)
+    var hi=0; for(var i=0;i<Math.min(rows.length,4);i++){ if(rows[i].some(function(c){return (c||'').indexOf('이름')>=0;})){hi=i;break;} }
+    // 컬럼: A날짜 B시간 C직무 D사이트 E이름 F지역 G연락처 H참석 I합격 J교육날짜 K교육시간 L교육담당 M메모
+    for(var r=hi+1;r<rows.length;r++){
+      var row=rows[r];
+      var nm=(row[4]||'').trim();
+      var dt=parseDate(row[0]);
+      if(!nm || !dt) continue;
+      IVS.push({
+        date:ymd(dt), dObj:dt,
+        time:(row[1]||'').trim(),
+        job:jobNorm(row[2]),
+        site:(row[3]||'').trim(),
+        name:nm,
+        region:(row[5]||'').trim(),
+        interviewer:(row[7]||'').trim(),   // [H열] 시트의 실제 면접관 (엄현호 이사/운영센터)
+        attend:(row[8]||'').trim(),
+        pass:(row[9]||'').trim(),
+        eduDate:(row[10]||'').trim(),
+        eduTime:(row[11]||'').trim(),
+        eduWho:(row[12]||'').trim(),
+        memo:(row[13]||'').trim()
+      });
+    }
+    IVS.sort(function(a,b){ return a.date<b.date?-1:a.date>b.date?1:(a.time<b.time?-1:1); });
+    document.getElementById('upd').textContent='실시간 · '+IVS.length+'건 · '+new Date().toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})+' 기준';
+    // 이번주로 초기화
+    __weekStart=mondayOf(new Date());
+    renderCal();
+  }).catch(function(e){
+    document.getElementById('cal_grid').innerHTML='<div class="err">시트를 불러오지 못했어요: '+e+'<br>시트 공유가 "링크 있는 사람 뷰어"인지 확인해주세요.</div>';
+    document.getElementById('upd').textContent='로드 실패';
+  });
+}
+
+function mondayOf(d){ var x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); var dow=x.getDay(); x.setDate(x.getDate()-(dow===0?6:dow-1)); return x; }
+
+// ── 오늘의 면접 (히어로) ──
+function renderToday(){
+  var el=document.getElementById('today-hero');
+  var td=todayYmd(), now=new Date();
+  var dnum=now.getMonth()+1, dday=now.getDate();
+  var todays=IVS.filter(function(x){return x.date===td;});
+  var h='<div class="today-hero"><div class="th-top"><span class="th-date">오늘 '+dnum+'월 '+dday+'일</span><span class="th-wd">('+WD[now.getDay()]+')</span><span class="th-live">면접 '+todays.length+'건</span></div>';
+  if(todays.length){
+    h+='<div class="th-sub">시간 · 이름 · 직무 · 유입경로</div><div class="th-list">';
+    todays.forEach(function(iv){
+      var st=statusOf(iv);
+      var esc=function(s){return String(s||'').replace(/</g,'&lt;');};
+      h+='<div class="th-item" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/'/g,'')+'\')">'
+        +'<span class="th-tm">'+(iv.time||'-')+'</span>'
+        +'<div class="th-body"><div class="th-nm">'+esc(iv.name)+'</div>'
+        +'<div class="th-tags"><span class="th-tag">'+esc(iv.job)+'</span>'
+        +(iv.site?'<span class="th-tag site">'+esc(iv.site)+'</span>':'')
+        +'<span class="th-tag site">👤 '+esc(interviewerOf(iv))+'</span>'
+        +(iv.region?'<span class="th-tag site">'+esc(iv.region)+'</span>':'')+'</div></div>'
+        +'<span class="th-status '+st.cls+'">'+st.label+'</span></div>';
     });
     h+='</div>';
-    // 사람별 행 (PC 간트)
-    ppl.forEach(function(p){
-      var siteCls=p.site==='잡코리아'?'jk':'am';
-      h+='<div class="gt-row"><div class="gt-person"><span class="gt-pname">'+p.name+'</span>'
-        +'<span class="gt-pmeta"><span class="gt-tag '+siteCls+'">'+p.site+'</span><span class="gt-tag '+gtGrpCls(p.grp)+'">'+p.grp+'</span>'+p.job+'</span></div>';
-      h+='<div class="gt-track">';
-      for(var i=0;i<7;i++) h+='<div class="gt-cell"></div>';
-      var iIdx=gtDayIdx(days,p.interviewDate);
-      if(iIdx>=0){
-        var lastDone=null;
-        p.stages.forEach(function(st){ if(st.state==='done' && st.k!=='교육') lastDone=st.k; });
-        var repClass = p.final==='불참'||p.final==='불합격' ? 'fail' : (lastDone||'면접');
-        h+='<span class="gt-node '+repClass+'" style="left:'+cx(iIdx)+'%"></span>';
-        h+='<span class="gt-nlabel" style="left:'+cx(iIdx)+'%;color:'+(repClass==='fail'?'#E23A22':'#4C6EF5')+'">면접</span>';
-        var eduIdx = p.eduDate ? gtDayIdx(days,p.eduDate) : -1;
-        if(p.final==='교육' && eduIdx>=0 && eduIdx>iIdx){
-          h+='<span class="gt-line" style="left:'+cx(iIdx)+'%;width:'+(cx(eduIdx)-cx(iIdx))+'%;background:linear-gradient(90deg,#7048E8,#BA7517)"></span>';
-          h+='<span class="gt-node 교육" style="left:'+cx(eduIdx)+'%"></span>';
-          h+='<span class="gt-nlabel" style="left:'+cx(eduIdx)+'%;color:#BA7517">🎓'+(p.eduWho||'교육')+'</span>';
-        } else if(p.final==='교육' && eduIdx===iIdx){
-          h+='<span class="gt-node 교육" style="left:'+(cx(iIdx)+4)+'%"></span>';
-        }
-      }
-      if(p.final==='예정' && iIdx>=0){
-        h+='<span class="gt-node plan" style="left:'+cx(iIdx)+'%"></span>';
-        h+='<span class="gt-nlabel" style="left:'+cx(iIdx)+'%;color:#8A94A6">예정</span>';
-      }
-      var finalLabel = p.final;
-      if(p.final==='불참') finalLabel='불참 · 탈락';
-      else if(p.final==='불합격') finalLabel='불합격 · 탈락';
-      else if(p.final==='교육' && p.eduDate){ finalLabel='🎓 교육 '+p.eduDate.slice(5).replace('-','/')+(p.eduWho?' · '+p.eduWho:''); }
-      else if(p.final==='합격') finalLabel='합격 · 교육대기';
-      h+='<span class="gt-final '+p.final+'">'+finalLabel+'</span>';
-      h+='</div>';
-      if(p.memo){ h+='<div class="gt-memo">💬 '+p.memo+'</div>'; }
-      h+='</div>';
-    });
-    // ── 모바일 카드 (이 부서) ──
-    ppl.forEach(function(p){
-      var siteCls=p.site==='잡코리아'?'jk':'am';
-      var steps=['<span class="gt-mstep 면접">면접</span>'];
-      p.stages.forEach(function(st,idx){
-        if(idx===0) return;
-        var cls = st.state==='fail'?'fail':(st.state==='plan'||st.state==='wait'?'plan':st.k);
-        var lbl = st.k;
-        if(st.state==='fail') lbl=st.k+' 탈락';
-        else if(st.k==='교육'&&st.date) lbl='🎓 '+st.date.slice(5).replace('-','/')+(p.eduWho?' '+p.eduWho:'');
-        steps.push('<span class="gt-marw">→</span><span class="gt-mstep '+cls+'">'+lbl+'</span>');
-      });
-      var fLabel=p.final;
-      if(p.final==='불참')fLabel='불참 · 탈락';
-      else if(p.final==='불합격')fLabel='불합격 · 탈락';
-      else if(p.final==='교육'&&p.eduDate)fLabel='🎓 교육 '+p.eduDate.slice(5).replace('-','/')+(p.eduWho?' · '+p.eduWho:'');
-      else if(p.final==='합격')fLabel='합격 · 교육대기';
-      h+='<div class="gt-mcard"><div class="gt-mc-top"><span class="gt-mc-time">'+p.date.slice(5).replace('-','/')+' '+p.time+'</span>'
-        +'<span class="gt-mc-name">'+p.name+'</span>'
-        +'<span class="gt-tag '+siteCls+'">'+p.site+'</span>'
-        +'<span class="gt-tag '+gtGrpCls(p.grp)+'">'+p.grp+'</span></div>'
-        +'<div class="gt-mc-flow">'+steps.join('')+'</div>'
-        +'<span class="gt-mc-final '+p.final+'">'+fLabel+'</span>'
-        +(p.memo?'<div class="gt-mc-memo">💬 '+p.memo+'</div>':'')
-        +'</div>';
-    });
-    h+='</div>';  // gt-dept
-  });
-  if(!anyDept){ h='<div class="gt-empty">이 주 면접 없음</div>'; }
-  document.getElementById('gt_inner').innerHTML=h;
+  } else {
+    // 다음 면접일 폴백
+    var next=IVS.filter(function(x){return x.date>td;})[0];
+    h+='<div class="th-none">오늘 예정된 면접이 없어요 ☕'
+      +(next?'<small>다음 면접 · '+next.date.slice(5).replace('-','/')+' ('+IVS.filter(function(x){return x.date===next.date;}).length+'명)</small>':'')
+      +'</div>';
+  }
+  h+='</div>';
+  el.innerHTML=h;
 }
-window.gtMove=function(dir){ var n=window.__gtIdx+dir; if(n<0||n>=GT_WEEKS.length)return; window.__gtIdx=n; gtRender(); };
-gtRender();
-</script>
-<div class="ft">소스 = 주간보고 구글시트 (운영센터·상담부·잡코리아) · 8월 4주 누적 · 매주 토요일 입력<br>공고비·면접·퇴사는 주차 합산 · 현재총원은 최신(8/24) 스냅샷 · 자동 갱신 Apps Script 연결 예정</div>
-</div>
-<script>const D={"total": {"gonggo": 3979960, "iryeok": 117, "myeontong": 99, "myeoncham": 36, "toesa": 19, "edu": 20}, "operations": {"weeks": [{"w": "8/3~8/9", "gonggo": 22880, "iryeok": 8, "myeontong": 5, "myeoncham": 3, "edu": 1, "toesa": "이유리(8/6)", "product": "슈퍼점프 8회(1일)"}, {"w": "8/10~8/16", "gonggo": 22880, "iryeok": 15, "myeontong": 2, "myeoncham": 0, "edu": 0, "toesa": "", "product": "슈퍼점프 8회(1일)"}, {"w": "8/17~8/23", "gonggo": 22880, "iryeok": 86, "myeontong": 10, "myeoncham": 4, "edu": 2, "toesa": "김재성(8/21)·배성호(8/21)", "product": "슈퍼점프 8회(1일)"}, {"w": "8/24~8/30", "gonggo": 22880, "iryeok": 8, "myeontong": 1, "myeoncham": 0, "edu": 0, "toesa": "", "product": "슈퍼점프 8회(1일)"}], "chongwon": {"코칭": "내근20/재택2", "수업": "내근4/재택36", "출석체크": "내근1/재택3", "문제등록": "내근1"}}, "consulting": {"weeks": [{"w": "8/3~8/9", "gonggo": 573648, "myeontong": 37, "myeoncham": 10, "edu": 7, "toesa": 9, "toesa_names": "고승현(7/29 교육 후 퇴사), 이효원(8/3), 이태헌(8/4) / 이슬(8/6) / 이수진(8/3), 김현수(8/5 교육 후 퇴사) / 김준회(8/5) / 손상우(8/7) / 김채령(7/30)", "product": "슈퍼점프 8회(1일)"}, {"w": "8/10~8/16", "gonggo": 411840, "myeontong": 21, "myeoncham": 15, "edu": 5, "toesa": 5, "toesa_names": "강민정(8/12) / 이송월(8/10) / 송원우(8/11) / 권민구(8/13) / 안현규(8/13)", "product": "슈퍼점프 8회(1일)"}, {"w": "8/17~8/23", "gonggo": 411840, "myeontong": 20, "myeoncham": 3, "edu": 5, "toesa": 0, "toesa_names": "", "product": "슈퍼점프 8회(1일)"}, {"w": "8/24~8/30", "gonggo": 585912, "myeontong": 1, "myeoncham": 0, "edu": 0, "toesa": 2, "toesa_names": "김호진(8/24), 김세호(8/24)", "product": "슈퍼점프 8회(1일)"}], "toesa_recent": "김호진(8/24)·김세호(8/24)", "byjijum": [{"nm": "마포연합센터", "g": 505008, "m": 15, "mc": 7, "e": 4, "t": 2, "toesa_names": "김준회(8/5) / 송원우(8/11)", "region": "응암", "ads": "M 지역 Special 결합 (2일) / 슈퍼점프 8회(1일)", "ipsa_names": "석지훈(8/18) / 김준회(8/5) / 송원우(8/11) / 김현중A(8/11) / 위서현(8/20)", "ipsa_n": 5}, {"nm": "가산연합센터", "g": 505008, "m": 20, "mc": 3, "e": 6, "t": 2, "toesa_names": "손상우(8/7) / 권민구(8/13)", "region": "오목교", "ads": "M 지역 Special 결합 (2일) / 슈퍼점프 8회(1일)", "ipsa_names": "손상우(8/4) / 전관우(8/5) / 김민철(8/11) / 서휘선(8/13) / 권민구(8/13) / 이원준(8/20)", "ipsa_n": 6}, {"nm": "마곡지점", "g": 286824, "m": 8, "mc": 4, "e": 1, "t": 4, "toesa_names": "고승현(7/29 교육 후 퇴사), 이효원(8/3), 이태헌(8/4) / 강민정(8/12)", "region": "까치산", "ads": "M 지역 Special 결합 (2일) / 슈퍼점프 8회(1일)", "ipsa_names": "강민정(8/12)", "ipsa_n": 1}, {"nm": "부평지점", "g": 183040, "m": 12, "mc": 3, "e": 2, "t": 1, "toesa_names": "이슬(8/6)", "region": "갈산", "ads": "슈퍼점프 8회(1일)", "ipsa_names": "최종하(8/10) / 이준호A(8/26)", "ipsa_n": 2}, {"nm": "메이킷위드", "g": 183040, "m": 8, "mc": 4, "e": 2, "t": 2, "toesa_names": "김채령(7/30) / 안현규(8/13)", "region": "신중동", "ads": "슈퍼점프 8회(1일)", "ipsa_names": "-", "ipsa_n": 0}, {"nm": "파인더루원", "g": 183040, "m": 7, "mc": 3, "e": 0, "t": 0, "toesa_names": "", "region": "주안", "ads": "슈퍼점프 8회(1일)", "ipsa_names": "-", "ipsa_n": 0}, {"nm": "수원지점", "g": 137280, "m": 9, "mc": 4, "e": 2, "t": 5, "toesa_names": "이수진(8/3), 김현수(8/5 교육 후 퇴사) / 이송월(8/10) / 김호진(8/24), 김세호(8/24)", "region": "-", "ads": "-", "ipsa_names": "-", "ipsa_n": 0}], "chongwon": {"bonsa": 64, "jisa": 23, "total": 87}, "weeks_jijum": {"8/3~8/9": {"마곡지점": 45760, "부평지점": 45760, "수원지점": 45760, "마포연합센터": 172424, "가산연합센터": 172424, "메이킷위드": 45760, "파인더루원": 45760}, "8/10~8/16": {"마곡지점": 45760, "부평지점": 45760, "수원지점": 45760, "마포연합센터": 91520, "가산연합센터": 91520, "메이킷위드": 45760, "파인더루원": 45760}, "8/17~8/23": {"마곡지점": 45760, "부평지점": 45760, "수원지점": 45760, "마포연합센터": 91520, "가산연합센터": 91520, "메이킷위드": 45760, "파인더루원": 45760}, "8/24~8/30": {"마곡지점": 149544, "부평지점": 45760, "수원지점": 0, "마포연합센터": 149544, "가산연합센터": 149544, "메이킷위드": 45760, "파인더루원": 45760}}, "jijum_total": {"g": 1983240, "m": 79, "mc": 28, "e": 17, "t": 16}, "trend": {"cols": ["8/3주", "8/4주", "증감"], "rows": [{"nm": "마곡지점", "v": [7, 7], "d": 0}, {"nm": "부평지점", "v": [8, 9], "d": 1}, {"nm": "수원지점", "v": [7, 7], "d": 0}, {"nm": "마포연합센터", "v": [9, 10], "d": 1}, {"nm": "가산연합센터", "v": [12, 13], "d": 1}, {"nm": "메이킷위드", "v": [11, 12], "d": 1}, {"nm": "파인더루원", "v": [5, 5], "d": 0}], "total": {"v": [59, 63], "d": 4}}, "cohort": {"cols": ["7/27~8/2", "8/3~8/9", "8/10~8/16", "8/17~8/23", "4주합계", "현재총원", "신입비중"], "rows": [{"nm": "마포연합센터", "v": [1, 3, 0, 1], "sum": 5, "now": 10, "rate": 50.0}, {"nm": "가산연합센터", "v": [0, 2, 3, 1], "sum": 6, "now": 13, "rate": 46.2}, {"nm": "마곡지점", "v": [1, 0, 1, 0], "sum": 2, "now": 7, "rate": 28.6}, {"nm": "수원지점", "v": [0, 1, 0, 1], "sum": 2, "now": 7, "rate": 28.6}, {"nm": "부평지점", "v": [0, 1, 0, 1], "sum": 2, "now": 9, "rate": 22.2}, {"nm": "파인더루원", "v": [1, 0, 0, 0], "sum": 1, "now": 5, "rate": 20.0}, {"nm": "메이킷위드", "v": [0, 0, 1, 1], "sum": 2, "now": 12, "rate": 16.7}], "total": {"v": [3, 7, 5, 5], "sum": 20, "now": 63, "rate": 31.7}}, "jijum_summary": [{"nm": "가산연합센터", "now": 13, "newin": 6, "rate": 46.2, "prev": 12, "delta": 1}, {"nm": "메이킷위드", "now": 12, "newin": 2, "rate": 16.7, "prev": 11, "delta": 1}, {"nm": "마포연합센터", "now": 10, "newin": 5, "rate": 50.0, "prev": 9, "delta": 1}, {"nm": "부평지점", "now": 9, "newin": 2, "rate": 22.2, "prev": 8, "delta": 1}, {"nm": "마곡지점", "now": 7, "newin": 2, "rate": 28.6, "prev": 7, "delta": 0}, {"nm": "수원지점", "now": 7, "newin": 2, "rate": 28.6, "prev": 7, "delta": 0}, {"nm": "파인더루원", "now": 5, "newin": 1, "rate": 20.0, "prev": 5, "delta": 0}], "summary_total": {"now": 63, "newin": 20, "rate": 31.7, "delta": 4}}, "jobkorea": [{"job": "교육상담부", "gonggo": 519600, "myeontong": 1, "myeoncham": 0, "region": "서울>강서구 · 인천>부평구 · 경기>수원시 팔달구 · 서울>마포구서울>금천구 · 인천>서해구 · 경기>부천", "product": "Excellent 채용관 (PC+M) 2026-08-2"}, {"job": "강사", "gonggo": 692800, "myeontong": 1, "myeoncham": 1, "region": "서울>강서구 · 서울전지역 · 경기전지역 · 인천전지역", "product": "Excellent 채용관 (PC+M) 2026-08-2"}, {"job": "교육사업부", "gonggo": 692800, "myeontong": 0, "myeoncham": 0, "region": "경기>수원시 팔달구  · 대구>수성구  · 대전 중구  · 서울>강서구  · 인천>부평구  · 경남>양산시 ", "product": "Excellent 채용관 (PC+M) 2026-08-2"}]};
-function won(n){return n.toLocaleString('ko-KR');}
-var t=D.total;
-document.getElementById('t_g').innerHTML=won(t.gonggo)+'<span style="font-size:13px;opacity:.7">원</span>';
-document.getElementById('t_i').textContent=t.iryeok;document.getElementById('t_m').textContent=t.myeontong;document.getElementById('t_c').textContent=t.myeoncham;document.getElementById('t_e').textContent=t.edu;document.getElementById('t_t').textContent=t.toesa+'명';
-</script><script>(function(){function s(){try{parent.postMessage({t:"frameH",h:document.body.scrollHeight},"*");}catch(e){}}window.addEventListener("load",function(){s();setTimeout(s,400);setTimeout(s,1000);});setInterval(s,1200);document.addEventListener("click",function(){setTimeout(s,200);setTimeout(s,600);});})();</script></body></html>
+
+// ── 주간 캘린더 ──
+window.calMove=function(dir){ __weekStart.setDate(__weekStart.getDate()+dir*7); renderCal(); };
+window.calToday=function(){ __weekStart=mondayOf(new Date()); renderCal(); };
+function renderCal(){
+  var ws=new Date(__weekStart), td=todayYmd();
+  var days=[]; for(var i=0;i<7;i++){ var d=new Date(ws); d.setDate(ws.getDate()+i); days.push(d); }
+  document.getElementById('cal_range').textContent=(days[0].getMonth()+1)+'/'+days[0].getDate()+' ~ '+(days[6].getMonth()+1)+'/'+days[6].getDate();
+  // 이번주면 제목에 오늘 날짜 강조
+  var _tt=document.getElementById('cal_title'), _now=new Date();
+  var _isThisWeek = days.some(function(d){return ymd(d)===td;});
+  if(_tt){ _tt.innerHTML = _isThisWeek ? '🗓️ 오늘 <span style=\"color:#E23A22\">'+( _now.getMonth()+1)+'월 '+_now.getDate()+'일('+WD[_now.getDay()]+')</span> · 이번주 면접' : '🗓️ 주간 면접'; }
+  var h='<div class="cal-grid">';
+  days.forEach(function(d){
+    var dstr=ymd(d), isT=(dstr===td), dow=d.getDay(), wknd=(dow===0||dow===6);
+    var list=IVS.filter(function(x){return x.date===dstr;});
+    var cls='cal-col'+(isT?' today':'')+(wknd?' weekend':'')+(list.length===0?' empty-mo':'');
+    h+='<div class="'+cls+'"><div class="cal-dhd"><div><div class="cal-wd">'+WD[dow]+'</div><div class="cal-dnum">'+d.getDate()+'</div></div>'
+      +(isT?'<span class="cal-todaytag">TODAY</span>':'')+'</div><div class="cal-ivs">';
+    if(list.length){
+      list.forEach(function(iv){
+        var st=statusOf(iv), done=(st.cls!=='wait');
+        var esc=function(s){return String(s||'').replace(/</g,'&lt;');};
+        var dotCls=st.cls==='at'||st.cls==='ps'?'at':st.cls==='ns'||st.cls==='fa'?'ns':'';
+        h+='<div class="cal-iv job-'+esc(iv.job)+(done?' done':'')+'" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/\x27/g,'')+'\')">'
+          +'<div class="cal-iv-tm">'+(dotCls?'<span class="cal-iv-dot '+dotCls+'"></span>':'')+(iv.time||'-')+'</div>'
+          +'<div class="cal-iv-nm">'+esc(iv.name)+'</div>'
+          +'<div class="cal-iv-tag">'+esc(iv.job)+(iv.site?' · '+esc(iv.site):'')+'</div>'
+          +'<div class="cal-iv-mgr">👤 '+esc(interviewerOf(iv))+'</div></div>';
+      });
+    } else {
+      h+='<div class="cal-empty">-</div>';
+    }
+    h+='</div></div>';
+  });
+  h+='</div>';
+  document.getElementById('cal_grid').innerHTML=h;
+}
+
+// ── 상세 모달 ──
+window.openIv=function(date,name){
+  var iv=IVS.filter(function(x){return x.date===date && x.name.replace(/'/g,'')===name;})[0];
+  if(!iv) iv=IVS.filter(function(x){return x.date===date && x.name.indexOf(name)>=0;})[0];
+  if(!iv) return;
+  var st=statusOf(iv);
+  var esc=function(s){return String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');};
+  var wd=WD[iv.dObj.getDay()];
+  var h='<div class="ivm-hd job-'+iv.job+'"><button class="ivm-close" onclick="closeIv()">✕</button>'
+    +'<div class="ivm-nm">'+esc(iv.name)+'</div>'
+    +'<div class="ivm-when">'+iv.date.slice(5).replace('-','/')+' ('+wd+') '+(iv.time||'')+'</div>'
+    +'<div class="ivm-tags"><span class="ivm-tag">'+esc(iv.job)+'</span>'
+    +(iv.site?'<span class="ivm-tag">'+esc(iv.site)+'</span>':'')
+    +(iv.region?'<span class="ivm-tag">'+esc(iv.region)+'</span>':'')+'</div></div>';
+  h+='<div class="ivm-body">';
+  h+='<div class="ivm-row"><span class="ivm-lbl">면접관</span><span class="ivm-val">'+esc(interviewerOf(iv))+'</span></div>';
+  h+='<div class="ivm-row"><span class="ivm-lbl">참석</span><span class="ivm-val '+(iv.attend.indexOf('불참')>=0?'ns':iv.attend.indexOf('참석')>=0?'at':'')+'">'+(esc(iv.attend)||'-')+'</span></div>';
+  h+='<div class="ivm-row"><span class="ivm-lbl">결과</span><span class="ivm-val '+(iv.pass.indexOf('불합격')>=0?'fa':iv.pass.indexOf('합격')>=0?'ps':'')+'">'+(esc(iv.pass)||'-')+'</span></div>';
+  if(iv.eduDate){
+    h+='<div class="ivm-row"><span class="ivm-lbl">교육</span><span class="ivm-val">'+esc(iv.eduDate.slice(5).replace('-','/'))+(iv.eduTime?' '+esc(iv.eduTime):'')+(iv.eduWho?' · '+esc(iv.eduWho):'')+'</span></div>';
+  }
+  if(iv.memo){ h+='<div class="ivm-memo">'+esc(iv.memo)+'</div>'; }
+  h+='</div>';
+  document.getElementById('ivBody').innerHTML=h;
+  document.getElementById('ivModal').classList.add('on');
+  document.body.style.overflow='hidden';
+};
+window.closeIv=function(){ document.getElementById('ivModal').classList.remove('on'); document.body.style.overflow=''; };
+
+boot();
+</script></body></html>
