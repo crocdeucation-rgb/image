@@ -608,7 +608,7 @@ function surgeBlk(surge){
   return '<div class="drgrp">'+tog+teamBlk+perBlk+'</div>';
 }
 function teamSurgeRows(arr, pd){
-  if(!arr||!arr.length) return '<div class="drnone">'+(pd==='weekly'?'이번주':'이달')+' 급등 팀 없음</div>';
+  if(!arr||!arr.length) return '<div class="drnone">'+(pd==='weekly'?'이번 주는':'이달은')+' 팀 순항 중 🚀</div>';
   var h='';
   arr.slice(0,3).forEach(function(x,i){
     var pct = x.ratio ? Math.round(x.ratio*100)+'%' : '신규';
@@ -618,7 +618,7 @@ function teamSurgeRows(arr, pd){
   return h;
 }
 function personSurgeRows(arr, pd){
-  if(!arr||!arr.length) return '<div class="drnone" style="padding-left:2px">해당 없음</div>';
+  if(!arr||!arr.length) return '<div class="drnone" style="padding-left:2px">'+(pd==='weekly'?'이번 주는':'이달은')+' 잠잠 😌</div>';
   var h='';
   arr.slice(0,3).forEach(function(x,i){
     var pct = x.ratio ? Math.round(x.ratio*100)+'%' : '신규';
@@ -631,7 +631,7 @@ window.sgPeriod=function(p){ window.__sg.period=p; if(window.__DK) renderRisers(
 function renderRecords(dk){
   var el=document.getElementById('d_records'); if(!el)return;
   function blk(t,arr){var h='<div class="drgrp"><div class="drlbl">'+t+'</div>';
-    if(!arr||!arr.length)return h+'<div class="drnone">신기록 없음</div></div>';
+    if(!arr||!arr.length)return h+'<div class="drnone">신기록 도전 중 🔥</div></div>';
     arr.forEach(function(x){h+='<div class="drrow"><span class="drnm">'+x.name+(x.team?'<span class="drtm">'+x.team+'</span>':'')+'</span><span class="drrec"><b>'+dwon(x.aug)+'</b><span class="drprev">이전최고 '+dwon(x.prevMax)+'</span></span></div>';});
     return h+'</div>';}
   el.innerHTML=blk('상담',dk.records.sang)+blk('사업',dk.records.saup);
