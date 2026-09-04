@@ -227,6 +227,12 @@ body.is-live .closed-only{display:none !important}
 .br-tag{font-size:9px;font-weight:800;color:#fff;background:#2563EB;padding:2px 6px;border-radius:6px;flex-shrink:0}
 .br-empty{opacity:.5}
 .br-noname{font-size:12px;color:#9DB3CE;font-weight:600}
+.br-ic-sm{font-size:15px;flex-shrink:0}
+.br-slot.br-blue{background:linear-gradient(135deg,#eef4ff,#dce8ff)}
+.br-slot.br-master{background:linear-gradient(135deg,#dbe4ff,#c3d4ff);border:1px solid #5B7FD4}
+.br-slot.br-grand{background:linear-gradient(135deg,#c7d6ff,#a8c0f5);border:1.5px solid #D4AF37}
+.br-slot.br-royal{background:linear-gradient(120deg,#1E3A8A,#4C6EF5 40%,#7048E8 70%,#D4AF37 100%);background-size:200% 200%;animation:ribHolo 6s ease infinite}
+.br-slot.br-royal .br-nm,.br-slot.br-royal .br-val,.br-slot.br-royal .br-tm{color:#fff}
 @media(max-width:820px){.clutch-two{grid-template-columns:1fr;gap:10px}}
 </style>
 <style id="araon-card-style">
@@ -526,46 +532,40 @@ function renderAwards(D){
   });
   h += '</div>';
 
-  // [2026-09] 블루리본 — 기준 돌파 수여 (MVP와 별개, 복수 가능)
-  //   사업부(divpersons) 순매출 1억↑ / 상담부(persons) 4천만↑
-  //   특례: 서승호 = 입사 1개월차 특별수여 (사업부 기준 미달이어도 포함)
-  var BR_SAUP_MIN = 100000000;   // 사업부 1억
-  var BR_SANG_MIN = 40000000;    // 상담부 4천만
-  var BR_SPECIAL = { '서승호': '입사 1개월 특례' };  // 이름:사유
-
-  function brSlot(x, seg, special){
-    var cls = 'br-slot' + (special ? ' br-special' : '');
-    return '<div class="'+cls+'" data-target="blueribbon:'+mk+':'+x.name+'">'
-      + '<span class="br-nm">'+x.name+'</span>'
-      + (x.team?'<span class="br-tm">'+x.team+'</span>':'')
-      + (special?'<span class="br-tag">'+special+'</span>':'')
-      + '<span class="br-val">'+won(x.sales)+'원</span></div>';
-  }
-  function brList(arr, min, seg){
-    arr = arr || [];
-    var out = [];
-    arr.forEach(function(x){
-      if(!x || !x.name) return;
-      var special = BR_SPECIAL[x.name];
-      if((x.sales||0) >= min || special){
-        out.push(brSlot(x, seg, (x.sales||0) < min ? special : null));
+  // [2026-09-04] 리본 시상 — HOF에서 '그 달(mk)에 수여된' 리본만 (중복 방지·등급 반영).
+  //   블루1회달성자는 재달성해도 블루 안 뜸, 3연속이면 마스터만 → 개인카드 등급과 동일 소스(HOF).
+  //   그 달에 아무 리본도 안 딴 사람은 안 뜸.
+  var RIBBON_TYPES = { '블루리본':{ic:'🎗️',cls:'blue'}, '마스터리본':{ic:'🔷',cls:'master'}, '그랜드리본':{ic:'💠',cls:'grand'}, '로얄리본':{ic:'👑',cls:'royal'} };
+  var HOF = window.__HOF || {};
+  // 그 달 리본 수여자 수집: {scope:'사업'|'상담'} 별로
+  var ribbonSaup = [], ribbonSang = [];
+  Object.keys(HOF).forEach(function(nm){
+    (HOF[nm]||[]).forEach(function(t){
+      if(t.m===mk && RIBBON_TYPES[t.type]){
+        var item = { name:nm, type:t.type, team:t.team||'', scope:t.scope||'' };
+        if(t.scope==='사업') ribbonSaup.push(item);
+        else ribbonSang.push(item);
       }
     });
-    return out;
+  });
+  function ribbonSlot(x){
+    var d = RIBBON_TYPES[x.type] || {ic:'🎗️',cls:'blue'};
+    return '<div class="br-slot br-'+d.cls+'" data-target="ribbon:'+mk+':'+x.name+'">'
+      + '<span class="br-ic-sm">'+d.ic+'</span>'
+      + '<span class="br-nm">'+x.name+'</span>'
+      + (x.team?'<span class="br-tm">'+x.team+'</span>':'')
+      + '<span class="br-val">'+x.type+'</span></div>';
   }
-  var brSaup = brList(DP, BR_SAUP_MIN, '사업');
-  var brSang = brList(P,  BR_SANG_MIN, '상담');
-
-  if(brSaup.length || brSang.length){
-    h += '<div class="br-wrap"><div class="br-hd"><span class="br-title">🎗️ 블루리본</span>'
-       + '<span class="br-sub">사업부 月 1억 · 상담부 月 4천 돌파 — 이달의 기준을 넘은 분들</span></div>'
+  if(ribbonSaup.length || ribbonSang.length){
+    h += '<div class="br-wrap"><div class="br-hd"><span class="br-title">🎗️ 이달의 리본</span>'
+       + '<span class="br-sub">사업부 月 1억 · 상담부 月 4천 — 이달 새로 획득한 리본 (블루→마스터→그랜드→로얄)</span></div>'
        + '<div class="br-grid">';
     h += '<div class="br-card"><div class="br-top"><span class="br-ic">🏢</span><div>'
-       + '<div class="br-cn">사업부 블루리본</div><div class="br-cd">월 순매출 1억 이상</div></div></div>'
-       + '<div class="br-body">' + (brSaup.length ? brSaup.join('') : '<div class="br-slot br-empty"><span class="br-noname">이달은 아직 없어요 👀</span></div>') + '</div></div>';
+       + '<div class="br-cn">사업부 리본</div><div class="br-cd">월 순매출 1억 이상</div></div></div>'
+       + '<div class="br-body">' + (ribbonSaup.length ? ribbonSaup.map(ribbonSlot).join('') : '<div class="br-slot br-empty"><span class="br-noname">이달 새 리본 없음 👀</span></div>') + '</div></div>';
     h += '<div class="br-card"><div class="br-top"><span class="br-ic">🎯</span><div>'
-       + '<div class="br-cn">상담부 블루리본</div><div class="br-cd">월 순매출 4천만 이상</div></div></div>'
-       + '<div class="br-body">' + (brSang.length ? brSang.join('') : '<div class="br-slot br-empty"><span class="br-noname">이달은 아직 없어요 👀</span></div>') + '</div></div>';
+       + '<div class="br-cn">상담부 리본</div><div class="br-cd">월 순매출 4천만 이상</div></div></div>'
+       + '<div class="br-body">' + (ribbonSang.length ? ribbonSang.map(ribbonSlot).join('') : '<div class="br-slot br-empty"><span class="br-noname">이달 새 리본 없음 👀</span></div>') + '</div></div>';
     h += '</div></div>';
   }
 
@@ -991,13 +991,13 @@ var ALLOW_NAME={
   'crocdeucation@gmail.com':{name:'신상준',rank:'이사'},
   '90younho@gmail.com':{name:'김윤호',rank:'지사장'},
   'deuk1992@gmail.com':{name:'김원득',rank:'과장'},
-  'goodida486@gmail.com':{name:'노영호',rank:'차장'},
+  'goodida486@gmail.com':{name:'노영호',rank:'과장'},
   'jeffkorea27@gmail.com':{name:'김성윤',rank:'대리'},
   'jjoon0804@gmail.com':{name:'안준섭',rank:'대리'},
   'skfkr4@gmail.com':{name:'김우진',rank:'대리'},
-  'w0wiam@gmail.com':{name:'장윤호',rank:'지사장'},
+  'w0wwiam1004@gmail.com':{name:'장윤호',rank:'지사장'},
   'whkimts@gmail.com':{name:'김태석',rank:'PM'},
-  'dbgpfla97@gmail.com':{name:'우혜림',rank:'지점장'},
+  'dbgpfla97@gmail.com':{name:'우혜림',rank:'과장'},
   'mjhsingle@gmail.com':{name:'문정현',rank:'주임'},
   'qkfka3090@gmail.com':{name:'이승엽',rank:'주임'},
   'ggh0305@gmail.com':{name:'고국희',rank:'사원'},
