@@ -1021,9 +1021,10 @@ function pcPraise(p,useF,closedM){
   else if(t==='SS') out.push('⭐ SS급 실력자');
   else if(t==='S') out.push('✨ S급 정예');
   else if(t==='A'||t==='B') out.push('💪 든든한 주력');
+  // [2026-09] 종결달 챔피언 문구는 아래 '🏆 명예의전당 MVP N회'와 동일 정보라 제거.
+  //   아직 트로피가 없는 진행중 1위만 남김(else if -> if 로 분리).
   var _cs=pcChampSplit(p);
-  if(_cs.done.length) out.push('👑 월간 챔피언 '+_cs.done.length+'회');
-  else if(_cs.cur) out.push('🔥 이달 1등 달리는 중');
+  if(_cs.cur) out.push('🔥 이달 1등 달리는 중');
   if(streak>=2) out.push('📈 '+streak+'개월 연속 우상향');
   if(nearCH) out.push('🎯 커리어하이 눈앞');
   var hof=(window.__HOF&&window.__HOF[p.name])||[];
