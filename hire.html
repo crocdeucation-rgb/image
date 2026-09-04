@@ -60,20 +60,35 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .cal-col.today .cal-dhd{border-color:#F3C9C0}
 .cal-todaytag{display:inline-block;font-size:8.5px;font-weight:800;background:#E23A22;color:#fff;padding:1px 6px;border-radius:5px;margin-top:3px}
 .cal-ivs{display:flex;flex-direction:column;gap:4px}
-.cal-iv{background:#fff;border:1px solid #E7ECF4;border-left-width:3px;border-radius:7px;padding:5px 7px;cursor:pointer;transition:.1s}
-.cal-iv:hover{border-color:var(--v1);box-shadow:0 2px 6px rgba(76,110,245,.12)}
-.cal-iv.job-상담부{border-left-color:#4C6EF5}
-.cal-iv.job-강사{border-left-color:#1D9E75}
-.cal-iv.job-사업부{border-left-color:#7048E8}
-.cal-iv.job-코칭{border-left-color:#BA7517}
-.cal-iv-tm{font-size:10px;font-weight:800;color:var(--soft)}
-.cal-iv-nm{font-size:12px;font-weight:800;color:var(--ink);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cal-iv-tag{font-size:9px;font-weight:700;color:#8A94A6;margin-top:2px}
-.cal-iv-mgr{font-size:9px;font-weight:700;color:#7048E8;margin-top:1px}
-.cal-iv.done{opacity:.62}
-.cal-iv.done .cal-iv-nm{color:#8A94A6}
-.cal-iv-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:3px;vertical-align:middle}
-.cal-iv-dot.at{background:#1D9E75}.cal-iv-dot.ns{background:#E23A22}.cal-iv-dot.ps{background:#7048E8}
+.cal-iv{background:#fff;border:1px solid #E7ECF4;border-radius:9px;padding:7px 9px;cursor:pointer;transition:.12s}
+.cal-iv:hover{border-color:var(--v1);box-shadow:0 3px 10px rgba(76,110,245,.14);transform:translateY(-1px)}
+.cal-iv.drop{background:#FCFAFA;border-color:#F0DAD6}
+.cal-iv.drop .cal-iv-nm{color:#B0736A;text-decoration:line-through;text-decoration-color:#E0BAB2}
+/* 1행: 시간 + 직무딱지 */
+.cal-iv-r1{display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.cal-iv-tm{font-size:11px;font-weight:800;color:var(--ink);letter-spacing:-.3px}
+.cal-jbadge{font-size:9.5px;font-weight:800;padding:1px 7px;border-radius:6px;margin-left:auto;white-space:nowrap}
+.cal-jbadge.job-상담부{background:#EEF0FF;color:#4C6EF5}
+.cal-jbadge.job-강사{background:#E6F7EE;color:#1B8A5C}
+.cal-jbadge.job-사업부{background:#F3EEFF;color:#7048E8}
+.cal-jbadge.job-코칭{background:#FFF4E6;color:#BA7517}
+.cal-iv-nm{font-size:13px;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.3px}
+/* 상태 플로우 딱지 */
+.cal-iv-flow{display:flex;align-items:center;gap:2px;flex-wrap:wrap;margin-top:4px}
+.cal-iv-flow .fb{font-size:9px;font-weight:800;padding:1px 6px;border-radius:5px;white-space:nowrap}
+.cal-iv-flow .fb.plan{background:#EEF1F6;color:#8A94A6}
+.cal-iv-flow .fb.at{background:#EEF0FF;color:#4C6EF5}
+.cal-iv-flow .fb.ns{background:#FBE0DC;color:#C0341E}
+.cal-iv-flow .fb.fa{background:#FBE0DC;color:#C0341E}
+.cal-iv-flow .fb.ps{background:#EAE2FF;color:#6741D9}
+.cal-iv-flow .fb.edu{background:#FFF0D9;color:#A66A12}
+.cal-iv-flow .fb.wait{background:#FFF9E6;color:#B58A1E}
+.cal-iv-flow .farw{font-size:9px;color:#C9D2E0;font-weight:900;margin:0 -1px}
+.cal-iv-mgr{font-size:9.5px;font-weight:600;color:#98A0AE;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-edu{background:linear-gradient(135deg,#FFF9EF,#FFF4E0);border:1px solid #F0D9A8;border-radius:9px;padding:7px 9px;cursor:pointer;transition:.12s}
+.cal-edu:hover{border-color:#E0A93E;box-shadow:0 3px 10px rgba(186,117,23,.15);transform:translateY(-1px)}
+.cal-edu .cal-iv-tm{color:#A66A12}
+.cal-edu-lbl{font-size:9.5px;font-weight:800;color:#BA7517;margin-top:4px}
 .cal-empty{font-size:10px;color:#C8D0DC;text-align:center;padding:8px 0}
 
 /* 범례 */
@@ -93,11 +108,10 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
   .cal-dnum{font-size:15px;margin-top:0}
   .cal-dnum::after{content:'일';font-size:11px;font-weight:700;color:var(--soft);margin-left:1px}
   .cal-todaytag{margin-top:0;margin-left:auto}
-  .cal-ivs{gap:6px}
-  .cal-iv{padding:8px 11px;display:flex;align-items:center;gap:9px}
-  .cal-iv-tm{min-width:42px}
-  .cal-iv-nm{font-size:13px;margin-top:0}
-  .cal-iv-tag{margin-top:0;margin-left:auto}
+  .cal-ivs{gap:7px}
+  .cal-iv{padding:10px 13px}
+  .cal-iv-nm{font-size:14px}
+  .cal-iv-flow{margin-top:5px}
 }
 
 /* 상세 모달 */
@@ -298,6 +312,24 @@ function statusOf(iv){
   return {cls:'wait',label:'예정'};
 }
 
+// 상태 플로우 딱지: 예정 / 불참 / 면접→불합격 / 면접→합격 / 면접→합격→교육
+function statusFlow(iv){
+  var at=String(iv.attend||'').trim(), pass=String(iv.pass||'').trim();
+  function b(cls,txt){ return '<span class="fb '+cls+'">'+txt+'</span>'; }
+  var arw='<span class="farw">›</span>';
+  if(!at && !pass) return b('plan','예정');
+  if(at.indexOf('불참')>=0||at.indexOf('노쇼')>=0) return b('ns','불참');
+  if(pass.indexOf('불합격')>=0) return b('at','면접')+arw+b('fa','불합격');
+  if(pass.indexOf('합격')>=0){
+    var base=b('at','면접')+arw+b('ps','합격');
+    if(iv.eduDate) return base+arw+b('edu','🎓교육');
+    return base+arw+b('wait','교육대기');
+  }
+  if(at.indexOf('참석')>=0) return b('at','참석')+arw+b('wait','결과대기');
+  return b('plan','예정');
+}
+// 교육날짜(2026-09-07 or 9/7) → ymd
+function ymdFromEdu(s){ var d=parseDate(s); return d?ymd(d):''; }
 var IVS=[];   // 전체 면접 (파싱됨)
 var __weekStart=null;   // 현재 보는 주 월요일
 
@@ -390,19 +422,32 @@ function renderCal(){
   days.forEach(function(d){
     var dstr=ymd(d), isT=(dstr===td), dow=d.getDay(), wknd=(dow===0||dow===6);
     var list=IVS.filter(function(x){return x.date===dstr;});
+    // 그날 교육 일정 (교육날짜가 이 날인 사람)
+    var eduList=IVS.filter(function(x){return x.eduDate && ymdFromEdu(x.eduDate)===dstr;});
     var cls='cal-col'+(isT?' today':'')+(wknd?' weekend':'')+(list.length===0?' empty-mo':'');
     h+='<div class="'+cls+'"><div class="cal-dhd"><div><div class="cal-wd">'+WD[dow]+'</div><div class="cal-dnum">'+d.getDate()+'</div></div>'
       +(isT?'<span class="cal-todaytag">TODAY</span>':'')+'</div><div class="cal-ivs">';
-    if(list.length){
+    if(list.length || eduList.length){
       list.forEach(function(iv){
-        var st=statusOf(iv), done=(st.cls!=='wait');
+        var st=statusOf(iv), isDrop=(st.cls==='ns'||st.cls==='fa');
         var esc=function(s){return String(s||'').replace(/</g,'&lt;');};
-        var dotCls=st.cls==='at'||st.cls==='ps'?'at':st.cls==='ns'||st.cls==='fa'?'ns':'';
-        h+='<div class="cal-iv job-'+esc(iv.job)+(done?' done':'')+'" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/\x27/g,'')+'\')">'
-          +'<div class="cal-iv-tm">'+(dotCls?'<span class="cal-iv-dot '+dotCls+'"></span>':'')+(iv.time||'-')+'</div>'
+        // 상태 플로우 딱지
+        var flow=statusFlow(iv);
+        h+='<div class="cal-iv job-'+esc(iv.job)+(isDrop?' drop':'')+'" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/\x27/g,'')+'\')">'
+          +'<div class="cal-iv-r1"><span class="cal-iv-tm">'+(iv.time||'-')+'</span>'
+          +'<span class="cal-jbadge job-'+esc(iv.job)+'">'+esc(iv.job)+'</span></div>'
           +'<div class="cal-iv-nm">'+esc(iv.name)+'</div>'
-          +'<div class="cal-iv-tag">'+esc(iv.job)+(iv.site?' · '+esc(iv.site):'')+'</div>'
-          +'<div class="cal-iv-mgr">👤 '+esc(interviewerOf(iv))+'</div></div>';
+          +'<div class="cal-iv-flow">'+flow+'</div>'
+          +'<div class="cal-iv-mgr">'+esc(iv.site||'')+' · 👤'+esc(interviewerOf(iv))+'</div></div>';
+      });
+      // 교육 카드 (그날 교육 일정)
+      eduList.forEach(function(iv){
+        var esc=function(s){return String(s||'').replace(/</g,'&lt;');};
+        h+='<div class="cal-edu" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/\x27/g,'')+'\')">'
+          +'<div class="cal-iv-r1"><span class="cal-iv-tm">🎓 '+(iv.eduTime||'')+'</span>'
+          +'<span class="cal-jbadge job-'+esc(iv.job)+'">'+esc(iv.job)+'</span></div>'
+          +'<div class="cal-iv-nm">'+esc(iv.name)+'</div>'
+          +'<div class="cal-edu-lbl">교육'+(iv.eduWho?' · 담당 '+esc(iv.eduWho):'')+'</div></div>';
       });
     } else {
       h+='<div class="cal-empty">-</div>';
