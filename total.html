@@ -578,17 +578,21 @@ function renderBirthdays(D){
   var bd=(D&&D.birthdays)||[];
   if(!bd.length){ el.style.display='none'; return; }
   el.style.display='';
-  var todays=bd.filter(function(x){return x.today;});
-  var h='<span class="bd-cake">🎂</span><span class="bd-ttl">이달의 생일</span>';
+  // [2026-09] 라이브(이번달)만 축하 가능. 종결달(과거월)은 지나간 생일이라 클릭·오늘배지 전부 비활성.
+  var _isLive=(D && D.isLive!==false);
+  var todays=_isLive?bd.filter(function(x){return x.today;}):[];
+  var _ttl=_isLive?'이달의 생일':((bd[0]?bd[0].mo:'')+ '월 생일자');
+  var h='<span class="bd-cake">🎂</span><span class="bd-ttl">'+_ttl+'</span>';
   if(todays.length){ h+='<span class="bd-today">🎉 오늘 '+todays.map(function(x){return x.name;}).join('·')+' 생일!</span>'; }
   // 이름/팀은 onclick 속성에 들어가므로 한글·영숫자·공백·._- 만 허용(따옴표/역슬래시/꺾쇠 제거)
   var bdSafe=function(s){ return String(s||'').replace(/[^0-9A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ ._-]/g,''); };
-  // [2026-09] 오늘 지난(또는 오늘) 생일만 축하 가능. 미래 생일자는 클릭 비활성(.bd-future)
+  // [2026-09] 라이브: 오늘 지난(또는 오늘) 생일만 축하 가능(미래는 .bd-future로 닫음).
+  //           종결달: 전원 비활성(축하 불가) — 이름·날짜만 표시.
   var _td=new Date().getDate();
   h+='<div class="bd-list">'+bd.map(function(x){
-    var _past=(x.dy<=_td);
-    var _cls='bd-item'+(x.today?' t':'')+(_past?'':' bd-future');
-    var _oc=_past?' onclick="openBirthday(\''+bdSafe(x.name)+'\','+x.mo+','+x.dy+',\''+bdSafe(x.team)+'\')"':'';
+    var _open=_isLive && (x.dy<=_td);   // 종결달이면 항상 닫힘
+    var _cls='bd-item'+(_isLive&&x.today?' t':'')+(_open?'':' bd-future');
+    var _oc=_open?' onclick="openBirthday(\''+bdSafe(x.name)+'\','+x.mo+','+x.dy+',\''+bdSafe(x.team)+'\')"':'';
     return '<span class="'+_cls+'"'+_oc+'>'+x.name+' <b>'+x.mo+'/'+x.dy+'</b></span>';
   }).join('')+'</div>';
   el.innerHTML=h;
