@@ -85,6 +85,9 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .cal-iv-flow .fb.wait{background:#FFF9E6;color:#B58A1E}
 .cal-iv-flow .farw{font-size:9px;color:#C9D2E0;font-weight:900;margin:0 -1px}
 .cal-iv-mgr{font-size:9.5px;font-weight:600;color:#98A0AE;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mgr-def{color:#98A0AE}
+.mgr-hi{color:#1B8A5C;font-weight:800;background:#E6F7EE;padding:1px 6px;border-radius:5px}
+.edu-who{color:#A66A12;font-weight:800}
 .cal-edu{background:linear-gradient(135deg,#FFF9EF,#FFF4E0);border:1px solid #F0D9A8;border-radius:9px;padding:7px 9px;cursor:pointer;transition:.12s}
 .cal-edu:hover{border-color:#E0A93E;box-shadow:0 3px 10px rgba(186,117,23,.15);transform:translateY(-1px)}
 .cal-edu .cal-iv-tm{color:#A66A12}
@@ -145,7 +148,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .hd .k{font-size:12px;letter-spacing:2px;color:var(--v1);font-weight:800}
 .hd h1{font-size:22px;font-weight:800;margin-top:5px}
 .hd .m{font-size:12px;color:var(--soft);margin-top:6px}
-/* ── CAC 효율 ── */
+/* ── 채용단가 CPH ── */
 .cac-wrap{background:var(--pan);border-radius:16px;padding:20px 22px;box-shadow:0 2px 8px rgba(27,36,54,.05);margin:14px 0}
 .cac-hd{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:6px}
 .cac-hd h2{font-size:15px;font-weight:800;display:flex;align-items:center;gap:8px;margin:0}
@@ -248,14 +251,14 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
   </div>
 </div>
 
-<!-- ② 채용 효율 CAC -->
+<!-- ② 채용단가 CPH -->
 <div class="cac-wrap">
-  <div class="cac-hd"><h2>💰 채용 효율 <span style="font-size:11px;font-weight:600;color:#B6C2DC">(공고비 → 실제 채용)</span></h2>
+  <div class="cac-hd"><h2>💰 채용단가 <span style="font-size:11px;font-weight:600;color:#B6C2DC">(공고비 ÷ 실제 채용 = CPH)</span></h2>
     <div class="cac-tabs" id="cac_tabs"></div></div>
-  <div class="cac-sub">CAC = 공고비 ÷ 실제 채용(교육까지 간 사람) · 이력서·통보 단순수 아님</div>
+  <div class="cac-sub">채용단가(CPH) = 공고비 ÷ 실제 채용(합격·교육까지 간 사람) · 이력서·통보 단순수 아님</div>
   <div id="cac_hero"></div>
   <div class="cac-chans" id="cac_chans"></div>
-  <div class="cac-note">💡 잡코리아 = 경력·정착형(비싸도 오래) / 알바몬 = 빠른충원(싸지만 이탈주의) · 실제 CAC는 <b>교육 후 투입·정착률</b>까지 봐야 정확 (투입 데이터 연동 예정)</div>
+  <div class="cac-note">💡 잡코리아 = 경력·정착형(비싸도 오래) / 알바몬 = 빠른충원(싸지만 이탈주의) · <b>채용은 단가보다 정착이 핵심</b> — 싸게 뽑아도 금방 나가면 실질 단가↑. 정착률(신규이탈) 연동 예정</div>
 </div>
 
 <!-- ③ 부서별 공고 상세 -->
@@ -301,6 +304,12 @@ var WD=['일','월','화','수','목','금','토'];
 // 직무 정규화 (강사(쌤이다) → 강사)
 function jobNorm(s){ s=String(s||''); if(s.indexOf('상담')>=0)return '상담부'; if(s.indexOf('사업')>=0)return '사업부'; if(s.indexOf('코칭')>=0)return '코칭'; if(s.indexOf('강사')>=0)return '강사'; return s||'기타'; }
 // [면접관 규칙] 운영센터+알바몬+코칭 = 운영센터 면접 / 나머지 전부 = 엄현호 이사
+// 면접관 배지 — 엄현호 이사(디폴트)는 조용히, 운영센터 등 예외는 강조
+function mgrBadge(name){
+  var n=String(name||'').replace(/</g,'&lt;');
+  if(n.indexOf('엄현호')>=0 || n.indexOf('엄이사')>=0) return '<span class="mgr-def">👤'+n+'</span>';
+  return '<span class="mgr-hi">🎯 '+n+'</span>';   // 운영센터 등 = 눈에 띄게
+}
 function interviewerOf(iv){
   // 시트 면접관 열(H) 값이 있으면 그대로 사용
   if(iv.interviewer) return iv.interviewer;
@@ -330,7 +339,11 @@ function statusFlow(iv){
   if(pass.indexOf('불합격')>=0) return b('at','면접')+arw+b('fa','불합격');
   if(pass.indexOf('합격')>=0){
     var base=b('at','면접')+arw+b('ps','합격');
-    if(iv.eduDate) return base+arw+b('edu','🎓교육');
+    if(iv.eduDate){
+      var ed=parseDate(iv.eduDate);
+      var edStr=ed?(ed.getMonth()+1)+'/'+ed.getDate():'';
+      return base+arw+b('edu','🎓교육 '+edStr);   // 교육 날짜 명시
+    }
     return base+arw+b('wait','교육대기');
   }
   if(at.indexOf('참석')>=0) return b('at','참석')+arw+b('wait','결과대기');
@@ -446,7 +459,7 @@ function renderCal(){
           +'<span class="cal-jbadge job-'+esc(iv.job)+'">'+esc(iv.job)+'</span></div>'
           +'<div class="cal-iv-nm">'+esc(iv.name)+'</div>'
           +'<div class="cal-iv-flow">'+flow+'</div>'
-          +'<div class="cal-iv-mgr">'+esc(iv.site||'')+' · 👤'+esc(interviewerOf(iv))+'</div></div>';
+          +'<div class="cal-iv-mgr">'+esc(iv.site||'')+' · '+mgrBadge(interviewerOf(iv))+'</div></div>';
       });
       // 교육 카드 (그날 교육 일정)
       eduList.forEach(function(iv){
@@ -455,7 +468,7 @@ function renderCal(){
           +'<div class="cal-iv-r1"><span class="cal-iv-tm">🎓 '+(iv.eduTime||'')+'</span>'
           +'<span class="cal-jbadge job-'+esc(iv.job)+'">'+esc(iv.job)+'</span></div>'
           +'<div class="cal-iv-nm">'+esc(iv.name)+'</div>'
-          +'<div class="cal-edu-lbl">교육'+(iv.eduWho?' · 담당 '+esc(iv.eduWho):'')+'</div></div>';
+          +'<div class="cal-edu-lbl">🎓 교육'+(iv.eduWho?' · <span class="edu-who">'+esc(iv.eduWho)+'</span>':'')+'</div></div>';
       });
     } else {
       h+='<div class="cal-empty">-</div>';
@@ -499,7 +512,7 @@ boot();
 
 </script>
 
-<!-- 부서별 + CAC 데이터/렌더 -->
+<!-- 부서별 + 채용단가 데이터/렌더 -->
 <script>
 var HIRE_DEPT = {"8월": {"depts": {"상담부": {"am": {"gonggo": 1546872, "iryeok": 205, "myeontong": 78, "myeoncham": 28, "edu": 17}, "amProd": "M 지역 Special 결합", "jk": {"gonggo": 519600, "iryeok": 10, "myeontong": 1, "myeoncham": 0, "edu": 0}, "jkProd": "Excellent 채용관 (PC+M)", "tot": {"gonggo": 2066472, "iryeok": 215, "myeontong": 79, "myeoncham": 28, "edu": 17}, "hire": {"jijum": [{"nm": "마포연합센터", "in": 4, "out": 2}, {"nm": "가산연합센터", "in": 6, "out": 2}, {"nm": "마곡지점", "in": 1, "out": 4}, {"nm": "부평지점", "in": 2, "out": 1}, {"nm": "메이킷위드", "in": 2, "out": 2}, {"nm": "파인더루원", "in": 0, "out": 0}], "tin": 15, "tout": 11}}, "사업부": {"am": null, "amProd": "", "jk": {"gonggo": 692800, "iryeok": 19, "myeontong": 0, "myeoncham": 0, "edu": 0}, "jkProd": "Excellent 채용관 (PC+M)", "tot": {"gonggo": 692800, "iryeok": 19, "myeontong": 0, "myeoncham": 0, "edu": 0}}, "강사": {"am": {"gonggo": 45760, "iryeok": 16, "myeontong": 7, "myeoncham": 3, "edu": 1}, "amProd": "슈퍼점프 8회(1일)", "jk": {"gonggo": 692800, "iryeok": 28, "myeontong": 3, "myeoncham": 2, "edu": 0}, "jkProd": "Excellent 채용관 (PC+M)", "tot": {"gonggo": 738560, "iryeok": 44, "myeontong": 10, "myeoncham": 5, "edu": 1}}, "코칭": {"am": {"gonggo": 45760, "iryeok": 101, "myeontong": 12, "myeoncham": 4, "edu": 2}, "amProd": "슈퍼점프 8회(1일)", "jk": null, "jkProd": "", "tot": {"gonggo": 45760, "iryeok": 101, "myeontong": 12, "myeoncham": 4, "edu": 2}}}, "total": {"gonggo": 3543592, "iryeok": 379, "myeontong": 101, "myeoncham": 37, "edu": 20}, "breakdown": {"myeontong": {"상담부": 79, "사업부": 0, "강사": 10, "코칭": 12}, "myeoncham": {"상담부": 28, "사업부": 0, "강사": 5, "코칭": 4}, "edu": {"상담부": 17, "사업부": 0, "강사": 1, "코칭": 2}, "iryeok": {"상담부": 215, "사업부": 19, "강사": 44, "코칭": 101}}}, "9월": {"depts": {"상담부": {"am": {"gonggo": 45760, "iryeok": 0, "myeontong": 0, "myeoncham": 0, "edu": 0}, "amProd": "슈퍼점프 8회(1일)", "jk": {"gonggo": 866000, "iryeok": 0, "myeontong": 2, "myeoncham": 0, "edu": 0}, "jkProd": "Excellent 채용관 (PC+M)", "tot": {"gonggo": 911760, "iryeok": 0, "myeontong": 2, "myeoncham": 0, "edu": 0}, "hire": {"jijum": [], "tin": 0, "tout": 0}}, "사업부": {"am": null, "amProd": "", "jk": {"gonggo": 0, "iryeok": 0, "myeontong": 2, "myeoncham": 1, "edu": 0}, "jkProd": "X", "tot": {"gonggo": 0, "iryeok": 0, "myeontong": 2, "myeoncham": 1, "edu": 0}}, "강사": {"am": null, "amProd": "", "jk": {"gonggo": 692800, "iryeok": 0, "myeontong": 3, "myeoncham": 2, "edu": 0}, "jkProd": "Excellent 채용관 (PC+M)", "tot": {"gonggo": 692800, "iryeok": 0, "myeontong": 3, "myeoncham": 2, "edu": 0}}, "코칭": {"am": null, "amProd": "", "jk": null, "jkProd": "", "tot": {"gonggo": 0, "iryeok": 0, "myeontong": 0, "myeoncham": 0, "edu": 0}}}, "total": {"gonggo": 1604560, "iryeok": 0, "myeontong": 7, "myeoncham": 3, "edu": 0}, "breakdown": {"myeontong": {"상담부": 2, "사업부": 2, "강사": 3, "코칭": 0}, "myeoncham": {"상담부": 0, "사업부": 1, "강사": 2, "코칭": 0}, "edu": {"상담부": 0, "사업부": 0, "강사": 0, "코칭": 0}, "iryeok": {"상담부": 0, "사업부": 0, "강사": 0, "코칭": 0}}}};
 window.__dpMonth='9월';
@@ -556,7 +569,7 @@ function cacRender(){
   if(pass.eduWait) pipe.push('교육대기 <b>'+pass.eduWait+'</b>');
   pipe.push('🎓완료 <b>'+(t.edu||0)+'</b>');
   var heroHtml='<div class="cac-hero"><div class="big">공고비 <span class="cost">'+dpWon(t.gonggo)+'원</span> · '+pipe.join(' <span style="opacity:.4">→</span> ')+'</div>'
-    + '<div class="mini">'+(passCac?'합격 1명당 '+dpWon(passCac):'집계중')+(eduCac?' · 교육완료 CAC '+dpWon(eduCac):'')+'</div></div>';
+    + '<div class="mini">'+(passCac?'합격 1명당 '+dpWon(passCac)+'원':'집계중')+(eduCac?' · 교육완료 단가 '+dpWon(eduCac)+'원':'')+'</div></div>';
   document.getElementById('cac_hero').innerHTML=heroHtml;
   // 채널 카드
   function chanCard(cls,nm,char,c,pc){
@@ -566,7 +579,7 @@ function cacRender(){
       +'<div class="cac-chan-grid">'
       +'<div class="cac-cell"><div class="l">공고비</div><div class="v">'+dpWon(c.g)+'</div></div>'
       +'<div class="cac-cell"><div class="l">합격</div><div class="v '+(pc?'hi':'gray')+'">'+pc+'명</div></div>'
-      +'<div class="cac-cell"><div class="l">CAC</div><div class="v '+(cac?'hi':'gray')+'">'+(cac?dpWon(cac):'-')+'</div></div></div>'
+      +'<div class="cac-cell"><div class="l">채용단가</div><div class="v '+(cac?'hi':'gray')+'">'+(cac?dpWon(cac):'-')+'</div></div></div>'
       +'<div class="cac-funnel">이력 <b>'+c.iry+'</b><span class="arw">→</span>통보 <b>'+c.mt+'</b><span class="arw">→</span>참여 <b>'+c.mc+'</b><span class="arw">→</span>합격 <b>'+pc+'</b><span class="arw">→</span>🎓 <b>'+c.edu+'</b></div></div>';
   }
   document.getElementById('cac_chans').innerHTML=
