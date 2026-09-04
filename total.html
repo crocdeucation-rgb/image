@@ -907,8 +907,33 @@ _fauth.onAuthStateChanged(function(u){
 });
 function pcLogin(){ var p=new firebase.auth.GoogleAuthProvider(); _fauth.signInWithPopup(p).catch(function(e){ alert('로그인 실패: '+e.message); }); }
 function pcLogout(){ _fauth.signOut(); }
+/* ── 모달 열고/닫을 때 스크롤 위치 보존 ──
+   body.style.overflow='hidden' 및 switcher의 iframe fixed 오버레이 전환 때문에
+   스크롤 위치가 0으로 클램프된다. 열 때 저장하고 닫을 때 되돌린다.
+   (body에 position:fixed는 쓰지 않는다 — 그게 더 확실한 리셋 원인이라 도입 금지) */
+function pcSaveScroll(){
+  // 모달이 이미 열려 있으면(카드 안에서 또 카드를 여는 경우) 원래 위치를 덮어쓰지 않는다.
+  var pm=document.getElementById('pcModal'), bm=document.getElementById('bdwModal');
+  if((pm&&pm.classList.contains('on'))||(bm&&bm.classList.contains('on'))) return;
+  window.__scrollY = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+}
+function pcRestoreScroll(){
+  var y = window.__scrollY || 0;
+  if(!y) return;
+  window.scrollTo(0, y);
+  // switcher iframe 안에서는 부모가 높이를 원복한 뒤에야 스크롤이 먹는다.
+  // 아직 복원 안 됐으면 짧게 재시도하고, 성공하면 즉시 중단(사용자 스크롤과 안 싸우게).
+  var tries = 0;
+  var t = setInterval(function(){
+    var cur = window.pageYOffset || document.documentElement.scrollTop || 0;
+    if(cur >= y - 2 || ++tries > 10){ clearInterval(t); return; }
+    window.scrollTo(0, y);
+  }, 40);
+}
+window.pcSaveScroll=pcSaveScroll; window.pcRestoreScroll=pcRestoreScroll;
 window.__curBday=null;
 function openBirthday(name, mo, dy, team){
+  pcSaveScroll();
   window.__curBday={name:name, mo:mo, dy:dy, team:team||''};
   renderBdwCard();
   document.getElementById('bdwModal').classList.add('on');
@@ -921,6 +946,7 @@ function closeBirthday(){
   document.body.style.overflow='';
   window.__curBday=null;
   if(window.__bdwUnsub){window.__bdwUnsub();window.__bdwUnsub=null;}
+  pcRestoreScroll();
 }
 function renderBdwCard(){
   var b=window.__curBday; if(!b)return;
@@ -1103,6 +1129,7 @@ window.pcSwitchTrend=function(mode,btn){
 /* ── 카드 열기 ── */
 window.__curCardName=null;
 function openCard(name){
+  pcSaveScroll();
   var f=pcFind(name);
   if(!f){ return; }  // personCards에 없으면 무시(지점명 등)
   window.__curCardName=name;
@@ -1175,7 +1202,7 @@ function openCard(name){
   try{ parent.postMessage({t:'cardOpen'}, '*'); }catch(e){}
   document.body.style.overflow='hidden';
 }
-function closeCard(){ document.getElementById('pcModal').classList.remove('on'); try{ parent.postMessage({t:'cardClose'}, '*'); }catch(e){} document.body.style.overflow=''; window.__curCardName=null; if(window.__likeUnsub){window.__likeUnsub();window.__likeUnsub=null;} if(window.__cmtUnsub){window.__cmtUnsub();window.__cmtUnsub=null;} }
+function closeCard(){ document.getElementById('pcModal').classList.remove('on'); try{ parent.postMessage({t:'cardClose'}, '*'); }catch(e){} document.body.style.overflow=''; window.__curCardName=null; if(window.__likeUnsub){window.__likeUnsub();window.__likeUnsub=null;} if(window.__cmtUnsub){window.__cmtUnsub();window.__cmtUnsub=null;} pcRestoreScroll(); }
 
 /* ── 소셜(좋아요·댓글) 렌더 + Firestore 실시간 ── */
 function renderSocial(name){

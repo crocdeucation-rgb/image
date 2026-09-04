@@ -36,6 +36,7 @@
   var FRAMES={total:{src:'total.html?v=828c',h:900},hire:{src:'hire.html?v=828c',h:900},hr:{src:'hr.html?v=828c',h:780},web:{src:'dashboard.html?v=828c',h:1700}};
   var frame=document.getElementById('frame');
   var _cardOverlay=false;   // 카드 모달 오버레이 중 높이 자동조정 중단
+  var _cardScrollY=0;      // 오버레이 전환 시 iframe이 flow에서 빠져 부모 스크롤이 0으로 클램프됨 → 원복용
   function fitHeight(){
     if(_cardOverlay) return;   // 오버레이 중에는 height 100vh 유지
     try{
@@ -71,6 +72,7 @@
     if(e.data && e.data.t==='cardOpen'){
       if(frame && !_cardOverlay){
         _cardOverlay=true;
+        _cardScrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
         frame.dataset.prevStyle = frame.getAttribute('style')||'';
         frame.style.position='fixed';
         frame.style.top='0'; frame.style.left='0';
@@ -84,7 +86,15 @@
         _cardOverlay=false;
         frame.setAttribute('style', frame.dataset.prevStyle||'');
         document.body.style.overflow='';
-        fitHeight();
+        fitHeight();   // iframe 높이를 먼저 되돌려야 scrollTo가 클램프되지 않는다
+        if(_cardScrollY){
+          window.scrollTo(0,_cardScrollY);
+          var _n=0, _t=setInterval(function(){
+            var cur=window.pageYOffset||document.documentElement.scrollTop||0;
+            if(cur>=_cardScrollY-2 || ++_n>10){ clearInterval(_t); return; }
+            fitHeight(); window.scrollTo(0,_cardScrollY);
+          },40);
+        }
       }
     }
   });
