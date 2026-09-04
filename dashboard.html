@@ -758,7 +758,7 @@ function render() {
     const r = allRows[ASSIGNEE_START_IDX + i] || [];
     const db=parseInt(r[offset]||'0')||0, visit=parseInt(r[offset+1]||'0')||0, setting=parseInt(r[offset+2]||'0')||0;
     const cancel=parseInt(r[offset+3]||'0')||0, order=parseInt(r[offset+4]||'0')||0, sales=r[offset+5]||'0원';
-    const salesNum=parseInt((sales+'').replace(/[^0-9]/g,''))||0;
+    const salesNum=parseFloat((sales+'').replace(/[^0-9.]/g,''))||0;   // [2026-09-04] 소수점 유지(만원 소수1자리) — 기존 parseInt+숫자만은 '.'제거로 10배 뻥튀기 버그
     const _co=19+funnelTab*3;
     const vcoh = (funnelTab===0) ? (r[32]||'') : '';   // 방문코호트M(33열=idx32), 이번달 탭만
     return {name:r[0]||name, db,visit,setting,cancel,order,sales,salesNum, cost:r[_co], iroas:parseFloat(r[_co+1])||0, eff:r[_co+2], yRank:(YRANK_MAP[r[0]||name]||0), vcoh:vcoh};
@@ -811,6 +811,19 @@ function render() {
     const _ur = allRows[ASSIGNEE_START_IDX + ASSIGNEES.length] || [];
     totalDb += parseInt(_ur[offset] || '0') || 0;
   }
+  // [2026-09-04] 전체탭 원가 = 시트 '전체 광고비'(getLeadStats가 MONTH_SPEND_TOTAL로 계산·누적).
+  //   담당자 cost 합(totalCost)은 이번달+지난달만이라 전체탭에선 5~7월이 빠져 ROAS가 폭발 → 전체탭만 교체.
+  //   시트값은 '원' 단위 → 만원으로 환산(÷10000)해서 totalCost(만원단위)와 정합.
+  let _totalCostView = totalCost;   // 이번달·지난달은 담당자합 그대로
+  if (funnelTab === 2) {
+    for (let _i = 0; _i < allRows.length; _i++) {
+      if (allRows[_i] && allRows[_i][0] === '전체 광고비') {
+        const _spendAllWon = parseFloat((allRows[_i][1] + '').replace(/[^0-9.]/g, '')) || 0;
+        if (_spendAllWon > 0) _totalCostView = _spendAllWon / 10000;   // 원 → 만원
+        break;
+      }
+    }
+  }
   const totCancelRate = totalVisit ? Math.round(totalCancel/totalVisit*100) : 0;
   const totOrderRate  = totalSetting ? Math.round(totalOrder/totalSetting*100) : 0;
   const totSalesFallback = totalSalesNum >= 10000 ? manWon(totalSalesNum) + '원' : totalSalesNum + '원';
@@ -826,8 +839,8 @@ function render() {
     <td class="sales">${totSalesStr}</td>
     <td class="rate" style="color:#e11d48">${totCancelRate}%</td>
     <td class="rate">${totOrderRate}%</td>
-    <td class="cost adm-only">${totalCost?Number(totalCost.toFixed(1)).toLocaleString()+'만':'-'}</td>
-    <td class="iroas adm-only">${totalCost?(totalSalesNum/(totalCost*10000)).toFixed(2):'-'}</td>
+    <td class="cost adm-only">${_totalCostView?Number(_totalCostView.toFixed(1)).toLocaleString()+'만':'-'}</td>
+    <td class="iroas adm-only">${_totalCostView?(totalSalesNum/(_totalCostView*10000)).toFixed(2):'-'}</td>
     <td class="eff2">${totalDb?(totalSalesNum/totalDb/10000).toFixed(1)+'만':'-'}</td>
   </tr>`);
   tbody.innerHTML = rows.join('');
