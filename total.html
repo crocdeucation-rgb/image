@@ -326,6 +326,8 @@ body.is-live .closed-only{display:none !important}
 .name-badges{font-size:10px;margin-left:5px;letter-spacing:0;white-space:nowrap;opacity:.9}
 .bd-item{cursor:pointer;transition:.12s}
 .bd-item:hover{transform:translateY(-2px);box-shadow:0 3px 8px rgba(233,64,120,.2)}
+.bd-item.bd-future{cursor:default;opacity:.55}
+.bd-item.bd-future:hover{transform:none;box-shadow:none}
 .bdw-bg{position:fixed;inset:0;background:rgba(60,20,40,.5);backdrop-filter:blur(3px);z-index:9999;display:none;align-items:center;justify-content:center;padding:16px}
 .bdw-bg.on{display:flex}
 .bdw{width:380px;max-width:100%;max-height:88vh;overflow-y:auto;background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(60,20,40,.4);position:relative;animation:bdwpop .22s cubic-bezier(.2,.9,.3,1.2)}
@@ -485,7 +487,14 @@ function renderBirthdays(D){
   if(todays.length){ h+='<span class="bd-today">🎉 오늘 '+todays.map(function(x){return x.name;}).join('·')+' 생일!</span>'; }
   // 이름/팀은 onclick 속성에 들어가므로 한글·영숫자·공백·._- 만 허용(따옴표/역슬래시/꺾쇠 제거)
   var bdSafe=function(s){ return String(s||'').replace(/[^0-9A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ ._-]/g,''); };
-  h+='<div class="bd-list">'+bd.map(function(x){ return '<span class="bd-item'+(x.today?' t':'')+'" onclick="openBirthday(\''+bdSafe(x.name)+'\','+x.mo+','+x.dy+',\''+bdSafe(x.team)+'\')">'+x.name+' <b>'+x.mo+'/'+x.dy+'</b></span>'; }).join('')+'</div>';
+  // [2026-09] 오늘 지난(또는 오늘) 생일만 축하 가능. 미래 생일자는 클릭 비활성(.bd-future)
+  var _td=new Date().getDate();
+  h+='<div class="bd-list">'+bd.map(function(x){
+    var _past=(x.dy<=_td);
+    var _cls='bd-item'+(x.today?' t':'')+(_past?'':' bd-future');
+    var _oc=_past?' onclick="openBirthday(\''+bdSafe(x.name)+'\','+x.mo+','+x.dy+',\''+bdSafe(x.team)+'\')"':'';
+    return '<span class="'+_cls+'"'+_oc+'>'+x.name+' <b>'+x.mo+'/'+x.dy+'</b></span>';
+  }).join('')+'</div>';
   el.innerHTML=h;
 }
 function renderAll(D){
@@ -887,10 +896,12 @@ function openBirthday(name, mo, dy, team){
   window.__curBday={name:name, mo:mo, dy:dy, team:team||''};
   renderBdwCard();
   document.getElementById('bdwModal').classList.add('on');
+  try{ parent.postMessage({t:'cardOpen'}, '*'); }catch(e){}   // switcher iframe 오버레이 전환
   document.body.style.overflow='hidden';
 }
 function closeBirthday(){
   document.getElementById('bdwModal').classList.remove('on');
+  try{ parent.postMessage({t:'cardClose'}, '*'); }catch(e){}
   document.body.style.overflow='';
   window.__curBday=null;
   if(window.__bdwUnsub){window.__bdwUnsub();window.__bdwUnsub=null;}
