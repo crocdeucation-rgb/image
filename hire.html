@@ -227,7 +227,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .ft{text-align:center;font-size:11px;color:var(--soft);margin-top:20px;line-height:1.8}
 </style></head><body><div class="wrap">
 <div class="hd"><div class="k">채용 · 통합채용</div><h1>증원현황</h1>
-<div class="m">전부서 통합 면접 (엄현호 이사) · 운영센터 코칭 별도 · 공고비 대비 실채용 효율</div></div>
+<div class="m">전부서 통합 면접 (엄현호 이사) · 운영센터 코칭 별도 · <span id="upd">불러오는 중…</span></div></div>
 
 <div class="cal-wrap">
   <div class="cal-hd">
@@ -369,14 +369,14 @@ function boot(){
       });
     }
     IVS.sort(function(a,b){ return a.date<b.date?-1:a.date>b.date?1:(a.time<b.time?-1:1); });
-    document.getElementById('upd').textContent='실시간 · '+IVS.length+'건 · '+new Date().toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})+' 기준';
+    var _upd=document.getElementById('upd'); if(_upd) _upd.textContent='실시간 · '+IVS.length+'건 · '+new Date().toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})+' 기준';
     // 이번주로 초기화
     __weekStart=mondayOf(new Date());
     renderCal();
     if(typeof cacRender==='function') cacRender();   // IVS 로드 후 합격자 반영해 CAC 재계산
   }).catch(function(e){
     document.getElementById('cal_grid').innerHTML='<div class="err">시트를 불러오지 못했어요: '+e+'<br>시트 공유가 "링크 있는 사람 뷰어"인지 확인해주세요.</div>';
-    document.getElementById('upd').textContent='로드 실패';
+    var _upd2=document.getElementById('upd'); if(_upd2) _upd2.textContent='로드 실패';
   });
 }
 
@@ -384,7 +384,7 @@ function mondayOf(d){ var x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); 
 
 // ── 오늘의 면접 (히어로) ──
 function renderToday(){
-  var el=document.getElementById('today-hero');
+  var el=document.getElementById('today-hero'); if(!el) return;
   var td=todayYmd(), now=new Date();
   var dnum=now.getMonth()+1, dday=now.getDate();
   var todays=IVS.filter(function(x){return x.date===td;});
