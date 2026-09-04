@@ -394,7 +394,7 @@ function renderAwards(D){
 
   // 수상자 1명 렌더 + data-target 후크 (트로피키:월:이름)
   function win(x, tkey, valHtml, seg){
-    if(!x) return '<div class="aw-slot aw-empty">'+(seg?'<span class="aw-seg">'+seg+'</span>':'')+'<span class="aw-noname">해당 없음</span></div>';
+    if(!x) return '<div class="aw-slot aw-empty">'+(seg?'<span class="aw-seg">'+seg+'</span>':'')+'<span class="aw-noname">아직 주인 없음 👀</span></div>';
     return '<div class="aw-slot" data-target="'+tkey+':'+mk+':'+x.name+'">'
       + (seg?'<span class="aw-seg">'+seg+'</span>':'')
       + '<span class="aw-nm">'+x.name+'</span>'
@@ -524,6 +524,7 @@ function renderAll(D){
       var p = window.__q3period, src = (p==='6' ? (D.top6||{}) : (D.top3||{})), lb = p+'개월';
       q3El.innerHTML = q3card(lb+' 지점 TOP3', src.branch, true) + q3card(lb+' 상담 TOP3', src.sang, true) + q3card(lb+' 사업 TOP3', src.saup, true);
       setupSwipe('q3','q3-hint');
+      setTimeout(function(){ if(window.attachCardClicks) window.attachCardClicks(); }, 50);
     };
     window.q3Period = function(p, btn){ window.__q3period=p; document.querySelectorAll('.q3togbtn').forEach(function(b){b.classList.remove('on');}); btn.classList.add('on'); window.renderQ3(); };
     window.renderQ3();
