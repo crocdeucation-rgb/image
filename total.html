@@ -1022,9 +1022,8 @@ function pcPraise(p,useF,closedM){
   else if(t==='S') out.push('✨ S급 정예');
   else if(t==='A'||t==='B') out.push('💪 든든한 주력');
   // [2026-09] 종결달 챔피언 문구는 아래 '🏆 명예의전당 MVP N회'와 동일 정보라 제거.
-  //   아직 트로피가 없는 진행중 1위만 남김(else if -> if 로 분리).
-  var _cs=pcChampSplit(p);
-  if(_cs.cur) out.push('🔥 이달 1등 달리는 중');
+  //   트로피에 아직 없는 진행중 1위만 남김.
+  if(pcIsCurLeader(p)) out.push('🔥 이달 1등 달리는 중');
   if(streak>=2) out.push('📈 '+streak+'개월 연속 우상향');
   if(nearCH) out.push('🎯 커리어하이 눈앞');
   var hof=(window.__HOF&&window.__HOF[p.name])||[];
@@ -1036,11 +1035,12 @@ function pcPraise(p,useF,closedM){
   return {slump:false, txt:out.slice(0,2).join(' · ')};
 }
 
-/* ── [2026-09] 챔피언 분리 — 종결달 1위(done) vs 현재월 진행중 1위(cur) ──
-   champMonths에 미종결 현재월이 섞여 HOF MVP 트로피와 어긋나던 문제 보정. */
-function pcChampSplit(p){
+/* ── [2026-09] 현재월(진행중) 1위 여부 ──
+   종결달 1위는 HOF MVP 트로피(🏆)로만 표기하므로, 트로피에 아직 없는
+   '진행중인 현재월 1위'만 판별한다. */
+function pcIsCurLeader(p){
   var curM=new Date().getMonth()+1, champs=(p&&p.champMonths)||[];
-  return { done: champs.filter(function(m){return m!==curM;}), cur: champs.indexOf(curM)>=0 };
+  return champs.indexOf(curM)>=0;
 }
 
 /* ── 뱃지 ── */
