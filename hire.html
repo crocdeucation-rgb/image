@@ -138,6 +138,20 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
   .wrap{padding:16px 12px 40px}
 
   /* 상단 요일 스트립 */
+  .cms-modetog{display:flex;gap:5px;margin-bottom:12px;background:#F1F4F9;padding:3px;border-radius:11px}
+  .cms-mt{flex:1;background:transparent;border:none;font-family:inherit;font-size:12.5px;font-weight:800;color:var(--soft);padding:7px 0;border-radius:8px;cursor:pointer;transition:.12s}
+  .cms-mt.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(27,36,54,.1)}
+  /* 주간뷰 날짜 헤더 */
+  .cms-daysep{display:flex;align-items:baseline;gap:8px;margin:20px 0 10px;padding-bottom:8px;border-bottom:2px solid #EDF1F7}
+  .cms-daysep:first-child{margin-top:4px}
+  .cms-daysep .dsw{font-size:13px;font-weight:900;color:var(--ink)}
+  .cms-daysep.today .dsw{color:#E23A22}
+  .cms-daysep .dsd{font-size:11px;font-weight:700;color:var(--soft)}
+  .cms-daysep .dstd{font-size:9.5px;font-weight:800;background:#E23A22;color:#fff;padding:1px 7px;border-radius:5px}
+  .cms-daysep .dscnt{font-size:11px;font-weight:700;color:var(--soft);margin-left:auto}
+  .cms-daysep.sun .dsw{color:#E23A22}.cms-daysep.sat .dsw{color:#4C6EF5}
+  .cms-daysep.none .dsw{color:#B6C2DC}
+  .cms-dayempty{font-size:11.5px;color:#C8D0DC;font-weight:600;padding:2px 0 4px}
   .cms-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:4px 0 12px;border-bottom:1px solid var(--line);margin-bottom:14px}
   .cms-day{position:relative;text-align:center;padding:7px 0 8px;border-radius:12px;cursor:pointer;transition:.12s;background:transparent}
   .cms-day .wd{font-size:11px;font-weight:700;color:var(--soft);margin-bottom:5px}
@@ -321,7 +335,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
   </div>
   <div class="cal-place-banner">📍 면접·교육 장소 <b>퀸즈파크10</b> · 서울 강서구 마곡중앙6로 66, 414호</div>
   <div id="cal_grid"></div>
-  <div class="cal-mob"><div class="cms-strip" id="cms_strip"></div><div id="cms_body"></div></div>
+  <div class="cal-mob"><div class="cms-modetog" id="cms_modetog"><button class="cms-mt on" data-m="day" onclick="calSetMode('day')">일간</button><button class="cms-mt" data-m="week" onclick="calSetMode('week')">주간</button></div><div class="cms-strip" id="cms_strip"></div><div id="cms_body"></div></div>
   <div class="cal-swipe-hint" id="cal_hint"></div>
   <div class="cal-legend">
     <span class="lg"><span class="d 상담부"></span>상담부</span>
@@ -598,44 +612,17 @@ function renderCal(){
 var __selDay=null;
 window.calSelDay=function(dstr){ __selDay=dstr; var days=[],ws=new Date(__weekStart); for(var i=0;i<7;i++){var d=new Date(ws);d.setDate(ws.getDate()+i);days.push(d);} renderCalMobile(days, todayYmd()); };
 
-function renderCalMobile(days, td){
-  var strip=document.getElementById('cms_strip'), body=document.getElementById('cms_body');
-  if(!strip||!body) return;
-  // 선택일 결정: 이번주에 오늘 있으면 오늘, 아니면 __selDay(이 주 범위 내), 아니면 첫날
-  var weekYmds=days.map(function(d){return ymd(d);});
-  var sel=__selDay;
-  if(!sel || weekYmds.indexOf(sel)<0){ sel = (weekYmds.indexOf(td)>=0) ? td : weekYmds[0]; }
-  __selDay=sel;
+// 모바일 모드: day(일간) / week(주간)
+var __calMode='day';
+window.calSetMode=function(m){ __calMode=m; var days=[],ws=new Date(__weekStart); for(var i=0;i<7;i++){var d=new Date(ws);d.setDate(ws.getDate()+i);days.push(d);} renderCalMobile(days, todayYmd()); };
 
-  // ── 요일 스트립 ──
-  var sh='';
-  days.forEach(function(d){
-    var dstr=ymd(d), dow=d.getDay(), isT=(dstr===td), isSel=(dstr===sel);
-    var list=IVS.filter(function(x){return x.date===dstr;});
-    var eduList=IVS.filter(function(x){return x.eduDate && ymdFromEdu(x.eduDate)===dstr;});
-    // 점: 직무별 색(중복 제거) + 교육
-    var jobs={}; list.forEach(function(x){jobs[x.job]=1;}); if(eduList.length)jobs['edu']=1;
-    var dots=''; Object.keys(jobs).slice(0,4).forEach(function(j){ dots+='<span class="dt '+j+'"></span>'; });
-    var cls='cms-day'+(dow===0?' sun':'')+(dow===6?' sat':'')+(isT?' today':'')+(isSel?' sel':'');
-    sh+='<div class="'+cls+'" onclick="calSelDay(\''+dstr+'\')">'
-      +'<div class="wd">'+WD[dow]+'</div><div class="dn">'+d.getDate()+'</div>'
-      +'<div class="cms-dots">'+dots+'</div></div>';
-  });
-  strip.innerHTML=sh;
-
-  // ── 선택일 일정 리스트 ──
-  var selD=days[weekYmds.indexOf(sel)];
-  var list=IVS.filter(function(x){return x.date===sel;});
-  var eduList=IVS.filter(function(x){return x.eduDate && ymdFromEdu(x.eduDate)===sel;});
+// 하루치 일정 리스트 HTML (그룹핑+행). 일간/주간 공용
+function dayListHtml(dstr){
+  var list=IVS.filter(function(x){return x.date===dstr;});
+  var eduList=IVS.filter(function(x){return x.eduDate && ymdFromEdu(x.eduDate)===dstr;});
   var esc=function(s){return String(s||'').replace(/</g,'&lt;');};
-  var cnt=list.length+eduList.length;
-  var bh='<div class="cms-selhd">'+(selD.getMonth()+1)+'월 '+selD.getDate()+'일 '+WD[selD.getDay()]+'요일'
-    +(sel===td?'<span class="sd-td">오늘</span>':'')
-    +(cnt?'<span class="sd-cnt">'+cnt+'건</span>':'')+'</div>';
-
-  if(!cnt){ bh+='<div class="cms-empty">일정 없음</div>'; body.innerHTML=bh; return; }
-
-  // 면접관+시간 그룹핑 (PC와 동일 규칙)
+  if(!list.length && !eduList.length) return '';
+  var bh='';
   var groups={}, gOrder=[];
   list.forEach(function(iv){
     var gkey=(iv.time||'-')+'|'+interviewerOf(iv);
@@ -658,7 +645,6 @@ function renderCalMobile(days, td){
     });
     bh+='</div>';
   });
-  // 교육 일정
   if(eduList.length){
     bh+='<div class="cms-grp"><div class="cms-grp-hd"><span class="cms-grp-tm">🎓 교육</span></div>';
     eduList.forEach(function(iv){
@@ -671,6 +657,64 @@ function renderCalMobile(days, td){
     });
     bh+='</div>';
   }
+  return bh;
+}
+function dayCount(dstr){
+  return IVS.filter(function(x){return x.date===dstr;}).length
+       + IVS.filter(function(x){return x.eduDate && ymdFromEdu(x.eduDate)===dstr;}).length;
+}
+
+function renderCalMobile(days, td){
+  var strip=document.getElementById('cms_strip'), body=document.getElementById('cms_body'), tog=document.getElementById('cms_modetog');
+  if(!strip||!body) return;
+  if(tog){ tog.querySelectorAll('.cms-mt').forEach(function(b){ b.classList.toggle('on', b.dataset.m===__calMode); }); }
+  var weekYmds=days.map(function(d){return ymd(d);});
+
+  // ═══ 주간 모드: 요일스트립 숨기고 일~토 전부 펼침 ═══
+  if(__calMode==='week'){
+    strip.style.display='none';
+    var wh='';
+    days.forEach(function(d){
+      var dstr=ymd(d), dow=d.getDay(), isT=(dstr===td), cnt=dayCount(dstr);
+      var scls='cms-daysep'+(dow===0?' sun':'')+(dow===6?' sat':'')+(isT?' today':'')+(cnt?'':' none');
+      wh+='<div class="'+scls+'"><span class="dsw">'+(d.getMonth()+1)+'/'+d.getDate()+'('+WD[dow]+')</span>'
+        +(isT?'<span class="dstd">오늘</span>':'')
+        +(cnt?'<span class="dscnt">'+cnt+'건</span>':'')+'</div>';
+      wh+= cnt ? dayListHtml(dstr) : '<div class="cms-dayempty">일정 없음</div>';
+    });
+    body.innerHTML=wh;
+    return;
+  }
+
+  // ═══ 일간 모드 ═══
+  strip.style.display='';
+  var sel=__selDay;
+  if(!sel || weekYmds.indexOf(sel)<0){ sel = (weekYmds.indexOf(td)>=0) ? td : weekYmds[0]; }
+  __selDay=sel;
+
+  // ── 요일 스트립 ──
+  var sh='';
+  days.forEach(function(d){
+    var dstr=ymd(d), dow=d.getDay(), isT=(dstr===td), isSel=(dstr===sel);
+    var list=IVS.filter(function(x){return x.date===dstr;});
+    var eduList=IVS.filter(function(x){return x.eduDate && ymdFromEdu(x.eduDate)===dstr;});
+    var jobs={}; list.forEach(function(x){jobs[x.job]=1;}); if(eduList.length)jobs['edu']=1;
+    var dots=''; Object.keys(jobs).slice(0,4).forEach(function(j){ dots+='<span class="dt '+j+'"></span>'; });
+    var cls='cms-day'+(dow===0?' sun':'')+(dow===6?' sat':'')+(isT?' today':'')+(isSel?' sel':'');
+    sh+='<div class="'+cls+'" onclick="calSelDay(\''+dstr+'\')">'
+      +'<div class="wd">'+WD[dow]+'</div><div class="dn">'+d.getDate()+'</div>'
+      +'<div class="cms-dots">'+dots+'</div></div>';
+  });
+  strip.innerHTML=sh;
+
+  // ── 선택일 일정 리스트 ──
+  var selD=days[weekYmds.indexOf(sel)];
+  var cnt=dayCount(sel);
+  var bh='<div class="cms-selhd">'+(selD.getMonth()+1)+'월 '+selD.getDate()+'일 '+WD[selD.getDay()]+'요일'
+    +(sel===td?'<span class="sd-td">오늘</span>':'')
+    +(cnt?'<span class="sd-cnt">'+cnt+'건</span>':'')+'</div>';
+  if(!cnt){ bh+='<div class="cms-empty">일정 없음</div>'; body.innerHTML=bh; return; }
+  bh+=dayListHtml(sel);
   body.innerHTML=bh;
 }
 
