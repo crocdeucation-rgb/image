@@ -203,7 +203,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .ivm-row{display:flex;padding:9px 0;border-bottom:1px solid #F2F4F7;font-size:13px}
 .ivm-row:last-child{border-bottom:none}
 .ivm-lbl{width:80px;color:var(--soft);font-weight:600;flex-shrink:0}
-.ivm-val{font-weight:700;color:var(--ink)}
+.ivm-val{font-weight:700;color:var(--ink);min-width:0;word-break:keep-all;line-height:1.5}
 .ivm-val.at{color:#1B7A4A}.ivm-val.ns{color:#C0341E}.ivm-val.ps{color:#5A3AD0}.ivm-val.fa{color:#C0341E}
 .ivm-memo{background:#F7F9FC;border-radius:10px;padding:11px 13px;font-size:12.5px;line-height:1.5;color:#3A4456;margin-top:12px}
 .ivm-memo::before{content:'💬 ';opacity:.6}
@@ -371,7 +371,7 @@ function ymd(d){ return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'
 function todayYmd(){ return ymd(new Date()); }
 var WD=['일','월','화','수','목','금','토'];
 var PLACE_SHORT='마곡';
-var PLACE_FULL='퀸즈파크텐10, 서울 강서구 마곡중앙6로 66, 414호';
+var PLACE_FULL='퀸즈파크10, 서울 강서구 마곡중앙6로 66, 414호';
 // 직무 정규화 (강사(쌤이다) → 강사)
 function jobNorm(s){ s=String(s||''); if(s.indexOf('상담')>=0)return '상담부'; if(s.indexOf('사업')>=0)return '사업부'; if(s.indexOf('코칭')>=0)return '코칭'; if(s.indexOf('강사')>=0)return '강사'; return s||'기타'; }
 // [면접관 규칙] 운영센터+알바몬+코칭 = 운영센터 면접 / 나머지 전부 = 엄현호 이사
@@ -692,8 +692,8 @@ window.openIv=function(date,name){
     +(iv.site?'<span class="ivm-tag">'+esc(iv.site)+'</span>':'')
     +(iv.region?'<span class="ivm-tag">'+esc(iv.region)+'</span>':'')+'</div></div>';
   h+='<div class="ivm-body">';
+  h+='<div class="ivm-row"><span class="ivm-lbl">📍 장소</span><span class="ivm-val">'+esc(PLACE_FULL)+'</span></div>';
   h+='<div class="ivm-row"><span class="ivm-lbl">면접관</span><span class="ivm-val">'+esc(interviewerOf(iv))+'</span></div>';
-  h+='<div class="ivm-row"><span class="ivm-lbl">장소</span><span class="ivm-val">📍 '+esc(PLACE_FULL)+'</span></div>';
   h+='<div class="ivm-row"><span class="ivm-lbl">참석</span><span class="ivm-val '+(iv.attend.indexOf('불참')>=0?'ns':iv.attend.indexOf('참석')>=0?'at':'')+'">'+(esc(iv.attend)||'-')+'</span></div>';
   h+='<div class="ivm-row"><span class="ivm-lbl">결과</span><span class="ivm-val '+(iv.pass.indexOf('불합격')>=0?'fa':iv.pass.indexOf('합격')>=0?'ps':'')+'">'+(esc(iv.pass)||'-')+'</span></div>';
   if(iv.eduDate){
