@@ -828,7 +828,9 @@ function render() {
   const totCancelRate = totalVisit ? Math.round(totalCancel/totalVisit*100) : 0;
   const totOrderRate  = totalSetting ? Math.round(totalOrder/totalSetting*100) : 0;
   const totSalesFallback = totalSalesNum >= 10000 ? manWon(totalSalesNum) + '원' : totalSalesNum + '원';
-  const totSalesStr = funnelTab === 0 ? (r12[1] || totSalesFallback) : funnelTab === 1 ? (r13[1] || totSalesFallback) : totSalesFallback;
+  // [2026-09-05] 합계 매출 = 담당자 매출 합(원장 기반) = 개별행과 정확히 일치.
+  //   기존엔 r12[1](시트 전사매출·노션)을 우선 써서 개별합과 890,000 어긋남 → 담당자합으로 통일.
+  const totSalesStr = totSalesFallback;
   rows.push(`<tr class="total">
     <td class="num"></td>
     <td class="name">합계</td>
