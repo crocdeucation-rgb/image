@@ -22,6 +22,8 @@
   iframe{width:100%;border:0;display:block;background:var(--bg);}
   /* [2026-09] 로그인 게이트 */
   #sgate{position:fixed;inset:0;z-index:99999;background:linear-gradient(160deg,#0F1626,#1E2C48);display:flex;align-items:center;justify-content:center;padding:24px;}
+  #sgate .sg-card{opacity:0;transition:opacity .25s ease;}   /* [2026-09] 판정 전엔 카드 숨김 — 로그인된 사람 깜빡임 방지 */
+  #sgate.ready .sg-card{opacity:1;}
   #sgate.hidden{display:none;}
   .sg-card{background:#fff;border-radius:22px;padding:38px 32px;max-width:380px;width:100%;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.4);}
   .sg-logo{font-size:34px;margin-bottom:6px;}
@@ -88,21 +90,16 @@
 var sgFirebaseConfig={apiKey:"AIzaSyCBDimk0MyGAHf762mvInS_H4K9HkW6Ol0",authDomain:"dashboard-88ba4.firebaseapp.com",projectId:"dashboard-88ba4",storageBucket:"dashboard-88ba4.firebasestorage.app",messagingSenderId:"857535538974",appId:"1:857535538974:web:999d190f28e14964eb4b0f"};
 firebase.initializeApp(sgFirebaseConfig);
 var _sgAuth=firebase.auth();
-var SG_ALLOW=['032100jesus@gmail.com','christuhm@gmail.com','crocdeucation@gmail.com','90younho@gmail.com','deuk1992@gmail.com','goodida486@gmail.com','jeffkorea27@gmail.com','jjoon0804@gmail.com','skfkr4@gmail.com','w0wwiam1004@gmail.com','whkimts@gmail.com','dbgpfla97@gmail.com','mjhsingle@gmail.com','qkfka3090@gmail.com','ggh0305@gmail.com','ahlee.sep@gmail.com','xpxmfltm5678@gmail.com','alsk102qpwoal@gmail.com','minsung32383238@gmail.com','happy1004elle@gmail.com','gh3541@gmail.com','ghtn1346@gmail.com','uss20182@gmail.com','dltjrgjs56@gmail.com','hr3213@gmail.com','starlim2723@gmail.com','100heamin7678@gmail.com','codud010802@gmail.com','01046153497a@gmail.com','lsmlsmopop@gmail.com','pjskimbo8@gmail.com','ksj245180@gmail.com','eunbini592@gmail.com'];
-var SG_NAME={'032100jesus@gmail.com':'오동근','christuhm@gmail.com':'엄현호','crocdeucation@gmail.com':'신상준','90younho@gmail.com':'김윤호','deuk1992@gmail.com':'김원득','goodida486@gmail.com':'노영호','jeffkorea27@gmail.com':'김성윤','jjoon0804@gmail.com':'안준섭','skfkr4@gmail.com':'김우진','w0wwiam1004@gmail.com':'장윤호','whkimts@gmail.com':'김태석','dbgpfla97@gmail.com':'우혜림','mjhsingle@gmail.com':'문정현','qkfka3090@gmail.com':'이승엽','ggh0305@gmail.com':'고국희','ahlee.sep@gmail.com':'이아현','xpxmfltm5678@gmail.com':'윤지환','alsk102qpwoal@gmail.com':'김준수','minsung32383238@gmail.com':'김민성','happy1004elle@gmail.com':'김예원','gh3541@gmail.com':'박건휘','ghtn1346@gmail.com':'김예림','uss20182@gmail.com':'이태희','dltjrgjs56@gmail.com':'이석헌','hr3213@gmail.com':'이상민','starlim2723@gmail.com':'임한별','100heamin7678@gmail.com':'홍혜민','codud010802@gmail.com':'김채영','01046153497a@gmail.com':'안세령','lsmlsmopop@gmail.com':'임성민','pjskimbo8@gmail.com':'박민수','ksj245180@gmail.com':'권순재','eunbini592@gmail.com':'이은빈'};
+var SG_ALLOW=['032100jesus@gmail.com','christuhm@gmail.com','crocdeucation@gmail.com','90younho@gmail.com','deuk1992@gmail.com','goodida486@gmail.com','jeffkorea27@gmail.com','jjoon0804@gmail.com','skfkr4@gmail.com','w0wwiam1004@gmail.com','whkimts@gmail.com','dbgpfla97@gmail.com','mjhsingle@gmail.com','qkfka3090@gmail.com','ggh0305@gmail.com','ahlee.sep@gmail.com','xpxmfltm5678@gmail.com','alsk102qpwoal@gmail.com','minsung32383238@gmail.com','happy1004elle@gmail.com','gh3541@gmail.com','ghtn1346@gmail.com','uss20182@gmail.com','dltjrgjs56@gmail.com','hr3213@gmail.com','starlim2723@gmail.com','100heamin7678@gmail.com','codud010802@gmail.com','01046153497a@gmail.com','lsmlsmopop@gmail.com','pjskimbo8@gmail.com','ksj245180@gmail.com','eunbini592@gmail.com','kanghansara@gmail.com'];
+var SG_NAME={'032100jesus@gmail.com':'오동근','christuhm@gmail.com':'엄현호','crocdeucation@gmail.com':'신상준','90younho@gmail.com':'김윤호','deuk1992@gmail.com':'김원득','goodida486@gmail.com':'노영호','jeffkorea27@gmail.com':'김성윤','jjoon0804@gmail.com':'안준섭','skfkr4@gmail.com':'김우진','w0wwiam1004@gmail.com':'장윤호','whkimts@gmail.com':'김태석','dbgpfla97@gmail.com':'우혜림','mjhsingle@gmail.com':'문정현','qkfka3090@gmail.com':'이승엽','ggh0305@gmail.com':'고국희','ahlee.sep@gmail.com':'이아현','xpxmfltm5678@gmail.com':'윤지환','alsk102qpwoal@gmail.com':'김준수','minsung32383238@gmail.com':'김민성','happy1004elle@gmail.com':'김예원','gh3541@gmail.com':'박건휘','ghtn1346@gmail.com':'김예림','uss20182@gmail.com':'이태희','dltjrgjs56@gmail.com':'이석헌','hr3213@gmail.com':'이상민','starlim2723@gmail.com':'임한별','100heamin7678@gmail.com':'홍혜민','codud010802@gmail.com':'김채영','01046153497a@gmail.com':'안세령','lsmlsmopop@gmail.com':'임성민','pjskimbo8@gmail.com':'박민수','ksj245180@gmail.com':'권순재','eunbini592@gmail.com':'이은빈','kanghansara@gmail.com':'김사라'};
 var _sgPassed=false;
-var SG_RANK={'032100jesus@gmail.com':'파운더','christuhm@gmail.com':'대표이사','crocdeucation@gmail.com':'이사','90younho@gmail.com':'지사장','w0wwiam1004@gmail.com':'지사장','deuk1992@gmail.com':'과장','goodida486@gmail.com':'과장','dbgpfla97@gmail.com':'과장','jeffkorea27@gmail.com':'대리','jjoon0804@gmail.com':'대리','skfkr4@gmail.com':'대리','gh3541@gmail.com':'대리','whkimts@gmail.com':'PM'};
+var SG_RANK={'032100jesus@gmail.com':'파운더','christuhm@gmail.com':'대표이사','crocdeucation@gmail.com':'이사','90younho@gmail.com':'지사장','w0wwiam1004@gmail.com':'지사장','deuk1992@gmail.com':'과장','goodida486@gmail.com':'과장','dbgpfla97@gmail.com':'과장','jeffkorea27@gmail.com':'대리','jjoon0804@gmail.com':'대리','skfkr4@gmail.com':'대리','gh3541@gmail.com':'대리','whkimts@gmail.com':'PM','kanghansara@gmail.com':'차장'};
 _sgAuth.onAuthStateChanged(function(u){
   var gate=document.getElementById('sgate'), msg=document.getElementById('sgateMsg');
   if(!gate) return;
   if(u && SG_ALLOW.indexOf((u.email||'').toLowerCase())>=0){
     _sgPassed=true;
-    // [2026-09] 인증 완료 피드백 — 통과 확인을 잠깐 보여주고 진입 (iframe은 이미 로드됨)
     var nm=SG_NAME[(u.email||'').toLowerCase()]||(u.displayName||'');
-    // 로그인 버튼·부제 숨기고 인사말만 (애플st)
-    var _b=gate.querySelector('.sg-btn'); if(_b)_b.style.display='none';
-    var _s=gate.querySelector('.sg-sub'); if(_s)_s.style.display='none';
-    if(msg){ msg.className='sg-msg ok'; msg.innerHTML=nm?'안녕하세요, <b>'+nm+'</b>님':'안녕하세요'; }
     // 우측 상단 로그인 상태 칩 채우기
     var chip=document.getElementById('userChip');
     if(chip){ chip.classList.add('on');
@@ -111,25 +108,35 @@ _sgAuth.onAuthStateChanged(function(u){
       if(av) av.textContent=(nm||'?').charAt(0);
       if(nmEl) nmEl.innerHTML=(nm||u.email)+(rk?'<span class="rk">'+rk+'</span>':'');
     }
-    setTimeout(function(){ gate.classList.add('bye'); }, 1800);
-    setTimeout(function(){ gate.classList.add('hidden'); gate.classList.remove('bye'); document.body.style.overflow=''; try{ parent.postMessage({t:'cardClose'},'*'); }catch(e){} }, 2400);
+    if(window._sgFreshLogin){
+      // 버튼 눌러 방금 로그인 → 인사말 연출
+      var _b=gate.querySelector('.sg-btn'); if(_b)_b.style.display='none';
+      var _s=gate.querySelector('.sg-sub'); if(_s)_s.style.display='none';
+      if(msg){ msg.className='sg-msg ok'; msg.innerHTML=nm?'안녕하세요, <b>'+nm+'</b>님':'안녕하세요'; }
+      gate.classList.add('ready');
+      setTimeout(function(){ gate.classList.add('bye'); }, 1400);
+      setTimeout(function(){ gate.classList.add('hidden'); gate.classList.remove('bye'); document.body.style.overflow=''; try{ parent.postMessage({t:'cardClose'},'*'); }catch(e){} }, 1900);
+    } else {
+      // 세션 복원(새로고침) → 깜빡임 없이 즉시 통과
+      gate.classList.add('hidden'); document.body.style.overflow=''; try{ parent.postMessage({t:'cardClose'},'*'); }catch(e){}
+    }
   } else if(u){
     if(msg){ msg.className='sg-msg err'; msg.textContent='접근 권한이 없는 계정입니다 ('+u.email+')'; }
-    gate.classList.remove('hidden'); document.body.style.overflow='hidden';
+    gate.classList.remove('hidden'); gate.classList.add('ready'); document.body.style.overflow='hidden';
     try{ parent.postMessage({t:'cardOpen'},'*'); }catch(e){}
     setTimeout(function(){ try{_sgAuth.signOut();}catch(e){} }, 2500);
   } else {
     if(msg){ msg.className='sg-msg'; msg.textContent=''; }
-    // 로그아웃 상태 — 칩 숨기고 게이트 원복(버튼·부제 복원)
     var chip2=document.getElementById('userChip'); if(chip2) chip2.classList.remove('on');
     var _b2=gate.querySelector('.sg-btn'); if(_b2)_b2.style.display='';
     var _s2=gate.querySelector('.sg-sub'); if(_s2)_s2.style.display='';
-    gate.classList.remove('hidden','bye'); document.body.style.overflow='hidden';
+    gate.classList.remove('hidden','bye'); gate.classList.add('ready'); document.body.style.overflow='hidden';
     try{ parent.postMessage({t:'cardOpen'},'*'); }catch(e){}
   }
 });
 window.sgateLogout=function(){ try{_sgAuth.signOut();}catch(e){} };
 window.sgateLogin=function(){
+  window._sgFreshLogin=true;   // [2026-09] 버튼 로그인 = 인사말 연출 / 세션복원 = 즉시통과 구분
   var msg=document.getElementById('sgateMsg');
   if(msg){ msg.className='sg-msg wait'; msg.textContent='로그인 창을 여는 중...'; }
   var p=new firebase.auth.GoogleAuthProvider();
