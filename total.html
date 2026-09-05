@@ -507,6 +507,8 @@ body.is-live .closed-only{display:none !important}
 /* [2026-09] 로그인 게이트 — 인증+33명 통과 전엔 대시보드 가림 */
 #authGate{position:fixed;inset:0;z-index:99999;background:linear-gradient(160deg,#0F1626,#1E2C48);display:flex;align-items:center;justify-content:center;padding:24px}
 #authGate.hidden{display:none}
+#authGate .gate-card{opacity:0;transition:opacity .25s ease}
+#authGate.ready .gate-card{opacity:1}
 .gate-card{background:#fff;border-radius:22px;padding:38px 32px;max-width:380px;width:100%;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.4)}
 .gate-logo{font-size:34px;margin-bottom:6px}
 .gate-ttl{font-size:20px;font-weight:900;color:#1B2436;letter-spacing:-.5px}
@@ -595,7 +597,7 @@ body.is-live .closed-only{display:none !important}
 <div class="wrap">
 <div id="birthday-bar" class="birthday-bar" style="display:none"></div>
 <div class="hd"><div class="k">전부서 실적</div><h1>전체실적 대시보드</h1>
-<div class="m">취소 반영 확정 · 미납 포함/취소 제외/연장 포함 · 매일 갱신</div></div>
+<div class="m">취소 반영 확정 · 미납 포함/취소 제외/연장 포함 · <span id="asOfLabel">매일 갱신</span></div></div>
 <div class="tophead">
 <div class="hero"><div class="lb">전사 매출 (실입금 기준 · 웹마케팅 포함)</div><div class="big" id="h_s"></div>
 <div class="breakdown" id="h_bd" style="display:none"></div>
@@ -773,11 +775,40 @@ function renderBirthdays(D){
   }).join('')+'</div>';
   el.innerHTML=h;
 }
+/* [2026-09] 반영 기준일 라벨 — 라이브는 원장 최신일 자동감지, 종결월은 그 달 결산 */
+function updateAsOfLabel(D, isLive){
+  var el=document.getElementById('asOfLabel'); if(!el) return;
+  if(!isLive){
+    // 종결월: 현재 선택된 월 키(window.__curMonthKey) → "8월 결산 확정"
+    var mk=window.__monthKey||''; var mm=(mk.indexOf('-')>=0)?mk.slice(5).replace(/^0/,''):'';
+    el.textContent=mm?(mm+'월 결산 확정'):'결산 확정';
+    return;
+  }
+  // 라이브: 원장(데일리 실적 gid=698799247) 최신일 조회 (현재월만이라 가벼움) · 1회 캐시
+  el.textContent='매일 갱신';
+  if(window.__asOfDone) return; window.__asOfDone=true;
+  try{
+    var url="https://docs.google.com/spreadsheets/d/1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU/gviz/tq?tqx=out:csv&headers=0&gid=698799247&_="+Date.now();
+    fetch(url).then(function(r){return r.text();}).then(function(csv){
+      var mx=0;
+      csv.split('\n').forEach(function(line){
+        var m=line.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*일/); // "09월 04일"
+        if(m){ var k=(+m[1])*100+(+m[2]); if(k>mx)mx=k; }
+        var m2=line.match(/"?(\d{4})-(\d{1,2})-(\d{1,2})/);
+        if(m2){ var k2=(+m2[2])*100+(+m2[3]); if(k2>mx)mx=k2; }
+      });
+      if(mx>0){ var mo=Math.floor(mx/100), dy=mx%100;
+        el.innerHTML='📅 <b style="color:#4C6EF5">'+mo+'월 '+dy+'일</b>까지 반영 · 매일 갱신';
+      }
+    }).catch(function(){});
+  }catch(e){}
+}
 function renderAll(D){
   window.__D = D;
   // [2026-09] 라이브(현재월) vs 종결(과거월) — buildTotalData가 보내는 D.isLive 사용.
   //   종결달은 실시간 지표(급등주·순위변동·커리어하이·3/6개월 누적) 숨기고 그달 결산만.
   var _isLive = (D.isLive !== false);
+  if(typeof updateAsOfLabel==='function') updateAsOfLabel(D, _isLive);   // [2026-09] 반영 기준일
   document.body.classList.toggle('is-closed', !_isLive);
   document.body.classList.toggle('is-live', _isLive);
   renderAwards(D);   // [2026-09] 종결달 MVP 시상식 (라이브면 함수 내부에서 스킵)
@@ -1215,7 +1246,8 @@ var ALLOW_NAME={
   'lsmlsmopop@gmail.com':{name:'임성민',rank:'주임'},
   'pjskimbo8@gmail.com':{name:'박민수',rank:'사원'},
   'ksj245180@gmail.com':{name:'권순재',rank:'사원'},
-  'eunbini592@gmail.com':{name:'이은빈',rank:'사원'}
+  'eunbini592@gmail.com':{name:'이은빈',rank:'사원'},
+  'kanghansara@gmail.com':{name:'김사라',rank:'차장'}
 };
 _fauth.onAuthStateChanged(function(u){
   if(u && ALLOW_NAME[u.email]){ _me={email:u.email, name:ALLOW_NAME[u.email].name, rank:ALLOW_NAME[u.email].rank}; }
@@ -1244,6 +1276,7 @@ function gateCheck(u){
 }
 function gateShow(gate){
   gate.classList.remove('hidden');
+  gate.classList.add('ready');
   document.body.style.overflow='hidden';
   try{ parent.postMessage({t:'cardOpen'}, '*'); }catch(e){}  // switcher iframe 전체화면 오버레이 전환
   try{ window.scrollTo(0,0); }catch(e){}
