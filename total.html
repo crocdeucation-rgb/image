@@ -570,7 +570,7 @@ body.is-live .closed-only{display:none !important}
       Google로 로그인
     </button>
     <div class="gate-msg" id="gateMsg"></div>
-    <div class="gate-foot">문의: 신상준 이사</div>
+    <div class="gate-foot">문의: 신상준 이사 · crocedu@naver.com</div>
   </div>
 </div>
 <div class="topnav" id="topnav">
@@ -1177,6 +1177,8 @@ window.loadMonth = loadMonth;
 /* ── Firebase 초기화 ── */
 var firebaseConfig={apiKey:"AIzaSyCBDimk0MyGAHf762mvInS_H4K9HkW6Ol0",authDomain:"dashboard-88ba4.firebaseapp.com",projectId:"dashboard-88ba4",storageBucket:"dashboard-88ba4.firebasestorage.app",messagingSenderId:"857535538974",appId:"1:857535538974:web:999d190f28e14964eb4b0f"};
 firebase.initializeApp(firebaseConfig);
+/* [2026-09] 로드 즉시 게이트 오버레이 전환 (Firebase 판정 전에도 벽 유지) */
+(function(){ try{ var g=document.getElementById('authGate'); if(g){ document.body.style.overflow='hidden'; parent.postMessage({t:'cardOpen'}, '*'); window.scrollTo(0,0); } }catch(e){} })();
 var _fdb=firebase.firestore(), _fauth=firebase.auth();
 var _me=null;   // {email,name,rank}
 // allowlist 이메일→이름·직급 (표시용). 규칙은 Firestore가 강제, 여긴 이름 표시만.
@@ -1230,14 +1232,21 @@ function gateCheck(u){
   if(!gate) return;
   if(u && ALLOW_NAME[u.email]){          // 통과
     gate.classList.add('hidden'); document.body.style.overflow='';
+    try{ parent.postMessage({t:'cardClose'}, '*'); }catch(e){}
   } else if(u){                           // 로그인은 됐으나 명단에 없음
     if(msg){ msg.className='gate-msg err'; msg.textContent='접근 권한이 없는 계정입니다 ('+u.email+')'; }
-    gate.classList.remove('hidden'); document.body.style.overflow='hidden';
+    gateShow(gate);
     setTimeout(function(){ try{_fauth.signOut();}catch(e){} }, 2500);  // 비인가 계정 로그아웃
   } else {                                // 미로그인
     if(msg){ msg.className='gate-msg'; msg.textContent=''; }
-    gate.classList.remove('hidden'); document.body.style.overflow='hidden';
+    gateShow(gate);
   }
+}
+function gateShow(gate){
+  gate.classList.remove('hidden');
+  document.body.style.overflow='hidden';
+  try{ parent.postMessage({t:'cardOpen'}, '*'); }catch(e){}  // switcher iframe 전체화면 오버레이 전환
+  try{ window.scrollTo(0,0); }catch(e){}
 }
 window.gateLogin=function(){
   var msg=document.getElementById('gateMsg');
