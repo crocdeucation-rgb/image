@@ -60,6 +60,17 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .cal-col.today .cal-dhd{border-color:#F3C9C0}
 .cal-todaytag{display:inline-block;font-size:8.5px;font-weight:800;background:#E23A22;color:#fff;padding:1px 6px;border-radius:5px;margin-top:3px}
 .cal-ivs{display:flex;flex-direction:column;gap:4px}
+/* 면접관+시간 그룹 */
+.cal-grp{margin-bottom:8px;background:#F7F9FC;border:1px solid #E9EEF5;border-radius:11px;padding:8px 9px}
+.cal-grp.multi{background:#F0F3FA;border-color:#D8E0EE}
+.cal-grp-hd{display:flex;align-items:center;gap:7px;margin-bottom:7px;padding-bottom:6px;border-bottom:1px dashed #DCE3EE}
+.cal-grp-tm{font-size:13px;font-weight:900;color:var(--ink);letter-spacing:-.3px}
+.cal-grp-cnt{margin-left:auto;font-size:10.5px;font-weight:800;color:#fff;background:#4C6EF5;padding:2px 9px;border-radius:20px}
+.cal-grp .cal-iv{margin-bottom:5px}
+.cal-grp .cal-iv:last-child{margin-bottom:0}
+.cal-iv-nm-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.cal-iv-nm-row .cal-iv-nm{margin-bottom:0}
+.cal-iv-nm-row .cal-jbadge{margin-left:auto}
 .cal-iv{background:#fff;border:1px solid #E7ECF4;border-radius:10px;padding:9px 11px;cursor:pointer;transition:.14s;border-left:4px solid #CBD5E8;position:relative}
 .cal-iv:hover{box-shadow:0 4px 14px rgba(27,36,54,.14);transform:translateY(-2px)}
 /* 상태별 카드 톤 */
@@ -94,14 +105,14 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .cal-site{color:#98A0AE;font-weight:700}
 .cal-place{color:#4C6EF5;font-weight:800;background:#EEF0FF;padding:1px 6px;border-radius:5px;font-size:9.5px}
 .cal-edu-badge{font-size:10.5px;font-weight:900;background:#0E9488;color:#fff;padding:2px 9px;border-radius:6px}
-.mgr-def{color:#3B4F9E;font-weight:800;background:#EEF0FF;padding:2px 8px;border-radius:6px;font-size:10px}
-.mgr-hi{color:#fff;font-weight:900;background:#1D9E75;padding:2px 9px;border-radius:6px;font-size:10px}
+.mgr-def{color:#fff;font-weight:800;background:#1E3A8A;padding:2px 9px;border-radius:6px;font-size:10px}
+.mgr-hi{color:#fff;font-weight:900;background:#0D8043;padding:2px 9px;border-radius:6px;font-size:10px}
 /* 교육 카드 */
 .cal-edu{background:linear-gradient(135deg,#EAFBF8,#D6F5F0);border:1px solid #8ED9CF;border-left:5px solid #0E9488;border-radius:10px;padding:10px 12px;cursor:pointer;transition:.14s}
 .cal-edu:hover{box-shadow:0 5px 16px rgba(14,148,136,.28);transform:translateY(-2px)}
 .cal-edu .cal-iv-tm{color:#0B7A70}
 .cal-edu-lbl{font-size:11px;font-weight:900;color:#0B7A70;margin-top:6px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
-.edu-who{color:#fff;font-weight:900;background:#0E9488;padding:2px 9px;border-radius:6px;font-size:10.5px}
+.edu-who{color:#fff;font-weight:900;background:#C2255C;padding:2px 9px;border-radius:6px;font-size:10.5px}
 .cal-edu{background:linear-gradient(135deg,#FFF9EF,#FFF4E0);border:1px solid #F0D9A8;border-radius:9px;padding:7px 9px;cursor:pointer;transition:.12s}
 .cal-edu:hover{border-color:#E0A93E;box-shadow:0 3px 10px rgba(186,117,23,.15);transform:translateY(-1px)}
 .cal-edu .cal-iv-tm{color:#0B7A70}
@@ -146,6 +157,9 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
   .cal-edu-lbl{font-size:12px}
   .cal-dnum{font-size:16px}
   .cal-wd{font-size:13px}
+  .cal-grp-tm{font-size:15px}
+  .cal-grp-cnt{font-size:11.5px;padding:3px 11px}
+  .cal-grp{padding:10px 11px}
 }
 
 /* 상세 모달 */
@@ -338,8 +352,7 @@ function jobNorm(s){ s=String(s||''); if(s.indexOf('상담')>=0)return '상담�
 // [면접관 규칙] 운영센터+알바몬+코칭 = 운영센터 면접 / 나머지 전부 = 엄현호 이사
 // 면접관 배지 — 엄현호 이사(디폴트)는 조용히, 운영센터 등 예외는 강조
 function mgrBadge(name){
-  var n=String(name||'').replace(/</g,'&lt;');
-  // 면접관 = 항상 배지로 명확히. 엄이사=남색 / 운영센터 등=초록
+  var n=String(withTitle(name)).replace(/</g,'&lt;');
   if(n.indexOf('엄현호')>=0 || n.indexOf('엄이사')>=0) return '<span class="mgr-def">👤 '+n+'</span>';
   return '<span class="mgr-hi">👤 '+n+'</span>';
 }
@@ -351,6 +364,15 @@ function cardStateClass(iv){
   if(p.indexOf('합격')>=0) return iv.eduDate?'st-edu':'st-pass';
   if(at.indexOf('참석')>=0) return 'st-attend';
   return 'st-plan';
+}
+// 직책 매핑 (이름 → 이름+직책)
+var TITLE_MAP={'신우성':'신우성 PM','엄현호':'엄현호 이사','우혜림':'우혜림 지점장','엄현호 이사':'엄현호 이사'};
+function withTitle(name){
+  var n=String(name||'').trim();
+  if(TITLE_MAP[n]) return TITLE_MAP[n];
+  // 이름만 매칭 (직책 이미 붙은 경우 대비)
+  for(var k in TITLE_MAP){ if(n.indexOf(k)===0 && k.indexOf(' ')<0) return TITLE_MAP[k]; }
+  return n;
 }
 function interviewerOf(iv){
   // 시트 면접관 열(H) 값이 있으면 그대로 사용
@@ -491,16 +513,31 @@ function renderCal(){
     h+='<div class="'+cls+'"><div class="cal-dhd"><div><div class="cal-wd">'+WD[dow]+'</div><div class="cal-dnum">'+d.getDate()+'</div></div>'
       +(isT?'<span class="cal-todaytag">TODAY</span>':'')+'</div><div class="cal-ivs">';
     if(list.length || eduList.length){
+      // [면접관+시간 그룹핑] 같은 시간·면접관 = 함께 보는 면접 → 하나로 묶기
+      var groups={}, gOrder=[];
       list.forEach(function(iv){
-        var esc=function(s){return String(s||'').replace(/</g,'&lt;');};
-        var stCls=cardStateClass(iv);   // st-plan/pass/edu/attend/drop
-        var flow=statusFlow(iv);
-        h+='<div class="cal-iv '+stCls+'" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/\x27/g,'')+'\')">'
-          +'<div class="cal-iv-r1"><span class="cal-iv-tm">'+(iv.time||'-')+'</span>'
-          +'<span class="cal-jbadge job-'+esc(iv.job)+'">'+esc(iv.job)+'</span></div>'
-          +'<div class="cal-iv-nm">'+esc(iv.name)+'</div>'
-          +'<div class="cal-iv-flow">'+flow+'</div>'
-          +'<div class="cal-iv-btm"><span class="cal-place">📍마곡</span><span class="cal-site">'+esc(iv.site||'')+'</span>'+mgrBadge(interviewerOf(iv))+'</div></div>';
+        var gkey=(iv.time||'-')+'|'+interviewerOf(iv);
+        if(!groups[gkey]){ groups[gkey]={time:iv.time||'-', mgr:interviewerOf(iv), members:[]}; gOrder.push(gkey); }
+        groups[gkey].members.push(iv);
+      });
+      gOrder.forEach(function(gk){
+        var g=groups[gk], esc=function(s){return String(s||'').replace(/</g,'&lt;');};
+        var multi=g.members.length>1;
+        // 그룹 헤더: 시간 + 면접관 + (인원)
+        h+='<div class="cal-grp'+(multi?' multi':'')+'">'
+          +'<div class="cal-grp-hd"><span class="cal-grp-tm">'+esc(g.time)+'</span>'
+          +mgrBadge(g.mgr)
+          +(multi?'<span class="cal-grp-cnt">'+g.members.length+'명</span>':'')+'</div>';
+        // 각 멤버 (이름·직무·상태·출처)
+        g.members.forEach(function(iv){
+          var stCls=cardStateClass(iv), flow=statusFlow(iv);
+          h+='<div class="cal-iv '+stCls+'" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/\x27/g,'')+'\')">'
+            +'<div class="cal-iv-nm-row"><span class="cal-iv-nm">'+esc(iv.name)+'</span>'
+            +'<span class="cal-jbadge job-'+esc(iv.job)+'">'+esc(iv.job)+'</span></div>'
+            +'<div class="cal-iv-flow">'+flow+'</div>'
+            +'<div class="cal-iv-btm"><span class="cal-place">📍마곡</span><span class="cal-site">'+esc(iv.site||'')+'</span></div></div>';
+        });
+        h+='</div>';
       });
       // 교육 카드 (그날 교육 일정)
       eduList.forEach(function(iv){
@@ -509,7 +546,7 @@ function renderCal(){
           +'<div class="cal-iv-r1"><span class="cal-edu-badge">🎓 교육</span><span class="cal-iv-tm">'+(iv.eduTime||'')+'</span>'
           +'<span class="cal-jbadge job-'+esc(iv.job)+'">'+esc(iv.job)+'</span></div>'
           +'<div class="cal-iv-nm">'+esc(iv.name)+'</div>'
-          +'<div class="cal-edu-lbl">🎓 교육 <span class="cal-place">📍마곡</span>'+(iv.eduWho?' <span class="edu-who">'+esc(iv.eduWho)+'</span>':'')+'</div></div>';
+          +'<div class="cal-edu-lbl">🎓 교육 <span class="cal-place">📍마곡</span>'+(iv.eduWho?' <span class="edu-who">'+esc(withTitle(iv.eduWho))+'</span>':'')+'</div></div>';
       });
     } else {
       h+='<div class="cal-empty">-</div>';
@@ -572,7 +609,7 @@ window.openIv=function(date,name){
   if(iv.eduDate){
     var _ed=parseDate(iv.eduDate);
     var _edStr=_ed?((_ed.getMonth()+1)+'/'+_ed.getDate()):esc(iv.eduDate);
-    h+='<div class="ivm-row"><span class="ivm-lbl">교육</span><span class="ivm-val">'+_edStr+(iv.eduTime?' '+esc(iv.eduTime):'')+(iv.eduWho?' · '+esc(iv.eduWho):'')+'</span></div>';
+    h+='<div class="ivm-row"><span class="ivm-lbl">교육</span><span class="ivm-val">'+_edStr+(iv.eduTime?' '+esc(iv.eduTime):'')+(iv.eduWho?' · '+esc(withTitle(iv.eduWho)):'')+'</span></div>';
   }
   if(iv.memo){ h+='<div class="ivm-memo">'+esc(iv.memo)+'</div>'; }
   h+='</div>';
