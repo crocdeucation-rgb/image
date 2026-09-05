@@ -465,7 +465,7 @@ function renderHL(){
   var hl={};
   for(var i=0;i<summaryRows.length;i++){ if(summaryRows[i]&&summaryRows[i][0]==='주간하이라이트'){ for(var j=i+1;j<Math.min(i+7,summaryRows.length);j++){var r=summaryRows[j];if(!r||!r[0])break;hl[r[0]]={name:r[1]||'-',val:r[2]||'',extra:r[3]||''}} break; } }
   // 급상승왕 = 이번달 점수 순위가 지난달 대비 제일 오른 사람
-  function rankOf(tab){var o=tab*6+1,c=19+tab*3,a=[];ASSIGNEES.forEach(function(nm,i){var r=summaryRows[ASSIGNEE_START_IDX+i]||[];var sn=parseInt(((r[o+5]||'0')+'').replace(/[^0-9]/g,''))||0;a.push({name:r[0]||nm,score:Math.round(sn*(+(r[c+1]||0)))});});a.sort(function(x,y){return y.score-x.score;});var rk={};a.forEach(function(x,idx){rk[x.name]=idx+1;});return rk;}
+  function rankOf(tab){var o=tab*6+1,c=19+tab*3,a=[];ASSIGNEES.forEach(function(nm,i){var r=summaryRows[ASSIGNEE_START_IDX+i]||[];var sn=parseFloat(((r[o+5]||'0')+'').replace(/[^0-9.]/g,''))||0;a.push({name:r[0]||nm,score:Math.round(sn*(+(r[c+1]||0)))});});a.sort(function(x,y){return y.score-x.score;});var rk={};a.forEach(function(x,idx){rk[x.name]=idx+1;});return rk;}
   var curR=rankOf(0), prvR=rankOf(1), topRise=null, mx=0;
   ASSIGNEES.forEach(function(nm){var d=(prvR[nm]||99)-(curR[nm]||99);if(d>mx){mx=d;topRise=nm;}});
   // 부재회수(전환왕) = 전환누적 시트 → summary에 emit되면 읽음. 없으면 '집계 중'
@@ -477,7 +477,7 @@ function renderHL(){
   var _stat={db:{n:'-',v:0},od:{n:'-',v:0},sl:{n:'-',v:0}};
   ASSIGNEES.forEach(function(nm,i){
     var r=summaryRows[ASSIGNEE_START_IDX+i]||[];
-    var db=+(r[_o]||0), od=+(r[_o+4]||0), sl=parseInt(((r[_o+5]||'0')+'').replace(/[^0-9]/g,''))||0;
+    var db=+(r[_o]||0), od=+(r[_o+4]||0), sl=parseFloat(((r[_o+5]||'0')+'').replace(/[^0-9.]/g,''))||0;
     if(db>_stat.db.v){_stat.db={n:r[0]||nm,v:db};}
     if(od>_stat.od.v){_stat.od={n:r[0]||nm,v:od};}
     if(sl>_stat.sl.v){_stat.sl={n:r[0]||nm,v:sl};}
@@ -501,7 +501,7 @@ function renderPerf(){
     var o=tab*6+1, c=19+tab*3, a=[];
     ASSIGNEES.forEach(function(name,i){
       var r=summaryRows[ASSIGNEE_START_IDX+i]||[];
-      var sn=parseInt(((r[o+5]||'0')+'').replace(/[^0-9]/g,''))||0;
+      var sn=parseFloat(((r[o+5]||'0')+'').replace(/[^0-9.]/g,''))||0;
       var rn=+(r[c+1]||0);
       a.push({name:r[0]||name, score:Math.round(sn*rn)});
     });
