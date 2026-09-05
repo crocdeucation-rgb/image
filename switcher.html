@@ -38,6 +38,16 @@
   @keyframes sgHello{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
   #sgate.bye{transition:opacity .5s ease;opacity:0;}
   .sg-foot{margin-top:20px;font-size:11px;color:#B6C2DC;font-weight:600;}
+  /* [2026-09] 우측 상단 로그인 상태 칩 */
+  .user-chip{margin-left:auto;display:none;align-items:center;gap:8px;padding:4px 6px 4px 4px;background:#F4F6FA;border-radius:20px;}
+  .user-chip.on{display:inline-flex;}
+  .uc-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#4C6EF5,#7048E8);color:#fff;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;}
+  .uc-nm{font-size:12.5px;font-weight:800;color:#1B2436;letter-spacing:-.3px;}
+  .uc-nm .rk{font-size:10.5px;font-weight:600;color:#8A97AC;margin-left:3px;}
+  .uc-out{width:26px;height:26px;border-radius:50%;border:none;background:transparent;color:#8A97AC;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .uc-out:hover{background:#E7ECF3;color:#E23A22;}
+  .uc-out svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+  @media(max-width:600px){.uc-nm{display:none;}}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -57,10 +67,18 @@
     </div>
   </div>
   <div class="bar">
+    <span class="logo">아라온 스태티즈 <span style="color:#C3CDDD;font-weight:600">×</span> <b>아라온 대시보드</b></span>
     <button class="tab on" data-t="total" onclick="go(this)">전체실적</button>
     <button class="tab" data-t="hire" onclick="go(this)">증원현황</button>
     <button class="tab" data-t="hr" onclick="go(this)">인사기록</button>
     <button class="tab" data-t="web" onclick="go(this)">웹마케팅</button>
+    <div class="user-chip" id="userChip">
+      <span class="uc-av" id="ucAv"></span>
+      <span class="uc-nm" id="ucNm"></span>
+      <button class="uc-out" id="ucOut" onclick="sgateLogout()" title="로그아웃">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      </button>
+    </div>
   </div>
   <div class="stage">
     <iframe id="frame" src="total.html?v=gate1" style="height:1250px"></iframe>
@@ -73,6 +91,7 @@ var _sgAuth=firebase.auth();
 var SG_ALLOW=['032100jesus@gmail.com','christuhm@gmail.com','crocdeucation@gmail.com','90younho@gmail.com','deuk1992@gmail.com','goodida486@gmail.com','jeffkorea27@gmail.com','jjoon0804@gmail.com','skfkr4@gmail.com','w0wwiam1004@gmail.com','whkimts@gmail.com','dbgpfla97@gmail.com','mjhsingle@gmail.com','qkfka3090@gmail.com','ggh0305@gmail.com','ahlee.sep@gmail.com','xpxmfltm5678@gmail.com','alsk102qpwoal@gmail.com','minsung32383238@gmail.com','happy1004elle@gmail.com','gh3541@gmail.com','ghtn1346@gmail.com','uss20182@gmail.com','dltjrgjs56@gmail.com','hr3213@gmail.com','starlim2723@gmail.com','100heamin7678@gmail.com','codud010802@gmail.com','01046153497a@gmail.com','lsmlsmopop@gmail.com','pjskimbo8@gmail.com','ksj245180@gmail.com','eunbini592@gmail.com'];
 var SG_NAME={'032100jesus@gmail.com':'오동근','christuhm@gmail.com':'엄현호','crocdeucation@gmail.com':'신상준','90younho@gmail.com':'김윤호','deuk1992@gmail.com':'김원득','goodida486@gmail.com':'노영호','jeffkorea27@gmail.com':'김성윤','jjoon0804@gmail.com':'안준섭','skfkr4@gmail.com':'김우진','w0wwiam1004@gmail.com':'장윤호','whkimts@gmail.com':'김태석','dbgpfla97@gmail.com':'우혜림','mjhsingle@gmail.com':'문정현','qkfka3090@gmail.com':'이승엽','ggh0305@gmail.com':'고국희','ahlee.sep@gmail.com':'이아현','xpxmfltm5678@gmail.com':'윤지환','alsk102qpwoal@gmail.com':'김준수','minsung32383238@gmail.com':'김민성','happy1004elle@gmail.com':'김예원','gh3541@gmail.com':'박건휘','ghtn1346@gmail.com':'김예림','uss20182@gmail.com':'이태희','dltjrgjs56@gmail.com':'이석헌','hr3213@gmail.com':'이상민','starlim2723@gmail.com':'임한별','100heamin7678@gmail.com':'홍혜민','codud010802@gmail.com':'김채영','01046153497a@gmail.com':'안세령','lsmlsmopop@gmail.com':'임성민','pjskimbo8@gmail.com':'박민수','ksj245180@gmail.com':'권순재','eunbini592@gmail.com':'이은빈'};
 var _sgPassed=false;
+var SG_RANK={'032100jesus@gmail.com':'파운더','christuhm@gmail.com':'대표이사','crocdeucation@gmail.com':'이사','90younho@gmail.com':'지사장','w0wwiam1004@gmail.com':'지사장','deuk1992@gmail.com':'과장','goodida486@gmail.com':'과장','dbgpfla97@gmail.com':'과장','jeffkorea27@gmail.com':'대리','jjoon0804@gmail.com':'대리','skfkr4@gmail.com':'대리','gh3541@gmail.com':'대리','whkimts@gmail.com':'PM'};
 _sgAuth.onAuthStateChanged(function(u){
   var gate=document.getElementById('sgate'), msg=document.getElementById('sgateMsg');
   if(!gate) return;
@@ -84,8 +103,16 @@ _sgAuth.onAuthStateChanged(function(u){
     var _b=gate.querySelector('.sg-btn'); if(_b)_b.style.display='none';
     var _s=gate.querySelector('.sg-sub'); if(_s)_s.style.display='none';
     if(msg){ msg.className='sg-msg ok'; msg.innerHTML=nm?'안녕하세요, <b>'+nm+'</b>님':'안녕하세요'; }
-    setTimeout(function(){ gate.classList.add('bye'); }, 800);
-    setTimeout(function(){ gate.classList.add('hidden'); gate.classList.remove('bye'); document.body.style.overflow=''; try{ parent.postMessage({t:'cardClose'},'*'); }catch(e){} }, 1300);
+    // 우측 상단 로그인 상태 칩 채우기
+    var chip=document.getElementById('userChip');
+    if(chip){ chip.classList.add('on');
+      var av=document.getElementById('ucAv'), nmEl=document.getElementById('ucNm');
+      var rk=SG_RANK[(u.email||'').toLowerCase()]||'';
+      if(av) av.textContent=(nm||'?').charAt(0);
+      if(nmEl) nmEl.innerHTML=(nm||u.email)+(rk?'<span class="rk">'+rk+'</span>':'');
+    }
+    setTimeout(function(){ gate.classList.add('bye'); }, 1800);
+    setTimeout(function(){ gate.classList.add('hidden'); gate.classList.remove('bye'); document.body.style.overflow=''; try{ parent.postMessage({t:'cardClose'},'*'); }catch(e){} }, 2400);
   } else if(u){
     if(msg){ msg.className='sg-msg err'; msg.textContent='접근 권한이 없는 계정입니다 ('+u.email+')'; }
     gate.classList.remove('hidden'); document.body.style.overflow='hidden';
@@ -93,10 +120,15 @@ _sgAuth.onAuthStateChanged(function(u){
     setTimeout(function(){ try{_sgAuth.signOut();}catch(e){} }, 2500);
   } else {
     if(msg){ msg.className='sg-msg'; msg.textContent=''; }
-    gate.classList.remove('hidden'); document.body.style.overflow='hidden';
+    // 로그아웃 상태 — 칩 숨기고 게이트 원복(버튼·부제 복원)
+    var chip2=document.getElementById('userChip'); if(chip2) chip2.classList.remove('on');
+    var _b2=gate.querySelector('.sg-btn'); if(_b2)_b2.style.display='';
+    var _s2=gate.querySelector('.sg-sub'); if(_s2)_s2.style.display='';
+    gate.classList.remove('hidden','bye'); document.body.style.overflow='hidden';
     try{ parent.postMessage({t:'cardOpen'},'*'); }catch(e){}
   }
 });
+window.sgateLogout=function(){ try{_sgAuth.signOut();}catch(e){} };
 window.sgateLogin=function(){
   var msg=document.getElementById('sgateMsg');
   if(msg){ msg.className='sg-msg wait'; msg.textContent='로그인 창을 여는 중...'; }
@@ -105,6 +137,7 @@ window.sgateLogin=function(){
     if(msg){ msg.className='sg-msg err'; msg.textContent='로그인 실패: '+(e.message||e.code); }
   });
 };
+  var FRAMES={total:{src:'total.html?v=gate1',h:900},hire:{src:'hire.html?v=gate1',h:900},hr:{src:'hr.html?v=gate1',h:780},web:{src:'dashboard.html?v=gate1',h:1700}};
   var frame=document.getElementById('frame');
   var _cardOverlay=false;   // 카드 모달 오버레이 중 높이 자동조정 중단
   var _cardScrollY=0;      // 오버레이 전환 시 iframe이 flow에서 빠져 부모 스크롤이 0으로 클램프됨 → 원복용
@@ -170,13 +203,15 @@ window.sgateLogin=function(){
     }
   });
   function go(btn){
-    if(!_sgPassed) return;   // [2026-09] 게이트 통과 전엔 탭 전환 불가
+    // [2026-09] 게이트가 아직 떠있으면(미통과) 무시. 통과했으면 정상 동작.
+    var g=document.getElementById('sgate');
+    if(g && !g.classList.contains('hidden')) return;
     document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
     btn.classList.add('on');
     var t=btn.dataset.t;
     if(_ro){ try{_ro.disconnect();}catch(e){} _ro=null; }
-    frame.style.height=FRAMES[t].h+'px';
-    frame.src=FRAMES[t].src;
+    var fr=document.getElementById('frame');
+    if(fr && FRAMES[t]){ fr.style.height=FRAMES[t].h+'px'; fr.src=FRAMES[t].src; }
     document.title=btn.textContent.trim()+' · 아라온 그로스';  // 탭별 제목
   }
   window.addEventListener('load', function(){ setTimeout(fitHeight,500); });
