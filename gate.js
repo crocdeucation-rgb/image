@@ -8,7 +8,7 @@
  */
 (function(){
   var CFG={apiKey:"AIzaSyCBDimk0MyGAHf762mvInS_H4K9HkW6Ol0",authDomain:"dashboard-88ba4.firebaseapp.com",projectId:"dashboard-88ba4",storageBucket:"dashboard-88ba4.firebasestorage.app",messagingSenderId:"857535538974",appId:"1:857535538974:web:999d190f28e14964eb4b0f"};
-  var ALLOW=['032100jesus@gmail.com','christuhm@gmail.com','crocdeucation@gmail.com','90younho@gmail.com','deuk1992@gmail.com','goodida486@gmail.com','jeffkorea27@gmail.com','jjoon0804@gmail.com','skfkr4@gmail.com','w0wwiam1004@gmail.com','whkimts@gmail.com','dbgpfla97@gmail.com','mjhsingle@gmail.com','qkfka3090@gmail.com','ggh0305@gmail.com','ahlee.sep@gmail.com','xpxmfltm5678@gmail.com','alsk102qpwoal@gmail.com','minsung32383238@gmail.com','happy1004elle@gmail.com','gh3541@gmail.com','ghtn1346@gmail.com','uss20182@gmail.com','dltjrgjs56@gmail.com','hr3213@gmail.com','starlim2723@gmail.com','100heamin7678@gmail.com','codud010802@gmail.com','01046153497a@gmail.com','lsmlsmopop@gmail.com','pjskimbo8@gmail.com','ksj245180@gmail.com','eunbini592@gmail.com'];
+  var ALLOW=['032100jesus@gmail.com','christuhm@gmail.com','crocdeucation@gmail.com','90younho@gmail.com','deuk1992@gmail.com','goodida486@gmail.com','jeffkorea27@gmail.com','jjoon0804@gmail.com','skfkr4@gmail.com','w0wwiam1004@gmail.com','whkimts@gmail.com','dbgpfla97@gmail.com','mjhsingle@gmail.com','qkfka3090@gmail.com','ggh0305@gmail.com','ahlee.sep@gmail.com','xpxmfltm5678@gmail.com','alsk102qpwoal@gmail.com','minsung32383238@gmail.com','happy1004elle@gmail.com','gh3541@gmail.com','ghtn1346@gmail.com','uss20182@gmail.com','dltjrgjs56@gmail.com','hr3213@gmail.com','starlim2723@gmail.com','100heamin7678@gmail.com','codud010802@gmail.com','01046153497a@gmail.com','lsmlsmopop@gmail.com','pjskimbo8@gmail.com','ksj245180@gmail.com','eunbini592@gmail.com','kanghansara@gmail.com'];
 
   if(!window.firebase||!firebase.auth){ console.error('[gate] firebase SDK 필요'); return; }
   try{ firebase.app(); }catch(e){ firebase.initializeApp(CFG); }
@@ -16,7 +16,8 @@
 
   var CSS='#agate{position:fixed;inset:0;z-index:2147483647;background:linear-gradient(160deg,#0F1626,#1E2C48);display:flex;align-items:center;justify-content:center;padding:24px;font-family:Pretendard,sans-serif}'
     +'#agate.hidden{display:none}'
-    +'#agate .c{background:#fff;border-radius:22px;padding:38px 32px;max-width:380px;width:100%;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.4)}'
+    +'#agate .c{background:#fff;border-radius:22px;padding:38px 32px;max-width:380px;width:100%;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.4);opacity:0;transition:opacity .25s ease}'
+    +'#agate.ready .c{opacity:1}'
     +'#agate .lg{font-size:34px;margin-bottom:6px}'
     +'#agate .t{font-size:20px;font-weight:900;color:#1B2436;letter-spacing:-.5px}'
     +'#agate .s{font-size:13px;color:#8A97AC;font-weight:600;margin-top:8px;line-height:1.5}'
@@ -57,11 +58,11 @@
         g.classList.add('hidden'); document.body.style.overflow='';
       } else if(u){
         if(m){ m.className='m err'; m.textContent='접근 권한이 없는 계정입니다 ('+u.email+')'; }
-        g.classList.remove('hidden'); document.body.style.overflow='hidden';
+        g.classList.remove('hidden'); g.classList.add('ready'); document.body.style.overflow='hidden';
         setTimeout(function(){ try{auth.signOut();}catch(e){} },2500);
       } else {
         if(m){ m.className='m'; m.textContent=''; }
-        g.classList.remove('hidden'); document.body.style.overflow='hidden';
+        g.classList.remove('hidden'); g.classList.add('ready'); document.body.style.overflow='hidden';
       }
     });
   });
