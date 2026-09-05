@@ -63,9 +63,9 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 /* 면접관+시간 그룹 */
 .cal-grp{margin-bottom:8px;background:#F7F9FC;border:1px solid #E9EEF5;border-radius:11px;padding:8px 9px}
 .cal-grp.multi{background:#F0F3FA;border-color:#D8E0EE}
-.cal-grp-hd{display:flex;align-items:center;gap:7px;margin-bottom:7px;padding-bottom:6px;border-bottom:1px dashed #DCE3EE}
-.cal-grp-tm{font-size:13px;font-weight:900;color:var(--ink);letter-spacing:-.3px}
-.cal-grp-cnt{margin-left:auto;font-size:10.5px;font-weight:800;color:#fff;background:#4C6EF5;padding:2px 9px;border-radius:20px}
+.cal-grp-hd{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:7px;padding-bottom:6px;border-bottom:1px dashed #DCE3EE}
+.cal-grp-tm{font-size:13px;font-weight:900;color:var(--ink);letter-spacing:-.3px;white-space:nowrap;flex-shrink:0}
+.cal-grp-cnt{font-size:10.5px;font-weight:800;color:#fff;background:#4C6EF5;padding:2px 9px;border-radius:20px;flex-shrink:0}
 .cal-grp .cal-iv{margin-bottom:5px}
 .cal-grp .cal-iv:last-child{margin-bottom:0}
 .cal-iv-nm-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}
@@ -105,8 +105,8 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .cal-site{color:#98A0AE;font-weight:700}
 .cal-place{color:#4C6EF5;font-weight:800;background:#EEF0FF;padding:1px 6px;border-radius:5px;font-size:9.5px}
 .cal-edu-badge{font-size:10.5px;font-weight:900;background:#0E9488;color:#fff;padding:2px 9px;border-radius:6px}
-.mgr-def{color:#fff;font-weight:800;background:#1E3A8A;padding:2px 9px;border-radius:6px;font-size:10px}
-.mgr-hi{color:#fff;font-weight:900;background:#0D8043;padding:2px 9px;border-radius:6px;font-size:10px}
+.mgr-def{color:#fff;font-weight:800;background:#1E3A8A;padding:2px 9px;border-radius:6px;font-size:10px;white-space:nowrap}
+.mgr-hi{color:#fff;font-weight:900;background:#0D8043;padding:2px 9px;border-radius:6px;font-size:10px;white-space:nowrap}
 /* 교육 카드 */
 .cal-edu{background:linear-gradient(135deg,#EAFBF8,#D6F5F0);border:1px solid #8ED9CF;border-left:5px solid #0E9488;border-radius:10px;padding:10px 12px;cursor:pointer;transition:.14s}
 .cal-edu:hover{box-shadow:0 5px 16px rgba(14,148,136,.28);transform:translateY(-2px)}
