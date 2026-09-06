@@ -951,7 +951,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
     ※ <b>매출 2기준 병기</b> — <b>결제일 기준</b>(경영·대시보드 일치) = <b>175,922,000원</b> / <b>신청일 코호트</b>(소재 생사 판단) = <b>122,890,000원</b>.
     <br>결제일 매출엔 <b>7월 이전 신청분이 8월에 결제된 것</b>도 포함되고, 코호트는 <b>8월 신규 리드가 만든 매출만</b> 셉니다. <b>두 값이 다른 게 정상입니다.</b>
     <br>💳 <b>광고비 = 카드결제 기준(실제 나간 돈)</b> — 메타 44,740,356(FACEBK) · 텐핑 13,200,000 · 카카오 5,261,775(비즈월렛 충전) · 네이버 1,675,855 = 매체 64,877,986. 여기에 운영비(노션 비즈 927,566 · 솔라피 50,000)를 더해 총 65,855,552원입니다.
-    <br><span style="color:var(--faint)">※ 카드결제액은 매체 집행 실측(메타 MCP 43,154,790 등)과 <b>환율·결제 시차</b>로 차이가 납니다 — 메타는 태평양시간(PT) 기준으로 하루를 끊고 카드는 승인일 환율(USD)이 적용되기 때문입니다. 채널별 주차 세부(아래 표)는 매체 집행 기준이라 카드 총액과 소폭 다를 수 있습니다.</span>
+    <br><span style="color:var(--faint)">※ 여기 광고비는 카드에서 실제 빠져나간 금액입니다. 매체에서 조회한 집행 금액(메타 43,154,790 등)과는 조금 차이가 나는데, 메타가 미국 시간 기준으로 하루를 끊고 결제도 정해진 금액에 도달할 때마다 그때의 환율(달러)로 청구하기 때문입니다. 아래 채널별 주차표는 매체 집행 기준이라 카드 총액과 소폭 다를 수 있습니다.</span>
     <br>✅ <b>8월 마감(8/1~8/31 · 원장 확정).</b> 순매출 227,112,000원은 취소 10건(3,757만)을 반영한 확정값입니다. 결제일·코호트 병기 수치(아래 채널표)는 소재 판정용 노션 기준이라 순매출과 별개입니다.
   </div>
 
@@ -1148,20 +1148,20 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
     <div class="tw-date">9/1 ~ 9/6 · <span style="color:var(--faint)">채널 재편 · 소재 운용 · 인프라 구축</span></div>
     <div class="tw-grid">
       <div class="tw-cell"><div class="k">광고비(메타)</div><div class="v">809만</div><div class="d">8,094,812원 · 카카오 41만(9/2 종료) · 메타 9/6분 잠정</div></div>
-      <div class="tw-cell"><div class="k">잡은 방문</div><div class="v">61건</div><div class="d">세팅 24 · 취소 15 · 예정 22</div></div>
-      <div class="tw-cell"><div class="k">오더</div><div class="v">16건</div><div class="d">원장 10(9/1~4) + 9/5 노션 6건</div></div>
-      <div class="tw-cell"><div class="k">순매출</div><div class="v">5,320만</div><div class="d">원장 3,066만(9/1~4) + 9/5 노션 2,254만</div></div>
+      <div class="tw-cell"><div class="k">잡은 방문</div><div class="v">61건</div><div class="d">세팅24·취소15·예정22 <span style="color:#d98a4a">8월DB29</span>·<span style="color:#4a90d9">9월DB19</span>·이전13</div></div>
+      <div class="tw-cell"><div class="k">오더</div><div class="v">16건</div><div class="d"><span style="color:#d98a4a">8월DB8</span>·<span style="color:#4a90d9">9월DB5</span>·이전3 (원장+9/5)</div></div>
+      <div class="tw-cell"><div class="k">매출</div><div class="v">5,320만</div><div class="d">원장 3,066만(9/1~4) + 9/5 노션 2,254만</div></div>
     </div>
     <div class="tw-note">
       이번 주의 핵심은 <b>채널 재편(카카오·텐핑 종료 → 메타 집중)</b>과 <b>위너테스트 세트(소재 10종 한 캠페인 경쟁)</b>입니다. 9월에 잡은 방문 61건 중 <b>42건(69%)이 8월 이전에 유입된 리드</b>가 이번 주에 세팅된 것으로, 8월 자산이 9월 방문·매출을 만들고 있습니다. 병행하여 <b>경영진 통합 대시보드 4종 + 실무자 실적판 + 보안 시스템</b>을 구축했습니다.
     </div>
   </div>
 
-  <div class="kpis" style="grid-template-columns:repeat(3,1fr)">
-    <div class="kpi"><div class="k">순매출</div><div class="v t">5,320만</div><div class="s">53,199,000원<br><span style="color:var(--faint)">원장 30,657,000(9/1~4) + 9/5 노션 22,542,000</span></div></div>
-    <div class="kpi"><div class="k">메타 광고비</div><div class="v">809만</div><div class="s">8,094,812원 <span style="color:#d98a4a">(잠정)</span><br><span style="color:var(--faint)">9/6 PT 미마감 · 9/8 19시 재확정 예정</span></div></div>
+  <div class="kpis">
+    <div class="kpi"><div class="k">매출</div><div class="v t">5,320만</div><div class="s">53,199,000원<br><span style="color:var(--faint)">원장 30,657,000(9/1~4) + 9/5 노션 22,542,000</span></div></div>
+    <div class="kpi"><div class="k">메타 광고비</div><div class="v">809만</div><div class="s">8,094,812원 <span style="color:#d98a4a">(잠정)</span><br><span style="color:var(--faint)">메타는 미국 시간 기준이라 9/6 집행분이 아직 다 안 잡혔습니다 · 9/8 저녁 확정값으로 갱신 예정</span></div></div>
     <div class="kpi"><div class="k">잡은 방문</div><div class="v">61건</div><div class="s">세팅 24·취소 15·예정 22<br><span style="color:var(--faint)">8월DB 29·9월DB 19·이전 13</span></div></div>
-    <div class="kpi"><div class="k">오더</div><div class="v">16건</div><div class="s">원장 10 + 9/5 노션 6<br><span style="color:var(--faint)">9/6(토) 방문취소로 세팅 0</span></div></div>
+    <div class="kpi"><div class="k">오더</div><div class="v">16건</div><div class="s">8월DB 8·9월DB 5·이전 3<br><span style="color:var(--faint)">원장 10 + 9/5 노션 6 · 9/6 세팅 0</span></div></div>
     <div class="kpi"><div class="k">세팅 중 오더</div><div class="v">66.7%</div><div class="s">오더 16 / 세팅 24<br><span style="color:var(--faint)">결보 8</span></div></div>
     <div class="kpi" style="border-color:rgba(120,180,255,.4);border-width:1.5px"><div class="k" style="color:#4a90d9">인프라</div><div class="v" style="color:#4a90d9;font-size:.85em">대시보드 4종<br>+보안 완비</div><div class="s">경영진·실무자 실적판</div></div>
   </div>
@@ -1215,15 +1215,15 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
     <b>9월에 잡은 방문 61건을 성사·부러짐·대기로 나누고, 각 방문이 "언제 들어온 DB"에서 나온 것인지를 함께 봤습니다.</b> 광고비가 방문·매출로 이어지는 흐름에서 가장 중요한 것은 <b>지금 잡히는 방문의 DB가 대부분 8월 이전에 유입된 리드</b>라는 점입니다 — 9월 신규 DB는 31%뿐이고, 나머지 69%는 8월에 쌓아둔 리드를 되살려 잡은 방문입니다. 채널이 줄었어도 <b>8월 자산이 9월 방문·매출을 만들고 있습니다.</b>
   </div>
   <div class="tbl-scroll"><table class="tbl">
-    <thead><tr><th>구분</th><th style="text-align:right">건수</th><th style="text-align:right">오더 매출</th><th style="text-align:right">8월 DB</th><th style="text-align:right">9월 DB</th><th style="text-align:right">이전(5~7월)</th></tr></thead>
+    <thead><tr><th>구분</th><th style="text-align:right">건수</th><th style="text-align:right">오더 매출</th><th style="text-align:right">9월 DB</th><th style="text-align:right">8월 DB</th><th style="text-align:right">7월</th><th style="text-align:right">6월</th><th style="text-align:right">5월↓</th></tr></thead>
     <tbody>
-      <tr><td><b>세팅(성사)</b> 오더16+결보8</td><td style="text-align:right"><b>24</b></td><td style="text-align:right"><b>53,189,000원</b></td><td style="text-align:right">9</td><td style="text-align:right">9</td><td style="text-align:right">6</td></tr>
-      <tr><td><b>방문취소(부러짐)</b></td><td style="text-align:right"><b>15</b></td><td style="text-align:right">—</td><td style="text-align:right">5</td><td style="text-align:right">4</td><td style="text-align:right">6</td></tr>
-      <tr><td><b>예정(대기)</b> 9/7~</td><td style="text-align:right"><b>22</b></td><td style="text-align:right">회수 대기</td><td style="text-align:right">15</td><td style="text-align:right">6</td><td style="text-align:right">1</td></tr>
-      <tr class="sum"><td><b>9월에 잡은 방문 계</b></td><td style="text-align:right"><b>61</b></td><td style="text-align:right"><b>53,189,000원</b></td><td style="text-align:right"><b>29</b></td><td style="text-align:right"><b>19</b></td><td style="text-align:right"><b>13</b></td></tr>
+      <tr><td><b>세팅(성사)</b> 오더16+결보8</td><td style="text-align:right"><b>24</b></td><td style="text-align:right"><b>53,189,000원</b></td><td style="text-align:right">9</td><td style="text-align:right">9</td><td style="text-align:right">1</td><td style="text-align:right">0</td><td style="text-align:right">5</td></tr>
+      <tr><td><b>방문취소(부러짐)</b></td><td style="text-align:right"><b>15</b></td><td style="text-align:right">—</td><td style="text-align:right">4</td><td style="text-align:right">5</td><td style="text-align:right">1</td><td style="text-align:right">2</td><td style="text-align:right">3</td></tr>
+      <tr><td><b>예정(대기)</b> 9/7~</td><td style="text-align:right"><b>22</b></td><td style="text-align:right">회수 대기</td><td style="text-align:right">6</td><td style="text-align:right">15</td><td style="text-align:right">0</td><td style="text-align:right">1</td><td style="text-align:right">0</td></tr>
+      <tr class="sum"><td><b>9월에 잡은 방문 계</b></td><td style="text-align:right"><b>61</b></td><td style="text-align:right"><b>53,189,000원</b></td><td style="text-align:right"><b>19</b></td><td style="text-align:right"><b>29</b></td><td style="text-align:right"><b>2</b></td><td style="text-align:right"><b>3</b></td><td style="text-align:right"><b>8</b></td></tr>
     </tbody>
   </table></div>
-  <div class="cap" style="margin-bottom:16px">※ 세팅·오더 매출은 원장(9/1~4) + 9/5 노션 기준. DB 출처(신청월)는 노션 유입일 기준. <b>9월 신규 DB 19건(31%)</b> 외 42건(69%)은 8월 이전 유입 리드가 9월에 방문으로 전환된 것입니다.</div>
+  <div class="cap" style="margin-bottom:16px">※ 세팅·오더 매출은 원장(9/1~4) + 9/5 노션 기준. DB 출처(신청월)는 노션 유입일 기준. <b>9월 신규 DB 19건(31%)</b> 외 42건(69%)은 8월 이전 유입 리드가 9월에 방문으로 전환된 것입니다. (5월↓ 열에 4월 유입 1건 포함)</div>
 
   <div class="knote" style="margin-bottom:10px">
     <b>방문취소 15건 —</b> 방문을 잡았다가 부러진 건입니다. 이 중 <b>9월 신규 DB는 4건뿐, 11건이 8월 이전 DB</b>라, 오래 물고 있던 리드를 되살려 방문까지 갔으나 성사되지 못한 경우가 많습니다. 담당별로는 안준섭·김우진·김원득에 집중돼 있어, 방문을 많이 잡는 인원일수록 취소도 함께 늘어나는 구조입니다.
@@ -1260,13 +1260,13 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   <div class="tbl-scroll"><table class="tbl">
     <thead><tr><th>담당자</th><th style="text-align:right">잡은 방문</th><th style="text-align:right">세팅</th><th style="text-align:right">오더</th><th style="text-align:right">결보</th><th style="text-align:right">방문취소</th><th style="text-align:right">매출</th><th style="text-align:right">오더율</th></tr></thead>
     <tbody>
-      <tr><td>🥇 <b>김원득</b></td><td style="text-align:right">12</td><td style="text-align:right">8</td><td style="text-align:right">5</td><td style="text-align:right">3</td><td style="text-align:right">4</td><td style="text-align:right">1,965만원</td><td style="text-align:right">62%</td></tr>
-      <tr><td>🥈 김우진</td><td style="text-align:right">9</td><td style="text-align:right">5</td><td style="text-align:right">3</td><td style="text-align:right">2</td><td style="text-align:right">4</td><td style="text-align:right">1,213만원</td><td style="text-align:right">60%</td></tr>
-      <tr><td>🥉 장윤호</td><td style="text-align:right">4</td><td style="text-align:right">2</td><td style="text-align:right">2</td><td style="text-align:right">0</td><td style="text-align:right">1</td><td style="text-align:right">838만원</td><td style="text-align:right">100%</td></tr>
-      <tr><td>4 노영호</td><td style="text-align:right">3</td><td style="text-align:right">3</td><td style="text-align:right">2</td><td style="text-align:right">1</td><td style="text-align:right">0</td><td style="text-align:right">693만원</td><td style="text-align:right">67%</td></tr>
-      <tr><td>5 안준섭</td><td style="text-align:right">8</td><td style="text-align:right">3</td><td style="text-align:right">1</td><td style="text-align:right">2</td><td style="text-align:right">5</td><td style="text-align:right">345만원</td><td style="text-align:right">33%</td></tr>
-      <tr><td>6 김윤호</td><td style="text-align:right">3</td><td style="text-align:right">2</td><td style="text-align:right">2</td><td style="text-align:right">0</td><td style="text-align:right">1</td><td style="text-align:right">262만원</td><td style="text-align:right">100%</td></tr>
-      <tr><td>7 우혜림</td><td style="text-align:right">2</td><td style="text-align:right">2</td><td style="text-align:right">1</td><td style="text-align:right">1</td><td style="text-align:right">0</td><td style="text-align:right">—</td><td style="text-align:right">50%</td></tr>
+      <tr><td>🥇 <b>김원득</b></td><td style="text-align:right">12<br><span style="font-size:9px;color:var(--faint)">8월4·9월4·이전3</span></td><td style="text-align:right">8</td><td style="text-align:right">5</td><td style="text-align:right">3</td><td style="text-align:right">4</td><td style="text-align:right">1,965만원</td><td style="text-align:right">62%</td></tr>
+      <tr><td>🥈 김우진</td><td style="text-align:right">9<br><span style="font-size:9px;color:var(--faint)">8월0·9월5·이전4</span></td><td style="text-align:right">5</td><td style="text-align:right">3</td><td style="text-align:right">2</td><td style="text-align:right">4</td><td style="text-align:right">1,213만원</td><td style="text-align:right">60%</td></tr>
+      <tr><td>🥉 장윤호</td><td style="text-align:right">4<br><span style="font-size:9px;color:var(--faint)">8월2·9월0·이전2</span></td><td style="text-align:right">2</td><td style="text-align:right">2</td><td style="text-align:right">0</td><td style="text-align:right">1</td><td style="text-align:right">838만원</td><td style="text-align:right">100%</td></tr>
+      <tr><td>4 노영호</td><td style="text-align:right">3<br><span style="font-size:9px;color:var(--faint)">8월2·9월0·이전1</span></td><td style="text-align:right">3</td><td style="text-align:right">2</td><td style="text-align:right">1</td><td style="text-align:right">0</td><td style="text-align:right">693만원</td><td style="text-align:right">67%</td></tr>
+      <tr><td>5 안준섭</td><td style="text-align:right">8<br><span style="font-size:9px;color:var(--faint)">8월5·9월2·이전1</span></td><td style="text-align:right">3</td><td style="text-align:right">1</td><td style="text-align:right">2</td><td style="text-align:right">5</td><td style="text-align:right">345만원</td><td style="text-align:right">33%</td></tr>
+      <tr><td>6 김윤호</td><td style="text-align:right">3<br><span style="font-size:9px;color:var(--faint)">8월0·9월2·이전1</span></td><td style="text-align:right">2</td><td style="text-align:right">2</td><td style="text-align:right">0</td><td style="text-align:right">1</td><td style="text-align:right">262만원</td><td style="text-align:right">100%</td></tr>
+      <tr><td>7 우혜림</td><td style="text-align:right">2<br><span style="font-size:9px;color:var(--faint)">8월1·9월0·이전1</span></td><td style="text-align:right">2</td><td style="text-align:right">1</td><td style="text-align:right">1</td><td style="text-align:right">0</td><td style="text-align:right">—</td><td style="text-align:right">50%</td></tr>
       <tr class="sum"><td><b>합계</b></td><td style="text-align:right"><b>41</b></td><td style="text-align:right"><b>25</b></td><td style="text-align:right"><b>16</b></td><td style="text-align:right"><b>9</b></td><td style="text-align:right"><b>15</b></td><td style="text-align:right"><b>5,319만원</b></td><td style="text-align:right"><b>64%</b></td></tr>    </tbody>
   </table></div>
   <div class="knote" style="margin-top:12px">
