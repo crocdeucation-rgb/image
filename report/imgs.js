@@ -3,6 +3,6 @@ const IMGS = {"노트릴스_영상": "https://raw.githubusercontent.com/crocdeuc
 "MLST_프로모션_2609": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/mlst_free10_2609.png",
 "MLST_학습유형_2609": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/mlst_type_2609.png",
 "MLST_어디서막힐까_2609": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/mlst_found_2609.png",
-"MLST_공부습관_2609": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/mlst_habit_2609.png",
+"MLST_공부습관_2609": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/mlst_habit_2609.jpg",
 "MLST_성향테스트_2609": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/mlst_academy_2609.png"
 };
