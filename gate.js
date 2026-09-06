@@ -43,13 +43,31 @@
   function login(){
     var m=document.getElementById('agMsg');
     if(m){ m.className='m wait'; m.textContent='로그인 창을 여는 중...'; }
-    auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function(e){
-      if(m){ m.className='m err'; m.textContent='로그인 실패: '+(e.message||e.code); }
+    var provider=new firebase.auth.GoogleAuthProvider();
+    // 노션·인스타·카톡 등 인앱 웹뷰 감지 → 팝업 불가 → 바로 리다이렉트
+    var ua=navigator.userAgent||'';
+    var inApp=/Notion|FBAN|FBAV|Instagram|Line|KAKAOTALK|NAVER|DaumApps|wv\)/i.test(ua);
+    if(inApp){
+      auth.signInWithRedirect(provider).catch(function(e){
+        if(m){ m.className='m err'; m.textContent='로그인 실패: '+(e.message||e.code); }
+      });
+      return;
+    }
+    auth.signInWithPopup(provider).catch(function(e){
+      if(e && (e.code==='auth/popup-closed-by-user'||e.code==='auth/popup-blocked'||e.code==='auth/cancelled-popup-request')){
+        auth.signInWithRedirect(provider).catch(function(e2){
+          if(m){ m.className='m err'; m.textContent='로그인 실패: '+(e2.message||e2.code); }
+        });
+      } else if(m){ m.className='m err'; m.textContent='로그인 실패: '+(e.message||e.code); }
     });
   }
   function ready(fn){ if(document.body) fn(); else document.addEventListener('DOMContentLoaded',fn); }
 
   ready(mount);
+  auth.getRedirectResult().catch(function(e){
+    var m=document.getElementById('agMsg');
+    if(m && e && e.code!=='auth/no-auth-event'){ m.className='m err'; m.textContent='로그인 실패: '+(e.message||e.code); }
+  });
   auth.onAuthStateChanged(function(u){
     ready(function(){
       var g=document.getElementById('agate'); if(!g){ mount(); g=document.getElementById('agate'); }
