@@ -319,7 +319,8 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   <button class="tab summary" onclick="sel('may',this)">5월 결산</button>
   <button class="tab summary" onclick="sel('jun',this)">6월 결산</button>
   <button class="tab summary" onclick="sel('jul',this)">7월 결산</button>
-  <button class="tab summary on" onclick="sel('aug',this)">8월</button>
+  <button class="tab summary" onclick="sel('aug',this)">8월 결산</button>
+  <button class="tab summary on" onclick="sel('sep1',this)">9월 1주차</button>
   <button class="tab" onclick="sel('crm',this)" style="border-color:rgba(180,120,255,.3);color:#b478ff">⚙ CRM 패치</button>
 </div>
 
@@ -920,8 +921,8 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 </div>
 
 
-<!-- ===== 8월 (누계 8/1~8/30) ===== -->
-<div id="p-aug" class="panel on">
+<!-- ===== 8월 (마감 8/1~8/31) ===== -->
+<div id="p-aug" class="panel">
 
   <!-- 📌 이번 주 요약 (4주차) — 열자마자 최신부터 -->
   <div class="thisweek">
@@ -939,23 +940,23 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   </div>
 
   <div class="kpis" style="grid-template-columns:repeat(3,1fr)">
-    <div class="kpi"><div class="k">8월 매출 · 누계</div><div class="v t">2억 3,095만</div><div class="s">230,949,500원<br><span style="color:var(--faint)">원장 기준(웹마) · 8/1~30 · 취소 반영</span></div></div>
+    <div class="kpi"><div class="k">8월 매출 · 마감</div><div class="v t">2억 2,711만</div><div class="s">227,112,000원<br><span style="color:var(--faint)">원장 기준(웹마) · 8/1~31 · 취소 반영 확정</span></div></div>
     <div class="kpi"><div class="k">총 광고비</div><div class="v">6,007만</div><div class="s">60,066,091원<br><span style="color:var(--faint)">카카오 무상캐시 180만 제외</span></div></div>
     <div class="kpi"><div class="k">ROAS</div><div class="v t">3.84</div><div class="s">결제일 기준<br><span style="color:var(--faint)">코호트 3.37</span></div></div>
     <div class="kpi"><div class="k">총 DB</div><div class="v">1,618건</div><div class="s">CPL 37,124원</div></div>
     <div class="kpi"><div class="k">오더</div><div class="v">66건</div><div class="s">결제일 기준</div></div>
-    <div class="kpi" style="border-color:var(--red);border-width:1.5px"><div class="k" style="color:var(--red)">당월 취소</div><div class="v" style="color:var(--red)">3,410.2만</div><div class="s">9건 · 원장 확정</div></div>
+    <div class="kpi" style="border-color:var(--red);border-width:1.5px"><div class="k" style="color:var(--red)">당월 취소</div><div class="v" style="color:var(--red)">3,757만</div><div class="s">10건 · 원장 확정</div></div>
   </div>
   <div class="knote">
     ※ <b>매출 2기준 병기</b> — <b>결제일 기준</b>(경영·대시보드 일치) = <b>175,922,000원</b> / <b>신청일 코호트</b>(소재 생사 판단) = <b>122,890,000원</b>.
     <br>결제일 매출엔 <b>7월 이전 신청분이 8월에 결제된 것</b>도 포함되고, 코호트는 <b>8월 신규 리드가 만든 매출만</b> 셉니다. <b>두 값이 다른 게 정상입니다.</b>
     <br>광고비 = 메타 실측 · 카카오·네이버 자동 수집 · GFA 수동 집계. 매출 = 오더+미납 인정.
-    <br>⚠️ <b>8월은 진행 중(누계 8/1~8/30 마감)이며 신규 소재 코호트가 아직 익지 않았습니다.</b> 신규 소재는 ROAS 대신 <b>“코호트 집계 예정”</b>으로 표기합니다 — 0으로 읽지 마십시오.
+    <br>✅ <b>8월 마감(8/1~8/31 · 원장 확정).</b> 순매출 227,112,000원은 취소 10건(3,757만)을 반영한 확정값입니다. 결제일·코호트 병기 수치(아래 채널표)는 소재 판정용 노션 기준이라 순매출과 별개입니다.
   </div>
 
   <!-- 채널별 -->
   <div class="sec-major"><span class="n">01</span><span class="t">채널별</span><span class="s">주차별 · 코호트/결제일 병기</span></div>
-  <div class="wk-legend">※ <b>1주차 = 8/1~8/9</b> · <b>2주차 = 8/10~8/16</b> · <b>3주차 = 8/17~8/23</b> · <b>4주차 = 8/24~8/30</b> · <b>누계 = 8/1~8/30</b>
+  <div class="wk-legend">※ <b>1주차 = 8/1~8/9</b> · <b>2주차 = 8/10~8/16</b> · <b>3주차 = 8/17~8/23</b> · <b>4주차 = 8/24~8/31</b> · <b>누계 = 8/1~8/31</b> <span style="color:var(--faint)">(아래 주차별 세부 수치는 8/30 기준이며, 8/31 집행분 메타 1,206,266원·카카오 현금 25,558원은 상단 KPI·월 총액에 반영됨)</span>
   <br>※ <b>코호트</b> = 그 주에 <b>들어온 리드</b>가 만든 매출(소재·채널 생사 판단용) · <b>결제일</b> = 그 주에 <b>실제 결제된</b> 매출(경영·대시보드 일치용). <b>두 값이 다른 것이 정상</b>입니다.</div>
   <div class="chwk-wrap"><button class="chwk-btn" onclick="chWk('4',this)">4주차</button><button class="chwk-btn" onclick="chWk('3',this)">3주차</button><button class="chwk-btn" onclick="chWk('2',this)">2주차</button><button class="chwk-btn" onclick="chWk('1',this)">1주차</button><button class="chwk-btn" onclick="chWk('all',this)">누계</button></div>
   <div class="tbl-scroll" style="margin-bottom:10px">
@@ -1137,11 +1138,310 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 </div>
 
 
+<!-- ===== 9월 1주차 (9/1~9/6) ===== -->
+<div id="p-sep1" class="panel on">
+
+  <!-- 📌 이번 주 요약 -->
+  <div class="thisweek">
+    <h4>📌 9월 1주차 요약</h4>
+    <div class="tw-date">9/1 ~ 9/6 · <span style="color:var(--faint)">채널 재편 · 소재 실험 · 인프라 구축</span></div>
+    <div class="tw-grid">
+      <div class="tw-cell"><div class="k">광고비(메타)</div><div class="v">809만</div><div class="d">8,094,812원 · 카카오 41만(9/2 종료)</div></div>
+      <div class="tw-cell"><div class="k">방문</div><div class="v">43건</div><div class="d">세팅 23 · 방문취소 4</div></div>
+      <div class="tw-cell"><div class="k">오더(원장)</div><div class="v">10건+</div><div class="d">9/1~4 확정 · 9/5~6 반영 예정</div></div>
+      <div class="tw-cell"><div class="k">순매출(원장)</div><div class="v">3,066만</div><div class="d">30,657,000원 · 9/1~4 확정</div></div>
+    </div>
+    <div class="tw-note">
+      이번 주의 핵심은 <b>채널 재편(카카오·텐핑 종료 → 메타 집중)</b>과 <b>위너테스트 세트(소재 10종 한 캠페인 경쟁)</b>입니다. 방문 45건 중 <b>22건(51%)이 8월에 유입된 리드</b>가 이번 주에 세팅된 것으로, 8월 자산이 9월 실적을 만들고 있습니다. 병행하여 <b>경영진 통합 대시보드 4종 + 실무자 실적판 + 보안 시스템</b>을 구축했습니다.
+    </div>
+  </div>
+
+  <div class="kpis" style="grid-template-columns:repeat(3,1fr)">
+    <div class="kpi"><div class="k">순매출 · 원장</div><div class="v t">3,066만</div><div class="s">30,657,000원<br><span style="color:var(--faint)">9/1~4 확정 · 취소 반영</span></div></div>
+    <div class="kpi"><div class="k">메타 광고비</div><div class="v">809만</div><div class="s">8,094,812원<br><span style="color:var(--faint)">MCP 실측 · 9/1~6</span></div></div>
+    <div class="kpi"><div class="k">방문</div><div class="v">43건</div><div class="s">세팅 23 · 방취 4<br><span style="color:var(--faint)">8월소스 22 · 9월소스 18</span></div></div>
+    <div class="kpi"><div class="k">오더</div><div class="v">10건+</div><div class="s">9/1~4 원장 확정<br><span style="color:var(--faint)">9/5~6 월요일 반영</span></div></div>
+    <div class="kpi"><div class="k">세팅→오더 비중</div><div class="v">52.2%</div><div class="s">오더 12 / 세팅 23<br><span style="color:var(--faint)">노션 기준</span></div></div>
+    <div class="kpi" style="border-color:rgba(120,180,255,.4);border-width:1.5px"><div class="k" style="color:#4a90d9">인프라</div><div class="v" style="color:#4a90d9;font-size:.85em">대시보드 4종<br>+보안 완비</div><div class="s">경영진·실무자 실적판</div></div>
+  </div>
+  <div class="knote">
+    ※ <b>매출·오더·취소 = 원장(확정)</b> · <b>방문·소스·캠페인 = 노션(퍼널 원천)</b>. 원장은 세팅일 기준이라 9/1~4까지 확정이며, 9/5(오더 5건 잠정)·9/6(토, 월요일 반영)은 노션 참고값입니다. 방문 집계는 <b>방문·방문취소·오더·결보</b> 전부를 "방문 일정이 잡혔던 것"으로 봅니다(7/7 확정 정의).
+  </div>
+
+  <!-- 01 채널 재편 -->
+  <div class="sec-major"><span class="n">01</span><span class="t">채널 재편</span><span class="s">선택과 집중 · 카카오/텐핑 종료</span></div>
+  <div class="knote" style="margin-bottom:12px">
+    9월 들어 <b>운영 채널이 줄었습니다.</b> 효율이 검증되지 않은 채널을 정리하고 <b>메타에 집중</b>하는 판단입니다. 채널을 늘리는 것이 아니라, <b>회수되는 채널만 남기는 것</b>이 이번 분기의 원칙입니다.
+  </div>
+  <div class="tbl-wrap"><table class="dt">
+    <thead><tr><th class="l">채널</th><th class="r">9월 광고비</th><th>상태</th><th class="l">판단 근거</th></tr></thead>
+    <tbody>
+      <tr><td class="l"><b>메타</b></td><td class="r">8,094,812원</td><td><span class="badge b-best">주력</span></td><td class="l">전 채널 중 유일하게 코호트·결제일 ROAS 모두 검증(8월 3.08~4.32). 위너 소재 집중.</td></tr>
+      <tr><td class="l"><b>카카오</b></td><td class="r">415,395원</td><td><span class="badge b-end">9/2 종료</span></td><td class="l">6월부터 코호트 ROAS 0.88(본전 미달) 지속. 8월 말 무상캐시(1+1) 소진 후 현금 전환 시 CPL 회복 안 됨 → 9/2 완전 종료.</td></tr>
+      <tr><td class="l"><b>텐핑</b></td><td class="r">0원</td><td><span class="badge b-end">8월 종료</span></td><td class="l">잔액 소진으로 8월 종료. 누적 코호트 ROAS 2.48로 회수는 완료. 재충전은 메타 대비 기회비용 검토 후 결정.</td></tr>
+      <tr><td class="l">네이버 브랜드검색</td><td class="r">월정액</td><td><span class="badge b-on">유지</span></td><td class="l">"살 사람을 받는 채널" — 오더율 높아 ROAS 뒤집힘. 유지.</td></tr>
+      <tr><td class="l">인스타 organic</td><td class="r">0원</td><td><span class="badge b-best">무료 자산</span></td><td class="l">광고비 0으로 결제 발생 지속. 콘텐츠·촬영 자산이 매출을 만드는 구조(9/12 촬영으로 강화 예정).</td></tr>
+    </tbody>
+  </table></div>
+  <div class="cap" style="margin-bottom:24px">※ 카카오 종료 근거 데이터: 8/28~30 무상캐시 90만/일 소진 중 CPM 20,573→24,793 급등, 무상 소진 후 9/1 현금 26.8만·9/2 14.7만 집행 후 OFF. 무상캐시는 실현금 아니므로 ROAS 분모 제외.</div>
+
+  <!-- 02 소재 실험 -->
+  <div class="sec-major"><span class="n">02</span><span class="t">소재 실험</span><span class="s">위너테스트 세트 · 10종 한 캠페인 경쟁</span></div>
+  <div class="knote" style="margin-bottom:12px">
+    <b>이번 주 소재 전략 = 한 캠페인에 소재 10종을 넣고 경쟁시켰습니다.</b> 이는 8월에 데이터로 증명한 <b>자기잠식(self-cannibalization)</b> 교훈의 실행입니다 — 같은 타겟에 캠페인을 여러 개 돌리면 메타 옥션에서 서로 잡아먹어 CPM이 오릅니다(8월 실측: 캠페인 5→10개로 늘리자 계정 CPM 11,544→24,484원, 약 2배 상승). 그래서 <b>다양성은 크리에이티브 레벨에, 판단은 캠페인 레벨에</b> — 소재는 여럿 태우되 캠페인은 하나로 모읍니다.
+    <br><span style="color:var(--faint)">근거: 8월 결산 "03 이번주 핵심 판단 ① 자기잠식" 섹션 · 계정 CPM 일별 추이 실측</span>
+  </div>
+  <div class="gal" id="sep1-gal"></div>
+  <div class="knote" style="margin-top:14px">
+    <b>결과 — 노트릴스 재편집이 압도했습니다.</b> 위너테스트 세트 안에서 노트릴스 재편집이 리드 54건(CPL 26,560원)으로 세트 리드의 대부분을 만들었고, 나머지 소재는 메타가 예산을 거의 배분하지 않았습니다. <b>MLST 5종은 아직 미성숙</b>(지출 1~3만·리드 0~2)이라 판정 유보하며, 반응이 약한 <b>노트필기 2종(방법제시·학원무용)은 오늘 OFF</b>했습니다.
+  </div>
+  <div class="cap" style="margin-bottom:24px">※ 소재 이미지는 실제 집행 소재. 판정 = ROAS 기준(CPL 단독 판단 금지). MLST 5종은 코호트가 익지 않아 "집계 예정"으로 표기 — 0으로 읽지 마십시오.</div>
+
+  <!-- 03 방문 세부 -->
+  <div class="sec-major"><span class="n">03</span><span class="t">방문 세부</span><span class="s">어느 소스·캠페인 · 8월/9월 구분</span></div>
+  <div class="knote" style="margin-bottom:12px">
+    <b>이번 주 방문 43건이 어디서 왔는지를 소스·신청월로 전수 분해했습니다.</b> 핵심은 <b>방문의 절반 이상(22건, 51%)이 8월에 유입된 리드</b>라는 점입니다 — 채널이 줄었어도 8월에 쌓은 리드 자산이 9월 실적을 만들고 있습니다. 방문이 잡혔다 부러진 <b>방문취소 4건</b>도 함께 봅니다.
+  </div>
+  <div class="tbl-wrap"><table class="dt">
+    <thead><tr><th class="l">소스</th><th class="r">방문(계)</th><th class="r">8월 소스</th><th class="r">9월 소스</th><th class="r">세팅</th></tr></thead>
+    <tbody>
+      <tr><td class="l"><b>메타</b></td><td class="r"><b>28</b></td><td class="r">12</td><td class="r">13</td><td class="r">13</td></tr>
+      <tr><td class="l">카카오</td><td class="r">6</td><td class="r">5</td><td class="r">1</td><td class="r">4</td></tr>
+      <tr><td class="l">인스타(insta+ig)</td><td class="r">5</td><td class="r">2</td><td class="r">3</td><td class="r">4</td></tr>
+      <tr><td class="l">텐핑</td><td class="r">2</td><td class="r">2</td><td class="r">0</td><td class="r">1</td></tr>
+      <tr><td class="l">네이버 브랜드검색</td><td class="r">2</td><td class="r">1</td><td class="r">1</td><td class="r">2</td></tr>
+      <tr style="border-top:1.5px solid var(--border)"><td class="l"><b>합계</b></td><td class="r"><b>43</b></td><td class="r"><b>22</b></td><td class="r"><b>18</b></td><td class="r"><b>23</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="cap" style="margin-bottom:10px">※ 6·7월 소스 3건은 표에서 생략(합계엔 포함). 세팅 = 결보+오더. 카카오·텐핑은 종료했지만 8월 유입 리드가 9월에 세팅됨 — 껐어도 잔여 리드가 회수되는 구조.</div>
+  <details style="margin-bottom:24px"><summary style="cursor:pointer;color:var(--faint);font-size:.9em">▸ 방문 건별 전수 (45건) 펼치기</summary>
+  <div class="tbl-wrap" style="margin-top:10px"><table class="dt" style="font-size:.85em">
+    <thead><tr><th class="l">방문일</th><th class="l">이름</th><th>상태</th><th class="l">소스</th><th class="l">캠페인</th><th>신청월</th></tr></thead>
+    <tbody>
+      <tr><td class="l">9/1</td><td class="l">김규리</td><td><span class="badge b-on">결보</span></td><td class="l">인스타</td><td class="l">—</td><td style="color:#d98a4a;font-weight:600">8월</td></tr>
+      <tr><td class="l">9/1</td><td class="l">김서하</td><td><span class="badge b-new">방문</span></td><td class="l">메타</td><td class="l">ARA_GT노트피드백_영상_2605</td><td >7월</td></tr>
+      <tr><td class="l">9/1</td><td class="l">최하늬</td><td><span class="badge b-new">방문</span></td><td class="l">메타</td><td class="l">ARA_노트릴스_영상_2505</td><td style="color:#d98a4a;font-weight:600">8월</td></tr>
+      <tr><td class="l">9/1</td><td class="l">성예서</td><td><span class="badge b-best">오더</span></td><td class="l">메타</td><td class="l">ARA_노트릴스_영상_2505</td><td style="color:#d98a4a;font-weight:600">8월</td></tr>
+      <tr><td class="l">9/2</td><td class="l">이민경</td><td><span class="badge b-on">결보</span></td><td class="l">메타</td><td class="l">ARA_노트릴스_영상_2505</td><td style="color:#d98a4a;font-weight:600">8월</td></tr>
+      <tr><td class="l">9/2</td><td class="l">김도진</td><td><span class="badge b-on">결보</span></td><td class="l">인스타</td><td class="l">—</td><td style="color:#d98a4a;font-weight:600">8월</td></tr>
+      <tr><td class="l">9/2</td><td class="l">박주원</td><td><span class="badge b-on">결보</span></td><td class="l">메타</td><td class="l">ARA_노트릴스_영상_2505</td><td style="color:#4a90d9;font-weight:600">9월</td></tr>
+      <tr><td class="l">9/2</td><td class="l">한예준</td><td><span class="badge b-new">방문</span></td><td class="l">메타</td><td class="l">ARA_노트릴스_영상_2505</td><td style="color:#d98a4a;font-weight:600">8월</td></tr>
+      <tr><td class="l">9/2</td><td class="l">박한결</td><td><span class="badge b-new">방문</span></td><td class="l">메타</td><td class="l">ARA_노트릴스_영상_2505</td><td style="color:#4a90d9;font-weight:600">9월</td></tr>
+      <tr><td class="l">9/2</td><td class="l">최다인</td><td><span class="badge b-dead">방문취소</span></td><td class="l">메타</td><td class="l">ARA_노트릴스_영상_2505</td><td style="color:#d98a4a;font-weight:600">8월</td></tr>
+      <tr><td class="l">9/3</td><td class="l">수아</td><td><span class="badge b-on">결보</span></td><td class="l">메타</td><td class="l">AD_노트필기릴스_방학점검_2607</td><td style="color:#4a90d9;font-weight:600">9월</td></tr>
+      <tr><td class="l">9/3</td><td class="l">이주안</td><td><span class="badge b-new">방문</span></td><td class="l">메타</td><td class="l">노트필기_02_이차방정식</td><td >7월</td></tr>
+      <tr><td class="l">9/3</td><td class="l">해리</td><td><span class="badge b-new">방문</span></td><td class="l">카카오</td><td class="l">—</td><td style="color:#d98a4a;font-weight:600">8월</td></tr>
+      <tr><td class="l">9/3</td><td class="l">박태랑</td><td><span class="badge b-dead">방문취소</span></td><td class="l">텐핑</td><td class="l">—</td><td style="color:#d98a4a;font-weight:600">8월</td></tr>
+      <tr><td class="l">9/3</td><td class="l">하승재</td><td><span class="badge b-best">오더</span></td><td class="l">카카오</td><td class="l">—</td><td style="color:#d98a4a;font-weight:600">8월</td></tr>
+      <tr><td class="l">9/3</td><td class="l">이연주</td><td><span class="badge b-best">오더</span></td><td class="l">카카오</td><td class="l">—</td><td style="color:#d98a4a;font-weight:600">8월</td></tr>
+      <tr><td class="l">9/3</td><td class="l">조서진</td><td><span class="badge b-best">오더</span></td><td class="l">네이버브검</td><td class="l">—</td><td style="color:#4a90d9;font-weight:600">9월</td></tr>
+      <tr><td class="l">9/3</td><td class="l">박소이</td><td><span class="badge b-best">오더</span></td><td class="l">인스타</td><td class="l">—</td><td style="color:#4a90d9;font-weight:600">9월</td></tr>
+      <tr><td class="l">9/4</td><td class="l">신승민</td><td><span class="badge b-on">결보</span></td><td class="l">메타</td><td class="l">ARA_노트릴스_영상_2505</td><td style="color:#4a90d9;font-weight:600">9월</td></tr>
+      <tr><td class="l">9/4</td><td class="l">양지오</td><td><span class="badge b-on">결보</span></td><td class="l">메타</td><td class="l">ARA_노트릴스_영상_2505</td><td style="color:#4a90d9;font-weight:600">9월</td></tr>
+      <tr><td class="l">9/4</td><td class="l">김예슬</td><td><span class="badge b-new">방문</span></td><td class="l">메타</td><td class="l">ARA_노트릴스_영상_2505</td><td style="color:#d98a4a;font-weight:600">8월</td></tr>
+      <tr><td class="l">9/4</td><td class="l">박지환</td><td><span class="badge b-new">방문</span></td><td class="l">카카오</td><td class="l">—</td><td style="color:#d98a4a;font-weight:600">8월</td></tr>
+      <tr><td class="l">9/4</td><td class="l">권지윤</td><td><span class="badge b-new">방문</span></td><td class="l">메타</td><td class="l">ARA_노트릴스_영상_2505</td><td style="color:#d98a4a;font-weight:600">8월</td></tr>
+      <tr><td class="l">9/4</td><td class="l">소연</td><td><span class="badge b-new">방문</span></td><td class="l">카카오</td><td class="l">—</td><td style="color:#d98a4a;font-weight:600">8월</td></tr>
+      <tr><td class="l">9/4</td><td class="l">임유찬</td><td><span class="badge b-best">오더</span></td><td class="l">텐핑</td><td class="l">—</td><td style="color:#d98a4a;font-weight:600">8월</td></tr>
+      <tr><td class="l">9/4</td><td class="l">안윤지</td><td><span class="badge b-best">오더</span></td><td class="l">메타</td><td class="l">AD_노트필기릴스_방학점검_2607</td><td style="color:#4a90d9;font-weight:600">9월</td></tr>
+      <tr><td class="l">9/5</td><td class="l">인아인</td><td><span class="badge b-on">결보</span></td><td class="l">메타</td><td class="l">ARA_노트릴스_영상_2505</td><td style="color:#d98a4a;font-weight:600">8월</td></tr>
+      <tr><td class="l">9/5</td><td class="l">최다예</td><td><span class="badge b-on">결보</span></td><td class="l">메타</td><td class="l">ARA_노트릴스_영상_2505</td><td style="color:#d98a4a;font-weight:600">8월</td></tr>
+      <tr><td class="l">9/5</td><td class="l">이우성</td><td><span class="badge b-on">결보</span></td><td class="l">카카오</td><td class="l">—</td><td style="color:#4a90d9;font-weight:600">9월</td></tr>
+      <tr><td class="l">9/5</td><td class="l">조하민</td><td><span class="badge b-on">결보</span></td><td class="l">메타</td><td class="l">노트릴스_재편집_2609</td><td style="color:#4a90d9;font-weight:600">9월</td></tr>
+      <tr><td class="l">9/5</td><td class="l">안서연</td><td><span class="badge b-new">방문</span></td><td class="l">메타</td><td class="l">ARA_GT노트피드백_영상_2605</td><td >6월</td></tr>
+      <tr><td class="l">9/5</td><td class="l">정지유</td><td><span class="badge b-new">방문</span></td><td class="l">메타</td><td class="l">AD_노트필기릴스_방학점검_2607</td><td style="color:#d98a4a;font-weight:600">8월</td></tr>
+      <tr><td class="l">9/5</td><td class="l">주형진</td><td><span class="badge b-new">방문</span></td><td class="l">메타</td><td class="l">ARA_노트릴스_영상_2505</td><td style="color:#d98a4a;font-weight:600">8월</td></tr>
+      <tr><td class="l">9/5</td><td class="l">중1  조예은. 초4 </td><td><span class="badge b-new">방문</span></td><td class="l">메타</td><td class="l">노트필기_방법제시_2608</td><td style="color:#4a90d9;font-weight:600">9월</td></tr>
+      <tr><td class="l">9/5</td><td class="l">신가영</td><td><span class="badge b-new">방문</span></td><td class="l">인스타</td><td class="l">—</td><td style="color:#4a90d9;font-weight:600">9월</td></tr>
+      <tr><td class="l">9/5</td><td class="l">김정윤</td><td><span class="badge b-new">방문</span></td><td class="l">메타</td><td class="l">ARA_노트릴스_영상_2505</td><td style="color:#4a90d9;font-weight:600">9월</td></tr>
+      <tr><td class="l">9/5</td><td class="l">한지오</td><td><span class="badge b-dead">방문취소</span></td><td class="l">메타</td><td class="l">ARA_노트릴스_영상_2505</td><td style="color:#4a90d9;font-weight:600">9월</td></tr>
+      <tr><td class="l">9/5</td><td class="l">지윤찬</td><td><span class="badge b-best">오더</span></td><td class="l">네이버브검</td><td class="l">—</td><td style="color:#d98a4a;font-weight:600">8월</td></tr>
+      <tr><td class="l">9/5</td><td class="l">임형시현</td><td><span class="badge b-best">오더</span></td><td class="l">메타</td><td class="l">AD_노트필기릴스_방학점검_2607</td><td style="color:#d98a4a;font-weight:600">8월</td></tr>
+      <tr><td class="l">9/5</td><td class="l">홍의정</td><td><span class="badge b-best">오더</span></td><td class="l">인스타</td><td class="l">—</td><td style="color:#4a90d9;font-weight:600">9월</td></tr>
+      <tr><td class="l">9/5</td><td class="l">이강희</td><td><span class="badge b-best">오더</span></td><td class="l">메타</td><td class="l">ARA_노트릴스_영상_2505</td><td style="color:#4a90d9;font-weight:600">9월</td></tr>
+      <tr><td class="l">9/5</td><td class="l">계온유</td><td><span class="badge b-best">오더</span></td><td class="l">메타</td><td class="l">ARA_노트릴스_영상_2505</td><td style="color:#4a90d9;font-weight:600">9월</td></tr>
+      <tr><td class="l">9/6</td><td class="l">정윤</td><td><span class="badge b-dead">방문취소</span></td><td class="l">메타</td><td class="l">ARA_노트릴스_영상_2505</td><td style="color:#4a90d9;font-weight:600">9월</td></tr>    </tbody>
+  </table></div>
+  </details>
+
+  <!-- 04 마케터별 -->
+  <div class="sec-major"><span class="n">04</span><span class="t">마케터별 성과</span><span class="s">9/1~4 원장 확정 · 그로스컵 진행</span></div>
+  <div class="knote" style="margin-bottom:12px">
+    9월 1주차 초반(9/1~4) 웹마 담당자별 성과입니다. 매출·오더는 <b>원장(취소 반영 확정)</b> 기준이며, 실무자용 실적판 '그로스컵'에서 실시간 순위·개인ROAS로 관리하고 있습니다.
+  </div>
+  <div class="tbl-wrap"><table class="dt">
+    <thead><tr><th class="l">담당자</th><th class="r">순매출(원장)</th><th class="r">오더</th><th class="r">결보</th><th class="l">비고</th></tr></thead>
+    <tbody>
+      <tr><td class="l">🥇 <b>김원득</b></td><td class="r"><b>9,248,000원</b></td><td class="r">2</td><td class="r">3</td><td class="l">주초 매출 선두</td></tr>
+      <tr><td class="l">🥈 김우진</td><td class="r">8,670,000원</td><td class="r">2</td><td class="r">2</td><td class="l"></td></tr>
+      <tr><td class="l">🥉 노영호</td><td class="r">6,936,000원</td><td class="r">2</td><td class="r">1</td><td class="l"></td></tr>
+      <tr><td class="l">장윤호</td><td class="r">3,179,000원</td><td class="r">1</td><td class="r">0</td><td class="l"></td></tr>
+      <tr><td class="l">김윤호</td><td class="r">2,624,000원</td><td class="r">2</td><td class="r">0</td><td class="l">근무 OFF 중 성사</td></tr>
+      <tr><td class="l">우혜림</td><td class="r">—</td><td class="r">1</td><td class="r">1</td><td class="l">오더 1건 입금 대기</td></tr>
+      <tr><td class="l">안준섭</td><td class="r">—</td><td class="r">0</td><td class="r">2</td><td class="l">결보 2건 진행</td></tr>
+    </tbody>
+  </table></div>
+  <div class="cap" style="margin-bottom:24px">※ 9/1~4 원장 확정. 9/5~6 세팅분은 월요일 반영 후 갱신. 그로스컵 실시간 순위는 실무자 실적판(team)에서 확인.</div>
+
+  <!-- 05 이번 주 한 일 / 다음 주 -->
+  <div class="sec-major"><span class="n">05</span><span class="t">이번 주 한 일 / 다음 주</span><span class="s">그로스 인프라 구축</span></div>
+  <div class="knote" style="margin-bottom:14px">
+    이번 주는 광고 운영과 병행하여 <b>회사 실적을 보는 시스템 자체를 구축</b>했습니다. 흩어져 있던 데이터를 하나로 모으고, 그 위에 보안을 씌운 것이 골자입니다.
+  </div>
+
+  <div class="wcard-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+    <div class="wcard" style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:16px 18px">
+      <div style="font-weight:700;color:var(--teal);margin-bottom:8px">✅ 이번 주 완료</div>
+      <div class="li" style="margin-bottom:7px"><b>경영진 통합 대시보드 4종</b> — 전체실적·증원현황·인사기록·웹마케팅을 하나의 입구(로그인)에서 탭 전환. 흩어진 데이터를 한 곳에 통합.</div>
+      <div class="li" style="margin-bottom:7px"><b>실무자 실적판(그로스컵)</b> — 매출×ROAS 점수제 순위·개인효율·덕질스탯. 담당자 동기부여용.</div>
+      <div class="li" style="margin-bottom:7px"><b>데이터 보안 시스템 완비</b> — 링크만 알면 열리던 상태 → 등록 임직원만 로그인 통과. 이중 방어(입구+각 페이지). 유출돼도 로그인 없이 열람 불가.</div>
+      <div class="li" style="margin-bottom:0"><b>매출 원장화</b> — 대시보드 매출을 확정 원장 기준으로 통일해 89만 원 오차 해소. 전 화면 매출 일치.</div>
+    </div>
+    <div class="wcard" style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:16px 18px">
+      <div style="font-weight:700;color:#d98a4a;margin-bottom:8px">🎯 다음 주 할 일</div>
+      <div class="li" style="margin-bottom:7px"><b>후기 영상 촬영 (9/12 토)</b> — 재원생 학부모·학생 스토리 CF + 릴스. 인스타 organic(광고비 0으로 매출 견인) 자산 강화. "관리형 화상수업·자기주도 습관" 메시지.</div>
+      <div class="li" style="margin-bottom:7px"><b>위너테스트 세트 판정</b> — 노트릴스 재편집 증액 검토, MLST 5종 코호트 성숙 후 생사 판정(ROAS 기준).</div>
+      <div class="li" style="margin-bottom:7px"><b>메타 집중 심화</b> — 채널 축소분을 메타 위너 소재로 흡수. 자기잠식 없는 단일 캠페인 구조 유지.</div>
+      <div class="li" style="margin-bottom:0"><b>신규 기획 진행 중</b> <span style="color:var(--faint)">(상세 별도 보고)</span></div>
+    </div>
+  </div>
+  <div class="cap">※ 대시보드·보안은 사내 자산으로, 링크 유출 리스크를 원천 차단하면서 경영진이 실적·증원·인사·웹마를 한 화면에서 봅니다. 유지비 0원(구글 인프라 기반).</div>
+
+</div>
+
+
 <div id="p-crm" class="panel">
   <div class="section-title">리드 수집 자동화 — 개발 이력</div>
   <div class="knote">Apps Script 기반 노션 CRM 자동화 · 메타/당근/카카오/텐핑 전채널 통합 파이프라인</div>
 
   <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:20px">
+
+    <!-- 9/1주 통합 대시보드+보안 -->
+    <div class="card" style="border-color:#c9dcf7;background:#fbfdff">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(91,141,239,.14);color:var(--blue)">PLATFORM</span>
+        <span style="font-size:14px;font-weight:700">경영진 통합 대시보드 + 데이터 보안 시스템</span>
+        <span style="font-size:12px;color:var(--sub)">2026.09.01 ~ 09.06</span>
+      </div>
+      <div style="font-size:12px;color:var(--sub);line-height:1.9;margin-bottom:14px;padding:12px 14px;background:#f2f6fd;border-radius:8px">
+        <b style="color:var(--text)">왜 했나</b> — 실적·증원·인사·웹마 데이터가 흩어져 있어 매번 여러 곳을 봐야 했고, 링크만 알면 로그인 없이 전 직원 실적·매출이 열리는 보안 공백이 있었습니다. 데이터를 하나로 모으고 그 위에 보안을 씌웠습니다.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <div style="font-size:11px;color:var(--teal);font-weight:700;margin-bottom:8px;letter-spacing:1px">ADDED</div>
+          <div style="font-size:12px;color:var(--sub);line-height:2">
+            <b>통합 대시보드 4종</b> — 전체실적·증원현황·인사기록·웹마케팅을 한 입구(switcher)에서 탭 전환<br>
+            <b>실무자 실적판(그로스컵)</b> — 매출×ROAS 점수제 순위·개인효율·덕질스탯<br>
+            <b>구글 로그인 게이트</b> — 등록 임직원만 통과, 이중 방어(입구+각 페이지)
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--amber);font-weight:700;margin-bottom:8px;letter-spacing:1px">CHANGED</div>
+          <div style="font-size:12px;color:var(--sub);line-height:2">
+            대시보드 매출 <b>노션 → 원장(리드요약_원장) 기준 전환</b> — 89만 원 오차 해소, 전 화면 매출 일치<br>
+            gviz 실시간 쿼리로 전환(published 캐시 사고 제거)<br>
+            노션 인앱 웹뷰 로그인 대응(signInWithRedirect 폴백)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8/22 리드 역류 근본해결 -->
+    <div class="card" style="border-color:#f7d5c9;background:#fffbfa">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(204,68,68,.12);color:var(--red)">FIX</span>
+        <span style="font-size:14px;font-weight:700">리드 역류 근본 해결 + 코드 구조 정리</span>
+        <span style="font-size:12px;color:var(--sub)">2026.08.22</span>
+      </div>
+      <div style="font-size:12px;color:var(--sub);line-height:1.9;margin-bottom:14px;padding:12px 14px;background:#fdf3f1;border-radius:8px">
+        <b style="color:var(--text)">왜 했나</b> — 며칠째 새벽마다 슬랙 자동복구 알림이 폭주하고 노션에 리드가 중복 생성됐습니다. 원인은 안전망(reconcile) 함수가 DONE 마킹을 무시한 채 노션 5,000건 전체를 매번 재대조하다 타임아웃 → 무한 재복구 루프였습니다(로그로 확정).
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <div style="font-size:11px;color:var(--teal);font-weight:700;margin-bottom:8px;letter-spacing:1px">FIXED</div>
+          <div style="font-size:12px;color:var(--sub);line-height:2">
+            onFormSubmit이 노션 성공 후 <b>DONE 마킹</b> → reconcile은 미처리 행만 처리<br>
+            360초 타임아웃 → <b>57초 "누락 없음"</b>으로 단축<br>
+            타임아웃 유발 트리거 2개 삭제, 안전망 1개씩 재설정
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--amber);font-weight:700;margin-bottom:8px;letter-spacing:1px">REFACTOR</div>
+          <div style="font-size:12px;color:var(--sub);line-height:2">
+            Code.gs(3,036줄) → <b>Code.gs(라이브 82함수) + Archive.gs(격리 17함수)</b> 분리<br>
+            죽은코드·1회성·install 함수를 Archive로 격리<br>
+            함수집합 무결성 검증(99=82+17)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8/19 이중생성 버그 -->
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(204,68,68,.12);color:var(--red)">FIX</span>
+        <span style="font-size:14px;font-weight:700">메타 리드 이중생성 버그 (race condition)</span>
+        <span style="font-size:12px;color:var(--sub)">2026.08.19</span>
+      </div>
+      <div style="font-size:12px;color:var(--sub);line-height:1.9;margin-bottom:14px;padding:12px 14px;background:#f7f8fa;border-radius:8px">
+        <b style="color:var(--text)">증상·원인</b> — 연락처+이름+신청일이 같은 리드가 2개씩 생성됐습니다. reconcile의 스냅샷 타이밍과 실시간 등록(onMetaLeadAdded)이 충돌하는 경쟁 상태(race condition)가 원인이었습니다.
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--teal);font-weight:700;margin-bottom:8px;letter-spacing:1px">해결</div>
+        <div style="font-size:12px;color:var(--sub);line-height:2">
+          reconcile 함수에 <b>"최근 15분 이내 리드 스킵" 가드</b> 추가 → 실시간 등록과 복구의 담당 시간대 분리 · 이중생성 그룹 3분류(내용동일→삭제 / 한쪽표식→실질남김 / 양쪽기록→병합)로 정리
+        </div>
+      </div>
+    </div>
+
+    <!-- 8/3 CRM 자동배정 -->
+    <div class="card" style="border-color:#c8e4d8;background:#fbfefd">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(3,199,90,.12);color:#03c75a">AUTO</span>
+        <span style="font-size:14px;font-weight:700">CRM 담당자 자동배정 + 슬랙 멘션 + 자기것만 보기</span>
+        <span style="font-size:12px;color:var(--sub)">2026.08.03</span>
+      </div>
+      <div style="font-size:12px;color:var(--sub);line-height:1.9;margin-bottom:14px;padding:12px 14px;background:#f0f7f4;border-radius:8px">
+        <b style="color:var(--text)">왜 했나</b> — 신규 리드를 사람이 수동 배정해 전달이 늦었습니다. 등록 즉시 자동 배정 + 담당자 실시간 알림 + 본인 리드만 보는 뷰가 필요했습니다.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <div style="font-size:11px;color:var(--teal);font-weight:700;margin-bottom:8px;letter-spacing:1px">ADDED</div>
+          <div style="font-size:12px;color:var(--sub);line-height:2">
+            <b>실시간 자동배정</b> — 구글폼·카카오·메타 등록 시 라운드로빈(활성자) / 중복은 원담당 승계<br>
+            <b>슬랙 멘션</b> — 배정 시 리드알림 채널에 담당자 태그<br>
+            <b>자기것만 보기</b> — "내 리드" 링크드뷰(@me)
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--amber);font-weight:700;margin-bottom:8px;letter-spacing:1px">MIGRATED</div>
+          <div style="font-size:12px;color:var(--sub);line-height:2">
+            담당자 Select → <b>담당자_P(People) 100% 이관</b>(3,966건)<br>
+            미배정 신규·중복 전량 배정(4,326건 / 96%)<br>
+            부재/홀딩 93건 재배정
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7/14 CAPI -->
+    <div class="card" style="border-color:#c9dcf7;background:#fbfdff">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(91,141,239,.14);color:var(--blue)">CAPI</span>
+        <span style="font-size:14px;font-weight:700">CAPI for CRM — 메타에 "구매자"를 학습시키다</span>
+        <span style="font-size:12px;color:var(--sub)">2026.07.14</span>
+      </div>
+      <div style="font-size:12px;color:var(--sub);line-height:1.9;margin-bottom:14px;padding:12px 14px;background:#f2f6fd;border-radius:8px">
+        <b style="color:var(--text)">왜 했나</b> — 메타는 "폼 작성자"만 알았지 "구매자"를 몰랐습니다. 그래서 폼은 잘 내지만 오더는 안 하는 층(25-34)을 계속 찾아왔습니다. 노션 상태 변화(방문·오더)를 메타에 되쏴서, 오더하는 사람을 닮은 사람을 찾게 만들었습니다.
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--teal);font-weight:700;margin-bottom:8px;letter-spacing:1px">ADDED</div>
+        <div style="font-size:12px;color:var(--sub);line-height:2">
+          노션 상태 <b>방문→Schedule · 오더→Purchase</b> 이벤트를 메타 CAPI로 전송(sendFunnelCAPI) · lead_id를 user_data에 매칭 · 결보/취소/당취는 전송 안 함(매출 0)<br>
+          <span style="color:var(--faint)">⚠️ event_time 7일 제한(과거 소급 불가) · 효과 발현 약 1개월</span>
+        </div>
+      </div>
+    </div>
 
     <!-- 7/13 소스 분리 -->
     <div class="card" style="border-color:#c8e4d8;background:#fbfefd">
@@ -2027,6 +2327,16 @@ const AUG_GAL = [
    since:'8/17', age:'신규', lifeSpendTxt:'방학점검 하위', lifeSales:null, lifeRoas:null, lifeDbTxt:'관찰', lifeVisit:null, lifeVisitRate:null, note:'초기 CTR 최저(0%). 손절 후보입니다.'},
 ];
 renderGal('aug-gal', AUG_GAL, {exact:true, spendLine:true, lifetime:true});
+
+const SEP1_GAL = [
+  {key:'노트릴스_재편집_2609', title:'노트릴스 재편집',   st:'best', tag:'위너테스트 압도 · 세트 리드 1위',        cpl:'26,560', spend:1434244, orders:0, sales:0},
+  {key:'MLST_어디서막힐까_2609', title:'MLST 어디서막힐까', st:'new',  tag:'MLST 5종 중 CPL 최저 · 리드 2',          cpl:'10,081', spend:20161, orders:0, sales:0},
+  {key:'MLST_프로모션_2609',   title:'MLST 10명무료',     st:'new',  tag:'MLST 신규 · 리드 2',                     cpl:'16,692', spend:33384, orders:0, sales:0},
+  {key:'MLST_학습유형_2609',   title:'MLST 학습유형',     st:'new',  tag:'MLST 신규 · 코호트 집계 예정',            cpl:'집계중', spend:21213, orders:0, sales:0},
+  {key:'MLST_공부습관_2609',   title:'MLST 공부습관',     st:'new',  tag:'MLST 신규 · 코호트 집계 예정',            cpl:'집계중', spend:14795, orders:0, sales:0},
+  {key:'MLST_성향테스트_2609', title:'MLST 성향테스트',   st:'new',  tag:'MLST 신규 · CTR 약세(0.70%)',            cpl:'집계중', spend:11016, orders:0, sales:0}
+];
+renderGal('sep1-gal', SEP1_GAL, {spendLine:true});
 
 renderGal('jw2-gal', JW2_GAL);
   renderGal('jw3-gal', JW3_GAL);
