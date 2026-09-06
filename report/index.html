@@ -1861,8 +1861,8 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 
 
 <!-- 이번주 할일 -->
-<div class="divider"></div>
-<div style="margin-bottom:24px">
+<div class="divider" id="tw-divider"></div>
+<div style="margin-bottom:24px" id="tw-block">
   <div class="section-label">THIS WEEK</div>
   <div class="section-title">이번 주 실행 계획</div>
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px" class="todo-grid">
@@ -2095,6 +2095,17 @@ const WEEK_TODO = {
 };
 
 function updateThisWeek(id) {
+  // 9월 1주차 탭은 '05 이번 주 한 일/다음 주' 섹션이 대신하므로 하단 THIS WEEK 블록 숨김
+  const twBlock = document.getElementById('tw-block');
+  const twDiv = document.getElementById('tw-divider');
+  if (id === 'sep1') {
+    if (twBlock) twBlock.style.display = 'none';
+    if (twDiv) twDiv.style.display = 'none';
+    return;
+  } else {
+    if (twBlock) twBlock.style.display = '';
+    if (twDiv) twDiv.style.display = '';
+  }
   const data = WEEK_TODO[id];
   if (!data) return;
 
