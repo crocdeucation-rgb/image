@@ -58,15 +58,15 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 .acc-body{padding:0 18px 8px}
 /* 이번 주 요약 카드 (최상단 — 열자마자 최신) */
 .thisweek{background:linear-gradient(135deg,rgba(76,110,245,.06),rgba(76,110,245,.02));border:1px solid rgba(76,110,245,.25);border-radius:14px;padding:18px 20px;margin-bottom:20px}
-.thisweek h4{font-size:15px;font-weight:800;color:var(--blue);margin-bottom:4px}
-.thisweek .tw-date{font-size:12px;color:var(--sub);margin-bottom:14px}
+.thisweek h4{font-size:18px;font-weight:800;color:var(--blue);margin-bottom:6px}
+.thisweek .tw-date{font-size:14px;color:var(--sub);margin-bottom:14px}
 .tw-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
-.tw-cell{background:var(--card);border:0.5px solid var(--border);border-radius:10px;padding:12px 14px}
-.tw-cell .k{font-size:11px;color:var(--sub);margin-bottom:3px}
-.tw-cell .v{font-size:19px;font-weight:800;color:var(--text);letter-spacing:-.5px}
-.tw-cell .d{font-size:11px;font-weight:600;margin-top:2px}
+.tw-cell{background:var(--card);border:0.5px solid var(--border);border-radius:10px;padding:18px 20px}
+.tw-cell .k{font-size:14px;color:var(--sub);margin-bottom:3px}
+.tw-cell .v{font-size:28px;font-weight:800;color:var(--text);letter-spacing:-.5px}
+.tw-cell .d{font-size:13px;font-weight:600;margin-top:2px}
 .tw-up{color:#2f9e44}.tw-dn{color:#e03131}
-.tw-note{font-size:12px;color:var(--sub);line-height:1.6}
+.tw-note{font-size:14.5px;color:var(--sub);line-height:1.8}
 @media(max-width:600px){.tw-grid{grid-template-columns:repeat(2,1fr)}}
 .kpi .k{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
 .kpi .v{font-size:22px;font-weight:700;letter-spacing:-.5px;color:var(--text)}
@@ -1229,117 +1229,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   <div class="knote" style="margin-bottom:10px">
     <b>방문취소 15건 —</b> 방문을 잡았다가 부러진 건입니다. 이 중 <b>9월 신규 DB는 4건뿐, 11건이 8월 이전 DB</b>라, 오래 물고 있던 리드를 되살려 방문까지 갔으나 성사되지 못한 경우가 많습니다. 담당별로는 안준섭·김우진·김원득에 집중돼 있어, 방문을 많이 잡는 인원일수록 취소도 함께 늘어나는 구조입니다.
   </div>
-  <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:4px">
-    <div style="display:flex;gap:8px;padding:8px 10px;background:var(--card2);font-size:13px;color:var(--faint);font-weight:600">
-      <span style="min-width:34px">취소일</span><span style="min-width:56px">이름</span><span style="min-width:52px">담당</span><span style="min-width:42px">DB출처</span><span>소스</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border2);font-size:14px">
-      <span style="min-width:34px;color:var(--faint)">9/2</span>
-      <b style="min-width:56px">박한결</b>
-      <span style="min-width:52px;color:var(--sub)">김우진</span>
-      <span style="min-width:42px;color:#4a90d9;font-weight:600">9월</span>
-      <span style="color:var(--sub)">메타</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border2);font-size:14px">
-      <span style="min-width:34px;color:var(--faint)">9/2</span>
-      <b style="min-width:56px">정소은</b>
-      <span style="min-width:52px;color:var(--sub)">안준섭</span>
-      <span style="min-width:42px;color:#d98a4a;font-weight:600">8월</span>
-      <span style="color:var(--sub)">메타</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border2);font-size:14px">
-      <span style="min-width:34px;color:var(--faint)">9/3</span>
-      <b style="min-width:56px">엄세웅</b>
-      <span style="min-width:52px;color:var(--sub)">김우진</span>
-      <span style="min-width:42px;color:#4a90d9;font-weight:600">9월</span>
-      <span style="color:var(--sub)">메타</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border2);font-size:14px">
-      <span style="min-width:34px;color:var(--faint)">9/3</span>
-      <b style="min-width:56px">이주안</b>
-      <span style="min-width:52px;color:var(--sub)">장윤호</span>
-      <span style="min-width:42px;color:var(--faint);font-weight:600">6월</span>
-      <span style="color:var(--sub)">메타</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border2);font-size:14px">
-      <span style="min-width:34px;color:var(--faint)">9/3</span>
-      <b style="min-width:56px">박태랑</b>
-      <span style="min-width:52px;color:var(--sub)">안준섭</span>
-      <span style="min-width:42px;color:#d98a4a;font-weight:600">8월</span>
-      <span style="color:var(--sub)">텐핑</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border2);font-size:14px">
-      <span style="min-width:34px;color:var(--faint)">9/3</span>
-      <b style="min-width:56px">임온유</b>
-      <span style="min-width:52px;color:var(--sub)">김원득</span>
-      <span style="min-width:42px;color:var(--faint);font-weight:600">7월</span>
-      <span style="color:var(--sub)">인스타</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border2);font-size:14px">
-      <span style="min-width:34px;color:var(--faint)">9/3</span>
-      <b style="min-width:56px">이재후</b>
-      <span style="min-width:52px;color:var(--sub)">김원득</span>
-      <span style="min-width:42px;color:#4a90d9;font-weight:600">9월</span>
-      <span style="color:var(--sub)">메타</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border2);font-size:14px">
-      <span style="min-width:34px;color:var(--faint)">9/4</span>
-      <b style="min-width:56px">소연</b>
-      <span style="min-width:52px;color:var(--sub)">안준섭</span>
-      <span style="min-width:42px;color:#d98a4a;font-weight:600">8월</span>
-      <span style="color:var(--sub)">카카오</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border2);font-size:14px">
-      <span style="min-width:34px;color:var(--faint)">9/4</span>
-      <b style="min-width:56px">박지환</b>
-      <span style="min-width:52px;color:var(--sub)">안준섭</span>
-      <span style="min-width:42px;color:var(--faint);font-weight:600">5월</span>
-      <span style="color:var(--sub)">—</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border2);font-size:14px">
-      <span style="min-width:34px;color:var(--faint)">9/4</span>
-      <b style="min-width:56px">박건우</b>
-      <span style="min-width:52px;color:var(--sub)">김원득</span>
-      <span style="min-width:42px;color:var(--faint);font-weight:600">5월</span>
-      <span style="color:var(--sub)">메타</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border2);font-size:14px">
-      <span style="min-width:34px;color:var(--faint)">9/5</span>
-      <b style="min-width:56px">정지유</b>
-      <span style="min-width:52px;color:var(--sub)">안준섭</span>
-      <span style="min-width:42px;color:#d98a4a;font-weight:600">8월</span>
-      <span style="color:var(--sub)">메타</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border2);font-size:14px">
-      <span style="min-width:34px;color:var(--faint)">9/5</span>
-      <b style="min-width:56px">신가영</b>
-      <span style="min-width:52px;color:var(--sub)">김윤호</span>
-      <span style="min-width:42px;color:#4a90d9;font-weight:600">9월</span>
-      <span style="color:var(--sub)">인스타</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border2);font-size:14px">
-      <span style="min-width:34px;color:var(--faint)">9/5</span>
-      <b style="min-width:56px">한지오</b>
-      <span style="min-width:52px;color:var(--sub)">김우진</span>
-      <span style="min-width:42px;color:var(--faint);font-weight:600">5월</span>
-      <span style="color:var(--sub)">메타</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border2);font-size:14px">
-      <span style="min-width:34px;color:var(--faint)">9/5</span>
-      <b style="min-width:56px">주형진</b>
-      <span style="min-width:52px;color:var(--sub)">김원득</span>
-      <span style="min-width:42px;color:#d98a4a;font-weight:600">8월</span>
-      <span style="color:var(--sub)">메타</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border2);font-size:14px">
-      <span style="min-width:34px;color:var(--faint)">9/6</span>
-      <b style="min-width:56px">정윤</b>
-      <span style="min-width:52px;color:var(--sub)">김우진</span>
-      <span style="min-width:42px;color:var(--faint);font-weight:600">6월</span>
-      <span style="color:var(--sub)">메타</span>
-    </div>
-  </div>
-  <div class="cap" style="margin-bottom:24px">※ 방문취소 = 어드민 확정 기준(방문잡은일자 9월). DB 출처 색: <span style="color:#d98a4a;font-weight:600">8월</span> · <span style="color:#4a90d9;font-weight:600">9월</span> · 이전(회색). 이번 집계로 방문취소가 종전 표기(4건)보다 크게 잡혀, 방문 퍼널의 실제 이탈 규모가 드러났습니다.</div>
+  <div class="cap" style="margin-bottom:24px">※ 방문취소 = 어드민 확정 기준(방문잡은일자 9월). 이번 집계로 방문취소가 종전 표기(4건)보다 크게 잡혀, 방문 퍼널의 실제 이탈 규모가 드러났습니다.</div>
 
       <!-- 04 마케터별 -->
   <div class="sec-major"><span class="n">04</span><span class="t">담당자별 성과 분석</span><span class="s">9월 1주차 · 원장+노션 · 측정 고도화 적용</span></div>
