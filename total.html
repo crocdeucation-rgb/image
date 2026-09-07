@@ -1048,7 +1048,7 @@ function surgeBlk(surge){
   // 개인 (상담·사업) — 좌우 2열로 압축
   var per = surge.person||{}, pm = per[pd]||{};
   var perBlk = '<div class="drsub" style="margin-top:9px">개인</div>'
-    + '<div class="surge-two">'
+    + '<div class="surge-two"'+((window.isBoss&&window.isBoss())?'':' style="grid-template-columns:1fr"')+'>'
     + '<div><div class="drsub2">상담</div>' + personSurgeRows(pm.sang, pd) + '</div>'
     + ((window.isBoss&&window.isBoss()) ? ('<div><div class="drsub2">사업</div>' + personSurgeRows(pm.saup, pd) + '</div>') : '')
     + '</div>';
@@ -1166,6 +1166,9 @@ function renderClutch(){
   // [2026-09] 사업 클러치는 부서장·경영진만
   var _bs=(window.isBoss&&window.isBoss());
   if(p){ if(_bs){ p.innerHTML=clutchRows(c.saup); if(p.parentNode)p.parentNode.style.display=''; } else { p.innerHTML=''; if(p.parentNode)p.parentNode.style.display='none'; } }
+  // [2026-09] 사업 열이 빠지면 상담이 전체 너비를 쓰게 1열로
+  var _ct=document.querySelector('.clutch-two');
+  if(_ct) _ct.style.gridTemplateColumns = _bs ? '' : '1fr';
   // [2026-09] 클러치 이름(.drnm)은 렌더마다 새로 그려져 기존 클릭 바인딩이 사라진다 → 재부착.
   //   personCards가 아직 없으면 attachCardClicks가 조기 return 하므로 지연 재시도까지 포함.
   pcReattach();
