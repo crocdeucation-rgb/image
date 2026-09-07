@@ -634,15 +634,15 @@ body.is-live .closed-only{display:none !important}
 </div>
 <!-- [2026-09] MVP 시상식 — 종결달 전용 (트로피 5종) -->
 <div id="mvp-awards" class="closed-only"></div>
-<!-- 이번주/지난주 왕 -->
-<div class="kings live-only" id="kings"></div>
-<div class="swipe-hint live-only" id="kings-hint"></div><div class="swipe-label live-only">← 밀어서 이번주·지난주 왕 보기 →</div>
 <!-- [2026-09] 지점 매출순·상담/사업 개인 TOP — 위로 이동 (매출TOP3 바로 다음) -->
 <div class="panel">
 <div class="tabs"><button class="tabbtn on" onclick="sw(0,this)">상담 지점 매출순</button><button class="tabbtn" onclick="sw(3,this)">상담 개인 TOP</button><button class="tabbtn" id="tab_saup" onclick="sw(4,this)">사업 개인 TOP</button><div id="brSortTog"><button class="on" data-k="sales" onclick="brSort('sales',this)">매출순</button><button data-k="set" onclick="brSort('set',this)">세팅순</button><button data-k="per" onclick="brSort('per',this)">1인당순</button></div></div>
 <div id="body"></div>
 <div class="note" id="note" style="display:none">지점별/개인별 매출 순위 · 매일 갱신</div>
 </div>
+<!-- 이번주/지난주 왕 -->
+<div class="kings live-only" id="kings"></div>
+<div class="swipe-hint live-only" id="kings-hint"></div><div class="swipe-label live-only">← 밀어서 이번주·지난주 왕 보기 →</div>
 <!-- 누적 매출 TOP3 (기간 토글) — 라이브 전용(현재월 시점 누적이라 종결달엔 의미없음) -->
 <div class="q3head live-only"><span class="q3title">📊 누적 매출 TOP3</span><span class="q3tog"><button class="q3togbtn on" data-q="3" onclick="q3Period('3',this)">3개월</button><button class="q3togbtn" data-q="6" onclick="q3Period('6',this)">6개월</button></span></div>
 <div class="q3 live-only" id="q3"></div>
