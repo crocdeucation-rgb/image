@@ -1281,6 +1281,9 @@ function isBoss(){ var R=(window._me&&window._me.rank)||''; return ['파운더',
 window.isBoss=isBoss;
 // allowlist 이메일→이름·직급 (표시용). 규칙은 Firestore가 강제, 여긴 이름 표시만.
 var ALLOW_NAME={
+  'thestudydesign@gmail.com':{name:'김상현',rank:'이사'},
+  'kimdohee213@gmail.com':{name:'김도희',rank:'사원'},
+  'ninanina364@gmail.com':{name:'정은지',rank:'인턴'},
   '032100jesus@gmail.com':{name:'오동근',rank:'파운더'},
   'christuhm@gmail.com':{name:'엄현호',rank:'대표이사'},
   'crocdeucation@gmail.com':{name:'신상준',rank:'이사'},
@@ -1291,7 +1294,6 @@ var ALLOW_NAME={
   'jjoon0804@gmail.com':{name:'안준섭',rank:'대리'},
   'skfkr4@gmail.com':{name:'김우진',rank:'대리'},
   'w0wiam1004@gmail.com':{name:'장윤호',rank:'지사장'},
-  'whkimts@gmail.com':{name:'김태석',rank:'PM'},
   'dbgpfla97@gmail.com':{name:'우혜림',rank:'지점장'},
   'mjhsingle@gmail.com':{name:'문정현',rank:'주임'},
   'qkfka3090@gmail.com':{name:'이승엽',rank:'주임'},
@@ -1315,7 +1317,6 @@ var ALLOW_NAME={
   'ksj245180@gmail.com':{name:'권순재',rank:'사원'},
   'eunbini592@gmail.com':{name:'이은빈',rank:'사원'},
   'kanghansara@gmail.com':{name:'김사라',rank:'차장'},
-  'bb000724@gmail.com':{name:'유두진',rank:'이사'},
   'rkdaudwn8921@gmail.com':{name:'강명주',rank:'주임'},
   'narae1619@gmail.com':{name:'하나래',rank:'사원'},
   'wkddnjswhd98@gmail.com':{name:'장원종',rank:'사원'},
@@ -1333,8 +1334,7 @@ var ALLOW_NAME={
   'mangjoo3@gmail.com':{name:'맹민주',rank:'사원'},
   'dldmlwo0304@gmail.com':{name:'이의재',rank:'사원'},
   'k01034759574@gmail.com':{name:'김민철',rank:'사원'},
-  'seyeonnnnnn@gmail.com':{name:'김세연',rank:'인턴'},
-  'thestudydesign@gmail.com':{name:'김상현',rank:'이사'}
+  'seyeonnnnnn@gmail.com':{name:'김세연',rank:'인턴'}
 };
 _fauth.onAuthStateChanged(function(u){
   if(u && ALLOW_NAME[u.email]){ _me={email:u.email, name:ALLOW_NAME[u.email].name, rank:ALLOW_NAME[u.email].rank}; }
@@ -1976,7 +1976,9 @@ function fdRenderCtrl(){
   var periods=[['latest','최신'],['yesterday','어제'],['week','이번주'],['month','이번달'],['custom','직접']];
   var stats=[['order','오더(매출)'],['set','세팅'],['cancel','취소']];
   // 학년 옵션은 원장에서
-  var grades=['all']; if(window.__ledger){ var gs={}; window.__ledger.forEach(function(r){if(r.grade)gs[r.grade]=1;}); grades=grades.concat(Object.keys(gs).sort()); }
+  var GRADE_ORDER=['초4','초5','초6','중1','중2','중3','고1','고2','고3'];
+  var grades=['all'];
+  if(window.__ledger){ var gs={}; window.__ledger.forEach(function(r){if(r.grade)gs[String(r.grade).trim()]=1;}); GRADE_ORDER.forEach(function(g){ if(gs[g]) grades.push(g); }); }
   var gradeChips=grades.map(function(g){return '<button class="fd-chip'+(s.grade===g?' on':'')+'" onclick="fdSet(\'grade\',\''+g+'\')">'+(g==='all'?'전체':g)+'</button>';}).join('');
   var h='<div class="fd-ctrl">';
   h+='<div class="fd-lbl">기간</div><div class="fd-chips">'+periods.map(function(p){return '<button class="fd-chip'+(s.period===p[0]?' on':'')+'" onclick="fdSet(\'period\',\''+p[0]+'\')">'+p[1]+'</button>';}).join('')+'</div>';
@@ -1992,7 +1994,7 @@ function fdRenderCtrl(){
   h+='</div>';
   document.getElementById('fdCtrl').innerHTML=h;
 }
-window.fdSet=function(k,v){ window.__fdState[k]=v; fdRenderCtrl(); if(window.__ledger)fdRun(); };
+window.fdSet=function(k,v){ window.__fdState[k]=v; if(k!=='q'){ fdRenderCtrl(); } if(window.__ledger)fdRun(); };
 /* 실행+렌더 */
 function fdRun(){
   var rg=fdRange();
