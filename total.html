@@ -1277,13 +1277,13 @@ var ALLOW_NAME={
   'crocdeucation@gmail.com':{name:'신상준',rank:'이사'},
   '90younho@gmail.com':{name:'김윤호',rank:'지사장'},
   'deuk1992@gmail.com':{name:'김원득',rank:'과장'},
-  'goodida486@gmail.com':{name:'노영호',rank:'과장'},
+  'goodida486@gmail.com':{name:'노영호',rank:'차장'},
   'jeffkorea27@gmail.com':{name:'김성윤',rank:'대리'},
   'jjoon0804@gmail.com':{name:'안준섭',rank:'대리'},
   'skfkr4@gmail.com':{name:'김우진',rank:'대리'},
-  'w0wwiam1004@gmail.com':{name:'장윤호',rank:'지사장'},
+  'w0wiam1004@gmail.com':{name:'장윤호',rank:'지사장'},
   'whkimts@gmail.com':{name:'김태석',rank:'PM'},
-  'dbgpfla97@gmail.com':{name:'우혜림',rank:'과장'},
+  'dbgpfla97@gmail.com':{name:'우혜림',rank:'지점장'},
   'mjhsingle@gmail.com':{name:'문정현',rank:'주임'},
   'qkfka3090@gmail.com':{name:'이승엽',rank:'주임'},
   'ggh0305@gmail.com':{name:'고국희',rank:'사원'},
@@ -1312,6 +1312,11 @@ var ALLOW_NAME={
   'teaamain@nate.com':{name:'장원종',rank:'사원'},
   'sorazzan07@gmail.com':{name:'조소라',rank:'팀장'}
 };
+// [2026-09] 리다이렉트 로그인 복귀 (엣지 폴백)
+try{ _fauth.getRedirectResult().catch(function(e){
+  var m=document.getElementById('gateMsg');
+  if(m && e && e.code && e.code!=='auth/no-current-user'){ m.className='gate-msg err'; m.textContent='로그인 실패: '+(e.message||e.code); }
+}); }catch(e){}
 _fauth.onAuthStateChanged(function(u){
   if(u && ALLOW_NAME[u.email]){ _me={email:u.email, name:ALLOW_NAME[u.email].name, rank:ALLOW_NAME[u.email].rank}; }
   else if(u){ _me={email:u.email, name:(u.displayName||u.email.split('@')[0]), rank:''}; }
@@ -1349,6 +1354,10 @@ window.gateLogin=function(){
   if(msg){ msg.className='gate-msg wait'; msg.textContent='로그인 창을 여는 중...'; }
   var p=new firebase.auth.GoogleAuthProvider();
   _fauth.signInWithPopup(p).catch(function(e){
+    if(e && (e.code==='auth/popup-blocked'||e.code==='auth/invalid-credential'||e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request'||e.code==='auth/internal-error'||e.code==='auth/web-storage-unsupported')){
+      if(msg){ msg.className='gate-msg wait'; msg.textContent='로그인 페이지로 이동 중...'; }
+      _fauth.signInWithRedirect(p); return;
+    }
     if(msg){ msg.className='gate-msg err'; msg.textContent='로그인 실패: '+(e.message||e.code); }
   });
 };
@@ -1469,7 +1478,13 @@ document.addEventListener('click', function(e){
 (function(){
   var _origAuth=_fauth.onAuthStateChanged;
 })();
-function pcLogin(){ var p=new firebase.auth.GoogleAuthProvider(); _fauth.signInWithPopup(p).catch(function(e){ alert('로그인 실패: '+e.message); }); }
+function pcLogin(){
+  var p=new firebase.auth.GoogleAuthProvider();
+  _fauth.signInWithPopup(p).catch(function(e){
+    if(e && (e.code==='auth/popup-blocked'||e.code==='auth/invalid-credential'||e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request'||e.code==='auth/internal-error'||e.code==='auth/web-storage-unsupported')){ _fauth.signInWithRedirect(p); return; }
+    alert('로그인 실패: '+e.message);
+  });
+}
 function pcLogout(){ _fauth.signOut(); }
 /* ── 모달 열고/닫을 때 스크롤 위치 보존 ──
    body.style.overflow='hidden' 및 switcher의 iframe fixed 오버레이 전환 때문에
