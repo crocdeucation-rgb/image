@@ -1786,9 +1786,9 @@ function openCard(name){
     +'<div class="pc-subst"><span>커리어하이 <b>'+pcEok(p.careerHigh)+'</b></span>'+(highCount?'<span>신기록 경신 <b>'+highCount+'회</b></span>':'')
     +'</div>'
     +'<div class="pc-trend"><div class="pc-sec-t" style="padding:2px 6px">📈 연간 추이 <span style="font-weight:600;color:#B6C2DC">·'+PC_MON[closedM]+'까지</span></div>'
-      +'<div class="pc-tabs"><button class="pc-tab on" onclick="pcSwitchTrend(\'sales\',this)">매출</button><button class="pc-tab" onclick="pcSwitchTrend(\'set\',this)">세팅</button></div>'
+      +'<div class="pc-tabs"><button class="pc-tab on" onclick="pcSwitchTrend(\'sales\',this)">매출</button>'+(useF?'':'<button class="pc-tab" onclick="pcSwitchTrend(\'set\',this)">세팅</button>')+'</div>'
       +'<div id="pcTrendWrap">'+pcTrendSvg(p.series,closedM,'sales')+'</div>'
-      +'<div class="pc-tlegend"><span class="b">● 매출</span> / <span class="s">● 세팅</span></div></div>'
+      +'<div class="pc-tlegend"><span class="b">● 매출</span>'+(useF?'':' / <span class="s">● 세팅</span>')+'</div></div>'
     +nextHtml
     +'<div class="pc-sec"><div class="pc-sec-t">🏅 뱃지</div><div class="pc-badges">'+bgHtml+'</div></div>'
     +trHtml
