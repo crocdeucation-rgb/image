@@ -48,9 +48,31 @@
     var ua=navigator.userAgent||'';
     var inApp=/Notion|FBAN|FBAV|Instagram|Line|KAKAOTALK|NAVER|DaumApps|wv\)/i.test(ua);
     if(inApp){
-      auth.signInWithRedirect(provider).catch(function(e){
-        if(m){ m.className='m err'; m.textContent='로그인 실패: '+(e.message||e.code); }
-      });
+      // [2026-09] 구글은 인앱 웹뷰 OAuth 를 403 으로 막는다 — 로그인 시도 없이 브라우저로 유도
+      var url=location.href;
+      if(m){
+        m.className='m wait';
+        m.innerHTML='앱 안에서는 구글 보안정책상 로그인이 막혀 있어요.<br>아래 버튼으로 <b>브라우저에서 열어</b> 로그인해주세요.'
+          +'<div style="margin-top:10px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap">'
+          +'<button class="b" style="padding:8px 14px;font-size:13px" id="agOpenExt">브라우저에서 열기</button>'
+          +'<button class="b" style="padding:8px 14px;font-size:13px;background:#eee;color:#333" id="agCopy">링크 복사</button>'
+          +'</div>';
+      }
+      // 안드로이드: intent 로 크롬, iOS/기타: 새 창 시도
+      var _ua=(navigator.userAgent||'');
+      var openExt=function(){
+        if(/android/i.test(_ua)){
+          var noScheme=url.replace(/^https?:\/\//,'');
+          location.href='intent://'+noScheme+'#Intent;scheme=https;package=com.android.chrome;end';
+        } else {
+          window.open(url,'_blank');
+        }
+      };
+      var btnE=document.getElementById('agOpenExt'); if(btnE) btnE.onclick=openExt;
+      var btnC=document.getElementById('agCopy'); if(btnC) btnC.onclick=function(){
+        try{ navigator.clipboard.writeText(url); if(m)m.innerHTML+='<div style="margin-top:6px;color:#2E9E5B">✔ 복사됨 — 브라우저에 붙여넣어 여세요</div>'; }
+        catch(e){ prompt('아래 주소를 복사해 브라우저에서 여세요', url); }
+      };
       return;
     }
     auth.signInWithPopup(provider).catch(function(e){
