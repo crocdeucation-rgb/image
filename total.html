@@ -1050,7 +1050,7 @@ function surgeBlk(surge){
   var perBlk = '<div class="drsub" style="margin-top:9px">개인</div>'
     + '<div class="surge-two">'
     + '<div><div class="drsub2">상담</div>' + personSurgeRows(pm.sang, pd) + '</div>'
-    + '<div><div class="drsub2">사업</div>' + personSurgeRows(pm.saup, pd) + '</div>'
+    + ((window.isBoss&&window.isBoss()) ? ('<div><div class="drsub2">사업</div>' + personSurgeRows(pm.saup, pd) + '</div>') : '')
     + '</div>';
   return '<div class="drgrp">'+tog+teamBlk+perBlk+'</div>';
 }
@@ -1081,7 +1081,7 @@ function renderRecords(dk){
     if(!arr||!arr.length)return h+'<div class="drnone">신기록 도전 중 🔥</div></div>';
     arr.forEach(function(x){h+='<div class="drrow"><span class="drnm">'+x.name+(x.team?'<span class="drtm">'+x.team+'</span>':'')+'</span><span class="drrec"><b>'+dwon(x.aug)+'</b><span class="drprev">이전최고 '+dwon(x.prevMax)+'</span></span></div>';});
     return h+'</div>';}
-  el.innerHTML=blk('상담',dk.records.sang)+blk('사업',dk.records.saup);
+  el.innerHTML=blk('상담',dk.records.sang)+((window.isBoss&&window.isBoss())?blk('사업',dk.records.saup):'');
 }
 function renderTrend(){
   var dk=window.__DK; if(!dk||!dk.branchTrend)return; var bt=dk.branchTrend;
@@ -1163,7 +1163,9 @@ function renderClutch(){
   var c=dk.clutch[window.__cl]||{};
   var s=document.getElementById('d_clutch_sang'), p=document.getElementById('d_clutch_saup');
   if(s)s.innerHTML=clutchRows(c.sang);
-  if(p)p.innerHTML=clutchRows(c.saup);
+  // [2026-09] 사업 클러치는 부서장·경영진만
+  var _bs=(window.isBoss&&window.isBoss());
+  if(p){ if(_bs){ p.innerHTML=clutchRows(c.saup); if(p.parentNode)p.parentNode.style.display=''; } else { p.innerHTML=''; if(p.parentNode)p.parentNode.style.display='none'; } }
   // [2026-09] 클러치 이름(.drnm)은 렌더마다 새로 그려져 기존 클릭 바인딩이 사라진다 → 재부착.
   //   personCards가 아직 없으면 attachCardClicks가 조기 return 하므로 지연 재시도까지 포함.
   pcReattach();
