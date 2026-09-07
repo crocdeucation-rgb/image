@@ -925,10 +925,12 @@ function renderAll(D){
       var val;
       if(lbl.indexOf('결보')>=0) val=(obj.gb||0)+'건';
       else if(lbl.indexOf('세팅')>=0) val=(obj.set||0)+'건';
-      else if(lbl.indexOf('확률')>=0) val=(obj.rate||0)+'% ('+(obj.ord||0)+'/'+(obj.set||0)+')';
+      else if(lbl.indexOf('확률')>=0) val=(obj.rate||0)+'%';
       else val=won(obj.sales);
       var team = obj.team ? '<span class="kteam">·'+obj.team+'</span>' : '';
-      var mo = (obj.mSet!==undefined) ? '<span class="kmo">이달 세팅'+obj.mSet+' · '+won(obj.mSales)+'</span>' : '';
+      var mo = (obj.mSet!==undefined) ? (seg==='saup'
+                ? '<span class="kmo">이달 장당'+(obj.mSet>0?eokman(Math.round(obj.mSales/obj.mSet)):'-')+'</span>'
+                : '<span class="kmo">이달 세팅'+obj.mSet+' · '+won(obj.mSales)+'</span>') : '';
       var nb = (D.newbie&&D.newbie[obj.name]) ? '<span class="tag" title="입사 6개월내">🌱</span>' : '';
       var _ct = (lbl.indexOf('매출')>=0 && obj.cxa>0) ? cxTag(obj.cxa, seg) : '';
       var cx = _ct ? '<span class="kmo">'+_ct+'</span>' : '';
@@ -953,7 +955,7 @@ function renderAll(D){
         var h='<div style="margin-bottom:12px"><div style="font-size:12px;color:#6B7688;font-weight:700;margin-bottom:6px">'+title+'</div>';
         (arr||[]).slice(0,3).forEach(function(x,i){
           var _cx=cxTag(x.cxa, title==='사업'?'saup':'sang');
-          h+='<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:14px"><span style="width:16px;height:16px;border-radius:5px;background:'+(i===0?'#7048E8':'#EEF0FF')+';color:'+(i===0?'#fff':'#4C6EF5')+';font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(i+1)+'</span>'+avatarMini(x.name,20)+'<b style="color:#1B2436">'+x.name+'</b>'+tags(x.name,i===0)+(x.team?'<span style="font-size:11px;color:#8A94A6">'+x.team+'</span>':'')+'<span style="margin-left:auto;text-align:right"><span style="font-weight:800;color:#7048E8;font-size:13px">'+won(x.sales)+'</span><br><span style="font-size:10px;color:#8A94A6">'+(title==='상담'?'방문'+(x.visit||0)+' · ':'')+'세팅'+(x.set||0)+' · 오더'+(x.ord||0)+'</span>'+(_cx?'<br>'+_cx:'')+'</span></div>';
+          h+='<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:14px"><span style="width:16px;height:16px;border-radius:5px;background:'+(i===0?'#7048E8':'#EEF0FF')+';color:'+(i===0?'#fff':'#4C6EF5')+';font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(i+1)+'</span>'+avatarMini(x.name,20)+'<b style="color:#1B2436">'+x.name+'</b>'+tags(x.name,i===0)+(x.team?'<span style="font-size:11px;color:#8A94A6">'+x.team+'</span>':'')+'<span style="margin-left:auto;text-align:right"><span style="font-weight:800;color:#7048E8;font-size:13px">'+won(x.sales)+'</span><br><span style="font-size:10px;color:#8A94A6">'+(title==='상담'?('방문'+(x.visit||0)+' · 세팅'+(x.set||0)+' · 오더'+(x.ord||0)):('장당 '+(x.set>0?eokman(Math.round(x.sales/x.set)):'-')))+'</span>'+(_cx?'<br>'+_cx:'')+'</span></div>';
         });
         return h+'</div>';
       }
@@ -970,7 +972,8 @@ function renderAll(D){
       var isBranch = title.indexOf('지점')>=0;
       var h='<div class="q3card"><h3>'+title+'</h3>';
       (arr||[]).forEach(function(x,i){
-        var meta = showSet ? '<br><span style="font-size:10px;color:#8A94A6;font-weight:600">세팅'+(x.set||0)+' · 오더'+(x.ord||0)+'</span>' : '';
+        var _isSaup = title.indexOf('사업')>=0;
+        var meta = _isSaup ? ('<br><span style="font-size:10px;color:#8A94A6;font-weight:600">장당 '+(x.set>0?eokman(Math.round(x.sales/x.set)):'-')+'</span>') : (showSet ? '<br><span style="font-size:10px;color:#8A94A6;font-weight:600">세팅'+(x.set||0)+' · 오더'+(x.ord||0)+'</span>' : '');
         h+='<div class="q3row"><span class="q3rk'+(i===0?' t':'')+'">'+(i+1)+'</span>'+(isBranch?'':avatarMini(x.name,20))+'<span class="q3nm">'+x.name
           +(isBranch?'':tags(x.name,i===0))
           +(x.team?' <span class="q3tm">'+x.team+'</span>':'')+'</span><span class="q3v" style="text-align:right">'+won(x.sales)+meta+'</span></div>';
