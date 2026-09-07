@@ -922,7 +922,7 @@ function renderAll(D){
       var nb = (D.newbie&&D.newbie[obj.name]) ? '<span class="tag" title="입사 6개월내">🌱</span>' : '';
       var _ct = (lbl.indexOf('매출')>=0 && obj.cxa>0) ? cxTag(obj.cxa, seg) : '';
       var cx = _ct ? '<span class="kmo">'+_ct+'</span>' : '';
-      return '<div class="krow"><span class="klbl">'+lbl+'</span><span class="kname">'+obj.name+nb+team+mo+cx+'</span><span class="kval">'+val+'</span></div>';
+      return '<div class="krow"><span class="klbl">'+lbl+'</span>'+avatarMini(obj.name,20)+'<span class="kname">'+obj.name+nb+team+mo+cx+'</span><span class="kval">'+val+'</span></div>';
     }
     function kcard(title, wk, d){
       return '<div class="kwrap"><h3>'+title+' <span class="wk">'+wk+'</span></h3>'
@@ -943,7 +943,7 @@ function renderAll(D){
         var h='<div style="margin-bottom:12px"><div style="font-size:12px;color:#6B7688;font-weight:700;margin-bottom:6px">'+title+'</div>';
         (arr||[]).slice(0,3).forEach(function(x,i){
           var _cx=cxTag(x.cxa, title==='사업'?'saup':'sang');
-          h+='<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px"><span style="width:16px;height:16px;border-radius:5px;background:'+(i===0?'#7048E8':'#EEF0FF')+';color:'+(i===0?'#fff':'#4C6EF5')+';font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(i+1)+'</span><b style="color:#1B2436">'+x.name+'</b>'+tags(x.name,i===0)+(x.team?'<span style="font-size:11px;color:#8A94A6">'+x.team+'</span>':'')+'<span style="margin-left:auto;text-align:right"><span style="font-weight:800;color:#7048E8;font-size:12px">'+won(x.sales)+'</span><br><span style="font-size:10px;color:#8A94A6">세팅'+(x.set||0)+' · 오더'+(x.ord||0)+'</span>'+(_cx?'<br>'+_cx:'')+'</span></div>';
+          h+='<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:14px"><span style="width:16px;height:16px;border-radius:5px;background:'+(i===0?'#7048E8':'#EEF0FF')+';color:'+(i===0?'#fff':'#4C6EF5')+';font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(i+1)+'</span>'+avatarMini(x.name,20)+'<b style="color:#1B2436">'+x.name+'</b>'+tags(x.name,i===0)+(x.team?'<span style="font-size:11px;color:#8A94A6">'+x.team+'</span>':'')+'<span style="margin-left:auto;text-align:right"><span style="font-weight:800;color:#7048E8;font-size:13px">'+won(x.sales)+'</span><br><span style="font-size:10px;color:#8A94A6">세팅'+(x.set||0)+' · 오더'+(x.ord||0)+'</span>'+(_cx?'<br>'+_cx:'')+'</span></div>';
         });
         return h+'</div>';
       }
@@ -961,7 +961,7 @@ function renderAll(D){
       var h='<div class="q3card"><h3>'+title+'</h3>';
       (arr||[]).forEach(function(x,i){
         var meta = showSet ? '<br><span style="font-size:10px;color:#8A94A6;font-weight:600">세팅'+(x.set||0)+' · 오더'+(x.ord||0)+'</span>' : '';
-        h+='<div class="q3row"><span class="q3rk'+(i===0?' t':'')+'">'+(i+1)+'</span><span class="q3nm">'+x.name
+        h+='<div class="q3row"><span class="q3rk'+(i===0?' t':'')+'">'+(i+1)+'</span>'+(isBranch?'':avatarMini(x.name,20))+'<span class="q3nm">'+x.name
           +(isBranch?'':tags(x.name,i===0))
           +(x.team?' <span class="q3tm">'+x.team+'</span>':'')+'</span><span class="q3v" style="text-align:right">'+won(x.sales)+meta+'</span></div>';
       });
@@ -1116,7 +1116,7 @@ function personSurgeRows(arr, pd){
   arr.slice(0,3).forEach(function(x,i){
     var pct = x.ratio ? Math.round(x.ratio*100)+'%' : '신규';
     var comp = pd==='weekly' ? ('지난주 '+eokman(x.lastW)+' → 이번주 '+eokman(x.thisW)) : ('지난달 '+eokman(x.prev)+' → 이달 '+eokman(x.cur));
-    h+='<div class="drrow'+(i===0?' top':'')+'"><span class="drmedal">🚀</span><span class="drnm">'+x.name+(x.team?'<span class="drtm">'+x.team+'</span>':'')+'</span><span class="drrec"><b>'+pct+'</b><span class="drprev">'+comp+'</span></span></div>';
+    h+='<div class="drrow'+(i===0?' top':'')+'"><span class="drmedal">🚀</span>'+avatarMini(x.name,20)+'<span class="drnm">'+x.name+(x.team?'<span class="drtm">'+x.team+'</span>':'')+'</span><span class="drrec"><b>'+pct+'</b><span class="drprev">'+comp+'</span></span></div>';
   });
   return h;
 }
@@ -1125,7 +1125,7 @@ function renderRecords(dk){
   var el=document.getElementById('d_records'); if(!el)return;
   function blk(t,arr){var h='<div class="drgrp"><div class="drlbl">'+t+'</div>';
     if(!arr||!arr.length)return h+'<div class="drnone">신기록 도전 중 🔥</div></div>';
-    arr.forEach(function(x){h+='<div class="drrow"><span class="drnm">'+x.name+(x.team?'<span class="drtm">'+x.team+'</span>':'')+'</span><span class="drrec"><b>'+dwon(x.aug)+'</b><span class="drprev">이전최고 '+dwon(x.prevMax)+'</span></span></div>';});
+    arr.forEach(function(x){h+='<div class="drrow">'+avatarMini(x.name,20)+'<span class="drnm">'+x.name+(x.team?'<span class="drtm">'+x.team+'</span>':'')+'</span><span class="drrec"><b>'+dwon(x.aug)+'</b><span class="drprev">이전최고 '+dwon(x.prevMax)+'</span></span></div>';});
     return h+'</div>';}
   el.innerHTML=blk('상담',dk.records.sang)+((window.isBoss&&window.isBoss())?blk('사업',dk.records.saup):'');
 }
@@ -1195,7 +1195,7 @@ function clutchRows(arr){
   arr.forEach(function(x){
     var nb=(D.newbie&&D.newbie[x.name])?'<span class="tag" title="입사 6개월내">🌱</span>':'';
     var pct=Math.round(x.ratio*100);
-    h+='<div class="drrow"><span class="drmedal">⚾</span><span class="drnm">'+x.name+nb+(x.team?'<span class="drtm">'+x.team+'</span>':'')+'</span>'
+    h+='<div class="drrow"><span class="drmedal">⚾</span>'+avatarMini(x.name,20)+'<span class="drnm">'+x.name+nb+(x.team?'<span class="drtm">'+x.team+'</span>':'')+'</span>'
       +'<span class="drrec"><b>막판 '+pct+'%</b>'
       +'<div class="cl-gauge"><div class="cl-gauge-fill" style="width:'+pct+'%"></div></div>'
       +'<span class="drprev">총 '+eokman(x.total)+' 중 '+eokman(x.late)+'</span></span></div>';
@@ -1774,6 +1774,20 @@ window.pcSwitchTrend=function(mode,btn){
 window.__curCardName=null;
 // [2026-09] 직원 사진 매칭용 이름→로마자
 var ROMAJA={"강명주":"gangmyeongju","고국희":"gogukhui","권순재":"gwonsunjae","김도희":"kimdohui","김민성":"kimminseong","김민철":"kimmincheol","김성윤":"kimseongyun","김세연":"kimseyeon","김승민":"kimseungmin","김예림":"kimyerim","김예원":"kimyewon","김우진":"kimujin","김원득":"kimwondeuk","김윤호":"kimyunho","김종범":"kimjongbeom","김준수":"kimjunsu","김채영":"kimchaeyoung","노영호":"noyoungho","맹민주":"maengminju","문수호":"munsuho","문정현":"munjeonghyeon","박건휘":"bakgeonhwi","박민수":"bakminsu","백충열":"baekchungyeol","서승재":"seoseungjae","석지훈":"seokjihun","안세령":"anseryeong","안준섭":"anjunseop","우혜림":"uhyerim","윤지환":"yunjihwan","이상민":"isangmin","이석헌":"iseokheon","이성혁":"iseonghyeok","이승엽":"iseungyeop","이아현":"iahyeon","이은빈":"ieunbin","이의재":"iuijae","이재원":"ijaewon","이준석":"ijunseok","이태희":"itaehui","임성민":"imseongmin","임한별":"imhanbyeol","장원종":"jangwonjong","장윤호":"jangyunho","장준혁":"jangjunhyeok","정다훈":"jeongdahun","정현우":"jeonghyeonu","조수현":"josuhyeon","하나래":"hanarae","홍혜민":"honghyemin"};
+// [2026-09] 순위·이름 블록 공용 사진 헬퍼 — 사진 없으면 이니셜 원형
+window.avatarMini=function(name, size){
+  if(!name) return '';
+  size=size||20;
+  var _n=String(name).replace(/[ABab]$/,'');
+  var _rm=(window.ROMAJA&&(ROMAJA[name]||ROMAJA[_n]))||'';
+  var ch=String(name).charAt(0), fs=Math.round(size*0.45);
+  var iniCss='width:'+size+'px;height:'+size+'px;border-radius:50%;flex-shrink:0;vertical-align:middle;margin-right:6px;display:inline-flex;align-items:center;justify-content:center;background:#EEF0FF;color:#5B4BD0;font-weight:800;font-size:'+fs+'px';
+  var ini='<span style="'+iniCss+'">'+ch+'</span>';
+  if(!_rm) return ini;
+  var url='https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/photos/'+_rm+'.jpg';
+  var st='width:'+size+'px;height:'+size+'px;border-radius:50%;flex-shrink:0;vertical-align:middle;margin-right:6px;object-fit:cover;border:1px solid #E3E8F0';
+  return '<img src="'+url+'" alt="" style="'+st+'" onerror="this.outerHTML=&quot;<span style=&#39;'+iniCss+'&#39;>'+ch+'</span>&quot;">';
+};
 function openCard(name){
   pcSaveScroll();
   var f=pcFind(name);
