@@ -768,7 +768,8 @@ function renderBirthdays(D){
   el.style.display='';
   // [2026-09] 라이브(이번달)만 축하 가능. 종결달(과거월)은 지나간 생일이라 클릭·오늘배지 전부 비활성.
   var _isLive=(D && D.isLive!==false);
-  var todays=_isLive?bd.filter(function(x){return x.today;}):[];
+  var _now=new Date(), _nm=_now.getMonth()+1, _nd=_now.getDate();
+  var todays=_isLive?bd.filter(function(x){return x.mo==_nm && x.dy==_nd;}):[];
   var _ttl=_isLive?'이달의 생일':((bd[0]?bd[0].mo:'')+ '월 생일자');
   var h='<span class="bd-cake">🎂</span><span class="bd-ttl">'+_ttl+'</span>';
   if(todays.length){ h+='<span class="bd-today">🎉 오늘 '+todays.map(function(x){return x.name;}).join('·')+' 생일!</span>'; }
