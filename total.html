@@ -1312,11 +1312,6 @@ var ALLOW_NAME={
   'wkddnjswhd98@gmail.com':{name:'장원종',rank:'사원'},
   'sorazzan07@gmail.com':{name:'조소라',rank:'팀장'}
 };
-// [2026-09] 리다이렉트 로그인 복귀 (엣지 폴백)
-try{ _fauth.getRedirectResult().catch(function(e){
-  var m=document.getElementById('gateMsg');
-  if(m && e && e.code && e.code!=='auth/no-current-user'){ m.className='gate-msg err'; m.textContent='로그인 실패: '+(e.message||e.code); }
-}); }catch(e){}
 _fauth.onAuthStateChanged(function(u){
   if(u && ALLOW_NAME[u.email]){ _me={email:u.email, name:ALLOW_NAME[u.email].name, rank:ALLOW_NAME[u.email].rank}; }
   else if(u){ _me={email:u.email, name:(u.displayName||u.email.split('@')[0]), rank:''}; }
@@ -1353,13 +1348,7 @@ window.gateLogin=function(){
   var msg=document.getElementById('gateMsg');
   if(msg){ msg.className='gate-msg wait'; msg.textContent='로그인 창을 여는 중...'; }
   var p=new firebase.auth.GoogleAuthProvider();
-  _fauth.signInWithPopup(p).catch(function(e){
-    if(e && (e.code==='auth/popup-blocked'||e.code==='auth/invalid-credential'||e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request'||e.code==='auth/internal-error'||e.code==='auth/web-storage-unsupported')){
-      if(msg){ msg.className='gate-msg wait'; msg.textContent='로그인 페이지로 이동 중...'; }
-      _fauth.signInWithRedirect(p); return;
-    }
-    if(msg){ msg.className='gate-msg err'; msg.textContent='로그인 실패: '+(e.message||e.code); }
-  });
+  _fauth.signInWithPopup(p).catch(function(e){ if(msg){ msg.className='gate-msg err'; msg.textContent='로그인 실패: '+(e.message||e.code); } });
 };
 
 /* ── [2026-09] 알림 시스템 ──
@@ -1478,13 +1467,7 @@ document.addEventListener('click', function(e){
 (function(){
   var _origAuth=_fauth.onAuthStateChanged;
 })();
-function pcLogin(){
-  var p=new firebase.auth.GoogleAuthProvider();
-  _fauth.signInWithPopup(p).catch(function(e){
-    if(e && (e.code==='auth/popup-blocked'||e.code==='auth/invalid-credential'||e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request'||e.code==='auth/internal-error'||e.code==='auth/web-storage-unsupported')){ _fauth.signInWithRedirect(p); return; }
-    alert('로그인 실패: '+e.message);
-  });
-}
+function pcLogin(){ var p=new firebase.auth.GoogleAuthProvider(); _fauth.signInWithPopup(p).catch(function(e){ alert('로그인 실패: '+e.message); }); }
 function pcLogout(){ _fauth.signOut(); }
 /* ── 모달 열고/닫을 때 스크롤 위치 보존 ──
    body.style.overflow='hidden' 및 switcher의 iframe fixed 오버레이 전환 때문에

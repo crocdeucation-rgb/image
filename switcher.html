@@ -94,12 +94,6 @@ var SG_ALLOW=['032100jesus@gmail.com','christuhm@gmail.com','crocdeucation@gmail
 var SG_NAME={'032100jesus@gmail.com':'오동근','christuhm@gmail.com':'엄현호','crocdeucation@gmail.com':'신상준','90younho@gmail.com':'김윤호','deuk1992@gmail.com':'김원득','goodida486@gmail.com':'노영호','jeffkorea27@gmail.com':'김성윤','jjoon0804@gmail.com':'안준섭','skfkr4@gmail.com':'김우진','w0wiam1004@gmail.com':'장윤호','whkimts@gmail.com':'김태석','dbgpfla97@gmail.com':'우혜림','mjhsingle@gmail.com':'문정현','qkfka3090@gmail.com':'이승엽','ggh0305@gmail.com':'고국희','ahlee.sep@gmail.com':'이아현','xpxmfltm5678@gmail.com':'윤지환','alsk102qpwoal@gmail.com':'김준수','minsung32383238@gmail.com':'김민성','happy1004elle@gmail.com':'김예원','gh3541@gmail.com':'박건휘','ghtn1346@gmail.com':'김예림','uss20182@gmail.com':'이태희','dltjrgjs56@gmail.com':'이석헌','hr3213@gmail.com':'이상민','starlim2723@gmail.com':'임한별','100heamin7678@gmail.com':'홍혜민','codud010802@gmail.com':'김채영','01046153497a@gmail.com':'안세령','lsmlsmopop@gmail.com':'임성민','pjskimbo8@gmail.com':'박민수','ksj245180@gmail.com':'권순재','eunbini592@gmail.com':'이은빈','kanghansara@gmail.com':'김사라'};
 var _sgPassed=false;
 var SG_RANK={'032100jesus@gmail.com':'파운더','christuhm@gmail.com':'대표이사','crocdeucation@gmail.com':'이사','90younho@gmail.com':'지사장','w0wiam1004@gmail.com':'지사장','deuk1992@gmail.com':'과장','goodida486@gmail.com':'차장','dbgpfla97@gmail.com':'지점장','jeffkorea27@gmail.com':'대리','jjoon0804@gmail.com':'대리','skfkr4@gmail.com':'대리','gh3541@gmail.com':'대리','whkimts@gmail.com':'PM','kanghansara@gmail.com':'차장'};
-// [2026-09] 리다이렉트 로그인 복귀 (엣지 폴백)
-try{ if(sessionStorage.getItem('_sgFreshLogin')==='1'){ window._sgFreshLogin=true; sessionStorage.removeItem('_sgFreshLogin'); } }catch(_e){}
-try{ _sgAuth.getRedirectResult().catch(function(e){
-  var m=document.getElementById('sgateMsg');
-  if(m && e && e.code && e.code!=='auth/no-current-user'){ m.className='sg-msg err'; m.textContent='로그인 실패: '+(e.message||e.code); }
-}); }catch(e){}
 _sgAuth.onAuthStateChanged(function(u){
   var gate=document.getElementById('sgate'), msg=document.getElementById('sgateMsg');
   if(!gate) return;
@@ -146,14 +140,7 @@ window.sgateLogin=function(){
   var msg=document.getElementById('sgateMsg');
   if(msg){ msg.className='sg-msg wait'; msg.textContent='로그인 창을 여는 중...'; }
   var p=new firebase.auth.GoogleAuthProvider();
-  _sgAuth.signInWithPopup(p).catch(function(e){
-    if(e && (e.code==='auth/popup-blocked'||e.code==='auth/invalid-credential'||e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request'||e.code==='auth/internal-error'||e.code==='auth/web-storage-unsupported')){
-      try{ sessionStorage.setItem('_sgFreshLogin','1'); }catch(_e){}
-      if(msg){ msg.className='sg-msg wait'; msg.textContent='로그인 페이지로 이동 중...'; }
-      _sgAuth.signInWithRedirect(p); return;
-    }
-    if(msg){ msg.className='sg-msg err'; msg.textContent='로그인 실패: '+(e.message||e.code); }
-  });
+  _sgAuth.signInWithPopup(p).catch(function(e){ if(msg){ msg.className='sg-msg err'; msg.textContent='로그인 실패: '+(e.message||e.code); } });
 };
   var FRAMES={total:{src:'total.html?v=gate1',h:900},hire:{src:'hire.html?v=gate1',h:900},hr:{src:'hr.html?v=gate1',h:780},web:{src:'dashboard.html?v=gate1',h:1700}};
   var frame=document.getElementById('frame');
