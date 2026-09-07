@@ -1039,6 +1039,7 @@ var metaLine='<span class="bml">'
   +'<span class="bm'+_hi('set')+'">세팅 <b>'+x.set+'</b></span>'
   +'<span class="bm">오더 <b>'+x.ord+'</b></span>'
   +'<span class="bm">인원 <b>'+(head||'-')+'</b></span>'
+  +'<span class="bm">방문 <b>'+(x.visit||0)+'</b></span>'
   +'</span>'
   +(_cxs?'<span class="bm bm-cx">'+_cxs+'</span>':'');
 var inside=w>=18;var _sh=(sortKey==='sales'?' bm-hi':'');
@@ -1058,7 +1059,7 @@ var _r=_dmMap[x.name]; var _mv='';
 if(_r){ if(_r.prevRank==null) _mv='<span class="mvnew">NEW</span>'; else if(_r.move>0) _mv='<span class="mvup">▲'+_r.move+'</span>'; else if(_r.move<0) _mv='<span class="mvdn">▼'+(-_r.move)+'</span>'; }
 var _pnm=x.name.replace(/[ABab]$/,''); var _prm=(window.ROMAJA&&(ROMAJA[x.name]||ROMAJA[_pnm]))||'';
 var _pimg=_prm?('<img src="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/photos/'+_prm+'.jpg" class="bar-av" alt="" onerror="this.outerHTML=\'<div class=&quot;bar-av bar-av-ini&quot;>'+x.name.charAt(0)+'</div>\'">'):('<div class="bar-av bar-av-ini">'+x.name.charAt(0)+'</div>');
-h+='<div class="bar"><div class="rk'+(i<3?' t':'')+'">'+(i+1)+'</div>'+_pimg+'<div class="nm">'+x.name+tags(x.name,i===0)+_mv+'<span class="s">'+x.team+'</span></div><div class="track"><div class="fill" style="width:'+w+'%">'+(ip?'<span>'+won(x.sales)+'</span>':'')+'</div>'+(ip?'':'<span class="outlbl" style="left:calc('+w+'% + 8px)">'+won(x.sales)+'</span>')+'</div><div class="meta">'+(seg==='saup' ? ('장당 <b>'+(x.set>0?eokman(Math.round(x.sales/x.set)):'-')+'</b>') : ('세팅 <b>'+x.set+'</b> · 오더 <b>'+x.ord+'</b>'))+cx+'</div></div>';});return h;}
+h+='<div class="bar"><div class="rk'+(i<3?' t':'')+'">'+(i+1)+'</div>'+_pimg+'<div class="nm">'+x.name+tags(x.name,i===0)+_mv+'<span class="s">'+x.team+'</span></div><div class="track"><div class="fill" style="width:'+w+'%">'+(ip?'<span>'+won(x.sales)+'</span>':'')+'</div>'+(ip?'':'<span class="outlbl" style="left:calc('+w+'% + 8px)">'+won(x.sales)+'</span>')+'</div><div class="meta">'+(seg==='saup' ? ('장당 <b>'+(x.set>0?eokman(Math.round(x.sales/x.set)):'-')+'</b>') : ('세팅 <b>'+x.set+'</b> · 오더 <b>'+x.ord+'</b> · 방문 <b>'+(x.visit||0)+'</b>'))+cx+'</div></div>';});return h;}
 window.sw=function(i,btn){var D=window.__D;if(i===4 && !_BOSS) return;window.__curTab=i;var _tg=document.getElementById('brSortTog'); if(_tg) _tg.style.display=(i===0)?'':'none';document.querySelectorAll('.tabbtn').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');
 document.getElementById('note').style.display=(i===2||i===4)?'block':'none';
 document.getElementById('body').innerHTML=i===0?barsBr(D.branches, window.__brSort||'sales'):i===2?barsDv(D.divs):i===3?barsP(D.persons,'sang'):barsP(D.divpersons,'saup');setTimeout(attachCardClicks,50);}
