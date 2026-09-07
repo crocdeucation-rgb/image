@@ -478,6 +478,7 @@ body.is-live .closed-only{display:none !important}
 @media(max-width:600px){.birthday-bar .bd-list{width:100%;margin-left:0}}
 .name-badges{font-size:10px;margin-left:5px;letter-spacing:0;white-space:nowrap;opacity:.9}
 .bd-item{cursor:pointer;transition:.12s}
+.bd-item .bd-av{width:18px;height:18px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:5px;border:1px solid rgba(255,192,203,.5)}
 .bd-item:hover{transform:translateY(-2px);box-shadow:0 3px 8px rgba(233,64,120,.2)}
 .bd-item.bd-future{cursor:default;opacity:.55}
 .bd-item.bd-future:hover{transform:none;box-shadow:none}
@@ -782,7 +783,9 @@ function renderBirthdays(D){
     var _open=_isLive && (x.dy<=_td);   // 종결달이면 항상 닫힘
     var _cls='bd-item'+(_isLive&&x.mo==_nm&&x.dy==_nd?' t':'')+(_open?'':' bd-future');
     var _oc=_open?' onclick="openBirthday(\''+bdSafe(x.name)+'\','+x.mo+','+x.dy+',\''+bdSafe(x.team)+'\')"':'';
-    return '<span class="'+_cls+'"'+_oc+'>'+x.name+' <b>'+x.mo+'/'+x.dy+'</b></span>';
+    var _bnm=x.name.replace(/[ABab]$/,''); var _brm=(window.ROMAJA&&(ROMAJA[x.name]||ROMAJA[_bnm]))||'';
+    var _bimg=_brm?('<img src="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/photos/'+_brm+'.jpg" class="bd-av" alt="" onerror="this.style.display=\'none\'">'):'';
+    return '<span class="'+_cls+'"'+_oc+'>'+_bimg+x.name+' <b>'+x.mo+'/'+x.dy+'</b></span>';
   }).join('')+'</div>';
   el.innerHTML=h;
 }
