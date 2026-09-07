@@ -645,7 +645,7 @@ body.is-live .closed-only{display:none !important}
 <div id="mvp-awards" class="closed-only"></div>
 <!-- [2026-09] 지점 매출순·상담/사업 개인 TOP — 위로 이동 (매출TOP3 바로 다음) -->
 <div class="panel">
-<div class="tabs"><button class="tabbtn on" onclick="sw(0,this)">상담 지점 매출순</button><button class="tabbtn" onclick="sw(3,this)">상담 개인 TOP</button><button class="tabbtn" id="tab_saup" onclick="sw(4,this)">사업 개인 TOP</button><div id="brSortTog"><button class="on" data-k="sales" onclick="brSort('sales',this)">매출순</button><button data-k="set" onclick="brSort('set',this)">세팅순</button><button data-k="per" onclick="brSort('per',this)">1인당순</button></div></div>
+<div class="tabs"><button class="tabbtn on" onclick="sw(0,this)">상담 지점 매출순</button><button class="tabbtn" onclick="sw(3,this)">상담 개인 TOP</button><button class="tabbtn" id="tab_saup" onclick="sw(4,this)">사업 개인 TOP</button><div id="brSortTog"><button class="on" data-k="sales" onclick="brSort('sales',this)">매출순</button><button data-k="visit" onclick="brSort('visit',this)">방문순</button><button data-k="set" onclick="brSort('set',this)">세팅순</button><button data-k="per" onclick="brSort('per',this)">1인당순</button></div></div>
 <div id="body"></div>
 <div class="note" id="note" style="display:none">지점별/개인별 매출 순위 · 매일 갱신</div>
 </div>
@@ -1023,6 +1023,7 @@ var a=arr.slice();
 a.sort(function(x,y){
   if(sortKey==='per'){ var hx=BH[x.name]||1, hy=BH[y.name]||1; return (y.sales/hy)-(x.sales/hx); }
   if(sortKey==='set') return y.set-x.set;
+  if(sortKey==='visit') return (y.visit||0)-(x.visit||0);
   return y.sales-x.sales;
 });
 var mx=Math.max.apply(null,a.map(function(x){return x.sales;}))||1;   // 막대 너비는 항상 매출 기준
@@ -1035,11 +1036,11 @@ var _cxs=cxTag(x.cxa,'sang');
 // [2026-09] 한 줄 나열 — 정렬 기준(sortKey) 항목만 진하게. 매출순은 막대가 매출이라 우측 강조 없음.
 var _hi=function(k){ return sortKey===k?' bm-hi':''; };
 var metaLine='<span class="bml">'
-  +'<span class="bm'+_hi('per')+'">1인당 <b>'+(per?eokman(per):'-')+'</b></span>'
+  +'<span class="bm'+_hi('visit')+'">방문 <b>'+(x.visit||0)+'</b></span>'
   +'<span class="bm'+_hi('set')+'">세팅 <b>'+x.set+'</b></span>'
   +'<span class="bm">오더 <b>'+x.ord+'</b></span>'
   +'<span class="bm">인원 <b>'+(head||'-')+'</b></span>'
-  +'<span class="bm">방문 <b>'+(x.visit||0)+'</b></span>'
+  +'<span class="bm'+_hi('per')+'">1인당 <b>'+(per?eokman(per):'-')+'</b></span>'
   +'</span>'
   +(_cxs?'<span class="bm bm-cx">'+_cxs+'</span>':'');
 var inside=w>=18;var _sh=(sortKey==='sales'?' bm-hi':'');
