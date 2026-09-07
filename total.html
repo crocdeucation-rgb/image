@@ -780,7 +780,7 @@ function renderBirthdays(D){
   var _td=new Date().getDate();
   h+='<div class="bd-list">'+bd.map(function(x){
     var _open=_isLive && (x.dy<=_td);   // 종결달이면 항상 닫힘
-    var _cls='bd-item'+(_isLive&&x.today?' t':'')+(_open?'':' bd-future');
+    var _cls='bd-item'+(_isLive&&x.mo==_nm&&x.dy==_nd?' t':'')+(_open?'':' bd-future');
     var _oc=_open?' onclick="openBirthday(\''+bdSafe(x.name)+'\','+x.mo+','+x.dy+',\''+bdSafe(x.team)+'\')"':'';
     return '<span class="'+_cls+'"'+_oc+'>'+x.name+' <b>'+x.mo+'/'+x.dy+'</b></span>';
   }).join('')+'</div>';
