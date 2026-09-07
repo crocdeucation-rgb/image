@@ -51,6 +51,8 @@ body{overflow-x:hidden}
 .bar{display:flex;align-items:center;gap:11px;padding:7px 0}
 .bar .rk{width:22px;text-align:center;font-weight:800;color:var(--soft);font-size:13px}.bar .rk.t{color:var(--web)}
 .bar .nm{width:110px;font-weight:700;font-size:13px;flex-shrink:0}.bar .nm .s{display:block;font-size:11px;color:var(--soft);font-weight:500}
+.bar .nm .mvup,.bar .nm .mvdn{font-size:11px;margin-left:4px}
+.bar .nm .mvnew{font-size:9px;padding:1px 5px;margin-left:4px}
 .bar .track{flex:1;background:var(--barbg);border-radius:7px;height:26px;overflow:hidden}
 .bar .fill{height:100%;border-radius:7px;background:linear-gradient(90deg,var(--v1),var(--v2));display:flex;align-items:center;justify-content:flex-end;padding-right:9px}
 .bar .fill span{color:#fff;font-size:12px;font-weight:800;white-space:nowrap}
@@ -645,11 +647,6 @@ body.is-live .closed-only{display:none !important}
 <div class="clutch-two"><div><div class="drsub2">상담</div><div id="d_clutch_sang"></div></div><div><div class="drsub2">사업</div><div id="d_clutch_saup"></div></div></div>
 </div>
 <div class="panel dpanel live-only">
-<div class="dhd"><h3>📈 순위 변동 <span class="dsub" id="rm_basis">· 전주 대비</span></h3>
-<div class="dtog"><button class="dtogbtn on" data-p="weekly" onclick="rmPeriod('weekly',this)">주간</button><button class="dtogbtn" data-p="monthly" onclick="rmPeriod('monthly',this)">월간</button><span class="dsp"></span><button class="dtogbtn seg on" data-s="sang" onclick="rmSeg('sang',this)">상담</button><button class="dtogbtn seg" id="rmseg_saup" data-s="saup" onclick="rmSeg('saup',this)">사업</button></div></div>
-<div id="d_rank"></div>
-</div>
-<div class="panel dpanel live-only">
 <div class="dhd"><h3>🏢 지점 추이 <span class="dsub">월별 추이 · 매출·세팅</span></h3></div>
 <div class="dchips" id="d_chips"></div>
 <div id="d_chart"></div>
@@ -1008,20 +1005,23 @@ function barsDv(arr){var mx=Math.max.apply(null,arr.map(function(x){return x.sal
 arr.forEach(function(x,i){var w=Math.max(x.sales/mx*100,3);
 var ins=w>=18;h+='<div class="bar"><div class="rk'+(i<3?' t':'')+'">'+(i+1)+'</div><div class="nm">'+x.name+'</div><div class="track"><div class="fill" style="width:'+w+'%">'+(ins?'<span>'+won(x.sales)+'</span>':'')+'</div>'+(ins?'':'<span class="outlbl">'+won(x.sales)+'</span>')+'</div><div class="meta">세팅 <b>'+x.set+'</b> · 오더 <b>'+x.ord+'</b> · 1인당 <b>'+won(x.per)+'</b></div></div>';});return h;}
 function barsP(arr,seg){var mx=Math.max.apply(null,arr.map(function(x){return x.sales;}))||1;var h='';
+var _dk0=window.__DK||{}; var _dmArr=((_dk0.rankMove||{}).daily||{})[seg]||[];
+var _dmMap={}; _dmArr.forEach(function(r){ _dmMap[r.name]=r; });
 arr.forEach(function(x,i){var w=Math.max(x.sales/mx*100,3);
 var ip=w>=18;var _c=cxTag(x.cxa,seg);var cx=_c?'<br>'+_c:'';
-h+='<div class="bar"><div class="rk'+(i<3?' t':'')+'">'+(i+1)+'</div><div class="nm">'+x.name+tags(x.name,i===0)+'<span class="s">'+x.team+'</span></div><div class="track"><div class="fill" style="width:'+w+'%">'+(ip?'<span>'+won(x.sales)+'</span>':'')+'</div>'+(ip?'':'<span class="outlbl">'+won(x.sales)+'</span>')+'</div><div class="meta">'+(seg==='saup' ? ('장당 <b>'+(x.set>0?eokman(Math.round(x.sales/x.set)):'-')+'</b>') : ('세팅 <b>'+x.set+'</b> · 오더 <b>'+x.ord+'</b>'))+cx+'</div></div>';});return h;}
+var _r=_dmMap[x.name]; var _mv='';
+if(_r){ if(_r.prevRank==null) _mv='<span class="mvnew">NEW</span>'; else if(_r.move>0) _mv='<span class="mvup">▲'+_r.move+'</span>'; else if(_r.move<0) _mv='<span class="mvdn">▼'+(-_r.move)+'</span>'; }
+h+='<div class="bar"><div class="rk'+(i<3?' t':'')+'">'+(i+1)+'</div><div class="nm">'+x.name+tags(x.name,i===0)+_mv+'<span class="s">'+x.team+'</span></div><div class="track"><div class="fill" style="width:'+w+'%">'+(ip?'<span>'+won(x.sales)+'</span>':'')+'</div>'+(ip?'':'<span class="outlbl">'+won(x.sales)+'</span>')+'</div><div class="meta">'+(seg==='saup' ? ('장당 <b>'+(x.set>0?eokman(Math.round(x.sales/x.set)):'-')+'</b>') : ('세팅 <b>'+x.set+'</b> · 오더 <b>'+x.ord+'</b>'))+cx+'</div></div>';});return h;}
 window.sw=function(i,btn){var D=window.__D;if(i===4 && !_BOSS) return;document.querySelectorAll('.tabbtn').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');
 document.getElementById('note').style.display=(i===2||i===4)?'block':'none';
 document.getElementById('body').innerHTML=i===0?barsBr(D.branches,false):i===2?barsDv(D.divs):i===3?barsP(D.persons,'sang'):barsP(D.divpersons,'saup');setTimeout(attachCardClicks,50);}
 // [2026-09] 사업 개인 TOP 탭 · 덕질 사업 토글 — 권한자만
-;['tab_saup','rmseg_saup'].forEach(function(id){ var _e=document.getElementById(id); if(_e) _e.style.display=_BOSS?'':'none'; });
-if(!_BOSS && window.__rm) window.__rm.seg='sang';
+;['tab_saup'].forEach(function(id){ var _e=document.getElementById(id); if(_e) _e.style.display=_BOSS?'':'none'; });
 document.getElementById('body').innerHTML=barsBr(D.branches,false);
 try{renderDukji(D);}catch(e){console.error('dukji',e);}
 }
 /* ── 덕질 스탯 렌더 ── */
-window.__DK=null; window.__rm={period:'weekly',seg:'sang'}; window.__sg={scope:'team',period:'weekly'};
+window.__DK=null; window.__sg={scope:'team',period:'weekly'};
 function dwon(n){return (n||0).toLocaleString('ko-KR');}
 function eokman(n){n=n||0;
   if(n>=100000000){var e=n/100000000;return (e%1===0?e.toFixed(0):e.toFixed(2))+'억';}
@@ -1083,20 +1083,6 @@ function renderRecords(dk){
     return h+'</div>';}
   el.innerHTML=blk('상담',dk.records.sang)+blk('사업',dk.records.saup);
 }
-function renderRank(){
-  var el=document.getElementById('d_rank'); if(!el)return; var dk=window.__DK; if(!dk)return;
-  var _sg=(window.isBoss&&window.isBoss())?window.__rm.seg:'sang';   // [2026-09] 비권한자는 상담 고정
-  var arr=((dk.rankMove||{})[window.__rm.period]||{})[_sg]||[];
-  if(!arr.length){el.innerHTML='<div class="drnone">데이터 없음</div>';return;}
-  var h=''; arr.slice(0,10).forEach(function(x){
-    var mv; if(x.prevRank==null)mv='<span class="mvnew">NEW</span>'; else if(x.move>0)mv='<span class="mvup">▲'+x.move+'</span>'; else if(x.move<0)mv='<span class="mvdn">▼'+(-x.move)+'</span>'; else mv='<span class="mvsame">–</span>';
-    h+='<div class="rkrow"><span class="rkn">'+x.rank+'</span><span class="rknm">'+x.name+(x.team?'<span class="rktm">'+x.team+'</span>':'')+'</span>'+mv+'<span class="rksales">'+dwon(x.sales)+'</span></div>';
-  });
-  el.innerHTML=h;
-  var bs=document.getElementById('rm_basis'); if(bs) bs.textContent = (window.__rm.period==='monthly') ? '· 전월 대비 (이번달 순위 vs 지난달)' : '· 전주 대비 (이번주 순위 vs 지난주)';
-}
-window.rmPeriod=function(p,btn){window.__rm.period=p;document.querySelectorAll('.dtogbtn[data-p]').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');renderRank();};
-window.rmSeg=function(s,btn){if(s==='saup' && !(window.isBoss&&window.isBoss())) return;window.__rm.seg=s;document.querySelectorAll('.dtogbtn[data-s]').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');renderRank();};
 function renderTrend(){
   var dk=window.__DK; if(!dk||!dk.branchTrend)return; var bt=dk.branchTrend;
   var chips=document.getElementById('d_chips'), chartEl=document.getElementById('d_chart');
@@ -1153,7 +1139,7 @@ function renderDukji(D){
   var wrap=document.querySelector('.dukji-wrap');
   if(!window.__DK){if(wrap)wrap.style.display='none';return;}
   if(wrap)wrap.style.display='';
-  renderRisers(window.__DK); renderRecords(window.__DK); renderRank(); renderTrend(); renderClutch();
+  renderRisers(window.__DK); renderRecords(window.__DK); renderTrend(); renderClutch();
 }
 window.__cl='m3';
 function clutchRows(arr){
