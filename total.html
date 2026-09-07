@@ -505,6 +505,9 @@ body.is-live .closed-only{display:none !important}
 .bdw-hd::before{content:'🎈';position:absolute;top:8px;left:16px;font-size:24px;opacity:.6;transform:rotate(-12deg)}
 .bdw-hd::after{content:'✨';position:absolute;bottom:10px;right:20px;font-size:16px;opacity:.7}
 .bdw-cake{font-size:38px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.2))}
+.bdw-photo-wrap{position:relative;display:inline-block}
+.bdw-photo{width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.7);box-shadow:0 3px 10px rgba(0,0,0,.25);display:block}
+.bdw-cake-badge{position:absolute;top:-6px;right:-6px;font-size:22px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))}
 .bdw-name{font-size:22px;font-weight:900;color:#fff;margin-top:6px;letter-spacing:-.5px}
 .bdw-date{font-size:13px;font-weight:700;color:rgba(255,255,255,.9);margin-top:2px}
 .bdw-team{font-size:12px;color:rgba(255,255,255,.8);font-weight:600;margin-top:2px}
@@ -1598,8 +1601,15 @@ function renderBdwCard(){
   var loginRow=canWrite
     ? '<div class="bdw-login"><span class="who">👤 <b>'+_me.name+'</b> '+(_me.rank||'')+'님 <a onclick="pcLogout()">로그아웃</a></span></div>'
     : '<div class="bdw-login"><button onclick="pcLogin()">🔒 로그인하고 축하 남기기</button></div>';
+  // [2026-09] 생일카드 상단 — 사진 + 케이크 뱃지, 사진 없으면 케이크만
+  var _bnm=String(b.name).replace(/[ABab]$/,'');
+  var _brm=(window.ROMAJA&&(ROMAJA[b.name]||ROMAJA[_bnm]))||'';
+  var _burl=_brm?('https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/photos/'+_brm+'.jpg'):'';
+  var _bhead=_burl
+    ? '<div class="bdw-photo-wrap"><img src="'+_burl+'" class="bdw-photo" alt="" onerror="this.parentNode.outerHTML=\'<div class=&quot;bdw-cake&quot;>🎂</div>\'"><span class="bdw-cake-badge">🎂</span></div>'
+    : '<div class="bdw-cake">🎂</div>';
   var html='<button class="bdw-close" onclick="closeBirthday()">✕</button>'
-    +'<div class="bdw-hd"><div class="bdw-cake">🎂</div><div class="bdw-name">'+b.name+'</div>'
+    +'<div class="bdw-hd">'+_bhead+'<div class="bdw-name">'+b.name+'</div>'
     +'<div class="bdw-date">'+b.mo+'월 '+b.dy+'일 생일</div>'
     +(b.team?'<div class="bdw-team">'+b.team+'</div>':'')+'</div>'
     +'<div class="bdw-body">'
