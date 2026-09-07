@@ -457,6 +457,12 @@ body.is-live .closed-only{display:none !important}
 .trp.royal{background:linear-gradient(120deg,#1E3A8A,#4C6EF5 35%,#7048E8 60%,#D4AF37 100%);background-size:220% 220%;animation:ribHolo 6s ease infinite;color:#fff;border:1.5px solid #D4AF37;box-shadow:0 3px 14px rgba(112,72,232,.35)}
 @keyframes ribHolo{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 .pc-social{border-top:1px solid #E3E8F0;padding:13px 18px 16px;background:#FAFBFD}
+.pc-status{font-size:12px;color:#8A6D9A;font-style:italic;text-align:center;margin-top:4px;padding:0 18px}
+.pc-edit{padding:12px 18px;border-top:1px solid #F1F4F9;display:flex;flex-direction:column;gap:8px}
+.pc-edit-btn{display:inline-flex;align-items:center;gap:6px;background:#EEF0FF;color:#5B4BD0;font-weight:700;font-size:12px;padding:8px 14px;border-radius:20px;cursor:pointer;align-self:flex-start}
+.pc-edit-status{display:flex;gap:6px}
+.pc-edit-status input{flex:1;border:1.5px solid #E3E8F0;border-radius:20px;padding:8px 14px;font-family:inherit;font-size:12px;outline:none}
+.pc-edit-status button{background:var(--v1);color:#fff;border:none;border-radius:20px;padding:8px 16px;font-weight:700;cursor:pointer;font-family:inherit}
 .pc-react{display:flex;align-items:center;gap:16px;margin-bottom:12px}
 .pc-like{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;font-weight:800;color:#6B7688;background:none;border:none;font-family:inherit}
 .pc-like .h{font-size:18px;transition:transform .15s}
@@ -1313,6 +1319,7 @@ window.loadMonth = loadMonth;
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <script>
 /* ── Firebase 초기화 ── */
 var firebaseConfig={apiKey:"AIzaSyCBDimk0MyGAHf762mvInS_H4K9HkW6Ol0",authDomain:"dashboard-88ba4.firebaseapp.com",projectId:"dashboard-88ba4",storageBucket:"dashboard-88ba4.firebasestorage.app",messagingSenderId:"857535538974",appId:"1:857535538974:web:999d190f28e14964eb4b0f"};
@@ -1320,6 +1327,64 @@ firebase.initializeApp(firebaseConfig);
 /* [2026-09] 로드 즉시 게이트 오버레이 전환 (Firebase 판정 전에도 벽 유지) */
 (function(){ try{ var g=document.getElementById('authGate'); if(g){ document.body.style.overflow='hidden'; parent.postMessage({t:'cardOpen'}, '*'); window.scrollTo(0,0); } }catch(e){} })();
 var _fdb=firebase.firestore(), _fauth=firebase.auth();
+var _fstorage=firebase.storage();
+// [2026-09] 프로필(사진·상태메시지) 실시간 구독 — profiles/{이름}
+window.__profiles={}; window.__profilesOn=false;
+function profilesStart(){
+  if(window.__profilesOn) return; window.__profilesOn=true;
+  try{
+    _fdb.collection('profiles').onSnapshot(function(qs){
+      var m={}; qs.forEach(function(d){ var v=d.data()||{};
+        m[d.id]={photoURL:v.photoURL||'', statusMsg:v.statusMsg||''}; });
+      window.__profiles=m;
+      if(window.__curCardName) pcApplyProfile(window.__curCardName);
+    }, function(){ window.__profilesOn=false; });
+  }catch(e){ window.__profilesOn=false; }
+}
+// 열려있는 카드에 프로필 변경을 제자리 반영
+function pcApplyProfile(name){
+  var pr=(window.__profiles&&window.__profiles[name])||{};
+  var body=document.getElementById('pcBody'); if(!body) return;
+  var av=body.querySelector('.pc-av');
+  if(av && pr.photoURL){
+    var im=av.querySelector('img');
+    if(im){ if(im.getAttribute('src')!==pr.photoURL) im.setAttribute('src', pr.photoURL); }
+    else { av.innerHTML='<img src="'+pr.photoURL+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">'; }
+  }
+  var st=body.querySelector('.pc-status');
+  if(st){ st.textContent=pr.statusMsg?('“'+pr.statusMsg+'”'):''; st.style.display=pr.statusMsg?'':'none'; }
+  var inp=document.getElementById('myStatusInput');
+  if(inp && _me && _me.name===name && document.activeElement!==inp) inp.value=pr.statusMsg||'';
+}
+// 본인 사진 업로드 (300px 리사이즈 후 Storage)
+window.myUploadPhoto=function(input){
+  var file=input.files&&input.files[0]; if(!file||!_me) return;
+  var img=new Image(); var rd=new FileReader();
+  rd.onload=function(e){ img.onload=function(){
+    var mx=300, sc=Math.min(mx/img.width, mx/img.height, 1);
+    var cv=document.createElement('canvas');
+    cv.width=Math.round(img.width*sc); cv.height=Math.round(img.height*sc);
+    cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+    cv.toBlob(function(blob){
+      var ref=_fstorage.ref('profiles/'+_me.email+'/photo.jpg');
+      ref.put(blob).then(function(){ return ref.getDownloadURL(); }).then(function(url){
+        return _fdb.collection('profiles').doc(_me.name).set(
+          {photoURL:url, email:_me.email, ts:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+      }).then(function(){ alert('사진이 변경되었습니다'); })
+      .catch(function(err){ alert('업로드 실패: '+err.message); });
+    },'image/jpeg',0.85);
+  }; img.src=e.target.result; };
+  rd.readAsDataURL(file);
+};
+window.mySaveStatus=function(){
+  var el=document.getElementById('myStatusInput'); if(!el||!_me) return;
+  var v=el.value.trim();
+  _fdb.collection('profiles').doc(_me.name).set(
+    {statusMsg:v, email:_me.email, ts:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})
+    .then(function(){ alert('상태메시지 저장됨'); })
+    .catch(function(err){ alert('저장 실패: '+err.message); });
+};
+profilesStart();
 var _me=null;   // {email,name,rank}
 // [2026-09] 권한 판별 — 부서장·경영진만 사업 실적·취소 표기 열람
 function isBoss(){ var R=(window._me&&window._me.rank)||''; return ['파운더','대표이사','이사','지사장','지점장','부지점장'].indexOf(R)>=0; }
@@ -1391,6 +1456,7 @@ _fauth.onAuthStateChanged(function(u){
   if(window.__curCardName) renderSocial(window.__curCardName);  // 카드 열려있으면 소셜 갱신
   if(window.__curBday) renderBdwCard();   // [2026-09] 생일 모달 열려있으면 로그인 상태 즉시 반영
   if(typeof notifStart==='function') notifStart();   // [2026-09] 알림 로드/재시작
+  if(typeof profilesStart==='function') profilesStart();   // [2026-09] 프로필 구독(미로그인 실패 대비)
 });
 /* [2026-09] 로그인 게이트 — 33명 통과해야 대시보드 오픈 */
 function gateCheck(u){
@@ -1845,13 +1911,25 @@ function openCard(name){
   var trHtml=''; if(trs.length){ trHtml='<div class="pc-sec"><div class="pc-sec-t">🏆 트로피 <span class="cnt">'+trs.length+'</span></div><div class="tr-list">'+trs.map(function(t){var d=PC_TROPHY[t.type]||{ic:'🏅',cls:'team',lbl:t.type};return '<div class="trp '+d.cls+'"><span class="ic">'+d.ic+'</span><span class="tt">'+PC_MON[+pcMoNum(t.m)]+' '+d.lbl+'</span>'+(t.scope?'<span class="mo">'+t.scope+'</span>':'')+'</div>';}).join('')+'</div></div>'; }
   var avTxt=name.charAt(0);
   var _nmKey=name.replace(/[ABab]$/,''); var _rm=ROMAJA[name]||ROMAJA[_nmKey]||''; var _avImg=_rm?('https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/photos/'+_rm+'.jpg'):'';
+  // [2026-09] 사진 우선순위: 본인 업로드 > GitHub 기본 > 이니셜
+  var _prof=(window.__profiles&&window.__profiles[name])||{};
+  var _upURL=_prof.photoURL||'';
+  var _finalImg=_upURL||_avImg;
+  var _status=_prof.statusMsg||'';
+  var _isMe=!!(_me && _me.name===name);
+  var _esc=function(t){return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');};
+  var _statusHtml='<div class="pc-status"'+(_status?'':' style="display:none"')+'>'+(_status?('“'+_esc(_status)+'”'):'')+'</div>';
+  var _editHtml=_isMe ? ('<div class="pc-edit">'
+    +'<label class="pc-edit-btn">📷 사진 변경<input type="file" accept="image/*" style="display:none" onchange="myUploadPhoto(this)"></label>'
+    +'<div class="pc-edit-status"><input id="myStatusInput" maxlength="40" placeholder="상태메시지 (예: 이번달 목표 5천!)" value="'+_esc(_status)+'">'
+    +'<button onclick="mySaveStatus()">저장</button></div></div>') : '';
 
   var html='<button class="pc-close" onclick="closeCard()">✕</button>'
     +'<div class="pc-hd t-'+tier+'"><div class="pc-hd-row">'
-    +'<div class="pc-av">'+(_avImg?('<img src="'+_avImg+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit" onerror="this.style.display=\'none\';this.parentNode.textContent=\''+avTxt+'\'">'):avTxt)+'</div>'
+    +'<div class="pc-av">'+(_finalImg?('<img src="'+_finalImg+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit" onerror="this.style.display=\'none\';this.parentNode.textContent=\''+avTxt+'\'">'):avTxt)+'</div>'
     +'<div class="pc-id"><div class="pc-nm">'+name+tags+'</div><div class="pc-meta">'+(p.rank?p.rank+' · ':'')+(p.team||'소속 미정')+'</div></div>'
     +'<div class="pc-tier"><div class="pc-tier-badge">'+tier+'</div><div class="pc-tier-lbl">TIER</div></div>'
-    +'</div><div class="pc-praise'+(pr.slump?' slump':'')+'">'+pr.txt+'</div></div>'
+    +'</div><div class="pc-praise'+(pr.slump?' slump':'')+'">'+pr.txt+'</div></div>'+_statusHtml
     +'<div class="pc-stats">'
     +'<div class="pc-st"><div class="l">이달 매출</div><div class="v pur">'+pcEok(p.curSales)+'</div></div>'
     +'<div class="pc-st"><div class="l">올해 누적</div><div class="v">'+pcEok(p.total)+'</div></div>'
@@ -1867,6 +1945,7 @@ function openCard(name){
     +'<div class="pc-sec"><div class="pc-sec-t">🏅 뱃지</div><div class="pc-badges">'+bgHtml+'</div></div>'
     +trHtml
     +(useF?'':'<button class="pc-cmpbtn" onclick="openVersus(\''+name.replace(/'/g,"")+'\')">⚔️ 다른 선수와 비교하기</button>')
+    +_editHtml
     +'<div class="pc-social" id="pcSocial"></div>';
   document.getElementById('pcBody').innerHTML=html;
   window.__pcTrendMode='sales';
