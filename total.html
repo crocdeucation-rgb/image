@@ -1705,6 +1705,8 @@ window.pcSwitchTrend=function(mode,btn){
 
 /* ── 카드 열기 ── */
 window.__curCardName=null;
+// [2026-09] 직원 사진 매칭용 이름→로마자
+var ROMAJA={"강명주":"gangmyeongju","고국희":"gogukhui","권순재":"gwonsunjae","김도희":"kimdohui","김민성":"kimminseong","김민철":"kimmincheol","김성윤":"kimseongyun","김세연":"kimseyeon","김승민":"kimseungmin","김예림":"kimyerim","김예원":"kimyewon","김우진":"kimujin","김원득":"kimwondeuk","김윤호":"kimyunho","김종범":"kimjongbeom","김준수":"kimjunsu","김채영":"kimchaeyoung","노영호":"noyoungho","맹민주":"maengminju","문수호":"munsuho","문정현":"munjeonghyeon","박건휘":"bakgeonhwi","박민수":"bakminsu","백충열":"baekchungyeol","서승재":"seoseungjae","석지훈":"seokjihun","안세령":"anseryeong","안준섭":"anjunseop","우혜림":"uhyerim","윤지환":"yunjihwan","이상민":"isangmin","이석헌":"iseokheon","이성혁":"iseonghyeok","이승엽":"iseungyeop","이아현":"iahyeon","이은빈":"ieunbin","이의재":"iuijae","이재원":"ijaewon","이준석":"ijunseok","이태희":"itaehui","임성민":"imseongmin","임한별":"imhanbyeol","장원종":"jangwonjong","장윤호":"jangyunho","장준혁":"jangjunhyeok","정다훈":"jeongdahun","정현우":"jeonghyeonu","조수현":"josuhyeon","하나래":"hanarae","홍혜민":"honghyemin"};
 function openCard(name){
   pcSaveScroll();
   var f=pcFind(name);
@@ -1749,10 +1751,11 @@ function openCard(name){
   // 트로피 html
   var trHtml=''; if(trs.length){ trHtml='<div class="pc-sec"><div class="pc-sec-t">🏆 트로피 <span class="cnt">'+trs.length+'</span></div><div class="tr-list">'+trs.map(function(t){var d=PC_TROPHY[t.type]||{ic:'🏅',cls:'team',lbl:t.type};return '<div class="trp '+d.cls+'"><span class="ic">'+d.ic+'</span><span class="tt">'+PC_MON[+pcMoNum(t.m)]+' '+d.lbl+'</span>'+(t.scope?'<span class="mo">'+t.scope+'</span>':'')+'</div>';}).join('')+'</div></div>'; }
   var avTxt=name.charAt(0);
+  var _rm=ROMAJA[name]||''; var _avImg=_rm?('https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/photos/'+_rm+'.jpg'):'';
 
   var html='<button class="pc-close" onclick="closeCard()">✕</button>'
     +'<div class="pc-hd t-'+tier+'"><div class="pc-hd-row">'
-    +'<div class="pc-av">'+avTxt+'</div>'
+    +'<div class="pc-av">'+(_avImg?('<img src="'+_avImg+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit" onerror="this.style.display=\'none\';this.parentNode.textContent=\''+avTxt+'\'">'):avTxt)+'</div>'
     +'<div class="pc-id"><div class="pc-nm">'+name+tags+'</div><div class="pc-meta">'+(p.rank?p.rank+' · ':'')+(p.team||'소속 미정')+'</div></div>'
     +'<div class="pc-tier"><div class="pc-tier-badge">'+tier+'</div><div class="pc-tier-lbl">TIER</div></div>'
     +'</div><div class="pc-praise'+(pr.slump?' slump':'')+'">'+pr.txt+'</div></div>'
