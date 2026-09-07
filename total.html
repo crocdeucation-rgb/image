@@ -1505,7 +1505,7 @@ function notifRender(){
     var ic=x.type==='birthday'?'🎂':(x.type==='like'?'❤️':'💬');
     var act=x.type==='birthday'?'생일을 축하했어요':(x.type==='like'?'내 카드에 좋아요를 눌렀어요':'응원 댓글을 남겼어요');
     var esc=function(t){return String(t||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');};
-    return '<div class="notif-item'+(isUnread?' unread':'')+'">'
+    return '<div class="notif-item'+(isUnread?' unread':'')+'" style="cursor:pointer" onclick="notifOpen(\''+x.type+'\')">'
       +'<span class="notif-ic">'+ic+'</span>'
       +'<span class="notif-tx"><b>'+esc(x.from)+(x.rank?' '+x.rank+'님':'')+'</b>이 '+act
       +(x.text?'<span class="msg">"'+esc(x.text)+'"</span>':'')
@@ -1513,6 +1513,18 @@ function notifRender(){
       +(isUnread?'<span class="notif-dot"></span>':'')+'</div>';
   }).join('');
 }
+// [2026-09] 알림 클릭 → 해당 창 열기 (생일알림→내 생일창 / 댓글·좋아요→내 카드)
+window.notifOpen=function(type){
+  var p=document.getElementById('notifPanel'); if(p) p.classList.remove('show');   // 알림 패널 닫기
+  if(!_me) return;
+  if(type==='birthday'){
+    var b=((window.__D&&window.__D.birthdays)||[]).filter(function(x){return x.name===_me.name;})[0];
+    if(b) openBirthday(b.name,b.mo,b.dy,b.team||'');
+    else openBirthday(_me.name,0,0,'');
+  } else {
+    openCard(_me.name);   // like / comment → 내 카드
+  }
+};
 window.notifToggle=function(){
   var p=document.getElementById('notifPanel');
   var opening=!p.classList.contains('show');
