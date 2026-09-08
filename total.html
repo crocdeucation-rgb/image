@@ -1494,7 +1494,7 @@ var ALLOW_NAME={
   'sorazzan07@gmail.com':{name:'조소라',rank:'팀장'},
   'tj9694@gmail.com':{name:'서경윤',rank:'지사장'},
   'beomble5133@gmail.com':{name:'김종범',rank:'사원'},
-  'atcheb6541@gmail.com':{name:'문수호',rank:'주임'},
+  'moonsuhope@gmail.com':{name:'문수호',rank:'주임'},
   'haruanday@gmail.com':{name:'백충열',rank:'사원'},
   'jihoon030212@gmail.com':{name:'석지훈',rank:'사원'},
   'sungh313@gmail.com':{name:'이성혁',rank:'사원'},
@@ -1946,7 +1946,16 @@ function openCard(name){
   // 트로피
   var hof=(window.__HOF&&window.__HOF[name])||[];
   var order={'MVP':0,'로얄리본':1,'그랜드리본':2,'마스터리본':3,'블루리본':4,'떡상왕':5,'커리어하이':6,'최고의지점':7};
-  var trs=hof.slice().sort(function(a,b){if(order[a.type]!==order[b.type])return order[a.type]-order[b.type];return b.m.localeCompare(a.m);});
+  // [2026-09] 개인카드 커리어하이 = series로 신기록 달 전부 (관대). HOF 커하(1등만)는 제외, 대신 series 계산분 추가.
+  var _trBase=hof.filter(function(t){ return t.type!=='커리어하이'; });
+  var _chRun=0; var _chScope=(useF?'사업':'상담');
+  (p.series||[]).forEach(function(s){
+    if(s.sales!=null && s.sales>0){
+      if(_chRun>0 && s.sales>_chRun){ _trBase.push({type:'커리어하이', m:'2026-'+('0'+s.m).slice(-2), scope:_chScope, team:(p.team||'')}); }
+      if(s.sales>_chRun) _chRun=s.sales;
+    }
+  });
+  var trs=_trBase.slice().sort(function(a,b){if(order[a.type]!==order[b.type])return order[a.type]-order[b.type];return b.m.localeCompare(a.m);});
   // 최고의달
   var best={m:0,sales:0}; (p.series||[]).forEach(function(x){if(x.sales!=null&&x.sales>best.sales)best={m:x.m,sales:x.sales};});
   // [2026-09] 나의 기록 — series로 신기록 경신 횟수(첫 기록은 경신 아님)
