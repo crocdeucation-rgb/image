@@ -439,6 +439,19 @@ body.is-live .closed-only{display:none !important}
 .fd-chips{display:flex;flex-wrap:wrap;gap:6px}
 .fd-chip{font-size:12px;font-weight:800;padding:6px 13px;border-radius:16px;border:1.5px solid #DCE3EE;background:#fff;color:#6B7688;cursor:pointer;font-family:inherit}
 .fd-chip.on{background:#7048E8;border-color:#7048E8;color:#fff}
+.fd-seg{display:flex;gap:6px}
+.fd-segbtn{flex:1;text-align:center;font-size:13px;font-weight:800;padding:9px 0;border-radius:11px;border:1.5px solid #DCE3EE;background:#fff;color:#6B7688;cursor:pointer;font-family:inherit;transition:.1s}
+.fd-segbtn.on{background:#7048E8;border-color:#7048E8;color:#fff}
+.fd-back{background:none;border:none;color:#7048E8;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;padding:2px 0 10px}
+.fd-brcard{padding:2px}
+.fd-brhd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.fd-brname{font-size:20px;font-weight:900;color:#1B2436;letter-spacing:-.5px}
+.fd-brtier{font-size:11px;font-weight:800;color:#7048E8;background:#EFEAFB;padding:4px 10px;border-radius:10px}
+.fd-brstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.fd-brst{background:#F7F9FC;border-radius:11px;padding:10px;text-align:center}
+.fd-brst span{display:block;font-size:10px;color:#8A97AC;font-weight:700;margin-bottom:3px}
+.fd-brst b{font-size:15px;color:#1B2436;font-weight:900}
+.fd-brmem-t{font-size:11px;font-weight:800;color:#8A97AC;margin:6px 0 6px 2px}
 .fd-dates{display:flex;align-items:center;gap:7px;margin-top:8px;flex-wrap:wrap}
 .fd-dates input{padding:7px 10px;border:1.5px solid #DCE3EE;border-radius:9px;font-size:12.5px;font-family:inherit;outline:none}
 .fd-dates input:focus{border-color:#7048E8}
@@ -2018,7 +2031,7 @@ var LEDGER_GID='698799247';    // total 시트 '데일리 실적' 탭 (현재 �
 var CLOSED_GID='1739211827';   // '월종결' 탭 (종결된 과거월 전부, 5월~)
 window.__ledger=null;          // 파싱된 원장 행 배열 (캐시)
 window.__ledgerMax=0;          // 원장 최신일 key (기준일)
-window.__fdState={ period:'latest', from:null, to:null, org:'all', status:'order', grade:'all', q:'' };
+window.__fdState={ period:'month', from:null, to:null, view:'sang', status:'order', grade:'all', q:'' };
 /* 진짜 CSV 파서 (따옴표 안 콤마·개행 처리) */
 function fdParseCSV(text){
   var rows=[], row=[], cur='', q=false;
@@ -2054,6 +2067,7 @@ function fdParseRows(raw){
       dt:dt, key:fdKey(dt),
       sang:sang, student:(row[2]||'').trim(),
       sales:fdNum(row[3])*1000, team:(row[7]||'').trim(),
+      saup:(row[5]||'').trim(),
       grade:(row[8]||'').trim(), cancelAmt:fdNum(row[15])*1000,
       state:(row[17]||'').trim(), gubun:(row[6]||'').trim(),
       nopo:(row[18]||'').trim(), isWeb:(sang==='웹마케팅팀')
@@ -2105,21 +2119,21 @@ function fdRange(){
   function k(yy,mm,dd){return yy*10000+mm*100+dd;}
   function ymd(o){return {y:o.getFullYear(),m:o.getMonth()+1,d:o.getDate()};}
   var mL=(mm<10?'0':'')+mm, dL=(md<10?'0':'')+md;
-  if(s.period==='latest'){ return {from:mx,to:mx,label:mL+'/'+dL+' (최신)'}; }
-  if(s.period==='yesterday'){ var yd=new Date(base);yd.setDate(d-1);var o=ymd(yd);return {from:k(o.y,o.m,o.d),to:k(o.y,o.m,o.d),label:(o.m<10?'0':'')+o.m+'/'+(o.d<10?'0':'')+o.d}; }
+  if(s.period==='day'){ return {from:mx,to:mx,label:mL+'/'+dL}; }
   if(s.period==='week'){ var wd=base.getDay()||7; var mon=new Date(base);mon.setDate(d-(wd-1));var o=ymd(mon);return {from:k(o.y,o.m,o.d),to:mx,label:'이번주 (~'+mL+'/'+dL+')'}; }
   if(s.period==='month'){ return {from:k(y,m,1),to:mx,label:m+'월 (~'+dL+')'}; }
+  if(s.period==='all'){ return {from:k(y,1,1),to:mx,label:y+'년 전체'}; }
   if(s.period==='custom'){
     var f=s.from?fdDate(s.from):null, t=s.to?fdDate(s.to):null;
     if(f&&t) return {from:fdKey(f),to:fdKey(t),label:s.from+'~'+s.to};
-    return {from:0,to:99999999,label:'전체'};
+    return {from:k(y,1,1),to:mx,label:y+'년 전체'};
   }
-  return {from:mx,to:mx,label:mL+'/'+dL+' (최신)'};
+  return {from:k(y,m,1),to:mx,label:m+'월 (~'+dL+')'};
 }
 /* 비교기간(전일/전주) 범위 */
 function fdPrevRange(rg){
   var s=window.__fdState;
-  if(s.period==='yesterday'||s.period==='latest'){ // 하루 → 전날
+  if(s.period==='day'){ // 하루 → 전날
     var dt=String(rg.from); var yy=+dt.slice(0,4),mm=+dt.slice(4,6),dd=+dt.slice(6,8);
     var pv=new Date(yy,mm-1,dd-1); var pk=pv.getFullYear()*10000+(pv.getMonth()+1)*100+pv.getDate();
     return {from:pk,to:pk,label:'전일'};
@@ -2134,30 +2148,29 @@ function fdPrevRange(rg){
 function fdAggregate(rg){
   var s=window.__fdState, rows=window.__ledger||[];
   var acc={sales:0,ord:0,set:0,cx:0,cxCnt:0,byPerson:{}};
+  var view=s.view||'sang';
   rows.forEach(function(r){
-    // [2026-09] 오더 조회는 사업부 담당 기준이므로 웹마를 제외하지 않는다
-    if(s.status!=='order' && r.isWeb) return;   // 세팅·취소는 웹마 제외 (개인구분 불가)
+    // 웹마 제외 규칙: 사업/지점 뷰는 웹마 무관, 상담 뷰는 웹마 제외
+    if(view==='sang' && r.isWeb) return;
     if(r.key<rg.from||r.key>rg.to) return;
-    // 지점 필터 (all=전체 지점)
-    if(s.org!=='all' && fdBranch(r.team)!==s.org) return;
     // 학년 필터
     if(s.grade!=='all' && r.grade!==s.grade) return;
-    // 검색
-    if(s.q){ var q=s.q; if(r.sang.indexOf(q)<0 && (r.team||'').indexOf(q)<0 && (r.student||'').indexOf(q)<0) return; }
+    // 직원 이름 검색 (상담/사업 담당명만)
+    if(s.q){ var q=s.q; if((r.sang||'').indexOf(q)<0 && (r.team||'').indexOf(q)<0) return; }
     var isOrd=(r.state==='order' && r.sales>0);
     var isSet=(r.state==='order'||r.state==='hold') && r.gubun!=='기타' && r.nopo!=='제외';
-    var isCx=(r.state==='cancel');
-    // 상태 필터
+    // 상태 필터 (오더/세팅만)
     if(s.status==='order' && !isOrd) return;
     if(s.status==='set' && !isSet) return;
-    if(s.status==='cancel' && !isCx) return;
     if(isOrd){ acc.sales+=r.sales; acc.ord++; }
     if(isSet) acc.set++;
-    if(isCx){ acc.cx+=r.cancelAmt; acc.cxCnt++; }
-    // 개인별 (웹마는 상담='웹마케팅팀'이라 학생 대신 팀으로 묶임 → 표시만)
-    // [2026-09] 오더는 사업부 담당(r.team), 세팅·취소는 상담(r.sang) 기준으로 묶는다
-    var pk=(s.status==='order') ? (r.team||'미지정') : r.sang;
-    if(!acc.byPerson[pk]) acc.byPerson[pk]={name:pk,sales:0,ord:0,set:0,team:fdOrgOf(r)};
+    // 묶음 키: 상담=상담담당(r.sang) / 사업=사업담당(r.saup) / 지점=소속지점
+    var pk, pteam;
+    if(view==='saup'){ if(!r.saup) return; pk=r.saup; pteam=fdBranch(r.team); }
+    else if(view==='branch'){ pk=fdOrgOf(r); pteam=''; }
+    else { pk=r.sang; pteam=fdOrgOf(r); }
+    if(!pk||pk==='기타') return;
+    if(!acc.byPerson[pk]) acc.byPerson[pk]={name:pk,sales:0,ord:0,set:0,team:pteam,isBranch:(view==='branch')};
     if(isOrd){ acc.byPerson[pk].sales+=r.sales; acc.byPerson[pk].ord++; }
     if(isSet) acc.byPerson[pk].set++;
   });
@@ -2185,69 +2198,120 @@ window.fdToCard=function(name){
   openCard(name);
   document.getElementById('fdModal').classList.remove('on');
 };
+/* [2026-09] 지점장/지사장/부지점장 판별 — D.persons의 rank 참조 */
+function fdIsBossName(name){
+  var P=(window.__D&&window.__D.persons)||[];
+  for(var i=0;i<P.length;i++){ if(P[i].name===name){ var R=P[i].rank||''; return ['지사장','지점장','부지점장'].indexOf(R)>=0 ? (P[i].team||'') : ''; } }
+  return '';
+}
+window.fdIsBossName=function(name){ return !!fdIsBossName(name); };
+/* [2026-09] 지점 실적 카드 — fdResult에 인라인 상세(뒤로가기) */
+window.fdToBranch=function(brName){
+  if(!brName){ return; }
+  var D=window.__D||{};
+  var br=null; (D.branches||[]).forEach(function(b){ if(b.name===brName) br=b; });
+  var members=(D.persons||[]).filter(function(p){ return p.team===brName; }).sort(function(a,b){return (b.sales||0)-(a.sales||0);});
+  var head=(typeof BRANCH_HEAD!=='undefined'?BRANCH_HEAD:{})[brName]||members.length||0;
+  var per=(br&&br.ord)?Math.round(br.sales/br.ord):0;
+  var h='<div class="fd-brcard">';
+  h+='<button class="fd-back" onclick="fdRun()">‹ 목록으로</button>';
+  h+='<div class="fd-brhd"><div class="fd-brname">'+brName+'</div><div class="fd-brtier">지점</div></div>';
+  h+='<div class="fd-brstats">'
+    +'<div class="fd-brst"><span>매출</span><b>'+pcEok(br?br.sales:0)+'</b></div>'
+    +'<div class="fd-brst"><span>오더</span><b>'+(br?br.ord:0)+'</b></div>'
+    +'<div class="fd-brst"><span>세팅</span><b>'+(br?br.set:0)+'</b></div>'
+    +'<div class="fd-brst"><span>방문</span><b>'+(br?(br.visit||0):0)+'</b></div>'
+    +'<div class="fd-brst"><span>인원</span><b>'+head+'</b></div>'
+    +'<div class="fd-brst"><span>1인당</span><b>'+(per?pcEok(per):'-')+'</b></div>'
+    +'</div>';
+  h+='<div class="fd-brmem-t">소속 상담원 ('+members.length+')</div>';
+  h+='<div class="fd-list">'+(members.length?members.map(function(m){
+    var oc=pcFind(m.name)?' onclick="fdToCard(\''+m.name.replace(/'/g,"")+'\')"':'';
+    return '<div class="fd-item"'+oc+'><div class="nm">'+m.name+(m.rank?'<span class="tm">'+m.rank+'</span>':'')+'</div><div class="met"><b>'+pcEok(m.sales)+'</b> · 오더 '+m.ord+' · 세팅 '+m.set+'</div></div>';
+  }).join(''):'<div class="fd-empty">소속 상담원 없음</div>')+'</div>';
+  h+='</div>';
+  document.getElementById('fdResult').innerHTML=h;
+};
 /* 컨트롤 UI */
 function fdRenderCtrl(){
   var s=window.__fdState;
-  var periods=[['latest','최신'],['yesterday','어제'],['week','이번주'],['month','이번달'],['custom','직접']];
-  var stats=[['order','오더(매출)'],['set','세팅'],['cancel','취소']];
-  // 학년 옵션은 원장에서
+  var periods=[['day','일'],['week','주'],['month','월'],['all','전체'],['custom','직접']];
+  var views=[['sang','상담'],['saup','사업'],['branch','지점']];
+  var stats=[['order','오더'],['set','세팅']];
   var GRADE_ORDER=['초4','초5','초6','중1','중2','중3','고1','고2','고3'];
   var grades=['all'];
   if(window.__ledger){ var gs={}; window.__ledger.forEach(function(r){if(r.grade)gs[String(r.grade).trim()]=1;}); GRADE_ORDER.forEach(function(g){ if(gs[g]) grades.push(g); }); }
   var gradeChips=grades.map(function(g){return '<button class="fd-chip'+(s.grade===g?' on':'')+'" onclick="fdSet(\'grade\',\''+g+'\')">'+(g==='all'?'전체':g)+'</button>';}).join('');
   var h='<div class="fd-ctrl">';
+  // 기간
   h+='<div class="fd-lbl">기간</div><div class="fd-chips">'+periods.map(function(p){return '<button class="fd-chip'+(s.period===p[0]?' on':'')+'" onclick="fdSet(\'period\',\''+p[0]+'\')">'+p[1]+'</button>';}).join('')+'</div>';
   if(s.period==='custom'){ h+='<div class="fd-dates"><input type="date" id="fdFrom" value="'+(s.from||'')+'" onchange="fdSet(\'from\',this.value)"><span class="sep">~</span><input type="date" id="fdTo" value="'+(s.to||'')+'" onchange="fdSet(\'to\',this.value)"></div>'; }
-  // 지점 드롭다운 (원장에서 그룹핑, 웹마 제외)
-  var brs={}; if(window.__ledger){ window.__ledger.forEach(function(r){ if(!r.isWeb){ var b=fdBranch(r.team); if(b&&b!=='기타')brs[b]=1; } }); }
-  var brList=Object.keys(brs).sort();
-  var brOpts='<option value="all"'+(s.org==='all'?' selected':'')+'>전체 지점</option>'+brList.map(function(b){return '<option value="'+b+'"'+(s.org===b?' selected':'')+'>'+b+'</option>';}).join('');
-  h+='<div class="fd-lbl">지점</div><select class="fd-srch" style="margin-top:0" onchange="fdSet(\'org\',this.value)">'+brOpts+'</select>';
+  // 구분 (상담/사업/지점) — 꽉찬 버튼
+  h+='<div class="fd-lbl">구분</div><div class="fd-seg">'+views.map(function(v){return '<button class="fd-segbtn'+(s.view===v[0]?' on':'')+'" onclick="fdSet(\'view\',\''+v[0]+'\')">'+v[1]+'</button>';}).join('')+'</div>';
+  // 상태
   h+='<div class="fd-lbl">상태</div><div class="fd-chips">'+stats.map(function(o){return '<button class="fd-chip'+(s.status===o[0]?' on':'')+'" onclick="fdSet(\'status\',\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'</div>';
+  // 학년
   h+='<div class="fd-lbl">학년</div><div class="fd-chips">'+gradeChips+'</div>';
-  h+='<input class="fd-srch" placeholder="🔍 이름·학생 검색" value="'+(s.q||'')+'" oninput="fdSet(\'q\',this.value)">';
+  // 직원 검색
+  h+='<input class="fd-srch" placeholder="🔍 직원 이름 검색" value="'+(s.q||'')+'" oninput="fdSet(\'q\',this.value)">';
   h+='</div>';
   document.getElementById('fdCtrl').innerHTML=h;
 }
 window.fdSet=function(k,v){ window.__fdState[k]=v; if(k!=='q'){ fdRenderCtrl(); } if(window.__ledger)fdRun(); };
 /* 실행+렌더 */
 function fdRun(){
+  var s=window.__fdState;
   var rg=fdRange();
   var acc=fdAggregate(rg);
-  // 비교
+  // 비교 (오더 + 일/주만)
   var cmpHtml='';
   var prg=fdPrevRange(rg);
-  if(prg && window.__fdState.status==='order'){
+  if(prg && s.status==='order'){
     var pacc=fdAggregate(prg);
     var diff=acc.sales-pacc.sales;
     var pct=pacc.sales>0?Math.round(diff/pacc.sales*100):(acc.sales>0?100:0);
     var up=diff>=0;
     cmpHtml='<span class="fd-sum-cmp '+(up?'up':'dn')+'">'+(up?'▲':'▼')+' '+pcEok(Math.abs(diff))+' ('+(up?'+':'')+pct+'% vs '+prg.label+')</span>';
   }
-  var statLbl=window.__fdState.status==='order'?'매출':(window.__fdState.status==='set'?'세팅':'취소');
-  var mainVal=window.__fdState.status==='cancel'?pcEok(acc.cx):(window.__fdState.status==='set'?acc.set+'건':pcEok(acc.sales));
+  var viewLbl=s.view==='saup'?'사업':(s.view==='branch'?'지점':'상담');
+  var statLbl=s.status==='order'?'매출':'세팅';
+  var mainVal=s.status==='set'?acc.set+'건':pcEok(acc.sales);
   var mx=window.__ledgerMax||0; var mxL=mx?(Math.floor(mx/100)%100)+'/'+(mx%100):'';
-  var h='<div class="fd-sum"><div class="fd-sum-main">'+rg.label+' · '+statLbl+' <span style="color:#B6C2DC">· 원장 '+mxL+'까지 반영</span></div>';
+  var h='<div class="fd-sum"><div class="fd-sum-main">'+rg.label+' · '+viewLbl+' · '+statLbl+' <span style="color:#B6C2DC">· 원장 '+mxL+'까지</span></div>';
   h+='<div class="fd-sum-val">'+mainVal+cmpHtml+'</div>';
-  h+='<div class="fd-sum-sub"><span>오더 <b>'+acc.ord+'</b>건</span><span>세팅 <b>'+acc.set+'</b>건</span>';
-  if(acc.cxCnt) h+='<span class="cx">취소 <b>'+acc.cxCnt+'</b>건 · '+pcEok(acc.cx)+'</span>';
-  h+='</div></div>';
-  // 개인별 목록 (매출순)
+  h+='<div class="fd-sum-sub"><span>오더 <b>'+acc.ord+'</b>건</span><span>세팅 <b>'+acc.set+'</b>건</span></div></div>';
+  // 목록 (매출/세팅순)
   var arr=Object.keys(acc.byPerson).map(function(k){return acc.byPerson[k];});
-  var sortKey=window.__fdState.status==='set'?'set':'sales';
+  var sortKey=s.status==='set'?'set':'sales';
   arr.sort(function(a,b){return (b[sortKey]||0)-(a[sortKey]||0);});
   arr=arr.filter(function(x){return (x.sales>0||x.ord>0||x.set>0);});
+  var grpLbl=s.view==='saup'?'사업 개인':(s.view==='branch'?'지점별':'상담 개인');
   var listHtml;
   if(!arr.length){ listHtml='<div class="fd-empty">해당 조건에 데이터가 없어요</div>'; }
   else{
     listHtml=arr.map(function(x){
-      var clickable=!x.name.startsWith('웹마') && pcFind(x.name);
-      var oc=clickable?' onclick="fdToCard(\''+x.name.replace(/'/g,"")+'\')"':'';
-      return '<div class="fd-item"'+oc+'><div class="nm">'+x.name+'<span class="tm">'+(x.team||'')+'</span></div>'
-        +'<div class="met"><b>'+pcEok(x.sales)+'</b> · 오더 '+x.ord+' · 세팅 '+x.set+'</div></div>';
+      var oc, met;
+      if(s.view==='branch'){
+        // 지점: 항상 클릭 → 지점 카드
+        oc=' onclick="fdToBranch(\''+x.name.replace(/'/g,"")+'\')"';
+        met='<b>'+pcEok(x.sales)+'</b> · 오더 '+x.ord+' · 세팅 '+x.set;
+      } else if(s.view==='saup'){
+        // 사업: 장당매출 (세팅·오더 노출 안 함), 클릭 시 개인카드
+        var jd=x.set>0?pcEok(Math.round(x.sales/x.set)):'-';
+        var clk=pcFind(x.name);
+        oc=clk?' onclick="fdToCard(\''+x.name.replace(/'/g,"")+'\')"':'';
+        met='<b>'+pcEok(x.sales)+'</b> · 장당 '+jd;
+      } else {
+        // 상담: 세팅·오더, 클릭 시 개인카드 (지점장/지사장이면 지점카드)
+        var isB=fdIsBossName(x.name);
+        oc=isB?' onclick="fdToBranch(\''+(x.team||'').replace(/'/g,"")+'\')"':(pcFind(x.name)?' onclick="fdToCard(\''+x.name.replace(/'/g,"")+'\')"':'');
+        met='<b>'+pcEok(x.sales)+'</b> · 오더 '+x.ord+' · 세팅 '+x.set;
+      }
+      var tm=x.team?'<span class="tm">'+x.team+'</span>':'';
+      return '<div class="fd-item"'+oc+'><div class="nm">'+x.name+tm+'</div><div class="met">'+met+'</div></div>';
     }).join('');
   }
-  h+='<div class="fd-list"><div class="fd-grp">개인별 ('+arr.length+'명) · 이름 클릭 시 카드</div>'+listHtml+'</div>';
+  h+='<div class="fd-list"><div class="fd-grp">'+grpLbl+' ('+arr.length+') · 클릭 시 카드</div>'+listHtml+'</div>';
   document.getElementById('fdResult').innerHTML=h;
 }
 
