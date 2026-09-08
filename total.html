@@ -49,6 +49,8 @@ body{overflow-x:hidden}
 .tabbtn{background:var(--barbg);border:none;color:var(--soft);font-family:inherit;font-weight:700;font-size:13px;padding:8px 15px;border-radius:30px;cursor:pointer}
 .tabbtn.on{background:var(--v1);color:#fff}
 .bar{display:flex;align-items:center;gap:11px;padding:7px 0}
+.br-clickable{cursor:pointer;border-radius:8px;transition:background .1s}
+.br-clickable:hover{background:rgba(112,72,232,.05)}
 .bar .rk{width:22px;text-align:center;font-weight:800;color:var(--soft);font-size:13px}
 .bar-av{width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0;margin:0 6px 0 2px;border:1px solid #E3E8F0}
 .bar-av-ini{display:flex;align-items:center;justify-content:center;background:#EEF0FF;color:#5B4BD0;font-weight:800;font-size:12px}.bar .rk.t{color:var(--web)}
@@ -1094,7 +1096,7 @@ var inside=w>=18;var _sh=(sortKey==='sales'?' bm-hi':'');
 var lblhtml=inside?('<span'+(_sh?' class="bm-hi"':'')+'>'+lbl+'</span>'):'';
 // [2026-09] 막대가 짧을 때 매출값이 보라 영역 위에 겹쳐 안 보이던 문제 — fill 오른쪽으로 밀어낸다
 var outlbl=inside?'':('<span class="outlbl'+_sh+'" style="left:calc('+w+'% + 8px)">'+lbl+'</span>');
-h+='<div class="bar"><div class="rk'+(i<3?' t':'')+'">'+(i+1)+'</div><div class="nm">'+x.name+'</div><div class="track"><div class="fill" style="width:'+w+'%">'+lblhtml+'</div>'+outlbl+'</div><div class="meta meta-br">'+metaLine+'</div></div>';});return h;}
+h+='<div class="bar br-clickable" onclick="openBranchCard(\''+x.name.replace(/'/g,"")+'\')"><div class="rk'+(i<3?' t':'')+'">'+(i+1)+'</div><div class="nm">'+x.name+'</div><div class="track"><div class="fill" style="width:'+w+'%">'+lblhtml+'</div>'+outlbl+'</div><div class="meta meta-br">'+metaLine+'</div></div>';});return h;}
 function barsDv(arr){var mx=Math.max.apply(null,arr.map(function(x){return x.sales;}))||1;var h='';
 arr.forEach(function(x,i){var w=Math.max(x.sales/mx*100,3);
 var ins=w>=18;h+='<div class="bar"><div class="rk'+(i<3?' t':'')+'">'+(i+1)+'</div><div class="nm">'+x.name+'</div><div class="track"><div class="fill" style="width:'+w+'%">'+(ins?'<span>'+won(x.sales)+'</span>':'')+'</div>'+(ins?'':'<span class="outlbl" style="left:calc('+w+'% + 8px)">'+won(x.sales)+'</span>')+'</div><div class="meta">세팅 <b>'+x.set+'</b> · 오더 <b>'+x.ord+'</b> · 1인당 <b>'+won(x.per)+'</b></div></div>';});return h;}
@@ -1900,8 +1902,9 @@ function pcTrendSvg(series,closedM,mode){
 window.pcSwitchTrend=function(mode,btn){
   window.__pcTrendMode=mode;
   var wrap=document.getElementById('pcTrendWrap'); if(!wrap)return;
-  var f=pcFind(window.__curCardName); if(!f)return;
-  wrap.innerHTML=pcTrendSvg(f.p.series, pcClosedMonth(), mode);
+  var f=pcFind(window.__curCardName);
+  var series=f?f.p.series:(window.__pcTrendSeries||[]);   // 지점카드는 __pcTrendSeries
+  wrap.innerHTML=pcTrendSvg(series, pcClosedMonth(), mode);
   document.querySelectorAll('.pc-tab').forEach(function(b){b.classList.remove('on');}); btn.classList.add('on');
 };
 
@@ -2025,6 +2028,78 @@ function openCard(name){
   document.body.style.overflow='hidden';
 }
 function closeCard(){ window.__pcEdit=false; document.getElementById('pcModal').classList.remove('on'); try{ parent.postMessage({t:'cardClose'}, '*'); }catch(e){} document.body.style.overflow=''; window.__curCardName=null; if(window.__likeUnsub){window.__likeUnsub();window.__likeUnsub=null;} if(window.__cmtUnsub){window.__cmtUnsub();window.__cmtUnsub=null;} pcRestoreScroll(); }
+
+// [2026-09] 지점 티어 (지점 매출 규모 = 상담원 합이라 큼)
+var PC_TIER_BRANCH=[{t:'SSS',v:300000000},{t:'SS',v:250000000},{t:'S',v:200000000},{t:'A',v:150000000},{t:'B',v:120000000},{t:'C',v:90000000},{t:'D',v:60000000},{t:'E',v:40000000},{t:'F',v:20000000}];
+function pcTierBranch(s){ for(var i=0;i<PC_TIER_BRANCH.length;i++){ if(s>=PC_TIER_BRANCH[i].v) return PC_TIER_BRANCH[i].t; } return 'F'; }
+function pcNextTierBranch(s){ for(var i=PC_TIER_BRANCH.length-1;i>=0;i--){ if(s<PC_TIER_BRANCH[i].v) return {t:PC_TIER_BRANCH[i].t,need:PC_TIER_BRANCH[i].v-s,base:(i<PC_TIER_BRANCH.length-1?PC_TIER_BRANCH[i+1].v:0),to:PC_TIER_BRANCH[i].v}; } return null; }
+
+// [2026-09] 지점 카드 — 개인카드 스타일. 월별추이(branchTrend)+티어+최고의지점 뱃지+댓글(소속원 알림)
+window.openBranchCard=function(brName){
+  if(!brName) return;
+  pcSaveScroll();
+  var D=window.__liveD||window.__D||{};
+  var dk=window.__DK||{};
+  // 월별 추이 (branchTrend.branches[]) → series {m,sales,set}
+  var bt=(dk.branchTrend&&dk.branchTrend.branches)||[];
+  var btRec=null; for(var i=0;i<bt.length;i++){ if(bt[i].name===brName){ btRec=bt[i]; break; } }
+  var series=(btRec&&btRec.series)||[];
+  // 현재월 지점 실적 (branches[])
+  var brNow=null; (D.branches||[]).forEach(function(b){ if(b.name===brName) brNow=b; });
+  var closedM=pcClosedMonth();
+  var closedSales=0; series.forEach(function(x){ if(x.m===closedM && x.sales!=null) closedSales=x.sales; });
+  var curSales=(brNow?brNow.sales:0);
+  var total=series.reduce(function(a,s){ return a+(s&&s.sales?s.sales:0); },0);
+  var best={m:0,sales:0}; series.forEach(function(x){ if(x.sales!=null&&x.sales>best.sales)best={m:x.m,sales:x.sales}; });
+  var careerHigh=0; series.forEach(function(x){ if(x.sales!=null&&x.sales>careerHigh)careerHigh=x.sales; });
+  var highCount=0, runMax=0; series.forEach(function(s){ if(s.sales!=null&&s.sales>0){ if(runMax>0&&s.sales>runMax)highCount++; if(s.sales>runMax)runMax=s.sales; } });
+  var tier=closedSales>0?pcTierBranch(closedSales):'NEW';
+  // 최고의지점 트로피 (HOF에서 이 지점이 받은 것 = 소속원 누구든 최고의지점 scope=지점명)
+  var hofTrs=[];
+  var HOF=window.__HOF||{};
+  var _seen={};
+  Object.keys(HOF).forEach(function(nm){ (HOF[nm]||[]).forEach(function(t){ if(t.type==='최고의지점' && t.team===brName){ var k=t.m; if(!_seen[k]){ _seen[k]=1; hofTrs.push({type:'최고의지점',m:t.m,team:brName}); } } }); });
+  hofTrs.sort(function(a,b){ return b.m.localeCompare(a.m); });
+  var trHtml=''; if(hofTrs.length){ trHtml='<div class="pc-sec"><div class="pc-sec-t">🏆 트로피 <span class="cnt">'+hofTrs.length+'</span></div><div class="tr-list">'+hofTrs.map(function(t){var d=PC_TROPHY['최고의지점'];return '<div class="trp '+d.cls+'"><span class="ic">'+d.ic+'</span><span class="tt">'+PC_MON[+pcMoNum(t.m)]+' '+d.lbl+'</span></div>';}).join('')+'</div></div>'; }
+  // 다음티어
+  var nt=pcNextTierBranch(closedSales), nextHtml;
+  if(!nt){ nextHtml='<div class="pc-next max"><div class="pc-next-top"><span>티어 <b>SSS</b></span><span>👑 최고 등급</span></div><div class="pc-next-bar"><div class="pc-next-fill" style="width:100%"></div></div></div>'; }
+  else { var prog=nt.base>0?Math.round((closedSales-nt.base)/(nt.to-nt.base)*100):Math.round(closedSales/nt.to*100); prog=Math.max(3,Math.min(100,prog)); nextHtml='<div class="pc-next"><div class="pc-next-top"><span>다음 티어 <b>'+nt.t+'</b>까지</span><span><b>'+pcEok(nt.need)+'</b> 남음</span></div><div class="pc-next-bar"><div class="pc-next-fill" style="width:'+prog+'%"></div></div></div>'; }
+  // 소속 인원/방문
+  var head=(typeof BRANCH_HEAD!=='undefined'?BRANCH_HEAD:{})[brName]||(brNow?(brNow.head||0):0);
+  var subLine='<div class="pc-subst"><span>커리어하이 <b>'+pcEok(careerHigh)+'</b></span>'+(highCount?'<span>신기록 경신 <b>'+highCount+'회</b></span>':'')+(brNow?'<span>방문 <b>'+(brNow.visit||0)+'</b></span>':'')+'</div>';
+  var avTxt=brName.charAt(0);
+  window.__curCardName=brName;
+  var html='<button class="pc-close" onclick="closeCard()">✕</button>'
+    +'<div class="pc-hd t-'+tier+'"><div class="pc-blob b1"></div><div class="pc-blob b2"></div>'+(tier==='SSS'?'<div class="pc-spark"></div>':'')
+    +'<div class="pc-tier"><div class="pc-tier-badge">'+tier+'</div><div class="pc-tier-lbl">TIER</div></div>'
+    +'<div class="pc-hd-row">'
+    +'<div class="pc-av">'+avTxt+'</div>'
+    +'<div class="pc-id"><div class="pc-nm">'+brName+'</div><div class="pc-meta">🏢 지점'+(brNow&&brNow.ord?' · 오더 '+brNow.ord:'')+'</div></div>'
+    +'<div class="pc-praise">🏢 '+brName+' 실적판</div>'
+    +'</div></div>'
+    +'<div class="pc-stats">'
+    +'<div class="pc-st"><div class="l">이달 매출</div><div class="v pur">'+pcEok(curSales)+'</div></div>'
+    +'<div class="pc-st"><div class="l">올해 누적</div><div class="v">'+pcEok(total)+'</div></div>'
+    +'<div class="pc-st"><div class="l">최고의 달</div><div class="v">'+(best.m?PC_MON[best.m]+' '+pcEok(best.sales):'-')+'</div></div>'
+    +'</div>'
+    +subLine
+    +'<div class="pc-trend"><div class="pc-sec-t" style="padding:2px 6px">📈 연간 추이 <span style="font-weight:600;color:#B6C2DC">·'+PC_MON[closedM]+'까지</span></div>'
+      +'<div class="pc-tabs"><button class="pc-tab on" onclick="pcSwitchTrend(\'sales\',this)">매출</button><button class="pc-tab" onclick="pcSwitchTrend(\'set\',this)">세팅</button></div>'
+      +'<div id="pcTrendWrap">'+pcTrendSvg(series,closedM,'sales')+'</div>'
+      +'<div class="pc-tlegend"><span class="b">● 매출</span> / <span class="s">● 세팅</span></div></div>'
+    +nextHtml
+    +trHtml
+    +'<div class="pc-social" id="pcSocial"></div>';
+  document.getElementById('pcBody').innerHTML=html;
+  window.__pcTrendMode='sales';
+  window.__pcTrendSeries=series;   // pcSwitchTrend가 참조
+  renderSocial(brName);   // 댓글·좋아요 (지점명 doc) — 소속원 알림은 renderSocial 내부 로직 재활용
+  document.body.appendChild(document.getElementById('pcModal'));
+  document.getElementById('pcModal').classList.add('on');
+  try{ parent.postMessage({t:'cardOpen'}, '*'); }catch(e){}
+  document.body.style.overflow='hidden';
+};
 
 /* ══════ 🔍 기간조회(FINDER) — 원장 직접 필터 ══════ */
 var LEDGER_GID='698799247';    // total 시트 '데일리 실적' 탭 (현재 진행월)
@@ -2591,6 +2666,7 @@ function attachCardClicks(){
   // 이달 매출 TOP3 = kings 안의 <b style*="color:#1B2436"> (class 없음)
   document.querySelectorAll('#kings b').forEach(function(el){ els.push(el); });
   els.forEach(function(el){
+    if(el.closest && el.closest('.br-clickable')) return;   // [2026-09] 지점 바는 openBranchCard가 처리 → 개인 매칭 스킵
     // 첫 텍스트노드만(자식 span 제외) 기준으로 이름 추출
     var raw=(el.childNodes[0]&&el.childNodes[0].nodeType===3)?el.childNodes[0].textContent.trim():el.textContent.trim();
     var matched=null;
