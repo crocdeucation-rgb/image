@@ -404,6 +404,19 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .dp-br .bpct.good{color:#20A56D}.dp-br .bpct.warn{color:#E23A22}.dp-br .bpct.z{color:#B6C2DC}
 .dp-br .bsmp{color:#8A9AB0;font-weight:600;font-size:10px;margin-left:auto}
 .dp-ret-note{font-size:10px;color:#B6C2DC;font-weight:600;margin-top:5px;line-height:1.4}
+/* 조기이탈자 리스트 */
+.dp-early-tog{margin-top:7px;font-size:10.5px;font-weight:800;color:#E23A22;cursor:pointer;user-select:none;display:flex;align-items:center;gap:4px}
+.dp-early-tog .arw{transition:transform .15s;font-size:9px}
+.dp-early-tog.open .arw{transform:rotate(180deg)}
+.dp-early{display:none;margin-top:7px;flex-direction:column;gap:1px}
+.dp-early.open{display:flex}
+.dp-early-row{display:flex;align-items:baseline;gap:8px;font-size:11px;padding:5px 9px;border-radius:6px;background:#FFF6F5}
+.dp-early-row .enm{font-weight:900;color:#1B2436;flex-shrink:0}
+.dp-early-row .espan{font-weight:900;color:#E23A22;flex-shrink:0}
+.dp-early-row .edate{color:#8A9AB0;font-weight:600;font-size:10px}
+.dp-early-row .esales{margin-left:auto;font-weight:900;flex-shrink:0}
+.dp-early-row .esales.has{color:#7048E8}
+.dp-early-row .esales.zero{color:#C3CDDD;font-weight:700}
 .ft{text-align:center;font-size:11px;color:var(--soft);margin-top:20px;line-height:1.8}
 </style></head><body><div class="wrap">
 <div class="hd"><div class="k">채용 · 증원현황</div><h1>통합채용TF</h1>
@@ -822,6 +835,68 @@ function passCountByMonth(moLabel){
 }
 
 // ══════════════════════════════════════════════
+// 원장(리드요약) 로더 — 조기이탈자 재직중 매출 매칭용
+// total.html fdLoadLedger 이식. 이름(r.sang) + 결제일 기준.
+// ══════════════════════════════════════════════
+var _LEDGER_SID='1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU';
+var _LEDGER_GID='698799247';   // 데일리 실적(현재월)
+var _CLOSED_GID='1739211827';  // 월종결(과거월 전부)
+function _ledParseCSV(text){
+  var rows=[], row=[], cur='', q=false; text=String(text||'').replace(/\r/g,'');
+  for(var i=0;i<text.length;i++){ var c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=c; }
+    else { if(c==='"')q=true; else if(c===','){row.push(cur);cur='';} else if(c==='\n'){row.push(cur);rows.push(row);row=[];cur='';} else cur+=c; }
+  }
+  if(cur!==''||row.length){ row.push(cur); rows.push(row); }
+  return rows;
+}
+function _ledNum(v){ var n=parseFloat(String(v||'').replace(/[^0-9.\-]/g,'')); return isNaN(n)?0:n; }
+function _ledDate(v){
+  v=String(v||'').trim(); if(!v) return null;
+  var m1=v.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if(m1) return new Date(+m1[1],+m1[2]-1,+m1[3]);
+  var m2=v.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*일/);
+  if(m2) return new Date(new Date().getFullYear(),+m2[1]-1,+m2[2]);
+  return null;
+}
+function _ledParseRows(raw){
+  var rows=_ledParseCSV(raw);
+  var hi=0; for(var i=0;i<Math.min(rows.length,4);i++){ if((rows[i][1]||'').indexOf('상담')>=0 && (rows[i][17]||'').indexOf('상태')>=0){hi=i;break;} }
+  var out=[];
+  for(var r=hi+1;r<rows.length;r++){
+    var row=rows[r]; var dt=_ledDate(row[0]); if(!dt) continue;
+    var sang=(row[1]||'').trim(); if(!sang) continue;
+    out.push({ dt:dt, sang:sang, sales:_ledNum(row[3])*1000, state:(row[17]||'').trim() });
+  }
+  return out;
+}
+var __LEDGER=null;
+async function _ledLoad(){
+  if(__LEDGER) return __LEDGER;
+  var base="https://docs.google.com/spreadsheets/d/"+_LEDGER_SID+"/gviz/tq?tqx=out:csv&headers=0&gid=";
+  var t=Date.now();
+  var res=await Promise.all([
+    fetch(base+_CLOSED_GID+"&_="+t).then(function(r){return r.text();}),
+    fetch(base+_LEDGER_GID+"&_="+t).then(function(r){return r.text();})
+  ]);
+  __LEDGER=_ledParseRows(res[0]).concat(_ledParseRows(res[1]));
+  return __LEDGER;
+}
+// 이탈자 재직중(입사~퇴사) 낸 order 매출 합산
+function _ledSalesInPeriod(name, inD, outD){
+  if(!__LEDGER || !name) return 0;
+  var sum=0;
+  __LEDGER.forEach(function(r){
+    if(r.sang!==name) return;
+    if(r.state!=='order' || r.sales<=0) return;
+    if(inD && r.dt < inD) return;
+    if(outD && r.dt > outD) return;
+    sum+=r.sales;
+  });
+  return sum;
+}
+
+// ══════════════════════════════════════════════
 // 정착률(이탈률) — HR 4시트 입퇴사 날짜 기준
 // 1개월=입사후30일내 퇴사 / 3개월=90일내 · 성숙필터: 3개월은 입사후90일 경과자만 분모
 // ⚠️ 채널(잡/알바)별 불가 — HR시트에 채널정보 없음. 전사만.
@@ -874,15 +949,29 @@ async function _hrLoadRows(url, isSang){
   }
   return out;
 }
-// 이탈률 집계 — 성숙필터 적용
+// 이탈률 집계 — 성숙필터 적용 + 이번달 입퇴사
 function _retentionCalc(rows){
   var today=new Date(); today.setHours(0,0,0,0);
+  var curYm=today.getFullYear()+'-'+('0'+(today.getMonth()+1)).slice(-2);
   var DAY=86400000;
   // 데이터 품질
   var q={total:rows.length, noIn:0, hasOut:0, outNoIn:0, future:0};
   // 1개월(30일): 성숙필터 = 입사후 30일 경과자만 분모
   var d1={denom:0, churn:0}, d3={denom:0, churn:0};
+  var mo={in:0, out:0}; // 이번달 입사/퇴사
+  var early=[]; // 조기이탈자 (최근 3개월내 퇴사 + 근속 90일이하)
+  var _3moAgo=new Date(today); _3moAgo.setMonth(_3moAgo.getMonth()-3);
+  var _ym=function(dt){ return dt.getFullYear()+'-'+('0'+(dt.getMonth()+1)).slice(-2); };
   rows.forEach(function(x){
+    if(x.inD && _ym(x.inD)===curYm) mo.in++;
+    if(x.outD && _ym(x.outD)===curYm) mo.out++;
+    // 조기이탈: 입퇴사일 다 있고, 근속 90일이하, 퇴사가 최근 3개월내
+    if(x.inD && x.outD){
+      var sp=Math.floor((x.outD - x.inD)/DAY);
+      if(sp>=0 && sp<=90 && x.outD>=_3moAgo){
+        early.push({name:x.name, inD:x.inD, outD:x.outD, span:sp, branch:x.branch||''});
+      }
+    }
     if(!x.inD){ q.noIn++; if(x.outD) q.outNoIn++; return; } // 입사일 없으면 판정불가 → 분모 제외
     var age = Math.floor((today - x.inD)/DAY);
     if(age<0){ q.future++; return; } // 미래 입사일(오타) 제외
@@ -899,7 +988,8 @@ function _retentionCalc(rows){
       if(span!==null && span<=90) d3.churn++;
     }
   });
-  return {d1:d1, d3:d3, q:q};
+  early.sort(function(a,b){ return a.span-b.span; }); // 근속 짧은 순
+  return {d1:d1, d3:d3, q:q, mo:mo, early:early};
 }
 var __HR_RET=null, __HR_RET_STATE='loading'; // loading|ok|err
 // HR 시트키 → hire 부서명
@@ -922,6 +1012,15 @@ async function loadRetention(){
     });
     __HR_RET={all:_retentionCalc(merged), byDept:byDept, sangBranch:sangBranch, raw:merged};
     __HR_RET_STATE='ok';
+    // 조기이탈자 재직중 매출 매칭 (원장) — 실패해도 정착률은 표시
+    try{
+      await _ledLoad();
+      var _fill=function(R){ (R.early||[]).forEach(function(e){ e.sales=_ledSalesInPeriod(e.name, e.inD, e.outD); }); };
+      _fill(__HR_RET.all);
+      Object.keys(__HR_RET.byDept).forEach(function(k){ _fill(__HR_RET.byDept[k]); });
+      Object.keys(__HR_RET.sangBranch||{}).forEach(function(k){ _fill(__HR_RET.sangBranch[k]); });
+      __HR_RET.ledgerOk=true;
+    }catch(e){ console.warn('원장 매출 매칭 실패',e); __HR_RET.ledgerOk=false; }
   }catch(e){ console.error('정착률 로드 실패',e); __HR_RET_STATE='err'; }
   cacRetRender();
   if(typeof dpRender==='function') dpRender(); // 부서별 카드에 이탈률 반영
@@ -985,6 +1084,44 @@ function cacRender(){
 }
 function cacFnTog(el){ el.classList.toggle('open'); var f=el.nextElementSibling; if(f) f.classList.toggle('open'); }
 
+// 입퇴사 HTML — HR 시트 이번달 자동집계 우선, 미로드/미대응 시 수동(v.hire) 폴백
+function dpHireHtml(dept, v){
+  var hd='<div class="dp-hire"><div class="dp-hire-top"><span class="hl"><svg class="hlic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M4 20c0-3 2.5-5 5-5s5 2 5 5"/><path d="M16 5.5a3 3 0 0 1 0 5"/><path d="M18 15c1.8.5 3 2 3 4"/></svg>이번달 입퇴사</span>';
+  // HR 자동 (로드 완료 + 해당 부서 데이터 있음)
+  if(__HR_RET_STATE==='ok' && __HR_RET && __HR_RET.byDept[dept]){
+    var m=__HR_RET.byDept[dept].mo;
+    var h=hd+'<span class="in">입사 '+m.in+'</span><span class="out">퇴사 '+m.out+'</span></div>';
+    // 상담부 = 지점별 입퇴사
+    if(dept==='상담부' && __HR_RET.sangBranch){
+      var SB=__HR_RET.sangBranch;
+      var brs=Object.keys(SB).filter(function(b){return b!=='미구분' && (SB[b].mo.in>0||SB[b].mo.out>0);})
+        .sort(function(a,b){ return (SB[b].mo.in+SB[b].mo.out)-(SB[a].mo.in+SB[a].mo.out); });
+      if(brs.length){
+        h+='<div class="dp-jj">';
+        brs.forEach(function(b){
+          var net=SB[b].mo.in-SB[b].mo.out, nc=net>0?'p':net<0?'m':'z';
+          h+='<div class="dp-jj-item">'+b.replace('센터','').replace('지점','')+' <b class="'+nc+'">'+(net>0?'+':'')+net+'</b></div>';
+        });
+        h+='</div>';
+      } else if(m.in===0 && m.out===0){ h+='<div class="dp-hire-none">이번 달 입퇴사 없음</div>'; }
+    } else if(m.in===0 && m.out===0){ h+='<div class="dp-hire-none">이번 달 입퇴사 없음</div>'; }
+    return h+'</div>';
+  }
+  // 폴백: 수동 v.hire (HR 미로드 or 부서 미대응)
+  if(v.hire){
+    var h2=hd;
+    if(v.hire.jijum && v.hire.jijum.length){
+      h2+='<span class="in">입사 '+v.hire.tin+'</span><span class="out">퇴사 '+v.hire.tout+'</span></div><div class="dp-jj">';
+      v.hire.jijum.forEach(function(j){var net=j.in-j.out;var nc=net>0?'p':net<0?'m':'z';h2+='<div class="dp-jj-item">'+j.nm.replace('센터','').replace('지점','')+' <b class="'+nc+'">'+(net>0?'+':'')+net+'</b></div>';});
+      h2+='</div>';
+    } else h2+='</div><div class="dp-hire-none">'+(__HR_RET_STATE==='loading'?'HR 입퇴사 불러오는 중…':'이번 달 입퇴사 집계 전')+'</div>';
+    return h2+'</div>';
+  }
+  // v.hire도 없으면 HR 로딩 표시만
+  if(__HR_RET_STATE==='loading') return hd+'</div><div class="dp-hire-none">HR 입퇴사 불러오는 중…</div></div>';
+  return '';
+}
+
 // 부서별 정착률 HTML (상담부는 지점별 드릴다운). __HR_RET 로드 후에만 내용, 아니면 빈칸
 function dpRetHtml(dept){
   if(__HR_RET_STATE!=='ok' || !__HR_RET) {
@@ -1022,9 +1159,26 @@ function dpRetHtml(dept){
   } else {
     h+='<div class="dp-ret-note">1개월=입사30일경과자 / 3개월=90일경과자 · 파트타임은 이탈 자체가 정상, 추세로 볼 것</div>';
   }
+  // 조기이탈자 리스트 (최근 3개월 · 근속 90일이하) — 접기
+  var early=(R.early||[]);
+  if(early.length){
+    var _md=function(d){ return d?((d.getMonth()+1)+'/'+d.getDate()):''; };
+    var _won=function(n){ return (n||0).toLocaleString('ko-KR'); };
+    h+='<div class="dp-early-tog" onclick="dpEarlyTog(this)"><span class="arw">▾</span> 조기이탈 상세 '+early.length+'명 (최근3개월·90일내)</div>';
+    h+='<div class="dp-early">';
+    early.forEach(function(e){
+      var hasSales=(e.sales>0);
+      h+='<div class="dp-early-row"><span class="enm">'+e.name+'</span>'
+        +'<span class="espan">'+e.span+'일</span>'
+        +'<span class="edate">'+_md(e.inD)+'입사 → '+_md(e.outD)+'퇴사</span>'
+        +'<span class="esales '+(hasSales?'has':'zero')+'">'+(hasSales?('매출 '+_won(e.sales)):'매출 0')+'</span></div>';
+    });
+    h+='</div>';
+  }
   h+='</div>';
   return h;
 }
+function dpEarlyTog(el){ el.classList.toggle('open'); var f=el.nextElementSibling; if(f) f.classList.toggle('open'); }
 
 function dpRender(){
   var mo=window.__dpMonth, D=HIRE_DEPT[mo]; if(!D) return;
@@ -1051,15 +1205,8 @@ function dpRender(){
     body+='<div class="dp-tot-row"><span class="lbl">합계</span>'
       +'<span class="meta">'+mb('이력',v.tot.iryeok)+' · '+mb('통보',v.tot.myeontong)+' · '+mb('참여',v.tot.myeoncham)+' · '+mb('교육',v.tot.edu)+'</span>'
       +'<span class="g">'+dpWon(v.tot.gonggo)+'</span></div>';
-    if(v.hire){
-      var hh='<div class="dp-hire"><div class="dp-hire-top"><span class="hl"><svg class="hlic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M4 20c0-3 2.5-5 5-5s5 2 5 5"/><path d="M16 5.5a3 3 0 0 1 0 5"/><path d="M18 15c1.8.5 3 2 3 4"/></svg>입퇴사</span>';
-      if(v.hire.jijum && v.hire.jijum.length){
-        hh+='<span class="in">입사 '+v.hire.tin+'</span><span class="out">퇴사 '+v.hire.tout+'</span></div><div class="dp-jj">';
-        v.hire.jijum.forEach(function(j){var net=j.in-j.out;var nc=net>0?'p':net<0?'m':'z';hh+='<div class="dp-jj-item">'+j.nm.replace('센터','').replace('지점','')+' <b class="'+nc+'">'+(net>0?'+':'')+net+'</b></div>';});
-        hh+='</div>';
-      } else hh+='</div><div class="dp-hire-none">이번 달 입퇴사 집계 전</div>';
-      hh+='</div>'; body+=hh;
-    }
+    // 입퇴사 — HR 시트 자동집계 우선 (로드 시), 없으면 수동 폴백
+    body += dpHireHtml(d, v);
     // 정착률 블록 (HR 입퇴사 기준, 전월 무관 — 부서 전체 히스토리)
     body += dpRetHtml(d);
     gh+='<div class="dp-card '+d+'"><div class="dp-card-hd"><span class="dp-dot"></span><span class="dp-name">'+d+'</span>'
