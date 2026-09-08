@@ -2308,6 +2308,14 @@ function _fdBossTeam(name){
   for(var i=0;i<list.length;i++){ if(list[i].name===name){ var R=list[i].rank||''; return ['지사장','지점장','부지점장'].indexOf(R)>=0 ? (list[i].team||'') : ''; } }
   return '';
 }
+/* [2026-09] 지사장·지점장만 → 지점카드 라우팅 (부지점장 제외, 어느 카드 클릭이든 적용) */
+function _headBranchOf(name){
+  var D=window.__liveD||window.__D||{};
+  var list=(D.personCards&&D.personCards.sang)||D.persons||[];
+  for(var i=0;i<list.length;i++){ if(list[i].name===name){ var R=list[i].rank||''; return ['지사장','지점장'].indexOf(R)>=0 ? (list[i].team||'') : ''; } }
+  return '';
+}
+window._headBranchOf=_headBranchOf;
 /* [2026-09] 지점 실적 카드 — fdResult에 인라인 상세(뒤로가기) */
 window.fdToBranch=function(brName){
   if(!brName){ return; }
@@ -2435,6 +2443,8 @@ function updateMyCardBtn(){
 }
 window.openMyCard=function(){
   if(!_me){ if(window.pcLogin)pcLogin(); return; }
+  var _bt=_headBranchOf(_me.name);   // [2026-09] 지사장·지점장 → 내 지점카드
+  if(_bt){ openBranchCard(_bt); return; }
   var f=pcFind(_me.name);
   if(!f){ alert('아직 '+_me.name+'님의 실적 카드가 없어요. 첫 실적이 등록되면 카드가 생성됩니다.'); return; }
   openCard(_me.name);
@@ -2697,7 +2707,10 @@ function attachCardClicks(){
     if(!el.__pcBound){
       el.classList.add('pc-clickable');
       el.__pcBound=true;
-      el.addEventListener('click',function(ev){ ev.stopPropagation(); openCard(matched); });
+      el.addEventListener('click',function(ev){ ev.stopPropagation();
+        var _bt=_headBranchOf(matched);   // [2026-09] 지사장·지점장 → 지점카드 (어느 카드든)
+        if(_bt) openBranchCard(_bt); else openCard(matched);
+      });
     }
     // [2026-09] 명예의전당 뱃지 — 개인카드(.pc-nm)는 전용 트로피 섹션이 있어 제외.
     //   __HOF는 늦게 로드되므로 아직 못 붙였으면 다음 호출 때 다시 시도.
