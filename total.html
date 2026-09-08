@@ -343,6 +343,9 @@ body.is-live .closed-only{display:none !important}
 /* ── ⚔️ 비교(VERSUS) ── */
 .pc-cmpbtn{margin:2px 18px 16px;display:flex;align-items:center;justify-content:center;gap:7px;width:calc(100% - 36px);padding:12px;border:none;border-radius:13px;background:linear-gradient(135deg,#1B2436,#2B3A55);color:#fff;font-size:13px;font-weight:900;font-family:inherit;cursor:pointer;letter-spacing:-.3px;box-shadow:0 4px 14px rgba(27,36,54,.25)}
 .pc-cmpbtn:active{transform:scale(.98)}
+.pc-editbtn{position:relative;z-index:2;margin:12px auto 0;display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border:1.5px solid rgba(255,255,255,.5);border-radius:16px;background:rgba(255,255,255,.14);color:#fff;font-size:12px;font-weight:800;font-family:inherit;cursor:pointer;transition:background .15s}
+.pc-editbtn:hover{background:rgba(255,255,255,.24)}
+.pc-editbtn:active{transform:scale(.97)}
 .vs-bg{position:fixed;inset:0;background:rgba(10,14,24,.72);backdrop-filter:blur(4px);z-index:9999;display:none;align-items:flex-start;justify-content:center;padding:20px 12px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .vs-bg.on{display:flex}
 .vs-wrap{width:820px;max-width:100%;margin:auto 0}
@@ -1950,11 +1953,19 @@ function openCard(name){
   var _finalImg=_upURL||_avImg;
   var _status=_prof.statusMsg||'';
   var _isMe=!!(_me && _me.name===name);
+  var _editing=_isMe && window.__pcEdit;
   var _esc=function(t){return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');};
   var _statusHtml='<div class="pc-status"'+(_status?'':' style="display:none"')+'>'+(_status?('“'+_esc(_status)+'”'):'')+'</div>';
-  // [2026-09] 사진 변경 = 사진 위 📷 오버레이 / 상태메시지 = 헤더 안 인라인 편집
-  var _camHtml=_isMe ? '<label class="pc-av-cam" title="사진 변경">📷<input type="file" accept="image/*" onchange="myUploadPhoto(this)"></label>' : '';
-  var _statusEditHtml=_isMe ? ('<div class="pc-status-edit"><input id="myStatusInput" maxlength="40" placeholder="상태메시지 (예: 이번달 목표 5천!)" value="'+_esc(_status)+'"><button onclick="mySaveStatus()">저장</button></div>') : _statusHtml;
+  // [2026-09] 인스타식 프로필 편집: 평소 깔끔 / [편집] 누르면 사진변경·상태입력 노출
+  var _camHtml=_editing ? '<label class="pc-av-cam" title="사진 변경">📷<input type="file" accept="image/*" onchange="myUploadPhoto(this)"></label>' : '';
+  var _statusBlock;
+  if(_editing){
+    _statusBlock='<div class="pc-status-edit"><input id="myStatusInput" maxlength="40" placeholder="상태메시지 (예: 이번달 목표 5천!)" value="'+_esc(_status)+'"><button onclick="mySaveStatus()">저장</button></div>'
+      +'<button class="pc-editbtn" onclick="window.__pcEdit=false;openCard(\''+name.replace(/'/g,"")+'\')">✓ 완료</button>';
+  } else {
+    _statusBlock=_statusHtml+(_isMe?('<button class="pc-editbtn" onclick="window.__pcEdit=true;openCard(\''+name.replace(/'/g,"")+'\')">✏️ 프로필 편집</button>'):'');
+  }
+  var _statusEditHtml=_statusBlock;
 
   var html='<button class="pc-close" onclick="closeCard()">✕</button>'
     +'<div class="pc-hd t-'+tier+'"><div class="pc-blob b1"></div><div class="pc-blob b2"></div>'+(tier==='SSS'?'<div class="pc-spark"></div>':'')
@@ -1988,7 +1999,7 @@ function openCard(name){
   try{ parent.postMessage({t:'cardOpen'}, '*'); }catch(e){}
   document.body.style.overflow='hidden';
 }
-function closeCard(){ document.getElementById('pcModal').classList.remove('on'); try{ parent.postMessage({t:'cardClose'}, '*'); }catch(e){} document.body.style.overflow=''; window.__curCardName=null; if(window.__likeUnsub){window.__likeUnsub();window.__likeUnsub=null;} if(window.__cmtUnsub){window.__cmtUnsub();window.__cmtUnsub=null;} pcRestoreScroll(); }
+function closeCard(){ window.__pcEdit=false; document.getElementById('pcModal').classList.remove('on'); try{ parent.postMessage({t:'cardClose'}, '*'); }catch(e){} document.body.style.overflow=''; window.__curCardName=null; if(window.__likeUnsub){window.__likeUnsub();window.__likeUnsub=null;} if(window.__cmtUnsub){window.__cmtUnsub();window.__cmtUnsub=null;} pcRestoreScroll(); }
 
 /* ══════ 🔍 기간조회(FINDER) — 원장 직접 필터 ══════ */
 var LEDGER_GID='698799247';    // total 시트 '데일리 실적' 탭 (현재 진행월)
