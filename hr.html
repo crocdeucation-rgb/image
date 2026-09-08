@@ -84,6 +84,12 @@ td.nm{font-weight:700}td.dt{text-align:right;color:var(--soft);font-variant-nume
 .br-outsum{margin:5px 8px 3px;padding:7px 10px;background:#F7F9FC;border-radius:8px;font-size:11px;color:#8A94A6;font-weight:700}
 .br-outsum b{color:#1B2436;font-weight:900}
 .br-outsum b.c-r{color:#E23A22}
+/* [2026-09] 특이사항 안전 뱃지 (진급·겸직·재입사) */
+.bg-nt{font-size:10px;font-weight:800;padding:1px 7px;border-radius:6px;margin-left:5px}
+.bg-nt.gj{background:#E6F1FB;color:#185FA5}
+.bg-nt.re{background:#F0F2F7;color:#6B7688}
+.bg-prom{font-size:10px;font-weight:800;padding:1px 7px;border-radius:6px;margin-left:5px;background:#E6F7EE;color:#177A4A}
+.oreason{color:#8A94A6;font-weight:600}
 @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.grid{grid-template-columns:1fr}}
 </style></head><body><div class="wrap">
@@ -358,6 +364,29 @@ function _ledMonthly(name, inD, outD, useF){
 }
 var __LED_STATE='none'; // none|loading|ok|err
 
+// [2026-09] 특이사항 안전 노출 — 화이트리스트만. 부정평가·사생활 원천 차단.
+//   재직자: 진급(텍스트) / 겸직(뱃지+직업) / 재입사(뱃지)
+//   퇴사자: 안전사유만, 건강·우울 등은 "건강 사유로" 치환
+function parseNoteSafe(note, isOut){
+  var s=String(note||'');
+  var out={ badges:[], text:'' };
+  if(!s) return out;
+  if(isOut){
+    if(/건강|우울|질병|병으로|아파|치료|입원/.test(s)){ out.text='건강 사유로 퇴사'; return out; }
+    var safe=[['취업','취업으로 퇴사'],['이직','이직으로 퇴사'],['학업','학업으로 퇴사'],['군입대','군입대로 퇴사'],['군대','군입대로 퇴사'],['급여','급여 사유로 퇴사'],['결혼','결혼으로 퇴사'],['이사','이사로 퇴사'],['개인사정','개인 사정으로 퇴사']];
+    for(var i=0;i<safe.length;i++){ if(s.indexOf(safe[i][0])>=0){ out.text=safe[i][1]; return out; } }
+    return out;
+  }
+  var mProm=s.match(/(\d{1,2}\/\d{1,2}\s*)?(정직원\s*전환|정규직\s*전환|주임\s*\d*호?\s*진급|승진)/);
+  if(mProm){ out.text=mProm[0].trim(); }
+  if(s.indexOf('본업')>=0){
+    var job=''; var mj=s.match(/본업\s*있음\s*\(([^)]+)\)/); if(mj) job=mj[1].trim();
+    out.badges.push({cls:'gj', txt:'겸직'+(job?' · '+job:'')});
+  }
+  if(s.indexOf('재입사')>=0) out.badges.push({cls:'re', txt:'재입사'});
+  return out;
+}
+
 function roleTags(note){
   var s=String(note||''), u=s.toUpperCase(), out=[];
   if(s.indexOf('출첵')>=0) out.push('출첵');
@@ -389,21 +418,24 @@ function render(key){
   var _hasSales=(key==='상담부'||key==='사업부');  // 매출 붙일 탭
   var _useF=(key==='사업부');
   function memRow(x){
-    var noteHtml = x.note ? '<span class="mnote" title="'+x.note.replace(/"/g,'&quot;')+'">·</span>' : '';
+    var note=parseNoteSafe(x.note, x.isOut);  // 안전 파싱 (원문 노출 안 함)
+    var safeBadges=note.badges.map(function(b){ return '<span class="bg-nt '+b.cls+'">'+b.txt+'</span>'; }).join('');
     var rankHtml = x.rank ? '<span class="mrank">'+x.rank+'</span>' : '';
     var badge = '';
     if(x.isOut) badge = '<span class="bg-out">퇴사</span>';
     else if(x.isNew) badge = '<span class="bg-new">NEW</span>';
     var roleHtml = (key==='코칭' && (x.sub||'')==='미구분' && !x.isOut)
       ? roleTags(x.note).map(function(t){ return '<span class="bg-role'+(t==='개통AS'?' pp':'')+'">'+t+'</span>'; }).join('') : '';
-    // 재직자 = 기존 그대로 (입사일 정확한 날짜)
+    // 재직자
     if(!x.isOut){
       var _ind = x.inDate ? (x.inDate.getFullYear()+'-'+('0'+(x.inDate.getMonth()+1)).slice(-2)+'-'+('0'+x.inDate.getDate()).slice(-2)) : x.in;
-      return '<div class="mrow"><span class="mnm">'+x.name+noteHtml+roleHtml+badge+'</span>'+rankHtml+'<span class="mdt">'+_ind+'</span></div>';
+      var promHtml = note.text ? '<span class="bg-prom">'+note.text+'</span>' : '';
+      return '<div class="mrow"><span class="mnm">'+x.name+roleHtml+badge+safeBadges+promHtml+'</span>'+rankHtml+'<span class="mdt">'+_ind+'</span></div>';
     }
-    // 퇴사자 = 확장 (근속·입퇴사일·매출)
-    var top='<div class="orow-top"><span class="mnm">'+x.name+noteHtml+badge+spanBadge(x.span)+'</span>'
-      +rankHtml+'<span class="mdt">'+(x.inDate&&x.outDate?(_md(x.inDate)+'입사 → '+_md(x.outDate)+'퇴사'):(x.outYm+' 퇴사'))+'</span></div>';
+    // 퇴사자 = 확장 (근속·입퇴사일·사유·매출)
+    var reasonHtml = note.text ? ' <span class="oreason">'+note.text+'</span>' : '';
+    var top='<div class="orow-top"><span class="mnm">'+x.name+badge+spanBadge(x.span)+safeBadges+'</span>'
+      +rankHtml+'<span class="mdt">'+(x.inDate&&x.outDate?(_md(x.inDate)+'입사 → '+_md(x.outDate)+'퇴사'):(x.outYm+' 퇴사'))+reasonHtml+'</span></div>';
     var salesLine='';
     if(_hasSales){
       var m=(window.__LED_MONTHLY&&window.__LED_MONTHLY[x.name])||null;
