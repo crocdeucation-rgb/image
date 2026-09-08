@@ -119,6 +119,10 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .cal-edu:hover{border-color:#E0A93E;box-shadow:0 3px 10px rgba(186,117,23,.15);transform:translateY(-1px)}
 .cal-edu .cal-iv-tm{color:#0B7A70}
 .cal-empty{font-size:11px;color:#C8D0DC;text-align:center;padding:20px 0;font-weight:600}
+/* [2026-09] 교육 그룹 (면접처럼 묶음, 초록톤) */
+.edu-grp{background:#F2FCFB;border-color:#B7E5DD}
+.edu-grp .cal-grp-hd{border-bottom-color:#CDEBE5}
+.edu-grp .cal-edu-badge{margin-right:2px}
 
 /* [2026-09] PC 캘린더 압축 — 같은 타임 이름칩 */
 .cal-chips{display:flex;flex-wrap:wrap;gap:4px}
@@ -576,30 +580,42 @@ function renderCal(){
         var g=groups[gk], esc=function(s){return String(s||'').replace(/</g,'&lt;');};
         var multi=g.members.length>1;
         h+='<div class="cal-grp'+(multi?' multi':'')+'">'
-          +'<div class="cal-grp-hd"><span class="cal-grp-tm">'+esc(g.time)+'</span>'
-          +mgrBadge(g.mgr)
+          +'<div class="cal-grp-hd">'+mgrBadge(g.mgr)+'<span class="cal-grp-tm">'+esc(g.time)+'</span>'
           +(multi?'<span class="cal-grp-cnt">'+g.members.length+'명</span>':'')+'</div>';
-        // [2026-09] 압축 — 이름칩(직무색 + 상태점 + 알/잡)
-        h+='<div class="cal-chips">';
+        // [2026-09] 개별 카드 유지(나이·유입·상태) + 그룹으로 묶기만
         g.members.forEach(function(iv){
-          var stCls=cardStateClass(iv);
-          var drop=(stCls==='st-drop');
-          var site=String(iv.site||'');
-          var sc=site.indexOf('알바몬')>=0?'am':(site.indexOf('잡코')>=0?'jk':'');
-          var scL=sc==='am'?'알':(sc==='jk'?'잡':'');
-          h+='<span class="cal-chip job-'+esc(iv.job)+(drop?' drop':'')+'" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/\x27/g,'')+'\')">'
-            +'<span class="cdot '+stCls+'"></span>'+esc(iv.name)+'</span>';
+          var stCls=cardStateClass(iv), flow=statusFlow(iv);
+          h+='<div class="cal-iv '+stCls+'" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/\x27/g,'')+'\')">'
+            +'<div class="cal-iv-nm-row"><span class="cal-iv-nm">'+esc(iv.name)+'</span>'
+            +'<span class="cal-jbadge job-'+esc(iv.job)+'">'+esc(iv.job)+'</span></div>'
+            +'<div class="cal-iv-flow">'+flow+'</div>'
+            +'<div class="cal-iv-btm"><span class="cal-site">'+esc(iv.site||'')+'</span></div></div>';
         });
         h+='</div>';
-        h+='</div>';
       });
+      // [2026-09] 교육도 시간+교육담당 그룹핑 (면접처럼). 담당 1번, 피교육자 카드
+      var eduGroups={}, eduOrder=[];
       eduList.forEach(function(iv){
         var esc=function(s){return String(s||'').replace(/</g,'&lt;');};
-        h+='<div class="cal-edu" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/\x27/g,'')+'\')">'
-          +'<div class="cal-iv-r1"><span class="cal-edu-badge">교육</span><span class="cal-iv-tm">'+(iv.eduTime||'')+'</span>'
-          +'<span class="cal-jbadge job-'+esc(iv.job)+'">'+esc(iv.job)+'</span></div>'
-          +'<div class="cal-iv-nm">'+esc(iv.name)+'</div>'
-          +'<div class="cal-edu-lbl">교육'+(iv.eduWho?' <span class="edu-who">'+esc(withTitle(iv.eduWho))+'</span>':'')+'</div></div>';
+        var gkey=(iv.eduTime||'-')+'|'+(iv.eduWho||'');
+        if(!eduGroups[gkey]){ eduGroups[gkey]={time:iv.eduTime||'', who:iv.eduWho||'', members:[]}; eduOrder.push(gkey); }
+        eduGroups[gkey].members.push(iv);
+      });
+      eduOrder.forEach(function(gk){
+        var g=eduGroups[gk], esc=function(s){return String(s||'').replace(/</g,'&lt;');};
+        var multi=g.members.length>1;
+        h+='<div class="cal-grp edu-grp'+(multi?' multi':'')+'">'
+          +'<div class="cal-grp-hd"><span class="cal-edu-badge">교육</span>'
+          +(g.who?'<span class="edu-who">'+esc(withTitle(g.who))+'</span>':'')
+          +'<span class="cal-grp-tm">'+esc(g.time)+'</span>'
+          +(multi?'<span class="cal-grp-cnt">'+g.members.length+'명</span>':'')+'</div>';
+        g.members.forEach(function(iv){
+          h+='<div class="cal-iv st-edu" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/\x27/g,'')+'\')">'
+            +'<div class="cal-iv-nm-row"><span class="cal-iv-nm">'+esc(iv.name)+'</span>'
+            +'<span class="cal-jbadge job-'+esc(iv.job)+'">'+esc(iv.job)+'</span></div>'
+            +'<div class="cal-iv-btm"><span class="cal-site">'+esc(iv.site||'')+'</span></div></div>';
+        });
+        h+='</div>';
       });
     } else {
       h+='<div class="cal-empty">일정 없음</div>';
