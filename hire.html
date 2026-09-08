@@ -745,9 +745,10 @@ window.openIv=function(date,name){
   h+='</div>';
   document.getElementById('ivBody').innerHTML=h;
   document.getElementById('ivModal').classList.add('on');
+  try{ parent.postMessage({t:'cardOpen'}, '*'); }catch(e){}
   document.body.style.overflow='hidden';
 };
-window.closeIv=function(){ document.getElementById('ivModal').classList.remove('on'); document.body.style.overflow=''; };
+window.closeIv=function(){ document.getElementById('ivModal').classList.remove('on'); try{ parent.postMessage({t:'cardClose'}, '*'); }catch(e){} document.body.style.overflow=''; };
 
 boot();
 
