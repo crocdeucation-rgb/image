@@ -65,6 +65,25 @@ td.nm{font-weight:700}td.dt{text-align:right;color:var(--soft);font-variant-nume
 .bg-out{background:#FBE9E7;color:#E23A22;font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:5px}
 .mrow.out{opacity:.5}
 .mrow.out .mnm{text-decoration:line-through;color:#8A94A6}
+/* [2026-09] 퇴사자 확장 행 (경영진용 상세) */
+.mrow.orow{opacity:1;display:block;background:#FFF6F5;border-radius:8px;padding:8px 10px;margin:2px 0}
+.mrow.orow .orow-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.mrow.orow .mnm{text-decoration:line-through;color:#8A8A8A;font-weight:700}
+.mrow.orow .mrank{color:#8A94A6}
+.mrow.orow .mdt{margin-left:auto;color:#8A94A6;font-size:11px;font-weight:600}
+.bg-span{font-size:10px;font-weight:900;padding:1px 7px;border-radius:6px;white-space:nowrap}
+.bg-span.sp-o{background:#FEEBC8;color:#C05621}
+.bg-span.sp-r{background:#FBE9E7;color:#E23A22}
+.bg-span.sp-g{background:#F0F2F7;color:#8A94A6}
+.orow-sales{margin-top:5px;padding-left:2px;font-size:11px;color:#8A94A6;font-weight:600}
+.orow-sales b.has{color:#7048E8;font-weight:900}
+.orow-sales b.zero{color:#C3CDDD;font-weight:900}
+.orow-sales .momini{color:#B6C2DC;font-weight:600}
+.orow-sales.muted{color:#B6C2DC}
+/* 지점 퇴사 요약 */
+.br-outsum{margin:5px 8px 3px;padding:7px 10px;background:#F7F9FC;border-radius:8px;font-size:11px;color:#8A94A6;font-weight:700}
+.br-outsum b{color:#1B2436;font-weight:900}
+.br-outsum b.c-r{color:#E23A22}
 @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.grid{grid-template-columns:1fr}}
 </style></head><body><div class="wrap">
@@ -210,6 +229,12 @@ async function loadSheet(cfg){
       var isNew = !!(_inDate && _inDate >= _30ago);   // NEW 뱃지: 입사 30일 이내
       var isNewMonth = (inYm===__curYm);            // [현재월 자동] 이번달 입사 카운트
       var isOutThisMonth = (outYm===__curYm);       // [현재월 자동] 이번달 퇴사
+      // [2026-09] 퇴사일 원본 Date + 근속일수 (경영진용 퇴사자 상세)
+      var _outDate = (function(){
+        var m=String(outv).match(/(\d{4})[-.\/]\s*(\d{1,2})[-.\/]\s*(\d{1,2})/);
+        return m ? new Date(+m[1],+m[2]-1,+m[3]) : null;
+      })();
+      var _span = (_inDate && _outDate) ? Math.floor((_outDate-_inDate)/86400000) : null;
       // 8월 입퇴사 카운트
       if(isNewMonth) ipsa++;
       if(isOutThisMonth) toesa++;
@@ -224,7 +249,8 @@ async function loadSheet(cfg){
         note:(cNote>=0?(row[cNote]||'').trim():''),
         isNew:isNew,
         isOut:isOutThisMonth,
-        outYm:outYm
+        outYm:outYm,
+        inDate:_inDate, outDate:_outDate, span:_span
       });
     }
     var jaeCount=members.filter(function(m){return !m.isOut;}).length;
@@ -258,9 +284,80 @@ async function boot(){
   document.getElementById('tabs').innerHTML=tb;
 
   render(results[0].key);
+
+  // [2026-09] 퇴사자(상담·사업) 재직중 매출 로드 → 이름 맵 → 재렌더
+  var outNames=[];
+  ['상담부','사업부'].forEach(function(dk){
+    var st=STATE[dk]; if(!st)return;
+    st.members.forEach(function(m){ if(m.isOut) outNames.push({name:m.name, inDate:m.inDate, outDate:m.outDate, useF:(dk==='사업부')}); });
+  });
+  if(outNames.length){
+    __LED_STATE='loading';
+    _ledLoad().then(function(){
+      window.__LED_MONTHLY={};
+      outNames.forEach(function(o){ window.__LED_MONTHLY[o.name]=_ledMonthly(o.name,o.inDate,o.outDate,o.useF); });
+      __LED_STATE='ok';
+      // 현재 탭이 상담/사업이면 다시 그림
+      if(window.__curTab==='상담부'||window.__curTab==='사업부') render(window.__curTab);
+    }).catch(function(e){ console.warn('원장 매출 로드 실패',e); __LED_STATE='err'; });
+  }
 }
+window.__curTab='수업';
 
 // 운영지원 역할 태그 (특이사항 → 뱃지)
+// ══════════════════════════════════════════════
+// [2026-09] 원장(리드요약) — 퇴사자 재직중 월별 매출 (상담/사업 탭)
+// total.html fdLoadLedger 이식. 이름(r.sang) 매칭 · 결제일 기준.
+// ══════════════════════════════════════════════
+var _LED_SID='1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU';
+var _LED_GID='698799247', _CLO_GID='1739211827';
+function _ledDate(v){
+  v=String(v||'').trim(); if(!v) return null;
+  var m1=v.match(/(\d{4})-(\d{1,2})-(\d{1,2})/); if(m1) return new Date(+m1[1],+m1[2]-1,+m1[3]);
+  var m2=v.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*일/); if(m2) return new Date(new Date().getFullYear(),+m2[1]-1,+m2[2]);
+  return null;
+}
+function _ledNum(v){ var n=parseFloat(String(v||'').replace(/[^0-9.\-]/g,'')); return isNaN(n)?0:n; }
+function _ledParse(raw){
+  var rows=parseCSV(raw);
+  var hi=0; for(var i=0;i<Math.min(rows.length,4);i++){ if((rows[i][1]||'').indexOf('상담')>=0 && (rows[i][17]||'').indexOf('상태')>=0){hi=i;break;} }
+  var out=[];
+  for(var r=hi+1;r<rows.length;r++){
+    var row=rows[r]; var dt=_ledDate(row[0]); if(!dt) continue;
+    var sang=(row[1]||'').trim(); if(!sang) continue;
+    out.push({ dt:dt, sang:sang, saup:(row[5]||'').trim(), sales:_ledNum(row[3])*1000, state:(row[17]||'').trim() });
+  }
+  return out;
+}
+var __LED=null;
+async function _ledLoad(){
+  if(__LED) return __LED;
+  var base="https://docs.google.com/spreadsheets/d/"+_LED_SID+"/gviz/tq?tqx=out:csv&headers=0&gid=";
+  var t=Date.now();
+  var res=await Promise.all([
+    fetch(base+_CLO_GID+"&_="+t).then(function(r){return r.text();}),
+    fetch(base+_LED_GID+"&_="+t).then(function(r){return r.text();})
+  ]);
+  __LED=_ledParse(res[0]).concat(_ledParse(res[1]));
+  return __LED;
+}
+// 이름 → 재직중(입사~퇴사) 월별 order매출 {'6':340만,...} + total. useF=사업(saup 매칭)
+function _ledMonthly(name, inD, outD, useF){
+  var by={}, total=0;
+  if(!__LED || !name) return {by:by, total:0};
+  __LED.forEach(function(r){
+    var who = useF ? r.saup : r.sang;
+    if(who!==name) return;
+    if(r.state!=='order' || r.sales<=0) return;
+    if(inD && r.dt<inD) return;
+    if(outD && r.dt>outD) return;
+    var mo=r.dt.getMonth()+1;
+    by[mo]=(by[mo]||0)+r.sales; total+=r.sales;
+  });
+  return {by:by, total:total};
+}
+var __LED_STATE='none'; // none|loading|ok|err
+
 function roleTags(note){
   var s=String(note||''), u=s.toUpperCase(), out=[];
   if(s.indexOf('출첵')>=0) out.push('출첵');
@@ -269,6 +366,7 @@ function roleTags(note){
 }
 
 function render(key){
+  window.__curTab=key;
   var g=STATE[key]; var arr=g.members.slice();
   var wonMap = WONJANG[key] || {};
   var teamLabelFn = TEAMLABEL[key] || function(t){return t;};
@@ -280,6 +378,16 @@ function render(key){
 
   document.getElementById('cnt').textContent=g.label+' 재직 '+arr.length+'명 (마스킹 명부)';
 
+  function _md(d){ return d?((d.getMonth()+1)+'/'+d.getDate()):''; }
+  function _man(n){ n=n||0; if(n>=100000000)return (n/100000000).toFixed(n%100000000===0?0:2)+'억'; if(n>=10000)return Math.round(n/10000)+'만'; return (n||0).toLocaleString('ko-KR'); }
+  // 근속 뱃지 색: 30일내 주황 / 90일내 빨강 / 그이상 회색
+  function spanBadge(sp){
+    if(sp==null) return '';
+    var c = sp<=30 ? 'sp-o' : sp<=90 ? 'sp-r' : 'sp-g';
+    return '<span class="bg-span '+c+'">'+sp+'일 만에</span>';
+  }
+  var _hasSales=(key==='상담부'||key==='사업부');  // 매출 붙일 탭
+  var _useF=(key==='사업부');
   function memRow(x){
     var noteHtml = x.note ? '<span class="mnote" title="'+x.note.replace(/"/g,'&quot;')+'">·</span>' : '';
     var rankHtml = x.rank ? '<span class="mrank">'+x.rank+'</span>' : '';
@@ -288,9 +396,27 @@ function render(key){
     else if(x.isNew) badge = '<span class="bg-new">NEW</span>';
     var roleHtml = (key==='코칭' && (x.sub||'')==='미구분' && !x.isOut)
       ? roleTags(x.note).map(function(t){ return '<span class="bg-role'+(t==='개통AS'?' pp':'')+'">'+t+'</span>'; }).join('') : '';
-    var cls = x.isOut ? 'mrow out' : 'mrow';
-    var dt = x.isOut ? (x.outYm+' 퇴사') : x.in;
-    return '<div class="'+cls+'"><span class="mnm">'+x.name+noteHtml+roleHtml+badge+'</span>'+rankHtml+'<span class="mdt">'+dt+'</span></div>';
+    // 재직자 = 기존 그대로 (입사일 정확한 날짜)
+    if(!x.isOut){
+      var _ind = x.inDate ? (x.inDate.getFullYear()+'-'+('0'+(x.inDate.getMonth()+1)).slice(-2)+'-'+('0'+x.inDate.getDate()).slice(-2)) : x.in;
+      return '<div class="mrow"><span class="mnm">'+x.name+noteHtml+roleHtml+badge+'</span>'+rankHtml+'<span class="mdt">'+_ind+'</span></div>';
+    }
+    // 퇴사자 = 확장 (근속·입퇴사일·매출)
+    var top='<div class="orow-top"><span class="mnm">'+x.name+noteHtml+badge+spanBadge(x.span)+'</span>'
+      +rankHtml+'<span class="mdt">'+(x.inDate&&x.outDate?(_md(x.inDate)+'입사 → '+_md(x.outDate)+'퇴사'):(x.outYm+' 퇴사'))+'</span></div>';
+    var salesLine='';
+    if(_hasSales){
+      var m=(window.__LED_MONTHLY&&window.__LED_MONTHLY[x.name])||null;
+      if(__LED_STATE==='loading') salesLine='<div class="orow-sales muted">재직 중 매출 불러오는 중…</div>';
+      else if(m){
+        var months=Object.keys(m.by).sort(function(a,b){return a-b;});
+        var moStr=months.map(function(mm){return mm+'월 '+_man(m.by[mm]);}).join(' · ');
+        var has=(m.total>0);
+        salesLine='<div class="orow-sales">재직 중 매출 <b class="'+(has?'has':'zero')+'">'+(has?_man(m.total):'0')+(has?'':'원')+'</b>'
+          +(moStr?' <span class="momini">· '+moStr+'</span>':'')+'</div>';
+      }
+    }
+    return '<div class="mrow out orow">'+top+salesLine+'</div>';
   }
 
   var h='<div class="grid">';
@@ -320,6 +446,13 @@ function render(key){
         teams[t].sort(function(a,b){if(a.isOut!==b.isOut)return a.isOut?1:-1;return (a.in||'')<(b.in||'')?-1:1;});
         teams[t].forEach(function(x){ h+=memRow(x); });
       });
+      // 퇴사 요약 (이번달 퇴사 있을 때만) — 지점 전체 취합
+      var _brOut=[]; teamKeys.forEach(function(t){ teams[t].forEach(function(m){ if(m.isOut) _brOut.push(m); }); });
+      if(_brOut.length){
+        var _early30=_brOut.filter(function(m){return m.span!=null && m.span<=30;}).length;
+        h+='<div class="br-outsum">이번달 퇴사 <b class="c-r">'+_brOut.length+'명</b>'
+          +(_early30?' · 30일내 이탈 <b class="c-r">'+_early30+'명</b>':'')+'</div>';
+      }
       h+='</div></div>';
     });
   } else {
@@ -349,7 +482,7 @@ function render(key){
   document.getElementById('body').innerHTML=h;
 }
 
-function sw(key,btn){document.querySelectorAll('.tabbtn').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');render(key);}
+function sw(key,btn){window.__curTab=key;document.querySelectorAll('.tabbtn').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');render(key);}
 
 boot();
 </script></body></html>
