@@ -2207,8 +2207,10 @@ window.fdToCard=function(name){
 };
 /* [2026-09] 지점장/지사장/부지점장 판별 — D.persons의 rank 참조 */
 function _fdBossTeam(name){
-  var P=(window.__D&&window.__D.persons)||[];
-  for(var i=0;i<P.length;i++){ if(P[i].name===name){ var R=P[i].rank||''; return ['지사장','지점장','부지점장'].indexOf(R)>=0 ? (P[i].team||'') : ''; } }
+  var D=window.__liveD||window.__D||{};
+  // personCards.sang = personTrend 생성물(rank 확실). 없으면 persons 폴백.
+  var list=(D.personCards&&D.personCards.sang)||D.persons||[];
+  for(var i=0;i<list.length;i++){ if(list[i].name===name){ var R=list[i].rank||''; return ['지사장','지점장','부지점장'].indexOf(R)>=0 ? (list[i].team||'') : ''; } }
   return '';
 }
 /* [2026-09] 지점 실적 카드 — fdResult에 인라인 상세(뒤로가기) */
