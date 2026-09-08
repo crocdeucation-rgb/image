@@ -119,6 +119,28 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .cal-edu:hover{border-color:#E0A93E;box-shadow:0 3px 10px rgba(186,117,23,.15);transform:translateY(-1px)}
 .cal-edu .cal-iv-tm{color:#0B7A70}
 .cal-empty{font-size:11px;color:#C8D0DC;text-align:center;padding:20px 0;font-weight:600}
+/* [2026-09] 시간순 타임라인 (PC·모바일 공용) */
+.tl-grp{margin-bottom:12px}
+.tl-grp.edu{}
+.tl-hd{display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap}
+.tl-tm{font-size:14px;font-weight:900;color:#1B2436;letter-spacing:-.3px}
+.tl-kind{font-size:9px;font-weight:800;color:#fff;padding:2px 7px;border-radius:5px}
+.tl-kind.iv{background:#4C6EF5}.tl-kind.edu{background:#0E9488}
+.tl-who{font-size:10px;font-weight:800;color:#fff;background:#1E3A8A;padding:2px 8px;border-radius:5px}
+.tl-who.edu{color:#0B7A70;background:#D6F5F0}
+.tl-cnt{font-size:9px;font-weight:800;color:#fff;background:#4C6EF5;padding:2px 7px;border-radius:20px;margin-left:auto}
+.tl-card{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #E7ECF4;border-left:3px solid #CBD5E8;border-radius:8px;padding:8px 10px;margin-bottom:4px;cursor:pointer;transition:.12s}
+.tl-card:hover{box-shadow:0 3px 10px rgba(27,36,54,.12);transform:translateY(-1px)}
+.tl-card.j-상담부{border-left-color:#4C6EF5}.tl-card.j-강사{border-left-color:#1D9E75}.tl-card.j-사업부{border-left-color:#7048E8}.tl-card.j-코칭{border-left-color:#BA7517}
+.tl-grp.edu .tl-card{border-left-color:#0E9488;background:#F7FCFB}
+.tl-card.drop{opacity:.55}
+.tl-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.tl-dot.st-plan{background:#4C6EF5}.tl-dot.st-at{background:#1D9E75}.tl-dot.st-ps{background:#7048E8}.tl-dot.st-edu{background:#7048E8}.tl-dot.st-ns,.tl-dot.st-fa{background:#E23A22}
+.tl-nm{font-size:13px;font-weight:900;color:#1B2436;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl-card.drop .tl-nm{color:#98A0AE}
+.tl-job{font-size:10.5px;font-weight:700;color:#98A0AE;flex-shrink:0}
+.tl-st{font-size:9px;font-weight:800;padding:1px 6px;border-radius:4px;margin-left:auto;flex-shrink:0;white-space:nowrap}
+.tl-st.plan{background:#EEF0FF;color:#4C6EF5}.tl-st.at{background:#E6F7F0;color:#1D9E75}.tl-st.ps{background:#F0EBFF;color:#5A3AD0}.tl-st.edu{background:#F0EBFF;color:#5A3AD0}.tl-st.ns,.tl-st.fa{background:#FCE8E4;color:#E23A22}
 /* [2026-09] 교육 그룹 (면접처럼 묶음, 초록톤) */
 .edu-grp{background:#F2FCFB;border-color:#B7E5DD}
 .edu-grp .cal-grp-hd{border-bottom-color:#CDEBE5}
@@ -262,43 +284,63 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .cac-tabs{display:inline-flex;gap:5px}
 .cac-tab{background:var(--barbg);border:none;color:var(--soft);font-family:inherit;font-weight:700;font-size:12px;padding:6px 14px;border-radius:20px;cursor:pointer}
 .cac-tab.on{background:var(--v1);color:#fff}
-/* 한줄 요약 */
-/* 한줄 요약 — 밝은 스트립 (캘린더 톤 통일) */
-.cac-hero{background:#F4F6FA;border-radius:13px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.cac-hero .big{font-size:13.5px;font-weight:700;color:var(--soft);display:flex;align-items:center;gap:7px;flex-wrap:wrap;line-height:1.9}
-.cac-hero .big .cost{color:var(--ink);font-weight:900;font-size:15px}
-.cac-hero .big b{color:var(--v2);font-weight:900;font-size:15px}
-.cac-hero .big .stp{color:var(--soft);font-weight:700}
-.cac-hero .big .arw{color:#C3CDDD;font-weight:700}
-.cac-hero .big .z{color:#C3CDDD}
-.cac-hero .mini{margin-left:auto;font-size:11.5px;color:var(--soft);font-weight:700;background:#fff;padding:5px 11px;border-radius:8px;border:1px solid var(--line)}
+/* ── HERO 대문짝 (CPH 헤드라인) — 캘린더 톤 통일 ── */
+.cac-hero{background:#F4F6FA;border-radius:13px;padding:15px 18px;margin-bottom:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.cac-hero .cph{display:flex;flex-direction:column;gap:1px}
+.cac-hero .cph .l{font-size:11px;font-weight:700;color:var(--soft)}
+.cac-hero .cph .v{font-size:27px;font-weight:900;color:var(--ink);letter-spacing:-1px;line-height:1}
+.cac-hero .cph .v small{font-size:15px;font-weight:800}
+.cac-hero .cph .v.z{color:#B6C2DC}
+.cac-hero .mini{margin-left:auto;font-size:11.5px;color:var(--soft);font-weight:700;background:#fff;padding:8px 13px;border-radius:9px;border:1px solid var(--line);line-height:1.7;text-align:right}
 .cac-hero .mini b{color:var(--ink);font-weight:900}
-/* 채널 2열 */
+/* 정착률 스트립 */
+.cac-ret{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#F7FCFB;border:1px solid #D6F0E8;border-radius:11px;padding:11px 15px;margin-bottom:14px}
+.cac-ret .ri{display:flex;flex-direction:column;gap:1px}
+.cac-ret .ri .l{font-size:10.5px;font-weight:700;color:var(--soft)}
+.cac-ret .ri .v{font-size:19px;font-weight:900;color:var(--pos,#20A56D);letter-spacing:-.5px;line-height:1.1}
+.cac-ret .ri .v.warn{color:var(--amber)}
+.cac-ret .ri .v.z{color:#B6C2DC}
+.cac-ret .rsep{width:1px;align-self:stretch;background:#CDEBE0}
+.cac-ret .rnote{margin-left:auto;font-size:10.5px;color:#8A9AB0;font-weight:600;line-height:1.5;text-align:right}
+.cac-ret.nodata{background:#FAFBFD;border-color:var(--line)}
+.cac-ret.nodata .v{color:#B6C2DC}
+/* 채널 2열 (세로 스택) */
 .cac-chans{display:grid;grid-template-columns:1fr;gap:10px}
 /* [2026-09] 하단 2단 — 좌 채용단가 / 우 부서별 */
 .hire-2col{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;margin:14px 0}
 .hire-2col .cac-wrap,.hire-2col .dp-wrap{margin:0}
 @media(max-width:900px){.hire-2col{grid-template-columns:1fr}}
-.cac-chan{border:1px solid var(--line);border-radius:13px;padding:15px 17px;background:#fff}
-.cac-chan.jk{border-left:4px solid #BA7517}
-.cac-chan.am{border-left:4px solid #1971C2}
-.cac-chan-top{display:flex;align-items:center;gap:8px;margin-bottom:11px}
+/* 채널 카드 = 타임라인 카드 결 (좌측 색바) */
+.cac-chan{background:#fff;border:1px solid #E7ECF4;border-radius:8px;padding:13px 15px}
+.cac-chan.jk{border-left:3px solid var(--amber)}
+.cac-chan.am{border-left:3px solid var(--v1)}
+.cac-chan-top{display:flex;align-items:center;gap:6px;margin-bottom:10px}
 .cac-chan-nm{font-size:14px;font-weight:900}
-.cac-chan.jk .cac-chan-nm{color:#BA7517}.cac-chan.am .cac-chan-nm{color:#1971C2}
-.cac-chan-char{margin-left:auto;font-size:10.5px;font-weight:800;padding:3px 10px;border-radius:20px}
-.cac-chan.jk .cac-chan-char{background:#FFF4E6;color:#BA7517}
-.cac-chan.am .cac-chan-char{background:#E7F5FF;color:#1971C2}
-.cac-chan-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--line);border-radius:9px;overflow:hidden}
-.cac-cell{background:#fff;padding:10px 6px;text-align:center}
-.cac-cell .l{font-size:10px;color:var(--soft);font-weight:600}
-.cac-cell .v{font-size:16px;font-weight:900;margin-top:2px;letter-spacing:-.5px}
-.cac-cell .v.hi{color:var(--v2)}
-.cac-cell .v.gray{color:#B6C2DC}
-.cac-funnel{display:flex;align-items:center;gap:4px;margin-top:11px;font-size:10.5px;color:var(--soft);font-weight:600;flex-wrap:wrap}
+.cac-chan.jk .cac-chan-nm{color:var(--amber)}.cac-chan.am .cac-chan-nm{color:var(--v1)}
+.cac-chan-char{margin-left:auto;font-size:9.5px;font-weight:800;padding:2px 9px;border-radius:20px}
+.cac-chan.jk .cac-chan-char{background:#FFF4E6;color:var(--amber)}
+.cac-chan.am .cac-chan-char{background:#EEF0FF;color:var(--v1)}
+.cac-chan .cph-l{font-size:10px;font-weight:700;color:var(--soft)}
+.cac-chan .cph-v{font-size:22px;font-weight:900;letter-spacing:-.5px;line-height:1.1}
+.cac-chan .cph-v small{font-size:12px}
+.cac-chan.jk .cph-v{color:var(--amber)}.cac-chan.am .cph-v{color:var(--v1)}
+.cac-chan .cph-v.z{color:#B6C2DC}
+.cac-chan-sub{display:flex;gap:12px;margin-top:9px;font-size:10.5px;color:var(--soft);font-weight:700}
+.cac-chan-sub b{color:var(--ink);font-weight:900}
+.cac-chan-sub b.z{color:#C3CDDD;font-weight:700}
+/* 퍼널 접기 */
+.cac-fntog{margin-top:10px;padding-top:9px;border-top:1px dashed #E7ECF4;font-size:10px;font-weight:800;color:var(--v1);cursor:pointer;user-select:none;display:flex;align-items:center;gap:4px}
+.cac-fntog .arw{transition:transform .15s}
+.cac-fntog.open .arw{transform:rotate(180deg)}
+.cac-funnel{display:none;align-items:center;gap:4px;margin-top:9px;font-size:10.5px;color:var(--soft);font-weight:600;flex-wrap:wrap}
+.cac-funnel.open{display:flex}
 .cac-funnel b{color:var(--ink);font-weight:800}
 .cac-funnel b.z{color:#C3CDDD;font-weight:700}
 .cac-funnel .arw{color:#C9D2E0}
 .cac-note{font-size:11px;color:#B6C2DC;margin-top:12px;line-height:1.5;background:#FAFBFD;border-radius:8px;padding:9px 12px}
+.h2ic{width:17px;height:17px;vertical-align:-3px;margin-right:5px;color:var(--v1)}
+.noteic{width:14px;height:14px;vertical-align:-2px;margin-right:4px;color:#C3CDDD}
+.hlic{width:14px;height:14px;vertical-align:-2px;margin-right:4px}
 /* ── 부서별 (기존 스타일 재사용) ── */
 .dp-wrap{background:var(--pan);border-radius:16px;padding:20px 22px;box-shadow:0 2px 8px rgba(27,36,54,.05);margin-bottom:14px}
 .dp-hd{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px}
@@ -379,15 +421,16 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 <!-- ②③ 채용단가 + 부서별 공고 (2단) -->
 <div class="hire-2col">
 <div class="cac-wrap">
-  <div class="cac-hd"><h2>💰 채용단가 <span style="font-size:11px;font-weight:600;color:#B6C2DC">(공고비 ÷ 채용 = CPH)</span></h2>
+  <div class="cac-hd"><h2><svg class="h2ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5"/><path d="M4 19h16"/><rect x="7" y="11" width="3" height="5" rx="0.5"/><rect x="12.5" y="7" width="3" height="9" rx="0.5"/></svg>채용단가 <span style="font-size:11px;font-weight:600;color:#B6C2DC">(공고비 ÷ 채용 = CPH)</span></h2>
     <div class="cac-tabs" id="cac_tabs"></div></div>
   <div id="cac_hero"></div>
+  <div id="cac_ret"></div>
   <div class="cac-chans" id="cac_chans"></div>
-  <div class="cac-note">💡 잡코리아 = 경력·정착형 / 알바몬 = 빠른충원 · <b>채용은 단가보다 정착</b></div>
+  <div class="cac-note"><svg class="noteic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.5.5 1 1.2 1 2.5h6c0-1.3.5-2 1-2.5A6 6 0 0 0 12 3z"/></svg>잡코리아 = 경력·정착형 / 알바몬 = 빠른충원 · <b>채용은 단가보다 정착</b> — 정착률 = HR 입퇴사 기준</div>
 </div>
 
 <div class="dp-wrap">
-  <div class="dp-hd"><div><h2>🏢 부서별 공고 <span class="sub">알바몬+잡코리아 · 입퇴사</span></h2></div>
+  <div class="dp-hd"><div><h2><svg class="h2ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/><path d="M5 21h14"/></svg>부서별 공고 <span class="sub">알바몬+잡코리아 · 입퇴사</span></h2></div>
     <div class="dp-tabs" id="dp_tabs"></div></div>
   <div class="dp-grid" id="dp_grid"></div>
 </div>
@@ -472,7 +515,7 @@ function statusFlow(iv){
     if(iv.eduDate){
       var ed=parseDate(iv.eduDate);
       var edStr=ed?(ed.getMonth()+1)+'/'+ed.getDate():'';
-      return b('ps','합격')+arw+b('edu','🎓교육 '+edStr);
+      return b('ps','합격')+arw+b('edu','교육 '+edStr);
     }
     return b('ps','합격')+arw+b('wait','교육대기');
   }
@@ -570,53 +613,7 @@ function renderCal(){
     h+='<div class="'+cls+'"><div class="cal-dhd"><div><div class="cal-wd">'+WD[dow]+'</div><div class="cal-dnum">'+d.getDate()+'</div></div>'
       +(isT?'<span class="cal-todaytag">TODAY</span>':'')+'</div><div class="cal-ivs">';
     if(list.length || eduList.length){
-      var groups={}, gOrder=[];
-      list.forEach(function(iv){
-        var gkey=(iv.time||'-')+'|'+interviewerOf(iv);
-        if(!groups[gkey]){ groups[gkey]={time:iv.time||'-', mgr:interviewerOf(iv), members:[]}; gOrder.push(gkey); }
-        groups[gkey].members.push(iv);
-      });
-      gOrder.forEach(function(gk){
-        var g=groups[gk], esc=function(s){return String(s||'').replace(/</g,'&lt;');};
-        var multi=g.members.length>1;
-        h+='<div class="cal-grp'+(multi?' multi':'')+'">'
-          +'<div class="cal-grp-hd">'+mgrBadge(g.mgr)+'<span class="cal-grp-tm">'+esc(g.time)+'</span>'
-          +(multi?'<span class="cal-grp-cnt">'+g.members.length+'명</span>':'')+'</div>';
-        // [2026-09] 개별 카드 유지(나이·유입·상태) + 그룹으로 묶기만
-        g.members.forEach(function(iv){
-          var stCls=cardStateClass(iv), flow=statusFlow(iv);
-          h+='<div class="cal-iv '+stCls+'" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/\x27/g,'')+'\')">'
-            +'<div class="cal-iv-nm-row"><span class="cal-iv-nm">'+esc(iv.name)+'</span>'
-            +'<span class="cal-jbadge job-'+esc(iv.job)+'">'+esc(iv.job)+'</span></div>'
-            +'<div class="cal-iv-flow">'+flow+'</div>'
-            +'<div class="cal-iv-btm"><span class="cal-site">'+esc(iv.site||'')+'</span></div></div>';
-        });
-        h+='</div>';
-      });
-      // [2026-09] 교육도 시간+교육담당 그룹핑 (면접처럼). 담당 1번, 피교육자 카드
-      var eduGroups={}, eduOrder=[];
-      eduList.forEach(function(iv){
-        var esc=function(s){return String(s||'').replace(/</g,'&lt;');};
-        var gkey=(iv.eduTime||'-')+'|'+(iv.eduWho||'');
-        if(!eduGroups[gkey]){ eduGroups[gkey]={time:iv.eduTime||'', who:iv.eduWho||'', members:[]}; eduOrder.push(gkey); }
-        eduGroups[gkey].members.push(iv);
-      });
-      eduOrder.forEach(function(gk){
-        var g=eduGroups[gk], esc=function(s){return String(s||'').replace(/</g,'&lt;');};
-        var multi=g.members.length>1;
-        h+='<div class="cal-grp edu-grp'+(multi?' multi':'')+'">'
-          +'<div class="cal-grp-hd"><span class="cal-edu-badge">교육</span>'
-          +(g.who?'<span class="edu-who">'+esc(withTitle(g.who))+'</span>':'')
-          +'<span class="cal-grp-tm">'+esc(g.time)+'</span>'
-          +(multi?'<span class="cal-grp-cnt">'+g.members.length+'명</span>':'')+'</div>';
-        g.members.forEach(function(iv){
-          h+='<div class="cal-iv st-edu" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/\x27/g,'')+'\')">'
-            +'<div class="cal-iv-nm-row"><span class="cal-iv-nm">'+esc(iv.name)+'</span>'
-            +'<span class="cal-jbadge job-'+esc(iv.job)+'">'+esc(iv.job)+'</span></div>'
-            +'<div class="cal-iv-btm"><span class="cal-site">'+esc(iv.site||'')+'</span></div></div>';
-        });
-        h+='</div>';
-      });
+      buildTimeline(dstr).forEach(function(g){ h+=timelineGroupHtml(g); });
     } else {
       h+='<div class="cal-empty">일정 없음</div>';
     }
@@ -634,46 +631,9 @@ var __calMode='day';
 window.calSetMode=function(m){ __calMode=m; var days=[],ws=new Date(__weekStart); for(var i=0;i<7;i++){var d=new Date(ws);d.setDate(ws.getDate()+i);days.push(d);} renderCalMobile(days, todayYmd()); };
 
 function dayListHtml(dstr){
-  var list=IVS.filter(function(x){return x.date===dstr;});
-  var eduList=IVS.filter(function(x){return x.eduDate && ymdFromEdu(x.eduDate)===dstr;});
-  var esc=function(s){return String(s||'').replace(/</g,'&lt;');};
-  if(!list.length && !eduList.length) return '';
-  var bh='';
-  var groups={}, gOrder=[];
-  list.forEach(function(iv){
-    var gkey=(iv.time||'-')+'|'+interviewerOf(iv);
-    if(!groups[gkey]){ groups[gkey]={time:iv.time||'-', mgr:interviewerOf(iv), members:[]}; gOrder.push(gkey); }
-    groups[gkey].members.push(iv);
-  });
-  gOrder.forEach(function(gk){
-    var g=groups[gk], multi=g.members.length>1;
-    bh+='<div class="cms-grp"><div class="cms-grp-hd"><span class="cms-grp-tm">'+esc(g.time)+'</span>'
-      +'<span class="cms-mgr">'+esc(mgrPlain(g.mgr))+'</span>'
-      +(multi?'<span class="cms-grp-cnt">'+g.members.length+'명</span>':'')+'</div>';
-    g.members.forEach(function(iv){
-      var drop=isDrop(iv), st=miniStatus(iv);
-      bh+='<div class="cms-row'+(drop?' drop':'')+'" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/\x27/g,'')+'\')">'
-        +'<div class="cms-bar j-'+esc(iv.job)+'"></div>'
-        +'<div class="cms-tm">'+esc(iv.time||'-')+'</div>'
-        +'<div class="cms-mid"><div class="cms-nm">'+esc(iv.name)+(iv.site?'<span class="site">'+esc(iv.site)+'</span>':'')+'</div>'
-        +'<div class="cms-sub"><span class="cms-jb job-'+esc(iv.job)+'">'+esc(iv.job)+'</span>'
-        +(st?'<span class="cms-st '+st.c+'">'+st.t+'</span>':'')+'</div></div></div>';
-    });
-    bh+='</div>';
-  });
-  if(eduList.length){
-    bh+='<div class="cms-grp"><div class="cms-grp-hd"><span class="cms-grp-tm">🎓 교육</span></div>';
-    eduList.forEach(function(iv){
-      bh+='<div class="cms-row edu" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/\x27/g,'')+'\')">'
-        +'<div class="cms-bar j-edu"></div>'
-        +'<div class="cms-tm">'+esc(iv.eduTime||'-')+'</div>'
-        +'<div class="cms-mid"><div class="cms-nm">'+esc(iv.name)+' <span class="egu">교육</span></div>'
-        +'<div class="cms-sub"><span class="cms-jb job-'+esc(iv.job)+'">'+esc(iv.job)+'</span>'
-        +(iv.eduWho?'<span class="cms-mgr">'+esc(withTitle(iv.eduWho))+'</span>':'')+'</div></div></div>';
-    });
-    bh+='</div>';
-  }
-  return bh;
+  var tl=buildTimeline(dstr);
+  if(!tl.length) return '';
+  return tl.map(function(g){ return timelineGroupHtml(g); }).join('');
 }
 function dayCount(dstr){
   return IVS.filter(function(x){return x.date===dstr;}).length
@@ -736,6 +696,47 @@ function miniStatus(iv){
   if(p.indexOf('합격')>=0) return iv.eduDate?{c:'edu',t:'교육예정'}:{c:'ps',t:'합격'};
   if(a.indexOf('참석')>=0) return {c:'at',t:'참석'};
   return {c:'plan',t:'예정'};
+}
+
+// [2026-09] 시간 문자열 → 분 (정렬용). "14:30"→870, "-"→9999
+function _tmin(t){ var m=String(t||'').match(/(\d{1,2}):(\d{2})/); return m?(+m[1]*60+ +m[2]):9999; }
+// [2026-09] 하루 = 면접+교육 통합 시간순 그룹 목록. 같은 시간+종류+진행자 = 한 그룹.
+function buildTimeline(dstr){
+  var list=IVS.filter(function(x){return x.date===dstr;});
+  var eduList=IVS.filter(function(x){return x.eduDate && ymdFromEdu(x.eduDate)===dstr;});
+  var groups={}, order=[];
+  list.forEach(function(iv){
+    var t=iv.time||'-', mgr=interviewerOf(iv), k='iv|'+t+'|'+mgr;
+    if(!groups[k]){ groups[k]={kind:'면접',time:t,who:mgr,tm:_tmin(t),members:[]}; order.push(k); }
+    groups[k].members.push(iv);
+  });
+  eduList.forEach(function(iv){
+    var t=iv.eduTime||'-', who=iv.eduWho||'', k='edu|'+t+'|'+who;
+    if(!groups[k]){ groups[k]={kind:'교육',time:t,who:who,tm:_tmin(t),members:[]}; order.push(k); }
+    groups[k].members.push(iv);
+  });
+  return order.map(function(k){return groups[k];}).sort(function(a,b){ return a.tm-b.tm; });
+}
+// [2026-09] 타임라인 그룹 1개 → HTML (PC·모바일 공용). 시간 크게 + 면접/교육 딱지 + 진행자 + 상태카드
+function timelineGroupHtml(g){
+  var esc=function(s){return String(s||'').replace(/</g,'&lt;');};
+  var multi=g.members.length>1;
+  var isEdu=(g.kind==='교육');
+  var kindBadge='<span class="tl-kind '+(isEdu?'edu':'iv')+'">'+g.kind+'</span>';
+  var whoBadge=g.who?'<span class="tl-who '+(isEdu?'edu':'')+'">'+esc(withTitle(g.who))+'</span>':'';
+  var h='<div class="tl-grp'+(isEdu?' edu':'')+'"><div class="tl-hd">'
+    +'<span class="tl-tm">'+esc(g.time)+'</span>'+kindBadge+whoBadge
+    +(multi?'<span class="tl-cnt">'+g.members.length+'</span>':'')+'</div>';
+  g.members.forEach(function(iv){
+    var st=miniStatus(iv), drop=isDrop(iv);
+    h+='<div class="tl-card'+(drop?' drop':'')+' j-'+esc(iv.job)+'" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/\x27/g,'')+'\')">'
+      +'<span class="tl-dot st-'+st.c+'"></span>'
+      +'<span class="tl-nm">'+esc(iv.name)+'</span>'
+      +'<span class="tl-job">'+esc(iv.site||iv.job)+'</span>'
+      +'<span class="tl-st '+st.c+'">'+st.t+'</span></div>';
+  });
+  h+='</div>';
+  return h;
 }
 
 window.openIv=function(date,name){
@@ -803,6 +804,105 @@ function passCountByMonth(moLabel){
   return out;
 }
 
+// ══════════════════════════════════════════════
+// 정착률(이탈률) — HR 4시트 입퇴사 날짜 기준
+// 1개월=입사후30일내 퇴사 / 3개월=90일내 · 성숙필터: 3개월은 입사후90일 경과자만 분모
+// ⚠️ 채널(잡/알바)별 불가 — HR시트에 채널정보 없음. 전사만.
+// ══════════════════════════════════════════════
+var HR_CSV = {
+  상담: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQsnuROsI7L8HP80yoRQCuaAkcoPnVcK9TY1U2Z-B8AVHmz_Y7rO4_aUBLsgu91bJGj63xJFmNrnPaJ/pub?gid=120536013&single=true&output=csv',
+  사업: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTOyHCwLPcRpL2wumHbbZCSuzSZJJw7zaGeARW2I9JjWbX-lA0Uf6mVO5n4JHIKfaAzeSrOFEvjvdKi/pub?gid=1502260628&single=true&output=csv',
+  수업: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vShRV1Qb_pqFgbkFJM1SCG5462zc_HgNTqG7-kxvoIvxd1yzx_pkIkP2IjjiVncH2arU5Ro2jgoH2AW/pub?gid=381025116&single=true&output=csv',
+  코칭: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vShRV1Qb_pqFgbkFJM1SCG5462zc_HgNTqG7-kxvoIvxd1yzx_pkIkP2IjjiVncH2arU5Ro2jgoH2AW/pub?gid=956415153&single=true&output=csv'
+};
+function _hrHeaderIdx(H,names){ for(var n=0;n<names.length;n++){ for(var i=0;i<H.length;i++){ if((H[i]||'').replace(/\s/g,'')===names[n].replace(/\s/g,'')) return i; } } return -1; }
+function _hrParseDate(v){
+  var s=String(v||'').trim();
+  var m=s.match(/(\d{4})[-.\/]\s*(\d{1,2})[-.\/]\s*(\d{1,2})/);
+  if(m) return new Date(+m[1],+m[2]-1,+m[3]);
+  return null;
+}
+// 각 시트 → {name,inD,outD,jae} 배열 (전체 행, 옛 퇴사자 포함)
+async function _hrLoadRows(url){
+  var res=await fetch(url); var text=await res.text();
+  var rows=parseCSV(text).filter(function(r){return r.some(function(c){return (c||'').trim();});});
+  var hi=0; for(var i=0;i<Math.min(rows.length,5);i++){ if(rows[i].some(function(c){return (c||'').indexOf('이름')>=0;})){hi=i;break;} }
+  var H=rows[hi];
+  var cName=_hrHeaderIdx(H,['이름']), cIn=_hrHeaderIdx(H,['입사일','입사']),
+      cOut=_hrHeaderIdx(H,['퇴사일','퇴사']), cJae=_hrHeaderIdx(H,['재직']);
+  var out=[];
+  for(var r=hi+1;r<rows.length;r++){
+    var row=rows[r]; var name=(cName>=0?row[cName]:'').trim(); if(!name) continue;
+    var inD=_hrParseDate(cIn>=0?row[cIn]:'');
+    var outv=(cOut>=0?row[cOut]:'').trim();
+    var outD=_hrParseDate(outv);
+    var jaev=(cJae>=0?row[cJae]:'').trim();
+    var jae = cJae>=0 ? (jaev==='재직') : (!outv);
+    out.push({name:name, inD:inD, outD:outD, jae:jae});
+  }
+  return out;
+}
+// 이탈률 집계 — 성숙필터 적용
+function _retentionCalc(rows){
+  var today=new Date(); today.setHours(0,0,0,0);
+  var DAY=86400000;
+  // 데이터 품질
+  var q={total:rows.length, noIn:0, hasOut:0, outNoIn:0, future:0};
+  // 1개월(30일): 성숙필터 = 입사후 30일 경과자만 분모
+  var d1={denom:0, churn:0}, d3={denom:0, churn:0};
+  rows.forEach(function(x){
+    if(!x.inD){ q.noIn++; if(x.outD) q.outNoIn++; return; } // 입사일 없으면 판정불가 → 분모 제외
+    var age = Math.floor((today - x.inD)/DAY);
+    if(age<0){ q.future++; return; } // 미래 입사일(오타) 제외
+    if(x.outD) q.hasOut++;
+    var span = x.outD ? Math.floor((x.outD - x.inD)/DAY) : null;
+    // 1개월: 입사후 30일 경과자만 분모 (재직자든 퇴사자든)
+    if(age>=30 || (span!==null && span<=30)){
+      d1.denom++;
+      if(span!==null && span<=30) d1.churn++;
+    }
+    // 3개월: 입사후 90일 경과자만 분모
+    if(age>=90 || (span!==null && span<=90)){
+      d3.denom++;
+      if(span!==null && span<=90) d3.churn++;
+    }
+  });
+  return {d1:d1, d3:d3, q:q};
+}
+var __HR_RET=null, __HR_RET_STATE='loading'; // loading|ok|err
+async function loadRetention(){
+  try{
+    var keys=Object.keys(HR_CSV);
+    var all=await Promise.all(keys.map(function(k){return _hrLoadRows(HR_CSV[k]);}));
+    // 수업·코칭은 같은 스프레드시트 다른 gid → 각각 정상. 중복 이름 있어도 시트 다르면 다른 사람일 수 있어 합산 유지
+    var merged=[]; var byDept={};
+    keys.forEach(function(k,i){ byDept[k]=_retentionCalc(all[i]); merged=merged.concat(all[i]); });
+    __HR_RET={all:_retentionCalc(merged), byDept:byDept, raw:merged};
+    __HR_RET_STATE='ok';
+  }catch(e){ console.error('정착률 로드 실패',e); __HR_RET_STATE='err'; }
+  cacRetRender();
+}
+function _retPct(o){ return o.denom>0 ? (100*(o.denom-o.churn)/o.denom) : null; }
+function cacRetRender(){
+  var el=document.getElementById('cac_ret'); if(!el) return;
+  if(__HR_RET_STATE==='loading'){ el.innerHTML='<div class="cac-ret nodata"><div class="ri"><div class="l">정착률</div><div class="v z">불러오는 중…</div></div></div>'; return; }
+  if(__HR_RET_STATE==='err' || !__HR_RET){ el.innerHTML='<div class="cac-ret nodata"><div class="ri"><div class="l">정착률</div><div class="v z">HR 시트 로드 실패</div></div></div>'; return; }
+  var R=__HR_RET.all, q=R.q;
+  function box(label, o){
+    var p=_retPct(o);
+    if(p===null) return '<div class="ri"><div class="l">'+label+'</div><div class="v z">표본 없음</div></div>';
+    var cls = p<70?' warn':'';
+    return '<div class="ri"><div class="l">'+label+'</div><div class="v'+cls+'">'+p.toFixed(1)+'%</div>'
+      +'<div class="l" style="color:#8A9AB0">'+o.denom+'명 중 '+o.churn+' 이탈</div></div>';
+  }
+  el.innerHTML='<div class="cac-ret">'
+    + box('정착률 (1개월)', R.d1)
+    + '<div class="rsep"></div>'
+    + box('정착률 (3개월)', R.d3)
+    + '<div class="rnote">전사 · HR 입퇴사 기준<br>1개월=입사후30일경과자 / 3개월=90일경과자<br>채널별(잡·알바) 구분 불가</div>'
+    + '</div>';
+}
+
 function cacRender(){
   var mo=window.__dpMonth, D=HIRE_DEPT[mo]; if(!D) return;
   var am={g:0,edu:0,iry:0,mt:0,mc:0}, jk={g:0,edu:0,iry:0,mt:0,mc:0};
@@ -818,30 +918,28 @@ function cacRender(){
   var passTotal = jkPass + amPass;
   var passCac = passTotal>0 ? Math.round(t.gonggo/passTotal) : 0;
   var eduCac  = t.edu>0 ? Math.round(t.gonggo/t.edu) : 0;
-  function stp(label,n){ return '<span class="stp">'+label+' <b'+(n?'':' class="z"')+'>'+n+'</b></span>'; }
-  var pipe=[];
-  if(pass.plan) pipe.push(stp('면접예정',pass.plan));
-  pipe.push(stp('합격',passTotal));
-  if(pass.eduWait) pipe.push(stp('교육대기',pass.eduWait));
-  pipe.push(stp('🎓완료',t.edu||0));
-  var heroHtml='<div class="cac-hero"><div class="big"><span class="cost">'+dpWon(t.gonggo)+'원</span> '+pipe.join('<span class="arw">→</span>')+'</div>'
-    + '<div class="mini">'+(passCac?'합격 1명당 <b>'+dpWon(passCac)+'</b>원':'집계중')+(eduCac?' · 교육 <b>'+dpWon(eduCac)+'</b>원':'')+'</div></div>';
+  // HERO — CPH 헤드라인 (합격 1명당)
+  var heroHtml='<div class="cac-hero">'
+    + '<div class="cph"><div class="l">합격 1명당 (CPH)</div><div class="v'+(passCac?'':' z')+'">'+(passCac?dpWon(passCac):'집계중')+(passCac?'<small>원</small>':'')+'</div></div>'
+    + '<div class="mini">공고비 <b>'+dpWon(t.gonggo)+'</b><br>합격 <b>'+passTotal+'</b>명 · 교육 <b'+(t.edu?'':' class="z"')+'>'+(t.edu||0)+'</b></div>'
+    + '</div>';
   document.getElementById('cac_hero').innerHTML=heroHtml;
   function chanCard(cls,nm,char,c,pc){
     var cac = pc>0 ? Math.round(c.g/pc) : 0;
     var fb=function(label,n){ return label+' <b'+(n?'':' class="z"')+'>'+n+'</b>'; };
     return '<div class="cac-chan '+cls+'"><div class="cac-chan-top"><span class="cac-chan-nm">'+nm+'</span>'
       +'<span class="cac-chan-char">'+char+'</span></div>'
-      +'<div class="cac-chan-grid">'
-      +'<div class="cac-cell"><div class="l">공고비</div><div class="v">'+dpWon(c.g)+'</div></div>'
-      +'<div class="cac-cell"><div class="l">합격</div><div class="v '+(pc?'hi':'gray')+'">'+pc+'명</div></div>'
-      +'<div class="cac-cell"><div class="l">채용단가</div><div class="v '+(cac?'hi':'gray')+'">'+(cac?dpWon(cac):'-')+'</div></div></div>'
-      +'<div class="cac-funnel">'+fb('이력',c.iry)+'<span class="arw">→</span>'+fb('통보',c.mt)+'<span class="arw">→</span>'+fb('참여',c.mc)+'<span class="arw">→</span>'+fb('합격',pc)+'<span class="arw">→</span>'+fb('🎓',c.edu)+'</div></div>';
+      +'<div class="cph-l">채용단가</div>'
+      +'<div class="cph-v'+(cac?'':' z')+'">'+(cac?dpWon(cac):'-')+(cac?'<small>원</small>':'')+'</div>'
+      +'<div class="cac-chan-sub"><span>공고 <b'+(c.g?'':' class="z"')+'>'+dpWon(c.g)+'</b></span><span>합격 <b'+(pc?'':' class="z"')+'>'+pc+'</b></span></div>'
+      +'<div class="cac-fntog" onclick="cacFnTog(this)"><span class="arw">▾</span> 퍼널 상세</div>'
+      +'<div class="cac-funnel">'+fb('이력',c.iry)+'<span class="arw">→</span>'+fb('통보',c.mt)+'<span class="arw">→</span>'+fb('참여',c.mc)+'<span class="arw">→</span>'+fb('합격',pc)+'<span class="arw">→</span>'+fb('교육',c.edu)+'</div></div>';
   }
   document.getElementById('cac_chans').innerHTML=
-    chanCard('jk','잡코리아','💼 경력·정착형',jk,jkPass)+chanCard('am','알바몬','⚡ 빠른충원',am,amPass);
+    chanCard('jk','잡코리아','경력·정착형',jk,jkPass)+chanCard('am','알바몬','빠른충원',am,amPass);
   document.querySelectorAll('.cac-tab').forEach(function(b){ b.classList.toggle('on', b.dataset.mo===mo); });
 }
+function cacFnTog(el){ el.classList.toggle('open'); var f=el.nextElementSibling; if(f) f.classList.toggle('open'); }
 
 function dpRender(){
   var mo=window.__dpMonth, D=HIRE_DEPT[mo]; if(!D) return;
@@ -869,7 +967,7 @@ function dpRender(){
       +'<span class="meta">'+mb('이력',v.tot.iryeok)+' · '+mb('통보',v.tot.myeontong)+' · '+mb('참여',v.tot.myeoncham)+' · '+mb('교육',v.tot.edu)+'</span>'
       +'<span class="g">'+dpWon(v.tot.gonggo)+'</span></div>';
     if(v.hire){
-      var hh='<div class="dp-hire"><div class="dp-hire-top"><span class="hl">👥 입퇴사</span>';
+      var hh='<div class="dp-hire"><div class="dp-hire-top"><span class="hl"><svg class="hlic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M4 20c0-3 2.5-5 5-5s5 2 5 5"/><path d="M16 5.5a3 3 0 0 1 0 5"/><path d="M18 15c1.8.5 3 2 3 4"/></svg>입퇴사</span>';
       if(v.hire.jijum && v.hire.jijum.length){
         hh+='<span class="in">입사 '+v.hire.tin+'</span><span class="out">퇴사 '+v.hire.tout+'</span></div><div class="dp-jj">';
         v.hire.jijum.forEach(function(j){var net=j.in-j.out;var nc=net>0?'p':net<0?'m':'z';hh+='<div class="dp-jj-item">'+j.nm.replace('센터','').replace('지점','')+' <b class="'+nc+'">'+(net>0?'+':'')+net+'</b></div>';});
@@ -891,6 +989,7 @@ function moSwitch(mo){ window.__dpMonth=mo; cacRender(); dpRender(); }
   var dpH=order.map(function(k){return '<button class="dp-tab'+(k===window.__dpMonth?' on':'')+'" data-mo="'+k+'" onclick="moSwitch(\''+k+'\')">'+k+'</button>';}).join('');
   document.getElementById('dp_tabs').innerHTML=dpH;
   cacRender(); dpRender();
+  cacRetRender(); loadRetention();
 })();
 </script>
 
