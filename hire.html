@@ -418,7 +418,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 </div>
 
 <div class="dp-wrap">
-  <div class="dp-hd"><div><h2><svg class="h2ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/><path d="M5 21h14"/></svg>부서별 공고 <span class="sub">알바몬+잡코리아 · 입퇴사</span></h2></div>
+  <div class="dp-hd"><div><h2><svg class="h2ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/><path d="M5 21h14"/></svg>부서별 공고 <span class="sub">알바몬+잡코리아</span></h2></div>
     <div class="dp-tabs" id="dp_tabs"></div></div>
   <div class="dp-grid" id="dp_grid"></div>
 </div>
@@ -855,15 +855,6 @@ function dpRender(){
     body+='<div class="dp-tot-row"><span class="lbl">합계</span>'
       +'<span class="meta">'+mb('이력',v.tot.iryeok)+' · '+mb('통보',v.tot.myeontong)+' · '+mb('참여',v.tot.myeoncham)+' · '+mb('교육',v.tot.edu)+'</span>'
       +'<span class="g">'+dpWon(v.tot.gonggo)+'</span></div>';
-    if(v.hire){
-      var hh='<div class="dp-hire"><div class="dp-hire-top"><span class="hl"><svg class="hlic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M4 20c0-3 2.5-5 5-5s5 2 5 5"/><path d="M16 5.5a3 3 0 0 1 0 5"/><path d="M18 15c1.8.5 3 2 3 4"/></svg>입퇴사</span>';
-      if(v.hire.jijum && v.hire.jijum.length){
-        hh+='<span class="in">입사 '+v.hire.tin+'</span><span class="out">퇴사 '+v.hire.tout+'</span></div><div class="dp-jj">';
-        v.hire.jijum.forEach(function(j){var net=j.in-j.out;var nc=net>0?'p':net<0?'m':'z';hh+='<div class="dp-jj-item">'+j.nm.replace('센터','').replace('지점','')+' <b class="'+nc+'">'+(net>0?'+':'')+net+'</b></div>';});
-        hh+='</div>';
-      } else hh+='</div><div class="dp-hire-none">이번 달 입퇴사 집계 전</div>';
-      hh+='</div>'; body+=hh;
-    }
     gh+='<div class="dp-card '+d+'"><div class="dp-card-hd"><span class="dp-dot"></span><span class="dp-name">'+d+'</span>'
       +'<span class="dp-sum">공고 '+dpWon(v.tot.gonggo)+'</span></div><div class="dp-body">'+body+'</div></div>';
   });
