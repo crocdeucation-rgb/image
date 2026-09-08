@@ -1833,7 +1833,7 @@ var PC_TIER_SANG=[{t:'SSS',v:40000000},{t:'SS',v:35000000},{t:'S',v:30000000},{t
 var PC_TIER_SAUP=[{t:'SSS',v:90000000},{t:'SS',v:80000000},{t:'S',v:70000000},{t:'A',v:60000000},{t:'B',v:50000000},{t:'C',v:40000000},{t:'D',v:30000000},{t:'E',v:20000000},{t:'F',v:15000000}];
 function pcTierOf(s,useF){var T=useF?PC_TIER_SAUP:PC_TIER_SANG;for(var i=0;i<T.length;i++){if(s>=T[i].v)return T[i].t;}return 'F';}
 function pcNextTier(s,useF){var T=useF?PC_TIER_SAUP:PC_TIER_SANG;for(var i=T.length-1;i>=0;i--){if(s<T[i].v)return {t:T[i].t,need:T[i].v-s,base:(i<T.length-1?T[i+1].v:0),to:T[i].v};}return null;}
-var PC_TROPHY={'MVP':{ic:'🏆',cls:'mvp',lbl:'MVP'},'블루리본':{ic:'🎗️',cls:'blue',lbl:'블루리본'},'마스터리본':{ic:'🔷',cls:'master',lbl:'마스터리본'},'그랜드리본':{ic:'💠',cls:'grand',lbl:'그랜드리본'},'로얄리본':{ic:'👑',cls:'royal',lbl:'로얄리본'},'떡상왕':{ic:'🚀',cls:'tteok',lbl:'떡상왕'},'커리어하이':{ic:'🎖️',cls:'career',lbl:'커리어하이'},'최고의지점':{ic:'🥇',cls:'team',lbl:'최고의지점'},'지점커리어하이':{ic:'🎖️',cls:'career',lbl:'지점 신기록'},'지점떡상왕':{ic:'🚀',cls:'tteok',lbl:'지점 떡상왕'},'효율왕':{ic:'⚡',cls:'mvp',lbl:'효율왕'}};
+var PC_TROPHY={'MVP':{ic:'🏆',cls:'mvp',lbl:'MVP'},'블루리본':{ic:'🎗️',cls:'blue',lbl:'블루리본'},'마스터리본':{ic:'🔷',cls:'master',lbl:'마스터리본'},'그랜드리본':{ic:'💠',cls:'grand',lbl:'그랜드리본'},'로얄리본':{ic:'👑',cls:'royal',lbl:'로얄리본'},'떡상왕':{ic:'🚀',cls:'tteok',lbl:'떡상왕'},'커리어하이':{ic:'🎖️',cls:'career',lbl:'커리어하이'},'최고의지점':{ic:'🥇',cls:'team',lbl:'최고의지점'},'지점커리어하이':{ic:'🎖️',cls:'career',lbl:'지점 신기록'},'지점떡상왕':{ic:'🚀',cls:'tteok',lbl:'지점 떡상왕'}};
 var PC_MON=['','1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
 function pcWon(n){return (n||0).toLocaleString('ko-KR');}
 function pcEok(n){n=n||0;if(n>=100000000){var e=n/100000000;return (e%1===0?e.toFixed(0):e.toFixed(2))+'억';}if(n>=10000){var m=n/10000;return (m%1===0?String(m):Math.round(m))+'만';}return pcWon(n);}
@@ -2115,8 +2115,8 @@ window.openBranchCard=function(brName){
   // (1) 최고의지점 — 소속원 이름으로 저장됨 (team===지점명). 월별 중복 제거
   Object.keys(HOF).forEach(function(nm){ (HOF[nm]||[]).forEach(function(t){ if(t.type==='최고의지점' && t.team===brName){ var k='최고의지점|'+t.m; if(!_seen[k]){ _seen[k]=1; hofTrs.push({type:'최고의지점',m:t.m,team:brName}); } } }); });
   // (2) 지점 전용 훈장 — name=지점명으로 저장됨 (HOF[지점명])
-  (HOF[brName]||[]).forEach(function(t){ if(['지점커리어하이','지점떡상왕','효율왕'].indexOf(t.type)>=0){ var k=t.type+'|'+t.m; if(!_seen[k]){ _seen[k]=1; hofTrs.push({type:t.type,m:t.m,team:brName}); } } });
-  var _tOrder={'최고의지점':0,'효율왕':1,'지점떡상왕':2,'지점커리어하이':3};
+  (HOF[brName]||[]).forEach(function(t){ if(['지점커리어하이','지점떡상왕'].indexOf(t.type)>=0){ var k=t.type+'|'+t.m; if(!_seen[k]){ _seen[k]=1; hofTrs.push({type:t.type,m:t.m,team:brName}); } } });
+  var _tOrder={'최고의지점':0,'지점떡상왕':1,'지점커리어하이':2};
   hofTrs.sort(function(a,b){ if(_tOrder[a.type]!==_tOrder[b.type]) return (_tOrder[a.type]||9)-(_tOrder[b.type]||9); return b.m.localeCompare(a.m); });
   var trHtml=''; if(hofTrs.length){ trHtml='<div class="pc-sec"><div class="pc-sec-t">🏆 트로피 <span class="cnt">'+hofTrs.length+'</span></div><div class="tr-list">'+hofTrs.map(function(t){var d=PC_TROPHY[t.type]||{ic:'🏅',cls:'team',lbl:t.type};return '<div class="trp '+d.cls+'"><span class="ic">'+d.ic+'</span><span class="tt">'+PC_MON[+pcMoNum(t.m)]+' '+d.lbl+'</span></div>';}).join('')+'</div></div>'; }
   // 다음티어
@@ -2367,7 +2367,6 @@ window.openGuide=function(){
    +'<div style="font-size:11px;font-weight:800;color:#8A97AC;margin:12px 0 5px">지점 훈장</div>'
    +'<div class="gd-tro">'
    +'<span class="gd-tro-item"><span class="i">🥇</span>최고의 지점 — 매출 1위 <span style="color:#B6C2DC">(영구)</span></span>'
-   +'<span class="gd-tro-item"><span class="i">⚡</span>효율왕 — 1인당 매출 1위</span>'
    +'<span class="gd-tro-item"><span class="i">🚀</span>지점 떡상왕 — 전월대비 성장</span>'
    +'<span class="gd-tro-item"><span class="i">🎖️</span>지점 신기록 — 최고 매출 경신</span>'
    +'</div></div>';
@@ -2787,7 +2786,7 @@ function branchBadges(brName){
   var d=new Date(), y=d.getFullYear(), pm=d.getMonth();
   if(pm===0){ y-=1; pm=12; }
   var closed=y+'-'+('0'+pm).slice(-2);
-  var icons={'효율왕':'⚡','지점떡상왕':'🚀','지점커리어하이':'🎖️'};
+  var icons={'지점떡상왕':'🚀','지점커리어하이':'🎖️'};
   var out=[], _seen={};
   // (1) 최고의지점 = 영구 누적 (개인 MVP와 동일). 소속원 이름으로 저장(team=지점명), 월별 중복제거
   var champMonths=[];
@@ -2799,7 +2798,7 @@ function branchBadges(brName){
   champMonths.sort().forEach(function(mk){ out.push('🥇'+parseInt(mk.slice(5),10)); });
   // (2) 지점 전용 훈장 = 직전 종결달만 (개인 나머지 훈장과 동일). 지점명 자체로 저장
   (HOF[brName]||[]).forEach(function(t){
-    if(['지점커리어하이','지점떡상왕','효율왕'].indexOf(t.type)>=0 && t.m===closed){
+    if(['지점커리어하이','지점떡상왕'].indexOf(t.type)>=0 && t.m===closed){
       var k=t.type+'|'+t.m; if(!_seen[k]){ _seen[k]=1; out.push((icons[t.type]||'🏅')+parseInt(t.m.slice(5),10)); }
     }
   });
