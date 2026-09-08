@@ -2094,6 +2094,13 @@ async function fdLoadLedger(){
 }
 /* 조직 판별 → 표시 그룹키 */
 function fdOrgOf(r){ return r.isWeb ? '웹마케팅' : fdBranch(r.team); }
+/* [2026-09] 이름→HR소속 맵 (buildTotalData가 만든 __D.persons/divpersons = HR 무적 소속) */
+function fdHrTeam(name, useF){
+  var D=window.__D||{};
+  var list=useF ? (D.divpersons||[]) : (D.persons||[]);
+  for(var i=0;i<list.length;i++){ if(list[i].name===name && list[i].team) return list[i].team; }
+  return '';
+}
 /* [2026-09] 팀구분(H열 raw) → 지점 그룹 (buildTotalData _h2branch 이식) */
 function fdBranch(h){
   h=String(h||'').trim();
@@ -2166,9 +2173,9 @@ function fdAggregate(rg){
     if(isSet) acc.set++;
     // 묶음 키: 상담=상담담당(r.sang) / 사업=사업담당(r.saup) / 지점=소속지점
     var pk, pteam;
-    if(view==='saup'){ if(!r.saup) return; pk=r.saup; pteam=fdBranch(r.team); }
-    else if(view==='branch'){ pk=fdOrgOf(r); pteam=''; }
-    else { pk=r.sang; pteam=fdOrgOf(r); }
+    if(view==='saup'){ if(!r.saup) return; pk=r.saup; pteam=fdHrTeam(r.saup,true)||fdBranch(r.team); }
+    else if(view==='branch'){ pk=(r.isWeb?'웹마케팅':(fdHrTeam(r.sang,false)||fdOrgOf(r))); pteam=''; }
+    else { pk=r.sang; pteam=fdHrTeam(r.sang,false)||fdOrgOf(r); }
     if(!pk||pk==='기타') return;
     if(!acc.byPerson[pk]) acc.byPerson[pk]={name:pk,sales:0,ord:0,set:0,team:pteam,isBranch:(view==='branch')};
     if(isOrd){ acc.byPerson[pk].sales+=r.sales; acc.byPerson[pk].ord++; }
