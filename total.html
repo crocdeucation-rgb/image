@@ -269,7 +269,7 @@ body.is-live .closed-only{display:none !important}
 .pcard{width:400px;max-width:100%;background:#fff;border-radius:20px;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 20px 60px rgba(15,20,34,.4);position:relative;animation:pcpop .22s cubic-bezier(.2,.9,.3,1.2)}
 @keyframes pcpop{from{transform:translateY(14px) scale(.97);opacity:0}to{transform:none;opacity:1}}
 .pc-close{position:sticky;top:10px;z-index:20;width:30px;height:30px;margin:10px 12px -40px auto;flex-shrink:0;border-radius:50%;background:rgba(27,36,54,.42);border:1px solid rgba(255,255,255,.45);color:#fff;font-size:16px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center}
-.pc-hd{padding:20px 20px 16px;position:relative;overflow:hidden}
+.pc-hd{padding:28px 20px 22px;position:relative;overflow:hidden;text-align:center}
 .pc-hd.t-A,.pc-hd.t-B{background:linear-gradient(135deg,#4C6EF5,#5C7CFA)}
 .pc-hd.t-C,.pc-hd.t-D,.pc-hd.t-E,.pc-hd.t-F{background:linear-gradient(135deg,#7A8699,#95A0B2)}
 .pc-hd.t-S{background:linear-gradient(135deg,#7048E8,#4C6EF5)}
@@ -278,20 +278,38 @@ body.is-live .closed-only{display:none !important}
 .pc-hd.t-NEW{background:linear-gradient(135deg,#1BA97A,#20C997)}
 .pc-hd.t-NEW .pc-tier-badge{font-size:16px;letter-spacing:0}
 @keyframes holo{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-.pc-hd::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:22px 22px;pointer-events:none}
-.pc-hd.t-SSS::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.5) 0,transparent 8px),radial-gradient(circle at 78% 22%,rgba(255,255,255,.4) 0,transparent 6px),radial-gradient(circle at 62% 68%,rgba(255,255,255,.35) 0,transparent 5px),radial-gradient(circle at 88% 60%,rgba(255,255,255,.3) 0,transparent 4px);animation:spark 3s ease-in-out infinite;pointer-events:none}
+/* [2026-09] 메쉬 블롭 — 티어색 위에 유기적 색번짐 2개 */
+.pc-blob{position:absolute;border-radius:50%;filter:blur(52px);pointer-events:none;z-index:0}
+.pc-blob.b1{width:200px;height:200px;top:-70px;left:-40px;background:rgba(255,255,255,.28)}
+.pc-blob.b2{width:180px;height:180px;bottom:-60px;right:-30px;background:rgba(255,255,255,.2)}
+.pc-hd.t-A .pc-blob.b1,.pc-hd.t-B .pc-blob.b1{background:#7FB0FF}
+.pc-hd.t-A .pc-blob.b2,.pc-hd.t-B .pc-blob.b2{background:#A5C8FF}
+.pc-hd.t-S .pc-blob.b1{background:#B14FE8}.pc-hd.t-S .pc-blob.b2{background:#6E8CFF}
+.pc-hd.t-SS .pc-blob.b1{background:#C266F0}.pc-hd.t-SS .pc-blob.b2{background:#7A5CF0}
+.pc-hd.t-SSS .pc-blob.b1{background:#B14FE8}.pc-hd.t-SSS .pc-blob.b2{background:#F0C05A}
+.pc-hd.t-NEW .pc-blob.b1{background:#3FE8A8}.pc-hd.t-NEW .pc-blob.b2{background:#5CE0C0}
+.pc-hd.t-C .pc-blob.b1,.pc-hd.t-D .pc-blob.b1,.pc-hd.t-E .pc-blob.b1,.pc-hd.t-F .pc-blob.b1{background:#A8B2C4}
+.pc-hd.t-C .pc-blob.b2,.pc-hd.t-D .pc-blob.b2,.pc-hd.t-E .pc-blob.b2,.pc-hd.t-F .pc-blob.b2{background:#BAC4D4}
+.pc-hd::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:26px 26px;pointer-events:none;z-index:1}
+.pc-hd.t-SSS .pc-spark{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.5) 0,transparent 8px),radial-gradient(circle at 78% 22%,rgba(255,255,255,.4) 0,transparent 6px),radial-gradient(circle at 62% 68%,rgba(255,255,255,.35) 0,transparent 5px),radial-gradient(circle at 88% 60%,rgba(255,255,255,.3) 0,transparent 4px);animation:spark 3s ease-in-out infinite;pointer-events:none;z-index:1}
 @keyframes spark{0%,100%{opacity:.5}50%{opacity:1}}
-.pc-hd-row{display:flex;align-items:flex-start;gap:13px;position:relative;z-index:2;padding-right:34px}
-.pc-av{width:56px;height:56px;border-radius:15px;background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#fff;flex-shrink:0;overflow:hidden;background-size:cover;background-position:center}
-.pc-id{flex:1;min-width:0}
-.pc-nm{font-size:21px;font-weight:900;color:#fff;letter-spacing:-.5px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.pc-hd-row{position:relative;z-index:2}
+.pc-av{position:relative;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.2);border:3px solid rgba(255,255,255,.7);box-shadow:0 8px 24px rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center;font-size:60px;font-weight:900;color:#fff;overflow:hidden;background-size:cover;background-position:center;margin:0 auto 16px}
+.pc-av-cam{position:absolute;right:8px;bottom:8px;width:38px;height:38px;border-radius:50%;background:#fff;border:2px solid rgba(255,255,255,.9);box-shadow:0 2px 8px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;z-index:5}
+.pc-av-cam input{display:none}
+.pc-status-edit{display:inline-flex;align-items:center;gap:6px;width:100%;max-width:300px;margin:14px auto 0}
+.pc-status-edit input{flex:1;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.4);border-radius:16px;padding:7px 12px;font-family:inherit;font-size:12px;color:#fff;outline:none;text-align:center}
+.pc-status-edit input::placeholder{color:rgba(255,255,255,.7)}
+.pc-status-edit button{background:#fff;color:#5B4BD0;border:none;border-radius:16px;padding:7px 14px;font-weight:800;cursor:pointer;font-family:inherit;font-size:12px;flex-shrink:0}
+.pc-id{min-width:0}
+.pc-nm{font-size:23px;font-weight:900;color:#fff;letter-spacing:-.5px;display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap}
 .pc-tags{font-size:16px}
-.pc-meta{font-size:12px;color:rgba(255,255,255,.85);font-weight:600;margin-top:3px}
-.pc-tier{margin-left:auto;text-align:center;flex-shrink:0;position:relative;z-index:6}
+.pc-meta{font-size:13px;color:rgba(255,255,255,.85);font-weight:600;margin-top:3px}
+.pc-tier{position:absolute;top:16px;right:18px;text-align:center;z-index:6}
 .pc-tier-badge{font-size:26px;font-weight:900;color:#fff;line-height:1;letter-spacing:-1.5px;text-shadow:0 2px 8px rgba(0,0,0,.2)}
 .pc-hd.t-SSS .pc-tier-badge{background:linear-gradient(#fff,#FFE9A8);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 6px rgba(255,220,120,.7))}
 .pc-tier-lbl{font-size:8.5px;color:rgba(255,255,255,.75);font-weight:800;letter-spacing:1.5px;margin-top:2px}
-.pc-praise{position:relative;z-index:2;margin-top:12px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);border-radius:11px;padding:8px 12px;font-size:12.5px;font-weight:800;color:#fff}
+.pc-praise{position:relative;z-index:2;margin:12px auto 0;max-width:300px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);border-radius:11px;padding:8px 12px;font-size:12.5px;font-weight:800;color:#fff}
 .pc-praise.slump{background:rgba(255,255,255,.2)}
 .pc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#E3E8F0}
 .pc-st{background:#fff;padding:12px 8px;text-align:center}
@@ -1354,7 +1372,14 @@ function pcApplyProfile(name){
   if(av && pr.photoURL){
     var im=av.querySelector('img');
     if(im){ if(im.getAttribute('src')!==pr.photoURL) im.setAttribute('src', pr.photoURL); }
-    else { av.innerHTML='<img src="'+pr.photoURL+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">'; }
+    else {
+      // [2026-09] 오버레이(📷) 보존: img만 앞에 삽입, 이니셜 텍스트 제거
+      var cam=av.querySelector('.pc-av-cam');
+      av.childNodes.forEach&&av.childNodes.forEach(function(n){ if(n.nodeType===3) n.textContent=''; });
+      var _img=document.createElement('img');
+      _img.src=pr.photoURL; _img.alt=''; _img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:inherit';
+      av.insertBefore(_img, cam||null);
+    }
   }
   var st=body.querySelector('.pc-status');
   if(st){ st.textContent=pr.statusMsg?('“'+pr.statusMsg+'”'):''; st.style.display=pr.statusMsg?'':'none'; }
@@ -1396,6 +1421,7 @@ function isBoss(){ var R=(window._me&&window._me.rank)||''; return ['파운더',
 window.isBoss=isBoss;
 // allowlist 이메일→이름·직급 (표시용). 규칙은 Firestore가 강제, 여긴 이름 표시만.
 var ALLOW_NAME={
+  'sondhhun12@gmail.com':{name:'손대현',rank:'팀장'},
   'thestudydesign@gmail.com':{name:'김상현',rank:'이사'},
   'kimdohee213@gmail.com':{name:'김도희',rank:'사원'},
   'ninanina364@gmail.com':{name:'정은지',rank:'인턴'},
@@ -1924,17 +1950,18 @@ function openCard(name){
   var _isMe=!!(_me && _me.name===name);
   var _esc=function(t){return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');};
   var _statusHtml='<div class="pc-status"'+(_status?'':' style="display:none"')+'>'+(_status?('“'+_esc(_status)+'”'):'')+'</div>';
-  var _editHtml=_isMe ? ('<div class="pc-edit">'
-    +'<label class="pc-edit-btn">📷 사진 변경<input type="file" accept="image/*" style="display:none" onchange="myUploadPhoto(this)"></label>'
-    +'<div class="pc-edit-status"><input id="myStatusInput" maxlength="40" placeholder="상태메시지 (예: 이번달 목표 5천!)" value="'+_esc(_status)+'">'
-    +'<button onclick="mySaveStatus()">저장</button></div></div>') : '';
+  // [2026-09] 사진 변경 = 사진 위 📷 오버레이 / 상태메시지 = 헤더 안 인라인 편집
+  var _camHtml=_isMe ? '<label class="pc-av-cam" title="사진 변경">📷<input type="file" accept="image/*" onchange="myUploadPhoto(this)"></label>' : '';
+  var _statusEditHtml=_isMe ? ('<div class="pc-status-edit"><input id="myStatusInput" maxlength="40" placeholder="상태메시지 (예: 이번달 목표 5천!)" value="'+_esc(_status)+'"><button onclick="mySaveStatus()">저장</button></div>') : _statusHtml;
 
   var html='<button class="pc-close" onclick="closeCard()">✕</button>'
-    +'<div class="pc-hd t-'+tier+'"><div class="pc-hd-row">'
-    +'<div class="pc-av">'+(_finalImg?('<img src="'+_finalImg+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit" onerror="this.style.display=\'none\';this.parentNode.textContent=\''+avTxt+'\'">'):avTxt)+'</div>'
-    +'<div class="pc-id"><div class="pc-nm">'+name+tags+'</div><div class="pc-meta">'+(p.rank?p.rank+' · ':'')+(p.team||'소속 미정')+'</div></div>'
+    +'<div class="pc-hd t-'+tier+'"><div class="pc-blob b1"></div><div class="pc-blob b2"></div>'+(tier==='SSS'?'<div class="pc-spark"></div>':'')
     +'<div class="pc-tier"><div class="pc-tier-badge">'+tier+'</div><div class="pc-tier-lbl">TIER</div></div>'
-    +'</div><div class="pc-praise'+(pr.slump?' slump':'')+'">'+pr.txt+'</div></div>'+_statusHtml
+    +'<div class="pc-hd-row">'
+    +'<div class="pc-av">'+(_finalImg?('<img src="'+_finalImg+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit" onerror="this.style.display=\'none\';this.parentNode.textContent=\''+avTxt+'\'">'):avTxt)+_camHtml+'</div>'
+    +'<div class="pc-id"><div class="pc-nm">'+name+tags+'</div><div class="pc-meta">'+(p.rank?p.rank+' · ':'')+(p.team||'소속 미정')+'</div></div>'
+    +'<div class="pc-praise'+(pr.slump?' slump':'')+'">'+pr.txt+'</div>'
+    +_statusEditHtml+'</div></div>'
     +'<div class="pc-stats">'
     +'<div class="pc-st"><div class="l">이달 매출</div><div class="v pur">'+pcEok(p.curSales)+'</div></div>'
     +'<div class="pc-st"><div class="l">올해 누적</div><div class="v">'+pcEok(p.total)+'</div></div>'
@@ -1950,7 +1977,6 @@ function openCard(name){
     +'<div class="pc-sec"><div class="pc-sec-t">🏅 뱃지</div><div class="pc-badges">'+bgHtml+'</div></div>'
     +trHtml
     +(useF?'':'<button class="pc-cmpbtn" onclick="openVersus(\''+name.replace(/'/g,"")+'\')">⚔️ 다른 선수와 비교하기</button>')
-    +_editHtml
     +'<div class="pc-social" id="pcSocial"></div>';
   document.getElementById('pcBody').innerHTML=html;
   window.__pcTrendMode='sales';
