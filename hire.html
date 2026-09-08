@@ -120,6 +120,23 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .cal-edu .cal-iv-tm{color:#0B7A70}
 .cal-empty{font-size:11px;color:#C8D0DC;text-align:center;padding:20px 0;font-weight:600}
 
+/* [2026-09] PC 캘린더 압축 — 같은 타임 이름칩 */
+.cal-chips{display:flex;flex-wrap:wrap;gap:4px}
+.cal-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;padding:4px 9px;border-radius:7px;cursor:pointer;transition:.12s;line-height:1.2;white-space:nowrap}
+.cal-chip:hover{transform:translateY(-1px);box-shadow:0 3px 9px rgba(27,36,54,.15)}
+.cal-chip .cdot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.cal-chip .csite{font-size:8.5px;color:#fff;padding:1px 4px;border-radius:4px;font-weight:800}
+.cal-chip .csite.am{background:#BA7517}.cal-chip .csite.jk{background:#1971C2}
+.cal-chip.job-상담부{background:#EEF0FF;color:#3B4F9E}
+.cal-chip.job-강사{background:#E6F7F0;color:#177A57}
+.cal-chip.job-사업부{background:#F0EBFF;color:#5A3AD0}
+.cal-chip.job-코칭{background:#FBF0DE;color:#96590F}
+.cal-chip .cdot.st-plan{background:#4C6EF5}
+.cal-chip .cdot.st-attend{background:#1D9E75}
+.cal-chip .cdot.st-pass,.cal-chip .cdot.st-edu{background:#7048E8}
+.cal-chip .cdot.st-drop{background:#E23A22}
+.cal-chip.drop{opacity:.5}
+
 /* 범례 */
 .cal-swipe-hint{display:none;justify-content:center;gap:5px;margin-top:10px}
 .cal-swipe-hint .sd{width:6px;height:6px;border-radius:50%;background:#D0D8E6;transition:.2s}
@@ -366,13 +383,11 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 </div>
 
 <div class="iv-modal-bg" id="ivModal" onclick="if(event.target===this)closeIv()"><div class="iv-card" id="ivBody"></div></div>
-
 <script>
 
 // ── 면접일정 시트 (publish CSV) ──
 var CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSz4NSoTmHTebOTpuiy3qbJIRe_vFbC9jf9A4QGDEMlZC4aatoIkEaMqIQspaCNI3scpFhu5TEQEyPA/pub?output=csv";
 
-// CSV 파서 (따옴표 대응)
 function parseCSV(text){
   var rows=[],row=[],cur='',q=false;
   for(var i=0;i<text.length;i++){var c=text[i];
@@ -383,12 +398,11 @@ function parseCSV(text){
   return rows;
 }
 
-// "8/26(수)" or "2026-08-26" → Date (올해 기준)
 function parseDate(s){
   s=String(s||'').trim();
   var m=s.match(/(\d{4})[-.\/](\d{1,2})[-.\/](\d{1,2})/);
   if(m) return new Date(+m[1],+m[2]-1,+m[3]);
-  m=s.match(/(\d{1,2})\s*[\/월.]\s*(\d{1,2})/);   // 8/26 or 8월26
+  m=s.match(/(\d{1,2})\s*[\/월.]\s*(\d{1,2})/);
   if(m){ var y=new Date().getFullYear(); return new Date(y,+m[1]-1,+m[2]); }
   return null;
 }
@@ -397,16 +411,12 @@ function todayYmd(){ return ymd(new Date()); }
 var WD=['일','월','화','수','목','금','토'];
 var PLACE_SHORT='마곡';
 var PLACE_FULL='퀸즈파크10, 서울 강서구 마곡중앙6로 66, 414호';
-// 직무 정규화 (강사(쌤이다) → 강사)
 function jobNorm(s){ s=String(s||''); if(s.indexOf('상담')>=0)return '상담부'; if(s.indexOf('사업')>=0)return '사업부'; if(s.indexOf('코칭')>=0)return '코칭'; if(s.indexOf('강사')>=0)return '강사'; return s||'기타'; }
-// [면접관 규칙] 운영센터+알바몬+코칭 = 운영센터 면접 / 나머지 전부 = 엄현호 이사
-// 면접관 배지 — 엄현호 이사(디폴트)는 조용히, 운영센터 등 예외는 강조
 function mgrBadge(name){
   var n=String(withTitle(name)).replace(/</g,'&lt;');
   if(n.indexOf('엄현호')>=0 || n.indexOf('엄이사')>=0) return '<span class="mgr-def">👤 '+n+'</span>';
   return '<span class="mgr-hi">👤 '+n+'</span>';
 }
-// 카드 상태 클래스 (색 톤)
 function cardStateClass(iv){
   var at=String(iv.attend||''), p=String(iv.pass||'');
   if(at.indexOf('불참')>=0||at.indexOf('노쇼')>=0) return 'st-drop';
@@ -415,24 +425,19 @@ function cardStateClass(iv){
   if(at.indexOf('참석')>=0) return 'st-attend';
   return 'st-plan';
 }
-// 직책 매핑 (이름 → 이름+직책)
 var TITLE_MAP={'신우성':'신우성 PM','엄현호':'엄현호 이사','우혜림':'우혜림 지점장','엄현호 이사':'엄현호 이사'};
 function withTitle(name){
   var n=String(name||'').trim();
   if(TITLE_MAP[n]) return TITLE_MAP[n];
-  // 이름만 매칭 (직책 이미 붙은 경우 대비)
   for(var k in TITLE_MAP){ if(n.indexOf(k)===0 && k.indexOf(' ')<0) return TITLE_MAP[k]; }
   return n;
 }
 function interviewerOf(iv){
-  // 시트 면접관 열(H) 값이 있으면 그대로 사용
   if(iv.interviewer) return iv.interviewer;
-  // 폴백 규칙: 코칭+알바몬 = 운영센터 / 그 외 = 엄현호 이사
   var site=String(iv.site||'').trim(), job=String(iv.job||'').trim();
   if(job==='코칭' && site.indexOf('알바몬')>=0) return '운영센터';
   return '엄현호 이사';
 }
-// 참석/합격 상태 → {cls,label}
 function statusOf(iv){
   var at=String(iv.attend||'').trim(), pass=String(iv.pass||'').trim();
   if(!at && !pass) return {cls:'wait',label:'예정'};
@@ -442,8 +447,6 @@ function statusOf(iv){
   if(at.indexOf('참석')>=0) return {cls:'at',label:'참석·결과대기'};
   return {cls:'wait',label:'예정'};
 }
-
-// 상태 플로우 딱지 (간결화: 결과 나오면 결과만, 예정/대기만 흐름 표시)
 function statusFlow(iv){
   var at=String(iv.attend||'').trim(), pass=String(iv.pass||'').trim();
   function b(cls,txt){ return '<span class="fb '+cls+'">'+txt+'</span>'; }
@@ -462,17 +465,14 @@ function statusFlow(iv){
   if(at.indexOf('참석')>=0) return b('at','참석')+arw+b('wait','결과대기');
   return b('plan','예정');
 }
-// 교육날짜(2026-09-07 or 9/7) → ymd
 function ymdFromEdu(s){ var d=parseDate(s); return d?ymd(d):''; }
-var IVS=[];   // 전체 면접 (파싱됨)
-var __weekStart=null;   // 현재 보는 주 월요일
+var IVS=[];
+var __weekStart=null;
 
 function boot(){
   fetch(CSV_URL+'&_='+Date.now()).then(function(r){return r.text();}).then(function(txt){
     var rows=parseCSV(txt).filter(function(r){return r.some(function(c){return (c||'').trim();});});
-    // 헤더행 찾기 (이름 포함)
     var hi=0; for(var i=0;i<Math.min(rows.length,4);i++){ if(rows[i].some(function(c){return (c||'').indexOf('이름')>=0;})){hi=i;break;} }
-    // 컬럼: A날짜 B시간 C직무 D사이트 E이름 F지역 G연락처 H참석 I합격 J교육날짜 K교육시간 L교육담당 M메모
     for(var r=hi+1;r<rows.length;r++){
       var row=rows[r];
       var nm=(row[4]||'').trim();
@@ -485,7 +485,7 @@ function boot(){
         site:(row[3]||'').trim(),
         name:nm,
         region:(row[5]||'').trim(),
-        interviewer:(row[7]||'').trim(),   // [H열] 시트의 실제 면접관 (엄현호 이사/운영센터)
+        interviewer:(row[7]||'').trim(),
         attend:(row[8]||'').trim(),
         pass:(row[9]||'').trim(),
         eduDate:(row[10]||'').trim(),
@@ -496,10 +496,9 @@ function boot(){
     }
     IVS.sort(function(a,b){ return a.date<b.date?-1:a.date>b.date?1:(a.time<b.time?-1:1); });
     var _upd=document.getElementById('upd'); if(_upd) _upd.textContent='실시간 · '+IVS.length+'건 · '+new Date().toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})+' 기준';
-    // 이번주로 초기화
     __weekStart=mondayOf(new Date());
     renderCal();
-    if(typeof cacRender==='function') cacRender();   // IVS 로드 후 합격자 반영해 CAC 재계산
+    if(typeof cacRender==='function') cacRender();
   }).catch(function(e){
     document.getElementById('cal_grid').innerHTML='<div class="err">시트를 불러오지 못했어요: '+e+'<br>시트 공유가 "링크 있는 사람 뷰어"인지 확인해주세요.</div>';
     var _upd2=document.getElementById('upd'); if(_upd2) _upd2.textContent='로드 실패';
@@ -508,7 +507,6 @@ function boot(){
 
 function mondayOf(d){ var x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); var dow=x.getDay(); x.setDate(x.getDate()-(dow===0?6:dow-1)); return x; }
 
-// ── 오늘의 면접 (히어로) ──
 function renderToday(){
   var el=document.getElementById('today-hero'); if(!el) return;
   var td=todayYmd(), now=new Date();
@@ -520,7 +518,7 @@ function renderToday(){
     todays.forEach(function(iv){
       var st=statusOf(iv);
       var esc=function(s){return String(s||'').replace(/</g,'&lt;');};
-      h+='<div class="th-item" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/'/g,'')+'\')">'
+      h+='<div class="th-item" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/\x27/g,'')+'\')">'
         +'<span class="th-tm">'+(iv.time||'-')+'</span>'
         +'<div class="th-body"><div class="th-nm">'+esc(iv.name)+'</div>'
         +'<div class="th-tags"><span class="th-tag">'+esc(iv.job)+'</span>'
@@ -531,7 +529,6 @@ function renderToday(){
     });
     h+='</div>';
   } else {
-    // 다음 면접일 폴백
     var next=IVS.filter(function(x){return x.date>td;})[0];
     h+='<div class="th-none">오늘 예정된 면접이 없어요 ☕'
       +(next?'<small>다음 면접 · '+next.date.slice(5).replace('-','/')+' ('+IVS.filter(function(x){return x.date===next.date;}).length+'명)</small>':'')
@@ -541,28 +538,24 @@ function renderToday(){
   el.innerHTML=h;
 }
 
-// ── 주간 캘린더 ──
 window.calMove=function(dir){ __weekStart.setDate(__weekStart.getDate()+dir*7); renderCal(); };
 window.calToday=function(){ __weekStart=mondayOf(new Date()); renderCal(); };
 function renderCal(){
   var ws=new Date(__weekStart), td=todayYmd();
   var days=[]; for(var i=0;i<7;i++){ var d=new Date(ws); d.setDate(ws.getDate()+i); days.push(d); }
   document.getElementById('cal_range').textContent=(days[0].getMonth()+1)+'/'+days[0].getDate()+' ~ '+(days[6].getMonth()+1)+'/'+days[6].getDate();
-  // 이번주면 제목에 오늘 날짜 강조
   var _tt=document.getElementById('cal_title'), _now=new Date();
   var _isThisWeek = days.some(function(d){return ymd(d)===td;});
-  if(_tt){ _tt.innerHTML = _isThisWeek ? '🗓️ 오늘 <span style=\"color:#E23A22\">'+( _now.getMonth()+1)+'월 '+_now.getDate()+'일('+WD[_now.getDay()]+')</span> · 이번주 면접' : '🗓️ 주간 면접'; }
+  if(_tt){ _tt.innerHTML = _isThisWeek ? '🗓️ 오늘 <span style="color:#E23A22">'+( _now.getMonth()+1)+'월 '+_now.getDate()+'일('+WD[_now.getDay()]+')</span> · 이번주 면접' : '🗓️ 주간 면접'; }
   var h='<div class="cal-grid">';
   days.forEach(function(d){
     var dstr=ymd(d), isT=(dstr===td), dow=d.getDay(), wknd=(dow===0||dow===6);
     var list=IVS.filter(function(x){return x.date===dstr;});
-    // 그날 교육 일정 (교육날짜가 이 날인 사람)
     var eduList=IVS.filter(function(x){return x.eduDate && ymdFromEdu(x.eduDate)===dstr;});
     var cls='cal-col'+(isT?' today':'')+(wknd?' weekend':'')+(list.length===0?' empty-mo':'');
     h+='<div class="'+cls+'"><div class="cal-dhd"><div><div class="cal-wd">'+WD[dow]+'</div><div class="cal-dnum">'+d.getDate()+'</div></div>'
       +(isT?'<span class="cal-todaytag">TODAY</span>':'')+'</div><div class="cal-ivs">';
     if(list.length || eduList.length){
-      // [면접관+시간 그룹핑] 같은 시간·면접관 = 함께 보는 면접 → 하나로 묶기
       var groups={}, gOrder=[];
       list.forEach(function(iv){
         var gkey=(iv.time||'-')+'|'+interviewerOf(iv);
@@ -572,23 +565,25 @@ function renderCal(){
       gOrder.forEach(function(gk){
         var g=groups[gk], esc=function(s){return String(s||'').replace(/</g,'&lt;');};
         var multi=g.members.length>1;
-        // 그룹 헤더: 시간 + 면접관 + (인원)
         h+='<div class="cal-grp'+(multi?' multi':'')+'">'
           +'<div class="cal-grp-hd"><span class="cal-grp-tm">'+esc(g.time)+'</span>'
           +mgrBadge(g.mgr)
           +(multi?'<span class="cal-grp-cnt">'+g.members.length+'명</span>':'')+'</div>';
-        // 각 멤버 (이름·직무·상태·출처)
+        // [2026-09] 압축 — 이름칩(직무색 + 상태점 + 알/잡)
+        h+='<div class="cal-chips">';
         g.members.forEach(function(iv){
-          var stCls=cardStateClass(iv), flow=statusFlow(iv);
-          h+='<div class="cal-iv '+stCls+'" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/\x27/g,'')+'\')">'
-            +'<div class="cal-iv-nm-row"><span class="cal-iv-nm">'+esc(iv.name)+'</span>'
-            +'<span class="cal-jbadge job-'+esc(iv.job)+'">'+esc(iv.job)+'</span></div>'
-            +'<div class="cal-iv-flow">'+flow+'</div>'
-            +'<div class="cal-iv-btm"><span class="cal-site">'+esc(iv.site||'')+'</span></div></div>';
+          var stCls=cardStateClass(iv);
+          var drop=(stCls==='st-drop');
+          var site=String(iv.site||'');
+          var sc=site.indexOf('알바몬')>=0?'am':(site.indexOf('잡코')>=0?'jk':'');
+          var scL=sc==='am'?'알':(sc==='jk'?'잡':'');
+          h+='<span class="cal-chip job-'+esc(iv.job)+(drop?' drop':'')+'" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/\x27/g,'')+'\')">'
+            +'<span class="cdot '+stCls+'"></span>'+esc(iv.name)
+            +(scL?'<span class="csite '+sc+'">'+scL+'</span>':'')+'</span>';
         });
         h+='</div>';
+        h+='</div>';
       });
-      // 교육 카드 (그날 교육 일정)
       eduList.forEach(function(iv){
         var esc=function(s){return String(s||'').replace(/</g,'&lt;');};
         h+='<div class="cal-edu" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/\x27/g,'')+'\')">'
@@ -604,19 +599,15 @@ function renderCal(){
   });
   h+='</div>';
   document.getElementById('cal_grid').innerHTML=h;
-  // [모바일] 카카오식 요일스트립 + 선택일 리스트
   renderCalMobile(days, td);
 }
 
-// 모바일 선택일 (없으면 오늘/이번주 첫날)
 var __selDay=null;
 window.calSelDay=function(dstr){ __selDay=dstr; var days=[],ws=new Date(__weekStart); for(var i=0;i<7;i++){var d=new Date(ws);d.setDate(ws.getDate()+i);days.push(d);} renderCalMobile(days, todayYmd()); };
 
-// 모바일 모드: day(일간) / week(주간)
 var __calMode='day';
 window.calSetMode=function(m){ __calMode=m; var days=[],ws=new Date(__weekStart); for(var i=0;i<7;i++){var d=new Date(ws);d.setDate(ws.getDate()+i);days.push(d);} renderCalMobile(days, todayYmd()); };
 
-// 하루치 일정 리스트 HTML (그룹핑+행). 일간/주간 공용
 function dayListHtml(dstr){
   var list=IVS.filter(function(x){return x.date===dstr;});
   var eduList=IVS.filter(function(x){return x.eduDate && ymdFromEdu(x.eduDate)===dstr;});
@@ -669,8 +660,6 @@ function renderCalMobile(days, td){
   if(!strip||!body) return;
   if(tog){ tog.querySelectorAll('.cms-mt').forEach(function(b){ b.classList.toggle('on', b.dataset.m===__calMode); }); }
   var weekYmds=days.map(function(d){return ymd(d);});
-
-  // ═══ 주간 모드: 요일스트립 숨기고 일~토 전부 펼침 ═══
   if(__calMode==='week'){
     strip.style.display='none';
     var wh='';
@@ -685,14 +674,10 @@ function renderCalMobile(days, td){
     body.innerHTML=wh;
     return;
   }
-
-  // ═══ 일간 모드 ═══
   strip.style.display='';
   var sel=__selDay;
   if(!sel || weekYmds.indexOf(sel)<0){ sel = (weekYmds.indexOf(td)>=0) ? td : weekYmds[0]; }
   __selDay=sel;
-
-  // ── 요일 스트립 ──
   var sh='';
   days.forEach(function(d){
     var dstr=ymd(d), dow=d.getDay(), isT=(dstr===td), isSel=(dstr===sel);
@@ -706,8 +691,6 @@ function renderCalMobile(days, td){
       +'<div class="cms-dots">'+dots+'</div></div>';
   });
   strip.innerHTML=sh;
-
-  // ── 선택일 일정 리스트 ──
   var selD=days[weekYmds.indexOf(sel)];
   var cnt=dayCount(sel);
   var bh='<div class="cms-selhd">'+(selD.getMonth()+1)+'월 '+selD.getDate()+'일 '+WD[selD.getDay()]+'요일'
@@ -718,7 +701,6 @@ function renderCalMobile(days, td){
   body.innerHTML=bh;
 }
 
-// 모바일용 헬퍼: 면접관 순수 텍스트, 상태 미니배지, 이탈여부
 function mgrPlain(name){ return withTitle(name); }
 function isDrop(iv){ var a=String(iv.attend||''),p=String(iv.pass||''); return a.indexOf('불참')>=0||a.indexOf('노쇼')>=0||p.indexOf('불합격')>=0; }
 function miniStatus(iv){
@@ -731,9 +713,8 @@ function miniStatus(iv){
   return {c:'plan',t:'예정'};
 }
 
-// ── 상세 모달 ──
 window.openIv=function(date,name){
-  var iv=IVS.filter(function(x){return x.date===date && x.name.replace(/'/g,'')===name;})[0];
+  var iv=IVS.filter(function(x){return x.date===date && x.name.replace(/\x27/g,'')===name;})[0];
   if(!iv) iv=IVS.filter(function(x){return x.date===date && x.name.indexOf(name)>=0;})[0];
   if(!iv) return;
   var st=statusOf(iv);
@@ -767,17 +748,15 @@ boot();
 
 </script>
 
+
 <!-- 부서별 + 채용단가 데이터/렌더 -->
 <script>
 var HIRE_DEPT = {"8월": {"depts": {"상담부": {"am": {"gonggo": 1546872, "iryeok": 205, "myeontong": 78, "myeoncham": 28, "edu": 17}, "amProd": "M 지역 Special 결합", "jk": {"gonggo": 519600, "iryeok": 10, "myeontong": 1, "myeoncham": 0, "edu": 0}, "jkProd": "Excellent 채용관 (PC+M)", "tot": {"gonggo": 2066472, "iryeok": 215, "myeontong": 79, "myeoncham": 28, "edu": 17}, "hire": {"jijum": [{"nm": "마포연합센터", "in": 4, "out": 2}, {"nm": "가산연합센터", "in": 6, "out": 2}, {"nm": "마곡지점", "in": 1, "out": 4}, {"nm": "부평지점", "in": 2, "out": 1}, {"nm": "메이킷위드", "in": 2, "out": 2}, {"nm": "파인더루원", "in": 0, "out": 0}], "tin": 15, "tout": 11}}, "사업부": {"am": null, "amProd": "", "jk": {"gonggo": 692800, "iryeok": 19, "myeontong": 0, "myeoncham": 0, "edu": 0}, "jkProd": "Excellent 채용관 (PC+M)", "tot": {"gonggo": 692800, "iryeok": 19, "myeontong": 0, "myeoncham": 0, "edu": 0}}, "강사": {"am": {"gonggo": 45760, "iryeok": 16, "myeontong": 7, "myeoncham": 3, "edu": 1}, "amProd": "슈퍼점프 8회(1일)", "jk": {"gonggo": 692800, "iryeok": 28, "myeontong": 3, "myeoncham": 2, "edu": 0}, "jkProd": "Excellent 채용관 (PC+M)", "tot": {"gonggo": 738560, "iryeok": 44, "myeontong": 10, "myeoncham": 5, "edu": 1}}, "코칭": {"am": {"gonggo": 45760, "iryeok": 101, "myeontong": 12, "myeoncham": 4, "edu": 2}, "amProd": "슈퍼점프 8회(1일)", "jk": null, "jkProd": "", "tot": {"gonggo": 45760, "iryeok": 101, "myeontong": 12, "myeoncham": 4, "edu": 2}}}, "total": {"gonggo": 3543592, "iryeok": 379, "myeontong": 101, "myeoncham": 37, "edu": 20}, "breakdown": {"myeontong": {"상담부": 79, "사업부": 0, "강사": 10, "코칭": 12}, "myeoncham": {"상담부": 28, "사업부": 0, "강사": 5, "코칭": 4}, "edu": {"상담부": 17, "사업부": 0, "강사": 1, "코칭": 2}, "iryeok": {"상담부": 215, "사업부": 19, "강사": 44, "코칭": 101}}}, "9월": {"depts": {"상담부": {"am": {"gonggo": 45760, "iryeok": 0, "myeontong": 0, "myeoncham": 0, "edu": 0}, "amProd": "슈퍼점프 8회(1일)", "jk": {"gonggo": 866000, "iryeok": 0, "myeontong": 2, "myeoncham": 0, "edu": 0}, "jkProd": "Excellent 채용관 (PC+M)", "tot": {"gonggo": 911760, "iryeok": 0, "myeontong": 2, "myeoncham": 0, "edu": 0}, "hire": {"jijum": [], "tin": 0, "tout": 0}}, "사업부": {"am": null, "amProd": "", "jk": {"gonggo": 0, "iryeok": 0, "myeontong": 2, "myeoncham": 1, "edu": 0}, "jkProd": "X", "tot": {"gonggo": 0, "iryeok": 0, "myeontong": 2, "myeoncham": 1, "edu": 0}}, "강사": {"am": null, "amProd": "", "jk": {"gonggo": 692800, "iryeok": 0, "myeontong": 3, "myeoncham": 2, "edu": 0}, "jkProd": "Excellent 채용관 (PC+M)", "tot": {"gonggo": 692800, "iryeok": 0, "myeontong": 3, "myeoncham": 2, "edu": 0}}, "코칭": {"am": null, "amProd": "", "jk": null, "jkProd": "", "tot": {"gonggo": 0, "iryeok": 0, "myeontong": 0, "myeoncham": 0, "edu": 0}}}, "total": {"gonggo": 1604560, "iryeok": 0, "myeontong": 7, "myeoncham": 3, "edu": 0}, "breakdown": {"myeontong": {"상담부": 2, "사업부": 2, "강사": 3, "코칭": 0}, "myeoncham": {"상담부": 0, "사업부": 1, "강사": 2, "코칭": 0}, "edu": {"상담부": 0, "사업부": 0, "강사": 0, "코칭": 0}, "iryeok": {"상담부": 0, "사업부": 0, "강사": 0, "코칭": 0}}}};
 window.__dpMonth='9월';
 function dpWon(n){return (n||0).toLocaleString('ko-KR');}
 
-// ── 면접 시트(IVS)에서 월별 합격자 집계 (교육대기 포함 = 현실 채용) ──
 function passCountByMonth(moLabel){
-  // '9월' → '2026-09'
   var yy='2026-'+('0'+String(moLabel).replace('월','')).slice(-2);
-  // total=합격(교육대기포함) / plan=면접예정 / attend=참석 / eduWait=합격했지만 교육아직 / jk,am=채널별 합격
   var out={total:0, jk:0, am:0, plan:0, attend:0, eduWait:0, has:false};
   if(typeof IVS==='undefined' || !IVS.length) return out;
   out.has=true;
@@ -786,12 +765,11 @@ function passCountByMonth(moLabel){
     if((iv.date||'').indexOf(yy)!==0) return;
     var p=String(iv.pass||''), a=String(iv.attend||'');
     var isPass = p.indexOf('합격')>=0 && p.indexOf('불합격')<0;
-    // 면접 예정 = 참석·불참·결과 아무것도 없고 날짜가 오늘 이후
     if(!a && !p && iv.date>=td) out.plan++;
     if(a.indexOf('참석')>=0) out.attend++;
     if(isPass){
       out.total++;
-      if(!iv.eduDate) out.eduWait++;   // 합격했는데 교육일 안 잡힘 = 교육대기
+      if(!iv.eduDate) out.eduWait++;
       if((iv.site||'').indexOf('잡코')>=0) out.jk++;
       else if((iv.site||'').indexOf('알바몬')>=0) out.am++;
     }
@@ -799,10 +777,8 @@ function passCountByMonth(moLabel){
   return out;
 }
 
-// ── CAC 효율 ──
 function cacRender(){
   var mo=window.__dpMonth, D=HIRE_DEPT[mo]; if(!D) return;
-  // 채널별 집계
   var am={g:0,edu:0,iry:0,mt:0,mc:0}, jk={g:0,edu:0,iry:0,mt:0,mc:0};
   Object.keys(D.depts).forEach(function(dept){
     var v=D.depts[dept];
@@ -810,14 +786,12 @@ function cacRender(){
     if(v.jk){ jk.g+=v.jk.gonggo; jk.edu+=v.jk.edu; jk.iry+=v.jk.iryeok; jk.mt+=v.jk.myeontong; jk.mc+=v.jk.myeoncham; }
   });
   var t=D.total;
-  var pass=passCountByMonth(mo);   // 면접 시트(예정·합격·교육대기)
-  // 채널별 합격 = max(면접시트 합격, 그 채널 교육완료). 교육 간 사람은 무조건 합격.
+  var pass=passCountByMonth(mo);
   var jkPass = Math.max(pass.jk, jk.edu);
   var amPass = Math.max(pass.am, am.edu);
-  var passTotal = jkPass + amPass;   // 전체 = 채널 합 (total·채널합 일치)
+  var passTotal = jkPass + amPass;
   var passCac = passTotal>0 ? Math.round(t.gonggo/passTotal) : 0;
   var eduCac  = t.edu>0 ? Math.round(t.gonggo/t.edu) : 0;
-  // 한줄 요약 — 파이프라인 (예정→합격→교육대기→완료). 0은 흐리게
   function stp(label,n){ return '<span class="stp">'+label+' <b'+(n?'':' class="z"')+'>'+n+'</b></span>'; }
   var pipe=[];
   if(pass.plan) pipe.push(stp('면접예정',pass.plan));
@@ -827,9 +801,8 @@ function cacRender(){
   var heroHtml='<div class="cac-hero"><div class="big"><span class="cost">'+dpWon(t.gonggo)+'원</span> '+pipe.join('<span class="arw">→</span>')+'</div>'
     + '<div class="mini">'+(passCac?'합격 1명당 <b>'+dpWon(passCac)+'</b>원':'집계중')+(eduCac?' · 교육 <b>'+dpWon(eduCac)+'</b>원':'')+'</div></div>';
   document.getElementById('cac_hero').innerHTML=heroHtml;
-  // 채널 카드
   function chanCard(cls,nm,char,c,pc){
-    var cac = pc>0 ? Math.round(c.g/pc) : 0;   // 합격 기준 CAC
+    var cac = pc>0 ? Math.round(c.g/pc) : 0;
     var fb=function(label,n){ return label+' <b'+(n?'':' class="z"')+'>'+n+'</b>'; };
     return '<div class="cac-chan '+cls+'"><div class="cac-chan-top"><span class="cac-chan-nm">'+nm+'</span>'
       +'<span class="cac-chan-char">'+char+'</span></div>'
@@ -841,11 +814,9 @@ function cacRender(){
   }
   document.getElementById('cac_chans').innerHTML=
     chanCard('jk','잡코리아','💼 경력·정착형',jk,jkPass)+chanCard('am','알바몬','⚡ 빠른충원',am,amPass);
-  // 탭 활성
   document.querySelectorAll('.cac-tab').forEach(function(b){ b.classList.toggle('on', b.dataset.mo===mo); });
 }
 
-// ── 부서별 공고 ──
 function dpRender(){
   var mo=window.__dpMonth, D=HIRE_DEPT[mo]; if(!D) return;
   var order=['상담부','사업부','강사','코칭'], gh='';
@@ -853,7 +824,6 @@ function dpRender(){
   order.forEach(function(d){
     var v=D.depts[d]; if(!v) return;
     var deptEmpty=(v.tot.gonggo===0 && v.tot.iryeok===0 && v.tot.myeontong===0 && v.tot.myeoncham===0);
-    // 공고·활동 0인 부서 = 컴팩트 축소 (헤더만, 회색)
     if(deptEmpty){
       gh+='<div class="dp-card '+d+' dp-empty"><div class="dp-card-hd"><span class="dp-dot"></span><span class="dp-name">'+d+'</span>'
         +'<span class="dp-sum z">이번 달 공고 없음</span></div></div>';
@@ -887,7 +857,6 @@ function dpRender(){
   document.getElementById('dp_grid').innerHTML=gh;
   document.querySelectorAll('.dp-tab').forEach(function(b){ b.classList.toggle('on', b.dataset.mo===mo); });
 }
-// 월 토글 (CAC+부서별 동시)
 function moSwitch(mo){ window.__dpMonth=mo; cacRender(); dpRender(); }
 (function(){
   var order=Object.keys(HIRE_DEPT).sort().reverse();
@@ -898,4 +867,5 @@ function moSwitch(mo){ window.__dpMonth=mo; cacRender(); dpRender(); }
   cacRender(); dpRender();
 })();
 </script>
+
 </body></html>
