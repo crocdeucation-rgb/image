@@ -2263,6 +2263,20 @@ function fdRun(){
   var s=window.__fdState;
   var rg=fdRange();
   var acc=fdAggregate(rg);
+  // [임시디버그] 상담뷰 진단
+  if(s.view==='sang'){
+    var _rows=window.__ledger||[];
+    var _sangSample=[], _stateSet={}, _cnt=0;
+    _rows.forEach(function(r){
+      if(r.key<rg.from||r.key>rg.to) return;
+      _cnt++;
+      _stateSet[r.state]=(_stateSet[r.state]||0)+1;
+      if(_sangSample.length<5) _sangSample.push({sang:r.sang,state:r.state,sales:r.sales,isWeb:r.isWeb});
+    });
+    console.log('[FINDER 상담뷰 진단] 기간내 행수:',_cnt,'| acc.byPerson 수:',Object.keys(acc.byPerson).length);
+    console.log('[state 값 분포]',JSON.stringify(_stateSet));
+    console.log('[sang 샘플5]',JSON.stringify(_sangSample));
+  }
   // 비교 (오더 + 일/주만)
   var cmpHtml='';
   var prg=fdPrevRange(rg);
