@@ -2206,12 +2206,11 @@ window.fdToCard=function(name){
   document.getElementById('fdModal').classList.remove('on');
 };
 /* [2026-09] 지점장/지사장/부지점장 판별 — D.persons의 rank 참조 */
-function fdIsBossName(name){
+function _fdBossTeam(name){
   var P=(window.__D&&window.__D.persons)||[];
   for(var i=0;i<P.length;i++){ if(P[i].name===name){ var R=P[i].rank||''; return ['지사장','지점장','부지점장'].indexOf(R)>=0 ? (P[i].team||'') : ''; } }
   return '';
 }
-window.fdIsBossName=function(name){ return !!fdIsBossName(name); };
 /* [2026-09] 지점 실적 카드 — fdResult에 인라인 상세(뒤로가기) */
 window.fdToBranch=function(brName){
   if(!brName){ return; }
@@ -2270,20 +2269,6 @@ function fdRun(){
   var s=window.__fdState;
   var rg=fdRange();
   var acc=fdAggregate(rg);
-  // [임시디버그] 상담뷰 진단
-  if(s.view==='sang'){
-    var _rows=window.__ledger||[];
-    var _sangSample=[], _stateSet={}, _cnt=0;
-    _rows.forEach(function(r){
-      if(r.key<rg.from||r.key>rg.to) return;
-      _cnt++;
-      _stateSet[r.state]=(_stateSet[r.state]||0)+1;
-      if(_sangSample.length<5) _sangSample.push({sang:r.sang,state:r.state,sales:r.sales,isWeb:r.isWeb});
-    });
-    console.log('[FINDER 상담뷰 진단] 기간내 행수:',_cnt,'| acc.byPerson 수:',Object.keys(acc.byPerson).length);
-    console.log('[state 값 분포]',JSON.stringify(_stateSet));
-    console.log('[sang 샘플5]',JSON.stringify(_sangSample));
-  }
   // 비교 (오더 + 일/주만)
   var cmpHtml='';
   var prg=fdPrevRange(rg);
@@ -2324,8 +2309,8 @@ function fdRun(){
         met='<b>'+pcEok(x.sales)+'</b> · 장당 '+jd;
       } else {
         // 상담: 세팅·오더, 클릭 시 개인카드 (지점장/지사장이면 지점카드)
-        var isB=fdIsBossName(x.name);
-        oc=isB?' onclick="fdToBranch(\''+(x.team||'').replace(/'/g,"")+'\')"':(pcFind(x.name)?' onclick="fdToCard(\''+x.name.replace(/'/g,"")+'\')"':'');
+        var bossTeam=_fdBossTeam(x.name);
+        oc=bossTeam?' onclick="fdToBranch(\''+bossTeam.replace(/'/g,"")+'\')"':(pcFind(x.name)?' onclick="fdToCard(\''+x.name.replace(/'/g,"")+'\')"':'');
         met='<b>'+pcEok(x.sales)+'</b> · 오더 '+x.ord+' · 세팅 '+x.set;
       }
       var tm=x.team?'<span class="tm">'+x.team+'</span>':'';
