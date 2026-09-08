@@ -365,8 +365,6 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
     <span class="lg"><span class="ldot" style="background:#1D9E75"></span>참석</span>
     <span class="lg"><span class="ldot" style="background:#7048E8"></span>합격</span>
     <span class="lg"><span class="ldot" style="background:#E23A22"></span>불참·불합격</span>
-    <span class="lg" style="margin-left:8px;padding-left:12px;border-left:1px solid #DCE3EE"><span class="csite am" style="position:static">알</span>알바몬</span>
-    <span class="lg"><span class="csite jk" style="position:static">잡</span>잡코리아</span>
   </div>
 </div>
 
@@ -422,8 +420,8 @@ var PLACE_FULL='퀸즈파크10, 서울 강서구 마곡중앙6로 66, 414호';
 function jobNorm(s){ s=String(s||''); if(s.indexOf('상담')>=0)return '상담부'; if(s.indexOf('사업')>=0)return '사업부'; if(s.indexOf('코칭')>=0)return '코칭'; if(s.indexOf('강사')>=0)return '강사'; return s||'기타'; }
 function mgrBadge(name){
   var n=String(withTitle(name)).replace(/</g,'&lt;');
-  if(n.indexOf('엄현호')>=0 || n.indexOf('엄이사')>=0) return '<span class="mgr-def">👤 '+n+'</span>';
-  return '<span class="mgr-hi">👤 '+n+'</span>';
+  if(n.indexOf('엄현호')>=0 || n.indexOf('엄이사')>=0) return '<span class="mgr-def">'+n+'</span>';
+  return '<span class="mgr-hi">'+n+'</span>';
 }
 function cardStateClass(iv){
   var at=String(iv.attend||''), p=String(iv.pass||'');
@@ -586,8 +584,7 @@ function renderCal(){
           var sc=site.indexOf('알바몬')>=0?'am':(site.indexOf('잡코')>=0?'jk':'');
           var scL=sc==='am'?'알':(sc==='jk'?'잡':'');
           h+='<span class="cal-chip job-'+esc(iv.job)+(drop?' drop':'')+'" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/\x27/g,'')+'\')">'
-            +'<span class="cdot '+stCls+'"></span>'+esc(iv.name)
-            +(scL?'<span class="csite '+sc+'">'+scL+'</span>':'')+'</span>';
+            +'<span class="cdot '+stCls+'"></span>'+esc(iv.name)+'</span>';
         });
         h+='</div>';
         h+='</div>';
@@ -595,10 +592,10 @@ function renderCal(){
       eduList.forEach(function(iv){
         var esc=function(s){return String(s||'').replace(/</g,'&lt;');};
         h+='<div class="cal-edu" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/\x27/g,'')+'\')">'
-          +'<div class="cal-iv-r1"><span class="cal-edu-badge">🎓 교육</span><span class="cal-iv-tm">'+(iv.eduTime||'')+'</span>'
+          +'<div class="cal-iv-r1"><span class="cal-edu-badge">교육</span><span class="cal-iv-tm">'+(iv.eduTime||'')+'</span>'
           +'<span class="cal-jbadge job-'+esc(iv.job)+'">'+esc(iv.job)+'</span></div>'
           +'<div class="cal-iv-nm">'+esc(iv.name)+'</div>'
-          +'<div class="cal-edu-lbl">🎓 교육'+(iv.eduWho?' <span class="edu-who">'+esc(withTitle(iv.eduWho))+'</span>':'')+'</div></div>';
+          +'<div class="cal-edu-lbl">교육'+(iv.eduWho?' <span class="edu-who">'+esc(withTitle(iv.eduWho))+'</span>':'')+'</div></div>';
       });
     } else {
       h+='<div class="cal-empty">일정 없음</div>';
