@@ -668,6 +668,10 @@ body.is-live .closed-only{display:none !important}
     <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.2-3.2"/></svg>
     <span>검색</span>
   </button>
+  <button class="tnav-btn" id="guideBtn" onclick="navClose();openGuide()">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>
+    <span>등급안내</span>
+  </button>
   <button class="tnav-btn hidden" id="notifBell" onclick="navClose();notifToggle()">
     <svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.5 20a2 2 0 0 0 3 0"/></svg>
     <span>알림</span><span class="tnav-badge" id="notifBadge">0</span>
@@ -1104,7 +1108,7 @@ var _bmv='';
 if(sortKey==='sales'){ var _br=_dmMap[x.name];
   if(_br){ if(_br.prevRank==null) _bmv='<span class="mvnew">NEW</span>'; else if(_br.move>0) _bmv='<span class="mvup">▲'+_br.move+'</span>'; else if(_br.move<0) _bmv='<span class="mvdn">▼'+(-_br.move)+'</span>'; }
 }
-h+='<div class="bar br-clickable" onclick="openBranchCard(\''+x.name.replace(/'/g,"")+'\')"><div class="rk'+(i<3?' t':'')+'">'+(i+1)+'</div><div class="nm">'+x.name+_bmv+'</div><div class="track"><div class="fill" style="width:'+w+'%">'+lblhtml+'</div>'+outlbl+'</div><div class="meta meta-br">'+metaLine+'</div></div>';});return h;}
+h+='<div class="bar br-clickable" onclick="openBranchCard(\''+x.name.replace(/'/g,"")+'\')"><div class="rk'+(i<3?' t':'')+'">'+(i+1)+'</div><div class="nm">'+x.name+(typeof branchBadges==='function'?branchBadges(x.name):'')+_bmv+'</div><div class="track"><div class="fill" style="width:'+w+'%">'+lblhtml+'</div>'+outlbl+'</div><div class="meta meta-br">'+metaLine+'</div></div>';});return h;}
 function barsDv(arr){var mx=Math.max.apply(null,arr.map(function(x){return x.sales;}))||1;var h='';
 arr.forEach(function(x,i){var w=Math.max(x.sales/mx*100,3);
 var ins=w>=18;h+='<div class="bar"><div class="rk'+(i<3?' t':'')+'">'+(i+1)+'</div><div class="nm">'+x.name+'</div><div class="track"><div class="fill" style="width:'+w+'%">'+(ins?'<span>'+won(x.sales)+'</span>':'')+'</div>'+(ins?'':'<span class="outlbl" style="left:calc('+w+'% + 8px)">'+won(x.sales)+'</span>')+'</div><div class="meta">세팅 <b>'+x.set+'</b> · 오더 <b>'+x.ord+'</b> · 1인당 <b>'+won(x.per)+'</b></div></div>';});return h;}
@@ -1372,6 +1376,31 @@ window.loadMonth = loadMonth;
     <div id="fdResult"></div>
   </div>
 </div>
+
+<div class="fd-bg" id="guideModal" onclick="if(event.target===this)closeGuide()">
+  <div class="fd-wrap" style="max-width:600px">
+    <div class="fd-hd"><span class="t">📖 등급 안내</span><button class="x" onclick="closeGuide()">✕</button></div>
+    <div id="guideBody" style="padding:18px 20px;max-height:76vh;overflow-y:auto"></div>
+  </div>
+</div>
+<style>
+.gd-sec{margin-bottom:22px}
+.gd-sec:last-child{margin-bottom:4px}
+.gd-h{font-size:14px;font-weight:900;color:#1B2436;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.gd-h .gd-ic{font-size:16px}
+.gd-desc{font-size:12px;color:#8A97AC;font-weight:600;margin-bottom:10px;line-height:1.5}
+.gd-reset{display:inline-block;font-size:10.5px;font-weight:800;color:#7048E8;background:#EFEAFB;padding:2px 9px;border-radius:20px;margin-left:4px}
+.gd-tbl{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;border:1px solid #E7ECF3}
+.gd-tbl th{background:#F4F6FA;font-size:11px;font-weight:800;color:#6B7688;padding:7px 10px;text-align:left;border-bottom:1px solid #E7ECF3}
+.gd-tbl td{font-size:12px;padding:6px 10px;border-bottom:1px solid #F2F4F7;font-weight:600}
+.gd-tbl td:first-child{font-weight:900;color:#7048E8;width:56px}
+.gd-tbl tr:last-child td{border-bottom:none}
+.gd-tbl .gd-num{color:#1B2436;font-variant-numeric:tabular-nums}
+.gd-tro{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.gd-tro-item{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#3A4456;background:#F7F9FC;border:1px solid #EAEFF6;border-radius:9px;padding:6px 11px}
+.gd-tro-item .i{font-size:15px}
+.gd-note{font-size:11px;color:#B6C2DC;font-weight:600;margin-top:10px;line-height:1.5}
+</style>
 
 
 <!-- ②-b  </body> 앞에 붙일 SCRIPT (Firebase SDK 포함) ──────────── -->
@@ -2302,6 +2331,67 @@ window.closeFinder=function(){
   document.body.style.overflow='';
   pcRestoreScroll();
 };
+/* ══════ 📖 등급 안내 ══════ */
+window.openGuide=function(){
+  pcSaveScroll();
+  var el=document.getElementById('guideBody');
+  var _man=function(n){ if(n>=100000000)return (n/100000000).toFixed(n%100000000===0?0:2).replace(/\.?0+$/,'')+'억'; return Math.round(n/10000).toLocaleString()+'만'; };
+  function tierTbl(T){
+    var h='<table class="gd-tbl"><tr><th>등급</th><th>기준 매출</th></tr>';
+    T.forEach(function(r,i){ var next=T[i+1]; var range=next?(_man(r.v)+' 이상'):(_man(r.v)+' 이상'); h+='<tr><td>'+r.t+'</td><td class="gd-num">'+_man(r.v)+' 이상</td></tr>'; });
+    return h+'</table>';
+  }
+  var h='';
+  // 티어
+  h+='<div class="gd-sec"><div class="gd-h"><span class="gd-ic">🎖️</span>티어 (SSS ~ F)<span class="gd-reset">매월 갱신</span></div>'
+   +'<div class="gd-desc">전월 종결 매출로 결정. 매달 초 전월 실적 기준으로 새로 매겨집니다.</div>'
+   +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'
+   +'<div><div style="font-size:11px;font-weight:800;color:#4C6EF5;margin-bottom:5px">상담 개인</div>'+tierTbl(PC_TIER_SANG)+'</div>'
+   +'<div><div style="font-size:11px;font-weight:800;color:#7048E8;margin-bottom:5px">사업 개인</div>'+tierTbl(PC_TIER_SAUP)+'</div>'
+   +'</div>'
+   +'<div style="margin-top:12px"><div style="font-size:11px;font-weight:800;color:#20A56D;margin-bottom:5px">지점 (전월 종결 매출)</div>'+tierTbl(PC_TIER_BRANCH)+'</div>'
+   +'</div>';
+  // 지점 누적랭크
+  h+='<div class="gd-sec"><div class="gd-h"><span class="gd-ic">📊</span>지점 누적 랭크<span class="gd-reset">연간 누적</span></div>'
+   +'<div class="gd-desc">올해 월평균 매출 기준. 한 해 꾸준함을 봅니다 (티어와 별개).</div>'
+   + tierTbl(PC_RANK_BRANCH) + '</div>';
+  // 트로피/훈장
+  h+='<div class="gd-sec"><div class="gd-h"><span class="gd-ic">🏆</span>트로피 · 훈장<span class="gd-reset">매월 시상</span></div>'
+   +'<div class="gd-desc">매달 종결 시 부문별 1등에게 수여. 카드와 매출순 이름 옆에 표시됩니다.</div>'
+   +'<div class="gd-tro">'
+   +'<span class="gd-tro-item"><span class="i">🏆</span>MVP — 매출 1위 <span style="color:#B6C2DC">(영구 누적)</span></span>'
+   +'<span class="gd-tro-item"><span class="i">🚀</span>떡상왕 — 전월대비 최고 성장</span>'
+   +'<span class="gd-tro-item"><span class="i">⚾</span>클러치왕 — 막판(25일~) 뒤집기</span>'
+   +'<span class="gd-tro-item"><span class="i">🎖️</span>커리어하이 — 역대 최고월 경신</span>'
+   +'</div>'
+   +'<div style="font-size:11px;font-weight:800;color:#8A97AC;margin:12px 0 5px">지점 훈장</div>'
+   +'<div class="gd-tro">'
+   +'<span class="gd-tro-item"><span class="i">🥇</span>최고의 지점 — 매출 1위 <span style="color:#B6C2DC">(영구)</span></span>'
+   +'<span class="gd-tro-item"><span class="i">⚡</span>효율왕 — 1인당 매출 1위</span>'
+   +'<span class="gd-tro-item"><span class="i">🚀</span>지점 떡상왕 — 전월대비 성장</span>'
+   +'<span class="gd-tro-item"><span class="i">🎖️</span>지점 신기록 — 최고 매출 경신</span>'
+   +'</div></div>';
+  // 리본
+  h+='<div class="gd-sec"><div class="gd-h"><span class="gd-ic">🎗️</span>리본<span class="gd-reset">연속 달성</span></div>'
+   +'<div class="gd-desc">기준 매출을 연속으로 넘기면 승급. 상담 월 4천만 · 사업 월 1억 기준.</div>'
+   +'<div class="gd-tro">'
+   +'<span class="gd-tro-item"><span class="i">🎗️</span>블루 — 1개월</span>'
+   +'<span class="gd-tro-item"><span class="i">🔷</span>마스터 — 3개월 연속</span>'
+   +'<span class="gd-tro-item"><span class="i">💠</span>그랜드 — 6개월 연속</span>'
+   +'<span class="gd-tro-item"><span class="i">👑</span>로얄 — 12개월 연속</span>'
+   +'</div></div>';
+  h+='<div class="gd-note">※ 순위변동 ▲▼ = 이번달 누적 매출 기준, 어제 vs 그제 비교 (매일 갱신)</div>';
+  el.innerHTML=h;
+  document.getElementById('guideModal').classList.add('on');
+  try{ parent.postMessage({t:'cardOpen'}, '*'); }catch(e){}
+  document.body.style.overflow='hidden';
+};
+window.closeGuide=function(){
+  document.getElementById('guideModal').classList.remove('on');
+  try{ parent.postMessage({t:'cardClose'}, '*'); }catch(e){}
+  document.body.style.overflow='';
+  pcRestoreScroll();
+};
 /* 파인더 → 카드 전환 (오버레이·스크롤 승계, 복원 안 탐) */
 window.fdToCard=function(name){
   // fdModal이 아직 'on'인 상태로 openCard 호출 → pcSaveScroll이 "열림 중"으로 보고 스크롤 안 덮음
@@ -2687,6 +2777,32 @@ function nameBadges(name){
      .forEach(function(t){out.push('🏆'+parseInt(t.m.slice(5),10));});
   hof.filter(function(t){return t.type!=='MVP'&&t.m===closed;})
      .forEach(function(t){out.push((icons[t.type]||'🏅')+parseInt(t.m.slice(5),10));});
+  if(out.length>3){ var extra=out.length-3; out=out.slice(0,3); out.push('+'+extra); }
+  return out.length?'<span class="name-badges">'+out.join(' ')+'</span>':'';
+}
+/* ── [2026-09-09] 지점 명예의전당 뱃지 (매출순 목록용) ──
+   개인(nameBadges)과 동일 규칙: 최고의지점=영구 누적(🥇+월) / 나머지 지점훈장=직전 종결달만 / 3개 초과 시 +N */
+function branchBadges(brName){
+  var HOF=window.__HOF||{};
+  var d=new Date(), y=d.getFullYear(), pm=d.getMonth();
+  if(pm===0){ y-=1; pm=12; }
+  var closed=y+'-'+('0'+pm).slice(-2);
+  var icons={'효율왕':'⚡','지점떡상왕':'🚀','지점커리어하이':'🎖️'};
+  var out=[], _seen={};
+  // (1) 최고의지점 = 영구 누적 (개인 MVP와 동일). 소속원 이름으로 저장(team=지점명), 월별 중복제거
+  var champMonths=[];
+  Object.keys(HOF).forEach(function(nm){
+    (HOF[nm]||[]).forEach(function(t){
+      if(t.type==='최고의지점' && t.team===brName){ var k=t.m; if(!_seen['champ|'+k]){ _seen['champ|'+k]=1; champMonths.push(k); } }
+    });
+  });
+  champMonths.sort().forEach(function(mk){ out.push('🥇'+parseInt(mk.slice(5),10)); });
+  // (2) 지점 전용 훈장 = 직전 종결달만 (개인 나머지 훈장과 동일). 지점명 자체로 저장
+  (HOF[brName]||[]).forEach(function(t){
+    if(['지점커리어하이','지점떡상왕','효율왕'].indexOf(t.type)>=0 && t.m===closed){
+      var k=t.type+'|'+t.m; if(!_seen[k]){ _seen[k]=1; out.push((icons[t.type]||'🏅')+parseInt(t.m.slice(5),10)); }
+    }
+  });
   if(out.length>3){ var extra=out.length-3; out=out.slice(0,3); out.push('+'+extra); }
   return out.length?'<span class="name-badges">'+out.join(' ')+'</span>':'';
 }
