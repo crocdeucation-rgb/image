@@ -387,6 +387,23 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .dp-jj-item{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:6px;background:#F4F6FA;color:var(--soft)}
 .dp-jj-item b.p{color:#20A56D}.dp-jj-item b.m{color:#E23A22}.dp-jj-item b.z{color:#B6C2DC}
 .dp-hire-none{font-size:11px;color:#B6C2DC}
+/* 부서별 카드 정착률 */
+.dp-ret{margin-top:8px;padding-top:9px;border-top:1px dashed var(--line)}
+.dp-ret-top{display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:7px}
+.dp-ret-top .hl{font-weight:800;color:var(--ink)}
+.dp-ret-row{display:flex;align-items:baseline;gap:8px;font-size:11.5px;padding:3px 0}
+.dp-ret-row .rlbl{color:var(--soft);font-weight:700;min-width:70px;flex-shrink:0}
+.dp-ret-row .rpct{font-weight:900;letter-spacing:-.3px}
+.dp-ret-row .rpct.good{color:#20A56D}.dp-ret-row .rpct.warn{color:#E23A22}.dp-ret-row .rpct.z{color:#B6C2DC}
+.dp-ret-row .rsmp{color:#8A9AB0;font-weight:600;font-size:10.5px}
+.dp-brs{margin-top:6px;display:flex;flex-direction:column;gap:1px}
+.dp-br{display:flex;align-items:baseline;gap:7px;font-size:11px;padding:4px 8px;border-radius:6px}
+.dp-br:nth-child(odd){background:#FAFBFD}
+.dp-br .bnm{font-weight:800;color:var(--ink);min-width:78px;flex-shrink:0}
+.dp-br .bpct{font-weight:900;letter-spacing:-.3px}
+.dp-br .bpct.good{color:#20A56D}.dp-br .bpct.warn{color:#E23A22}.dp-br .bpct.z{color:#B6C2DC}
+.dp-br .bsmp{color:#8A9AB0;font-weight:600;font-size:10px;margin-left:auto}
+.dp-ret-note{font-size:10px;color:#B6C2DC;font-weight:600;margin-top:5px;line-height:1.4}
 .ft{text-align:center;font-size:11px;color:var(--soft);margin-top:20px;line-height:1.8}
 </style></head><body><div class="wrap">
 <div class="hd"><div class="k">채용 · 증원현황</div><h1>통합채용TF</h1>
@@ -822,14 +839,27 @@ function _hrParseDate(v){
   if(m) return new Date(+m[1],+m[2]-1,+m[3]);
   return null;
 }
-// 각 시트 → {name,inD,outD,jae} 배열 (전체 행, 옛 퇴사자 포함)
-async function _hrLoadRows(url){
+// 상담부 세부팀 → 지점(대분류) 묶기 (hr.html _h2branch 이식)
+function _h2branch(h){
+  h=String(h||'').trim();
+  if(h==='부평1팀'||h==='부평2팀'||h==='부평운영팀') return '부평지점';
+  if(h==='메이킷위드1과'||h==='메이킷위드2과'||h==='메이킷위드운영팀'||h==='메이킷위드1팀'||h==='메이킷위드2팀') return '메이킷위드';
+  if(h==='가산연합메이킷위드팀'||h==='가산연합인투팀') return '가산연합센터';
+  if(h==='파인더루원') return '파인더루원';
+  if(h==='마포연합센터'||h==='마포연합인투팀'||h==='마포연합파인더팀') return '마포연합센터';
+  if(h==='스카이에듀1팀'||h==='스카이에듀2팀'||h==='스카이에듀3팀') return '스카이에듀';
+  return h||'미구분';
+}
+var _HR_SUB_REMAP = { '메이킷위드1팀':'메이킷위드1과', '메이킷위드2팀':'메이킷위드2과' };
+// 각 시트 → {name,inD,outD,jae,branch} 배열 (전체 행, 옛 퇴사자 포함). branch=상담부 지점명(부서명 컬럼)
+async function _hrLoadRows(url, isSang){
   var res=await fetch(url); var text=await res.text();
   var rows=parseCSV(text).filter(function(r){return r.some(function(c){return (c||'').trim();});});
   var hi=0; for(var i=0;i<Math.min(rows.length,5);i++){ if(rows[i].some(function(c){return (c||'').indexOf('이름')>=0;})){hi=i;break;} }
   var H=rows[hi];
   var cName=_hrHeaderIdx(H,['이름']), cIn=_hrHeaderIdx(H,['입사일','입사']),
-      cOut=_hrHeaderIdx(H,['퇴사일','퇴사']), cJae=_hrHeaderIdx(H,['재직']);
+      cOut=_hrHeaderIdx(H,['퇴사일','퇴사']), cJae=_hrHeaderIdx(H,['재직']),
+      cGrp=_hrHeaderIdx(H,['부서명','팀','과']);
   var out=[];
   for(var r=hi+1;r<rows.length;r++){
     var row=rows[r]; var name=(cName>=0?row[cName]:'').trim(); if(!name) continue;
@@ -838,7 +868,9 @@ async function _hrLoadRows(url){
     var outD=_hrParseDate(outv);
     var jaev=(cJae>=0?row[cJae]:'').trim();
     var jae = cJae>=0 ? (jaev==='재직') : (!outv);
-    out.push({name:name, inD:inD, outD:outD, jae:jae});
+    var branch='';
+    if(isSang && cGrp>=0){ var sub=(row[cGrp]||'').trim(); sub=_HR_SUB_REMAP[sub]||sub; branch=_h2branch(sub); }
+    out.push({name:name, inD:inD, outD:outD, jae:jae, branch:branch});
   }
   return out;
 }
@@ -870,17 +902,29 @@ function _retentionCalc(rows){
   return {d1:d1, d3:d3, q:q};
 }
 var __HR_RET=null, __HR_RET_STATE='loading'; // loading|ok|err
+// HR 시트키 → hire 부서명
+var _HR_DEPT_MAP = { '상담':'상담부', '사업':'사업부', '수업':'강사', '코칭':'코칭' };
 async function loadRetention(){
   try{
     var keys=Object.keys(HR_CSV);
-    var all=await Promise.all(keys.map(function(k){return _hrLoadRows(HR_CSV[k]);}));
-    // 수업·코칭은 같은 스프레드시트 다른 gid → 각각 정상. 중복 이름 있어도 시트 다르면 다른 사람일 수 있어 합산 유지
-    var merged=[]; var byDept={};
-    keys.forEach(function(k,i){ byDept[k]=_retentionCalc(all[i]); merged=merged.concat(all[i]); });
-    __HR_RET={all:_retentionCalc(merged), byDept:byDept, raw:merged};
+    var all=await Promise.all(keys.map(function(k){return _hrLoadRows(HR_CSV[k], k==='상담');}));
+    var merged=[]; var byDept={}, sangBranch={};
+    keys.forEach(function(k,i){
+      var dept=_HR_DEPT_MAP[k]||k;
+      byDept[dept]=_retentionCalc(all[i]);
+      merged=merged.concat(all[i]);
+      // 상담부는 지점별로도 쪼갬
+      if(k==='상담'){
+        var grp={};
+        all[i].forEach(function(x){ var br=x.branch||'미구분'; (grp[br]=grp[br]||[]).push(x); });
+        Object.keys(grp).forEach(function(br){ sangBranch[br]=_retentionCalc(grp[br]); });
+      }
+    });
+    __HR_RET={all:_retentionCalc(merged), byDept:byDept, sangBranch:sangBranch, raw:merged};
     __HR_RET_STATE='ok';
   }catch(e){ console.error('정착률 로드 실패',e); __HR_RET_STATE='err'; }
   cacRetRender();
+  if(typeof dpRender==='function') dpRender(); // 부서별 카드에 이탈률 반영
 }
 function _retPct(o){ return o.denom>0 ? (100*(o.denom-o.churn)/o.denom) : null; }
 function cacRetRender(){
@@ -941,6 +985,47 @@ function cacRender(){
 }
 function cacFnTog(el){ el.classList.toggle('open'); var f=el.nextElementSibling; if(f) f.classList.toggle('open'); }
 
+// 부서별 정착률 HTML (상담부는 지점별 드릴다운). __HR_RET 로드 후에만 내용, 아니면 빈칸
+function dpRetHtml(dept){
+  if(__HR_RET_STATE!=='ok' || !__HR_RET) {
+    if(__HR_RET_STATE==='loading') return '<div class="dp-ret"><div class="dp-ret-top"><span class="hl">정착률</span></div><div class="dp-ret-note">HR 입퇴사 불러오는 중…</div></div>';
+    return '';
+  }
+  var pctCls=function(p){ return p===null?'z':(p<70?'warn':'good'); };
+  var pctTxt=function(o){ var p=_retPct(o); return p===null?'—':p.toFixed(1)+'%'; };
+  var smpTxt=function(o){ return o.denom>0?(o.denom+'명 중 '+o.churn+' 이탈'):'표본 없음'; };
+  function retRow(lbl,o){
+    var p=_retPct(o);
+    return '<div class="dp-ret-row"><span class="rlbl">'+lbl+'</span>'
+      +'<span class="rpct '+pctCls(p)+'">'+pctTxt(o)+'</span>'
+      +'<span class="rsmp">'+smpTxt(o)+'</span></div>';
+  }
+  var R=__HR_RET.byDept[dept];
+  if(!R) return '';
+  var h='<div class="dp-ret"><div class="dp-ret-top"><span class="hl">정착률 <span style="font-size:10px;font-weight:600;color:#B6C2DC">입퇴사 기준</span></span></div>';
+  h+=retRow('1개월', R.d1)+retRow('3개월', R.d3);
+  // 상담부 = 지점별 드릴다운 (1개월만, 표본 얇음)
+  if(dept==='상담부' && __HR_RET.sangBranch){
+    var SB=__HR_RET.sangBranch;
+    var brs=Object.keys(SB).filter(function(b){return b!=='미구분' && SB[b].d1.denom>0;})
+      .sort(function(a,b){ return SB[b].d1.denom - SB[a].d1.denom; });
+    if(brs.length){
+      h+='<div class="dp-brs">';
+      brs.forEach(function(b){
+        var o=SB[b].d1, p=_retPct(o);
+        h+='<div class="dp-br"><span class="bnm">'+b.replace('센터','').replace('지점','')+'</span>'
+          +'<span class="bpct '+pctCls(p)+'">'+pctTxt(o)+'</span>'
+          +'<span class="bsmp">'+o.denom+'명·이탈 '+o.churn+'</span></div>';
+      });
+      h+='</div><div class="dp-ret-note">지점별 = 1개월 이탈 기준 · 알바 진입→정규직 육성 관점 (표본 적으면 흔들림)</div>';
+    }
+  } else {
+    h+='<div class="dp-ret-note">1개월=입사30일경과자 / 3개월=90일경과자 · 파트타임은 이탈 자체가 정상, 추세로 볼 것</div>';
+  }
+  h+='</div>';
+  return h;
+}
+
 function dpRender(){
   var mo=window.__dpMonth, D=HIRE_DEPT[mo]; if(!D) return;
   var order=['상담부','사업부','강사','코칭'], gh='';
@@ -975,6 +1060,8 @@ function dpRender(){
       } else hh+='</div><div class="dp-hire-none">이번 달 입퇴사 집계 전</div>';
       hh+='</div>'; body+=hh;
     }
+    // 정착률 블록 (HR 입퇴사 기준, 전월 무관 — 부서 전체 히스토리)
+    body += dpRetHtml(d);
     gh+='<div class="dp-card '+d+'"><div class="dp-card-hd"><span class="dp-dot"></span><span class="dp-name">'+d+'</span>'
       +'<span class="dp-sum">공고 '+dpWon(v.tot.gonggo)+'</span></div><div class="dp-body">'+body+'</div></div>';
   });
