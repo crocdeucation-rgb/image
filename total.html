@@ -1108,9 +1108,9 @@ var _bmv='';
 if(sortKey==='sales'){ var _br=_dmMap[x.name];
   if(_br){ if(_br.prevRank==null) _bmv='<span class="mvnew">NEW</span>'; else if(_br.move>0) _bmv='<span class="mvup">▲'+_br.move+'</span>'; else if(_br.move<0) _bmv='<span class="mvdn">▼'+(-_br.move)+'</span>'; }
 }
-// [2026-09-09] 지점 사진/이니셜 — 사진 있으면 report/branches/{로마자}.jpg, 없으면 이니셜 원형
-var _brm=(window.BRANCH_ROMAJA&&BRANCH_ROMAJA[x.name])||'';
-var _bimg=_brm?('<img src="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/branches/'+_brm+'.jpg" class="bar-av" alt="" onerror="this.outerHTML=\'<div class=&quot;bar-av bar-av-ini&quot;>'+x.name.charAt(0)+'</div>\'">'):('<div class="bar-av bar-av-ini">'+x.name.charAt(0)+'</div>');
+// [2026-09-09] 지점 사진 — Firebase(branchProfiles) 우선, 없으면 이니셜 원형. (지점장이 지점카드에서 등록)
+var _bpr=(window.__branchProfiles&&window.__branchProfiles[x.name])||{};
+var _bimg=_bpr.photoURL?('<img src="'+_bpr.photoURL+'" class="bar-av" alt="" onerror="this.outerHTML=\'<div class=&quot;bar-av bar-av-ini&quot;>'+x.name.charAt(0)+'</div>\'">'):('<div class="bar-av bar-av-ini">'+x.name.charAt(0)+'</div>');
 h+='<div class="bar br-clickable" onclick="openBranchCard(\''+x.name.replace(/'/g,"")+'\')"><div class="rk'+(i<3?' t':'')+'">'+(i+1)+'</div>'+_bimg+'<div class="nm">'+x.name+(typeof branchBadges==='function'?branchBadges(x.name):'')+_bmv+'</div><div class="track"><div class="fill" style="width:'+w+'%">'+lblhtml+'</div>'+outlbl+'</div><div class="meta meta-br">'+metaLine+'</div></div>';});return h;}
 function barsDv(arr){var mx=Math.max.apply(null,arr.map(function(x){return x.sales;}))||1;var h='';
 arr.forEach(function(x,i){var w=Math.max(x.sales/mx*100,3);
@@ -1483,6 +1483,64 @@ window.mySaveStatus=function(){
     .catch(function(err){ alert('저장 실패: '+err.message); });
 };
 profilesStart();
+
+// [2026-09-09] 지점 프로필(사진) 실시간 구독 — branchProfiles/{지점명}. 개인 profiles 구조 복제.
+window.__branchProfiles={}; window.__brProfOn=false;
+function branchProfilesStart(){
+  if(window.__brProfOn) return; window.__brProfOn=true;
+  try{
+    _fdb.collection('branchProfiles').onSnapshot(function(qs){
+      var m={}; qs.forEach(function(d){ var v=d.data()||{}; m[d.id]={photoURL:v.photoURL||''}; });
+      window.__branchProfiles=m;
+      // 매출순 목록 다시 그림 (사진 반영)
+      if(window.__curTab===0 && window.__D && typeof barsBr==='function'){
+        var _bd=document.getElementById('body'); if(_bd){ _bd.innerHTML=barsBr(window.__D.branches, window.__brSort||'sales'); setTimeout(attachCardClicks,50); }
+      }
+      // 지점카드 열려있으면 반영
+      if(window.__curCardName && window.__branchProfiles[window.__curCardName]) brApplyProfile(window.__curCardName);
+    }, function(){ window.__brProfOn=false; });
+  }catch(e){ window.__brProfOn=false; }
+}
+function brApplyProfile(brName){
+  var pr=(window.__branchProfiles&&window.__branchProfiles[brName])||{};
+  var body=document.getElementById('pcBody'); if(!body||!pr.photoURL) return;
+  var av=body.querySelector('.pc-av'); if(!av) return;
+  var im=av.querySelector('img');
+  if(im){ if(im.getAttribute('src')!==pr.photoURL) im.setAttribute('src', pr.photoURL); }
+  else {
+    var cam=av.querySelector('.pc-av-cam');
+    av.childNodes.forEach&&av.childNodes.forEach(function(n){ if(n.nodeType===3) n.textContent=''; });
+    var _img=document.createElement('img');
+    _img.src=pr.photoURL; _img.alt=''; _img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:inherit';
+    av.insertBefore(_img, cam||null);
+  }
+}
+// 지점 사진 업로드 — 그 지점 지점장/지사장만. brName = 현재 지점카드
+window.branchUploadPhoto=function(input, brName){
+  var file=input.files&&input.files[0]; if(!file||!_me) return;
+  // 권한: 내가 이 지점의 지점장/지사장인가
+  var myBr=(typeof _headBranchOf==='function')?_headBranchOf(_me.name):'';
+  if(myBr!==brName){ alert('이 지점의 지점장·지사장만 사진을 등록할 수 있어요.'); return; }
+  var img=new Image(); var rd=new FileReader();
+  rd.onload=function(e){ img.onload=function(){
+    var mx=600, sc=Math.min(mx/img.width, mx/img.height, 1);   // 지점 사진은 좀 더 크게(600px)
+    var cv=document.createElement('canvas');
+    cv.width=Math.round(img.width*sc); cv.height=Math.round(img.height*sc);
+    cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+    cv.toBlob(function(blob){
+      var safe=brName.replace(/[^0-9A-Za-z가-힣]/g,'');
+      var ref=_fstorage.ref('branchProfiles/'+safe+'/photo.jpg');
+      ref.put(blob).then(function(){ return ref.getDownloadURL(); }).then(function(url){
+        return _fdb.collection('branchProfiles').doc(brName).set(
+          {photoURL:url, by:_me.email, ts:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+      }).then(function(){ alert('지점 사진이 등록되었습니다'); })
+      .catch(function(err){ alert('업로드 실패: '+err.message); });
+    },'image/jpeg',0.85);
+  }; img.src=e.target.result; };
+  rd.readAsDataURL(file);
+};
+branchProfilesStart();
+
 var _me=null;   // {email,name,rank}
 // [2026-09] 권한 판별 — 부서장·경영진만 사업 실적·취소 표기 열람
 function isBoss(){ var R=(window._me&&window._me.rank)||''; return ['파운더','대표이사','이사','지사장','지점장','부지점장'].indexOf(R)>=0; }
@@ -1952,8 +2010,6 @@ window.pcSwitchTrend=function(mode,btn){
 window.__curCardName=null;
 // [2026-09] 직원 사진 매칭용 이름→로마자
 var ROMAJA={"강명주":"gangmyeongju","고국희":"gogukhui","권순재":"gwonsunjae","김도희":"kimdohui","김민성":"kimminseong","김민철":"kimmincheol","김성윤":"kimseongyun","김세연":"kimseyeon","김승민":"kimseungmin","김예림":"kimyerim","김예원":"kimyewon","김우진":"kimujin","김원득":"kimwondeuk","김윤호":"kimyunho","김종범":"kimjongbeom","김준수":"kimjunsu","김채영":"kimchaeyoung","노영호":"noyoungho","맹민주":"maengminju","문수호":"munsuho","문정현":"munjeonghyeon","박건휘":"bakgeonhwi","박민수":"bakminsu","백충열":"baekchungyeol","서승재":"seoseungjae","석지훈":"seokjihun","안세령":"anseryeong","안준섭":"anjunseop","우혜림":"uhyerim","윤지환":"yunjihwan","이상민":"isangmin","이석헌":"iseokheon","이성혁":"iseonghyeok","이승엽":"iseungyeop","이아현":"iahyeon","이은빈":"ieunbin","이의재":"iuijae","이재원":"ijaewon","이준석":"ijunseok","이태희":"itaehui","임성민":"imseongmin","임한별":"imhanbyeol","장원종":"jangwonjong","장윤호":"jangyunho","장준혁":"jangjunhyeok","정다훈":"jeongdahun","정현우":"jeonghyeonu","정은지":"jeongeunji","조수현":"josuhyeon","하나래":"hanarae","홍혜민":"honghyemin"};
-// [2026-09-09] 지점 사진 매핑 — report/branches/{로마자}.jpg. 파일 올린 지점만 사진, 없으면 이니셜.
-var BRANCH_ROMAJA={"마곡지점":"magok","가산연합센터":"gasan","수호에듀":"suho","메이킷위드":"makeitwith","부평지점":"bupyeong","마포연합센터":"mapo","스카이에듀":"skyedu","더온에듀":"theon","파인더루원":"finderluone","수원지점":"suwon","오름에듀":"oreum"};
 // [2026-09] 순위·이름 블록 공용 사진 헬퍼 — 사진 없으면 이니셜 원형
 window.avatarMini=function(name, size){
   if(!name) return '';
@@ -2132,13 +2188,20 @@ window.openBranchCard=function(brName){
   var subLine='<div class="pc-subst"><span>누적랭크 <b>'+rankTier+'</b></span><span>월평균 <b>'+pcEok(avgSales)+'</b></span>'+(brNow?'<span>방문 <b>'+(brNow.visit||0)+'</b></span>':'')+'</div>';
   var avTxt=brName.charAt(0);
   window.__curCardName=brName;
+  // [2026-09-09] 지점 사진(Firebase) + 지점장/지사장만 업로드 버튼
+  var _bpr=(window.__branchProfiles&&window.__branchProfiles[brName])||{};
+  var _bimg=_bpr.photoURL;
+  var _isBrBoss=(typeof _headBranchOf==='function' && _me && _headBranchOf(_me.name)===brName);
+  var _camSvg='<svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
+  var _brCam=_isBrBoss ? '<label class="pc-av-cam" title="지점 사진 등록">'+_camSvg+'<input type="file" accept="image/*" onchange="branchUploadPhoto(this,\''+brName.replace(/'/g,"")+'\')"></label>' : '';
+  var _brAvInner=_bimg?('<img src="'+_bimg+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit" onerror="this.style.display=\'none\';this.parentNode.childNodes[0].textContent=\''+avTxt+'\'">'):avTxt;
   var html='<button class="pc-close" onclick="closeCard()">✕</button>'
     +'<div class="pc-hd t-'+tier+'"><div class="pc-blob b1"></div><div class="pc-blob b2"></div>'+(tier==='SSS'?'<div class="pc-spark"></div>':'')
     +'<div class="pc-tier"><div class="pc-tier-badge">'+tier+'</div><div class="pc-tier-lbl">TIER</div></div>'
     +'<div class="pc-hd-row">'
-    +'<div class="pc-av">'+avTxt+'</div>'
+    +'<div class="pc-av">'+_brAvInner+_brCam+'</div>'
     +'<div class="pc-id"><div class="pc-nm">'+brName+'</div><div class="pc-meta">지점'+(brNow&&brNow.ord?' · 오더 '+brNow.ord:'')+'</div></div>'
-    +'<div class="pc-praise">'+brName+' 실적판</div>'
+    +'<div class="pc-praise">'+brName+' 실적판'+(_isBrBoss&&!_bimg?' · <span style="opacity:.85">사진 등록 가능</span>':'')+'</div>'
     +'</div></div>'
     +'<div class="pc-stats">'
     +'<div class="pc-st"><div class="l">이달 매출</div><div class="v pur">'+pcEok(curSales)+'</div></div>'
