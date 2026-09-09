@@ -463,14 +463,11 @@ async function loadSum(){
 function renderHL(){
   // [2026-09] 덕질 스탯 — 순위는 GROWTH CUP 표에서, 여긴 재미요소만
   var hl={};
-  for(var i=0;i<summaryRows.length;i++){ if(summaryRows[i]&&summaryRows[i][0]==='주간하이라이트'){ for(var j=i+1;j<Math.min(i+7,summaryRows.length);j++){var r=summaryRows[j];if(!r||!r[0])break;hl[r[0]]={name:r[1]||'-',val:r[2]||'',extra:r[3]||''}} break; } }
+  for(var i=0;i<summaryRows.length;i++){ if(summaryRows[i]&&summaryRows[i][0]==='주간하이라이트'){ for(var j=i+1;j<Math.min(i+9,summaryRows.length);j++){var r=summaryRows[j];if(!r||!r[0])break;hl[r[0]]={name:r[1]||'-',val:r[2]||'',extra:r[3]||''}} break; } }
   // 급상승왕 = 이번달 점수 순위가 지난달 대비 제일 오른 사람
   function rankOf(tab){var o=tab*6+1,c=19+tab*3,a=[];ASSIGNEES.forEach(function(nm,i){var r=summaryRows[ASSIGNEE_START_IDX+i]||[];var sn=parseFloat(((r[o+5]||'0')+'').replace(/[^0-9.]/g,''))||0;a.push({name:r[0]||nm,score:Math.round(sn*(+(r[c+1]||0)))});});a.sort(function(x,y){return y.score-x.score;});var rk={};a.forEach(function(x,idx){rk[x.name]=idx+1;});return rk;}
   var curR=rankOf(0), prvR=rankOf(1), topRise=null, mx=0;
   ASSIGNEES.forEach(function(nm){var d=(prvR[nm]||99)-(curR[nm]||99);if(d>mx){mx=d;topRise=nm;}});
-  // 부재회수(전환왕) = 전환누적 시트 → summary에 emit되면 읽음. 없으면 '집계 중'
-  var recovery=null;
-  for(var i=0;i<summaryRows.length;i++){ if(summaryRows[i]&&summaryRows[i][0]==='부재회수'){ recovery={name:summaryRows[i][1]||'-',val:summaryRows[i][2]||''}; break; } }
   var row=function(ic,lb,nm,vl){return '<div class="hlrow"><span class="ic">'+ic+'</span><span class="lb">'+lb+'</span><span class="nm">'+esc(nm||'-')+'</span><span class="vl">'+esc(vl||'')+'</span></div>';};
   // 담당자 데이터에서 DB왕·오더왕·매출왕 계산 (이달)
   var _o=1;  // 이번달 offset
@@ -490,7 +487,7 @@ function renderHL(){
     + row('🏆','방문왕',hl['방문왕']?hl['방문왕'].name:'-',hl['방문왕']?hl['방문왕'].val:'')
     + row('⚡','전환왕',hl['전환왕']?hl['전환왕'].name:'-',hl['전환왕']?hl['전환왕'].val:'')
     + row('⏳','홀딩회수',hl['홀딩회수']?hl['홀딩회수'].name:'-',hl['홀딩회수']?hl['홀딩회수'].val:'')
-    + row('🔄','부재회수',recovery?recovery.name:'집계 중',recovery?recovery.val:'내일부터');
+    + row('🔄','부재회수',hl['부재회수']?hl['부재회수'].name:'-',hl['부재회수']?hl['부재회수'].val:'');
 }
 function setPerfTab(i){perfTab=i;var ts=document.querySelectorAll('#pf-tabs .tab');for(var k=0;k<ts.length;k++)ts[k].classList.toggle('on',k===i);renderPerf()}
 function renderPerf(){
