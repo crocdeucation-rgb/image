@@ -134,6 +134,11 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .tl-place.pl-bucheon{background:#E6F7F0;color:#1D9E75}
 .tl-place.pl-luone{background:#F0EBFF;color:#7048E8}
 .tl-place.pl-edu{background:#FFF4E6;color:#BA7517}
+/* [2026-09-10] 그룹 하단 장소 — 명단 밑에 지점+요약장소 */
+.tl-foot{margin-top:5px;font-size:10px;font-weight:800;padding:4px 9px;border-radius:6px;display:inline-block}
+.tl-foot.pl-magok{background:#EEF0FF;color:#3B4F9E}
+.tl-foot.pl-bucheon{background:#E6F7F0;color:#177A57}
+.tl-foot.pl-luone{background:#F0EBFF;color:#5A3AD0}
 .tl-who.edu{color:#0B7A70;background:#D6F5F0}
 .tl-cnt{font-size:9px;font-weight:800;color:#fff;background:#4C6EF5;padding:2px 7px;border-radius:20px;margin-left:auto}
 .tl-card{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #E7ECF4;border-left:3px solid #CBD5E8;border-radius:8px;padding:8px 10px;margin-bottom:4px;cursor:pointer;transition:.12s}
@@ -463,13 +468,13 @@ var PLACE_FULL='퀸즈파크10, 서울 강서구 마곡중앙6로 66, 414호';
 var JISA_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSUcPm-SYlCaeNj0i0PJoCVG5LufnlD8dC-UptL4LaEq1sJIEtdzipD8K5G8VaR4lNuesWWoxDhJTez/pub?output=csv";
 // 지점명(부분일치) → {short:배지, full:주소, cls:색}
 var PLACE_MAP = [
-  { key:'파인더', short:'루원', full:'인천 서구 봉오재3로 120 봄645 406호', cls:'pl-luone' },
-  { key:'메이킷',  short:'부천', full:'경기 부천시 조마루로385번길 92 부천테크노밸리 U1센터 1820호', cls:'pl-bucheon' }
+  { key:'파인더', short:'루원', foot:'봄645 406호', full:'인천 서구 봉오재3로 120 봄645 406호', cls:'pl-luone' },
+  { key:'메이킷',  short:'부천', foot:'U1센터 1820호', full:'경기 부천시 조마루로385번길 92 부천테크노밸리 U1센터 1820호', cls:'pl-bucheon' }
 ];
 function placeOf(iv){
   var g=String(iv.branch||iv.site||'');
   for(var i=0;i<PLACE_MAP.length;i++){ if(g.indexOf(PLACE_MAP[i].key)>=0) return PLACE_MAP[i]; }
-  return { key:'마곡', short:'마곡', full:PLACE_FULL, cls:'pl-magok' };
+  return { key:'마곡', short:'마곡', foot:'퀸즈파크10', full:PLACE_FULL, cls:'pl-magok' };
 }
 function jobNorm(s){ s=String(s||''); if(s.indexOf('상담')>=0)return '상담부'; if(s.indexOf('사업')>=0)return '사업부'; if(s.indexOf('코칭')>=0)return '코칭'; if(s.indexOf('강사')>=0)return '강사'; return s||'기타'; }
 function mgrBadge(name){
@@ -718,7 +723,8 @@ function buildTimeline(dstr){
   var eduList=IVS.filter(function(x){return x.eduDate && ymdFromEdu(x.eduDate)===dstr;});
   var groups={}, order=[];
   list.forEach(function(iv){
-    var t=iv.time||'-', mgr=interviewerOf(iv), pl=placeOf(iv), k='iv|'+t+'|'+mgr+'|'+pl.short;
+    var t=iv.time||'-', mgr=interviewerOf(iv), pl=placeOf(iv);
+    var k='iv|'+t+'|'+mgr+'|'+pl.short;
     if(!groups[k]){ groups[k]={kind:'면접',time:t,who:mgr,place:pl,tm:_tmin(t),members:[]}; order.push(k); }
     groups[k].members.push(iv);
   });
@@ -729,6 +735,10 @@ function buildTimeline(dstr){
   });
   return order.map(function(k){return groups[k];}).sort(function(a,b){ return a.tm-b.tm; });
 }
+// [2026-09-10] 교육장소 텍스트에서 호수만 추출 ("마곡(408호)"→"408호" / "408호"→"408호")
+function _roomOf(s){
+  s=String(s||''); var m=s.match(/(\d+\s*호)/); return m?m[1].replace(/\s/g,''):'';
+}
 // [2026-09] 타임라인 그룹 1개 → HTML (PC·모바일 공용). 시간 크게 + 면접/교육 딱지 + 진행자 + 상태카드
 function timelineGroupHtml(g){
   var esc=function(s){return String(s||'').replace(/</g,'&lt;');};
@@ -736,12 +746,9 @@ function timelineGroupHtml(g){
   var isEdu=(g.kind==='교육');
   var kindBadge='<span class="tl-kind '+(isEdu?'edu':'iv')+'">'+g.kind+'</span>';
   var whoBadge=g.who?'<span class="tl-who '+(isEdu?'edu':'')+'">'+esc(withTitle(g.who))+'</span>':'';
-  // 장소 배지 — 면접=placeOf(마곡/부천/루원 색) / 교육=eduPlace(시트값 그대로)
-  var placeBadge='';
-  if(isEdu){ if(g.eduPlace) placeBadge='<span class="tl-place pl-edu">'+esc(g.eduPlace)+'</span>'; }
-  else if(g.place){ placeBadge='<span class="tl-place '+g.place.cls+'">'+esc(g.place.short)+'</span>'; }
+  // 헤더 = 딱지 + 진행자 + 인원 (장소는 하단으로)
   var h='<div class="tl-grp'+(isEdu?' edu':'')+'"><div class="tl-hd">'
-    +'<span class="tl-tm">'+esc(g.time)+'</span>'+kindBadge+placeBadge+whoBadge
+    +'<span class="tl-tm">'+esc(g.time)+'</span>'+kindBadge+whoBadge
     +(multi?'<span class="tl-cnt">'+g.members.length+'</span>':'')+'</div>';
   g.members.forEach(function(iv){
     var st=miniStatus(iv), drop=isDrop(iv);
@@ -751,7 +758,20 @@ function timelineGroupHtml(g){
       +'<span class="tl-job">'+esc(iv.site||iv.job)+'</span>'
       +'<span class="tl-st '+st.c+'">'+st.t+'</span></div>';
   });
-  h+='</div>';
+  // 하단 장소 — 면접=지점+건물 / 교육=지점+교육장소(M열 방번호)
+  var placeFoot='';
+  if(isEdu){
+    if(g.eduPlace){
+      // 교육장소 M열에서 지점 판별 (마곡/부천/루원) + 방 텍스트
+      var _ep=g.eduPlace, _cls='pl-magok';
+      if(_ep.indexOf('부천')>=0||_ep.indexOf('메이킷')>=0) _cls='pl-bucheon';
+      else if(_ep.indexOf('루원')>=0||_ep.indexOf('파인더')>=0) _cls='pl-luone';
+      placeFoot='<div class="tl-foot '+_cls+'">📍 '+esc(_ep)+'</div>';
+    }
+  } else if(g.place){
+    placeFoot='<div class="tl-foot '+g.place.cls+'">📍 '+esc(g.place.short)+' · '+esc(g.place.foot||g.place.full)+'</div>';
+  }
+  h+=placeFoot+'</div>';
   return h;
 }
 
