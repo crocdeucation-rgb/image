@@ -134,11 +134,15 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .tl-place.pl-bucheon{background:#E6F7F0;color:#1D9E75}
 .tl-place.pl-luone{background:#F0EBFF;color:#7048E8}
 .tl-place.pl-edu{background:#FFF4E6;color:#BA7517}
-/* [2026-09-10] 그룹 하단 장소 — 명단 밑에 지점+요약장소 */
-.tl-foot{margin-top:5px;font-size:10px;font-weight:800;padding:4px 9px;border-radius:6px;display:inline-block}
-.tl-foot.pl-magok{background:#EEF0FF;color:#3B4F9E}
-.tl-foot.pl-bucheon{background:#E6F7F0;color:#177A57}
-.tl-foot.pl-luone{background:#F0EBFF;color:#5A3AD0}
+/* [2026-09-10] 그룹 좌측 색띠 = 장소 구분 (본사 파랑 / 지사 초록·보라) */
+.tl-grp.bar-pl-magok{border-left:3px solid #4C6EF5;padding-left:9px}
+.tl-grp.bar-pl-bucheon{border-left:3px solid #1D9E75;padding-left:9px}
+.tl-grp.bar-pl-luone{border-left:3px solid #7048E8;padding-left:9px}
+/* [2026-09-10] 그룹 하단 장소 — 이모지 없이 텍스트, 지점색 */
+.tl-foot{margin-top:5px;font-size:10px;font-weight:800;padding:3px 0 0;display:block}
+.tl-foot.pl-magok{color:#4C6EF5}
+.tl-foot.pl-bucheon{color:#1D9E75}
+.tl-foot.pl-luone{color:#7048E8}
 .tl-who.edu{color:#0B7A70;background:#D6F5F0}
 .tl-cnt{font-size:9px;font-weight:800;color:#fff;background:#4C6EF5;padding:2px 7px;border-radius:20px;margin-left:auto}
 .tl-card{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #E7ECF4;border-left:3px solid #CBD5E8;border-radius:8px;padding:8px 10px;margin-bottom:4px;cursor:pointer;transition:.12s}
@@ -399,7 +403,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
       <button class="cal-navbtn" onclick="calMove(1)">›</button>
     </div>
   </div>
-  <div class="cal-place-banner">📍 <b style="color:#4C6EF5">마곡</b> 퀸즈파크10(강서구 마곡중앙6로 66, 414호) · <b style="color:#1D9E75">부천</b> 부천테크노밸리 U1센터 1820호 · <b style="color:#7048E8">루원</b> 인천 서구 봉오재3로 120 봄645 406호</div>
+  <div class="cal-place-banner"><b style="color:#4C6EF5">● 마곡</b> 퀸즈파크10(강서구 마곡중앙6로 66, 414호) · <b style="color:#1D9E75">● 부천</b> 부천테크노밸리 U1센터 1820호 · <b style="color:#7048E8">● 루원</b> 인천 서구 봉오재3로 120 봄645 406호</div>
   <div id="cal_grid"></div>
   <div class="cal-mob"><div class="cms-modetog" id="cms_modetog"><button class="cms-mt on" data-m="day" onclick="calSetMode('day')">일간</button><button class="cms-mt" data-m="week" onclick="calSetMode('week')">주간</button></div><div class="cms-strip" id="cms_strip"></div><div id="cms_body"></div></div>
   <div class="cal-swipe-hint" id="cal_hint"></div>
@@ -746,8 +750,11 @@ function timelineGroupHtml(g){
   var isEdu=(g.kind==='교육');
   var kindBadge='<span class="tl-kind '+(isEdu?'edu':'iv')+'">'+g.kind+'</span>';
   var whoBadge=g.who?'<span class="tl-who '+(isEdu?'edu':'')+'">'+esc(withTitle(g.who))+'</span>':'';
-  // 헤더 = 딱지 + 진행자 + 인원 (장소는 하단으로)
-  var h='<div class="tl-grp'+(isEdu?' edu':'')+'"><div class="tl-hd">'
+  // 그룹 좌측 색띠 = 장소 (마곡 파랑=본사 / 부천 초록·루원 보라=지사)
+  var grpCls='pl-magok';
+  if(isEdu){ var _e=g.eduPlace||''; if(_e.indexOf('부천')>=0||_e.indexOf('메이킷')>=0)grpCls='pl-bucheon'; else if(_e.indexOf('루원')>=0||_e.indexOf('파인더')>=0)grpCls='pl-luone'; }
+  else if(g.place){ grpCls=g.place.cls; }
+  var h='<div class="tl-grp bar-'+grpCls+(isEdu?' edu':'')+'"><div class="tl-hd">'
     +'<span class="tl-tm">'+esc(g.time)+'</span>'+kindBadge+whoBadge
     +(multi?'<span class="tl-cnt">'+g.members.length+'</span>':'')+'</div>';
   g.members.forEach(function(iv){
@@ -758,18 +765,17 @@ function timelineGroupHtml(g){
       +'<span class="tl-job">'+esc(iv.site||iv.job)+'</span>'
       +'<span class="tl-st '+st.c+'">'+st.t+'</span></div>';
   });
-  // 하단 장소 — 면접=지점+건물 / 교육=지점+교육장소(M열 방번호)
+  // 하단 장소 — 이모지 없이 텍스트만 (좌측 색띠로 본사/지사 구분)
   var placeFoot='';
   if(isEdu){
     if(g.eduPlace){
-      // 교육장소 M열에서 지점 판별 (마곡/부천/루원) + 방 텍스트
       var _ep=g.eduPlace, _cls='pl-magok';
       if(_ep.indexOf('부천')>=0||_ep.indexOf('메이킷')>=0) _cls='pl-bucheon';
       else if(_ep.indexOf('루원')>=0||_ep.indexOf('파인더')>=0) _cls='pl-luone';
-      placeFoot='<div class="tl-foot '+_cls+'">📍 '+esc(_ep)+'</div>';
+      placeFoot='<div class="tl-foot '+_cls+'">'+esc(_ep)+'</div>';
     }
   } else if(g.place){
-    placeFoot='<div class="tl-foot '+g.place.cls+'">📍 '+esc(g.place.short)+' · '+esc(g.place.foot||g.place.full)+'</div>';
+    placeFoot='<div class="tl-foot '+g.place.cls+'">'+esc(g.place.short)+' · '+esc(g.place.foot||g.place.full)+'</div>';
   }
   h+=placeFoot+'</div>';
   return h;
@@ -790,7 +796,7 @@ window.openIv=function(date,name){
     +(iv.region?'<span class="ivm-tag">'+esc(iv.region)+'</span>':'')+'</div></div>';
   h+='<div class="ivm-body">';
   var _pl=placeOf(iv);
-  h+='<div class="ivm-row"><span class="ivm-lbl">📍 장소</span><span class="ivm-val"><b style="color:#4C6EF5">'+esc(_pl.short)+'</b> · '+esc(_pl.full)+'</span></div>';
+  h+='<div class="ivm-row"><span class="ivm-lbl">장소</span><span class="ivm-val"><b style="color:#4C6EF5">'+esc(_pl.short)+'</b> · '+esc(_pl.full)+'</span></div>';
   h+='<div class="ivm-row"><span class="ivm-lbl">면접관</span><span class="ivm-val">'+esc(interviewerOf(iv))+'</span></div>';
   h+='<div class="ivm-row"><span class="ivm-lbl">참석</span><span class="ivm-val '+(iv.attend.indexOf('불참')>=0?'ns':iv.attend.indexOf('참석')>=0?'at':'')+'">'+(esc(iv.attend)||'-')+'</span></div>';
   h+='<div class="ivm-row"><span class="ivm-lbl">결과</span><span class="ivm-val '+(iv.pass.indexOf('불합격')>=0?'fa':iv.pass.indexOf('합격')>=0?'ps':'')+'">'+(esc(iv.pass)||'-')+'</span></div>';
