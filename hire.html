@@ -216,6 +216,9 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
   .cms-daysep .dscnt{font-size:11px;font-weight:700;color:var(--soft);margin-left:auto}
   .cms-daysep.sun .dsw{color:#E23A22}.cms-daysep.sat .dsw{color:#4C6EF5}
   .cms-daysep.none .dsw{color:#B6C2DC}
+  /* [2026-09-10] 모바일 지난 날 살짝 dim */
+  .cms-daysep.past{opacity:.55}
+  .cms-day.past{opacity:.4}
   .cms-dayempty{font-size:11.5px;color:#C8D0DC;font-weight:600;padding:2px 0 4px}
   .cms-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:4px 0 12px;border-bottom:1px solid var(--line);margin-bottom:14px}
   .cms-day{position:relative;text-align:center;padding:7px 0 8px;border-radius:12px;cursor:pointer;transition:.12s;background:transparent}
@@ -676,7 +679,7 @@ function renderCalMobile(days, td){
     var wh='';
     days.forEach(function(d){
       var dstr=ymd(d), dow=d.getDay(), isT=(dstr===td), cnt=dayCount(dstr);
-      var scls='cms-daysep'+(dow===0?' sun':'')+(dow===6?' sat':'')+(isT?' today':'')+(cnt?'':' none');
+      var scls='cms-daysep'+(dow===0?' sun':'')+(dow===6?' sat':'')+(isT?' today':'')+(dstr<td?' past':'')+(cnt?'':' none');
       wh+='<div class="'+scls+'"><span class="dsw">'+(d.getMonth()+1)+'/'+d.getDate()+'('+WD[dow]+')</span>'
         +(isT?'<span class="dstd">오늘</span>':'')
         +(cnt?'<span class="dscnt">'+cnt+'건</span>':'')+'</div>';
@@ -696,7 +699,7 @@ function renderCalMobile(days, td){
     var eduList=IVS.filter(function(x){return x.eduDate && ymdFromEdu(x.eduDate)===dstr;});
     var jobs={}; list.forEach(function(x){jobs[x.job]=1;}); if(eduList.length)jobs['edu']=1;
     var dots=''; Object.keys(jobs).slice(0,4).forEach(function(j){ dots+='<span class="dt '+j+'"></span>'; });
-    var cls='cms-day'+(dow===0?' sun':'')+(dow===6?' sat':'')+(isT?' today':'')+(isSel?' sel':'');
+    var cls='cms-day'+(dow===0?' sun':'')+(dow===6?' sat':'')+(isT?' today':'')+(dstr<td&&!isSel?' past':'')+(isSel?' sel':'');
     sh+='<div class="'+cls+'" onclick="calSelDay(\''+dstr+'\')">'
       +'<div class="wd">'+WD[dow]+'</div><div class="dn">'+d.getDate()+'</div>'
       +'<div class="cms-dots">'+dots+'</div></div>';
