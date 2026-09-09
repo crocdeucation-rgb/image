@@ -54,6 +54,10 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
 .cal-col{background:#FAFBFD;border:1px solid var(--line);border-radius:12px;padding:9px 8px;min-height:64px}
 .cal-col.today{background:#FFF5F3;border-color:#F3B5AA;border-width:1.5px}
+/* [2026-09-10] 지난 날 = 살짝 흐리게 (끝난 일정 톤다운, 결과는 읽히게) */
+.cal-col.past{background:#FAFBFC}
+.cal-col.past .cal-ivs{opacity:.6;filter:saturate(.8)}
+.cal-col.past .cal-dnum,.cal-col.past .cal-wd{color:#C3CDDD}
 .cal-col.weekend .cal-dnum{color:#B6C2DC}
 .cal-dhd{text-align:center;margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid #EDF1F7}
 .cal-wd{font-size:10.5px;font-weight:700;color:var(--soft)}
@@ -628,9 +632,10 @@ function renderCal(){
   var h='<div class="cal-grid">';
   days.forEach(function(d){
     var dstr=ymd(d), isT=(dstr===td), dow=d.getDay(), wknd=(dow===0||dow===6);
+    var isPast=(dstr<td);   // [2026-09-10] 오늘 이전 = 지난 날 (살짝 dim)
     var list=IVS.filter(function(x){return x.date===dstr;});
     var eduList=IVS.filter(function(x){return x.eduDate && ymdFromEdu(x.eduDate)===dstr;});
-    var cls='cal-col'+(isT?' today':'')+(wknd?' weekend':'')+(list.length===0?' empty-mo':'');
+    var cls='cal-col'+(isT?' today':'')+(isPast?' past':'')+(wknd?' weekend':'')+(list.length===0?' empty-mo':'');
     h+='<div class="'+cls+'"><div class="cal-dhd"><div><div class="cal-wd">'+WD[dow]+'</div><div class="cal-dnum">'+d.getDate()+'</div></div>'
       +(isT?'<span class="cal-todaytag">TODAY</span>':'')+'</div><div class="cal-ivs">';
     if(list.length || eduList.length){
