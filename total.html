@@ -2417,12 +2417,15 @@ window.openGuide=function(){
    +'<div><div style="font-size:11px;font-weight:800;color:#4C6EF5;margin-bottom:5px">상담 개인</div>'+tierTbl(PC_TIER_SANG)+'</div>'
    +'<div><div style="font-size:11px;font-weight:800;color:#7048E8;margin-bottom:5px">사업 개인</div>'+tierTbl(PC_TIER_SAUP)+'</div>'
    +'</div>'
-   +'<div style="margin-top:12px"><div style="font-size:11px;font-weight:800;color:#20A56D;margin-bottom:5px">지점 (전월 종결 매출)</div>'+tierTbl(PC_TIER_BRANCH)+'</div>'
    +'</div>';
-  // 지점 누적랭크
-  h+='<div class="gd-sec"><div class="gd-h"><span class="gd-ic">📊</span>지점 누적 랭크<span class="gd-reset">연간 누적</span></div>'
-   +'<div class="gd-desc">올해 월평균 매출 기준. 한 해 꾸준함을 봅니다 (티어와 별개).</div>'
-   + tierTbl(PC_RANK_BRANCH) + '</div>';
+  // 지점 티어 + 누적랭크 (좌우 2열)
+  h+='<div class="gd-sec"><div class="gd-h"><span class="gd-ic">🏢</span>지점 등급</div>'
+   +'<div class="gd-desc">티어=전월 종결 매출 (매월 갱신) · 누적랭크=올해 월평균 (연간 꾸준함)</div>'
+   +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'
+   +'<div><div style="font-size:11px;font-weight:800;color:#20A56D;margin-bottom:5px">티어 (전월 매출)</div>'+tierTbl(PC_TIER_BRANCH)+'</div>'
+   +'<div><div style="font-size:11px;font-weight:800;color:#7048E8;margin-bottom:5px">누적 랭크 (월평균)</div>'+tierTbl(PC_RANK_BRANCH)+'</div>'
+   +'</div>'
+   +'</div>';
   // 트로피/훈장
   h+='<div class="gd-sec"><div class="gd-h"><span class="gd-ic">🏆</span>트로피 · 훈장<span class="gd-reset">매월 시상</span></div>'
    +'<div class="gd-desc">매달 종결 시 부문별 1등에게 수여. 카드와 매출순 이름 옆에 표시됩니다.</div>'
