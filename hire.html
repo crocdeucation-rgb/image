@@ -318,11 +318,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .cac-chan-sub b{color:var(--ink);font-weight:900}
 .cac-chan-sub b.z{color:#C3CDDD;font-weight:700}
 /* 퍼널 접기 */
-.cac-fntog{margin-top:10px;padding-top:9px;border-top:1px dashed #E7ECF4;font-size:10px;font-weight:800;color:var(--v1);cursor:pointer;user-select:none;display:flex;align-items:center;gap:4px}
-.cac-fntog .arw{transition:transform .15s}
-.cac-fntog.open .arw{transform:rotate(180deg)}
-.cac-funnel{display:none;align-items:center;gap:4px;margin-top:9px;font-size:10.5px;color:var(--soft);font-weight:600;flex-wrap:wrap}
-.cac-funnel.open{display:flex}
+.cac-funnel{display:flex;align-items:center;gap:4px;margin-top:10px;padding-top:9px;border-top:1px dashed #E7ECF4;font-size:10.5px;color:var(--soft);font-weight:600;flex-wrap:wrap}
 .cac-funnel b{color:var(--ink);font-weight:800}
 .cac-funnel b.z{color:#C3CDDD;font-weight:700}
 .cac-funnel .arw{color:#C9D2E0}
@@ -821,7 +817,6 @@ function cacRender(){
       +'<div class="cph-l">채용단가</div>'
       +'<div class="cph-v'+(cac?'':' z')+'">'+(cac?dpWon(cac):'-')+(cac?'<small>원</small>':'')+'</div>'
       +'<div class="cac-chan-sub"><span>공고 <b'+(c.g?'':' class="z"')+'>'+dpWon(c.g)+'</b></span><span>합격 <b'+(pc?'':' class="z"')+'>'+pc+'</b></span></div>'
-      +'<div class="cac-fntog" onclick="cacFnTog(this)"><span class="arw">▾</span> 퍼널 상세</div>'
       +'<div class="cac-funnel">'+fb('이력',c.iry)+'<span class="arw">→</span>'+fb('통보',c.mt)+'<span class="arw">→</span>'+fb('참여',c.mc)+'<span class="arw">→</span>'+fb('합격',pc)+'<span class="arw">→</span>'+fb('교육',c.edu)+'</div></div>';
   }
   document.getElementById('cac_chans').innerHTML=
