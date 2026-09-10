@@ -74,6 +74,7 @@
     <button class="tab" data-t="hire" onclick="go(this)">증원현황</button>
     <button class="tab" data-t="hr" onclick="go(this)">인사기록</button>
     <button class="tab" data-t="web" onclick="go(this)">웹마케팅</button>
+    <button class="tab" data-t="ssamida" onclick="go(this)">쌤IDA</button>
     <div class="user-chip" id="userChip">
       <span class="uc-av" id="ucAv"></span>
       <span class="uc-nm" id="ucNm"></span>
@@ -142,7 +143,7 @@ window.sgateLogin=function(){
   var p=new firebase.auth.GoogleAuthProvider();
   _sgAuth.signInWithPopup(p).catch(function(e){ if(msg){ msg.className='sg-msg err'; msg.textContent='로그인 실패: '+(e.message||e.code); } });
 };
-  var FRAMES={total:{src:'total.html?v=gate1',h:900},hire:{src:'hire.html?v=gate1',h:900},hr:{src:'hr.html?v=gate1',h:780},web:{src:'dashboard.html?v=gate1',h:1700}};
+  var FRAMES={total:{src:'total.html?v=gate1',h:900},hire:{src:'hire.html?v=gate1',h:900},hr:{src:'hr.html?v=gate1',h:780},web:{src:'dashboard.html?v=gate1',h:1700},ssamida:{src:'ssamida.html?v=gate1',h:1350}};
   var frame=document.getElementById('frame');
   var _cardOverlay=false;   // 카드 모달 오버레이 중 높이 자동조정 중단
   var _cardScrollY=0;      // 오버레이 전환 시 iframe이 flow에서 빠져 부모 스크롤이 0으로 클램프됨 → 원복용
