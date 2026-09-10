@@ -73,7 +73,7 @@ body{background:var(--bg);font-family:'Pretendard',sans-serif;color:var(--ink);p
 <div class="wrap">
 <div class="hd">
   <h1>🚀 쌤IDA 프로젝트</h1>
-  <div class="sub">신사업 구축 진행판 · <b>5개 영역</b> · 기존 아라 업무와 별개 · <span id="today"></span> 기준</div>
+  <div class="sub">신사업 구축 진행판 · <b>4개 영역</b> · 기존 아라 업무와 별개 · <span id="today"></span> 기준</div>
 </div>
 
 <div class="dday" id="dday"></div>
@@ -87,7 +87,7 @@ body{background:var(--bg);font-family:'Pretendard',sans-serif;color:var(--ink);p
 <script>
 // ── 쌤IDA 프로젝트 데이터 (하드코딩 · 매주 갱신) ──
 // status: done(완료) / doing(진행중) / plan(예정·기획중) / talk(협의중) / review(심사중)
-var OPEN_DATE = '2026-09-19';   // 1차 오픈 목표 (사장님 지시) — 준비속도·장애물에 따라 변경 가능
+var OPEN_DATE = '2026-09-19';   // 1차 오픈 목표 (파운더님 지시)
 var AREAS = [
   { key:'web', ic:'🎨', nm:'브랜딩 · 프론트엔드', who:'김상현 이사',
     groups:[
@@ -135,24 +135,19 @@ var AREAS = [
         {st:'doing', t:'방문 → 시강 즉시 연결', memo:'30분 무료수업 후킹'}
       ]}
     ]},
-  { key:'content', ic:'🎬', nm:'콘텐츠', who:'신상준 이사',
+  { key:'content', ic:'🚀', nm:'콘텐츠 · 마케팅 · 그로스', who:'신상준 이사',
     groups:[
-      { hd:'기획중', items:[
-        {st:'plan', t:'유튜브 채널', memo:'영상 기획 → 촬영 → 편집 → 업로드 (전 과정, 무→유)'},
-        {st:'plan', t:'인스타 카드뉴스', memo:'입시 관련 우선, 수험 꿀팁 등'},
-        {st:'plan', t:'블로그 포스팅'},
-        {st:'plan', t:'광고 소재 크리에이티브', memo:'메타·유튜브 소재'}
-      ]}
-    ]},
-  { key:'perf', ic:'📊', nm:'퍼포먼스 · CRM 인프라', who:'신상준 이사',
-    groups:[
-      { hd:'기획중', items:[
-        {st:'plan', t:'픽셀 설치'},
-        {st:'plan', t:'GTM 연결'},
-        {st:'plan', t:'상세페이지 제작'},
-        {st:'plan', t:'리드 요약 쌤IDA 구축', memo:'기존 아라 CRM 방식으로'},
-        {st:'plan', t:'유입 시 알림톡'},
-        {st:'plan', t:'카톡 응대'}
+      { hd:'콘텐츠 제작 (지속 생산 · 기획중)', items:[
+        {st:'plan', t:'유튜브 채널', memo:'기획→촬영→편집→업로드 전 과정. 롱폼(합격사례·강사 인터뷰) + 숏폼(입시 Q&A 시리즈). 경쟁사 밀당 185개·상상코칭 609개 수준 축적 필요'},
+        {st:'plan', t:'인스타 (카드뉴스·릴스)', memo:'입시 관련 우선, 수험 꿀팁. 마라톤스터디 벤치마크'},
+        {st:'plan', t:'블로그 포스팅', memo:'합격후기·입시정보·학습법 SEO. 경쟁사 785~1,265개 누적, 지속 발행 필요'},
+        {st:'plan', t:'광고 크리에이티브', memo:'캠페인별 소재·문구·후킹 기획 (기말저격·비평준화·5단계루틴 등 — 캠페인마다 무→유)'}
+      ]},
+      { hd:'그로스 인프라 1차 (기획중)', items:[
+        {st:'plan', t:'전환 퍼널 구축', memo:'상세페이지 → 픽셀 설치 → GTM 연결 → 리드 요약(쌤IDA CRM) → 유입 알림톡 → 카톡 응대'}
+      ]},
+      { hd:'그로스 인프라 2차 (기획중)', items:[
+        {st:'plan', t:'캠페인 운영·최적화', memo:'캠페인별 소재 A/B, 예산 배분, ROAS 관리 (기존 아라 방식)'}
       ]}
     ]}
 ];
@@ -168,7 +163,7 @@ function render(){
   document.getElementById('dday').innerHTML=
     '<div class="dday-box '+ddayCls+'"><div class="dl"><span class="dgoal">🎯 1차 오픈 목표</span><span class="ddate">'+(od.getMonth()+1)+'월 '+od.getDate()+'일 오픈</span></div>'
    +'<div class="dcnt">'+ddayTxt+'</div>'
-   +'<div class="dnote">사장님 지시 · 준비속도·장애물에 따라 변경 가능</div></div>';
+   +'<div class="dnote">파운더님 지시 · 전 영역 9/19 오픈 목표로 총력 대응</div></div>';
   // 전체 집계
   var tot={done:0,doing:0,plan:0};
   AREAS.forEach(function(a){ a.groups.forEach(function(g){ g.items.forEach(function(it){
