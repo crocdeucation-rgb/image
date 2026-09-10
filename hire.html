@@ -132,21 +132,20 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .tl-kind.iv{background:#4C6EF5}.tl-kind.edu{background:#0E9488}
 .tl-who{font-size:10px;font-weight:800;color:#fff;background:#1E3A8A;padding:2px 8px;border-radius:5px}
 /* [2026-09-10] 장소 배지 — 마곡/부천/루원 색구분 */
-.tl-place{font-size:9.5px;font-weight:800;padding:2px 8px;border-radius:5px}
-.tl-place::before{content:'📍';font-size:8px;margin-right:2px}
-.tl-place.pl-magok{background:#EEF0FF;color:#4C6EF5}
-.tl-place.pl-bucheon{background:#E6F7F0;color:#1D9E75}
-.tl-place.pl-luone{background:#F0EBFF;color:#7048E8}
-.tl-place.pl-edu{background:#FFF4E6;color:#BA7517}
+/* [2026-09-10] PC: 헤더·명단 사이 장소줄(지역+방) */
+.tl-place2{font-size:10px;font-weight:800;margin:2px 0 5px;padding-left:1px}
+.tl-place2.pl-magok{color:#4C6EF5}
+.tl-place2.pl-bucheon{color:#1D9E75}
+.tl-place2.pl-luone{color:#7048E8}
+/* 모바일 전용 지역칩 (헤더 우측) — PC 숨김 */
+.tl-region-m{display:none;font-size:10px;font-weight:800}
+.tl-region-m.pl-magok{color:#4C6EF5}
+.tl-region-m.pl-bucheon{color:#1D9E75}
+.tl-region-m.pl-luone{color:#7048E8}
 /* [2026-09-10] 그룹 좌측 색띠 = 장소 구분 (본사 파랑 / 지사 초록·보라) */
 .tl-grp.bar-pl-magok{border-left:3px solid #4C6EF5;padding-left:9px}
 .tl-grp.bar-pl-bucheon{border-left:3px solid #1D9E75;padding-left:9px}
 .tl-grp.bar-pl-luone{border-left:3px solid #7048E8;padding-left:9px}
-/* [2026-09-10] 그룹 하단 장소 — 이모지 없이 텍스트, 지점색 */
-.tl-foot{margin-top:5px;font-size:10px;font-weight:800;padding:3px 0 0;display:block}
-.tl-foot.pl-magok{color:#4C6EF5}
-.tl-foot.pl-bucheon{color:#1D9E75}
-.tl-foot.pl-luone{color:#7048E8}
 .tl-who.edu{color:#0B7A70;background:#D6F5F0}
 .tl-cnt{font-size:9px;font-weight:800;color:#fff;background:#4C6EF5;padding:2px 7px;border-radius:20px;margin-left:auto}
 .tl-card{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #E7ECF4;border-left:3px solid #CBD5E8;border-radius:8px;padding:8px 10px;margin-bottom:4px;cursor:pointer;transition:.12s}
@@ -201,6 +200,11 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
   .cal-swipe-hint{display:none !important}
   .cal-mob{display:block}
   .wrap{padding:16px 12px 40px}
+  /* [2026-09-10] 모바일 장소 = 헤더 우측 지역칩만 (PC 장소줄 숨김) */
+  .tl-place2{display:none}
+  .tl-region-m{display:inline-block;margin-left:auto}
+  .tl-hd{display:flex;align-items:center;gap:5px;flex-wrap:nowrap}
+  .tl-hd .tl-cnt{margin-left:6px}
 
   /* 상단 요일 스트립 */
   .cms-modetog{display:flex;gap:5px;margin-bottom:12px;background:#F1F4F9;padding:3px;border-radius:11px}
@@ -508,6 +512,10 @@ function withTitle(name){
   for(var k in TITLE_MAP){ if(n.indexOf(k)===0 && k.indexOf(' ')<0) return TITLE_MAP[k]; }
   return n;
 }
+// [2026-09-10] 직책 떼고 이름만 (캘린더 헤더 — 줄바꿈 방지). "엄현호 이사"→"엄현호"
+function nameOnly(name){
+  return String(name||'').replace(/\s*(이사|대표|부장|과장|차장|팀장|실장|본부장|지점장|지사장|대리|주임|센터|사원|매니저|파트장)\s*$/,'').trim();
+}
 function interviewerOf(iv){
   if(iv.interviewer) return iv.interviewer;
   var site=String(iv.site||'').trim(), job=String(iv.job||'').trim();
@@ -757,14 +765,20 @@ function timelineGroupHtml(g){
   var multi=g.members.length>1;
   var isEdu=(g.kind==='교육');
   var kindBadge='<span class="tl-kind '+(isEdu?'edu':'iv')+'">'+g.kind+'</span>';
-  var whoBadge=g.who?'<span class="tl-who '+(isEdu?'edu':'')+'">'+esc(withTitle(g.who))+'</span>':'';
-  // 그룹 좌측 색띠 = 장소 (마곡 파랑=본사 / 부천 초록·루원 보라=지사)
-  var grpCls='pl-magok';
-  if(isEdu){ var _e=g.eduPlace||''; if(_e.indexOf('부천')>=0||_e.indexOf('메이킷')>=0)grpCls='pl-bucheon'; else if(_e.indexOf('루원')>=0||_e.indexOf('파인더')>=0)grpCls='pl-luone'; }
-  else if(g.place){ grpCls=g.place.cls; }
+  var whoBadge=g.who?'<span class="tl-who '+(isEdu?'edu':'')+'">'+esc(nameOnly(g.who))+'</span>':'';
+  // 장소 색 + 지역명 + 방번호
+  var grpCls='pl-magok', regionName='마곡';
+  if(isEdu){ var _e=g.eduPlace||''; if(_e.indexOf('부천')>=0||_e.indexOf('메이킷')>=0){grpCls='pl-bucheon';regionName='부천';} else if(_e.indexOf('루원')>=0||_e.indexOf('파인더')>=0){grpCls='pl-luone';regionName='루원';} }
+  else if(g.place){ grpCls=g.place.cls; regionName=g.place.short; }
+  var room = isEdu ? _roomOf(g.eduPlace) : '';
+  // 헤더 = 시간 + 딱지 + 진행자(이름만) + [모바일용 지역칩] + 인원
   var h='<div class="tl-grp bar-'+grpCls+(isEdu?' edu':'')+'"><div class="tl-hd">'
     +'<span class="tl-tm">'+esc(g.time)+'</span>'+kindBadge+whoBadge
+    +'<span class="tl-region-m '+grpCls+'">'+esc(regionName)+'</span>'   // 모바일 전용(우측), PC 숨김
     +(multi?'<span class="tl-cnt">'+g.members.length+'</span>':'')+'</div>';
+  // 장소 줄 = 헤더와 명단 사이 (PC 전용: 지역+방번호). 모바일 숨김
+  var placeLine='<div class="tl-place2 '+grpCls+'">'+esc(regionName)+(room?(' '+esc(room)):'')+'</div>';
+  h+=placeLine;
   g.members.forEach(function(iv){
     var st=miniStatus(iv), drop=isDrop(iv);
     h+='<div class="tl-card'+(drop?' drop':'')+' j-'+esc(iv.job)+'" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/\x27/g,'')+'\')">'
@@ -773,19 +787,7 @@ function timelineGroupHtml(g){
       +'<span class="tl-job">'+esc(iv.site||iv.job)+'</span>'
       +'<span class="tl-st '+st.c+'">'+st.t+'</span></div>';
   });
-  // 하단 장소 — 이모지 없이 텍스트만 (좌측 색띠로 본사/지사 구분)
-  var placeFoot='';
-  if(isEdu){
-    if(g.eduPlace){
-      var _ep=g.eduPlace, _cls='pl-magok';
-      if(_ep.indexOf('부천')>=0||_ep.indexOf('메이킷')>=0) _cls='pl-bucheon';
-      else if(_ep.indexOf('루원')>=0||_ep.indexOf('파인더')>=0) _cls='pl-luone';
-      placeFoot='<div class="tl-foot '+_cls+'">'+esc(_ep)+'</div>';
-    }
-  } else if(g.place){
-    placeFoot='<div class="tl-foot '+g.place.cls+'">'+esc(g.place.short)+' · '+esc(g.place.foot||g.place.full)+'</div>';
-  }
-  h+=placeFoot+'</div>';
+  h+='</div>';
   return h;
 }
 
