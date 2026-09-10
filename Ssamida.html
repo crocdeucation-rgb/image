@@ -44,11 +44,14 @@ body{background:var(--bg);font-family:'Pretendard',sans-serif;color:var(--ink);p
 .area.web .ic{background:#EEF0FF;color:#4C6EF5}
 .area.sys .ic{background:#F0EBFF;color:#7048E8}
 .area.teach .ic{background:#E6F7F0;color:#1D9E75}
+.area.content .ic{background:#FFF0E6;color:#E8590C}
+.area.perf .ic{background:#FFF6E0;color:#BA7517}
 /* 진행바 (완료 비율) */
 .pbar{height:5px;background:#EDF1F7;position:relative}
 .pbar i{position:absolute;left:0;top:0;bottom:0;border-radius:0 3px 3px 0}
 .area.viral .pbar i{background:#E8590C}.area.web .pbar i{background:#4C6EF5}
 .area.sys .pbar i{background:#7048E8}.area.teach .pbar i{background:#1D9E75}
+.area.content .pbar i{background:#E8590C}.area.perf .pbar i{background:#BA7517}
 /* 항목 */
 .items{padding:6px 11px 14px}
 .subhd{font-size:10px;font-weight:800;color:#98A4B6;margin:11px 6px 4px;letter-spacing:.4px}
@@ -70,7 +73,7 @@ body{background:var(--bg);font-family:'Pretendard',sans-serif;color:var(--ink);p
 <div class="wrap">
 <div class="hd">
   <h1>🚀 쌤IDA 프로젝트</h1>
-  <div class="sub">신사업 구축 진행판 · <b>4개 영역</b> · 기존 아라 업무와 별개 · <span id="today"></span> 기준</div>
+  <div class="sub">신사업 구축 진행판 · <b>5개 영역</b> · 기존 아라 업무와 별개 · <span id="today"></span> 기준</div>
 </div>
 
 <div class="dday" id="dday"></div>
@@ -84,9 +87,9 @@ body{background:var(--bg);font-family:'Pretendard',sans-serif;color:var(--ink);p
 <script>
 // ── 쌤IDA 프로젝트 데이터 (하드코딩 · 매주 갱신) ──
 // status: done(완료) / doing(진행중) / plan(예정·기획중) / talk(협의중) / review(심사중)
-var OPEN_DATE = '2026-09-19';   // 오픈 목표 (사장님 지시) — 준비속도·장애물에 따라 변경 가능
+var OPEN_DATE = '2026-09-19';   // 1차 오픈 목표 (사장님 지시) — 준비속도·장애물에 따라 변경 가능
 var AREAS = [
-  { key:'web', ic:'🎨', nm:'브랜드 · 웹', who:'김상현 이사',
+  { key:'web', ic:'🎨', nm:'브랜딩 · 프론트엔드', who:'김상현 이사',
     groups:[
       { hd:'완료', items:[
         {st:'done', t:'쌤IDA 사이트 1차 제작'},
@@ -99,8 +102,8 @@ var AREAS = [
         {st:'doing', t:'아이스캔 사이트', due:'9/15', memo:'연혁 수정, 실제 이미지 추가'},
         {st:'doing', t:'카페 바이럴', memo:'오디플랜 모니터링, 댓글 기획 3건, 네이버 미노출 문제제기'}
       ]},
-      { hd:'채널 운영', items:[
-        {st:'done', t:'인스타 @쌤이다 · 페북 쌤이다 · 구글 통합계정', memo:'김상현 이사 명의'}
+      { hd:'예정', items:[
+        {st:'plan', t:'SNS 채널 개설', memo:'인스타·페북·구글 통합계정 — 오늘 신상준·김상현 공동 개설 예정'}
       ]}
     ]},
   { key:'sys', ic:'⚙️', nm:'시스템 · 백엔드', who:'이경훈 이사',
@@ -117,7 +120,8 @@ var AREAS = [
       ]},
       { hd:'논의·협의', items:[
         {st:'talk', t:'KISPG 결제', memo:'3·6개월 무이자(반값 수수료) / 카드 직접입력 단점 → 에스크로 협의 예정'},
-        {st:'review', t:'알림톡 채널', memo:'외부 API 연동·심사, 친구추가 없이 발송 (solapi 등)'}
+        {st:'review', t:'알림톡 채널', memo:'외부 API 연동·심사, 친구추가 없이 발송 (solapi 등)'},
+        {st:'talk', t:'고객센터 운영', memo:'운영시간 12시~7시 검토 / 카톡 응대 / 강사 핸드폰 직접 연결'}
       ]}
     ]},
   { key:'teach', ic:'👨‍🏫', nm:'강사 플랫폼', who:'엄현호 이사 · 신우성 주임',
@@ -129,26 +133,26 @@ var AREAS = [
         {st:'doing', t:'강사 = 영업 모델', memo:'대표강사로 육성'},
         {st:'doing', t:'퍼널 단축', memo:'상담→사업→결제→운영(4단계) → 상담↔사업 통합(1개)'},
         {st:'doing', t:'방문 → 시강 즉시 연결', memo:'30분 무료수업 후킹'}
-      ]},
-      { hd:'논의중', items:[
-        {st:'talk', t:'전화 응대 방식', memo:'별도 전화 없이 강사 폰 활용? / 채널톡·카카오채널 검토'},
-        {st:'talk', t:'해피콜 시간 여부'},
-        {st:'talk', t:'운영시간', memo:'12시~7시 등 검토 중'}
       ]}
     ]},
-  { key:'viral', ic:'📣', nm:'바이럴 · SNS', who:'신상준 이사',
+  { key:'content', ic:'🎬', nm:'콘텐츠', who:'신상준 이사',
     groups:[
-      { hd:'완료', items:[
-        {st:'done', t:'계정 개설', memo:'9/10 개설'}
-      ]},
-      { hd:'진행중', items:[
-        {st:'doing', t:'전 SNS 채널 운영', memo:'인스타 · 블로그 · 유튜브 총괄'},
-        {st:'doing', t:'카드뉴스 기획·업로드', memo:'오늘부터 시작'},
-        {st:'doing', t:'광고용 소재 기획'}
-      ]},
       { hd:'기획중', items:[
-        {st:'plan', t:'유튜브 채널 영상 기획'},
-        {st:'plan', t:'랜딩페이지 제작'}
+        {st:'plan', t:'유튜브 채널', memo:'영상 기획 → 촬영 → 편집 → 업로드 (전 과정, 무→유)'},
+        {st:'plan', t:'인스타 카드뉴스', memo:'입시 관련 우선, 수험 꿀팁 등'},
+        {st:'plan', t:'블로그 포스팅'},
+        {st:'plan', t:'광고 소재 크리에이티브', memo:'메타·유튜브 소재'}
+      ]}
+    ]},
+  { key:'perf', ic:'📊', nm:'퍼포먼스 · CRM 인프라', who:'신상준 이사',
+    groups:[
+      { hd:'기획중', items:[
+        {st:'plan', t:'픽셀 설치'},
+        {st:'plan', t:'GTM 연결'},
+        {st:'plan', t:'상세페이지 제작'},
+        {st:'plan', t:'리드 요약 쌤IDA 구축', memo:'기존 아라 CRM 방식으로'},
+        {st:'plan', t:'유입 시 알림톡'},
+        {st:'plan', t:'카톡 응대'}
       ]}
     ]}
 ];
@@ -162,7 +166,7 @@ function render(){
   var ddayCls = dleft<0?'over':dleft<=7?'urgent':'';
   var ddayTxt = dleft>0?('D-'+dleft):dleft===0?'D-DAY':('D+'+(-dleft));
   document.getElementById('dday').innerHTML=
-    '<div class="dday-box '+ddayCls+'"><div class="dl"><span class="dgoal">🎯 오픈 목표</span><span class="ddate">'+(od.getMonth()+1)+'월 '+od.getDate()+'일 오픈</span></div>'
+    '<div class="dday-box '+ddayCls+'"><div class="dl"><span class="dgoal">🎯 1차 오픈 목표</span><span class="ddate">'+(od.getMonth()+1)+'월 '+od.getDate()+'일 오픈</span></div>'
    +'<div class="dcnt">'+ddayTxt+'</div>'
    +'<div class="dnote">사장님 지시 · 준비속도·장애물에 따라 변경 가능</div></div>';
   // 전체 집계
