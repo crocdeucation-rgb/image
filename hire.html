@@ -151,6 +151,12 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .tl-card{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #E7ECF4;border-left:3px solid #CBD5E8;border-radius:8px;padding:8px 10px;margin-bottom:4px;cursor:pointer;transition:.12s}
 .tl-card:hover{box-shadow:0 3px 10px rgba(27,36,54,.12);transform:translateY(-1px)}
 .tl-card.j-상담부{border-left-color:#4C6EF5}.tl-card.j-강사{border-left-color:#1D9E75}.tl-card.j-사업부{border-left-color:#7048E8}.tl-card.j-코칭{border-left-color:#BA7517}
+/* [2026-09-10] 부서 딱지 (지점 색띠와 별개 — 강사/상담/사업/코칭) */
+.tl-jobtag{font-size:9px;font-weight:800;padding:1px 7px;border-radius:5px;flex-shrink:0}
+.tl-jobtag.j-상담부{background:#EEF0FF;color:#3B4F9E}
+.tl-jobtag.j-강사{background:#E6F7F0;color:#177A57}
+.tl-jobtag.j-사업부{background:#F0EBFF;color:#5A3AD0}
+.tl-jobtag.j-코칭{background:#FFF6E0;color:#8A6212}
 .tl-grp.edu .tl-card{border-left-color:#0E9488;background:#F7FCFB}
 .tl-card.drop{opacity:.55}
 .tl-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
@@ -781,10 +787,13 @@ function timelineGroupHtml(g){
   h+=placeLine;
   g.members.forEach(function(iv){
     var st=miniStatus(iv), drop=isDrop(iv);
+    var jobShort={'상담부':'상담','강사':'강사','사업부':'사업','코칭':'코칭'}[iv.job]||'';
+    var jobBadge=jobShort?'<span class="tl-jobtag j-'+esc(iv.job)+'">'+jobShort+'</span>':'';
     h+='<div class="tl-card'+(drop?' drop':'')+' j-'+esc(iv.job)+'" onclick="openIv(\''+iv.date+'\',\''+esc(iv.name).replace(/\x27/g,'')+'\')">'
       +'<span class="tl-dot st-'+st.c+'"></span>'
       +'<span class="tl-nm">'+esc(iv.name)+'</span>'
-      +'<span class="tl-job">'+esc(iv.site||iv.job)+'</span>'
+      +jobBadge
+      +'<span class="tl-job">'+esc(iv.site||'')+'</span>'
       +'<span class="tl-st '+st.c+'">'+st.t+'</span></div>';
   });
   h+='</div>';
