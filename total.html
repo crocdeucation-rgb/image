@@ -733,7 +733,10 @@ var CSV_BASE = "https://docs.google.com/spreadsheets/d/1lfvUHZcm58JX_dVEkj-5jGEf
 var MONTH_GIDS = {
   '2026-01':'1976134774','2026-02':'256641291','2026-03':'561134361','2026-04':'1117447105',
   '2026-05':'56635171','2026-06':'1906326005','2026-07':'521296434','2026-08':'1549200253',
-  '현재':'1261488271'
+  '현재':'1261488271',
+  '2025-01':'150116830','2025-02':'1615595953','2025-03':'777005875','2025-04':'1722821986',
+  '2025-05':'495690872','2025-06':'2054417772','2025-07':'624411814','2025-08':'850357996',
+  '2025-09':'2086781450','2025-10':'94101960','2025-11':'1715459544','2025-12':'542913962'
 };
 // 지점 인원 (상담부 매출현황 기준 — 실적현황 갱신 시 같이 업데이트). 인투본사 무시. 오름=미파악(공란).
 var BRANCH_HEAD = {
@@ -748,7 +751,7 @@ function renderAwards(D){
   if(D.isLive !== false){ el.innerHTML=''; return; }   // 라이브(현재월)는 시상식 없음
   function won(n){ return (n||0).toLocaleString('ko-KR'); }
   var mk = window.__monthKey || '';
-  var mLabel = mk.replace('2026-','').replace(/^0/,'') + '월';
+  var mLabel = mk.replace(/^\d{4}-/,'').replace(/^0/,'') + '월';
   var dk = D.dukji || {};
   var cl = (dk.clutch && dk.clutch.month) || {};
   var rc = dk.records || {};
@@ -1340,22 +1343,57 @@ async function loadMonth(key){
 window.loadMonth = loadMonth;
 (async function(){
   await loadMonth('현재');   // 기본 = 현재월
-  // 월 선택 바 삽입 (대시보드 최상단)
-  var order = ['현재','2026-08','2026-07','2026-06','2026-05','2026-04','2026-03','2026-02','2026-01'];
-  var label = {'현재':'이번달','2026-08':'8월','2026-07':'7월','2026-06':'6월','2026-05':'5월','2026-04':'4월','2026-03':'3월','2026-02':'2월','2026-01':'1월'};
-  var bar = '<div id="mo-selector" style="display:flex;gap:6px;flex-wrap:wrap;padding:14px 20px 0;max-width:1560px;margin:0 auto">';
-  order.forEach(function(k){
-    if(k!=='현재' && !MONTH_GIDS[k]) return;
-    bar += '<button class="mo-sel-btn'+(k==='현재'?' on':'')+'" data-mo="'+k+'" onclick="loadMonth(\''+k+'\')" '
-        + 'style="background:var(--card2,#f0f2f8);border:0.5px solid var(--border,#e2e6ef);color:var(--sub,#667);'
-        + 'font-family:inherit;font-weight:700;font-size:13px;padding:7px 16px;border-radius:20px;cursor:pointer;transition:.15s">'
-        + label[k]+'</button>';
-  });
-  bar += '</div>';
+  // 월 선택 바 삽입 (대시보드 최상단) — [2026-09] 연도 토글 추가
+  var YEAR_ORDER = {
+    '2026': ['현재','2026-08','2026-07','2026-06','2026-05','2026-04','2026-03','2026-02','2026-01'],
+    '2025': ['2025-12','2025-11','2025-10','2025-09','2025-08','2025-07','2025-06','2025-05','2025-04','2025-03','2025-02','2025-01']
+  };
+  var LABEL = {
+    '현재':'이번달',
+    '2026-08':'8월','2026-07':'7월','2026-06':'6월','2026-05':'5월','2026-04':'4월','2026-03':'3월','2026-02':'2월','2026-01':'1월',
+    '2025-12':'12월','2025-11':'11월','2025-10':'10월','2025-09':'9월','2025-08':'8월','2025-07':'7월','2025-06':'6월','2025-05':'5월','2025-04':'4월','2025-03':'3월','2025-02':'2월','2025-01':'1월'
+  };
+  window.__curYear = '2026';
+
+  function _renderMonthBtns(year){
+    var order = YEAR_ORDER[year] || YEAR_ORDER['2026'];
+    var html = '';
+    order.forEach(function(k){
+      if(k!=='현재' && !MONTH_GIDS[k]) return;
+      var isOn = (year==='2026' && k==='현재');
+      html += '<button class="mo-sel-btn'+(isOn?' on':'')+'" data-mo="'+k+'" onclick="loadMonth(\''+k+'\')" '
+          + 'style="background:var(--card2,#f0f2f8);border:0.5px solid var(--border,#e2e6ef);color:var(--sub,#667);'
+          + 'font-family:inherit;font-weight:700;font-size:13px;padding:7px 16px;border-radius:20px;cursor:pointer;transition:.15s">'
+          + LABEL[k]+'</button>';
+    });
+    return html;
+  }
+
+  window.switchYear = function(year){
+    window.__curYear = year;
+    document.querySelectorAll('.yr-sel-btn').forEach(function(b){
+      b.classList.toggle('on', b.getAttribute('data-yr')===year);
+    });
+    var mb = document.getElementById('mo-btns');
+    if(mb) mb.innerHTML = _renderMonthBtns(year);
+    var first = (year==='2026') ? '현재' : '2025-01';
+    loadMonth(first);
+  };
+
+  var bar = '<div id="mo-selector" style="padding:14px 20px 0;max-width:1560px;margin:0 auto">'
+    + '<div id="yr-btns" style="display:flex;gap:6px;margin-bottom:8px">'
+    + '<button class="yr-sel-btn on" data-yr="2026" onclick="switchYear(\'2026\')" '
+    + 'style="font-family:inherit;font-weight:800;font-size:13px;padding:6px 18px;border-radius:20px;cursor:pointer;border:0.5px solid var(--border,#e2e6ef);background:var(--card2,#f0f2f8);color:var(--sub,#667);transition:.15s">2026</button>'
+    + '<button class="yr-sel-btn" data-yr="2025" onclick="switchYear(\'2025\')" '
+    + 'style="font-family:inherit;font-weight:800;font-size:13px;padding:6px 18px;border-radius:20px;cursor:pointer;border:0.5px solid var(--border,#e2e6ef);background:var(--card2,#f0f2f8);color:var(--sub,#667);transition:.15s">2025</button>'
+    + '</div>'
+    + '<div id="mo-btns" style="display:flex;gap:6px;flex-wrap:wrap">' + _renderMonthBtns('2026') + '</div>'
+    + '</div>';
   document.body.insertAdjacentHTML('afterbegin', bar);
   // 활성 스타일
   var st=document.createElement('style');
-  st.textContent='.mo-sel-btn.on{background:#5B5FE0 !important;color:#fff !important;border-color:#5B5FE0 !important}';
+  st.textContent='.mo-sel-btn.on{background:#5B5FE0 !important;color:#fff !important;border-color:#5B5FE0 !important}'
+    +'.yr-sel-btn.on{background:#1B2A44 !important;color:#fff !important;border-color:#1B2A44 !important}';
   document.head.appendChild(st);
 })();
 
@@ -1899,7 +1937,7 @@ var PC_TROPHY={'MVP':{ic:'🏆',cls:'mvp',lbl:'MVP'},'블루리본':{ic:'🎗️
 var PC_MON=['','1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
 function pcWon(n){return (n||0).toLocaleString('ko-KR');}
 function pcEok(n){n=n||0;if(n>=100000000){var e=n/100000000;return (e%1===0?e.toFixed(0):e.toFixed(2))+'억';}if(n>=10000){var m=n/10000;return (m%1===0?String(m):Math.round(m))+'만';}return pcWon(n);}
-function pcMoNum(mt){return mt.replace('2026-','').replace(/^0/,'');}
+function pcMoNum(mt){return mt.replace(/^\d{4}-/,'').replace(/^0/,'');}
 
 /* ── 종결달 = 현재월-1 (그래프·티어 기준) ── */
 function pcClosedMonth(){ var d=new Date(); var cm=d.getMonth()+1; return cm>1?cm-1:12; }
