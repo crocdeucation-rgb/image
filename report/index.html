@@ -173,6 +173,12 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 /* 소재 갤러리 */
 .gal{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
 @media(max-width:768px){.gal{grid-template-columns:repeat(2,1fr)}}
+/* 9월 1·2주차 갤러리 — 소재 이미지 작게 (4열 + 납작) */
+#sep1-gal,#sep2-gal{grid-template-columns:repeat(4,1fr);gap:10px}
+#sep1-gal .thumb,#sep2-gal .thumb,#sep1-gal .thumb-ph,#sep2-gal .thumb-ph{aspect-ratio:1/0.72}
+#sep1-gal .gi,#sep2-gal .gi{padding:9px 10px}
+#sep1-gal .gt,#sep2-gal .gt{font-size:12px}
+@media(max-width:768px){#sep1-gal,#sep2-gal{grid-template-columns:repeat(2,1fr)}}
 .gcard{background:var(--card);border:0.5px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:.15s}
 .gcard:hover{border-color:#aaa;transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.06)}
 .gcard.best{border-color:#a8d8c0}
@@ -1411,21 +1417,21 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   <div class="knote" style="margin-bottom:12px">
     이번 주는 <b>새로 올린 소재가 없습니다.</b> 위너테스트 세트(한 캠페인 안에서 소재들이 예산을 두고 경쟁하는 구조) 안에서 <b>반응이 죽은 소재를 정지</b>하고, 메타가 예산을 몰아준 검증 소재만 남겼습니다. 소재를 계속 늘리기보다 세트가 지저분해지면 정리해 <b>깨끗한 경쟁 풀을 유지</b>하는 것이 2026 운용 원칙입니다. 분모는 2주차 소재 광고비(메타 9/7~12 실측), 분자는 그 소재로 <b>이번 주 들어온 리드(신청 9/7~13)</b>가 만든 매출입니다.
   </div>
-  <table>
-    <thead><tr><th>소재</th><th>상태</th><th>광고비</th><th>리드</th><th>CPL</th><th>CPM</th><th>CTR</th><th>빈도</th><th>코호트   오더</th><th>코호트 매출</th><th>ROAS   코호트</th></tr></thead>
+  <div class="tbl-scroll"><table class="tbl">
+    <thead><tr><th class="l">소재</th><th class="l">상태</th><th class="r">광고비</th><th class="r">리드</th><th class="r">CPL</th><th class="r">CPM</th><th class="r">CTR</th><th class="r">빈도</th><th class="r">코호트 오더</th><th class="r">코호트 매출</th><th class="r">ROAS 코호트</th></tr></thead>
     <tbody>
-      <tr><td><b>노트릴스 재편집</b></td><td><span class="badge b-best">위너</span></td><td>2,324,209</td><td>110</td><td>21,129</td><td>35,789</td><td>1.77%</td><td>1.58</td><td>1</td><td>7,803,000</td><td><b>3.36</b></td></tr>
-      <tr><td><b>노트릴스 영상</b></td><td><span class="badge b-on">유지</span></td><td>2,604,661</td><td>143</td><td>18,214</td><td>19,886</td><td>1.36%</td><td>1.35</td><td>0</td><td>—</td><td>집계 대기</td></tr>
-      <tr><td><b>방학점검</b></td><td><span class="badge b-on">유지</span></td><td>1,962,977</td><td>83</td><td>23,650</td><td>43,362</td><td>1.86%</td><td>1.23</td><td>1</td><td>5,202,000</td><td><b>2.65</b></td></tr>
-      <tr><td>노트필기 관리부재</td><td><span class="badge b-on">생존</span></td><td>519,779</td><td>32</td><td><b>16,243</b></td><td>34,887</td><td><b>2.36%</b></td><td>1.38</td><td>0</td><td>—</td><td>집계 대기</td></tr>
-      <tr><td>MLST 어디서막힐까</td><td><span class="badge b-on">생존</span></td><td>87,625</td><td>7</td><td>12,518</td><td>24,690</td><td>1.13%</td><td>1.40</td><td>0</td><td>—</td><td>집계 대기</td></tr>
-      <tr style="opacity:.55"><td>노트필기 시간압박</td><td><span class="badge b-dead">OFF</span></td><td>42,415</td><td>0</td><td>—</td><td>18,251</td><td>1.46%</td><td>1.27</td><td>0</td><td>—</td><td>정지</td></tr>
-      <tr style="opacity:.55"><td>MLST 성향테스트</td><td><span class="badge b-dead">OFF</span></td><td>25,497</td><td>0</td><td>—</td><td>35,710</td><td>1.40%</td><td>1.21</td><td>0</td><td>—</td><td>정지</td></tr>
-      <tr style="opacity:.55"><td>MLST 공부습관</td><td><span class="badge b-dead">OFF</span></td><td>10,536</td><td>0</td><td>—</td><td>26,209</td><td>0.75%</td><td>1.48</td><td>0</td><td>—</td><td>정지</td></tr>
-      <tr style="opacity:.55"><td>MLST 학습유형</td><td><span class="badge b-dead">OFF</span></td><td>10,285</td><td>0</td><td>—</td><td>36,996</td><td>0.36%</td><td>1.26</td><td>0</td><td>—</td><td>정지</td></tr>
-      <tr><td><b>메타 합계</b></td><td></td><td><b>7,603,716</b></td><td><b>222</b>*</td><td>34,251</td><td>—</td><td>—</td><td>—</td><td><b>2</b></td><td><b>13,005,000</b></td><td><b>1.71</b></td></tr>
+      <tr><td class="l"><b>노트릴스 재편집</b></td><td class="l"><span class="badge b-best">위너</span></td><td class="r">2,324,209</td><td class="r">110</td><td class="r">21,129</td><td class="r">35,789</td><td class="r">1.77%</td><td class="r">1.58</td><td class="r">1</td><td class="r">7,803,000</td><td class="r"><b>3.36</b></td></tr>
+      <tr><td class="l"><b>노트릴스 영상</b></td><td class="l"><span class="badge b-on">유지</span></td><td class="r">2,604,661</td><td class="r">143</td><td class="r">18,214</td><td class="r">19,886</td><td class="r">1.36%</td><td class="r">1.35</td><td class="r">0</td><td class="r">—</td><td class="r">집계 대기</td></tr>
+      <tr><td class="l"><b>방학점검</b></td><td class="l"><span class="badge b-on">유지</span></td><td class="r">1,962,977</td><td class="r">83</td><td class="r">23,650</td><td class="r">43,362</td><td class="r">1.86%</td><td class="r">1.23</td><td class="r">1</td><td class="r">5,202,000</td><td class="r"><b>2.65</b></td></tr>
+      <tr><td class="l">노트필기 관리부재</td><td class="l"><span class="badge b-on">생존</span></td><td class="r">519,779</td><td class="r">32</td><td class="r"><b>16,243</b></td><td class="r">34,887</td><td class="r"><b>2.36%</b></td><td class="r">1.38</td><td class="r">0</td><td class="r">—</td><td class="r">집계 대기</td></tr>
+      <tr><td class="l">MLST 어디서막힐까</td><td class="l"><span class="badge b-on">생존</span></td><td class="r">87,625</td><td class="r">7</td><td class="r">12,518</td><td class="r">24,690</td><td class="r">1.13%</td><td class="r">1.40</td><td class="r">0</td><td class="r">—</td><td class="r">집계 대기</td></tr>
+      <tr style="opacity:.55"><td class="l">노트필기 시간압박</td><td class="l"><span class="badge b-dead">OFF</span></td><td class="r">42,415</td><td class="r">0</td><td class="r">—</td><td class="r">18,251</td><td class="r">1.46%</td><td class="r">1.27</td><td class="r">0</td><td class="r">—</td><td class="r">정지</td></tr>
+      <tr style="opacity:.55"><td class="l">MLST 성향테스트</td><td class="l"><span class="badge b-dead">OFF</span></td><td class="r">25,497</td><td class="r">0</td><td class="r">—</td><td class="r">35,710</td><td class="r">1.40%</td><td class="r">1.21</td><td class="r">0</td><td class="r">—</td><td class="r">정지</td></tr>
+      <tr style="opacity:.55"><td class="l">MLST 공부습관</td><td class="l"><span class="badge b-dead">OFF</span></td><td class="r">10,536</td><td class="r">0</td><td class="r">—</td><td class="r">26,209</td><td class="r">0.75%</td><td class="r">1.48</td><td class="r">0</td><td class="r">—</td><td class="r">정지</td></tr>
+      <tr style="opacity:.55"><td class="l">MLST 학습유형</td><td class="l"><span class="badge b-dead">OFF</span></td><td class="r">10,285</td><td class="r">0</td><td class="r">—</td><td class="r">36,996</td><td class="r">0.36%</td><td class="r">1.26</td><td class="r">0</td><td class="r">—</td><td class="r">정지</td></tr>
+      <tr class="sum"><td class="l"><b>메타 합계</b></td><td class="l"></td><td class="r"><b>7,603,716</b></td><td class="r"><b>222</b>*</td><td class="r">34,251</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td class="r"><b>2</b></td><td class="r"><b>13,005,000</b></td><td class="r"><b>1.71</b></td></tr>
     </tbody>
-  </table>
+  </table></div>
   <div class="cap">※ 광고비·리드·CPM·CTR·빈도는 <b>메타 실측(9/7~12)</b>, 코호트 오더·매출은 <b>노션(신청 9/7~13 리드의 결제 확정)</b>입니다. *합계 리드 222는 노션 소재별 코호트 기준(폼이탈·중복정제로 메타 리포트 리드와 차이). 노트릴스 방법제시·학원무용은 1주차에 이미 정지.</div>
 
   <div class="gal" id="sep2-gal"></div>
@@ -2575,10 +2581,10 @@ renderGal('sep1-gal', SEP1_GAL, {spendLine:true});
 const SEP2_GAL = [
   {key:'노트릴스_재편집_2609', title:'노트릴스 재편집',   st:'best', tag:'세트 유일 코호트 오더 · ROAS 3.36',       cpl:'21,129', spend:2324209, orders:1, sales:7803000},
   {key:'노트릴스_영상',        title:'노트릴스 영상(원본)', st:'keep',   tag:'싼 CPM으로 리드 대량 · 리드 143',        cpl:'18,214', spend:2604661, orders:0, sales:0},
-  {key:'방학점검',            title:'방학점검',           st:'keep',   tag:'코호트 오더 1 · ROAS 2.65',             cpl:'23,650', spend:1962977, orders:1, sales:5202000},
-  {key:'노트필기_관리부재',     title:'노트필기 관리부재',   st:'ok',   tag:'CTR 2.36% · CPL 최저 16,243',           cpl:'16,243', spend:519779,  orders:0, sales:0},
+  {key:'노트필기릴스_2607',    title:'방학점검',           st:'keep',   tag:'코호트 오더 1 · ROAS 2.65',             cpl:'23,650', spend:1962977, orders:1, sales:5202000},
+  {key:'중간고사_관리부재_2608', title:'노트필기 관리부재',   st:'ok',   tag:'CTR 2.36% · CPL 최저 16,243',           cpl:'16,243', spend:519779,  orders:0, sales:0},
   {key:'MLST_어디서막힐까_2609', title:'MLST 어디서막힐까', st:'ok',  tag:'MLST 유일 생존 · 리드 7',               cpl:'12,518', spend:87625,   orders:0, sales:0},
-  {key:'노트필기_시간압박',     title:'노트필기 시간압박',   st:'dead', tag:'리드 0 · 이번 주 정지',                  cpl:'정지',   spend:42415,   orders:0, sales:0},
+  {key:'중간고사_시간압박_2608', title:'노트필기 시간압박',   st:'dead', tag:'리드 0 · 이번 주 정지',                  cpl:'정지',   spend:42415,   orders:0, sales:0},
   {key:'MLST_성향테스트_2609', title:'MLST 성향테스트',   st:'dead', tag:'리드 0 · CTR 1.40% · 정지',             cpl:'정지',   spend:25497,   orders:0, sales:0},
   {key:'MLST_공부습관_2609',   title:'MLST 공부습관',     st:'dead', tag:'CTR 0.75% · 정지',                      cpl:'정지',   spend:10536,   orders:0, sales:0},
   {key:'MLST_학습유형_2609',   title:'MLST 학습유형',     st:'dead', tag:'CTR 0.36% 최저 · 정지',                 cpl:'정지',   spend:10285,   orders:0, sales:0}
