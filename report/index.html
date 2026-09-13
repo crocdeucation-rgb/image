@@ -178,6 +178,11 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 #sep1-gal .thumb,#sep2-gal .thumb,#sep1-gal .thumb-ph,#sep2-gal .thumb-ph{aspect-ratio:1/0.72}
 #sep1-gal .gi,#sep2-gal .gi{padding:9px 10px}
 #sep1-gal .gt,#sep2-gal .gt{font-size:12px}
+/* 촬영 사진 호버 확대 */
+.shoot-photo{transition:transform .2s ease, box-shadow .2s ease; position:relative; z-index:1}
+.shoot-photo:hover{transform:scale(1.35); z-index:10; box-shadow:0 12px 40px rgba(0,0,0,.28)}
+.shoot-photo:hover img{object-fit:contain !important; background:#0d1117}
+@media(max-width:768px){.shoot-photo:hover{transform:none}}
 @media(max-width:768px){#sep1-gal,#sep2-gal{grid-template-columns:repeat(2,1fr)}}
 .gcard{background:var(--card);border:0.5px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:.15s}
 .gcard:hover{border-color:#aaa;transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.06)}
@@ -1390,7 +1395,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
     <h4>📌 9월 2주차 요약</h4>
     <div class="tw-date">9/7 ~ 9/13 · <span style="color:var(--faint)">소재 정비 · 후기영상 제작 · 대시보드 고도화</span></div>
     <div class="tw-grid">
-      <div class="tw-cell"><div class="k">광고비(메타)</div><div class="v">760만</div><div class="d">7,603,716원 · 9/7~12 실집행<br><span style="color:var(--faint)">태평양시간 기준 9/13(일)분 마감 전</span></div></div>
+      <div class="tw-cell"><div class="k">광고비(메타)</div><div class="v">760만</div><div class="d">7,603,716원 · 9/7~12 집행<br><span style="color:var(--faint)">일요일(9/13)분은 아직 집계 전</span></div></div>
       <div class="tw-cell"><div class="k">잡은 방문</div><div class="v">22건</div><div class="d">세팅17·취소1·방문4<br><span style="color:#4a90d9">9월DB7</span>·<span style="color:#d98a4a">8월DB15</span></div></div>
       <div class="tw-cell"><div class="k">오더</div><div class="v">13건</div><div class="d"><span style="color:var(--faint)">실적 게시판(9/7~11) + 토 노션(9/12)</span></div></div>
       <div class="tw-cell"><div class="k">매출</div><div class="v">5,234만</div><div class="d">실적 게시판 2,514만(9/7~11) + 토 노션 2,720만(9/12)</div></div>
@@ -1402,7 +1407,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 
   <div class="kpis">
     <div class="kpi"><div class="k">매출</div><div class="v t">5,234만</div><div class="s">52,342,000원 · 오더 13건<br><span style="color:var(--faint)">실적 게시판 25,143,000(9/7~11) + 9/12(토) 노션 27,199,000</span></div></div>
-    <div class="kpi"><div class="k">메타 광고비</div><div class="v">760만</div><div class="s">7,603,716원 <span style="color:var(--faint)">(9/7~12 실집행)</span><br><span style="color:var(--faint)">노트릴스 260만 · 방학점검 196만 · 위너세트 304만<br>※ 메타는 태평양시간 기준이라 9/13(일) 집행분은 아직 마감 전 — 9/12(토)까지 반영</span></div></div>
+    <div class="kpi"><div class="k">메타 광고비</div><div class="v">760만</div><div class="s">7,603,716원 <span style="color:var(--faint)">(9/7~12 실집행)</span><br><span style="color:var(--faint)">노트릴스 260만 · 방학점검 196만 · 위너세트 304만<br>※ 메타 광고비는 미국(태평양) 시간 기준으로 하루를 끊는데, 한국보다 약 16시간 느려서 <b>한국의 일요일(9/13)이 미국에선 아직 진행 중</b>입니다. 그래서 9/13분은 집계가 안 끝나, <b>9/12(토)까지 확정된 금액</b>만 반영했습니다.</span></div></div>
     <div class="kpi"><div class="k">잡은 방문</div><div class="v">22건</div><div class="s">세팅 17·취소 1·방문 4<br><span style="color:var(--faint)">9월DB 7·8월DB 15 (69%가 8월 이전 유입)</span></div></div>
     <div class="kpi"><div class="k">오더</div><div class="v">13건</div><div class="s">실적 게시판(9/7~11) + 토 노션(9/12)<br><span style="color:var(--faint)">세팅→오더율 76%</span></div></div>
     <div class="kpi"><div class="k">CAC · 고객획득비용</div><div class="v t">58만</div><div class="s">584,901원 <span style="color:var(--faint)">(광고비÷오더)</span><br><span style="color:var(--faint)">CPL보다 상위 지표 · 오더 13건 기준</span></div></div>
@@ -1455,13 +1460,13 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 
   <!-- 촬영 현장 사진 -->
   <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:10px;margin-bottom:14px;align-items:stretch">
-    <a href="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/docs/KakaoTalk_20260912_165256721.jpg" target="_blank" style="display:block;border-radius:10px;overflow:hidden;border:1px solid var(--border)">
+    <a href="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/docs/KakaoTalk_20260912_165256721.jpg" target="_blank" class="shoot-photo" style="display:block;border-radius:10px;overflow:hidden;border:1px solid var(--border)">
       <img src="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/docs/KakaoTalk_20260912_165256721.jpg" style="width:100%;height:100%;min-height:300px;object-fit:cover;object-position:center;display:block" alt="촬영 현장 — 실제 수업 장면">
     </a>
-    <a href="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/docs/KakaoTalk_20260912_165141186_01.jpg" target="_blank" style="display:block;border-radius:10px;overflow:hidden;border:1px solid var(--border)">
+    <a href="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/docs/KakaoTalk_20260912_165141186_01.jpg" target="_blank" class="shoot-photo" style="display:block;border-radius:10px;overflow:hidden;border:1px solid var(--border)">
       <img src="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/docs/KakaoTalk_20260912_165141186_01.jpg" style="width:100%;height:100%;min-height:300px;object-fit:cover;object-position:center 30%;display:block" alt="촬영 단체">
     </a>
-    <a href="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/docs/KakaoTalk_20260912_165141186_02.jpg" target="_blank" style="display:block;border-radius:10px;overflow:hidden;border:1px solid var(--border)">
+    <a href="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/docs/KakaoTalk_20260912_165141186_02.jpg" target="_blank" class="shoot-photo" style="display:block;border-radius:10px;overflow:hidden;border:1px solid var(--border)">
       <img src="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/docs/KakaoTalk_20260912_165141186_02.jpg" style="width:100%;height:100%;min-height:300px;object-fit:cover;object-position:center 30%;display:block" alt="촬영 마무리">
     </a>
   </div>
@@ -1472,19 +1477,19 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   </div>
   <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px">
     <a href="https://crocdeucation-rgb.github.io/image/report/docs/%EA%B3%B5%EB%B6%80%EC%97%90%20%EB%B9%A0%EC%A7%84%20%EC%B1%84%EB%A6%B0%EC%9D%B4%20STORY%20BOARD.pdf" target="_blank" class="card" style="text-decoration:none;color:inherit;display:block;border-color:#c8e4d8;background:#fbfefd">
-      <div style="font-size:14px;font-weight:700;margin-bottom:4px">📄 스토리보드 (8씬)</div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:4px">📄 스토리보드 (8씬) <span style="font-size:11px;color:var(--faint);font-weight:400">↗ 새 창</span></div>
       <div style="font-size:12.5px;color:var(--sub)">하교→공부준비→수업→코칭→피드백→대화. 씬별 구도·대사·나레이션 예시</div>
     </a>
     <a href="https://crocdeucation-rgb.github.io/image/report/docs/%EC%B1%84%EB%A6%B0%EC%9D%B4%EB%84%A4_%EC%B4%AC%EC%98%81%EC%95%88%EB%82%B4_%ED%95%99%EB%B6%80%EB%AA%A8%EC%9A%A9.pdf" target="_blank" class="card" style="text-decoration:none;color:inherit;display:block;border-color:#c8e4d8;background:#fbfefd">
-      <div style="font-size:14px;font-weight:700;margin-bottom:4px">📄 학부모 촬영 안내서</div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:4px">📄 학부모 촬영 안내서 <span style="font-size:11px;color:var(--faint);font-weight:400">↗ 새 창</span></div>
       <div style="font-size:12.5px;color:var(--sub)">"연기 아닌 평소 모습" · 준비물 최소화 · 인터뷰 질문 가이드(Q1~Q6)</div>
     </a>
     <a href="https://crocdeucation-rgb.github.io/image/report/docs/260912_%EC%B1%84%EB%A6%B0%EC%9D%B4%20%EC%A0%84%ED%99%94%EC%BD%94%EC%B9%AD%20%EB%8C%80%EB%B3%B8.pdf" target="_blank" class="card" style="text-decoration:none;color:inherit;display:block;border-color:#c8e4d8;background:#fbfefd">
-      <div style="font-size:14px;font-weight:700;margin-bottom:4px">📄 전화코칭 대본</div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:4px">📄 전화코칭 대본 <span style="font-size:11px;color:var(--faint);font-weight:400">↗ 새 창</span></div>
       <div style="font-size:12.5px;color:var(--sub)">실제 진행한 주간 학습 점검 — 국어·과학·사회·수학(소수 나눗셈) 오답 지도</div>
     </a>
     <a href="https://crocdeucation-rgb.github.io/image/report/docs/260912_%EC%B1%84%EB%A6%B0%EC%9D%B4%EB%84%A4%20%EC%B4%AC%EC%98%81%20%28%EC%94%AC%204%EA%B0%9C%29.pdf" target="_blank" class="card" style="text-decoration:none;color:inherit;display:block;border-color:#c8e4d8;background:#fbfefd">
-      <div style="font-size:14px;font-weight:700;margin-bottom:4px">📄 촬영 씬 구성 (4씬)</div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:4px">📄 촬영 씬 구성 (4씬) <span style="font-size:11px;color:var(--faint);font-weight:400">↗ 새 창</span></div>
       <div style="font-size:12.5px;color:var(--sub)">현장 촬영용 씬 분할 — 세팅별 묶음 촬영 순서(편집 순서 아님)</div>
     </a>
   </div>
