@@ -183,6 +183,14 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 .shoot-photo:hover{transform:scale(1.35); z-index:10; box-shadow:0 12px 40px rgba(0,0,0,.28)}
 .shoot-photo:hover img{object-fit:contain !important; background:#0d1117}
 @media(max-width:768px){.shoot-photo:hover{transform:none}}
+/* 촬영 사진 그리드 — 폴드/모바일 대응 */
+.shoot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:10px;margin-bottom:14px;align-items:stretch}
+@media(max-width:768px){.shoot-grid{grid-template-columns:1fr 1fr;gap:8px}}
+@media(max-width:420px){.shoot-grid{grid-template-columns:1fr;gap:8px}}
+@media(max-width:420px){.shoot-grid .shoot-photo img{height:auto !important;min-height:0 !important;max-height:400px;object-fit:contain !important}}
+/* 촬영 문서 카드 그리드 */
+.doc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+@media(max-width:560px){.doc-grid{grid-template-columns:1fr}}
 @media(max-width:768px){#sep1-gal,#sep2-gal{grid-template-columns:repeat(2,1fr)}}
 .gcard{background:var(--card);border:0.5px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:.15s}
 .gcard:hover{border-color:#aaa;transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.06)}
@@ -1459,7 +1467,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   </div>
 
   <!-- 촬영 현장 사진 -->
-  <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:10px;margin-bottom:14px;align-items:stretch">
+  <div class="shoot-grid">
     <a href="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/docs/KakaoTalk_20260912_165256721.jpg" target="_blank" class="shoot-photo" style="display:block;border-radius:10px;overflow:hidden;border:1px solid var(--border)">
       <img src="https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/docs/KakaoTalk_20260912_165256721.jpg" style="width:100%;height:100%;min-height:300px;object-fit:cover;object-position:center;display:block" alt="촬영 현장 — 실제 수업 장면">
     </a>
@@ -1475,7 +1483,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   <div class="knote" style="margin-bottom:12px">
     <b>기획 산출물 4종을 직접 제작</b>했습니다. 촬영은 대본 낭독이 아니라 <b>평소 하루를 그대로 담는 방식</b>이라, 학부모가 부담 없이 참여하도록 안내서·인터뷰 가이드를 별도로 준비했습니다. 아래는 실제 사용한 문서입니다.
   </div>
-  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px">
+  <div class="doc-grid">
     <a href="https://crocdeucation-rgb.github.io/image/report/docs/%EA%B3%B5%EB%B6%80%EC%97%90%20%EB%B9%A0%EC%A7%84%20%EC%B1%84%EB%A6%B0%EC%9D%B4%20STORY%20BOARD.pdf" target="_blank" class="card" style="text-decoration:none;color:inherit;display:block;border-color:#c8e4d8;background:#fbfefd">
       <div style="font-size:14px;font-weight:700;margin-bottom:4px">📄 스토리보드 (8씬) <span style="font-size:11px;color:var(--faint);font-weight:400">↗ 새 창</span></div>
       <div style="font-size:12.5px;color:var(--sub)">하교→공부준비→수업→코칭→피드백→대화. 씬별 구도·대사·나레이션 예시</div>
