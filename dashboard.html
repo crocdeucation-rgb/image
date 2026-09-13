@@ -1088,9 +1088,9 @@ function render() {
   const killHead = killedList.length
     ? `<tr class="camp-kill-head"><td class="kname">캠페인</td><td class="knum">DB</td><td class="knum">방문</td><td class="knum">세팅</td><td class="knum">오더</td><td class="knum">종료직전 CPL/사유</td><td class="knum">ROAS</td><td class="knum">매출</td></tr>`
     : '';
-  const offRows = sepRow + killHead + killedList.map(killRow).join('');
-  ctbody.innerHTML = (onList.length + killedList.length) > 0
-    ? onList.map(campRow).join('') + offRows
+  const offRows = '';  // [2026-09-14] '최근 종료' 섹션 제거 — ON 캠페인만 표시
+  ctbody.innerHTML = onList.length > 0
+    ? onList.map(campRow).join('')
     : '<tr><td colspan="8" style="color:#aaa;text-align:center;padding:14px;">데이터 없음</td></tr>';
 }
 
