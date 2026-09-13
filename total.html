@@ -337,6 +337,9 @@ body.is-live .closed-only{display:none !important}
 .pc-sec-t .cnt{background:#EDF1F8;color:#7048E8;font-size:10.5px;font-weight:800;padding:1px 7px;border-radius:9px}
 .pc-trend{padding:8px 10px 4px}
 .pc-tabs{display:flex;gap:6px;padding:0 10px 4px}
+.role-tabs{display:flex;gap:6px;padding:10px 12px 4px;position:sticky;top:0;z-index:5}
+.role-tab{flex:1;font-family:inherit;font-weight:800;font-size:14px;padding:9px 0;border-radius:12px;cursor:pointer;border:1px solid #e2e6ef;background:#f0f2f8;color:#667;transition:.15s}
+.role-tab.on{background:#5B5FE0;color:#fff;border-color:#5B5FE0}
 .pc-tab{font-size:11px;font-weight:800;padding:4px 12px;border-radius:14px;border:none;background:#EDF1F8;color:#6B7688;cursor:pointer;font-family:inherit}
 .pc-tab.on{background:#7048E8;color:#fff}
 .pc-tsvg{width:100%;height:auto;display:block}
@@ -2172,6 +2175,8 @@ function openCard(name){
   document.getElementById('pcModal').classList.add('on');
   try{ parent.postMessage({t:'cardOpen'}, '*'); }catch(e){}
   document.body.style.overflow='hidden';
+  // [역할탭] 상담/사업 개인카드 — 겸직이면 상단 탭. useF면 사업, 아니면 상담 활성
+  try{ _injectRoleTabs(name, (f.useF?'saup':'sang')); }catch(e){}
 }
 function closeCard(){ window.__pcEdit=false; document.getElementById('pcModal').classList.remove('on'); try{ parent.postMessage({t:'cardClose'}, '*'); }catch(e){} document.body.style.overflow=''; window.__curCardName=null; if(window.__likeUnsub){window.__likeUnsub();window.__likeUnsub=null;} if(window.__cmtUnsub){window.__cmtUnsub();window.__cmtUnsub=null;} pcRestoreScroll(); }
 
@@ -2263,6 +2268,8 @@ window.openBranchCard=function(brName){
   document.getElementById('pcModal').classList.add('on');
   try{ parent.postMessage({t:'cardOpen'}, '*'); }catch(e){}
   document.body.style.overflow='hidden';
+  // [역할탭] 지점카드 — 이 지점의 지사장 본인이 겸직이면 상단 탭 (지사 활성)
+  try{ if(window.__roleForceName){ _injectRoleTabs(window.__roleForceName, 'jisa'); } }catch(e){}
 };
 
 /* ══════ 🔍 기간조회(FINDER) — 원장 직접 필터 ══════ */
@@ -2916,6 +2923,56 @@ function branchBadges(brName){
   return out.length?'<span class="name-badges">'+out.join(' ')+'</span>':'';
 }
 /* ── 이름에 클릭 달기 (후처리) ── */
+/* ═══ [역할 탭] 지사/상담/사업 겸직자 카드 전환 ═══
+   기존 openCard·openBranchCard·_headBranchOf 안 건드림. 카드 열린 뒤 상단에 탭만 얹음.
+*/
+// 그 사람이 실제 가진 역할 목록 반환: [{key,label,type,arg}]
+function _myRoles(name){
+  var D=window.__liveD||window.__D||{};
+  var roles=[];
+  // 지사 = 본인이 지사장/지점장인 지점 (강제 라우팅 대상)
+  var br=(typeof _headBranchOf==='function')?_headBranchOf(name):'';
+  if(br) roles.push({key:'jisa', label:'지사', type:'branch', arg:br});
+  // 상담 = personCards.sang에 개인 실적(세팅 or 오더 or 매출)이 있으면
+  var sang=(D.personCards&&D.personCards.sang)||[];
+  for(var i=0;i<sang.length;i++){ if(sang[i].name===name){ var s=sang[i]; if((s.set||0)>0||(s.ord||0)>0||(s.sales||0)>0){ roles.push({key:'sang',label:'상담',type:'person',arg:name}); } break; } }
+  // 사업 = personCards.saup에 실적 있으면
+  var saup=(D.personCards&&D.personCards.saup)||[];
+  for(var j=0;j<saup.length;j++){ if(saup[j].name===name){ var f=saup[j]; if((f.set||0)>0||(f.ord||0)>0||(f.sales||0)>0){ roles.push({key:'saup',label:'사업',type:'personF',arg:name}); } break; } }
+  return roles;
+}
+// 역할 탭 바 HTML (2개 이상일 때만). activeKey = 현재 보는 역할
+function _roleTabsHtml(name, activeKey){
+  var roles=_myRoles(name);
+  if(roles.length<2) return '';
+  var btns=roles.map(function(r){
+    var on=(r.key===activeKey)?' on':'';
+    return '<button class="role-tab'+on+'" onclick="_switchRole(\''+name.replace(/'/g,"")+'\',\''+r.key+'\')">'+r.label+'</button>';
+  }).join('');
+  return '<div class="role-tabs" data-for="'+name+'">'+btns+'</div>';
+}
+// 탭 클릭 → 해당 역할 카드로 전환
+window._switchRole=function(name, key){
+  var roles=_myRoles(name);
+  var r=null; for(var i=0;i<roles.length;i++){ if(roles[i].key===key){ r=roles[i]; break; } }
+  if(!r) return;
+  window.__roleActive=key;   // 다음 카드 렌더 시 탭 활성표시용
+  window.__roleForceName=name;
+  if(r.type==='branch'){ openBranchCard(r.arg); }
+  else { openCard(r.arg); }  // 상담/사업 둘 다 openCard (내부에서 useF 판별)
+};
+// 카드 body 상단에 역할 탭 삽입 (openCard/openBranchCard 끝나고 호출)
+function _injectRoleTabs(name, activeKey){
+  if(!name) return;
+  var tabs=_roleTabsHtml(name, activeKey);
+  if(!tabs) return;
+  var body=document.getElementById('pcBody');
+  if(body && body.querySelector && !body.querySelector('.role-tabs')){
+    body.insertAdjacentHTML('afterbegin', tabs);
+  }
+}
+window._injectRoleTabs=_injectRoleTabs;
+
 function attachCardClicks(){
   var D=window.__liveD||window.__D;
   if(!D||!D.personCards)return;
@@ -2942,6 +2999,8 @@ function attachCardClicks(){
       el.__pcBound=true;
       el.addEventListener('click',function(ev){ ev.stopPropagation();
         var _bt=_headBranchOf(matched);   // [2026-09] 지사장·지점장 → 지점카드 (어느 카드든)
+        // [역할탭] 겸직(2역할+)이면 지점카드에 탭 뜨게 이름 기억, 아니면 초기화
+        window.__roleForceName = (_myRoles(matched).length>=2) ? matched : null;
         if(_bt) openBranchCard(_bt); else openCard(matched);
       });
     }
