@@ -2731,7 +2731,10 @@ async function fdLoadLedger(){
   var seen={}, dedup=[];
   all.forEach(function(r){ var k=r.key+'|'+r.sang+'|'+r.student+'|'+r.sales+'|'+r.state; if(!seen[k]){seen[k]=1;dedup.push(r);} });
   window.__ledger=dedup;
-  window.__ledgerMax=dedup.reduce(function(mx,r){return r.key>mx?r.key:mx;},0);
+  // [2026-09] 기준일(최신일)은 오늘까지만 — 미래 완납예정일(12월 등)이 기준일 오염 방지
+  var _now=new Date(); var _todayKey=_now.getFullYear()*10000+(_now.getMonth()+1)*100+_now.getDate();
+  window.__ledgerMax=dedup.reduce(function(mx,r){return (r.key<=_todayKey && r.key>mx)?r.key:mx;},0);
+  if(!window.__ledgerMax) window.__ledgerMax=_todayKey;   // 폴백
   return dedup;
 }
 /* 조직 판별 → 표시 그룹키 */
@@ -2763,26 +2766,31 @@ function fdRange(){
   var s=window.__fdState;
   var mx=window.__ledgerMax||0;
   var my=Math.floor(mx/10000), mm=Math.floor(mx/100)%100, md=mx%100;
-  var base=mx?new Date(my,mm-1,md):new Date();  // 원장 최신일
-  var y=base.getFullYear(),m=base.getMonth()+1,d=base.getDate();
+  var base=mx?new Date(my,mm-1,md):new Date();  // 기준일 = 원장 최신일(오늘 클램프됨)
   function k(yy,mm,dd){return yy*10000+mm*100+dd;}
   function ymd(o){return {y:o.getFullYear(),m:o.getMonth()+1,d:o.getDate()};}
-  var mL=(mm<10?'0':'')+mm, dL=(md<10?'0':'')+md;
-  if(s.period==='day'){ return {from:mx,to:mx,label:mL+'/'+dL}; }
-  if(s.period==='week'){ var wd=base.getDay()||7; var mon=new Date(base);mon.setDate(d-(wd-1));var o=ymd(mon);return {from:k(o.y,o.m,o.d),to:mx,label:'이번주 (~'+mL+'/'+dL+')'}; }
-  if(s.period==='month'){ return {from:k(y,m,1),to:mx,label:m+'월 (~'+dL+')'}; }
-  if(s.period==='all'){ return {from:k(y,1,1),to:mx,label:y+'년 전체'}; }
+  function keyOf(dt){return dt.getFullYear()*10000+(dt.getMonth()+1)*100+dt.getDate();}
+  function mL2(n){return (n<10?'0':'')+n;}
+  var y=base.getFullYear(), m=base.getMonth()+1, d=base.getDate();
+  // [2026-09] 프리셋: 이번주/지난주/이번달/지난달/어제/그제/전체/직접
+  if(s.period==='yesterday'){ var yd=new Date(base);yd.setDate(d-1);var o=ymd(yd);return {from:keyOf(yd),to:keyOf(yd),label:'어제 ('+o.m+'/'+o.d+')'}; }
+  if(s.period==='day2'){ var d2=new Date(base);d2.setDate(d-2);var o2=ymd(d2);return {from:keyOf(d2),to:keyOf(d2),label:'그제 ('+o2.m+'/'+o2.d+')'}; }
+  if(s.period==='week'){ var wd=base.getDay()||7; var mon=new Date(base);mon.setDate(d-(wd-1));return {from:keyOf(mon),to:mx,label:'이번주 ('+(mon.getMonth()+1)+'/'+mon.getDate()+'~'+m+'/'+d+')'}; }
+  if(s.period==='week2'){ var wd2=base.getDay()||7; var lmon=new Date(base);lmon.setDate(d-(wd2-1)-7); var lsun=new Date(lmon);lsun.setDate(lmon.getDate()+6); return {from:keyOf(lmon),to:keyOf(lsun),label:'지난주 ('+(lmon.getMonth()+1)+'/'+lmon.getDate()+'~'+(lsun.getMonth()+1)+'/'+lsun.getDate()+')'}; }
+  if(s.period==='month'){ return {from:k(y,m,1),to:mx,label:'이번달 ('+m+'월 ~'+md+'일)'}; }
+  if(s.period==='month2'){ var lm=new Date(y,m-1,0); return {from:k(lm.getFullYear(),lm.getMonth()+1,1),to:keyOf(lm),label:'지난달 ('+(lm.getMonth()+1)+'월)'}; }
+  if(s.period==='all'){ return {from:0,to:99999999,label:'전체'}; }
   if(s.period==='custom'){
     var f=s.from?fdDate(s.from):null, t=s.to?fdDate(s.to):null;
     if(f&&t) return {from:fdKey(f),to:fdKey(t),label:s.from+'~'+s.to};
-    return {from:k(y,1,1),to:mx,label:y+'년 전체'};
+    return {from:k(y,m,1),to:mx,label:'이번달'};
   }
-  return {from:k(y,m,1),to:mx,label:m+'월 (~'+dL+')'};
+  return {from:k(y,m,1),to:mx,label:'이번달 ('+m+'월 ~'+md+'일)'};
 }
 /* 비교기간(전일/전주) 범위 */
 function fdPrevRange(rg){
   var s=window.__fdState;
-  if(s.period==='day'){ // 하루 → 전날
+  if(s.period==='yesterday'||s.period==='day2'){ // 하루 → 전날
     var dt=String(rg.from); var yy=+dt.slice(0,4),mm=+dt.slice(4,6),dd=+dt.slice(6,8);
     var pv=new Date(yy,mm-1,dd-1); var pk=pv.getFullYear()*10000+(pv.getMonth()+1)*100+pv.getDate();
     return {from:pk,to:pk,label:'전일'};
@@ -2965,7 +2973,7 @@ window.fdToBranch=function(brName){
 /* 컨트롤 UI */
 function fdRenderCtrl(){
   var s=window.__fdState;
-  var periods=[['day','일'],['week','주'],['month','월'],['all','전체'],['custom','직접']];
+  var periods=[['week','이번주'],['week2','지난주'],['month','이번달'],['month2','지난달'],['yesterday','어제'],['day2','그제'],['all','전체'],['custom','직접']];
   var views=[['sang','상담'],['saup','사업'],['branch','지점']];
   var stats=[['order','오더'],['set','세팅']];
   var GRADE_ORDER=['초4','초5','초6','중1','중2','중3','고1','고2','고3'];
