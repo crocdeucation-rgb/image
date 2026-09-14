@@ -386,6 +386,25 @@ body.is-live .closed-only{display:none !important}
 .pc-yrtoggle{display:flex;gap:5px;justify-content:center;margin:14px 16px 0}
 .pc-yrtoggle button{font-family:inherit;font-weight:800;font-size:12px;padding:5px 16px;border-radius:20px;cursor:pointer;border:1px solid #E3E8F2;background:#fff;color:#8894AC;transition:.15s}
 .pc-yrtoggle button.on{background:#1B2A44;color:#fff;border-color:#1B2A44}
+/* [2026-09] 파운더 댓글 — 격이 다른 헌정 스타일 */
+.founder-cmt{position:relative;display:flex;align-items:flex-start;gap:11px;margin:10px 0;padding:14px 15px 14px 14px;border-radius:13px;overflow:hidden;
+  background:linear-gradient(135deg,#1c1708 0%,#3d3013 48%,#231b0a 100%);
+  border:1px solid transparent;box-shadow:0 5px 20px rgba(140,100,20,.28),inset 0 0 26px rgba(255,214,120,.07)}
+.founder-cmt::before{content:'';position:absolute;inset:0;border-radius:13px;padding:1px;
+  background:linear-gradient(135deg,rgba(255,224,150,.75),rgba(255,214,120,.12),rgba(255,240,200,.6),rgba(200,150,50,.2));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.founder-cmt::after{content:'';position:absolute;top:-50%;left:-30%;width:50%;height:200%;
+  background:linear-gradient(90deg,transparent,rgba(255,245,210,.14),transparent);transform:rotate(20deg);
+  animation:lg-shine 5s ease-in-out infinite;pointer-events:none}
+.founder-cmt .fc-crown{flex-shrink:0;font-size:20px;line-height:1.3;color:#FFD97A;
+  filter:drop-shadow(0 0 8px rgba(255,205,90,.6));animation:lg-float 3.5s ease-in-out infinite}
+.founder-cmt .fc-body{flex:1;min-width:0}
+.founder-cmt .fc-nm{font-size:13px;font-weight:900;letter-spacing:-.2px;margin-bottom:5px;
+  background:linear-gradient(90deg,#FFF3D0,#FFD97A,#FFF3D0);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.founder-cmt .fc-rk{font-size:9px;font-weight:800;letter-spacing:2px;color:#C9A24A;
+  border:1px solid rgba(255,214,120,.35);border-radius:20px;padding:1px 7px;margin-left:5px;-webkit-text-fill-color:#E8C874}
+.founder-cmt .fc-tx{font-size:13.5px;line-height:1.6;color:#F0E4C2;font-weight:500;word-break:break-word}
+.founder-cmt .del{color:#8a7a4a;font-size:11px;flex-shrink:0;cursor:pointer;align-self:flex-start}
 /* [2026-09] LEGEND 티어 — 김슬기 전용 헤더 (SSS보다 화려) */
 .pc-hd.t-LEGEND{background:linear-gradient(120deg,#1a1305,#6b4d10 25%,#F0C040 50%,#6b4d10 75%,#1a1305);background-size:260% 260%;animation:holo 5s ease infinite}
 .pc-hd.t-LEGEND .pc-blob.b1{background:#F0C040}.pc-hd.t-LEGEND .pc-blob.b2{background:#FFE9A8}
@@ -2951,6 +2970,14 @@ function renderSocial(name){
     if(cc)cc.textContent=arr.length;
     if(box){ box.innerHTML=arr.map(function(c){
       var canDel=_me&&(_me.email===c.email||_me.email==='crocdeucation@gmail.com');
+      // [2026-09] 파운더 댓글 = 격이 다른 헌정 스타일 (무게감·골드)
+      var _isFounder = (c.rank==='파운더');
+      if(_isFounder){
+        return '<div class="pc-cmt founder-cmt"><div class="fc-crown">♔</div>'
+          +'<div class="fc-body"><div class="fc-nm">'+(c.name||'')+' <span class="fc-rk">FOUNDER</span></div>'
+          +'<div class="fc-tx">'+pcEsc(c.text)+'</div></div>'
+          +(canDel?'<span class="del" onclick="pcDelComment(\''+c.id+'\')">삭제</span>':'')+'</div>';
+      }
       return '<div class="pc-cmt"><b>'+(c.name||'익명')+(c.rank?' '+c.rank+'님':'')+'</b><span class="tx">'+pcEsc(c.text)+'</span>'+(canDel?'<span class="del" onclick="pcDelComment(\''+c.id+'\')">삭제</span>':'')+'</div>';
     }).join('')||'<div style="font-size:12px;color:#B6C2DC">첫 응원을 남겨보세요</div>'; }
   },function(e){console.warn('cmt snap',e);});
