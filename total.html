@@ -861,7 +861,7 @@ body.is-live .closed-only{display:none !important}
 </div>
 <div class="dukji-two">
 <div class="dcard" id="probking_card"><h3>🎯 확률왕 <span class="dsub">사업 · 세팅 10건↑ · 성사율 50%↑ (세팅→오더)</span></h3><div id="d_probking"></div></div>
-<div class="dcard"><h3>💎 꾸준왕 <span class="dsub">상담 2천·사업 5천 6개월+ 안정 유지</span></h3><div id="d_steadyking"></div></div>
+<div class="dcard"><h3>💎 꾸준왕 <span class="dsub" id="steadyking_sub">상담 2천·사업 5천 6개월+ 안정 유지</span></h3><div id="d_steadyking"></div></div>
 </div>
 <div class="dcard" id="keeper_card" style="display:none;margin-top:12px"><h3>🛡️ 클린히트 <span class="dsub">사업 · 매출 4천만↑ · 취소 0건 (깔끔 마감)</span></h3><div id="d_keeperking"></div></div>
 <div class="panel dpanel live-only">
@@ -1473,7 +1473,7 @@ function renderLegendLine(){
   function build(grpKey){
     var map={};
     // [2026-09] 비개인 항목 제외 (수호웹마·웹마케팅·운영팀·인투본사 = 마케팅/조직 단위)
-    function _skip(nm){ return /웹마|운영팀|인투본사|웹마케팅/.test(nm); }
+    function _skip(nm){ var _ex=['최혜영','김동원','박종현']; var _n=String(nm).replace(/[ABab]$/,''); return /웹마|운영팀|인투본사|웹마케팅/.test(nm) || _ex.indexOf(nm)>=0 || _ex.indexOf(_n)>=0; }
     // 2026
     ((lv.personCards||{})[grpKey]||[]).forEach(function(p){
       if(_skip(p.name)) return;
@@ -1509,7 +1509,7 @@ function renderYearMvp(){
   function top1(grp){
     var best=null,bv=-1;
     (pc[grp]||[]).forEach(function(p){
-      if(/웹마|운영팀|인투본사|웹마케팅/.test(p.name)) return;
+      if(/웹마|운영팀|인투본사|웹마케팅/.test(p.name) || ['최혜영','김동원','박종현'].indexOf(p.name.replace(/[ABab]$/,''))>=0) return;
       var t=(p.series||[]).reduce(function(a,s){return a+(s.sales||0);},0);
       if(t>bv){bv=t;best={name:p.name,total:t};}
     });
@@ -1540,7 +1540,9 @@ function renderKings2(D){
   var pe=document.getElementById('d_probking');
   if(probCard){ probCard.style.display=_BOSS?'':'none'; }
   if(_BOSS && pe){
+    var _exN=['최혜영','김동원','박종현'];
     var prob=(lv.divpersons||[]).filter(function(p){
+      if(_exN.indexOf(String(p.name).replace(/[ABab]$/,''))>=0) return false;
       var st=p.set||0, rate=st?(p.ord||0)/st*100:0; return st>=10 && rate>=50;
     }).map(function(p){return {name:p.name,team:p.team||'',rate:Math.round((p.ord||0)/(p.set||1)*100),ord:p.ord||0,set:p.set||0};})
       .sort(function(a,b){return b.ord-a.ord || b.rate-a.rate;}).slice(0,5);
@@ -1556,7 +1558,7 @@ function renderKings2(D){
     var map={};
     [(lv.personCards||{})[grp]||[], (d25.personCards||{})[grp]||[]].forEach(function(arr){
       arr.forEach(function(p){
-        if(/웹마|운영팀|인투본사|웹마케팅/.test(p.name)) return;
+        if(/웹마|운영팀|인투본사|웹마케팅/.test(p.name) || ['최혜영','김동원','박종현'].indexOf(p.name.replace(/[ABab]$/,''))>=0) return;
         var vals=(p.series||[]).map(function(s){return s.sales;}).filter(function(v){return v!=null;});
         if(!map[p.name]) map[p.name]={name:p.name,team:p.team||'',vals:[]};
         map[p.name].vals=map[p.name].vals.concat(vals);
@@ -1575,6 +1577,9 @@ function renderKings2(D){
   }
   var sang=steadyList('sang',20000000);
   var saup=_BOSS?steadyList('saup',50000000):[];   // 사업 꾸준왕은 BOSS만
+  // [2026-09] 제목도 권한별 — 일반 직원은 사업 문구 숨김
+  var _skSub=document.getElementById('steadyking_sub');
+  if(_skSub) _skSub.textContent=_BOSS?'상담 2천·사업 5천 6개월+ 안정 유지':'상담 2천 6개월+ 안정 유지';
   var all=sang.map(function(x){x.g='상담';return x;}).concat(saup.map(function(x){x.g='사업';return x;}))
     .sort(function(a,b){return a.cv-b.cv;}).slice(0,5);
   var se=document.getElementById('d_steadyking');
@@ -1589,7 +1594,7 @@ function renderKings2(D){
   if(kc && ke){
     if(!_BOSS){ kc.style.display='none'; }
     else {
-      var keep=(lv.divpersons||[]).filter(function(p){ return (p.sales||0)>=40000000 && (p.cxc||0)===0; })
+      var keep=(lv.divpersons||[]).filter(function(p){ return (p.sales||0)>=40000000 && (p.cxc||0)===0 && ['최혜영','김동원','박종현'].indexOf(String(p.name).replace(/[ABab]$/,''))<0; })
         .map(function(p){return {name:p.name,team:p.team||'',sales:p.sales||0};})
         .sort(function(a,b){return b.sales-a.sales;}).slice(0,5);
       kc.style.display='';
