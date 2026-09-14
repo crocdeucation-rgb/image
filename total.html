@@ -424,6 +424,12 @@ body.is-live .closed-only{display:none !important}
 .king-cmt.king-2nd.king-sang{background:linear-gradient(135deg,#f7f5ff,#f0ecfd);border-color:#ddd5f7}
 .king-cmt.king-2nd.king-saup{background:linear-gradient(135deg,#eefbf6,#e4f7ef);border-color:#c2e9d9}
 .king-cmt.king-2nd .kc-crown{font-size:16px}
+/* [2026-09] 왕관 댓글 레이아웃 고정 (pc-cmt와 충돌 방지, 사진·이니셜 정렬) */
+.pc-cmt.king-cmt{gap:8px !important;align-items:flex-start !important}
+.king-cmt>img,.king-cmt>span[style*="border-radius:50%"]{width:26px !important;height:26px !important;min-width:26px;border-radius:50% !important;flex-shrink:0 !important;margin:0 !important;object-fit:cover;vertical-align:top !important}
+.king-cmt .kc-body{flex:1 1 auto;min-width:0;overflow:hidden}
+.king-cmt .kc-nm{white-space:normal;word-break:break-word;display:block}
+.king-cmt .kc-tx{white-space:normal;word-break:break-word}
 /* [2026-09] 역전극 배너 — 오늘 왕좌 탈환 */
 .upset-banner{display:flex;flex-direction:column;gap:8px;margin:0 0 14px}
 .upset-banner:empty{display:none}
