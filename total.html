@@ -382,6 +382,10 @@ body.is-live .closed-only{display:none !important}
 .pc-legend .lg-sub{margin-top:10px;text-align:center;font-size:13px;font-weight:500;line-height:1.65;color:#E8D6A6;letter-spacing:.2px}
 .pc-legend .lg-sub b{color:#FFE9A8;font-weight:800}
 .pc-legend .lg-div{margin:13px auto 0;width:60px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,214,120,.6),transparent)}
+/* [2026-09] 개인카드 연도 토글 */
+.pc-yrtoggle{display:flex;gap:5px;justify-content:center;margin:14px 16px 0}
+.pc-yrtoggle button{font-family:inherit;font-weight:800;font-size:12px;padding:5px 16px;border-radius:20px;cursor:pointer;border:1px solid #E3E8F2;background:#fff;color:#8894AC;transition:.15s}
+.pc-yrtoggle button.on{background:#1B2A44;color:#fff;border-color:#1B2A44}
 /* [2026-09] LEGEND 티어 — 김슬기 전용 헤더 (SSS보다 화려) */
 .pc-hd.t-LEGEND{background:linear-gradient(120deg,#1a1305,#6b4d10 25%,#F0C040 50%,#6b4d10 75%,#1a1305);background-size:260% 260%;animation:holo 5s ease infinite}
 .pc-hd.t-LEGEND .pc-blob.b1{background:#F0C040}.pc-hd.t-LEGEND .pc-blob.b2{background:#FFE9A8}
@@ -957,6 +961,13 @@ function updateYesterdaySales(){
   }
   // 원장 로드 후 날짜별 집계
   fdLoadLedger().then(function(rows){
+    // [2026-09] 원장에 실제 존재하는 최신 order 날짜 → 이후 날짜는 "반영 전"
+    var _maxRd='';
+    rows.forEach(function(r){
+      if(r.state!=='order') return;
+      var rd=r.dt.y+'-'+('0'+r.dt.m).slice(-2)+'-'+('0'+r.dt.d).slice(-2);
+      if(rd>_maxRd) _maxRd=rd;
+    });
     function calc(ds){
       var web=0, sang=0;
       rows.forEach(function(r){
@@ -970,8 +981,14 @@ function updateYesterdaySales(){
     var hb=[], wb=[], sb=[];
     targets.forEach(function(t){
       var ds=dstr(t.d), wd=WD[t.d.getDay()], md=(t.d.getMonth()+1)+'/'+t.d.getDate();
-      var c=calc(ds);
       var lbl=(targets.length>1? wd : '어제')+'('+md+')';
+      // [2026-09] 그 날짜가 원장 최신일 이후면 아직 반영 전 → 0 대신 "반영 전"
+      if(_maxRd && ds>_maxRd){
+        var _wait='<span class="yb" style="opacity:.6">'+lbl+' <b style="color:#94a0b8;font-weight:600">반영 전</b></span>';
+        hb.push(_wait); wb.push(_wait); sb.push(_wait);
+        return;
+      }
+      var c=calc(ds);
       hb.push('<span class="yb">'+lbl+' <b>'+pcEok(c.tot)+'</b></span>');
       wb.push('<span class="yb">'+lbl+' <b>'+pcEok(c.web)+'</b></span>');
       sb.push('<span class="yb">'+lbl+' <b>'+pcEok(c.sang)+'</b></span>');
@@ -1990,8 +2007,8 @@ function pcClosedMonth(){ var d=new Date(); var cm=d.getMonth()+1; return cm>1?c
 
 /* ── 개인 찾기 (personCards에서) ── */
 function pcFind(name, forceF){
-  // [2026-09] 현재 선택된 __D에 personCards 있으면 그걸(연도 반영). 없으면(2026 종결월 등) __liveD 폴백.
-  var D=(window.__D && window.__D.personCards) ? window.__D : window.__liveD;
+  // [2026-09] 연도토글(ocYear)이 세팅한 강제 D 우선 → 현재 __D → __liveD 폴백.
+  var D = window.__ocForceD || ((window.__D && window.__D.personCards) ? window.__D : window.__liveD);
   if(!D||!D.personCards) return null;
   var s=D.personCards.sang||[], u=D.personCards.saup||[];
   var hit=null, useF=false;
@@ -2124,6 +2141,12 @@ function openCard(name, forceF){
   if(f.useF && !(window.isBoss&&window.isBoss())) return;
   window.__curCardName=name;
   var p=f.p, useF=f.useF, closedM=pcClosedMonth();
+  // [2026-09] 카드 연도 판정 — 강제D(ocYear) > __D. 2025면 12월까지 완결.
+  var _yD = window.__ocForceD || window.__D;
+  var _cardYear = (_yD && _yD.year===2025) ? 2025 : 2026;
+  if(_cardYear===2025) closedM=12;
+  // 이 사람이 2025 실적 있는지 (연도토글 노출 여부)
+  var _has2025 = !!(window.__pc2025Names && window.__pc2025Names[name]);
   // [2026-09] 소속 미정 버그 — personCards.sang은 team이 빈값이라
   //   persons/divpersons(branchOf로 team 채워짐)에서 이름으로 조인해 보정.
   var liveD = window.__liveD || window.__D;
@@ -2164,6 +2187,8 @@ function openCard(name, forceF){
   var tags=''; if(D&&D.newbie&&D.newbie[name])tags+='<span class="pc-tags">🌱</span>';
   // 칭찬
   var pr=pcPraise(p,useF,closedM);
+  // [2026-09] 김슬기 = 회복 응원 문구 (레전드 헌정)
+  if(name.replace(/[ABab]$/,'')==='김슬기'){ pr={slump:true, txt:'💚 회복 중 · 전 직원이 당신의 건강을 응원합니다'}; }
   // 다음티어
   var nt=pcNextTier(closedSales,useF), nextHtml;
   if(!nt){ nextHtml='<div class="pc-next max"><div class="pc-next-top"><span>티어 <b>SSS</b></span><span>👑 최고 등급 달성</span></div><div class="pc-next-bar"><div class="pc-next-fill" style="width:100%"></div></div></div>'; }
@@ -2206,6 +2231,7 @@ function openCard(name, forceF){
     +'<div class="pc-praise'+(pr.slump?' slump':'')+'">'+pr.txt+'</div>'
     +_statusEditHtml+'</div></div>'
     +( name.replace(/[ABab]$/,'')==='김슬기' ? '<div class="pc-legend"><span class="lg-crown">👑</span><span class="lg-yr">THE LEGEND</span><div class="lg-ttl">아라온이 기억하는 레전드</div><div class="lg-div"></div><div class="lg-sub">기록으로 다 담을 수 없는 이름.<br>언제나 <b>당신의 자리는 비워두겠습니다.</b></div></div>' : '' )
+    +( _has2025 ? '<div class="pc-yrtoggle"><button class="'+(_cardYear===2026?'on':'')+'" onclick="ocYear(\''+name.replace(/'/g,"\\'")+'\',2026,'+(useF?'true':'false')+')">2026</button><button class="'+(_cardYear===2025?'on':'')+'" onclick="ocYear(\''+name.replace(/'/g,"\\'")+'\',2025,'+(useF?'true':'false')+')">2025</button></div>' : '' )
     +'<div class="pc-stats">'
     +'<div class="pc-st"><div class="l">이달 매출</div><div class="v pur">'+pcEok(p.curSales)+'</div></div>'
     +'<div class="pc-st"><div class="l">올해 누적</div><div class="v">'+pcEok(p.total)+'</div></div>'
@@ -2213,7 +2239,7 @@ function openCard(name, forceF){
     +'</div>'
     +'<div class="pc-subst"><span>커리어하이 <b>'+pcEok(p.careerHigh)+'</b></span>'+(highCount?'<span>신기록 경신 <b>'+highCount+'회</b></span>':'')
     +'</div>'
-    +'<div class="pc-trend"><div class="pc-sec-t" style="padding:2px 6px">📈 연간 추이 <span style="font-weight:600;color:#B6C2DC">·'+PC_MON[closedM]+'까지</span></div>'
+    +'<div class="pc-trend"><div class="pc-sec-t" style="padding:2px 6px">📈 '+_cardYear+' 연간 추이 <span style="font-weight:600;color:#B6C2DC">·'+PC_MON[closedM]+'까지</span></div>'
       +'<div class="pc-tabs"><button class="pc-tab on" onclick="pcSwitchTrend(\'sales\',this)">매출</button>'+(useF?'':'<button class="pc-tab" onclick="pcSwitchTrend(\'set\',this)">세팅</button>')+'</div>'
       +'<div id="pcTrendWrap">'+pcTrendSvg(p.series,closedM,'sales')+'</div>'
       +'<div class="pc-tlegend"><span class="b">● 매출</span>'+(useF?'':' / <span class="s">● 세팅</span>')+'</div></div>'
@@ -2232,7 +2258,22 @@ function openCard(name, forceF){
   // [역할탭] 상담/사업 개인카드 — 겸직이면 상단 탭. useF면 사업, 아니면 상담 활성
   try{ _injectRoleTabs(name, (f.useF?'saup':'sang')); }catch(e){}
 }
-function closeCard(){ window.__pcEdit=false; document.getElementById('pcModal').classList.remove('on'); try{ parent.postMessage({t:'cardClose'}, '*'); }catch(e){} document.body.style.overflow=''; window.__curCardName=null; if(window.__likeUnsub){window.__likeUnsub();window.__likeUnsub=null;} if(window.__cmtUnsub){window.__cmtUnsub();window.__cmtUnsub=null;} pcRestoreScroll(); }
+function closeCard(){ window.__pcEdit=false; window.__ocForceD=null; document.getElementById('pcModal').classList.remove('on'); try{ parent.postMessage({t:'cardClose'}, '*'); }catch(e){} document.body.style.overflow=''; window.__curCardName=null; if(window.__likeUnsub){window.__likeUnsub();window.__likeUnsub=null;} if(window.__cmtUnsub){window.__cmtUnsub();window.__cmtUnsub=null;} pcRestoreScroll(); }
+
+// [2026-09] 개인카드 연도 토글 — 그 연도 personCards로 강제 세팅 후 카드 재렌더.
+//   2025는 __D2025(연간 완성본) / 2026은 __liveD. openCard가 __ocForceD를 우선 참조함.
+window.ocYear=function(name, year, forceF){
+  if(year===2025){
+    if(!window.__D2025){ return; }   // 아직 로드 안 됨
+    window.__ocForceD=window.__D2025;
+  } else {
+    window.__ocForceD=null;   // 2026 = 기존 흐름(__D/__liveD)
+  }
+  // 스크롤 위치 유지하며 재렌더
+  var _sc=document.getElementById('pcBody'); var _top=_sc?_sc.scrollTop:0;
+  openCard(name, forceF);
+  setTimeout(function(){ var b=document.getElementById('pcBody'); if(b) b.scrollTop=_top; }, 0);
+};
 
 // [2026-09] 지점 티어 = 전월 종결 매출 (절대). SSS 2억, 2500만씩 하강.
 var PC_TIER_BRANCH=[{t:'SSS',v:200000000},{t:'SS',v:175000000},{t:'S',v:150000000},{t:'A',v:125000000},{t:'B',v:100000000},{t:'C',v:75000000},{t:'D',v:50000000},{t:'E',v:25000000},{t:'F',v:0}];
@@ -3087,6 +3128,23 @@ window.attachCardClicks=attachCardClicks;
 })();
 // 최초 진입 시에도
 setTimeout(function(){ if(window.__D&&window.__D.personCards)window.__liveD=window.__D; attachCardClicks(); }, 1200);
+// [2026-09] 개인카드 연도토글용 — 2025 연간 personCards(total_2025-12) 백그라운드 캐시.
+//   그 사람이 2025 실적 있으면 카드에 [2026][2025] 토글 노출. 없으면 미노출.
+(function(){
+  var GID_2025_DEC = (typeof MONTH_GIDS_2025!=='undefined' && MONTH_GIDS_2025['2025-12']) ? MONTH_GIDS_2025['2025-12'] : '542913962';
+  fetch(CSV_BASE + GID_2025_DEC + '&_=' + Date.now()).then(function(r){return r.text();}).then(function(raw){
+    function uncsv(line){ var t=line.trim(); if(t.charAt(0)==='"'&&t.charAt(t.length-1)==='"') t=t.substring(1,t.length-1); return t.split('""').join('"'); }
+    var lines=raw.replace(/\r/g,'').split('\n').filter(function(l){return l.trim()!=='';});
+    var text=lines.map(uncsv).join('');
+    var a=text.indexOf('{'), b=text.lastIndexOf('}');
+    if(a>=0&&b>a) text=text.substring(a,b+1);
+    var D=JSON.parse(text);
+    window.__D2025=D;   // 2025 연간 D 전체 (personCards 포함)
+    // 이름 → 2025 카드 빠른 조회 맵
+    var idx={}; ['sang','saup'].forEach(function(g){ (D.personCards&&D.personCards[g]||[]).forEach(function(p){ idx[p.name]=1; }); });
+    window.__pc2025Names=idx;
+  }).catch(function(){ window.__pc2025Names={}; });
+})();
 </script>
 <div class="bdw-bg" id="bdwModal" onclick="if(event.target===this)closeBirthday()">
   <div class="bdw" id="bdwBody"></div>
