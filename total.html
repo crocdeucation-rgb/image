@@ -1472,12 +1472,16 @@ function renderLegendLine(){
   }
   function build(grpKey){
     var map={};
+    // [2026-09] 비개인 항목 제외 (수호웹마·웹마케팅·운영팀·인투본사 = 마케팅/조직 단위)
+    function _skip(nm){ return /웹마|운영팀|인투본사|웹마케팅/.test(nm); }
     // 2026
     ((lv.personCards||{})[grpKey]||[]).forEach(function(p){
+      if(_skip(p.name)) return;
       var b=bestOf(p.name,p.series); if(b.sales>0){ if(!map[p.name]||b.sales>map[p.name].sales) map[p.name]={name:p.name,sales:b.sales,y:2026,m:b.m,team:p.team||''}; }
     });
     // 2025
     ((d25.personCards||{})[grpKey]||[]).forEach(function(p){
+      if(_skip(p.name)) return;
       var b=bestOf(p.name,p.series); if(b.sales>0){ if(!map[p.name]||b.sales>map[p.name].sales) map[p.name]={name:p.name,sales:b.sales,y:2025,m:b.m,team:p.team||''}; }
     });
     return Object.keys(map).map(function(k){return map[k];}).sort(function(a,b){return b.sales-a.sales;}).slice(0,5);
@@ -1505,6 +1509,7 @@ function renderYearMvp(){
   function top1(grp){
     var best=null,bv=-1;
     (pc[grp]||[]).forEach(function(p){
+      if(/웹마|운영팀|인투본사|웹마케팅/.test(p.name)) return;
       var t=(p.series||[]).reduce(function(a,s){return a+(s.sales||0);},0);
       if(t>bv){bv=t;best={name:p.name,total:t};}
     });
@@ -1550,6 +1555,7 @@ function renderKings2(D){
     var map={};
     [(lv.personCards||{})[grp]||[], (d25.personCards||{})[grp]||[]].forEach(function(arr){
       arr.forEach(function(p){
+        if(/웹마|운영팀|인투본사|웹마케팅/.test(p.name)) return;
         var vals=(p.series||[]).map(function(s){return s.sales;}).filter(function(v){return v!=null;});
         if(!map[p.name]) map[p.name]={name:p.name,team:p.team||'',vals:[]};
         map[p.name].vals=map[p.name].vals.concat(vals);
