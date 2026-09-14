@@ -1894,12 +1894,30 @@ function brApplyProfile(brName){
     av.insertBefore(_img, cam||null);
   }
 }
-// 지점 사진 업로드 — 그 지점 지점장/지사장만. brName = 현재 지점카드
+// [2026-09] 지점 사진 업로드 권한 — 실제 운영자 명시 매핑 (rank 무관)
+//   지점명 → 등록 가능한 사람 목록. 여기 + 기존 지사장/지점장(rank)도 유지.
+var BRANCH_PHOTO_EDITORS = {
+  '가산연합센터': ['김성윤'],
+  '마곡지점':     ['안준섭'],
+  '마포연합센터': ['노영호','김원득'],
+  '수원지점':     ['김우진']
+};
+// 이 사람이 이 지점 사진을 등록할 수 있나 (명시 매핑 OR rank 기반 지사장/지점장)
+function canEditBranchPhoto(name, brName){
+  if(!name || !brName) return false;
+  var _n=String(name).replace(/[ABab]$/,'');
+  var eds=BRANCH_PHOTO_EDITORS[brName]||[];
+  for(var i=0;i<eds.length;i++){ if(eds[i]===name||eds[i]===_n) return true; }
+  // 기존 rank 기반(지사장·지점장 본인 지점)도 유지
+  if(typeof _headBranchOf==='function' && _headBranchOf(name)===brName) return true;
+  return false;
+}
+window.canEditBranchPhoto=canEditBranchPhoto;
+// 지점 사진 업로드 — 권한자만. brName = 현재 지점카드
 window.branchUploadPhoto=function(input, brName){
   var file=input.files&&input.files[0]; if(!file||!_me) return;
   // 권한: 내가 이 지점의 지점장/지사장인가
-  var myBr=(typeof _headBranchOf==='function')?_headBranchOf(_me.name):'';
-  if(myBr!==brName){ alert('이 지점의 지점장·지사장만 사진을 등록할 수 있어요.'); return; }
+  if(!canEditBranchPhoto(_me.name, brName)){ alert('이 지점의 운영자만 사진을 등록할 수 있어요.'); return; }
   var img=new Image(); var rd=new FileReader();
   rd.onload=function(e){ img.onload=function(){
     var mx=600, sc=Math.min(mx/img.width, mx/img.height, 1);   // 지점 사진은 좀 더 크게(600px)
@@ -2470,8 +2488,12 @@ function pcTrendSvg(series,closedM,mode){
 window.pcSwitchTrend=function(mode,btn){
   window.__pcTrendMode=mode;
   var wrap=document.getElementById('pcTrendWrap'); if(!wrap)return;
-  var f=pcFind(window.__curCardName);
-  var series=f?f.p.series:(window.__pcTrendSeries||[]);   // 지점카드는 __pcTrendSeries
+  // [2026-09] 지점카드면 __pcTrendSeries(지점 series) 우선. 개인카드만 pcFind.
+  //   지점명이 pcFind에 부분매칭돼 엉뚱한 개인 series를 그리던 버그 수정.
+  var series;
+  var _isBranch=!!(window.__DK&&window.__DK.branchTrend&&(window.__DK.branchTrend.branches||[]).some(function(b){return b.name===window.__curCardName;}));
+  if(_isBranch){ series=window.__pcTrendSeries||[]; }
+  else { var f=pcFind(window.__curCardName); series=f?f.p.series:(window.__pcTrendSeries||[]); }
   wrap.innerHTML=pcTrendSvg(series, pcClosedMonth(), mode);
   document.querySelectorAll('.pc-tab').forEach(function(b){b.classList.remove('on');}); btn.classList.add('on');
 };
@@ -2694,7 +2716,7 @@ window.openBranchCard=function(brName){
   // [2026-09-09] 지점 사진(Firebase) + 지점장/지사장만 업로드 버튼
   var _bpr=(window.__branchProfiles&&window.__branchProfiles[brName])||{};
   var _bimg=_bpr.photoURL;
-  var _isBrBoss=(typeof _headBranchOf==='function' && _me && _headBranchOf(_me.name)===brName);
+  var _isBrBoss=(_me && canEditBranchPhoto(_me.name, brName));
   var _camSvg='<svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
   var _brCam=_isBrBoss ? '<label class="pc-av-cam" title="지점 사진 등록">'+_camSvg+'<input type="file" accept="image/*" onchange="branchUploadPhoto(this,\''+brName.replace(/'/g,"")+'\')"></label>' : '';
   var _brAvInner=_bimg?('<img src="'+_bimg+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit" onerror="this.style.display=\'none\';this.parentNode.childNodes[0].textContent=\''+avTxt+'\'">'):avTxt;
