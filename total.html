@@ -1522,11 +1522,12 @@ function renderYearMvp(){
     if(!x) return '';
     return '<div class="ymvp-card '+cls+'"><div class="ymvp-crown">🏆</div>'
       +'<div class="ymvp-body"><div class="ymvp-lb">2025 연간 최우수 · '+lb+'</div>'
-      +'<div class="ymvp-nm">'+avatarMini(x.name,26)+'<span>'+x.name+'</span></div>'
+      +'<div class="ymvp-nm">'+avatarMini(x.name,26)+'<span class="ymvp-nmtxt">'+x.name+'</span></div>'
       +'<div class="ymvp-v">'+pcEok(x.total)+'</div></div></div>';
   }
   el.innerHTML='<div class="ymvp-hd">🏆 2025 명예의 전당 <span>연간 매출 1위 · 2026에도 도전하세요</span></div>'
     +'<div class="ymvp-grid">'+card('상담',sang,'ymvp-sang')+card('사업',saup,'ymvp-saup')+'</div>';
+  setTimeout(function(){ if(window.attachCardClicks) window.attachCardClicks(); }, 60);
 }
 window.renderYearMvp=renderYearMvp;
 // [2026-09] 확률왕(사업 성사율) + 꾸준왕(고수준 6개월+ 안정)
@@ -1871,9 +1872,16 @@ function branchProfilesStart(){
     _fdb.collection('branchProfiles').onSnapshot(function(qs){
       var m={}; qs.forEach(function(d){ var v=d.data()||{}; m[d.id]={photoURL:v.photoURL||''}; });
       window.__branchProfiles=m;
-      // 매출순 목록 다시 그림 (사진 반영)
-      if(window.__curTab===0 && window.__D && typeof barsBr==='function'){
-        var _bd=document.getElementById('body'); if(_bd){ _bd.innerHTML=barsBr(window.__D.branches, window.__brSort||'sales'); setTimeout(attachCardClicks,50); }
+      // [2026-09] 사진 로드되면 현재 보고있는 탭 무조건 다시 그림 (curTab undefined 초기 대응)
+      var _ct=window.__curTab||0;
+      if(window.__D && typeof barsBr==='function'){
+        var _bd=document.getElementById('body');
+        if(_bd){
+          if(_ct===0) _bd.innerHTML=barsBr(window.__D.branches, window.__brSort||'sales');
+          else if(_ct===3) _bd.innerHTML=barsP(window.__D.persons,'sang');
+          else if(_ct===4) _bd.innerHTML=barsP(window.__D.divpersons,'saup');
+          setTimeout(function(){ if(window.attachCardClicks) window.attachCardClicks(); },50);
+        }
       }
       // 지점카드 열려있으면 반영
       if(window.__curCardName && window.__branchProfiles[window.__curCardName]) brApplyProfile(window.__curCardName);
@@ -3509,7 +3517,7 @@ function attachCardClicks(){
   var brNames={};
   (D.branches||[]).forEach(function(b){ brNames[b.name]=1; });
   // 이름 후보 요소: class 있는 것 + 이달TOP3의 <b>(부모가 특정 스타일)
-  var sels=['.q3nm','.kname','.rknm','.drnm','.aw-nm','.pc-nm','.nm','.ll-nm'];
+  var sels=['.q3nm','.kname','.rknm','.drnm','.aw-nm','.pc-nm','.nm','.ll-nm','.ymvp-nmtxt'];
   var els=[];
   sels.forEach(function(sel){ document.querySelectorAll(sel).forEach(function(el){els.push(el);}); });
   // 이달 매출 TOP3 = kings 안의 <b style*="color:#1B2436"> (class 없음)
