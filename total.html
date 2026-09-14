@@ -833,7 +833,7 @@ body.is-live .closed-only{display:none !important}
 <div class="clutch-two"><div><div class="drsub2">상담</div><div id="d_legend_sang"></div></div><div><div class="drsub2">사업</div><div id="d_legend_saup"></div></div></div>
 </div>
 <div class="dukji-two live-only">
-<div class="dcard"><h3>🎯 확률왕 <span class="dsub">사업 · 계약 성사율 (세팅→오더)</span></h3><div id="d_probking"></div></div>
+<div class="dcard" id="probking_card"><h3>🎯 확률왕 <span class="dsub">사업 · 계약 성사율 (세팅→오더)</span></h3><div id="d_probking"></div></div>
 <div class="dcard"><h3>💎 꾸준왕 <span class="dsub">상담 2천·사업 5천 6개월+ 안정 유지</span></h3><div id="d_steadyking"></div></div>
 </div>
 <div class="dcard live-only" id="keeper_card" style="display:none;margin-top:12px"><h3>🛡️ 유지왕 <span class="dsub">사업 · 매출 4천만↑ · 취소 0건 (깔끔 마감)</span></h3><div id="d_keeperking"></div></div>
@@ -1470,17 +1470,21 @@ window.renderLegendLine=renderLegendLine;
 function renderKings2(D){
   var lv=window.__liveD||D||{};
   var _BOSS=!!(window.isBoss&&window.isBoss());
-  // 확률왕 = 사업 세팅10↑ & 성사율50%↑ → 성사 건수(물량) 순. 표본·자격 문턱으로 착시 제거.
-  var prob=(lv.divpersons||[]).filter(function(p){
-    var st=p.set||0, rate=st?(p.ord||0)/st*100:0; return st>=10 && rate>=50;
-  }).map(function(p){return {name:p.name,team:p.team||'',rate:Math.round((p.ord||0)/(p.set||1)*100),ord:p.ord||0,set:p.set||0};})
-    .sort(function(a,b){return b.ord-a.ord || b.rate-a.rate;}).slice(0,5);
+  // 확률왕 = 사업 데이터 → 지사장·지점장·운영진(BOSS)만. 일반 상담원은 카드 숨김.
+  var probCard=document.getElementById('probking_card');
   var pe=document.getElementById('d_probking');
-  if(pe){ pe.innerHTML=prob.length?prob.map(function(x,i){
-    var md=['🥇','🥈','🥉','4','5'][i];
-    return '<div class="ll-row'+(i===0?' ll-top':'')+'"><span class="ll-rk">'+md+'</span>'+avatarMini(x.name,22)
-      +'<span class="ll-nm">'+x.name+'</span><span class="ll-v">'+x.rate+'%<span class="ll-when">성사 '+x.ord+'건 / 세팅 '+x.set+'</span></span></div>';
-  }).join(''):'<div class="drnone">세팅 10건↑·성사율 50%↑ 달성자 없음</div>'; }
+  if(probCard){ probCard.style.display=_BOSS?'':'none'; }
+  if(_BOSS && pe){
+    var prob=(lv.divpersons||[]).filter(function(p){
+      var st=p.set||0, rate=st?(p.ord||0)/st*100:0; return st>=10 && rate>=50;
+    }).map(function(p){return {name:p.name,team:p.team||'',rate:Math.round((p.ord||0)/(p.set||1)*100),ord:p.ord||0,set:p.set||0};})
+      .sort(function(a,b){return b.ord-a.ord || b.rate-a.rate;}).slice(0,5);
+    pe.innerHTML=prob.length?prob.map(function(x,i){
+      var md=['🥇','🥈','🥉','4','5'][i];
+      return '<div class="ll-row'+(i===0?' ll-top':'')+'"><span class="ll-rk">'+md+'</span>'+avatarMini(x.name,22)
+        +'<span class="ll-nm">'+x.name+'</span><span class="ll-v">'+x.rate+'%<span class="ll-when">성사 '+x.ord+'건 / 세팅 '+x.set+'</span></span></div>';
+    }).join(''):'<div class="drnone">세팅 10건↑·성사율 50%↑ 달성자 없음</div>';
+  }
   // 꾸준왕 = 상담2천/사업5천 6개월+ 유지, 변동계수 낮은 순 (2025+2026 통합 series)
   var d25=window.__D2025||{};
   function steadyList(grp,floor){
@@ -1503,7 +1507,8 @@ function renderKings2(D){
     });
     return res.sort(function(a,b){return a.cv-b.cv;}).slice(0,5);
   }
-  var sang=steadyList('sang',20000000), saup=steadyList('saup',50000000);
+  var sang=steadyList('sang',20000000);
+  var saup=_BOSS?steadyList('saup',50000000):[];   // 사업 꾸준왕은 BOSS만
   var all=sang.map(function(x){x.g='상담';return x;}).concat(saup.map(function(x){x.g='사업';return x;}))
     .sort(function(a,b){return a.cv-b.cv;}).slice(0,5);
   var se=document.getElementById('d_steadyking');
@@ -1982,7 +1987,46 @@ function notifStart(){
   var u3=_fdb.collection('cardLikes').doc(myName)
     .onSnapshot(function(doc){ notifMergeLikes(doc); }, function(e){console.warn('notif like',e);});
   window.__notifUnsubs=[u1,u2,u3];
+  // [2026-09] 순위 역전 알림 — 내(로그인) 이름을 rankMove에서 찾아 어제 대비 변동.
+  try{ notifRankCheck(myName); }catch(e){}
 }
+// 순위 변동 알림: 내가 밀렸으면 "누구에게 밀림", 올랐으면 "N위 상승"
+function notifRankCheck(myName){
+  var rm=((window.__DK||{}).rankMove||{}).daily||{};
+  var LB={sang:'상담',saup:'사업',branch:'지점'};
+  var ms=Date.now();
+  // 개인(상담·사업) — 내 이름 기준
+  ['sang','saup'].forEach(function(seg){
+    var arr=rm[seg]||[]; var me=null,idx=-1;
+    for(var i=0;i<arr.length;i++){ if(arr[i].name===myName){ me=arr[i]; idx=i; break; } }
+    if(!me || me.prevRank==null || me.move===0) return;
+    if(me.move<0){
+      var by=(arr[idx-1]||{}).name||'';
+      window.__notifItems.push({type:'rank', seg:seg, from:by, text:LB[seg]+' '+me.prevRank+'위 → '+me.rank+'위 하락', ms:ms, down:true});
+    } else if(me.move>0){
+      window.__notifItems.push({type:'rank', seg:seg, from:'', text:LB[seg]+' '+me.prevRank+'위 → '+me.rank+'위 상승', ms:ms, up:true, rank1:(me.rank===1)});
+    }
+  });
+  // [2026-09] 지점 — 내 소속 지점 순위 변동 시 소속 전원에게 (소속감)
+  var myBr=notifMyBranch(myName);
+  if(myBr){
+    var barr=rm.branch||[]; var b=null;
+    for(var j=0;j<barr.length;j++){ if(barr[j].name===myBr){ b=barr[j]; break; } }
+    if(b && b.prevRank!=null && b.move!==0){
+      if(b.move>0) window.__notifItems.push({type:'rank', seg:'branch', from:'', text:'우리 '+myBr+' '+b.prevRank+'위 → '+b.rank+'위 상승!', ms:ms, up:true, rank1:(b.rank===1), team:true});
+      else window.__notifItems.push({type:'rank', seg:'branch', from:'', text:'우리 '+myBr+' '+b.prevRank+'위 → '+b.rank+'위', ms:ms, down:true, team:true});
+    }
+  }
+  notifRender();
+}
+// 내 소속 지점 찾기 (persons/divpersons의 team)
+function notifMyBranch(name){
+  var D=window.__liveD||window.__D||{};
+  var lists=[D.persons||[], D.divpersons||[]];
+  for(var L=0;L<lists.length;L++){ for(var i=0;i<lists[L].length;i++){ if(lists[L][i].name===name && lists[L][i].team) return lists[L][i].team; } }
+  return '';
+}
+window.notifRankCheck=notifRankCheck;
 function notifMerge(type, qs){
   // 같은 type 기존 항목 제거 후 새로 채움
   window.__notifItems=window.__notifItems.filter(function(x){return x.type!==type;});
@@ -2034,9 +2078,26 @@ function notifRender(){
   if(!items.length){ list.innerHTML='<div class="notif-empty">아직 받은 알림이 없어요 🌱</div>'; return; }
   list.innerHTML=items.slice(0,50).map(function(x){
     var isUnread=x.ms>seen;
+    var esc=function(t){return String(t||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');};
+    // [2026-09] 순위 역전 알림
+    if(x.type==='rank'){
+      var ric=x.up?(x.rank1?'👑':(x.team?'🏢':'📈')):'📉';
+      var rtx;
+      if(x.team){
+        // 우리 지점 알림 (소속감)
+        rtx=(x.up?(x.rank1?'<b>🎉 우리 지점 1위!</b>':'<b>우리 지점 순위 상승!</b>'):'<b>우리 지점 순위 변동</b>')+' <span class="msg">'+esc(x.text)+'</span>';
+      } else if(x.down){
+        rtx='<b>'+(x.from?esc(x.from)+'님':'경쟁자')+'</b>에게 밀렸어요 <span class="msg">'+esc(x.text)+'</span>';
+      } else {
+        rtx=(x.rank1?'<b>🎉 1위 등극!</b>':'<b>순위 상승!</b>')+' <span class="msg">'+esc(x.text)+'</span>';
+      }
+      return '<div class="notif-item'+(isUnread?' unread':'')+'" style="cursor:pointer" onclick="notifOpen(\'rank\')">'
+        +'<span class="notif-ic">'+ric+'</span>'
+        +'<span class="notif-tx">'+rtx+'<span class="tm">'+notifTimeAgo(x.ms)+'</span></span>'
+        +(isUnread?'<span class="notif-dot"></span>':'')+'</div>';
+    }
     var ic=x.type==='birthday'?'🎂':(x.type==='like'?'❤️':'💬');
     var act=x.type==='birthday'?'생일을 축하했어요':(x.type==='like'?'내 카드에 좋아요를 눌렀어요':'응원 댓글을 남겼어요');
-    var esc=function(t){return String(t||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');};
     return '<div class="notif-item'+(isUnread?' unread':'')+'" style="cursor:pointer" onclick="notifOpen(\''+x.type+'\')">'
       +'<span class="notif-ic">'+ic+'</span>'
       +'<span class="notif-tx"><b>'+esc(x.from)+(x.rank?' '+x.rank+'님':'')+'</b>이 '+act
@@ -2049,6 +2110,12 @@ function notifRender(){
 window.notifOpen=function(type){
   var p=document.getElementById('notifPanel'); if(p) p.classList.remove('show');   // 알림 패널 닫기
   if(!_me) return;
+  // [2026-09] 순위 알림 → 순위표(tabs)로 스크롤
+  if(type==='rank'){
+    var t=document.querySelector('.tabs')||document.getElementById('kings');
+    if(t) t.scrollIntoView({behavior:'smooth',block:'start'});
+    return;
+  }
   if(type==='birthday'){
     var b=((window.__D&&window.__D.birthdays)||[]).filter(function(x){return x.name===_me.name;})[0];
     if(b) openBirthday(b.name,b.mo,b.dy,b.team||'');
