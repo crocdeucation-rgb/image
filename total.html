@@ -354,6 +354,34 @@ body.is-live .closed-only{display:none !important}
 .pc-next-fill{height:100%;background:linear-gradient(90deg,#4C6EF5,#7048E8);border-radius:5px}
 .pc-next.max .pc-next-fill{background:linear-gradient(90deg,#E9A100,#FFCB2E)}
 .pc-badges{display:flex;flex-wrap:wrap;gap:6px}
+/* [2026-09] THE LEGEND 헌정 배너 — 김슬기 전용 (최상급 유니크) */
+.pc-legend{margin:16px 16px 2px;padding:22px 20px 20px;border-radius:18px;position:relative;overflow:hidden;
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(255,224,150,.16), transparent 60%),
+    linear-gradient(135deg,#1a1509 0%,#3a2e12 40%,#241b0b 70%,#1a1509 100%);
+  border:1.5px solid transparent;
+  background-clip:padding-box;
+  box-shadow:0 10px 40px rgba(150,110,20,.35), inset 0 0 40px rgba(255,214,120,.1), 0 0 0 1px rgba(255,214,120,.25)}
+.pc-legend::before{content:'';position:absolute;inset:0;border-radius:18px;padding:1.5px;
+  background:linear-gradient(135deg,rgba(255,224,150,.7),rgba(255,214,120,.15),rgba(255,240,200,.6),rgba(200,150,50,.2));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.pc-legend::after{content:'';position:absolute;top:-60%;left:-30%;width:60%;height:220%;
+  background:linear-gradient(90deg,transparent,rgba(255,245,210,.18),transparent);transform:rotate(20deg);
+  animation:lg-shine 4.5s ease-in-out infinite;pointer-events:none}
+@keyframes lg-shine{0%,100%{left:-40%;opacity:0}45%,55%{opacity:1}70%{left:120%;opacity:0}}
+.pc-legend .lg-crown{font-size:34px;line-height:1;display:block;text-align:center;
+  filter:drop-shadow(0 0 14px rgba(255,205,90,.75));animation:lg-float 3.5s ease-in-out infinite}
+@keyframes lg-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.pc-legend .lg-yr{display:block;text-align:center;margin-top:6px;font-size:12px;font-weight:900;letter-spacing:5px;
+  color:#FFE9A8;text-shadow:0 0 12px rgba(255,205,90,.5)}
+.pc-legend .lg-ttl{margin-top:12px;text-align:center;font-size:19px;font-weight:900;letter-spacing:-.3px;
+  background:linear-gradient(90deg,#FFEFC2,#FFD97A,#FFF6DD,#FFD97A,#FFEFC2);background-size:200% auto;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:lg-flow 5s linear infinite}
+@keyframes lg-flow{to{background-position:200% center}}
+.pc-legend .lg-sub{margin-top:10px;text-align:center;font-size:13px;font-weight:500;line-height:1.65;color:#E8D6A6;letter-spacing:.2px}
+.pc-legend .lg-sub b{color:#FFE9A8;font-weight:800}
+.pc-legend .lg-div{margin:13px auto 0;width:60px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,214,120,.6),transparent)}
 .bgd{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;background:#EDF1F8;color:#1B2436}
 /* ── ⚔️ 비교(VERSUS) ── */
 .pc-cmpbtn{margin:2px 18px 16px;display:flex;align-items:center;justify-content:center;gap:7px;width:calc(100% - 36px);padding:12px;border:none;border-radius:13px;background:linear-gradient(135deg,#1B2436,#2B3A55);color:#fff;font-size:13px;font-weight:900;font-family:inherit;cursor:pointer;letter-spacing:-.3px;box-shadow:0 4px 14px rgba(27,36,54,.25)}
@@ -2158,6 +2186,7 @@ function openCard(name, forceF){
     +'<div class="pc-id"><div class="pc-nm">'+name+tags+'</div><div class="pc-meta">'+(p.rank?p.rank+' · ':'')+(p.team||'소속 미정')+'</div></div>'
     +'<div class="pc-praise'+(pr.slump?' slump':'')+'">'+pr.txt+'</div>'
     +_statusEditHtml+'</div></div>'
+    +( name.replace(/[ABab]$/,'')==='김슬기' ? '<div class="pc-legend"><span class="lg-crown">👑</span><span class="lg-yr">THE LEGEND</span><div class="lg-ttl">아라온이 기억하는 레전드</div><div class="lg-div"></div><div class="lg-sub">기록으로 다 담을 수 없는 이름.<br>언제나 <b>당신의 자리는 비워두겠습니다.</b></div></div>' : '' )
     +'<div class="pc-stats">'
     +'<div class="pc-st"><div class="l">이달 매출</div><div class="v pur">'+pcEok(p.curSales)+'</div></div>'
     +'<div class="pc-st"><div class="l">올해 누적</div><div class="v">'+pcEok(p.total)+'</div></div>'
