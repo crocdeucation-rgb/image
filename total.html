@@ -911,6 +911,12 @@ function updateAsOfLabel(D, isLive){
     return;
   }
   // 라이브: 원장(데일리 실적 gid=698799247) 최신일 조회 (현재월만이라 가벼움) · 1회 캐시
+  // [2026-09] 종결월/연도 갔다 라이브 복귀 시 라벨 복원 — 캐시된 최신일(__asOfMx) 재사용
+  if(window.__asOfMx){
+    var _mo=Math.floor(window.__asOfMx/100), _dy=window.__asOfMx%100;
+    el.innerHTML='📅 <b style="color:#4C6EF5">'+_mo+'월 '+_dy+'일</b>까지 반영 · 매일 갱신';
+    return;
+  }
   el.textContent='매일 갱신';
   if(window.__asOfDone) return; window.__asOfDone=true;
   try{
@@ -923,7 +929,7 @@ function updateAsOfLabel(D, isLive){
         var m2=line.match(/"?(\d{4})-(\d{1,2})-(\d{1,2})/);
         if(m2){ var k2=(+m2[2])*100+(+m2[3]); if(k2>mx)mx=k2; }
       });
-      if(mx>0){ var mo=Math.floor(mx/100), dy=mx%100;
+      if(mx>0){ window.__asOfMx=mx; var mo=Math.floor(mx/100), dy=mx%100;
         el.innerHTML='📅 <b style="color:#4C6EF5">'+mo+'월 '+dy+'일</b>까지 반영 · 매일 갱신';
       }
     }).catch(function(){});
@@ -1984,7 +1990,8 @@ function pcClosedMonth(){ var d=new Date(); var cm=d.getMonth()+1; return cm>1?c
 
 /* ── 개인 찾기 (personCards에서) ── */
 function pcFind(name, forceF){
-  var D=window.__liveD || window.__D;
+  // [2026-09] 현재 선택된 __D에 personCards 있으면 그걸(연도 반영). 없으면(2026 종결월 등) __liveD 폴백.
+  var D=(window.__D && window.__D.personCards) ? window.__D : window.__liveD;
   if(!D||!D.personCards) return null;
   var s=D.personCards.sang||[], u=D.personCards.saup||[];
   var hit=null, useF=false;
@@ -2126,9 +2133,9 @@ function openCard(name, forceF){
   }
   var closedSales=0; (p.series||[]).forEach(function(x){ if(x.m===closedM && x.sales!=null) closedSales=x.sales; });
   var tier=closedSales>0?pcTierOf(closedSales,useF):'NEW';
-  // [2026-09] 김슬기 = LEGEND 티어 (은퇴 레전드 헌정). series는 실제 2025/2026 데이터 사용.
+  // [2026-09] 김슬기 = LEGEND 티어 (은퇴 레전드 헌정). 실적 0이어도 항상 LEGEND.
   var _isLegend = (name.replace(/[ABab]$/,'')==='김슬기');
-  if(_isLegend && closedSales>0) tier='LEGEND';
+  if(_isLegend) tier='LEGEND';
   // 트로피
   var hof=(window.__HOF&&window.__HOF[name])||[];
   var order={'MVP':0,'로얄리본':1,'그랜드리본':2,'마스터리본':3,'블루리본':4,'떡상왕':5,'커리어하이':6,'최고의지점':7};
