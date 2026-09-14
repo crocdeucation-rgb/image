@@ -2267,7 +2267,8 @@ window.ocYear=function(name, year, forceF){
     if(!window.__D2025){ return; }   // 아직 로드 안 됨
     window.__ocForceD=window.__D2025;
   } else {
-    window.__ocForceD=null;   // 2026 = 기존 흐름(__D/__liveD)
+    // [2026-09] 2026 = 항상 라이브(__liveD). 대시보드가 2025 상태여도 카드는 2026 데이터.
+    window.__ocForceD = window.__liveD || null;
   }
   // 스크롤 위치 유지하며 재렌더
   var _sc=document.getElementById('pcBody'); var _top=_sc?_sc.scrollTop:0;
@@ -2620,8 +2621,17 @@ function _fdBossTeam(name){
 /* [2026-09] 지사장·지점장만 → 지점카드 라우팅 (부지점장 제외, 어느 카드 클릭이든 적용) */
 function _headBranchOf(name){
   var D=window.__liveD||window.__D||{};
-  var list=(D.personCards&&D.personCards.sang)||D.persons||[];
-  for(var i=0;i<list.length;i++){ if(list[i].name===name){ var R=list[i].rank||''; return ['지사장','지점장'].indexOf(R)>=0 ? (list[i].team||'') : ''; } }
+  // [2026-09] 상담(sang) + 사업(saup) 둘 다 확인 — 사업부 소속 지사장(유두진 등) 대응
+  var lists=[(D.personCards&&D.personCards.sang)||[], (D.personCards&&D.personCards.saup)||[], D.persons||[], D.divpersons||[]];
+  for(var L=0;L<lists.length;L++){
+    var list=lists[L];
+    for(var i=0;i<list.length;i++){
+      if(list[i].name===name){
+        var R=list[i].rank||'';
+        if(['지사장','지점장'].indexOf(R)>=0 && list[i].team) return list[i].team;
+      }
+    }
+  }
   return '';
 }
 window._headBranchOf=_headBranchOf;
@@ -3070,11 +3080,15 @@ function _injectRoleTabs(name, activeKey){
 window._injectRoleTabs=_injectRoleTabs;
 
 function attachCardClicks(){
-  var D=window.__liveD||window.__D;
+  // [2026-09] 현재 표시 연도(__D) 우선 — 2025 볼 때 2025 이름/지점 매칭. personCards 없으면 라이브 폴백.
+  var D=(window.__D && window.__D.personCards) ? window.__D : (window.__liveD||window.__D);
   if(!D||!D.personCards)return;
   var names={};
   (D.personCards.sang||[]).forEach(function(x){names[x.name]=1;});
   (D.personCards.saup||[]).forEach(function(x){names[x.name]=1;});
+  // [2026-09] 지점명도 클릭 대상 — 이달 지점 TOP3 등에서 지점명 클릭 시 openBranchCard
+  var brNames={};
+  (D.branches||[]).forEach(function(b){ brNames[b.name]=1; });
   // 이름 후보 요소: class 있는 것 + 이달TOP3의 <b>(부모가 특정 스타일)
   var sels=['.q3nm','.kname','.rknm','.drnm','.aw-nm','.pc-nm','.nm'];
   var els=[];
@@ -3085,19 +3099,23 @@ function attachCardClicks(){
     if(el.closest && el.closest('.br-clickable')) return;   // [2026-09] 지점 바는 openBranchCard가 처리 → 개인 매칭 스킵
     // 첫 텍스트노드만(자식 span 제외) 기준으로 이름 추출
     var raw=(el.childNodes[0]&&el.childNodes[0].nodeType===3)?el.childNodes[0].textContent.trim():el.textContent.trim();
-    var matched=null;
-    // 정확 일치 우선, 없으면 시작일치
-    if(names[raw]) matched=raw;
+    var matched=null, isBr=false;
+    // 지점명 우선 매칭 (이달 지점 TOP3 등)
+    if(brNames[raw]){ matched=raw; isBr=true; }
+    // 정확 일치 우선, 없으면 시작일치 (개인)
+    else if(names[raw]) matched=raw;
     else { for(var nm in names){ if(raw.indexOf(nm)===0){ matched=nm; break; } } }
     if(!matched) return;
     if(!el.__pcBound){
       el.classList.add('pc-clickable');
       el.__pcBound=true;
+      var _mName=matched, _mBr=isBr;
       el.addEventListener('click',function(ev){ ev.stopPropagation();
-        var _bt=_headBranchOf(matched);   // [2026-09] 지사장·지점장 → 지점카드 (어느 카드든)
+        if(_mBr){ openBranchCard(_mName); return; }   // [2026-09] 지점 TOP3 → 지점카드 직행
+        var _bt=_headBranchOf(_mName);   // [2026-09] 지사장·지점장 → 지점카드 (어느 카드든)
         // [역할탭] 겸직(2역할+)이면 지점카드에 탭 뜨게 이름 기억, 아니면 초기화
-        window.__roleForceName = (_myRoles(matched).length>=2) ? matched : null;
-        if(_bt) openBranchCard(_bt); else openCard(matched);
+        window.__roleForceName = (_myRoles(_mName).length>=2) ? _mName : null;
+        if(_bt) openBranchCard(_bt); else openCard(_mName);
       });
     }
     // [2026-09] 명예의전당 뱃지 — 개인카드(.pc-nm)는 전용 트로피 섹션이 있어 제외.
