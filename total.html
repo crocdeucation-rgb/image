@@ -635,7 +635,7 @@ body.is-live .closed-only{display:none !important}
 .trp.royal{background:linear-gradient(120deg,#1E3A8A,#4C6EF5 35%,#7048E8 60%,#D4AF37 100%);background-size:220% 220%;animation:ribHolo 6s ease infinite;color:#fff;border:1.5px solid #D4AF37;box-shadow:0 3px 14px rgba(112,72,232,.35)}
 @keyframes ribHolo{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 .pc-social{border-top:1px solid #E3E8F0;padding:13px 18px 16px;background:#FAFBFD}
-.pc-status{font-size:12px;color:#8A6D9A;font-style:italic;text-align:center;margin-top:4px;padding:0 18px}
+.pc-status{font-size:12.5px;font-weight:600;color:#fff;text-align:center;margin:8px auto 0;padding:5px 14px;max-width:calc(100% - 32px);background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.35);border-radius:20px;backdrop-filter:blur(2px);word-break:break-word;line-height:1.4}
 .pc-edit{padding:12px 18px;border-top:1px solid #F1F4F9;display:flex;flex-direction:column;gap:8px}
 .pc-edit-btn{display:inline-flex;align-items:center;gap:6px;background:#EEF0FF;color:#5B4BD0;font-weight:700;font-size:12px;padding:8px 14px;border-radius:20px;cursor:pointer;align-self:flex-start}
 .pc-edit-status{display:flex;gap:6px}
@@ -1860,6 +1860,15 @@ window.mySaveStatus=function(){
   _fdb.collection('profiles').doc(_me.name).set(
     {statusMsg:v, email:_me.email, ts:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})
     .then(function(){ alert('상태메시지 저장됨'); })
+    .catch(function(err){ alert('저장 실패: '+err.message); });};
+// [2026-09] 지점 상태메시지 저장 — 운영자만. branchProfiles/{지점명}
+window.branchSaveStatus=function(brName){
+  if(!_me || !canEditBranchPhoto(_me.name, brName)){ alert('이 지점의 운영자만 수정할 수 있어요.'); return; }
+  var el=document.getElementById('brStatusInput'); if(!el) return;
+  var v=el.value.trim();
+  _fdb.collection('branchProfiles').doc(brName).set(
+    {statusMsg:v, editedBy:_me.name, ts:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})
+    .then(function(){ alert('지점 상태메시지 저장됨'); })
     .catch(function(err){ alert('저장 실패: '+err.message); });
 };
 profilesStart();
@@ -1870,7 +1879,7 @@ function branchProfilesStart(){
   if(window.__brProfOn) return; window.__brProfOn=true;
   try{
     _fdb.collection('branchProfiles').onSnapshot(function(qs){
-      var m={}; qs.forEach(function(d){ var v=d.data()||{}; m[d.id]={photoURL:v.photoURL||''}; });
+      var m={}; qs.forEach(function(d){ var v=d.data()||{}; m[d.id]={photoURL:v.photoURL||'', statusMsg:v.statusMsg||''}; });
       window.__branchProfiles=m;
       // [2026-09] 사진 로드되면 현재 보고있는 탭 무조건 다시 그림 (curTab undefined 초기 대응)
       var _ct=window.__curTab||0;
@@ -2726,7 +2735,7 @@ window.openBranchCard=function(brName){
   var _bimg=_bpr.photoURL;
   var _isBrBoss=(_me && canEditBranchPhoto(_me.name, brName));
   var _camSvg='<svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
-  var _brCam=_isBrBoss ? '<label class="pc-av-cam" title="지점 사진 등록">'+_camSvg+'<input type="file" accept="image/*" onchange="branchUploadPhoto(this,\''+brName.replace(/'/g,"")+'\')"></label>' : '';
+  var _brCam='';   // [2026-09] 아바타 카메라 제거 → 개인처럼 "프로필 편집" 모드에서 사진 수정
   var _brAvInner=_bimg?('<img src="'+_bimg+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit" onerror="this.style.display=\'none\';this.parentNode.childNodes[0].textContent=\''+avTxt+'\'">'):avTxt;
   var html='<button class="pc-close" onclick="closeCard()">✕</button>'
     +'<div class="pc-hd t-'+tier+'"><div class="pc-blob b1"></div><div class="pc-blob b2"></div>'+(tier==='SSS'?'<div class="pc-spark"></div>':'')
@@ -2734,7 +2743,17 @@ window.openBranchCard=function(brName){
     +'<div class="pc-hd-row">'
     +'<div class="pc-av">'+_brAvInner+_brCam+'</div>'
     +'<div class="pc-id"><div class="pc-nm">'+brName+'</div><div class="pc-meta">지점'+(brNow&&brNow.ord?' · 오더 '+brNow.ord:'')+'</div></div>'
-    +'<div class="pc-praise">'+brName+' 실적판'+(_isBrBoss&&!_bimg?' · <span style="opacity:.85">사진 등록 가능</span>':'')+'</div>'
+    +'<div class="pc-praise">'+brName+' 실적판</div>'
+    +(function(){
+        var _bEditing=(window.__brEdit===brName);
+        if(_bEditing && _isBrBoss){
+          return '<label class="pc-photo-edit">사진 수정<input type="file" accept="image/*" onchange="branchUploadPhoto(this,\''+brName.replace(/'/g,"\\'")+'\')"></label>'
+            +'<div class="pc-status-edit"><label>지점 상태메시지</label><div class="pc-se-box"><input id="brStatusInput" maxlength="40" placeholder="예: 이번달 지점 목표 3억!" value="'+((_bpr.statusMsg||'').replace(/"/g,'&quot;'))+'"><button class="pc-se-save" onclick="branchSaveStatus(\''+brName.replace(/'/g,"\\'")+'\')">저장</button></div></div>'
+            +'<button class="pc-editbtn done" onclick="window.__brEdit=null;openBranchCard(\''+brName.replace(/'/g,"\\'")+'\')">완료</button>';
+        }
+        var _sv=(_bpr.statusMsg?('<div class="pc-status">“'+_bpr.statusMsg.replace(/</g,'&lt;')+'”</div>'):'');
+        return _sv+(_isBrBoss?('<button class="pc-editbtn" onclick="window.__brEdit=\''+brName.replace(/'/g,"\\'")+'\';openBranchCard(\''+brName.replace(/'/g,"\\'")+'\')">프로필 편집</button>'):'');
+      })()
     +'</div></div>'
     +'<div class="pc-stats">'
     +'<div class="pc-st"><div class="l">이달 매출</div><div class="v pur">'+pcEok(curSales)+'</div></div>'
