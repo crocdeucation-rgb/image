@@ -382,6 +382,15 @@ body.is-live .closed-only{display:none !important}
 .pc-legend .lg-sub{margin-top:10px;text-align:center;font-size:13px;font-weight:500;line-height:1.65;color:#E8D6A6;letter-spacing:.2px}
 .pc-legend .lg-sub b{color:#FFE9A8;font-weight:800}
 .pc-legend .lg-div{margin:13px auto 0;width:60px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,214,120,.6),transparent)}
+/* [2026-09] LEGEND 티어 — 김슬기 전용 헤더 (SSS보다 화려) */
+.pc-hd.t-LEGEND{background:linear-gradient(120deg,#1a1305,#6b4d10 25%,#F0C040 50%,#6b4d10 75%,#1a1305);background-size:260% 260%;animation:holo 5s ease infinite}
+.pc-hd.t-LEGEND .pc-blob.b1{background:#F0C040}.pc-hd.t-LEGEND .pc-blob.b2{background:#FFE9A8}
+.pc-hd.t-LEGEND .pc-tier-badge{font-size:20px;letter-spacing:-.5px;background:linear-gradient(#fff,#FFE0A0);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 10px rgba(255,215,120,.9))}
+.pc-hd.t-LEGEND .pc-spark{content:'';position:absolute;inset:0;background:radial-gradient(circle at 15% 25%,rgba(255,245,200,.6) 0,transparent 7px),radial-gradient(circle at 82% 20%,rgba(255,245,200,.5) 0,transparent 6px),radial-gradient(circle at 55% 70%,rgba(255,245,200,.45) 0,transparent 5px),radial-gradient(circle at 90% 65%,rgba(255,245,200,.4) 0,transparent 4px),radial-gradient(circle at 30% 80%,rgba(255,245,200,.4) 0,transparent 4px);animation:spark 2.6s ease-in-out infinite;pointer-events:none;z-index:1}
+/* 연도 토글 버튼 (김슬기 카드) */
+.pc-yrtab{display:inline-flex;gap:4px;margin-left:auto}
+.pc-yrtab button{font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;border:1px solid #E3E8F2;background:#fff;color:#8894AC;cursor:pointer}
+.pc-yrtab button.on{background:linear-gradient(135deg,#6b4d10,#F0C040);color:#fff;border-color:transparent;box-shadow:0 2px 8px rgba(200,150,40,.3)}
 .bgd{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;background:#EDF1F8;color:#1B2436}
 /* ── ⚔️ 비교(VERSUS) ── */
 .pc-cmpbtn{margin:2px 18px 16px;display:flex;align-items:center;justify-content:center;gap:7px;width:calc(100% - 36px);padding:12px;border:none;border-radius:13px;background:linear-gradient(135deg,#1B2436,#2B3A55);color:#fff;font-size:13px;font-weight:900;font-family:inherit;cursor:pointer;letter-spacing:-.3px;box-shadow:0 4px 14px rgba(27,36,54,.25)}
@@ -2117,6 +2126,9 @@ function openCard(name, forceF){
   }
   var closedSales=0; (p.series||[]).forEach(function(x){ if(x.m===closedM && x.sales!=null) closedSales=x.sales; });
   var tier=closedSales>0?pcTierOf(closedSales,useF):'NEW';
+  // [2026-09] 김슬기 = LEGEND 티어 (은퇴 레전드 헌정). series는 실제 2025/2026 데이터 사용.
+  var _isLegend = (name.replace(/[ABab]$/,'')==='김슬기');
+  if(_isLegend && closedSales>0) tier='LEGEND';
   // 트로피
   var hof=(window.__HOF&&window.__HOF[name])||[];
   var order={'MVP':0,'로얄리본':1,'그랜드리본':2,'마스터리본':3,'블루리본':4,'떡상왕':5,'커리어하이':6,'최고의지점':7};
