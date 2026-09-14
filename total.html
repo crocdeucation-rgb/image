@@ -1946,13 +1946,19 @@ function pcMoNum(mt){return mt.replace(/^\d{4}-/,'').replace(/^0/,'');}
 function pcClosedMonth(){ var d=new Date(); var cm=d.getMonth()+1; return cm>1?cm-1:12; }
 
 /* ── 개인 찾기 (personCards에서) ── */
-function pcFind(name){
+function pcFind(name, forceF){
   var D=window.__liveD || window.__D;
   if(!D||!D.personCards) return null;
   var s=D.personCards.sang||[], u=D.personCards.saup||[];
   var hit=null, useF=false;
-  for(var i=0;i<s.length;i++){ if(s[i].name===name){ hit=s[i]; useF=false; break; } }
-  if(!hit) for(var j=0;j<u.length;j++){ if(u[j].name===name){ hit=u[j]; useF=true; break; } }
+  if(forceF){
+    // 사업 탭 강제 — 사업(saup) 먼저 찾음
+    for(var j=0;j<u.length;j++){ if(u[j].name===name){ hit=u[j]; useF=true; break; } }
+    if(!hit) for(var i=0;i<s.length;i++){ if(s[i].name===name){ hit=s[i]; useF=false; break; } }
+  } else {
+    for(var i=0;i<s.length;i++){ if(s[i].name===name){ hit=s[i]; useF=false; break; } }
+    if(!hit) for(var j=0;j<u.length;j++){ if(u[j].name===name){ hit=u[j]; useF=true; break; } }
+  }
   if(!hit) return null;
   return {p:hit, useF:useF};
 }
@@ -2066,9 +2072,9 @@ window.avatarMini=function(name, size){
   var st='width:'+size+'px;height:'+size+'px;border-radius:50%;flex-shrink:0;vertical-align:middle;margin-right:6px;object-fit:cover;border:1px solid #E3E8F0';
   return '<img src="'+url+'" alt="" style="'+st+'" onerror="this.outerHTML=&quot;<span style=&#39;'+iniCss+'&#39;>'+ch+'</span>&quot;">';
 };
-function openCard(name){
+function openCard(name, forceF){
   pcSaveScroll();
-  var f=pcFind(name);
+  var f=pcFind(name, forceF);
   if(!f){ return; }  // personCards에 없으면 무시(지점명 등)
   // [2026-09] 사업 선수카드는 부서장·경영진만
   if(f.useF && !(window.isBoss&&window.isBoss())) return;
@@ -2933,12 +2939,12 @@ function _myRoles(name){
   // 지사 = 본인이 지사장/지점장인 지점 (강제 라우팅 대상)
   var br=(typeof _headBranchOf==='function')?_headBranchOf(name):'';
   if(br) roles.push({key:'jisa', label:'지사', type:'branch', arg:br});
-  // 상담 = personCards.sang에 개인 실적(세팅 or 오더 or 매출)이 있으면
+  // 상담 = personCards.sang에 이름이 있으면 (역할 존재 = 탭)
   var sang=(D.personCards&&D.personCards.sang)||[];
-  for(var i=0;i<sang.length;i++){ if(sang[i].name===name){ var s=sang[i]; if((s.set||0)>0||(s.ord||0)>0||(s.sales||0)>0){ roles.push({key:'sang',label:'상담',type:'person',arg:name}); } break; } }
-  // 사업 = personCards.saup에 실적 있으면
+  for(var i=0;i<sang.length;i++){ if(sang[i].name===name){ roles.push({key:'sang',label:'상담',type:'person',arg:name}); break; } }
+  // 사업 = personCards.saup에 이름이 있으면
   var saup=(D.personCards&&D.personCards.saup)||[];
-  for(var j=0;j<saup.length;j++){ if(saup[j].name===name){ var f=saup[j]; if((f.set||0)>0||(f.ord||0)>0||(f.sales||0)>0){ roles.push({key:'saup',label:'사업',type:'personF',arg:name}); } break; } }
+  for(var j=0;j<saup.length;j++){ if(saup[j].name===name){ roles.push({key:'saup',label:'사업',type:'personF',arg:name}); break; } }
   return roles;
 }
 // 역할 탭 바 HTML (2개 이상일 때만). activeKey = 현재 보는 역할
@@ -2959,7 +2965,8 @@ window._switchRole=function(name, key){
   window.__roleActive=key;   // 다음 카드 렌더 시 탭 활성표시용
   window.__roleForceName=name;
   if(r.type==='branch'){ openBranchCard(r.arg); }
-  else { openCard(r.arg); }  // 상담/사업 둘 다 openCard (내부에서 useF 판별)
+  else if(r.type==='personF'){ openCard(r.arg, true); }   // 사업 강제
+  else { openCard(r.arg); }                                 // 상담
 };
 // 카드 body 상단에 역할 탭 삽입 (openCard/openBranchCard 끝나고 호출)
 function _injectRoleTabs(name, activeKey){
