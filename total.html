@@ -452,6 +452,25 @@ body.is-live .closed-only{display:none !important}
 .ll-nm{flex:1;font-weight:700;color:#1B2436;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ll-v{font-weight:800;color:#7048E8;text-align:right;flex-shrink:0}
 .ll-when{display:block;font-size:10px;color:#A8B0C0;font-weight:600}
+/* [2026-09] 2025 연간 MVP 명예 배너 */
+.yearmvp-banner{margin:0 0 16px}
+.yearmvp-banner:empty{display:none}
+.ymvp-hd{font-size:13px;font-weight:800;color:#8a6d1a;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.ymvp-hd span{font-size:11px;font-weight:600;color:#B08A3A}
+.ymvp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:600px){.ymvp-grid{grid-template-columns:1fr}}
+.ymvp-card{position:relative;display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:14px;overflow:hidden;
+  background:linear-gradient(120deg,#1c1708,#3d3013 48%,#231b0a);box-shadow:0 5px 20px rgba(140,100,20,.28)}
+.ymvp-card::before{content:'';position:absolute;inset:0;border-radius:14px;padding:1px;
+  background:linear-gradient(135deg,rgba(255,224,150,.7),rgba(255,214,120,.12),rgba(255,240,200,.55),rgba(200,150,50,.2));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.ymvp-card .ymvp-crown{font-size:26px;flex-shrink:0;filter:drop-shadow(0 0 10px rgba(255,205,90,.6));animation:lg-float 3.5s ease-in-out infinite}
+.ymvp-body{flex:1;min-width:0}
+.ymvp-lb{font-size:10.5px;font-weight:800;letter-spacing:1px;color:#C9A24A;margin-bottom:4px}
+.ymvp-nm{display:flex;align-items:center;font-size:16px;font-weight:900;margin-bottom:2px;
+  background:linear-gradient(90deg,#FFF3D0,#FFD97A,#FFF3D0);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.ymvp-nm>img,.ymvp-nm>span[style*="border-radius:50%"]{margin-right:8px !important;border:1px solid rgba(255,214,120,.4)}
+.ymvp-v{font-size:13px;font-weight:700;color:#EAD9A8}
 /* [2026-09] LEGEND 티어 — 김슬기 전용 헤더 (SSS보다 화려) */
 .pc-hd.t-LEGEND{background:linear-gradient(120deg,#1a1305,#6b4d10 25%,#F0C040 50%,#6b4d10 75%,#1a1305);background-size:260% 260%;animation:holo 5s ease infinite}
 .pc-hd.t-LEGEND .pc-blob.b1{background:#F0C040}.pc-hd.t-LEGEND .pc-blob.b2{background:#FFE9A8}
@@ -825,6 +844,7 @@ body.is-live .closed-only{display:none !important}
 <div class="swipe-hint live-only" id="q3-hint"></div><div class="swipe-label live-only">← 밀어서 지점·상담·사업 보기 →</div>
 <!-- 덕질 스탯 -->
 <div class="dukji-wrap">
+<div class="yearmvp-banner" id="yearMvpBanner"></div>
 <div class="dsect-hd live-only">👑 덕질 스탯</div>
 <div class="dukji-two live-only">
 <div class="dcard"><h3>🚀 실시간 급등주 <span class="dsub">팀·개인 / 주간·월간</span></h3><div id="d_risers"></div></div>
@@ -839,11 +859,11 @@ body.is-live .closed-only{display:none !important}
 <div class="dhd"><h3>🏛️ 레전드 라인 <span class="dsub">역대 한 달 최고 매출 — 아라온 명예 기록</span></h3></div>
 <div class="clutch-two"><div><div class="drsub2">상담</div><div id="d_legend_sang"></div></div><div><div class="drsub2">사업</div><div id="d_legend_saup"></div></div></div>
 </div>
-<div class="dukji-two live-only">
+<div class="dukji-two">
 <div class="dcard" id="probking_card"><h3>🎯 확률왕 <span class="dsub">사업 · 세팅 10건↑ · 성사율 50%↑ (세팅→오더)</span></h3><div id="d_probking"></div></div>
 <div class="dcard"><h3>💎 꾸준왕 <span class="dsub">상담 2천·사업 5천 6개월+ 안정 유지</span></h3><div id="d_steadyking"></div></div>
 </div>
-<div class="dcard live-only" id="keeper_card" style="display:none;margin-top:12px"><h3>🛡️ 유지왕 <span class="dsub">사업 · 매출 4천만↑ · 취소 0건 (깔끔 마감)</span></h3><div id="d_keeperking"></div></div>
+<div class="dcard" id="keeper_card" style="display:none;margin-top:12px"><h3>🛡️ 클린히트 <span class="dsub">사업 · 매출 4천만↑ · 취소 0건 (깔끔 마감)</span></h3><div id="d_keeperking"></div></div>
 <div class="panel dpanel live-only">
 <div class="dhd"><h3>🏢 지점 추이 <span class="dsub">월별 추이 · 매출·세팅</span></h3></div>
 <div class="dchips" id="d_chips"></div>
@@ -1414,6 +1434,7 @@ function renderDukji(D){
   renderRisers(window.__DK); renderRecords(window.__DK); renderTrend(); renderClutch();
   if(typeof renderLegendLine==='function'){ try{ renderLegendLine(); }catch(_e){} }
   if(typeof renderKings2==='function'){ try{ renderKings2(D); }catch(_e){} }
+  if(typeof renderYearMvp==='function'){ try{ renderYearMvp(); }catch(_e){} }
   setTimeout(function(){ if(window.attachCardClicks) window.attachCardClicks(); }, 60);
 }
 window.__cl='m3';
@@ -1476,9 +1497,37 @@ function renderLegendLine(){
   if(eu) eu.innerHTML=rows(build('saup'));
 }
 window.renderLegendLine=renderLegendLine;
+// [2026-09] 2025 연간 MVP — 상담·사업 연간 매출 1위 명예 표시 (26년 도전 동기부여)
+function renderYearMvp(){
+  var el=document.getElementById('yearMvpBanner'); if(!el) return;
+  var d25=window.__D2025||{};
+  var pc=d25.personCards||{};
+  function top1(grp){
+    var best=null,bv=-1;
+    (pc[grp]||[]).forEach(function(p){
+      var t=(p.series||[]).reduce(function(a,s){return a+(s.sales||0);},0);
+      if(t>bv){bv=t;best={name:p.name,total:t};}
+    });
+    return best;
+  }
+  var sang=top1('sang'), saup=top1('saup');
+  if(!sang && !saup){ el.innerHTML=''; el.style.display='none'; return; }
+  el.style.display='';
+  function card(lb,x,cls){
+    if(!x) return '';
+    return '<div class="ymvp-card '+cls+'"><div class="ymvp-crown">🏆</div>'
+      +'<div class="ymvp-body"><div class="ymvp-lb">2025 연간 최우수 · '+lb+'</div>'
+      +'<div class="ymvp-nm">'+avatarMini(x.name,26)+'<span>'+x.name+'</span></div>'
+      +'<div class="ymvp-v">'+pcEok(x.total)+'</div></div></div>';
+  }
+  el.innerHTML='<div class="ymvp-hd">🏆 2025 명예의 전당 <span>연간 매출 1위 · 2026에도 도전하세요</span></div>'
+    +'<div class="ymvp-grid">'+card('상담',sang,'ymvp-sang')+card('사업',saup,'ymvp-saup')+'</div>';
+}
+window.renderYearMvp=renderYearMvp;
 // [2026-09] 확률왕(사업 성사율) + 꾸준왕(고수준 6개월+ 안정)
 function renderKings2(D){
-  var lv=window.__liveD||D||{};
+  // [2026-09] 확률왕·클린히트 = 현재 표시 월(D) 기준. 종결월이면 그 달 왕, 라이브면 이번달.
+  var lv=D||window.__liveD||{};
   var _BOSS=!!(window.isBoss&&window.isBoss());
   // 확률왕 = 사업 데이터 → 지사장·지점장·운영진(BOSS)만. 일반 상담원은 카드 숨김.
   var probCard=document.getElementById('probking_card');
@@ -1528,7 +1577,7 @@ function renderKings2(D){
       +'<span class="ll-nm">'+x.name+' <span style="font-size:10px;color:#A8B0C0">'+x.g+'</span></span>'
       +'<span class="ll-v">'+x.cnt+'개월<span class="ll-when">평균 '+pcEok(x.avg)+'</span></span></div>';
   }).join(''):'<div class="drnone">도전자 대기 중 💪</div>'; }
-  // 유지왕 = 사업 매출4천만↑ & 취소0 (깔끔 마감). 취소 데이터는 지사장·지점장만.
+  // 클린히트 = 사업 매출4천만↑ & 취소0 (깔끔 마감). 취소 데이터는 지사장·지점장만.
   var kc=document.getElementById('keeper_card'), ke=document.getElementById('d_keeperking');
   if(kc && ke){
     if(!_BOSS){ kc.style.display='none'; }
