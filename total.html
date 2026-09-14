@@ -405,6 +405,47 @@ body.is-live .closed-only{display:none !important}
   border:1px solid rgba(255,214,120,.35);border-radius:20px;padding:1px 7px;margin-left:5px;-webkit-text-fill-color:#E8C874}
 .founder-cmt .fc-tx{font-size:13.5px;line-height:1.6;color:#F0E4C2;font-weight:500;word-break:break-word}
 .founder-cmt .del{color:#8a7a4a;font-size:11px;flex-shrink:0;cursor:pointer;align-self:flex-start}
+/* [2026-09] 이달 1등 댓글 — 상담왕(퍼플)/사업왕(틸) */
+.king-cmt{position:relative;display:flex;align-items:flex-start;gap:10px;margin:10px 0;padding:12px 13px;border-radius:12px;overflow:hidden}
+.king-cmt.king-sang{background:linear-gradient(135deg,#f3f0ff,#eae4ff);border:1px solid #cdc2f5}
+.king-cmt.king-saup{background:linear-gradient(135deg,#e6f7f1,#d6f2e7);border:1px solid #a7e0cb}
+.king-cmt .kc-crown{flex-shrink:0;font-size:18px;line-height:1.35;filter:drop-shadow(0 1px 3px rgba(0,0,0,.12))}
+.king-cmt .kc-body{flex:1;min-width:0}
+.king-cmt .kc-nm{font-size:13px;font-weight:800;margin-bottom:4px;color:#1B2436}
+.king-cmt.king-sang .kc-rk{color:#5b4ac9}
+.king-cmt.king-saup .kc-rk{color:#0f8a63}
+.king-cmt .kc-rk{font-size:10px;font-weight:800;letter-spacing:.3px;padding:1px 8px;border-radius:20px;margin-left:4px}
+.king-cmt.king-sang .kc-rk{background:rgba(112,72,232,.12)}
+.king-cmt.king-saup .kc-rk{background:rgba(15,138,99,.12)}
+.king-cmt .kc-tx{font-size:13.5px;line-height:1.55;color:#2c3444;font-weight:500;word-break:break-word}
+.king-cmt .del{color:#9aa4b5;font-size:11px;flex-shrink:0;cursor:pointer;align-self:flex-start}
+/* 2위 추격 중 — 1위보다 살짝 옅게 */
+.king-cmt.king-2nd{opacity:.96}
+.king-cmt.king-2nd.king-sang{background:linear-gradient(135deg,#f7f5ff,#f0ecfd);border-color:#ddd5f7}
+.king-cmt.king-2nd.king-saup{background:linear-gradient(135deg,#eefbf6,#e4f7ef);border-color:#c2e9d9}
+.king-cmt.king-2nd .kc-crown{font-size:16px}
+/* [2026-09] 역전극 배너 — 오늘 왕좌 탈환 */
+.upset-banner{display:flex;flex-direction:column;gap:8px;margin:0 0 14px}
+.upset-banner:empty{display:none}
+.upset-card{position:relative;display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;overflow:hidden;
+  background:linear-gradient(100deg,#2a1a4d,#5b2b8a 45%,#c94db8 100%);background-size:200% 100%;animation:upsetflow 6s ease infinite;
+  box-shadow:0 4px 18px rgba(120,40,140,.3)}
+.upset-card.upset-saup{background:linear-gradient(100deg,#0d3d2e,#12805a 45%,#2fc98d 100%)}
+.upset-card.upset-branch{background:linear-gradient(100deg,#3a2410,#a5691a 45%,#f0b84d 100%)}
+@keyframes upsetflow{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.upset-card .up-ic{font-size:20px;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(255,220,120,.7));animation:lg-float 2.5s ease-in-out infinite}
+.upset-card .up-tx{flex:1;color:#fff;font-size:13.5px;line-height:1.5;font-weight:500}
+.upset-card .up-tx b{font-weight:800}
+.upset-card .up-1{color:#FFE066}
+.upset-card .up-spark{font-size:15px;opacity:.9;animation:lg-shine 3s ease-in-out infinite}
+/* [2026-09] 레전드 라인 — 역대 한달 최고 */
+.ll-row{display:flex;align-items:center;gap:8px;padding:7px 4px;border-bottom:0.5px solid #EEF0F5;font-size:13px}
+.ll-row:last-child{border-bottom:0}
+.ll-row.ll-top{background:linear-gradient(90deg,rgba(255,214,120,.14),transparent);border-radius:8px}
+.ll-rk{width:22px;text-align:center;font-size:13px;flex-shrink:0}
+.ll-nm{flex:1;font-weight:700;color:#1B2436;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ll-v{font-weight:800;color:#7048E8;text-align:right;flex-shrink:0}
+.ll-when{display:block;font-size:10px;color:#A8B0C0;font-weight:600}
 /* [2026-09] LEGEND 티어 — 김슬기 전용 헤더 (SSS보다 화려) */
 .pc-hd.t-LEGEND{background:linear-gradient(120deg,#1a1305,#6b4d10 25%,#F0C040 50%,#6b4d10 75%,#1a1305);background-size:260% 260%;animation:holo 5s ease infinite}
 .pc-hd.t-LEGEND .pc-blob.b1{background:#F0C040}.pc-hd.t-LEGEND .pc-blob.b2{background:#FFE9A8}
@@ -547,6 +588,9 @@ body.is-live .closed-only{display:none !important}
 .bgd.new{background:#EAF7F0;color:#1B7A4A}
 .bgd.crown{background:#FFF6E0;color:#9A7300}
 .bgd.up{background:#FFEEE6;color:#C4501A}
+.bgd.streak2{background:#FFE4D6;color:#C4501A;font-weight:800}
+.bgd.streak3{background:linear-gradient(100deg,#FF6B35,#FF9838);color:#fff;font-weight:800;box-shadow:0 2px 8px rgba(255,107,53,.35)}
+.bgd.streak3 .i{filter:drop-shadow(0 0 3px rgba(255,220,150,.8))}
 .bgd.near{background:#EEF0FF;color:#3B4F9E}
 .bgd.champ{background:#F3EEFF;color:#6A3FD0}
 .bgd.leading{background:#FFEEE6;color:#E23A22}
@@ -579,10 +623,11 @@ body.is-live .closed-only{display:none !important}
 .pc-like:active .h{transform:scale(1.3)}
 .pc-cmt-cnt{font-size:13px;color:#6B7688;font-weight:700}
 .pc-cmts{display:flex;flex-direction:column;gap:8px;margin-bottom:11px;max-height:180px;overflow-y:auto}
-.pc-cmt{font-size:12.5px;line-height:1.45}
+.pc-cmt{font-size:12.5px;line-height:1.45;display:flex;align-items:flex-start;gap:2px;margin:7px 0}
+.pc-cmt .cmt-body{flex:1;min-width:0}
 .pc-cmt b{font-weight:800;color:#1B2436;margin-right:5px}
 .pc-cmt .tx{color:#3A4456}
-.pc-cmt .del{color:#B6C2DC;font-size:11px;cursor:pointer;margin-left:5px}
+.pc-cmt .del{color:#B6C2DC;font-size:11px;cursor:pointer;margin-left:5px;flex-shrink:0}
 .pc-cmt-in{display:flex;gap:7px}
 .pc-cmt-in input{flex:1;border:1px solid #E3E8F0;border-radius:20px;padding:8px 13px;font-family:inherit;font-size:12.5px;outline:none}
 .pc-cmt-in input:focus{border-color:#4C6EF5}
@@ -631,10 +676,11 @@ body.is-live .closed-only{display:none !important}
 .bdw-sec{font-size:12px;font-weight:800;color:#9A6D7A;margin-bottom:10px;display:flex;align-items:center;gap:6px}
 .bdw-sec .cnt{background:#FFF0F5;color:#E94078;font-size:11px;font-weight:800;padding:1px 8px;border-radius:10px}
 .bdw-wishes{display:flex;flex-direction:column;gap:9px;margin-bottom:12px;max-height:240px;overflow-y:auto}
-.bdw-wish{background:#FFF6F9;border:1px solid #FFE0EC;border-radius:11px;padding:9px 12px;font-size:12.5px;line-height:1.45}
+.bdw-wish{background:#FFF6F9;border:1px solid #FFE0EC;border-radius:11px;padding:9px 12px;font-size:12.5px;line-height:1.45;display:flex;align-items:flex-start;gap:2px}
+.bdw-wish .cmt-body{flex:1;min-width:0}
 .bdw-wish b{font-weight:800;color:#E94078;margin-right:5px}
 .bdw-wish .tx{color:#5A4048}
-.bdw-wish .del{color:#D0A0B0;font-size:11px;cursor:pointer;margin-left:5px}
+.bdw-wish .del{color:#D0A0B0;font-size:11px;cursor:pointer;margin-left:5px;flex-shrink:0}
 .bdw-empty{font-size:12px;color:#C9A0B0;text-align:center;padding:14px}
 .bdw-in{display:flex;gap:7px}
 .bdw-in input{flex:1;border:1.5px solid #FFE0EC;border-radius:20px;padding:9px 14px;font-family:inherit;font-size:12.5px;outline:none}
@@ -763,6 +809,7 @@ body.is-live .closed-only{display:none !important}
 <div class="note" id="note" style="display:none">지점별/개인별 매출 순위 · 매일 갱신</div>
 </div>
 <!-- 이번주/지난주 왕 -->
+<div class="upset-banner live-only" id="upsetBanner"></div>
 <div class="kings live-only" id="kings"></div>
 <div class="swipe-hint live-only" id="kings-hint"></div><div class="swipe-label live-only">← 밀어서 이번주·지난주 왕 보기 →</div>
 <!-- 누적 매출 TOP3 (기간 토글) — 라이브 전용(현재월 시점 누적이라 종결달엔 의미없음) -->
@@ -781,6 +828,15 @@ body.is-live .closed-only{display:none !important}
 <div class="dtog"><button class="dtogbtn on" data-cl="m3" onclick="clPeriod('m3',this)">3개월</button><button class="dtogbtn" data-cl="month" onclick="clPeriod('month',this)">이달</button></div></div>
 <div class="clutch-two"><div><div class="drsub2">상담</div><div id="d_clutch_sang"></div></div><div><div class="drsub2">사업</div><div id="d_clutch_saup"></div></div></div>
 </div>
+<div class="panel dpanel live-only" id="legend_panel">
+<div class="dhd"><h3>🏛️ 레전드 라인 <span class="dsub">역대 한 달 최고 매출 — 아라온 명예 기록</span></h3></div>
+<div class="clutch-two"><div><div class="drsub2">상담</div><div id="d_legend_sang"></div></div><div><div class="drsub2">사업</div><div id="d_legend_saup"></div></div></div>
+</div>
+<div class="dukji-two live-only">
+<div class="dcard"><h3>🎯 확률왕 <span class="dsub">사업 · 계약 성사율 (세팅→오더)</span></h3><div id="d_probking"></div></div>
+<div class="dcard"><h3>💎 꾸준왕 <span class="dsub">상담 2천·사업 5천 6개월+ 안정 유지</span></h3><div id="d_steadyking"></div></div>
+</div>
+<div class="dcard live-only" id="keeper_card" style="display:none;margin-top:12px"><h3>🛡️ 유지왕 <span class="dsub">사업 · 매출 4천만↑ · 취소 0건 (깔끔 마감)</span></h3><div id="d_keeperking"></div></div>
 <div class="panel dpanel live-only">
 <div class="dhd"><h3>🏢 지점 추이 <span class="dsub">월별 추이 · 매출·세팅</span></h3></div>
 <div class="dchips" id="d_chips"></div>
@@ -1342,12 +1398,139 @@ function drawChart(i){
 }
 function renderDukji(D){
   window.__DK=D.dukji||null;
+  if(typeof renderUpset==='function'){ try{ renderUpset(D); }catch(_e){} }
   var wrap=document.querySelector('.dukji-wrap');
   if(!window.__DK){if(wrap)wrap.style.display='none';return;}
   if(wrap)wrap.style.display='';
   renderRisers(window.__DK); renderRecords(window.__DK); renderTrend(); renderClutch();
+  if(typeof renderLegendLine==='function'){ try{ renderLegendLine(); }catch(_e){} }
+  if(typeof renderKings2==='function'){ try{ renderKings2(D); }catch(_e){} }
 }
 window.__cl='m3';
+// [2026-09] 역전극 배너 — 오늘 1위 탈환(어제 2위 이하 → 오늘 1위)
+function renderUpset(D){
+  var el=document.getElementById('upsetBanner'); if(!el) return;
+  if(D.isLive===false){ el.innerHTML=''; el.style.display='none'; return; }
+  var rm=((D.dukji||{}).rankMove||{}).daily||{};
+  var LB={sang:'상담',saup:'사업',branch:'지점'};
+  var cards=[];
+  ['sang','saup','branch'].forEach(function(seg){
+    var arr=rm[seg]||[];
+    // 오늘 1위인데 어제 2위 이하였던 사람 = 탈환
+    var champ=null; for(var i=0;i<arr.length;i++){ if(arr[i].rank===1){ champ=arr[i]; break; } }
+    if(champ && champ.prevRank!=null && champ.prevRank>=2){
+      cards.push({seg:seg, name:champ.name, from:champ.prevRank});
+    }
+  });
+  if(!cards.length){ el.innerHTML=''; el.style.display='none'; return; }
+  el.style.display='';
+  el.innerHTML=cards.map(function(c){
+    return '<div class="upset-card upset-'+c.seg+'">'
+      +'<span class="up-ic">👑</span>'
+      +'<span class="up-tx"><b>'+LB[c.seg]+' 1위 탈환!</b> '+c.name+'님이 '+c.from+'위 → <b class="up-1">1위</b> 등극</span>'
+      +'<span class="up-spark">✨</span></div>';
+  }).join('');
+}
+window.renderUpset=renderUpset;
+// [2026-09] 레전드 라인 — 각자 역대 한 달 최고 매출(2025+2026 통합) TOP5
+function renderLegendLine(){
+  var lv=window.__liveD||window.__D||{};
+  var d25=window.__D2025||{};
+  function bestOf(name, series){
+    var mx=0,mm=0; (series||[]).forEach(function(s){ if(s.sales!=null&&s.sales>mx){mx=s.sales;mm=s.m;} }); return {sales:mx,m:mm};
+  }
+  function build(grpKey){
+    var map={};
+    // 2026
+    ((lv.personCards||{})[grpKey]||[]).forEach(function(p){
+      var b=bestOf(p.name,p.series); if(b.sales>0){ if(!map[p.name]||b.sales>map[p.name].sales) map[p.name]={name:p.name,sales:b.sales,y:2026,m:b.m,team:p.team||''}; }
+    });
+    // 2025
+    ((d25.personCards||{})[grpKey]||[]).forEach(function(p){
+      var b=bestOf(p.name,p.series); if(b.sales>0){ if(!map[p.name]||b.sales>map[p.name].sales) map[p.name]={name:p.name,sales:b.sales,y:2025,m:b.m,team:p.team||''}; }
+    });
+    return Object.keys(map).map(function(k){return map[k];}).sort(function(a,b){return b.sales-a.sales;}).slice(0,5);
+  }
+  function rows(arr){
+    if(!arr.length) return '<div class="drnone">기록 없음</div>';
+    var medal=['🥇','🥈','🥉','4','5'];
+    return arr.map(function(x,i){
+      return '<div class="ll-row'+(i===0?' ll-top':'')+'">'
+        +'<span class="ll-rk">'+medal[i]+'</span>'+avatarMini(x.name,22)
+        +'<span class="ll-nm">'+x.name+'</span>'
+        +'<span class="ll-v">'+pcEok(x.sales)+'<span class="ll-when">'+x.y+'.'+x.m+'월</span></span></div>';
+    }).join('');
+  }
+  var es=document.getElementById('d_legend_sang'), eu=document.getElementById('d_legend_saup');
+  if(es) es.innerHTML=rows(build('sang'));
+  if(eu) eu.innerHTML=rows(build('saup'));
+}
+window.renderLegendLine=renderLegendLine;
+// [2026-09] 확률왕(사업 성사율) + 꾸준왕(고수준 6개월+ 안정)
+function renderKings2(D){
+  var lv=window.__liveD||D||{};
+  var _BOSS=!!(window.isBoss&&window.isBoss());
+  // 확률왕 = 사업 세팅10↑ & 성사율50%↑ → 성사 건수(물량) 순. 표본·자격 문턱으로 착시 제거.
+  var prob=(lv.divpersons||[]).filter(function(p){
+    var st=p.set||0, rate=st?(p.ord||0)/st*100:0; return st>=10 && rate>=50;
+  }).map(function(p){return {name:p.name,team:p.team||'',rate:Math.round((p.ord||0)/(p.set||1)*100),ord:p.ord||0,set:p.set||0};})
+    .sort(function(a,b){return b.ord-a.ord || b.rate-a.rate;}).slice(0,5);
+  var pe=document.getElementById('d_probking');
+  if(pe){ pe.innerHTML=prob.length?prob.map(function(x,i){
+    var md=['🥇','🥈','🥉','4','5'][i];
+    return '<div class="ll-row'+(i===0?' ll-top':'')+'"><span class="ll-rk">'+md+'</span>'+avatarMini(x.name,22)
+      +'<span class="ll-nm">'+x.name+'</span><span class="ll-v">'+x.rate+'%<span class="ll-when">성사 '+x.ord+'건 / 세팅 '+x.set+'</span></span></div>';
+  }).join(''):'<div class="drnone">세팅 10건↑·성사율 50%↑ 달성자 없음</div>'; }
+  // 꾸준왕 = 상담2천/사업5천 6개월+ 유지, 변동계수 낮은 순 (2025+2026 통합 series)
+  var d25=window.__D2025||{};
+  function steadyList(grp,floor){
+    var map={};
+    [(lv.personCards||{})[grp]||[], (d25.personCards||{})[grp]||[]].forEach(function(arr){
+      arr.forEach(function(p){
+        var vals=(p.series||[]).map(function(s){return s.sales;}).filter(function(v){return v!=null;});
+        if(!map[p.name]) map[p.name]={name:p.name,team:p.team||'',vals:[]};
+        map[p.name].vals=map[p.name].vals.concat(vals);
+      });
+    });
+    var res=[];
+    Object.keys(map).forEach(function(k){
+      var over=map[k].vals.filter(function(v){return v>=floor;});
+      if(over.length>=6){
+        var m=over.reduce(function(a,v){return a+v;},0)/over.length;
+        var std=Math.sqrt(over.reduce(function(a,v){return a+(v-m)*(v-m);},0)/over.length);
+        res.push({name:map[k].name,cnt:over.length,avg:m,cv:std/m});
+      }
+    });
+    return res.sort(function(a,b){return a.cv-b.cv;}).slice(0,5);
+  }
+  var sang=steadyList('sang',20000000), saup=steadyList('saup',50000000);
+  var all=sang.map(function(x){x.g='상담';return x;}).concat(saup.map(function(x){x.g='사업';return x;}))
+    .sort(function(a,b){return a.cv-b.cv;}).slice(0,5);
+  var se=document.getElementById('d_steadyking');
+  if(se){ se.innerHTML=all.length?all.map(function(x,i){
+    var md=['🥇','🥈','🥉','4','5'][i];
+    return '<div class="ll-row'+(i===0?' ll-top':'')+'"><span class="ll-rk">'+md+'</span>'+avatarMini(x.name,22)
+      +'<span class="ll-nm">'+x.name+' <span style="font-size:10px;color:#A8B0C0">'+x.g+'</span></span>'
+      +'<span class="ll-v">'+x.cnt+'개월<span class="ll-when">평균 '+pcEok(x.avg)+'</span></span></div>';
+  }).join(''):'<div class="drnone">도전자 대기 중 💪</div>'; }
+  // 유지왕 = 사업 매출4천만↑ & 취소0 (깔끔 마감). 취소 데이터는 지사장·지점장만.
+  var kc=document.getElementById('keeper_card'), ke=document.getElementById('d_keeperking');
+  if(kc && ke){
+    if(!_BOSS){ kc.style.display='none'; }
+    else {
+      var keep=(lv.divpersons||[]).filter(function(p){ return (p.sales||0)>=40000000 && (p.cxc||0)===0; })
+        .map(function(p){return {name:p.name,team:p.team||'',sales:p.sales||0};})
+        .sort(function(a,b){return b.sales-a.sales;}).slice(0,5);
+      kc.style.display='';
+      ke.innerHTML=keep.length?keep.map(function(x,i){
+        var md=['🥇','🥈','🥉','4','5'][i];
+        return '<div class="ll-row'+(i===0?' ll-top':'')+'"><span class="ll-rk">'+md+'</span>'+avatarMini(x.name,22)
+          +'<span class="ll-nm">'+x.name+'</span><span class="ll-v">'+pcEok(x.sales)+'<span class="ll-when">취소 0건 ✨</span></span></div>';
+      }).join(''):'<div class="drnone">4천만↑ 무취소 달성자 없음</div>';
+    }
+  }
+}
+window.renderKings2=renderKings2;
 function clutchRows(arr){
   if(!arr||!arr.length) return '<div class="drnone">막판 몰이 없음</div>';
   var D=window.__D||{};
@@ -1972,9 +2155,26 @@ function renderBdwCard(){
     var arr=[]; qs.forEach(function(d){arr.push(Object.assign({id:d.id},d.data()));});
     var box=document.getElementById('bdw_wishes'), cc=document.getElementById('bdw_cnt');
     if(cc)cc.textContent=arr.length;
-    if(box){ box.innerHTML=arr.length?arr.map(function(w){
+    if(box){
+      // [2026-09] 생일 축하도 이달 1등·2등이 남기면 왕관 표시
+      var _lv=window.__liveD||window.__D||{};
+      var _sK=((_lv.persons||[])[0]||{}).name||'', _uK=((_lv.divpersons||[])[0]||{}).name||'';
+      var _s2=((_lv.persons||[])[1]||{}).name||'', _u2=((_lv.divpersons||[])[1]||{}).name||'';
+      box.innerHTML=arr.length?arr.map(function(w){
       var canDel=_me&&(_me.email===w.email||_me.email==='crocdeucation@gmail.com');
-      return '<div class="bdw-wish"><b>'+(w.who||'익명')+(w.rank?' '+w.rank+'님':'')+'</b><span class="tx">'+bdwEsc(w.text)+'</span>'+(canDel?'<span class="del" onclick="bdwDel(\''+w.id+'\')">삭제</span>':'')+'</div>';
+      var _delH=canDel?'<span class="del" onclick="bdwDel(\''+w.id+'\')">삭제</span>':'';
+      var _kt='',_kl='',_r1=false;
+      if(w.who===_sK){_kt='sang';_kl='상담 1위 달리는 중';_r1=true;}
+      else if(w.who===_uK){_kt='saup';_kl='사업 1위 달리는 중';_r1=true;}
+      else if(w.who===_s2){_kt='sang';_kl='상담 2위 추격 중';}
+      else if(w.who===_u2){_kt='saup';_kl='사업 2위 추격 중';}
+      if(_kt){
+        var _ic=_r1?'👑':'🔥';
+        return '<div class="bdw-wish king-cmt king-'+_kt+(_r1?'':' king-2nd')+'" style="background:none;border:0;padding:12px 13px"><span class="kc-crown">'+_ic+'</span>'+avatarMini(w.who,22)
+          +'<div class="kc-body"><div class="kc-nm">'+(w.who||'')+(w.rank?' '+w.rank+'님':'')+' <span class="kc-rk">'+_kl+'</span></div>'
+          +'<div class="kc-tx">'+bdwEsc(w.text)+'</div></div>'+_delH+'</div>';
+      }
+      return '<div class="bdw-wish">'+avatarMini(w.who,22)+'<div class="cmt-body"><b>'+(w.who||'익명')+(w.rank?' '+w.rank+'님':'')+'</b><span class="tx">'+bdwEsc(w.text)+'</span></div>'+_delH+'</div>';
     }).join(''):'<div class="bdw-empty">첫 축하를 남겨보세요 🎉</div>'; }
   },function(e){console.warn('bdw snap',e);});
 }
@@ -2094,7 +2294,11 @@ function pcBadges(p,closedM){
   var declining=s.length>=2 && s[s.length-1].sales<s[s.length-2].sales;
   var isSlump = ch>0 && lastSales>0 && lastSales<ch*0.7 && declining;
   if(D&&D.newbie&&D.newbie[p.name]) b.push({cls:'new',i:'🌱',t:'새싹'});
-  if(s.length>=2 && s[s.length-1].sales>s[s.length-2].sales) b.push({cls:'up',i:'🔥',t:'상승중'});
+  // [2026-09] 연승 스트릭 — 연속 우상향 개월수. 2개월↑면 강조 뱃지.
+  var _streak=0; for(var _si=s.length-1;_si>0;_si--){ if(s[_si].sales>s[_si-1].sales) _streak++; else break; }
+  if(_streak>=3) b.push({cls:'streak3',i:'🔥',t:_streak+'개월 연속 우상향'});
+  else if(_streak===2) b.push({cls:'streak2',i:'🔥',t:'2개월 연속 상승'});
+  else if(_streak===1) b.push({cls:'up',i:'🔥',t:'상승중'});
   if(ch>0 && lastSales>=ch*0.9 && lastSales<ch) b.push({cls:'near',i:'🎯',t:'커하 근접'});
   // [2026-09] 종결달 1위는 MVP 트로피(🏆)와 동일 정보라 뱃지에서 제외.
   //   아직 트로피가 없는 '진행중인 현재월 1위'만 별도 표기.
@@ -2968,17 +3172,35 @@ function renderSocial(name){
     var arr=[]; qs.forEach(function(doc){ arr.push(Object.assign({id:doc.id},doc.data())); });
     var box=document.getElementById('pcCmts'), cc=document.getElementById('pcCmtCnt');
     if(cc)cc.textContent=arr.length;
-    if(box){ box.innerHTML=arr.map(function(c){
+    if(box){
+      // [2026-09] 이달 1등(상담·사업) 판별 — 작성자가 현재 매출 1위면 왕관 스타일
+      var _lv=window.__liveD||window.__D||{};
+      var _sangKing=((_lv.persons||[])[0]||{}).name||'';
+      var _saupKing=((_lv.divpersons||[])[0]||{}).name||'';
+      var _sang2=((_lv.persons||[])[1]||{}).name||'';
+      var _saup2=((_lv.divpersons||[])[1]||{}).name||'';
+      box.innerHTML=arr.map(function(c){
       var canDel=_me&&(_me.email===c.email||_me.email==='crocdeucation@gmail.com');
-      // [2026-09] 파운더 댓글 = 격이 다른 헌정 스타일 (무게감·골드)
-      var _isFounder = (c.rank==='파운더');
-      if(_isFounder){
+      var _delH=canDel?'<span class="del" onclick="pcDelComment(\''+c.id+'\')">삭제</span>':'';
+      // 파운더 = 격이 다른 헌정 (최상위)
+      if(c.rank==='파운더'){
         return '<div class="pc-cmt founder-cmt"><div class="fc-crown">♔</div>'
           +'<div class="fc-body"><div class="fc-nm">'+(c.name||'')+' <span class="fc-rk">FOUNDER</span></div>'
-          +'<div class="fc-tx">'+pcEsc(c.text)+'</div></div>'
-          +(canDel?'<span class="del" onclick="pcDelComment(\''+c.id+'\')">삭제</span>':'')+'</div>';
+          +'<div class="fc-tx">'+pcEsc(c.text)+'</div></div>'+_delH+'</div>';
       }
-      return '<div class="pc-cmt"><b>'+(c.name||'익명')+(c.rank?' '+c.rank+'님':'')+'</b><span class="tx">'+pcEsc(c.text)+'</span>'+(canDel?'<span class="del" onclick="pcDelComment(\''+c.id+'\')">삭제</span>':'')+'</div>';
+      // 이달 1위 = 왕관(달리는 중) / 2위 = 추격 중
+      var _kt='', _klbl='', _rank1=false;
+      if(c.name===_sangKing){ _kt='sang'; _klbl='상담 1위 달리는 중'; _rank1=true; }
+      else if(c.name===_saupKing){ _kt='saup'; _klbl='사업 1위 달리는 중'; _rank1=true; }
+      else if(c.name===_sang2){ _kt='sang'; _klbl='상담 2위 추격 중'; }
+      else if(c.name===_saup2){ _kt='saup'; _klbl='사업 2위 추격 중'; }
+      if(_kt){
+        var _ic = _rank1 ? '👑' : '🔥';
+        return '<div class="pc-cmt king-cmt king-'+_kt+(_rank1?'':' king-2nd')+'"><span class="kc-crown">'+_ic+'</span>'+avatarMini(c.name,22)
+          +'<div class="kc-body"><div class="kc-nm">'+(c.name||'')+(c.rank?' '+c.rank+'님':'')+' <span class="kc-rk">'+_klbl+'</span></div>'
+          +'<div class="kc-tx">'+pcEsc(c.text)+'</div></div>'+_delH+'</div>';
+      }
+      return '<div class="pc-cmt">'+avatarMini(c.name,22)+'<div class="cmt-body"><b>'+(c.name||'익명')+(c.rank?' '+c.rank+'님':'')+'</b><span class="tx">'+pcEsc(c.text)+'</span></div>'+_delH+'</div>';
     }).join('')||'<div style="font-size:12px;color:#B6C2DC">첫 응원을 남겨보세요</div>'; }
   },function(e){console.warn('cmt snap',e);});
 }
