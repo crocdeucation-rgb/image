@@ -609,6 +609,7 @@ async function loadCancel() {
     // 취소요약_전체 컬럼: 날짜(0)|학생(1)|학년(2)|취소액(3)|담당자(4) — 전부 cancel
     cancelData.rows = rows.filter(r => r[0] && (parseFloat(r[3])||0) > 0);
     renderCancel();
+    if(typeof render==='function' && allRows && allRows.length){ try{ render(); }catch(_e){} }   // [2026-09] 취소금액 담당자표 반영
   } catch(e) {
     const el = document.getElementById('cancel-amt');
     if (el) el.textContent = '-';
@@ -750,6 +751,22 @@ function render() {
   const offset = funnelTab * 6 + 1;
   const tbody = document.getElementById('funnel-tbody');
   let totalDb=0, totalVisit=0, totalSetting=0, totalCancel=0, totalOrder=0, totalSalesNum=0, totalCost=0;
+  // [2026-09] 담당자별 취소 금액 — 취소요약(cancelData)에서 funnelTab 기간 합산 (건수 옆 금액 표시)
+  const _cxByName = (function(){
+    var m={}; var now=new Date();
+    var thisYM=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+    var lm=new Date(now.getFullYear(), now.getMonth()-1, 1);
+    var lastYM=lm.getFullYear()+'-'+String(lm.getMonth()+1).padStart(2,'0');
+    (cancelData.rows||[]).forEach(function(r){
+      var date=r[0]||'', amt=parseFloat(r[3])||0, nm=(r[4]||'').trim();
+      if(!nm) return;
+      var match = funnelTab===0 ? date.indexOf(thisYM)===0 : funnelTab===1 ? date.indexOf(lastYM)===0 : true;
+      if(match) m[nm]=(m[nm]||0)+amt;
+    });
+    return m;
+  })();
+  function _cxAmtOf(name){ return (_cxByName[name]||0)*1000; }
+  function _cxFmt(won){ if(!won||won<=0) return ''; return won>=10000 ? Math.round(won/10000).toLocaleString()+'만' : won.toLocaleString(); }
   // [2026-09] 매출순 순위 + 전날(32열)/전월 변동
   const _monthRank = (function(){
     var a = ASSIGNEES.map((nm,i)=>{ var r=allRows[ASSIGNEE_START_IDX+i]||[]; return {name:nm, s:parseInt(((r[18]||'0')+'').replace(/[^0-9]/g,''))||0}; });
@@ -797,7 +814,7 @@ function render() {
       <td class="num db">${db}</td>
       <td class="num visit">${visit}${d.vcoh ? '<div style="font-size:8px;color:#94a3b8;font-weight:600;line-height:1.2;margin-top:1px">'+d.vcoh.split(';').map(function(x){return x.replace(':','');}).join('·')+'</div>' : ''}</td>
       <td class="num" style="color:#2563eb">${setting}</td>
-      <td class="num" style="color:#e11d48">${cancel}</td>
+      <td class="num" style="color:#e11d48">${cancel}${(function(){var _a=_cxAmtOf(d.name);return _a>0?'<div style="font-size:8px;color:#f0879b;font-weight:600;line-height:1.2;margin-top:1px">'+_cxFmt(_a)+'</div>':'';})()}</td>
       <td class="num order">${order}</td>
       <td class="sales">${sales}</td>
       <td class="rate" style="color:#e11d48">${cancelRate}%</td>
