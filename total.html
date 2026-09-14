@@ -1413,6 +1413,7 @@ function renderDukji(D){
   renderRisers(window.__DK); renderRecords(window.__DK); renderTrend(); renderClutch();
   if(typeof renderLegendLine==='function'){ try{ renderLegendLine(); }catch(_e){} }
   if(typeof renderKings2==='function'){ try{ renderKings2(D); }catch(_e){} }
+  setTimeout(function(){ if(window.attachCardClicks) window.attachCardClicks(); }, 60);
 }
 window.__cl='m3';
 // [2026-09] 역전극 배너 — 오늘 1위 탈환(어제 2위 이하 → 오늘 1위)
@@ -3430,7 +3431,7 @@ function attachCardClicks(){
   var brNames={};
   (D.branches||[]).forEach(function(b){ brNames[b.name]=1; });
   // 이름 후보 요소: class 있는 것 + 이달TOP3의 <b>(부모가 특정 스타일)
-  var sels=['.q3nm','.kname','.rknm','.drnm','.aw-nm','.pc-nm','.nm'];
+  var sels=['.q3nm','.kname','.rknm','.drnm','.aw-nm','.pc-nm','.nm','.ll-nm'];
   var els=[];
   sels.forEach(function(sel){ document.querySelectorAll(sel).forEach(function(el){els.push(el);}); });
   // 이달 매출 TOP3 = kings 안의 <b style*="color:#1B2436"> (class 없음)
