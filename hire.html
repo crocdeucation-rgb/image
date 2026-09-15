@@ -318,6 +318,23 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .cac-tab{background:var(--barbg);border:none;color:var(--soft);font-family:inherit;font-weight:700;font-size:12px;padding:6px 14px;border-radius:20px;cursor:pointer}
 .cac-tab.on{background:var(--v1);color:#fff}
 /* ── HERO 대문짝 (CPH 헤드라인) — 캘린더 톤 통일 ── */
+.cac-funnel-hero{background:#F4F6FA;border-radius:13px;padding:16px 18px;margin-bottom:12px}
+.fnh-flow{display:flex;align-items:flex-end;gap:4px;flex-wrap:wrap;margin-bottom:12px}
+.fn-step{display:flex;flex-direction:column;gap:2px;min-width:44px}
+.fn-step .fn-l{font-size:10.5px;font-weight:700;color:var(--soft)}
+.fn-step .fn-v{font-size:19px;font-weight:900;color:var(--ink);letter-spacing:-.5px;line-height:1}
+.fn-step .fn-v small{font-size:11px;font-weight:800;margin-left:1px}
+.fn-step .fn-v.z{color:#C3CDDD}
+.fn-step.big .fn-v{font-size:22px;color:#4C6EF5}
+.fn-step.hl .fn-v{color:#7048E8}
+.fn-step.hl .fn-l{color:#7048E8}
+.fn-arw{font-size:13px;color:#C9D2E0;font-weight:900;padding-bottom:2px;align-self:flex-end}
+.fnh-cph{display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:10px;padding:11px 16px;border:1px solid var(--line)}
+.fnh-cph .l{font-size:12px;font-weight:700;color:var(--soft)}
+.fnh-cph .v{font-size:24px;font-weight:900;color:var(--ink);letter-spacing:-.8px}
+.fnh-cph .v small{font-size:14px;font-weight:800}
+.fnh-cph .v.z{color:#B6C2DC}
+@media(max-width:600px){.fn-step{min-width:38px}.fn-step .fn-v{font-size:16px}.fn-step.big .fn-v{font-size:18px}.fn-arw{padding-bottom:1px}}
 .cac-hero{background:#F4F6FA;border-radius:13px;padding:15px 18px;margin-bottom:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .cac-hero .cph{display:flex;flex-direction:column;gap:1px}
 .cac-hero .cph .l{font-size:11px;font-weight:700;color:var(--soft)}
@@ -840,8 +857,59 @@ boot();
 
 <!-- 부서별 + 채용단가 데이터/렌더 -->
 <script>
-var HIRE_DEPT = {"8월": {"depts": {"상담부": {"am": {"gonggo": 1546872, "iryeok": 205, "myeontong": 78, "myeoncham": 28, "edu": 17}, "amProd": "M 지역 Special 결합", "jk": {"gonggo": 519600, "iryeok": 10, "myeontong": 1, "myeoncham": 0, "edu": 0}, "jkProd": "Excellent 채용관 (PC+M)", "tot": {"gonggo": 2066472, "iryeok": 215, "myeontong": 79, "myeoncham": 28, "edu": 17}, "hire": {"jijum": [{"nm": "마포연합센터", "in": 4, "out": 2}, {"nm": "가산연합센터", "in": 6, "out": 2}, {"nm": "마곡지점", "in": 1, "out": 4}, {"nm": "부평지점", "in": 2, "out": 1}, {"nm": "메이킷위드", "in": 2, "out": 2}, {"nm": "파인더루원", "in": 0, "out": 0}], "tin": 15, "tout": 11}}, "사업부": {"am": null, "amProd": "", "jk": {"gonggo": 692800, "iryeok": 19, "myeontong": 0, "myeoncham": 0, "edu": 0}, "jkProd": "Excellent 채용관 (PC+M)", "tot": {"gonggo": 692800, "iryeok": 19, "myeontong": 0, "myeoncham": 0, "edu": 0}}, "강사": {"am": {"gonggo": 45760, "iryeok": 16, "myeontong": 7, "myeoncham": 3, "edu": 1}, "amProd": "슈퍼점프 8회(1일)", "jk": {"gonggo": 692800, "iryeok": 28, "myeontong": 3, "myeoncham": 2, "edu": 0}, "jkProd": "Excellent 채용관 (PC+M)", "tot": {"gonggo": 738560, "iryeok": 44, "myeontong": 10, "myeoncham": 5, "edu": 1}}, "코칭": {"am": {"gonggo": 45760, "iryeok": 101, "myeontong": 12, "myeoncham": 4, "edu": 2}, "amProd": "슈퍼점프 8회(1일)", "jk": null, "jkProd": "", "tot": {"gonggo": 45760, "iryeok": 101, "myeontong": 12, "myeoncham": 4, "edu": 2}}}, "total": {"gonggo": 3543592, "iryeok": 379, "myeontong": 101, "myeoncham": 37, "edu": 20}, "breakdown": {"myeontong": {"상담부": 79, "사업부": 0, "강사": 10, "코칭": 12}, "myeoncham": {"상담부": 28, "사업부": 0, "강사": 5, "코칭": 4}, "edu": {"상담부": 17, "사업부": 0, "강사": 1, "코칭": 2}, "iryeok": {"상담부": 215, "사업부": 19, "강사": 44, "코칭": 101}}}, "9월": {"depts": {"상담부": {"am": {"gonggo": 45760, "iryeok": 0, "myeontong": 0, "myeoncham": 0, "edu": 0}, "amProd": "슈퍼점프 8회(1일)", "jk": {"gonggo": 866000, "iryeok": 0, "myeontong": 2, "myeoncham": 0, "edu": 0}, "jkProd": "Excellent 채용관 (PC+M)", "tot": {"gonggo": 911760, "iryeok": 0, "myeontong": 2, "myeoncham": 0, "edu": 0}, "hire": {"jijum": [], "tin": 0, "tout": 0}}, "사업부": {"am": null, "amProd": "", "jk": {"gonggo": 0, "iryeok": 0, "myeontong": 2, "myeoncham": 1, "edu": 0}, "jkProd": "X", "tot": {"gonggo": 0, "iryeok": 0, "myeontong": 2, "myeoncham": 1, "edu": 0}}, "강사": {"am": null, "amProd": "", "jk": {"gonggo": 692800, "iryeok": 0, "myeontong": 3, "myeoncham": 2, "edu": 0}, "jkProd": "Excellent 채용관 (PC+M)", "tot": {"gonggo": 692800, "iryeok": 0, "myeontong": 3, "myeoncham": 2, "edu": 0}}, "코칭": {"am": null, "amProd": "", "jk": null, "jkProd": "", "tot": {"gonggo": 0, "iryeok": 0, "myeontong": 0, "myeoncham": 0, "edu": 0}}}, "total": {"gonggo": 1604560, "iryeok": 0, "myeontong": 7, "myeoncham": 3, "edu": 0}, "breakdown": {"myeontong": {"상담부": 2, "사업부": 2, "강사": 3, "코칭": 0}, "myeoncham": {"상담부": 0, "사업부": 1, "강사": 2, "코칭": 0}, "edu": {"상담부": 0, "사업부": 0, "강사": 0, "코칭": 0}, "iryeok": {"상담부": 0, "사업부": 0, "강사": 0, "코칭": 0}}}};
-window.__dpMonth='9월';
+// ═══ [2026-09] 채용단가/공고 = 주간보고 시트 실시간 파싱 (하드코딩 제거) ═══
+// 주간보고 구글시트 3개를 publish CSV로 만들어 아래 URL에 넣으세요.
+// (파일 > 공유 > 웹에 게시 > 해당 시트 > CSV)  +  "링크 있는 사람 뷰어" 공유
+var WR_URLS = {
+  am: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRBvUlcggDr6z7FcQlXCpFvARGolpoDKgpDAfwQcHl01Yhv3mI2LBYOMiiO5V4ytUVALsTtmBNrzjSI/pub?gid=0&single=true&output=csv",   // 알바몬(상담부) 시트
+  jk: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRBvUlcggDr6z7FcQlXCpFvARGolpoDKgpDAfwQcHl01Yhv3mI2LBYOMiiO5V4ytUVALsTtmBNrzjSI/pub?gid=136431108&single=true&output=csv",  // 잡코리아 시트
+  op: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRBvUlcggDr6z7FcQlXCpFvARGolpoDKgpDAfwQcHl01Yhv3mI2LBYOMiiO5V4ytUVALsTtmBNrzjSI/pub?gid=1572863577&single=true&output=csv"   // 운영센터 시트
+};
+var HIRE_DEPT = {};   // 주간보고 파싱으로 채워짐
+
+// ── 주간보고 파서 (파이썬 검증 완료 로직) ──
+function _wrNum(v){if(v==null)return 0;var s=String(v).trim();if(['','X','x','·','-','None'].indexOf(s)>=0)return 0;if(s.indexOf('/')>=0)return s.split('/').reduce(function(a,p){return a+_wrNum(p);},0);var n=parseFloat(s.replace(/,/g,''));return isNaN(n)?0:n;}
+function _wrBlocks(rows){var b=[],i=0;while(i<rows.length){var c0=String(rows[i][0]||'').trim();var m=c0.match(/(\d{1,2})\/(\d{1,2}).*~.*?(\d{1,2})\/(\d{1,2})/);if(m){var mo=+m[1],data=[],j=i+2;while(j<rows.length){var c=String(rows[j][0]||'').trim();if(!c||c==='·')break;if(/^\d{1,2}\/\d{1,2}.*~/.test(c))break;data.push(rows[j]);j++;}b.push([mo,data]);i=j;}else i++;}return b;}
+function _wrMoney(cell,fb){var s=String(cell||'');var parts=s.split(/\(([\d,\.]+)\s*원\)/);var res={},found=false;for(var i=1;i<parts.length;i+=2){var before=parts[i-1];var amt=parseInt(parts[i].replace(/[,\.]/g,''),10);var dm=(before.match(/\d{4}-(\d{2})-\d{2}/g)||[]);var mo=fb;if(dm.length){var last=dm[dm.length-1].match(/\d{4}-(\d{2})-\d{2}/);mo=+last[1];}res[mo]=(res[mo]||0)+amt;found=true;}return found?res:null;}
+function _wrJob(s){s=String(s||'');if(s.indexOf('상담')>=0)return '상담부';if(s.indexOf('수업')>=0||s.indexOf('강사')>=0)return '강사';if(s.indexOf('사업')>=0)return '사업부';if(s.indexOf('코칭')>=0)return '코칭';return s.trim();}
+function _wrEnsure(H,mo,dept,ch){var k=mo+'월';H[k]=H[k]||{depts:{}};H[k].depts[dept]=H[k].depts[dept]||{am:null,amProd:'',jk:null,jkProd:'',tot:{gonggo:0,iryeok:0,myeontong:0,myeoncham:0,edu:0}};var D=H[k].depts[dept];if(!D[ch])D[ch]={gonggo:0,iryeok:0,myeontong:0,myeoncham:0,edu:0};return D[ch];}
+function _wrAdd(o,r,gongCol,iryCol,mtCol,mcCol,eduCol){o.iryeok+=_wrNum(r[iryCol]);o.myeontong+=_wrNum(r[mtCol]);o.myeoncham+=_wrNum(r[mcCol]);o.edu+=_wrNum(r[eduCol]);}
+function buildHireFromSheets(amCsv,jkCsv,opCsv){
+  var H={};
+  // 알바몬(상담부): 지점별. 2공고 3이력 5통보 6참여 7교육
+  _wrBlocks(parseCSV(amCsv)).forEach(function(bk){var mo=bk[0];bk[1].forEach(function(r){var j=String(r[0]||'').trim();if(j==='지점'||!j)return;var o=_wrEnsure(H,mo,'상담부','am');o.gonggo+=_wrNum(r[2]);_wrAdd(o,r,2,3,5,6,7);H[mo+'월'].depts['상담부'].amProd='슈퍼점프 8회(1일)';});});
+  // 잡코리아: 직무별. 상품셀(2) 날짜배분. 3공고 4이력 5통보 6참여 7교육
+  _wrBlocks(parseCSV(jkCsv)).forEach(function(bk){var mo=bk[0];bk[1].forEach(function(r){var job=_wrJob(r[0]);if(job==='직무'||!job)return;var mbm=_wrMoney(r[2],mo);if(mbm){for(var mm in mbm){_wrEnsure(H,+mm,job,'jk').gonggo+=mbm[mm];}}else{_wrEnsure(H,mo,job,'jk').gonggo+=_wrNum(r[3]);}var o=_wrEnsure(H,mo,job,'jk');_wrAdd(o,r,3,4,5,6,7);H[mo+'월'].depts[job].jkProd='Excellent 채용관 (PC+M)';});});
+  // 운영센터: 강사/코칭. 알바몬 채널. 상품셀(2) 날짜배분
+  _wrBlocks(parseCSV(opCsv)).forEach(function(bk){var mo=bk[0];bk[1].forEach(function(r){var job=_wrJob(r[0]);if(job==='직무'||!job)return;var mbm=_wrMoney(r[2],mo);if(mbm){for(var mm in mbm){_wrEnsure(H,+mm,job,'am').gonggo+=mbm[mm];}}else{_wrEnsure(H,mo,job,'am').gonggo+=_wrNum(r[3]);}var o=_wrEnsure(H,mo,job,'am');_wrAdd(o,r,3,4,5,6,7);H[mo+'월'].depts[job].amProd='슈퍼점프 8회(1일)';});});
+  // tot + total + breakdown 계산
+  Object.keys(H).forEach(function(k){
+    var M=H[k];var total={gonggo:0,iryeok:0,myeontong:0,myeoncham:0,edu:0};
+    var bd={myeontong:{},myeoncham:{},edu:{},iryeok:{}};
+    ['상담부','사업부','강사','코칭'].forEach(function(dept){
+      if(!M.depts[dept])M.depts[dept]={am:null,amProd:'',jk:null,jkProd:'',tot:{gonggo:0,iryeok:0,myeontong:0,myeoncham:0,edu:0}};
+      var D=M.depts[dept];var am=D.am,jk=D.jk;
+      function s(k){return (am?am[k]:0)+(jk?jk[k]:0);}
+      D.tot={gonggo:s('gonggo'),iryeok:s('iryeok'),myeontong:s('myeontong'),myeoncham:s('myeoncham'),edu:s('edu')};
+      ['gonggo','iryeok','myeontong','myeoncham','edu'].forEach(function(x){total[x]+=D.tot[x];});
+      bd.myeontong[dept]=D.tot.myeontong;bd.myeoncham[dept]=D.tot.myeoncham;bd.edu[dept]=D.tot.edu;bd.iryeok[dept]=D.tot.iryeok;
+    });
+    M.total=total;M.breakdown=bd;
+  });
+  return H;
+}
+function loadHireSheets(){
+  var bust='&_='+Date.now();
+  return Promise.all([
+    fetch(WR_URLS.am+bust).then(function(r){return r.text();}).catch(function(){return '';}),
+    fetch(WR_URLS.jk+bust).then(function(r){return r.text();}).catch(function(){return '';}),
+    fetch(WR_URLS.op+bust).then(function(r){return r.text();}).catch(function(){return '';})
+  ]).then(function(a){
+    HIRE_DEPT=buildHireFromSheets(a[0],a[1],a[2]);
+    return HIRE_DEPT;
+  });
+}
+window.__dpMonth=null; // 로드 후 최신월 자동
 function dpWon(n){return (n||0).toLocaleString('ko-KR');}
 
 function passCountByMonth(moLabel){
@@ -881,11 +949,27 @@ function cacRender(){
   var passTotal = jkPass + amPass;
   var passCac = passTotal>0 ? Math.round(t.gonggo/passTotal) : 0;
   var eduCac  = t.edu>0 ? Math.round(t.gonggo/t.edu) : 0;
-  // HERO — CPH 헤드라인 (합격 1명당)
-  var heroHtml='<div class="cac-hero">'
-    + '<div class="cph"><div class="l">합격 1명당 (CPH)</div><div class="v'+(passCac?'':' z')+'">'+(passCac?dpWon(passCac):'집계중')+(passCac?'<small>원</small>':'')+'</div></div>'
-    + '<div class="mini">공고비 <b>'+dpWon(t.gonggo)+'</b><br>합격 <b>'+passTotal+'</b>명 · 교육 <b'+(t.edu?'':' class="z"')+'>'+(t.edu||0)+'</b></div>'
-    + '</div>';
+  // HERO — 월간 채용 퍼널 요약 (공고비→이력→통보→참여→합격→교육) + CPH
+  var funnel=[
+    {l:'공고비',v:dpWon(t.gonggo),unit:'원',big:true},
+    {l:'이력',v:t.iryeok,unit:''},
+    {l:'통보',v:t.myeontong,unit:''},
+    {l:'참여',v:t.myeoncham,unit:''},
+    {l:'합격',v:passTotal,unit:'',hl:true},
+    {l:'교육',v:t.edu,unit:''}
+  ];
+  var steps=funnel.map(function(s,i){
+    var zc=(s.v===0||s.v==='0')?' z':'';
+    return (i>0?'<span class="fn-arw">→</span>':'')
+      +'<div class="fn-step'+(s.hl?' hl':'')+(s.big?' big':'')+'">'
+      +'<div class="fn-l">'+s.l+'</div>'
+      +'<div class="fn-v'+zc+'">'+s.v+(s.unit?'<small>'+s.unit+'</small>':'')+'</div></div>';
+  }).join('');
+  var heroHtml='<div class="cac-funnel-hero">'
+    +'<div class="fnh-flow">'+steps+'</div>'
+    +'<div class="fnh-cph"><div class="l">합격 1명당 (CPH)</div>'
+    +'<div class="v'+(passCac?'':' z')+'">'+(passCac?dpWon(passCac):'집계중')+(passCac?'<small>원</small>':'')+'</div></div>'
+    +'</div>';
   document.getElementById('cac_hero').innerHTML=heroHtml;
   function chanCard(cls,nm,char,c,pc){
     var cac = pc>0 ? Math.round(c.g/pc) : 0;
@@ -935,13 +1019,28 @@ function dpRender(){
   document.querySelectorAll('.dp-tab').forEach(function(b){ b.classList.toggle('on', b.dataset.mo===mo); });
 }
 function moSwitch(mo){ window.__dpMonth=mo; cacRender(); dpRender(); }
-(function(){
-  var order=Object.keys(HIRE_DEPT).sort().reverse();
+function renderHireTabs(){
+  var order=Object.keys(HIRE_DEPT).sort(function(a,b){return (+b.replace('월',''))-(+a.replace('월',''));});
+  if(!order.length){
+    document.getElementById('cac_hero').innerHTML='<div class="cac-note" style="color:#C0341E">주간보고 시트를 불러오지 못했어요. WR_URLS에 publish CSV 주소 3개를 넣고 "링크 있는 사람 뷰어"로 공유했는지 확인해주세요.</div>';
+    return;
+  }
+  if(!window.__dpMonth || order.indexOf(window.__dpMonth)<0) window.__dpMonth=order[0]; // 최신월 자동
   var tabH=order.map(function(k){return '<button class="cac-tab'+(k===window.__dpMonth?' on':'')+'" data-mo="'+k+'" onclick="moSwitch(\''+k+'\')">'+k+'</button>';}).join('');
   document.getElementById('cac_tabs').innerHTML=tabH;
   var dpH=order.map(function(k){return '<button class="dp-tab'+(k===window.__dpMonth?' on':'')+'" data-mo="'+k+'" onclick="moSwitch(\''+k+'\')">'+k+'</button>';}).join('');
   document.getElementById('dp_tabs').innerHTML=dpH;
   cacRender(); dpRender();
+}
+// 주간보고 시트 로드 → 렌더. URL 미설정이면 안내.
+(function(){
+  if(WR_URLS.am.indexOf('PUT_')===0){
+    document.getElementById('cac_hero').innerHTML='<div class="cac-note">📋 주간보고 시트 연동 대기 — 코드의 <b>WR_URLS</b>에 알바몬·잡코리아·운영센터 publish CSV 주소 3개를 넣으면 채용단가가 실시간 집계됩니다.</div>';
+    return;
+  }
+  loadHireSheets().then(renderHireTabs).catch(function(e){
+    document.getElementById('cac_hero').innerHTML='<div class="cac-note" style="color:#C0341E">주간보고 로드 실패: '+e+'</div>';
+  });
 })();
 </script>
 
