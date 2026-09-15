@@ -925,7 +925,7 @@ function dpWon(n){return (n||0).toLocaleString('ko-KR');}
 
 function passCountByMonth(moLabel){
   var yy='2026-'+('0'+String(moLabel).replace('월','')).slice(-2);
-  var out={total:0, jk:0, am:0, plan:0, attend:0, eduWait:0, has:false};
+  var out={total:0, jk:0, am:0, plan:0, attend:0, eduWait:0, has:false, jkList:[], amList:[]};
   if(typeof IVS==='undefined' || !IVS.length) return out;
   out.has=true;
   var td=todayYmd();
@@ -938,8 +938,9 @@ function passCountByMonth(moLabel){
     if(isPass){
       out.total++;
       if(!iv.eduDate) out.eduWait++;
-      if((iv.site||'').indexOf('잡코')>=0) out.jk++;
-      else if((iv.site||'').indexOf('알바몬')>=0) out.am++;
+      var rec={name:iv.name, job:iv.job, date:iv.date, edu:!!iv.eduDate};
+      if((iv.site||'').indexOf('잡코')>=0){ out.jk++; out.jkList.push(rec); }
+      else if((iv.site||'').indexOf('알바몬')>=0){ out.am++; out.amList.push(rec); }
     }
   });
   return out;
