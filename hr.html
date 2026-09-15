@@ -32,8 +32,8 @@ svg.combo{width:100%;height:auto;display:block;overflow:visible}
 .combo .mhit:hover rect{fill:rgba(76,110,245,.05)}
 /* 지점 카드 */
 .brgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.brc{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;cursor:pointer;transition:.15s;position:relative;overflow:hidden}
-.brc:hover{border-color:var(--v1);transform:translateY(-2px);box-shadow:0 8px 22px rgba(76,110,245,.1)}
+.brc{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;position:relative;overflow:hidden}
+
 .brc .bn{font-size:13px;font-weight:800}
 .brc .bl{font-size:10px;color:#9AA6B8;font-weight:600;margin-top:1px;min-height:12px}
 .brc .brow{display:flex;align-items:flex-end;justify-content:space-between;margin-top:8px}
@@ -115,7 +115,7 @@ svg.combo{width:100%;height:auto;display:block;overflow:visible}
 .swipehint{display:none;font-size:11px;color:#B6C2DC;text-align:center;margin-top:8px}
 </style></head><body><div class="wrap">
 <div class="hd"><div><div class="k">HR 인사 리포트 · 경영진용</div><h1>인사 현황 — 인력 추이</h1>
-<div class="m">2026년 1~9월 · 월말 재직 기준 · 지점 카드나 월을 클릭하면 상세가 열립니다</div></div>
+<div class="m">2026년 1~9월 · 월말 재직 기준</div></div>
 <div class="asof">기준<b>2026년 9월</b></div></div>
 <div class="tabs" id="tabs"></div>
 <div class="kpis" id="kpis"></div>
@@ -124,9 +124,9 @@ svg.combo{width:100%;height:auto;display:block;overflow:visible}
   <div class="clgd"><span><i style="background:#5DCAA5"></i>입사</span><span><i style="background:#F09595"></i>퇴사</span><span><i style="background:#161C2B"></i>월말 재직 인원</span></div></div>
 <div class="card" id="tenureCard"><h2 id="tenTitle"></h2><div class="sub">2026년 퇴사자를 근속 기간별로 분류 · 얼마나 빨리 나가는지가 채용 효율의 핵심 지표</div>
   <div id="tenure"></div></div>
-<div class="card"><h2 id="brTitle"></h2><div class="sub">각 카드 = 현재 인원 · 1~9월 미니 추이 · 연초 대비 순증감 · 클릭하면 그 지점 포함 상세로</div>
+<div class="card"><h2 id="brTitle"></h2><div class="sub">각 카드 = 현재 인원 · 1~9월 미니 추이 · 연초 대비 순증감</div>
   <div class="brgrid" id="brgrid"></div>
-  <div class="hint">↑ 지점 카드를 클릭하면 아래 월 상세로 이동합니다</div>
+  
   <div class="swipehint">← 좌우로 밀어 지점을 넘겨보세요 · 탭하면 상세로</div></div>
 <div class="mbar" id="mbar"></div>
 <div class="mtitle"><h2 id="mTitle"></h2><span class="pill" id="mPill"></span></div>
@@ -216,7 +216,7 @@ function renderBranches(){
     let d=arr.map((v,i)=>`${i?'L':'M'}${px(i).toFixed(1)},${py(v).toFixed(1)}`).join(' ');
     let col=net>0?'#20A56D':net<0?'#E23A22':'#9AA6B8';
     let lead=LEAD[g]||'';
-    return `<div class="brc" onclick="jumpBranch()">
+    return `<div class="brc">
       <div class="bn">${g}</div><div class="bl">${lead}</div>
       <div class="brow"><div class="now">${now}<small>명</small></div>
         <div class="net ${net>0?'up':net<0?'dn':'flat'}"><span class="lb2">연초대비</span>${net>0?'+'+net:net}</div></div>
@@ -226,7 +226,6 @@ function renderBranches(){
     </div>`;
   }).join('');
 }
-function jumpBranch(){document.getElementById('mTitle').scrollIntoView({behavior:'smooth',block:'start'});}
 
 function renderMbar(){document.getElementById('mbar').innerHTML=MONTHS.map(m=>{let s=sumOf(curDept,m);return `<button class="mbtn ${m===curMonth?'on':''}" onclick="selMonth(${m})">${m}월<span class="mn">+${s.in}/-${s.out}</span></button>`;}).join('');}
 function renderMonth(){
@@ -265,7 +264,7 @@ function memRow(m){
   else sales=`<div class="orow-sales">재직 중 매출 <b class="zero">0원</b></div>`;
   return `<div class="mrow orow">${top}${sales}</div>`;
 }
-function selMonth(m){curMonth=m;renderCombo();renderMbar();renderMonth();document.getElementById('mTitle').scrollIntoView({behavior:'smooth',block:'start'});}
+function selMonth(m){curMonth=m;renderCombo();renderMbar();renderMonth();}
 function renderTenure(){
   let T=DATA[curDept].tenure;
   document.getElementById('tenTitle').textContent=`${curDept} — 퇴사자 근속 기간 분포`;
