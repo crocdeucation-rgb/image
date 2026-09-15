@@ -319,7 +319,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .cac-tab.on{background:var(--v1);color:#fff}
 /* ── HERO 대문짝 (CPH 헤드라인) — 캘린더 톤 통일 ── */
 .cac-funnel-hero{background:#F4F6FA;border-radius:13px;padding:16px 18px;margin-bottom:12px}
-.fnh-flow{display:flex;align-items:flex-end;gap:4px;flex-wrap:wrap;margin-bottom:12px}
+.fnh-flow{display:flex;align-items:flex-end;gap:5px;flex-wrap:wrap}
 .fn-step{display:flex;flex-direction:column;gap:2px;min-width:44px}
 .fn-step .fn-l{font-size:10.5px;font-weight:700;color:var(--soft)}
 .fn-step .fn-v{font-size:19px;font-weight:900;color:var(--ink);letter-spacing:-.5px;line-height:1}
@@ -328,6 +328,11 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .fn-step.big .fn-v{font-size:22px;color:#4C6EF5}
 .fn-step.hl .fn-v{color:#7048E8}
 .fn-step.hl .fn-l{color:#7048E8}
+.fn-arw.fn-sep{color:#DCE3EE;margin:0 2px}
+.fn-step.cph-step{margin-left:2px;padding-left:12px;border-left:1px solid #E3E8F0}
+.fn-step.cph-step .fn-l{color:#4C6EF5;font-weight:800}
+.fn-step.cph-step .fn-v{font-size:22px;color:#4C6EF5}
+.fn-step.cph-step .fn-v small{font-size:12px}
 .fn-arw{font-size:13px;color:#C9D2E0;font-weight:900;padding-bottom:2px;align-self:flex-end}
 .fnh-cph{display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:10px;padding:11px 16px;border:1px solid var(--line)}
 .fnh-cph .l{font-size:12px;font-weight:700;color:var(--soft)}
@@ -364,6 +369,12 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .cac-chan .cph-v small{font-size:12px}
 .cac-chan.jk .cph-v{color:var(--amber)}.cac-chan.am .cph-v{color:var(--v1)}
 .cac-chan .cph-v.z{color:#B6C2DC}
+.cac-chan-2col{display:flex;gap:14px;align-items:flex-end;margin-top:2px}
+.cac-chan-2col .ch-col{flex:1}
+.cac-chan-2col .ch-r{text-align:right}
+.ch-gonggo{font-size:20px;font-weight:900;letter-spacing:-.5px;color:#1B2436;line-height:1.1}
+.ch-gonggo small{font-size:11px;font-weight:800;color:#6B7688;margin-left:1px}
+.ch-gonggo.z{color:#B6C2DC}
 .cac-chan-sub{display:flex;gap:12px;margin-top:9px;font-size:10.5px;color:var(--soft);font-weight:700}
 .cac-chan-sub b{color:var(--ink);font-weight:900}
 .cac-chan-sub b.z{color:#C3CDDD;font-weight:700}
@@ -965,20 +976,19 @@ function cacRender(){
       +'<div class="fn-l">'+s.l+'</div>'
       +'<div class="fn-v'+zc+'">'+s.v+(s.unit?'<small>'+s.unit+'</small>':'')+'</div></div>';
   }).join('');
-  var heroHtml='<div class="cac-funnel-hero">'
-    +'<div class="fnh-flow">'+steps+'</div>'
-    +'<div class="fnh-cph"><div class="l">합격 1명당 (CPH)</div>'
-    +'<div class="v'+(passCac?'':' z')+'">'+(passCac?dpWon(passCac):'집계중')+(passCac?'<small>원</small>':'')+'</div></div>'
-    +'</div>';
+  var cphStep='<span class="fn-arw fn-sep">|</span>'
+    +'<div class="fn-step cph-step"><div class="fn-l">합격 1명당 CPH</div>'
+    +'<div class="fn-v'+(passCac?'':' z')+'">'+(passCac?dpWon(passCac):'—')+(passCac?'<small>원</small>':'')+'</div></div>';
+  var heroHtml='<div class="cac-funnel-hero"><div class="fnh-flow">'+steps+cphStep+'</div></div>';
   document.getElementById('cac_hero').innerHTML=heroHtml;
   function chanCard(cls,nm,char,c,pc){
     var cac = pc>0 ? Math.round(c.g/pc) : 0;
     var fb=function(label,n){ return label+' <b'+(n?'':' class="z"')+'>'+n+'</b>'; };
     return '<div class="cac-chan '+cls+'"><div class="cac-chan-top"><span class="cac-chan-nm">'+nm+'</span>'
       +'<span class="cac-chan-char">'+char+'</span></div>'
-      +'<div class="cph-l">채용단가</div>'
-      +'<div class="cph-v'+(cac?'':' z')+'">'+(cac?dpWon(cac):'-')+(cac?'<small>원</small>':'')+'</div>'
-      +'<div class="cac-chan-sub"><span>공고 <b'+(c.g?'':' class="z"')+'>'+dpWon(c.g)+'</b></span><span>합격 <b'+(pc?'':' class="z"')+'>'+pc+'</b></span></div>'
+      +'<div class="cac-chan-2col"><div class="ch-col"><div class="cph-l">이 채널 집행액</div><div class="ch-gonggo'+(c.g?'':' z')+'">'+dpWon(c.g)+'<small>원</small></div></div>'
+      +'<div class="ch-col ch-r"><div class="cph-l">채용단가 (CPH)</div><div class="cph-v'+(cac?'':' z')+'">'+(cac?dpWon(cac):'-')+(cac?'<small>원</small>':'')+'</div></div></div>'
+      +'<div class="cac-chan-sub"><span>합격 <b'+(pc?'':' class="z"')+'>'+pc+'</b>명</span></div>'
       +'<div class="cac-funnel">'+fb('이력',c.iry)+'<span class="arw">→</span>'+fb('통보',c.mt)+'<span class="arw">→</span>'+fb('참여',c.mc)+'<span class="arw">→</span>'+fb('합격',pc)+'<span class="arw">→</span>'+fb('교육',c.edu)+'</div></div>';
   }
   document.getElementById('cac_chans').innerHTML=
