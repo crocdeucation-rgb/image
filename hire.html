@@ -383,6 +383,23 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .cac-funnel b{color:var(--ink);font-weight:800}
 .cac-funnel b.z{color:#C3CDDD;font-weight:700}
 .cac-funnel .arw{color:#C9D2E0}
+.ch-pass{margin-top:10px;padding-top:10px;border-top:1px dashed #E7ECF4}
+.ch-pass-hd{font-size:11px;font-weight:800;color:#5A3AD0;margin-bottom:7px}
+.ch-pass-row{display:flex;gap:8px;align-items:flex-start;margin-bottom:6px}
+.ch-pass-row:last-child{margin-bottom:0}
+.ch-pass-job{font-size:10px;font-weight:800;padding:2px 8px;border-radius:6px;white-space:nowrap;flex-shrink:0;margin-top:1px}
+.ch-pass-job.job-상담부{background:#EEF0FF;color:#3B4F9E}
+.ch-pass-job.job-강사{background:#E6F7F0;color:#177A57}
+.ch-pass-job.job-사업부{background:#F0EBFF;color:#5A3AD0}
+.ch-pass-job.job-코칭{background:#FBF0DE;color:#96590F}
+.ch-pass-chips{display:flex;flex-wrap:wrap;gap:4px}
+.ch-chip{font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:7px;cursor:pointer;transition:.12s;background:#F4F6FA;color:#1B2436;border:1px solid #E7ECF4}
+.ch-chip:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(27,36,54,.12);border-color:#CBD5E8}
+.ch-chip.job-상담부{background:#EEF0FF;color:#3B4F9E}
+.ch-chip.job-강사{background:#E6F7F0;color:#177A57}
+.ch-chip.job-사업부{background:#F0EBFF;color:#5A3AD0}
+.ch-chip.job-코칭{background:#FBF0DE;color:#96590F}
+.ch-chip-wait{font-size:9px;font-weight:700;opacity:.6;margin-left:2px}
 .cac-note{font-size:11px;color:#B6C2DC;margin-top:12px;line-height:1.5;background:#FAFBFD;border-radius:8px;padding:9px 12px}
 .h2ic{width:17px;height:17px;vertical-align:-3px;margin-right:5px;color:var(--v1)}
 .noteic{width:14px;height:14px;vertical-align:-2px;margin-right:4px;color:#C3CDDD}
@@ -982,18 +999,37 @@ function cacRender(){
     +'<div class="fn-v'+(passCac?'':' z')+'">'+(passCac?dpWon(passCac):'—')+(passCac?'<small>원</small>':'')+'</div></div>';
   var heroHtml='<div class="cac-funnel-hero"><div class="fnh-flow">'+steps+cphStep+'</div></div>';
   document.getElementById('cac_hero').innerHTML=heroHtml;
-  function chanCard(cls,nm,char,c,pc){
+  function chanCard(cls,nm,char,c,pc,passList){
     var cac = pc>0 ? Math.round(c.g/pc) : 0;
     var fb=function(label,n){ return label+' <b'+(n?'':' class="z"')+'>'+n+'</b>'; };
+    // 합격자 부서별 그룹핑
+    var passHtml='';
+    if(passList && passList.length){
+      var byJob={};
+      passList.forEach(function(r){ (byJob[r.job]=byJob[r.job]||[]).push(r); });
+      var jobOrder=['상담부','강사','사업부','코칭'];
+      var jobKeys=Object.keys(byJob).sort(function(a,b){var ia=jobOrder.indexOf(a),ib=jobOrder.indexOf(b);return (ia<0?9:ia)-(ib<0?9:ib);});
+      passHtml='<div class="ch-pass"><div class="ch-pass-hd">합격자 '+passList.length+'명</div>';
+      jobKeys.forEach(function(job){
+        var arr=byJob[job];
+        passHtml+='<div class="ch-pass-row"><span class="ch-pass-job job-'+job+'">'+job+' '+arr.length+'</span><span class="ch-pass-chips">';
+        arr.forEach(function(r){
+          var esc=String(r.name||'').replace(/</g,'&lt;').replace(/\x27/g,'');
+          passHtml+='<span class="ch-chip job-'+r.job+'" onclick="openIv(\''+r.date+'\',\''+esc+'\')">'+esc+(r.edu?'':'<span class="ch-chip-wait">·교육대기</span>')+'</span>';
+        });
+        passHtml+='</span></div>';
+      });
+      passHtml+='</div>';
+    }
     return '<div class="cac-chan '+cls+'"><div class="cac-chan-top"><span class="cac-chan-nm">'+nm+'</span>'
       +'<span class="cac-chan-char">'+char+'</span></div>'
       +'<div class="cac-chan-2col"><div class="ch-col"><div class="cph-l">이 채널 집행액</div><div class="ch-gonggo'+(c.g?'':' z')+'">'+dpWon(c.g)+'<small>원</small></div></div>'
       +'<div class="ch-col ch-r"><div class="cph-l">채용단가 (CPH)</div><div class="cph-v'+(cac?'':' z')+'">'+(cac?dpWon(cac):'-')+(cac?'<small>원</small>':'')+'</div></div></div>'
       +'<div class="cac-chan-sub"><span>합격 <b'+(pc?'':' class="z"')+'>'+pc+'</b>명</span></div>'
-      +'<div class="cac-funnel">'+fb('이력',c.iry)+'<span class="arw">→</span>'+fb('통보',c.mt)+'<span class="arw">→</span>'+fb('참여',c.mc)+'<span class="arw">→</span>'+fb('합격',pc)+'<span class="arw">→</span>'+fb('교육',c.edu)+'</div></div>';
+      +'<div class="cac-funnel">'+fb('이력',c.iry)+'<span class="arw">→</span>'+fb('통보',c.mt)+'<span class="arw">→</span>'+fb('참여',c.mc)+'<span class="arw">→</span>'+fb('합격',pc)+'<span class="arw">→</span>'+fb('교육',c.edu)+'</div>'+passHtml+'</div>';
   }
   document.getElementById('cac_chans').innerHTML=
-    chanCard('jk','잡코리아','경력·정착형',jk,jkPass)+chanCard('am','알바몬','빠른충원',am,amPass);
+    chanCard('jk','잡코리아','경력·정착형',jk,jkPass,pass.jkList)+chanCard('am','알바몬','빠른충원',am,amPass,pass.amList);
   document.querySelectorAll('.cac-tab').forEach(function(b){ b.classList.toggle('on', b.dataset.mo===mo); });
 }
 function cacFnTog(el){ el.classList.toggle('open'); var f=el.nextElementSibling; if(f) f.classList.toggle('open'); }
