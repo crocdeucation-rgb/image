@@ -272,24 +272,35 @@ function buildDept(dept,emps,salesFn){
 }
 
 
-// ===== 매출 매칭 (월종결 + 총매출) =====
-function _salesNum(v){ var s=String(v==null?'':v).replace(/,/g,''); var n=parseFloat(s); return isNaN(n)?null:n; }
+// ===== 매출 매칭 (월종결 + 총매출) — total.html fdParseRows 로직 이식 =====
+// ⚠️ 원장 컬럼: 날짜(0)·상담원(1)·학생(2)·매출(3). 헤더행 자동탐지(고정 r=1 금지).
+//    URL은 gviz+headers=0 (publish 금지 — 캐시로 매출 0 사고).
+function _salesNum(v){ var n=parseFloat(String(v||'').replace(/[^0-9.\-]/g,'')); return isNaN(n)?0:n; }
+// 날짜 파싱: 'YYYY-MM-DD' 또는 'MM월 DD일' → 월(1~12)
 function _salesMonth(d){
-  if(!d)return 0;
-  var m=String(d).match(/(\d{4})-(\d{2})/);
-  return m?+m[2]:0;
+  d=String(d||'').trim(); if(!d)return 0;
+  var m1=d.match(/(\d{4})-(\d{1,2})-(\d{1,2})/); if(m1)return +m1[2];
+  var m2=d.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*일/); if(m2)return +m2[1];
+  return 0;
 }
-// CSV들(월종결·총매출) → recs[{name,mo,amt}]  (name=상담원=1번컬럼, 매출=3번, 날짜=0번)
+// CSV들(월종결·총매출) → recs[{name,mo,amt}]
 function buildSalesRecs(csvTexts){
   var recs=[];
   csvTexts.forEach(function(txt){
     var rows=parseCSV(txt);
-    for(var r=1;r<rows.length;r++){
+    // 헤더행 자동탐지: row[1]에 '상담' & row[17]에 '상태' 든 행 다음부터 데이터 (없으면 0=첫줄부터)
+    var hi=0;
+    for(var i=0;i<Math.min(rows.length,4);i++){
+      if(String(rows[i][1]||'').indexOf('상담')>=0 && String(rows[i][17]||'').indexOf('상태')>=0){hi=i;break;}
+    }
+    for(var r=hi+1;r<rows.length;r++){
       var row=rows[r];
+      var mo=_salesMonth(row[0]);            // 날짜→월
+      if(!mo)continue;                       // 날짜 없으면 데이터행 아님
       var nm=String(row[1]||'').trim();      // 상담원
+      if(!nm)continue;
       var amt=_salesNum(row[3]);             // 매출
-      var mo=_salesMonth(row[0]);            // 월
-      if(nm && amt && amt>0 && mo>=1){ recs.push({name:nm,mo:mo,amt:amt*1000}); }
+      if(amt>0){ recs.push({name:nm,mo:mo,amt:amt*1000}); }
     }
   });
   return recs;
@@ -316,8 +327,8 @@ var HR_URLS={
   coach:"https://docs.google.com/spreadsheets/d/e/2PACX-1vShRV1Qb_pqFgbkFJM1SCG5462zc_HgNTqG7-kxvoIvxd1yzx_pkIkP2IjjiVncH2arU5Ro2jgoH2AW/pub?gid=956415153&single=true&output=csv",
   suup:"https://docs.google.com/spreadsheets/d/e/2PACX-1vShRV1Qb_pqFgbkFJM1SCG5462zc_HgNTqG7-kxvoIvxd1yzx_pkIkP2IjjiVncH2arU5Ro2jgoH2AW/pub?gid=381025116&single=true&output=csv",
   ssam:"https://docs.google.com/spreadsheets/d/e/2PACX-1vROlkhhY9Ed7bm5LwF8OhP5bAYcaQrwiGRmo-ZdFNaoDOGpW0guTYNYTZusx3nVF6GRkyCUGLcAugOq/pub?gid=861431574&single=true&output=csv",
-  wolgyeol:"https://docs.google.com/spreadsheets/d/e/2PACX-1vTBUBxnTPPn_AebCqxIC8Q2x-5V3VuvIY6MM6QlgKVUUA7Bbjh3jMO7q6i4sDgQse-UKsNGe5Hxt7QF/pub?gid=1739211827&single=true&output=csv",
-  chongmae:"https://docs.google.com/spreadsheets/d/e/2PACX-1vTBUBxnTPPn_AebCqxIC8Q2x-5V3VuvIY6MM6QlgKVUUA7Bbjh3jMO7q6i4sDgQse-UKsNGe5Hxt7QF/pub?gid=698799247&single=true&output=csv"
+  wolgyeol:"https://docs.google.com/spreadsheets/d/1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU/gviz/tq?tqx=out:csv&headers=0&gid=1739211827",
+  chongmae:"https://docs.google.com/spreadsheets/d/1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU/gviz/tq?tqx=out:csv&headers=0&gid=698799247"
 };
 var DATA={};
 async function loadHR(){
