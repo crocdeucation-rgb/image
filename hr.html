@@ -619,6 +619,24 @@ function renderMonth(){
     return `<div class="gcard"><div class="ghd"><span class="gnm">${g.name}</span>${lead}<span class="gflow"><span>${g.start}</span> → <span class="e">${g.jae}</span></span></div><div class="gbody">${body}</div></div>`;
   }).join('');
 }
+function ssamCommonRange(){
+  // 전 강사 수업 범위 스캔 → 공통 축 (기본 15:00~24:00, 밖이면 확장)
+  var axS=15*60, axE=24*60;
+  function toMin(t){var m=String(t).match(/(\d{1,2})\s*:\s*(\d{2})/);return m?(+m[1]*60+ +m[2]):null;}
+  for(var nm in SSAM_SCHED){
+    SSAM_SCHED[nm].rows.forEach(function(r){
+      var mm=String(r.time).match(/(\d{1,2}:\d{2})\s*[~\-]\s*(\d{1,2}:\d{2})/);
+      var st=mm?toMin(mm[1]):toMin(r.time);
+      var en=mm?toMin(mm[2]):(st!=null?st+40:null);
+      if(st==null)return;
+      var hasClass=r.cells.some(function(c){return c;});
+      if(!hasClass)return;
+      if(st<axS)axS=Math.floor(st/60)*60;
+      if(en>axE)axE=Math.ceil(en/60)*60;
+    });
+  }
+  return {axS:axS, axE:axE};
+}
 function ssamScheduleHtml(name){
   var s=SSAM_SCHED[name];
   if(!s||!s.rows.length)return '';
@@ -647,7 +665,9 @@ function ssamScheduleHtml(name){
     });
   });
   if(!evts.length)return '';
-  var axS=Math.floor(minS/60)*60, axE=Math.ceil(maxE/60)*60;
+  // 시간축: 전 강사 공통 범위 (모든 강사 나란히 비교되게 통일)
+  var _cr=ssamCommonRange();
+  var axS=_cr.axS, axE=_cr.axE;
   var totalH=(axE-axS)/60*HH;
   var hourLines='';
   for(var t=axS;t<=axE;t+=60){
