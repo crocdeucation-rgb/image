@@ -67,6 +67,29 @@ svg.combo{width:100%;height:auto;display:block;overflow:visible}
 .bg-new{background:#E6F7EE;color:var(--pos);font-size:10px;font-weight:800;padding:1px 6px;border-radius:6px;margin-left:5px}
 .bg-out{background:#FBE9E7;color:var(--red);font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:5px}
 .bg-prom{background:#E6F7EE;color:#177A4A;font-size:10px;font-weight:800;padding:1px 7px;border-radius:6px;margin-left:5px}
+/* 쌤이다 강사 프로필 카드 */
+.ssam-card{display:flex;gap:16px;padding:16px 6px;border-bottom:1px solid #EEF1F6;align-items:flex-start}
+.ssam-photo{position:relative;width:96px;height:120px;border-radius:14px;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#E8ECF3,#D5DCE8)}
+.ssam-photo img{width:100%;height:100%;object-fit:cover;display:block;position:relative;z-index:1}
+.ssam-init{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800;color:#9AA6B8;z-index:0}
+.ssam-photo.noimg img{display:none}
+.ssam-subj{position:absolute;left:0;right:0;bottom:0;z-index:2;background:linear-gradient(to top,rgba(20,28,45,.88),rgba(20,28,45,.55),transparent);color:#fff;font-size:10.5px;font-weight:700;line-height:1.3;padding:14px 8px 6px;text-align:center;word-break:keep-all}
+.ssam-body{flex:1;min-width:0;padding-top:2px}
+.ssam-name{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:16px;font-weight:800;margin-bottom:4px}
+.ssam-rank{font-size:12px;font-weight:600;color:#6B7688}
+.ssam-in{font-size:11px;color:#9AA6B8;font-weight:600;margin-left:auto}
+.ssam-school{font-size:12.5px;color:#4C6EF5;font-weight:700;margin-bottom:8px}
+.ssam-note{display:flex;flex-direction:column;gap:5px}
+.ssam-line{font-size:12.5px;line-height:1.55;color:#4A5568;word-break:break-word}
+.ssam-line b{color:#2B4C8C;font-weight:800;margin-right:4px}
+@media(max-width:768px){
+  .ssam-card{gap:12px;padding:14px 2px}
+  .ssam-photo{width:76px;height:96px;border-radius:12px}
+  .ssam-init{font-size:26px}
+  .ssam-name{font-size:15px}
+  .ssam-subj{font-size:9.5px;padding:12px 5px 5px}
+  .ssam-line{font-size:12px}
+}
 .bg-leave{background:#FFF3E0;color:#C77700;font-size:10px;font-weight:800;padding:1px 7px;border-radius:6px;margin-left:5px}
 .bg-role{background:#E6F1FB;color:#185FA5;font-size:10px;font-weight:800;padding:1px 7px;border-radius:6px;margin-left:5px}
 .mrow.leave .mnm{color:#9AA6B8}
@@ -124,7 +147,7 @@ svg.combo{width:100%;height:auto;display:block;overflow:visible}
   <div class="clgd"><span><i style="background:#5DCAA5"></i>입사</span><span><i style="background:#F09595"></i>퇴사</span><span><i style="background:#161C2B"></i>월말 재직 인원</span></div></div>
 <div class="card" id="tenureCard"><h2 id="tenTitle"></h2><div class="sub">2026년 퇴사자를 근속 기간별로 분류 · 얼마나 빨리 나가는지가 채용 효율의 핵심 지표</div>
   <div id="tenure"></div></div>
-<div class="card"><h2 id="brTitle"></h2><div class="sub">각 카드 = 현재 인원 · 1~9월 미니 추이 · 연초 대비 순증감</div>
+<div class="card" id="brCard"><h2 id="brTitle"></h2><div class="sub">각 카드 = 현재 인원 · 1~9월 미니 추이 · 연초 대비 순증감</div>
   <div class="brgrid" id="brgrid"></div>
   
   <div class="swipehint">← 좌우로 밀어 지점을 넘겨보세요 · 탭하면 상세로</div></div>
@@ -193,6 +216,7 @@ function loadDept(csvText, grpfn, subcol){
     var sub=(subcol in idx)?String(row[idx[subcol]]||'').trim():'전체';
     var rank=('직급' in idx)?String(row[idx['직급']]||'').trim():'';
     var note=('특이사항' in idx)?String(row[idx['특이사항']]||'').trim():'';
+    var school=('학교' in idx)?String(row[idx['학교']]||'').trim():'';
     var hasJae=('재직' in idx);
     var jae=hasJae?String(row[idx['재직']]||'').trim():'';
     var inD=ymd(row[idx['입사일']]), outD=row[idx['퇴사일']]?ymd(row[idx['퇴사일']]):null;
@@ -201,7 +225,7 @@ function loadDept(csvText, grpfn, subcol){
     var drop=(!isJae)&&(outD===null);
     if(drop)continue;
     var leave=(nm==='김슬기'&&rank==='본부장');
-    out.push({name:nm,sub:sub||'미구분',grp:grpfn(sub),rank:rank,note:note,inD:inD,outD:outD,isJae:isJae,leave:leave});
+    out.push({name:nm,sub:sub||'미구분',grp:grpfn(sub),rank:rank,note:note,school:school,inD:inD,outD:outD,isJae:isJae,leave:leave});
   }
   return out;
 }
@@ -241,7 +265,7 @@ function buildDept(dept,emps,salesFn){
       var sal=(isOut&&dept==='상담부'&&salesFn)?salesFn(e.name,e.inD,e.outD):{};
       var salTot=0; for(var k in sal)salTot+=sal[k];
       var onLeave=!!e.leave&&mo>=2;
-      var m={name:e.name,sub:e.sub,rank:e.rank,note:e.note,inD:dstr(e.inD),in_md:mdstr(e.inD),out_md:mdstr(e.outD),
+      var m={name:e.name,sub:e.sub,rank:e.rank,note:e.note,school:e.school,inD:dstr(e.inD),in_md:mdstr(e.inD),out_md:mdstr(e.outD),
              span:span,isOut:isOut,isNew:isNew,onLeave:onLeave,sales:sal,sales_tot:salTot};
       (groups[e.grp]=groups[e.grp]||[]).push(m);
     });
@@ -320,6 +344,9 @@ function makeSalesFn(recs){
     return by;
   };
 }
+var SSAM_PHOTO_BASE='https://crocdeucation-rgb.github.io/image/report/ssam/';
+var SSAM_ROMAJA={'안중현':'anjunghyeon','최정민':'choejeongmin'};
+function ssamPhotoUrl(name){return SSAM_ROMAJA[name]?(SSAM_PHOTO_BASE+SSAM_ROMAJA[name]+'.jpg'):'';}
 const ORDER={"상담부":["가산연합센터","마곡지점","마포연합센터","메이킷위드","부평지점","수원지점","파인더루원","스카이에듀"],"사업부":["수호에듀","오름에듀","더온에듀","웹마케팅","인투수도권1팀","인투수도권2팀","인투수도권3팀","인투경상팀","인투충청전라팀","지니스터디","본사"],"수업강사":["국어","영어","수학","사회","과학","역사","미술","코딩","위드온","필기방","사무보조"],"코칭코치":["팀A","팀B","지원"],"쌤이다":[]}, LEAD={"메이킷위드":"지사장 장윤호","파인더루원":"지사장 김윤호","부평지점":"지점장 우혜림","마곡지점":"김슬기(휴직)","수원지점":"김우진 대리","가산연합센터":"장윤호·우혜림","마포연합센터":"김윤호·노영호","팀A":"정나영 본부장","팀B":"장영주 과장","지원":"출석체크·개통 A/S"};
 var HR_URLS={
   sangdam:"https://docs.google.com/spreadsheets/d/e/2PACX-1vQsnuROsI7L8HP80yoRQCuaAkcoPnVcK9TY1U2Z-B8AVHmz_Y7rO4_aUBLsgu91bJGj63xJFmNrnPaJ/pub?gid=120536013&single=true&output=csv",
@@ -414,6 +441,9 @@ function renderCombo(){
 }
 
 function renderBranches(){
+  var brCard=document.getElementById('brCard');
+  if(curDept==='쌤이다'){ if(brCard) brCard.style.display='none'; return; }  // 쌤이다는 지점 구분 없음
+  if(brCard) brCard.style.display='';
   document.getElementById('brTitle').textContent=`${curDept} — 지점별 현황`;
   let gs=orderedGroups(curDept);
   // 현재 인원 큰 순
@@ -466,6 +496,25 @@ function memRow(m){
   if(m.note){let n=m.note;
     if(/출첵|출석/.test(n))roleBadge='<span class="bg-role">출석체크</span>';
     else if(/개통|A\/S|AS/.test(n))roleBadge='<span class="bg-role">개통 A/S</span>';}
+  // 쌤이다 강사: 프로필 사진(과목 오버레이) + 학교 + 경력·자격증
+  if(curDept==='쌤이다'){
+    var purl=(typeof ssamPhotoUrl==='function')?ssamPhotoUrl(m.name):'';
+    var subj=m.sub&&m.sub!=='전체'&&m.sub!=='미구분'?m.sub:'';
+    var photoBox = purl
+      ? `<div class="ssam-photo"><img src="${purl}" alt="${m.name}" onerror="this.parentNode.classList.add('noimg');this.remove();"><span class="ssam-init">${m.name.charAt(0)}</span>${subj?`<div class="ssam-subj">${subj}</div>`:''}</div>`
+      : `<div class="ssam-photo noimg"><span class="ssam-init">${m.name.charAt(0)}</span>${subj?`<div class="ssam-subj">${subj}</div>`:''}</div>`;
+    var schoolLine=m.school?`<div class="ssam-school">${m.school}</div>`:'';
+    var noteBlock='';
+    if(m.note){
+      var parts=m.note.split('|').map(function(s){return s.trim();}).filter(Boolean);
+      noteBlock='<div class="ssam-note">'+parts.map(function(p){
+        return '<div class="ssam-line">'+p.replace(/^\*/,'').replace(/^(경력|자격증)\s*:\s*/,'<b>$1</b> ')+'</div>';
+      }).join('')+'</div>';
+    }
+    return `<div class="ssam-card">${photoBox}<div class="ssam-body">
+      <div class="ssam-name">${m.name}${badge}${prom}<span class="ssam-rank">${m.rank||''}</span><span class="ssam-in">${m.inD}</span></div>
+      ${schoolLine}${noteBlock}</div></div>`;
+  }
   if(!m.isOut)return `<div class="mrow ${m.onLeave?'leave':''}"><span class="mnm">${m.name}${badge}${prom}${leaveBadge}${roleBadge}</span>${rank}<span class="mdt">${m.inD}</span></div>`;
   let dt=m.in_md?`${m.in_md}입사 → ${m.out_md}퇴사`:(m.out_md+'퇴사');
   let reason=(m.note&&m.note.includes('급여'))?' <span style="color:#8A94A6">급여 사유</span>':'';
