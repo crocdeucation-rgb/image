@@ -96,11 +96,18 @@ body.ssam-mode .grid{grid-template-columns:repeat(2,1fr)}
 .cal-col{position:relative;border-left:1px solid #EEF1F6}
 .cal-col.cal-we{background:#FAFBFD}
 .cal-col::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(to bottom,transparent,transparent 39px,#F2F5FA 39px,#F2F5FA 40px)}
-.cal-ev{position:absolute;left:1px;right:1px;background:#4C6EF5;border-radius:4px;padding:1px 2px;overflow:hidden;z-index:1;box-shadow:0 1px 2px rgba(76,110,245,.25)}
+.cal-ev{position:absolute;left:1px;right:1px;border-radius:4px;padding:1px 3px;overflow:hidden;z-index:1;box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.cal-ev.cal-ara{background:#4C6EF5}
+.cal-ev.cal-ssam{background:#1FA37A}
 .cal-ev-l{display:block;font-size:9px;font-weight:700;color:#fff;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-ev-o{display:block;font-size:7px;font-weight:700;color:rgba(255,255,255,.75);line-height:1;letter-spacing:.2px}
+.cal-leg{font-size:9px;font-weight:600;color:#9AA6B8;margin-left:8px}
+.cal-leg i{display:inline-block;width:8px;height:8px;border-radius:2px;margin:0 2px 0 6px;vertical-align:-1px}
+.cal-leg i.lg-ara{background:#4C6EF5}.cal-leg i.lg-ssam{background:#1FA37A}
 @media(max-width:430px){
   .cal-dh{font-size:9px;padding:4px 0}
   .cal-ev-l{font-size:8px}
+  .cal-ev-o{font-size:6.5px}
   .cal-hl{font-size:8px}
   .cal-axis{width:34px}
   .cal-days{margin-left:34px}
@@ -628,7 +635,11 @@ function ssamScheduleHtml(name){
       if(c){
         var wd=WEEK.indexOf(sheetDays[di]);   // 시트 요일 → 7일 인덱스
         if(wd<0)return;
-        evts.push({wd:wd,s:st,e:en,label:c}); if(st<minS)minS=st; if(en>maxE)maxE=en;
+        // 소속 판별: S로 시작 or 쌤) = 쌤이다, 그 외 = 아라(기본)
+        var org='ara', label=c;
+        var mk=c.match(/^\s*(?:S|s|쌤\)?|쌤이다\)?)\s*[:\-)]?\s*/);
+        if(mk && /^(?:S|s|쌤)/.test(c.trim())){ org='ssam'; label=c.replace(mk,'').trim()||c; }
+        evts.push({wd:wd,s:st,e:en,label:label,org:org}); if(st<minS)minS=st; if(en>maxE)maxE=en;
       }
     });
   });
@@ -647,11 +658,11 @@ function ssamScheduleHtml(name){
     var blocks=evts.filter(function(e){return e.wd===wi;}).map(function(e){
       var top=(e.s-axS)/60*HH, h=Math.max((e.e-e.s)/60*HH,16);
       var tm=(Math.floor(e.s/60))+':'+('0'+(e.s%60)).slice(-2);
-      return '<div class="cal-ev" style="top:'+top+'px;height:'+(h-2)+'px" title="'+tm+' '+e.label+'"><span class="cal-ev-l">'+e.label+'</span></div>';
+      return '<div class="cal-ev cal-'+e.org+'" style="top:'+top+'px;height:'+(h-2)+'px" title="'+tm+' '+e.label+' ('+(e.org==='ssam'?'쌤이다':'아라')+')"><span class="cal-ev-l">'+e.label+'</span><span class="cal-ev-o">'+(e.org==='ssam'?'쌤이다':'아라')+'</span></div>';
     }).join('');
     return '<div class="cal-col'+(wi>=5?' cal-we':'')+'" style="height:'+totalH+'px">'+blocks+'</div>';
   }).join('');
-  return '<div class="ssam-sched"><div class="ssam-sched-lb">주간 시간표 <span class="sc-cnt">주 '+evts.length+'교시</span></div>'+
+  return '<div class="ssam-sched"><div class="ssam-sched-lb">주간 시간표 <span class="sc-cnt">주 '+evts.length+'교시</span><span class="cal-leg"><i class="lg-ara"></i>아라 <i class="lg-ssam"></i>쌤이다</span></div>'+
     '<div class="cal-wrap cal-7">'+
       '<div class="cal-corner"></div><div class="cal-days">'+dayHead+'</div>'+
       '<div class="cal-body"><div class="cal-axis" style="height:'+totalH+'px">'+hourLines+'</div>'+
