@@ -88,19 +88,21 @@ body.ssam-mode .grid{grid-template-columns:repeat(2,1fr)}
 .cal-corner{position:absolute}
 .cal-dh{text-align:center;font-size:10.5px;font-weight:700;color:#4A5568;padding:5px 0;background:#F4F6FA;border-left:1px solid #EEF1F6}
 .cal-dh.cal-we{color:#B6BECB}
-.cal-body{position:relative;display:flex}
+.cal-body{position:relative;display:flex;padding:6px 0 10px}
 .cal-axis{position:relative;width:42px;flex:none;background:#FAFBFD}
 .cal-hr{position:absolute;left:0;right:0;border-top:1px solid #EEF1F6}
-.cal-hl{position:absolute;top:-6px;right:5px;font-size:9px;color:#9AA6B8;font-weight:600;background:#FAFBFD;padding:0 2px}
+.cal-hl{position:absolute;top:-7px;right:5px;font-size:9px;color:#9AA6B8;font-weight:600;background:#FAFBFD;padding:0 3px;line-height:1}
 .cal-grid{position:relative;flex:1;display:grid;grid-template-columns:repeat(7,1fr)}
+.cal-ev-t{display:block;font-size:8px;font-weight:700;color:rgba(255,255,255,.9);line-height:1.15}
+.cal-ev-l{display:block;font-size:9.5px;font-weight:800;color:#fff;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-ev-o{display:none}
+.cal-ev.cal-ssam .cal-ev-o{display:block;font-size:7px;color:rgba(255,255,255,.8)}
 .cal-col{position:relative;border-left:1px solid #EEF1F6}
 .cal-col.cal-we{background:#FAFBFD}
 .cal-col::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(to bottom,transparent,transparent 39px,#F2F5FA 39px,#F2F5FA 40px)}
 .cal-ev{position:absolute;left:1px;right:1px;border-radius:4px;padding:1px 3px;overflow:hidden;z-index:1;box-shadow:0 1px 2px rgba(0,0,0,.12)}
 .cal-ev.cal-ara{background:#4C6EF5}
 .cal-ev.cal-ssam{background:#1FA37A}
-.cal-ev-l{display:block;font-size:9px;font-weight:700;color:#fff;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cal-ev-o{display:block;font-size:7px;font-weight:700;color:rgba(255,255,255,.75);line-height:1;letter-spacing:.2px}
 .cal-leg{font-size:9px;font-weight:600;color:#9AA6B8;margin-left:8px}
 .cal-leg i{display:inline-block;width:8px;height:8px;border-radius:2px;margin:0 2px 0 6px;vertical-align:-1px}
 .cal-leg i.lg-ara{background:#4C6EF5}.cal-leg i.lg-ssam{background:#1FA37A}
@@ -619,7 +621,7 @@ function renderMonth(){
 function ssamScheduleHtml(name){
   var s=SSAM_SCHED[name];
   if(!s||!s.rows.length)return '';
-  var HH=40;                    // 1시간 = 40px
+  var HH=46;                    // 1시간 = 46px (블록에 시간+과목 2줄)
   var WEEK=['월','화','수','목','금','토','일'];   // 7일 고정 축
   var sheetDays=s.days;         // 시트에 있는 요일 (예: 월화수목)
   // 시간 파싱
@@ -658,7 +660,7 @@ function ssamScheduleHtml(name){
     var blocks=evts.filter(function(e){return e.wd===wi;}).map(function(e){
       var top=(e.s-axS)/60*HH, h=Math.max((e.e-e.s)/60*HH,16);
       var tm=(Math.floor(e.s/60))+':'+('0'+(e.s%60)).slice(-2);
-      return '<div class="cal-ev cal-'+e.org+'" style="top:'+top+'px;height:'+(h-2)+'px" title="'+tm+' '+e.label+' ('+(e.org==='ssam'?'쌤이다':'아라')+')"><span class="cal-ev-l">'+e.label+'</span><span class="cal-ev-o">'+(e.org==='ssam'?'쌤이다':'아라')+'</span></div>';
+      return '<div class="cal-ev cal-'+e.org+'" style="top:'+top+'px;height:'+(h-2)+'px" title="'+tm+' '+e.label+' ('+(e.org==='ssam'?'쌤이다':'아라')+')"><span class="cal-ev-t">'+tm+'</span><span class="cal-ev-l">'+e.label+'</span><span class="cal-ev-o">'+(e.org==='ssam'?'쌤이다':'아라')+'</span></div>';
     }).join('');
     return '<div class="cal-col'+(wi>=5?' cal-we':'')+'" style="height:'+totalH+'px">'+blocks+'</div>';
   }).join('');
