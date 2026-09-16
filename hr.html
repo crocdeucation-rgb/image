@@ -667,9 +667,9 @@ function ssamScheduleHtml(name){
     });
   });
   if(!evts.length)return '';
-  // 시간축: 전 강사 공통 범위 (모든 강사 나란히 비교되게 통일)
-  var _cr=ssamCommonRange();
-  var axS=_cr.axS, axE=_cr.axE;
+  // 시간축: 이 강사 자기 수업 범위만 (첫 수업~막 수업). 짧으면 짧게.
+  var axS=Math.floor(minS/60)*60;   // 시작 정시 내림
+  var axE=Math.ceil(maxE/30)*30;    // 끝 30분 올림
   var totalH=(axE-axS)/60*HH;
   var hourLines='';
   for(var t=axS;t<=axE;t+=60){
