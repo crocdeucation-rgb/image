@@ -76,7 +76,35 @@ body.ssam-mode .grid{grid-template-columns:repeat(2,1fr)}
 .ssam-photo img{width:100%;height:100%;object-fit:cover;display:block;position:relative;z-index:1}
 .ssam-init{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800;color:#9AA6B8;z-index:0}
 .ssam-photo.noimg img{display:none}
-.ssam-subj{position:absolute;left:0;right:0;bottom:0;z-index:2;background:linear-gradient(to top,rgba(20,28,45,.88),rgba(20,28,45,.55),transparent);color:#fff;font-size:10.5px;font-weight:700;line-height:1.3;padding:14px 8px 6px;text-align:center;word-break:keep-all}
+.ssam-subj{position:absolute;left:0;right:0;bottom:0;z-index:2;background:linear-gradient(to top,rgba(20,28,45,.9),rgba(20,28,45,.6),transparent);color:#fff;padding:16px 6px 7px;text-align:center}
+.ssam-subj-nm{font-size:11px;font-weight:800;line-height:1.2;margin-bottom:4px;word-break:keep-all}
+.ssam-tags{display:flex;gap:3px;justify-content:center;flex-wrap:wrap}
+.ssam-tag{font-size:8.5px;font-weight:800;padding:1px 5px;border-radius:5px;line-height:1.4;color:#fff}
+.ssam-tag.t-초{background:#3B82C4}.ssam-tag.t-중{background:#2AA37B}.ssam-tag.t-고{background:#C0662E}
+/* 주간 캘린더 (시간축 + 이벤트 블록) */
+.sc-cnt{font-size:10px;font-weight:700;color:#4C6EF5;background:#EEF2FF;padding:1px 7px;border-radius:5px;margin-left:4px}
+.cal-wrap{border:1px solid #E3E8F0;border-radius:10px;overflow:hidden;background:#fff}
+.cal-days{display:grid;grid-template-columns:repeat(7,1fr);margin-left:42px;border-bottom:1px solid #E3E8F0}
+.cal-corner{position:absolute}
+.cal-dh{text-align:center;font-size:10.5px;font-weight:700;color:#4A5568;padding:5px 0;background:#F4F6FA;border-left:1px solid #EEF1F6}
+.cal-dh.cal-we{color:#B6BECB}
+.cal-body{position:relative;display:flex}
+.cal-axis{position:relative;width:42px;flex:none;background:#FAFBFD}
+.cal-hr{position:absolute;left:0;right:0;border-top:1px solid #EEF1F6}
+.cal-hl{position:absolute;top:-6px;right:5px;font-size:9px;color:#9AA6B8;font-weight:600;background:#FAFBFD;padding:0 2px}
+.cal-grid{position:relative;flex:1;display:grid;grid-template-columns:repeat(7,1fr)}
+.cal-col{position:relative;border-left:1px solid #EEF1F6}
+.cal-col.cal-we{background:#FAFBFD}
+.cal-col::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(to bottom,transparent,transparent 39px,#F2F5FA 39px,#F2F5FA 40px)}
+.cal-ev{position:absolute;left:1px;right:1px;background:#4C6EF5;border-radius:4px;padding:1px 2px;overflow:hidden;z-index:1;box-shadow:0 1px 2px rgba(76,110,245,.25)}
+.cal-ev-l{display:block;font-size:9px;font-weight:700;color:#fff;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:430px){
+  .cal-dh{font-size:9px;padding:4px 0}
+  .cal-ev-l{font-size:8px}
+  .cal-hl{font-size:8px}
+  .cal-axis{width:34px}
+  .cal-days{margin-left:34px}
+}
 .ssam-body{flex:1;min-width:0;padding-top:2px}
 .ssam-name{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:16px;font-weight:800;margin-bottom:4px}
 .ssam-rank{font-size:12px;font-weight:600;color:#6B7688}
@@ -102,7 +130,9 @@ body.ssam-mode .grid{grid-template-columns:repeat(2,1fr)}
   .ssam-photo{width:78px;height:104px;border-radius:12px}
   .ssam-init{font-size:26px}
   .ssam-name{font-size:15px}
-  .ssam-subj{font-size:9.5px;padding:12px 5px 5px}
+  .ssam-subj{padding:12px 5px 5px}
+  .ssam-subj-nm{font-size:9.5px}
+  .ssam-tag{font-size:8px;padding:1px 4px}
   .ssam-line{font-size:12px}
 }
 .bg-leave{background:#FFF3E0;color:#C77700;font-size:10px;font-weight:800;padding:1px 7px;border-radius:6px;margin-left:5px}
@@ -160,7 +190,9 @@ body.ssam-mode .grid{grid-template-columns:repeat(2,1fr)}
   .ssam-card{flex-direction:column;gap:12px;padding:14px 4px}
   .ssam-photo{width:100%;height:200px;border-radius:14px}
   .ssam-init{font-size:44px}
-  .ssam-subj{font-size:12px;padding:16px 10px 8px}
+  .ssam-subj{padding:16px 10px 9px}
+  .ssam-subj-nm{font-size:13px}
+  .ssam-tag{font-size:10px;padding:2px 7px}
   .ssam-body{width:100%}
   .ssam-name{font-size:16px}
   .ssam-in{font-size:10.5px}
@@ -406,19 +438,23 @@ function parseSsamSchedule(csvText){
   if(!csvText)return;
   var rows=parseCSV(csvText);
   var cur=null;
+  var DOW=['월','화','수','목','금','토','일'];
   rows.forEach(function(r){
     var name=String(r[1]||'').trim();
     var c2=String(r[2]||'').trim();
-    // 강사명 헤더행: C열(2)이 '월'
-    if(c2==='월' && name){
+    // 강사명 헤더행: C열(2)이 요일이면 (월/화/… 무엇으로 시작하든)
+    if(DOW.indexOf(c2)>=0 && name){
       cur=name;
-      SSAM_SCHED[cur]={days:[r[2],r[3],r[4],r[5]].map(function(x){return String(x||'').trim();}), rows:[]};
+      // 시트에 나온 요일 순서 저장 (C열=2부터 끝까지)
+      var hdrDays=[];
+      for(var i=2;i<r.length;i++){var d=String(r[i]||'').trim();if(DOW.indexOf(d)>=0)hdrDays.push({day:d,col:i});}
+      SSAM_SCHED[cur]={days:hdrDays.map(function(x){return x.day;}), cols:hdrDays.map(function(x){return x.col;}), rows:[]};
       return;
     }
-    // 시간대 행: B열(1)에 시간, 하나라도 값 있으면
+    // 시간대 행
     var time=name;
     if(cur && time && /[:~시]/.test(time)){
-      var cells=[r[2],r[3],r[4],r[5]].map(function(x){return String(x||'').trim();});
+      var cells=SSAM_SCHED[cur].cols.map(function(ci){return String(r[ci]||'').trim();});
       SSAM_SCHED[cur].rows.push({time:time, cells:cells});
     }
   });
@@ -576,16 +612,51 @@ function renderMonth(){
 function ssamScheduleHtml(name){
   var s=SSAM_SCHED[name];
   if(!s||!s.rows.length)return '';
-  // 값이 하나라도 있는 행만 표시
-  var visRows=s.rows.filter(function(r){return r.cells.some(function(c){return c;});});
-  if(!visRows.length)return '';
-  var head='<tr><th class="sc-t"></th>'+s.days.map(function(d){return '<th>'+d+'</th>';}).join('')+'</tr>';
-  var body=visRows.map(function(r){
-    return '<tr><td class="sc-t">'+r.time+'</td>'+r.cells.map(function(c){
-      return '<td'+(c?' class="sc-on"':'')+'>'+(c||'')+'</td>';
-    }).join('')+'</tr>';
+  var HH=40;                    // 1시간 = 40px
+  var WEEK=['월','화','수','목','금','토','일'];   // 7일 고정 축
+  var sheetDays=s.days;         // 시트에 있는 요일 (예: 월화수목)
+  // 시간 파싱
+  function toMin(t){var m=String(t).match(/(\d{1,2})\s*:\s*(\d{2})/);return m?(+m[1]*60+ +m[2]):null;}
+  var evts=[];  // {wd:0~6(월~일), s, e, label}
+  var minS=1e9, maxE=-1;
+  s.rows.forEach(function(r){
+    var mm=String(r.time).match(/(\d{1,2}:\d{2})\s*[~\-]\s*(\d{1,2}:\d{2})/);
+    var st=mm?toMin(mm[1]):toMin(r.time);
+    var en=mm?toMin(mm[2]):(st!=null?st+40:null);
+    if(st==null)return;
+    r.cells.forEach(function(c,di){
+      if(c){
+        var wd=WEEK.indexOf(sheetDays[di]);   // 시트 요일 → 7일 인덱스
+        if(wd<0)return;
+        evts.push({wd:wd,s:st,e:en,label:c}); if(st<minS)minS=st; if(en>maxE)maxE=en;
+      }
+    });
+  });
+  if(!evts.length)return '';
+  var axS=Math.floor(minS/60)*60, axE=Math.ceil(maxE/60)*60;
+  var totalH=(axE-axS)/60*HH;
+  var hourLines='';
+  for(var t=axS;t<=axE;t+=60){
+    var y=(t-axS)/60*HH;
+    hourLines+='<div class="cal-hr" style="top:'+y+'px"><span class="cal-hl">'+(t/60)+':00</span></div>';
+  }
+  // 요일 헤더: 월~일 7개 (주말은 흐리게)
+  var dayHead=WEEK.map(function(d,i){return '<div class="cal-dh'+(i>=5?' cal-we':'')+'">'+d+'</div>';}).join('');
+  // 7일 컬럼
+  var cols=WEEK.map(function(d,wi){
+    var blocks=evts.filter(function(e){return e.wd===wi;}).map(function(e){
+      var top=(e.s-axS)/60*HH, h=Math.max((e.e-e.s)/60*HH,16);
+      var tm=(Math.floor(e.s/60))+':'+('0'+(e.s%60)).slice(-2);
+      return '<div class="cal-ev" style="top:'+top+'px;height:'+(h-2)+'px" title="'+tm+' '+e.label+'"><span class="cal-ev-l">'+e.label+'</span></div>';
+    }).join('');
+    return '<div class="cal-col'+(wi>=5?' cal-we':'')+'" style="height:'+totalH+'px">'+blocks+'</div>';
   }).join('');
-  return '<div class="ssam-sched"><div class="ssam-sched-lb">주간 시간표</div><table class="sc-tbl">'+head+body+'</table></div>';
+  return '<div class="ssam-sched"><div class="ssam-sched-lb">주간 시간표 <span class="sc-cnt">주 '+evts.length+'교시</span></div>'+
+    '<div class="cal-wrap cal-7">'+
+      '<div class="cal-corner"></div><div class="cal-days">'+dayHead+'</div>'+
+      '<div class="cal-body"><div class="cal-axis" style="height:'+totalH+'px">'+hourLines+'</div>'+
+        '<div class="cal-grid">'+cols+'</div></div>'+
+    '</div></div>';
 }
 function memRow(m){
   let badge=m.isOut?'<span class="bg-out">퇴사</span>':(m.isNew?'<span class="bg-new">NEW</span>':'');
@@ -599,10 +670,26 @@ function memRow(m){
   // 쌤이다 강사: 프로필 사진(과목 오버레이) + 학교 + 경력·자격증
   if(curDept==='쌤이다'){
     var purl=(typeof ssamPhotoUrl==='function')?ssamPhotoUrl(m.name):'';
-    var subj=m.sub&&m.sub!=='전체'&&m.sub!=='미구분'?m.sub:'';
+    // 과목명에서 과목·커버범위 분리: "국어,사회 (~고3)" → 과목[국어·사회] 범위[~고3→초중고]
+    var rawSub=m.sub&&m.sub!=='전체'&&m.sub!=='미구분'?m.sub:'';
+    var subjHtml='';
+    if(rawSub){
+      var mm=rawSub.match(/^([^(]+?)\s*\(([^)]*)\)/);
+      var subjName=(mm?mm[1]:rawSub).trim().replace(/,/g,'·');
+      var rangeTxt=mm?mm[2]:'';
+      // 커버 범위 → 초/중/고 딱지
+      var tags=[];
+      var hasCho=/초/.test(rangeTxt), hasJung=/중/.test(rangeTxt), hasGo=/고/.test(rangeTxt);
+      // "~고3" = 고까지니 초·중·고 다 / "~중3" = 초·중 / "~초N" = 초
+      if(hasGo){tags=['초등','중등','고등'];}
+      else if(hasJung){tags=['초등','중등'];}
+      else if(hasCho){tags=['초등'];}
+      var tagHtml=tags.length?('<div class="ssam-tags">'+tags.map(function(t){return '<span class="ssam-tag t-'+t.charAt(0)+'">'+t+'</span>';}).join('')+'</div>'):'';
+      subjHtml='<div class="ssam-subj"><div class="ssam-subj-nm">'+subjName+'</div>'+tagHtml+'</div>';
+    }
     var photoBox = purl
-      ? `<div class="ssam-photo"><img src="${purl}" alt="${m.name}" onerror="this.parentNode.classList.add('noimg');this.remove();"><span class="ssam-init">${m.name.charAt(0)}</span>${subj?`<div class="ssam-subj">${subj}</div>`:''}</div>`
-      : `<div class="ssam-photo noimg"><span class="ssam-init">${m.name.charAt(0)}</span>${subj?`<div class="ssam-subj">${subj}</div>`:''}</div>`;
+      ? `<div class="ssam-photo"><img src="${purl}" alt="${m.name}" onerror="this.parentNode.classList.add('noimg');this.remove();"><span class="ssam-init">${m.name.charAt(0)}</span>${subjHtml}</div>`
+      : `<div class="ssam-photo noimg"><span class="ssam-init">${m.name.charAt(0)}</span>${subjHtml}</div>`;
     var schoolLine=m.school?`<div class="ssam-school">${m.school}</div>`:'';
     var noteBlock='';
     if(m.note){
