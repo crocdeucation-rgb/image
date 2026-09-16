@@ -492,7 +492,7 @@ let currentSec = 0;
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1438610573&single=true&output=csv';
 const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1384080283&single=true&output=csv';
     const LEDGER_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBUBxnTPPn_AebCqxIC8Q2x-5V3VuvIY6MM6QlgKVUUA7Bbjh3jMO7q6i4sDgQse-UKsNGe5Hxt7QF/pub?gid=431762866&single=true&output=csv';
-    const CANCEL_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBUBxnTPPn_AebCqxIC8Q2x-5V3VuvIY6MM6QlgKVUUA7Bbjh3jMO7q6i4sDgQse-UKsNGe5Hxt7QF/pub?gid=128666314&single=true&output=csv';
+    const CANCEL_CSV_URL = 'https://docs.google.com/spreadsheets/d/1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU/gviz/tq?tqx=out:csv&headers=0&gid=431762866';
 
 const ASSIGNEES = ['우혜림','김윤호','장윤호','박창건','김태석','김성윤','노영호','김원득','김우진','안준섭','김주환'];
 // [2026-09-02] 담당자 수 변동(김주환 추가 등)에도 안 깨지게 — 고정 행번호 대신 라벨로 탐색.
@@ -605,9 +605,9 @@ async function loadCancel() {
     const res = await fetch(CANCEL_CSV_URL);
     const text = await res.text();
     const rows = parseCSV(text);
-    rows.shift();
-    // 취소요약_전체 컬럼: 날짜(0)|학생(1)|학년(2)|취소액(3)|담당자(4) — 전부 cancel
-    cancelData.rows = rows.filter(r => r[0] && (parseFloat(r[3])||0) > 0);
+    // 원장(리드요약_원장) 컬럼: 날짜(0)|시간(1)|이름(2)|학년(3)|타입(4)|매출(5)|담당자(6)|pageId(7)|취소액(8)
+    // total과 동일 소스. 취소액(8)>0 인 행만 = 취소 발생분. (헤더행은 날짜형식 아님 → 자동 제외)
+    cancelData.rows = rows.filter(r => /^\d{4}-\d{2}-\d{2}/.test(String(r[0]||'').trim()) && (parseFloat(r[8])||0) > 0);
     renderCancel();
     if(typeof render==='function' && allRows && allRows.length){ try{ render(); }catch(_e){} }   // [2026-09] 취소금액 담당자표 반영
   } catch(e) {
@@ -633,7 +633,7 @@ function renderCancel() {
   let sum = 0, cnt = 0;
   cancelData.rows.forEach(r => {
     const date = r[0] || '';
-    const amt = parseFloat(r[3]) || 0;
+    const amt = parseFloat(r[8]) || 0;
     let match = false;
     if (cancelTab === 0) match = date.indexOf(thisYM) === 0;      // 이번달
     else if (cancelTab === 1) match = date.indexOf(lastYM) === 0;  // 지난달
@@ -758,7 +758,7 @@ function render() {
     var lm=new Date(now.getFullYear(), now.getMonth()-1, 1);
     var lastYM=lm.getFullYear()+'-'+String(lm.getMonth()+1).padStart(2,'0');
     (cancelData.rows||[]).forEach(function(r){
-      var date=r[0]||'', amt=parseFloat(r[3])||0, nm=(r[4]||'').trim();
+      var date=r[0]||'', amt=parseFloat(r[8])||0, nm=(r[6]||'').trim();
       if(!nm) return;
       var match = funnelTab===0 ? date.indexOf(thisYM)===0 : funnelTab===1 ? date.indexOf(lastYM)===0 : true;
       if(match) m[nm]=(m[nm]||0)+amt;
@@ -879,7 +879,7 @@ function render() {
 
   // [개편] 담당자 × 소재 히트맵 렌더 (r[_sojCol] = 소재분포 "키:값;키:값")
   // ★ 2026-08-04 신규 소재 추가: 원톱·5단계루틴·기초부족 (getLeadStats sojKeyOf와 키 일치시킬 것)
-  const SOJ_KEYS=['노트릴스','노필릴스','채리','GT','원톱','맞춤처방','방으로','5단계루틴','기초부족','MLST공부','MLST캐러셀','노트공부법','정지소재단일','너만본다','CPA(텐핑)','카카오','Organic','네이버브랜드','기타'];
+  const SOJ_KEYS=['위너노트릴스','위너노트필기','위너MLST','노트릴스','노필릴스','채리','GT','원톱','맞춤처방','방으로','5단계루틴','기초부족','MLST공부','MLST캐러셀','노트공부법','정지소재단일','너만본다','메타기타','CPA(텐핑)','카카오','Organic','네이버브랜드','기타'];
   const _sojCol = funnelTab===1 ? 29 : (funnelTab===2 ? 30 : 28);
   const heatData=ASSIGNEES.map((name,i)=>{
     const r=allRows[ASSIGNEE_START_IDX+i]||[];
