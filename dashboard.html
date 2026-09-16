@@ -599,15 +599,31 @@ async function loadYRank(){
 let cancelData = { rows: [] };  // 원장 취소 데이터 캐시
 let cancelTab = 0;              // 0=이번달 1=지난달 2=전체
 
-// 원장 CSV 로드 (취소 데이터 캐시)
+// 원장 CSV(지난달·전체 취소) + total JSON(이번달 웹마 취소=total과 동일) 로드
+var webCxaThisMonth = null;   // total JSON의 이번달 웹마 취소(web.cxa). null=아직 로드 안 됨
 async function loadCancel() {
   try {
     const res = await fetch(CANCEL_CSV_URL);
     const text = await res.text();
     const rows = parseCSV(text);
     // 원장(리드요약_원장) 컬럼: 날짜(0)|시간(1)|이름(2)|학년(3)|타입(4)|매출(5)|담당자(6)|pageId(7)|취소액(8)
-    // total과 동일 소스. 취소액(8)>0 인 행만 = 취소 발생분. (헤더행은 날짜형식 아님 → 자동 제외)
+    // 원장 취소액(8)엔 4~8월만 있음(과거월). 이번달 취소는 total JSON(web.cxa)에서 별도 로드.
     cancelData.rows = rows.filter(r => /^\d{4}-\d{2}-\d{2}/.test(String(r[0]||'').trim()) && (parseFloat(r[8])||0) > 0);
+    // [2026-09] 이번달 웹마 취소 = total(총매출_전사 JSON)의 web.cxa — total 카드와 동일값
+    try {
+      const jres = await fetch('https://docs.google.com/spreadsheets/d/1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU/gviz/tq?tqx=out:csv&headers=0&gid=1261488271&_=' + Date.now());
+      let jtext = await jres.text();
+      // gviz는 JSON 셀을 CSV로 내보내며 내부 "를 ""로 이스케이프 → 복원 필요
+      jtext = jtext.replace(/^\uFEFF/, '').trim();
+      if (jtext.charAt(0) === '"') jtext = jtext.slice(1);           // 셀 감싼 바깥 따옴표 제거
+      jtext = jtext.replace(/""/g, '"');                            // "" → " 복원
+      const jstart = jtext.indexOf('{');
+      const jend = jtext.lastIndexOf('}');
+      if (jstart >= 0 && jend > jstart) {
+        const D = JSON.parse(jtext.slice(jstart, jend + 1));
+        if (D && D.web && typeof D.web.cxa === 'number') webCxaThisMonth = D.web.cxa;  // 원 단위
+      }
+    } catch(_je) { webCxaThisMonth = null; }
     renderCancel();
     if(typeof render==='function' && allRows && allRows.length){ try{ render(); }catch(_e){} }   // [2026-09] 취소금액 담당자표 반영
   } catch(e) {
@@ -630,29 +646,37 @@ function renderCancel() {
   const lastM = new Date(now.getFullYear(), now.getMonth()-1, 1);
   const lastYM = lastM.getFullYear() + '-' + String(lastM.getMonth()+1).padStart(2,'0');
 
-  let sum = 0, cnt = 0;
-  cancelData.rows.forEach(r => {
-    const date = r[0] || '';
-    const amt = parseFloat(r[8]) || 0;
-    let match = false;
-    if (cancelTab === 0) match = date.indexOf(thisYM) === 0;      // 이번달
-    else if (cancelTab === 1) match = date.indexOf(lastYM) === 0;  // 지난달
-    else match = true;                                            // 전체
-    if (match) { sum += amt; cnt++; }
-  });
+  let wonAmt = 0, cnt = 0;   // wonAmt = 원 단위 취소액
+  if (cancelTab === 0 && webCxaThisMonth !== null) {
+    // 이번달 = total(총매출_전사 web.cxa)과 동일값. 원장엔 당월 취소가 없어 JSON을 신뢰.
+    wonAmt = webCxaThisMonth;
+    cnt = cancelData.rows.filter(r => (r[0]||'').indexOf(thisYM) === 0).length;  // 참고용 건수
+  } else {
+    // 지난달·전체 = 원장 취소액(r[8], 천 단위) 합산
+    let sum = 0;
+    cancelData.rows.forEach(r => {
+      const date = r[0] || '';
+      const amt = parseFloat(r[8]) || 0;
+      let match = false;
+      if (cancelTab === 0) match = date.indexOf(thisYM) === 0;      // 이번달(JSON 폴백 시)
+      else if (cancelTab === 1) match = date.indexOf(lastYM) === 0;  // 지난달
+      else match = true;                                            // 전체
+      if (match) { sum += amt; cnt++; }
+    });
+    wonAmt = sum * 1000;   // 원장은 천 단위 → 원
+  }
 
-  const won = sum * 1000;
-  const disp = won >= 10000 ? Math.round(won/10000).toLocaleString() + '만원' : (won>0? won.toLocaleString()+'원' : '0원');
+  const disp = wonAmt >= 10000 ? Math.round(wonAmt/10000).toLocaleString() + '만원' : (wonAmt>0? wonAmt.toLocaleString()+'원' : '0원');
   const amtEl = document.getElementById('cancel-amt');
   const cntEl = document.getElementById('cancel-cnt');
   const monthEl = document.getElementById('cancel-month');  // 매출 그리드 취소 카드 — 통합 토글 연동
-  if (amtEl) amtEl.textContent = sum > 0 ? '-' + disp : '0원';
+  if (amtEl) amtEl.textContent = wonAmt > 0 ? '-' + disp : '0원';
   if (cntEl) cntEl.textContent = cnt + '건';
 
   // [2026-08-27] 취소 카드 = 통합 토글(cancelTab) 연동 (이번달/지난달/전체)
   const cxl = document.getElementById('cx-label');
   if (cxl) cxl.textContent = ['이번 달 취소','지난 달 취소','전체 취소'][cancelTab];
-  if (monthEl) monthEl.textContent = sum > 0 ? '-' + disp : '0원';
+  if (monthEl) monthEl.textContent = wonAmt > 0 ? '-' + disp : '0원';
 }
 
 async function loadData() {
