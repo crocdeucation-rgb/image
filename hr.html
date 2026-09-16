@@ -55,6 +55,9 @@ svg.combo{width:100%;height:auto;display:block;overflow:visible}
 .hero .io{display:flex;gap:24px}.hero .io div{font-size:11px;color:#B6C2DC}.hero .io b{display:block;font-size:18px;margin-top:2px}
 .hero .io .in b{color:#5DCAA5}.hero .io .out b{color:#F09595}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+/* 쌤이다: 강사 정보량 많아 최대 2컬럼, 폴드펼침(≤768) 이하 1컬럼 */
+body.ssam-mode .grid{grid-template-columns:repeat(2,1fr)}
+@media(max-width:768px){body.ssam-mode .grid{grid-template-columns:1fr}}
 .gcard{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
 .ghd{display:flex;align-items:center;gap:8px;padding:9px 12px;background:#F1F4F9;border-bottom:1px solid #E9EEF5}
 .gnm{font-weight:800;color:var(--v1);font-size:13px}.c-won{color:var(--pur);font-size:11px;font-weight:700}
@@ -147,10 +150,36 @@ svg.combo{width:100%;height:auto;display:block;overflow:visible}
   .hint{display:none}
   .swipehint{display:block}
 }
+/* 폴드 커버 · 초좁은 화면 (≤430px): 쌤이다 카드 세로 스택 */
+@media(max-width:430px){
+  .wrap{padding:14px 10px 44px}
+  .card{padding:13px 11px}
+  .kpis{gap:7px}
+  .kpi{padding:11px 12px}.kpi .lb{font-size:11px}.kpi .vv{font-size:21px}.kpi .sub2{font-size:10px}
+  /* 쌤이다 강사 카드: 사진 위 + 정보 아래 세로 배치 */
+  .ssam-card{flex-direction:column;gap:12px;padding:14px 4px}
+  .ssam-photo{width:100%;height:200px;border-radius:14px}
+  .ssam-init{font-size:44px}
+  .ssam-subj{font-size:12px;padding:16px 10px 8px}
+  .ssam-body{width:100%}
+  .ssam-name{font-size:16px}
+  .ssam-in{font-size:10.5px}
+  .ssam-line{font-size:12px;line-height:1.6}
+  /* 시간표: 화면 폭 꽉, 가로 스크롤 */
+  .ssam-sched{margin-left:-4px;margin-right:-4px}
+  .sc-tbl{min-width:0;font-size:9.5px;width:100%}
+  .sc-tbl th,.sc-tbl td{padding:2px 2px}
+  .sc-tbl .sc-t{font-size:8.5px;padding-right:4px}
+}
+/* 폴드 완전 접힘 (≤360px): KPI 1컬럼 */
+@media(max-width:360px){
+  .kpis{grid-template-columns:1fr}
+  .ssam-photo{height:180px}
+}
 .swipehint{display:none;font-size:11px;color:#B6C2DC;text-align:center;margin-top:8px}
 </style></head><body><div class="wrap">
-<div class="hd"><div><div class="k">HR 인사 리포트 · 경영진용</div><h1>인사 현황 — 인력 추이</h1>
-<div class="m">2026년 1~9월 · 월말 재직 기준</div></div>
+<div class="hd"><div><div class="k">HR 인사 리포트 · 경영진용</div><h1 id="pageTitle">인사 현황 — 인력 추이</h1>
+<div class="m" id="pageSub">2026년 1~9월 · 월말 재직 기준</div></div>
 <div class="asof">기준<b>2026년 9월</b></div></div>
 <div class="tabs" id="tabs"></div>
 <div class="kpis" id="kpis"></div>
@@ -425,6 +454,26 @@ function selDept(d){curDept=d;curMonth=9;renderAll();window.scrollTo({top:0,beha
 function renderKpi(){
   let tot=DATA[curDept].totalTrend;let now=tot[8],jan=tot[0],prev=tot[7];
   let ytd=now-jan, mom=now-prev;
+  // 쌤이다: 출범 준비 단계 전용 KPI (인력추이·이탈 지표 대신)
+  if(curDept==='쌤이다'){
+    var md=DATA['쌤이다'].months[9]||DATA['쌤이다'].months['9'];
+    var sepIn=md?md.sum.in:0;
+    // 과목 수 = 재직 강사의 과목(sub) 종류
+    var subs={};
+    (md?md.groups:[]).forEach(function(g){g.members.forEach(function(mm){if(!mm.isOut&&mm.sub)subs[mm.sub]=1;});});
+    var subCnt=Object.keys(subs).length;
+    // 10월 1일 출범 D-day
+    var today=new Date(); today.setHours(0,0,0,0);
+    var launch=new Date(2026,9,1);  // 2026-10-01
+    var dday=Math.round((launch-today)/86400000);
+    var ddayStr=dday>0?('D-'+dday):(dday===0?'D-DAY':'출범');
+    document.getElementById('kpis').innerHTML=`
+     <div class="kpi"><div class="lb">현재 강사 수</div><div class="vv">${now}<small>명</small></div><div class="sub2 up">전월 대비 ${mom>=0?'+'+mom:mom}명 (8월 ${prev}명)</div></div>
+     <div class="kpi"><div class="lb">이번 달 증원</div><div class="vv up">+${sepIn}<small>명</small></div><div class="sub2 flat">9월 신규 합류</div></div>
+     <div class="kpi"><div class="lb">담당 과목</div><div class="vv">${subCnt}<small>과목</small></div><div class="sub2 flat">${Object.keys(subs).join(' · ')||'-'}</div></div>
+     <div class="kpi"><div class="lb">10월 출범까지</div><div class="vv up" style="font-size:26px">${ddayStr}</div><div class="sub2 flat">정식 출범 · 증원 진행 중</div></div>`;
+    return;
+  }
   let mn=Math.min(...tot),mnMo=MONTHS[tot.indexOf(mn)];
   let mx=Math.max(...tot),mxMo=MONTHS[tot.indexOf(mx)];
   let T=DATA[curDept].tenure; let e30r=T.total?T.e30/T.total*100:0;
@@ -557,9 +606,16 @@ function memRow(m){
     var schoolLine=m.school?`<div class="ssam-school">${m.school}</div>`:'';
     var noteBlock='';
     if(m.note){
-      var parts=m.note.split('|').map(function(s){return s.trim();}).filter(Boolean);
+      // 구분자 통일: 개행·| 를 * 앞에서 끊고, *업무내용/*경력/*자격증 단위로 분리
+      var norm=m.note.replace(/\r/g,'').replace(/[\n|]+/g,' ').replace(/\s*\*\s*/g,'\n*').trim();
+      var parts=norm.split('\n').map(function(s){return s.trim();}).filter(Boolean);
       noteBlock='<div class="ssam-note">'+parts.map(function(p){
-        return '<div class="ssam-line">'+p.replace(/^\*/,'').replace(/^(경력|자격증)\s*:\s*/,'<b>$1</b> ')+'</div>';
+        p=p.replace(/^\*/,'').trim();
+        // 라벨 통일: 업무내용→업무 / 경력→경력 / 자격증→자격
+        return '<div class="ssam-line">'+p
+          .replace(/^업무내용\s*:\s*/,'<b>업무</b> ')
+          .replace(/^경력\s*:\s*/,'<b>경력</b> ')
+          .replace(/^자격증\s*:\s*/,'<b>자격</b> ')+'</div>';
       }).join('')+'</div>';
     }
     var schedBlock=(typeof ssamScheduleHtml==='function')?ssamScheduleHtml(m.name):'';
@@ -608,6 +664,10 @@ function renderTenure(){
 function renderAll(){
   renderTabs();
   var isSsam=(curDept==='쌤이다');
+  document.body.classList.toggle('ssam-mode',isSsam);
+  var pt=document.getElementById('pageTitle'), ps=document.getElementById('pageSub');
+  if(pt) pt.textContent=isSsam?'쌤이다 — 강사 현황':'인사 현황 — 인력 추이';
+  if(ps) ps.textContent=isSsam?'10월 정식 출범 · 9월부터 증원 중':'2026년 1~9월 · 월말 재직 기준';
   // 쌤이다: 지점/근속/월추이/월별탭 전부 숨김 → 강사 인사상세만
   var hide=['comboCard','tenureCard','brCard','mbar'];
   hide.forEach(function(id){var el=document.getElementById(id);if(el)el.style.display=isSsam?'none':'';});
