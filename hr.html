@@ -82,6 +82,18 @@ svg.combo{width:100%;height:auto;display:block;overflow:visible}
 .ssam-note{display:flex;flex-direction:column;gap:5px}
 .ssam-line{font-size:12.5px;line-height:1.55;color:#4A5568;word-break:break-word}
 .ssam-line b{color:#2B4C8C;font-weight:800;margin-right:4px}
+/* 주간 시간표 */
+.ssam-sched{margin-top:10px;overflow-x:auto}
+.ssam-sched-lb{font-size:11px;font-weight:800;color:#6B7688;margin-bottom:5px;letter-spacing:.3px}
+.sc-tbl{border-collapse:collapse;width:100%;min-width:260px;font-size:11px}
+.sc-tbl th,.sc-tbl td{border:1px solid #E3E8F0;padding:3px 5px;text-align:center;white-space:nowrap}
+.sc-tbl th{background:#F4F6FA;color:#4A5568;font-weight:700;font-size:10.5px}
+.sc-tbl .sc-t{background:#FAFBFD;color:#8A94A6;font-weight:600;font-size:10px;text-align:right;padding-right:7px}
+.sc-tbl .sc-on{background:#E9F2FF;color:#1C3F78;font-weight:700}
+@media(max-width:768px){
+  .sc-tbl{font-size:10px;min-width:240px}
+  .sc-tbl th,.sc-tbl td{padding:2px 3px}
+}
 @media(max-width:768px){
   .ssam-card{gap:12px;padding:14px 2px}
   .ssam-photo{width:76px;height:96px;border-radius:12px}
@@ -142,7 +154,7 @@ svg.combo{width:100%;height:auto;display:block;overflow:visible}
 <div class="asof">기준<b>2026년 9월</b></div></div>
 <div class="tabs" id="tabs"></div>
 <div class="kpis" id="kpis"></div>
-<div class="card"><h2 id="comboTitle"></h2><div class="sub">선 = 월말 전체 재직 인원 (재직 기준·정확) · 막대 = 월별 입사/퇴사 흐름 (참고) · 클릭하면 그 달 상세</div>
+<div class="card" id="comboCard"><h2 id="comboTitle"></h2><div class="sub">선 = 월말 전체 재직 인원 (재직 기준·정확) · 막대 = 월별 입사/퇴사 흐름 (참고) · 클릭하면 그 달 상세</div>
   <div class="hscroll"><div id="combo"></div></div>
   <div class="clgd"><span><i style="background:#5DCAA5"></i>입사</span><span><i style="background:#F09595"></i>퇴사</span><span><i style="background:#161C2B"></i>월말 재직 인원</span></div></div>
 <div class="card" id="tenureCard"><h2 id="tenTitle"></h2><div class="sub">2026년 퇴사자를 근속 기간별로 분류 · 얼마나 빨리 나가는지가 채용 효율의 핵심 지표</div>
@@ -355,15 +367,40 @@ var HR_URLS={
   suup:"https://docs.google.com/spreadsheets/d/e/2PACX-1vShRV1Qb_pqFgbkFJM1SCG5462zc_HgNTqG7-kxvoIvxd1yzx_pkIkP2IjjiVncH2arU5Ro2jgoH2AW/pub?gid=381025116&single=true&output=csv",
   ssam:"https://docs.google.com/spreadsheets/d/e/2PACX-1vROlkhhY9Ed7bm5LwF8OhP5bAYcaQrwiGRmo-ZdFNaoDOGpW0guTYNYTZusx3nVF6GRkyCUGLcAugOq/pub?gid=861431574&single=true&output=csv",
   wolgyeol:"https://docs.google.com/spreadsheets/d/1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU/gviz/tq?tqx=out:csv&headers=0&gid=1739211827",
-  chongmae:"https://docs.google.com/spreadsheets/d/1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU/gviz/tq?tqx=out:csv&headers=0&gid=698799247"
+  chongmae:"https://docs.google.com/spreadsheets/d/1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU/gviz/tq?tqx=out:csv&headers=0&gid=698799247",
+  ssamSchedule:"https://docs.google.com/spreadsheets/d/1euPvWfckYgrqtJ1-oxGe0BQOai3PKCdrwWMNjhtyLi0/gviz/tq?tqx=out:csv&headers=0"
 };
 var DATA={};
+var SSAM_SCHED={};   // {강사명:{days:['월','화','수','목'], rows:[{time, cells:['','','','']}]}}
+function parseSsamSchedule(csvText){
+  SSAM_SCHED={};
+  if(!csvText)return;
+  var rows=parseCSV(csvText);
+  var cur=null;
+  rows.forEach(function(r){
+    var name=String(r[1]||'').trim();
+    var c2=String(r[2]||'').trim();
+    // 강사명 헤더행: C열(2)이 '월'
+    if(c2==='월' && name){
+      cur=name;
+      SSAM_SCHED[cur]={days:[r[2],r[3],r[4],r[5]].map(function(x){return String(x||'').trim();}), rows:[]};
+      return;
+    }
+    // 시간대 행: B열(1)에 시간, 하나라도 값 있으면
+    var time=name;
+    if(cur && time && /[:~시]/.test(time)){
+      var cells=[r[2],r[3],r[4],r[5]].map(function(x){return String(x||'').trim();});
+      SSAM_SCHED[cur].rows.push({time:time, cells:cells});
+    }
+  });
+}
 async function loadHR(){
   var b='&_='+Date.now();
   function f(u){return fetch(u+b).then(r=>r.text()).catch(_=>'');}
   try{
-    var res=await Promise.all([f(HR_URLS.sangdam),f(HR_URLS.saup),f(HR_URLS.coach),f(HR_URLS.suup),f(HR_URLS.ssam),f(HR_URLS.wolgyeol),f(HR_URLS.chongmae)]);
+    var res=await Promise.all([f(HR_URLS.sangdam),f(HR_URLS.saup),f(HR_URLS.coach),f(HR_URLS.suup),f(HR_URLS.ssam),f(HR_URLS.wolgyeol),f(HR_URLS.chongmae),f(HR_URLS.ssamSchedule)]);
     var salesFn=makeSalesFn(buildSalesRecs([res[5],res[6]]));
+    parseSsamSchedule(res[7]);
     var depts={
       '상담부':loadDept(res[0],h2branch,'부서명'),
       '사업부':loadDept(res[1],saupBranch,'부서명'),
@@ -487,6 +524,20 @@ function renderMonth(){
     return `<div class="gcard"><div class="ghd"><span class="gnm">${g.name}</span>${lead}<span class="gflow"><span>${g.start}</span> → <span class="e">${g.jae}</span></span></div><div class="gbody">${body}</div></div>`;
   }).join('');
 }
+function ssamScheduleHtml(name){
+  var s=SSAM_SCHED[name];
+  if(!s||!s.rows.length)return '';
+  // 값이 하나라도 있는 행만 표시
+  var visRows=s.rows.filter(function(r){return r.cells.some(function(c){return c;});});
+  if(!visRows.length)return '';
+  var head='<tr><th class="sc-t"></th>'+s.days.map(function(d){return '<th>'+d+'</th>';}).join('')+'</tr>';
+  var body=visRows.map(function(r){
+    return '<tr><td class="sc-t">'+r.time+'</td>'+r.cells.map(function(c){
+      return '<td'+(c?' class="sc-on"':'')+'>'+(c||'')+'</td>';
+    }).join('')+'</tr>';
+  }).join('');
+  return '<div class="ssam-sched"><div class="ssam-sched-lb">주간 시간표</div><table class="sc-tbl">'+head+body+'</table></div>';
+}
 function memRow(m){
   let badge=m.isOut?'<span class="bg-out">퇴사</span>':(m.isNew?'<span class="bg-new">NEW</span>':'');
   let prom=(!m.isOut&&m.note&&m.note.includes('진급'))?'<span class="bg-prom">진급</span>':'';
@@ -511,9 +562,10 @@ function memRow(m){
         return '<div class="ssam-line">'+p.replace(/^\*/,'').replace(/^(경력|자격증)\s*:\s*/,'<b>$1</b> ')+'</div>';
       }).join('')+'</div>';
     }
+    var schedBlock=(typeof ssamScheduleHtml==='function')?ssamScheduleHtml(m.name):'';
     return `<div class="ssam-card">${photoBox}<div class="ssam-body">
       <div class="ssam-name">${m.name}${badge}${prom}<span class="ssam-rank">${m.rank||''}</span><span class="ssam-in">${m.inD}</span></div>
-      ${schoolLine}${noteBlock}</div></div>`;
+      ${schoolLine}${noteBlock}${schedBlock}</div></div>`;
   }
   if(!m.isOut)return `<div class="mrow ${m.onLeave?'leave':''}"><span class="mnm">${m.name}${badge}${prom}${leaveBadge}${roleBadge}</span>${rank}<span class="mdt">${m.inD}</span></div>`;
   let dt=m.in_md?`${m.in_md}입사 → ${m.out_md}퇴사`:(m.out_md+'퇴사');
@@ -553,7 +605,17 @@ function renderTenure(){
     </div>
     <div class="tsegs">${rows}</div>`;
 }
-function renderAll(){renderTabs();renderKpi();renderCombo();renderTenure();renderBranches();renderMbar();renderMonth();}
+function renderAll(){
+  renderTabs();
+  var isSsam=(curDept==='쌤이다');
+  // 쌤이다: 지점/근속/월추이/월별탭 전부 숨김 → 강사 인사상세만
+  var hide=['comboCard','tenureCard','brCard','mbar'];
+  hide.forEach(function(id){var el=document.getElementById(id);if(el)el.style.display=isSsam?'none':'';});
+  var mt=document.querySelector('.mtitle');if(mt)mt.style.display=isSsam?'none':'';
+  renderKpi();
+  if(!isSsam){renderCombo();renderTenure();renderBranches();renderMbar();renderMonth();}
+  else{curMonth=9;renderMonth();}   // 쌤이다도 9월 상세는 grid에 렌더
+}
 (function(){
   var ld=document.createElement('div');
   ld.id='hrLoading';
