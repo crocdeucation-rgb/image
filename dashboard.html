@@ -601,6 +601,7 @@ let cancelTab = 0;              // 0=이번달 1=지난달 2=전체
 
 // 원장 CSV(지난달·전체 취소) + total JSON(이번달 웹마 취소=total과 동일) 로드
 var webCxaThisMonth = null;   // total JSON의 이번달 웹마 취소(web.cxa). null=아직 로드 안 됨
+var totalDataDate = null;     // total JSON 기준일 (예: 2026-09-15) — "N일까지 반영" 표시용
 async function loadCancel() {
   try {
     const res = await fetch(CANCEL_CSV_URL);
@@ -612,20 +613,24 @@ async function loadCancel() {
     // [2026-09] 이번달 웹마 취소 = total(총매출_전사 JSON)의 web.cxa — total 카드와 동일값
     try {
       const jres = await fetch('https://docs.google.com/spreadsheets/d/1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU/gviz/tq?tqx=out:csv&headers=0&gid=1261488271&_=' + Date.now());
-      let jtext = await jres.text();
-      // gviz는 JSON 셀을 CSV로 내보내며 내부 "를 ""로 이스케이프 → 복원 필요
-      jtext = jtext.replace(/^\uFEFF/, '').trim();
-      if (jtext.charAt(0) === '"') jtext = jtext.slice(1);           // 셀 감싼 바깥 따옴표 제거
-      jtext = jtext.replace(/""/g, '"');                            // "" → " 복원
-      const jstart = jtext.indexOf('{');
-      const jend = jtext.lastIndexOf('}');
-      if (jstart >= 0 && jend > jstart) {
-        const D = JSON.parse(jtext.slice(jstart, jend + 1));
-        if (D && D.web && typeof D.web.cxa === 'number') webCxaThisMonth = D.web.cxa;  // 원 단위
-      }
+      const jtext = await jres.text();
+      // ⚠️ 이 JSON은 매우 커서 전체 JSON.parse가 중간(~45000자)에서 깨짐(gviz 이스케이프).
+      //    web.cxa는 앞부분이라 정규식으로 값만 직접 추출 (""→" 이스케이프 감안, 따옴표 유무 모두 허용).
+      var mWeb = jtext.match(/web"*\s*:\s*\{[^}]*?cxa"*\s*:\s*(\d+)/);
+      if (mWeb) webCxaThisMonth = parseInt(mWeb[1], 10);          // 웹마 이번달 취소 (원 단위)
+      var mDate = jtext.match(/date"*\s*:\s*"+(\d{4}-\d{2}-\d{2})/);
+      if (mDate) totalDataDate = mDate[1];                        // total 기준일 (예: 2026-09-15)
     } catch(_je) { webCxaThisMonth = null; }
     renderCancel();
     if(typeof render==='function' && allRows && allRows.length){ try{ render(); }catch(_e){} }   // [2026-09] 취소금액 담당자표 반영
+    // 기준일이 loadData보다 늦게 도착할 수 있어 업데이트 문구 재갱신
+    if (totalDataDate) {
+      var _u = document.getElementById('updated');
+      if (_u && _u.textContent.indexOf('까지 반영') < 0 && _u.textContent.indexOf('업데이트') === 0) {
+        var _m = totalDataDate.split('-');
+        _u.textContent += ' · ' + parseInt(_m[1],10) + '월 ' + parseInt(_m[2],10) + '일까지 반영';
+      }
+    }
   } catch(e) {
     const el = document.getElementById('cancel-amt');
     if (el) el.textContent = '-';
@@ -689,7 +694,12 @@ async function loadData() {
     render();
     renderWebmaDukji();
     const now = new Date();
-    document.getElementById('updated').textContent = '업데이트: ' + now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
+    var _upd = '업데이트: ' + now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
+    if (totalDataDate) {
+      var _md = totalDataDate.split('-');   // yyyy-mm-dd
+      _upd += ' · ' + parseInt(_md[1],10) + '월 ' + parseInt(_md[2],10) + '일까지 반영';
+    }
+    document.getElementById('updated').textContent = _upd;
   } catch(e) {
     document.getElementById('updated').textContent = '로드 실패';
   }
