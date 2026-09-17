@@ -873,6 +873,8 @@ body.is-live .closed-only{display:none !important}
 <div class="ft">소스 = 총매출_전사 (매일 갱신) · 당월 취소 = 특이사항 파싱 · 수호웹마는 수호에듀 포함 · 웹마케팅은 전사 합계 포함/지점순위 분리</div>
 </div>
 <script>
+window.BLUE_RIBBON='<svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.15em;display:inline-block" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="8" r="6" fill="#3B82F6"/><circle cx="12" cy="8" r="6" fill="none" stroke="#1D4ED8" stroke-width="1"/><circle cx="12" cy="8" r="2.6" fill="#DBEAFE"/><path d="M8.5 12.5 L6 22 L10 19 L12 21.5 L14 19 L18 22 L15.5 12.5 Z" fill="#2563EB"/><path d="M8.5 12.5 L6 22 L10 19 L12 21.5" fill="#3B82F6"/></svg>'; var BLUE_RIBBON=window.BLUE_RIBBON;
+
 var TOTAL_CSV = "https://docs.google.com/spreadsheets/d/1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU/gviz/tq?tqx=out:csv&headers=0&gid=1261488271";
 // [월별 2026-09] 각 월 박제 탭 gid. buildAllMonths 로그의 MONTH_GIDS로 갱신.
 var CSV_BASE = "https://docs.google.com/spreadsheets/d/1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU/gviz/tq?tqx=out:csv&headers=0&gid=";
@@ -945,7 +947,7 @@ function renderAwards(D){
   // [2026-09-04] 리본 시상 — HOF에서 '그 달(mk)에 수여된' 리본만 (중복 방지·등급 반영).
   //   블루1회달성자는 재달성해도 블루 안 뜸, 3연속이면 마스터만 → 개인카드 등급과 동일 소스(HOF).
   //   그 달에 아무 리본도 안 딴 사람은 안 뜸.
-  var RIBBON_TYPES = { '블루리본':{ic:'🎗️',cls:'blue'}, '마스터리본':{ic:'🔷',cls:'master'}, '그랜드리본':{ic:'💠',cls:'grand'}, '로얄리본':{ic:'👑',cls:'royal'} };
+  var RIBBON_TYPES = { '블루리본':{ic:window.BLUE_RIBBON,cls:'blue'}, '마스터리본':{ic:'🔷',cls:'master'}, '그랜드리본':{ic:'💠',cls:'grand'}, '로얄리본':{ic:'👑',cls:'royal'} };
   var HOF = window.__HOF || {};
   // 그 달 리본 수여자 수집: {scope:'사업'|'상담'} 별로
   var ribbonSaup = [], ribbonSang = [];
@@ -2413,7 +2415,7 @@ var PC_TIER_SANG=[{t:'SSS',v:40000000},{t:'SS',v:35000000},{t:'S',v:30000000},{t
 var PC_TIER_SAUP=[{t:'SSS',v:90000000},{t:'SS',v:80000000},{t:'S',v:70000000},{t:'A',v:60000000},{t:'B',v:50000000},{t:'C',v:40000000},{t:'D',v:30000000},{t:'E',v:20000000},{t:'F',v:15000000}];
 function pcTierOf(s,useF){var T=useF?PC_TIER_SAUP:PC_TIER_SANG;for(var i=0;i<T.length;i++){if(s>=T[i].v)return T[i].t;}return 'F';}
 function pcNextTier(s,useF){var T=useF?PC_TIER_SAUP:PC_TIER_SANG;for(var i=T.length-1;i>=0;i--){if(s<T[i].v)return {t:T[i].t,need:T[i].v-s,base:(i<T.length-1?T[i+1].v:0),to:T[i].v};}return null;}
-var PC_TROPHY={'MVP':{ic:'🏆',cls:'mvp',lbl:'MVP'},'블루리본':{ic:'🎗️',cls:'blue',lbl:'블루리본'},'마스터리본':{ic:'🔷',cls:'master',lbl:'마스터리본'},'그랜드리본':{ic:'💠',cls:'grand',lbl:'그랜드리본'},'로얄리본':{ic:'👑',cls:'royal',lbl:'로얄리본'},'떡상왕':{ic:'🚀',cls:'tteok',lbl:'떡상왕'},'커리어하이':{ic:'🎖️',cls:'career',lbl:'커리어하이'},'최고의지점':{ic:'🥇',cls:'team',lbl:'최고의지점'},'지점커리어하이':{ic:'🎖️',cls:'career',lbl:'지점 신기록'},'지점떡상왕':{ic:'🚀',cls:'tteok',lbl:'지점 떡상왕'}};
+var PC_TROPHY={'MVP':{ic:'🏆',cls:'mvp',lbl:'MVP'},'블루리본':{ic:window.BLUE_RIBBON,cls:'blue',lbl:'블루리본'},'마스터리본':{ic:'🔷',cls:'master',lbl:'마스터리본'},'그랜드리본':{ic:'💠',cls:'grand',lbl:'그랜드리본'},'로얄리본':{ic:'👑',cls:'royal',lbl:'로얄리본'},'떡상왕':{ic:'🚀',cls:'tteok',lbl:'떡상왕'},'커리어하이':{ic:'🎖️',cls:'career',lbl:'커리어하이'},'최고의지점':{ic:'🥇',cls:'team',lbl:'최고의지점'},'지점커리어하이':{ic:'🎖️',cls:'career',lbl:'지점 신기록'},'지점떡상왕':{ic:'🚀',cls:'tteok',lbl:'지점 떡상왕'}};
 var PC_MON=['','1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
 function pcWon(n){return (n||0).toLocaleString('ko-KR');}
 function pcEok(n){n=n||0;if(n>=100000000){var e=n/100000000;return (e%1===0?e.toFixed(0):e.toFixed(2))+'억';}if(n>=10000){var m=n/10000;return (m%1===0?String(m):Math.round(m))+'만';}return pcWon(n);}
@@ -3032,7 +3034,7 @@ window.openGuide=function(){
   h+='<div class="gd-sec"><div class="gd-h"><span class="gd-ic">🎗️</span>리본<span class="gd-reset">연속 달성</span></div>'
    +'<div class="gd-desc">기준 매출을 연속으로 넘기면 승급. 상담 월 4천만 · 사업 월 1억 기준.</div>'
    +'<div class="gd-tro">'
-   +'<span class="gd-tro-item"><span class="i">🎗️</span>블루 — 1개월</span>'
+   +'<span class="gd-tro-item"><span class="i">'+window.BLUE_RIBBON+'</span>블루 — 1개월</span>'
    +'<span class="gd-tro-item"><span class="i">🔷</span>마스터 — 3개월 연속</span>'
    +'<span class="gd-tro-item"><span class="i">💠</span>그랜드 — 6개월 연속</span>'
    +'<span class="gd-tro-item"><span class="i">👑</span>로얄 — 12개월 연속</span>'
@@ -3463,7 +3465,7 @@ function nameBadges(name){
   var d=new Date(), y=d.getFullYear(), pm=d.getMonth();  // getMonth()는 0-based라 그 값이 곧 직전달(1-based)
   if(pm===0){ y-=1; pm=12; }                             // 1월이면 전년 12월
   var closed=y+'-'+('0'+pm).slice(-2);
-  var icons={'MVP':'🏆','블루리본':'🎗️','마스터리본':'🔷','그랜드리본':'💠','로얄리본':'👑','떡상왕':'🚀','커리어하이':'🎖️','최고의지점':'🥇'};
+  var icons={'MVP':'🏆','블루리본':window.BLUE_RIBBON,'마스터리본':'🔷','그랜드리본':'💠','로얄리본':'👑','떡상왕':'🚀','커리어하이':'🎖️','최고의지점':'🥇'};
   var out=[];
   hof.filter(function(t){return t.type==='MVP';}).sort(function(a,b){return a.m.localeCompare(b.m);})
      .forEach(function(t){out.push('🏆'+parseInt(t.m.slice(5),10));});
