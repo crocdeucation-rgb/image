@@ -175,25 +175,27 @@
     document.getElementById('status').textContent='재생 중…';
     void todoEl.offsetWidth;
     todoEl.classList.add('show');
-    // 1) 판 뜨고 항목 순차 등장 (초반 빠르게)
-    var els=[];
-    var intro=1400, step=500;
+
+    var APPEAR=500;   // 항목 등장 애니 시간
+    var acc=900;      // 판 뜨고 첫 항목까지 여유
+
     data.forEach(function(d,i){
-      var el=document.createElement('div');
-      el.className='item'; el.style.opacity='0';
-      el.innerHTML='<div class="box"><svg viewBox="0 0 44 44"><path d="M9 23 L19 33 L36 12"/></svg></div><div class="txt">'+(d.t? fmt(d.t) : '\u00A0')+'</div>';
-      itemsEl.appendChild(el); els.push(el);
-      setTimeout(function(){ el.style.opacity=''; el.classList.add('in'); }, intro + i*step);
+      // (1) 이 항목 등장
+      setTimeout(function(){
+        var el=document.createElement('div');
+        el.className='item'; el.id='ti_'+i; el.style.opacity='0';
+        el.innerHTML='<div class="box"><svg viewBox="0 0 44 44"><path d="M9 23 L19 33 L36 12"/></svg></div><div class="txt">'+(d.t? fmt(d.t) : '\u00A0')+'</div>';
+        itemsEl.appendChild(el);
+        void el.offsetWidth;
+        el.style.opacity=''; el.classList.add('in');
+      }, acc);
+      // (2) 이 항목 dur의 마지막 1초에 체크
+      var checkAt = acc + APPEAR + Math.max(d.dur*1000 - 1000, 0);
+      setTimeout(function(){ var e=document.getElementById('ti_'+i); if(e) e.classList.add('checked'); }, checkAt);
+      // 다음 항목은 이 항목 (등장+dur) 끝난 뒤
+      acc += APPEAR + d.dur*1000;
     });
-    // 2) 모든 항목 등장 후, 각 항목 dur 순차로 마지막 1초에 체크
-    var introEnd = intro + data.length*step + 300;
-    var acc = introEnd;
-    data.forEach(function(d,i){
-      var checkAt = acc + Math.max(d.dur*1000 - 1000, 0);   // dur 끝나기 1초 전
-      setTimeout(function(){ els[i].classList.add('checked'); }, checkAt);
-      acc += d.dur*1000;
-    });
-    // 3) 종료
+
     setTimeout(function(){
       document.getElementById('status').textContent='완료 ✓ (다시 재생 가능)';
       window.__playing=false;
