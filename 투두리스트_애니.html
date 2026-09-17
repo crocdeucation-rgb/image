@@ -84,8 +84,7 @@
   body.obs #stage{aspect-ratio:auto;width:100%;height:100vh}
   .obs-toggle{position:fixed;right:14px;top:14px;z-index:100;background:#3B82F6;color:#fff;
     border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:800;cursor:pointer;font-family:system-ui,sans-serif}
-  body.obs .obs-toggle{background:rgba(0,0,0,.4);opacity:.3}
-  body.obs .obs-toggle:hover{opacity:1}
+  body.obs .obs-toggle{display:none !important}
   body.obs-url .obs-toggle{display:none !important}
 </style>
 </head>
@@ -223,6 +222,14 @@
       renderPreview();   // 편집으로 돌아오면 미리보기 복원
     }
   };
+  document.body.addEventListener('dblclick', function(){
+    if(document.body.classList.contains('obs')){
+      document.body.classList.remove('obs','obs-url');
+      window.__playing=false;
+      var _tg=document.getElementById('obsToggle'); if(_tg) _tg.textContent='OBS 모드';
+      renderPreview();
+    }
+  });
 </script>
 </body>
 </html>
