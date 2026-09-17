@@ -77,10 +77,10 @@
   body.clean #stage{aspect-ratio:auto;height:100vh}
 
   /* [OBS 모드] 버튼으로 토글: 투두판만 전체화면, 나머지 숨김 */
-  body.obs{background:#3a4150;padding:0;overflow:hidden}
+  body.obs{background:#00B140;padding:0;overflow:hidden;margin:0}
   body.obs h1,body.obs .desc,body.obs .panel{display:none}
-  body.obs .stage-outer{height:100vh;border-radius:0}
-  body.obs #stage{aspect-ratio:auto;height:100vh}
+  body.obs .stage-outer{width:100vw;height:100vh;border-radius:0;background:#00B140;background-image:none}
+  body.obs #stage{aspect-ratio:auto;width:100vw;height:100vh}
   .obs-toggle{position:fixed;right:14px;top:14px;z-index:100;background:#3B82F6;color:#fff;
     border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:800;cursor:pointer;font-family:system-ui,sans-serif}
   body.obs .obs-toggle{background:rgba(0,0,0,.4);opacity:.3}
