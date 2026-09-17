@@ -27,7 +27,7 @@
   #stage{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden}
 
   /* 투두 카드 — 우측 */
-  .todo{position:absolute;right:4%;top:11%;width:44%;
+  .todo{position:absolute;right:5%;top:12%;width:min(42%,620px);max-width:620px;
     background:var(--paper);border:3px solid var(--ink);border-radius:20px;
     padding:26px 30px 30px;box-shadow:6px 8px 0 rgba(0,0,0,.15);
     transform:scale(.9);opacity:0}
@@ -85,6 +85,7 @@
     border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:800;cursor:pointer;font-family:system-ui,sans-serif}
   body.obs .obs-toggle{background:rgba(0,0,0,.4);opacity:.3}
   body.obs .obs-toggle:hover{opacity:1}
+  body.obs-url .obs-toggle{display:none !important}
 </style>
 </head>
 <body>
@@ -197,6 +198,8 @@
     if(q.indexOf('clean')>=0) document.body.classList.add('clean');
     if(q.indexOf('obs')>=0){
       document.body.classList.add('obs');
+      document.body.classList.add('obs-url');
+      document.getElementById('items').innerHTML='';   // 미리보기 완성본 제거 → 애니부터 시작
       var _tg=document.getElementById('obsToggle'); if(_tg) _tg.textContent='편집으로';
       setTimeout(function(){ document.getElementById('playBtn').click(); }, 700);
     }
@@ -206,7 +209,12 @@
   document.getElementById('obsToggle').onclick=function(){
     document.body.classList.toggle('obs');
     this.textContent=document.body.classList.contains('obs')?'편집으로':'OBS 모드';
-    if(document.body.classList.contains('obs')) setTimeout(function(){document.getElementById('playBtn').click();},600);
+    if(document.body.classList.contains('obs')){
+      document.getElementById('items').innerHTML='';   // 완성본 제거 → 애니부터
+      setTimeout(function(){document.getElementById('playBtn').click();},600);
+    } else {
+      renderPreview();   // 편집으로 돌아오면 미리보기 복원
+    }
   };
 </script>
 </body>
