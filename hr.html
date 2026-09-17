@@ -239,7 +239,7 @@ body.ssam-mode .grid{grid-template-columns:repeat(2,1fr)}
 <div class="hero" id="hero"></div>
 <div class="grid" id="grid"></div>
 <div class="foot">소스 = 4개 부서 인사파일 + 26년 말일기준 실적 · 월말 기준 재직 역산<br>
-개인정보(주민·계좌·연락처·생년월일·특이사항 원문) 전부 제외 · 재직 중 매출은 상담부 퇴사자만</div>
+개인정보(주민·계좌·연락처·생년월일·특이사항 원문) 전부 제외 · 재직 중 매출은 상담·사업부 퇴사자</div>
 </div>
 <script>
 // ===== 실시간 데이터: 파서 + ORDER/LEAD + 로더 =====
@@ -345,7 +345,7 @@ function buildDept(dept,emps,salesFn){
       var isNew=!!(e.inD&&e.inD>=MS&&e.inD<=ME)&&!isOut;
       if(isNew)s_in++; if(isOut)s_out++;
       var span=(e.inD&&e.outD)?daysBetween(e.inD,e.outD):null;
-      var sal=(isOut&&dept==='상담부'&&salesFn)?salesFn(e.name,e.inD,e.outD):{};
+      var sal=(isOut && (dept==='상담부'||dept==='사업부') && salesFn)?salesFn(e.name,e.inD,e.outD,dept):{};
       var salTot=0; for(var k in sal)salTot+=sal[k];
       var onLeave=!!e.leave&&mo>=2;
       var m={name:e.name,sub:e.sub,rank:e.rank,note:e.note,school:e.school,inD:dstr(e.inD),in_md:mdstr(e.inD),out_md:mdstr(e.outD),
@@ -395,30 +395,33 @@ function buildSalesRecs(csvTexts){
   var recs=[];
   csvTexts.forEach(function(txt){
     var rows=parseCSV(txt);
-    // 헤더행 자동탐지: row[1]에 '상담' & row[17]에 '상태' 든 행 다음부터 데이터 (없으면 0=첫줄부터)
+    // 헤더행 자동탐지: row[1]에 '상담' & row[17]에 '상태' 든 행 다음부터 데이터
     var hi=0;
     for(var i=0;i<Math.min(rows.length,4);i++){
       if(String(rows[i][1]||'').indexOf('상담')>=0 && String(rows[i][17]||'').indexOf('상태')>=0){hi=i;break;}
     }
     for(var r=hi+1;r<rows.length;r++){
       var row=rows[r];
-      var mo=_salesMonth(row[0]);            // 날짜→월
-      if(!mo)continue;                       // 날짜 없으면 데이터행 아님
-      var nm=String(row[1]||'').trim();      // 상담원
-      if(!nm)continue;
-      var amt=_salesNum(row[3]);             // 매출
-      if(amt>0){ recs.push({name:nm,mo:mo,amt:amt*1000}); }
+      var mo=_salesMonth(row[0]);            // 날짜(0)→월
+      if(!mo)continue;
+      var amt=_salesNum(row[3]);             // 매출(D열=3, 상담·사업 공유)
+      if(amt<=0)continue;
+      var sang=String(row[1]||'').trim();    // 상담원(B열=1)
+      var saup=String(row[5]||'').trim();    // 사업부담당자(F열=5)
+      if(sang) recs.push({name:sang,mo:mo,amt:amt*1000,dept:'상담부'});
+      if(saup) recs.push({name:saup,mo:mo,amt:amt*1000,dept:'사업부'});
     }
   });
   return recs;
 }
 function makeSalesFn(recs){
-  return function(name,inD,outD){
+  return function(name,inD,outD,dept){
     var by={};
     var inMo=inD?(inD.getFullYear()*12+inD.getMonth()):0;
     var outMo=outD?(outD.getFullYear()*12+outD.getMonth()):9999;
     recs.forEach(function(rec){
       if(rec.name!==name)return;
+      if(dept && rec.dept!==dept)return;    // 소속 일치하는 레코드만 (상담↔상담, 사업↔사업)
       var recMo=2026*12+(rec.mo-1);
       if(inD && recMo<inMo)return;
       if(outD && recMo>outMo)return;
