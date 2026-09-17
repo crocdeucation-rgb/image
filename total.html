@@ -1886,9 +1886,10 @@ function branchProfilesStart(){
     _fdb.collection('branchProfiles').onSnapshot(function(qs){
       var m={}; qs.forEach(function(d){ var v=d.data()||{}; m[d.id]={photoURL:v.photoURL||'', statusMsg:v.statusMsg||''}; });
       window.__branchProfiles=m;
-      // [2026-09] 사진 로드되면 현재 보고있는 탭 무조건 다시 그림 (curTab undefined 초기 대응)
-      var _ct=window.__curTab||0;
-      if(window.__D && typeof barsBr==='function'){
+      // [2026-09] 사진 로드되면 현재 보고있는 탭 다시 그림. __D 아직이면 잠깐 뒤 재시도(초기 타이밍 대응).
+      function _redrawBr(tries){
+        if(!(window.__D && typeof barsBr==='function')){ if(tries>0) setTimeout(function(){_redrawBr(tries-1);},200); return; }
+        var _ct=window.__curTab||0;
         var _bd=document.getElementById('body');
         if(_bd){
           if(_ct===0) _bd.innerHTML=barsBr(window.__D.branches, window.__brSort||'sales');
@@ -1897,6 +1898,7 @@ function branchProfilesStart(){
           setTimeout(function(){ if(window.attachCardClicks) window.attachCardClicks(); },50);
         }
       }
+      _redrawBr(15);   // __D 로드까지 최대 3초(200ms×15) 재시도
       // 지점카드 열려있으면 반영
       if(window.__curCardName && window.__branchProfiles[window.__curCardName]) brApplyProfile(window.__curCardName);
     }, function(){ window.__brProfOn=false; });
