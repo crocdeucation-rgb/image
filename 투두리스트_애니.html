@@ -27,7 +27,7 @@
   #stage{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden}
 
   /* 투두 카드 — 우측 */
-  .todo{position:absolute;right:6%;top:13%;width:560px;max-width:44%;
+  .todo{position:absolute;left:5%;top:10%;width:560px;max-width:44%;
     background:var(--paper);border:3px solid var(--ink);border-radius:20px;
     padding:26px 30px 30px;box-shadow:6px 8px 0 rgba(0,0,0,.15);
     transform:scale(.9);opacity:0}
@@ -86,6 +86,10 @@
     border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:800;cursor:pointer;font-family:system-ui,sans-serif}
   body.obs .obs-toggle{display:none !important}
   body.obs-url .obs-toggle{display:none !important}
+
+  .durwrap{display:flex;align-items:center;gap:3px;white-space:nowrap}
+  .erow input.dur{width:52px;background:#0d1218;border:1px solid #2a3542;border-radius:8px;padding:9px 6px;color:#e7ecf3;font-size:14px;font-family:inherit;text-align:center}
+  .durlb{font-size:12px;color:#9fb0c3}
 </style>
 </head>
 <body>
@@ -120,11 +124,12 @@
 </div>
 
 <script>
+  // dur = 이 항목이 표시되는 시간(초). 그 시간의 마지막 1초에 체크됨. 순차로 진행.
   var DEFAULT=[
-    {t:'*학교알리미* 시험기간 CHECK', done:true},
-    {t:'다인이 필기 상태 꼼꼼히 CHECK', done:false},
-    {t:'채린이 수학 학습 상태 점검', done:false},
-    {t:'새로 추가된 원어민 특강 추천', done:false}
+    {t:'*학교알리미* 시험기간 CHECK', dur:10},
+    {t:'다인이 필기 상태 꼼꼼히 CHECK', dur:8},
+    {t:'채린이 수학 학습 상태 점검', dur:16},
+    {t:'채린이 *영어 방탈출 게임* 추천', dur:9}
   ];
   var rowsEl=document.getElementById('rows');
   var itemsEl=document.getElementById('items');
@@ -135,34 +140,34 @@
 
   function readRows(){
     return [...rowsEl.querySelectorAll('.erow')].map(function(r){
-      return { t:r.querySelector('input[type=text]').value, done:r.querySelector('input[type=checkbox]').checked };
+      return { t:r.querySelector('input[type=text]').value, dur:parseFloat(r.querySelector('input.dur').value)||5 };
     });
   }
   function renderPreview(){
     var data=readRows();
+    // 편집 미리보기: 전 항목 표시(체크 안 됨)
     itemsEl.innerHTML=data.map(function(d){
-      var check='<svg viewBox="0 0 44 44"><path d="M9 23 L19 33 L36 12"/></svg>';
-      return '<div class="item in '+(d.done?'checked':'')+'"><div class="box">'+(d.done?check:'')+'</div><div class="txt">'+(d.t? fmt(d.t) : '\u00A0')+'</div></div>';
+      return '<div class="item in"><div class="box"></div><div class="txt">'+(d.t? fmt(d.t) : '\u00A0')+'</div></div>';
     }).join('');
     todoEl.classList.add('show');
   }
   function makeRow(d){
     var row=document.createElement('div'); row.className='erow';
     row.innerHTML='<input type="text" value="'+(d.t||'').replace(/"/g,'&quot;')+'" placeholder="할 일 입력">'
-      +'<label class="chk"><input type="checkbox" '+(d.done?'checked':'')+'> 완료</label>'
+      +'<span class="durwrap"><input type="number" class="dur" value="'+(d.dur||5)+'" min="1" step="1"><span class="durlb">초</span></span>'
       +'<button class="del">×</button>';
     row.querySelector('.del').onclick=function(){ row.remove(); renderPreview(); };
     row.querySelector('input[type=text]').oninput=renderPreview;
-    row.querySelector('input[type=checkbox]').onchange=renderPreview;
+    row.querySelector('input.dur').oninput=renderPreview;
     return row;
   }
   DEFAULT.forEach(function(d){ rowsEl.appendChild(makeRow(d)); });
-  document.getElementById('add').onclick=function(){ rowsEl.appendChild(makeRow({t:'',done:false})); renderPreview(); };
+  document.getElementById('add').onclick=function(){ rowsEl.appendChild(makeRow({t:'',dur:5})); renderPreview(); };
   renderPreview();
 
-  // 재생 애니메이션
+  // 재생: 전 항목 먼저 표시 → 각 항목 dur의 마지막 1초에 순차 체크
   document.getElementById('playBtn').onclick=function(){
-    if(window.__playing) return;   // 재생 중 중복 실행 방지 (역류 방지)
+    if(window.__playing) return;
     window.__playing=true;
     var data=readRows();
     todoEl.classList.remove('show');
@@ -170,33 +175,37 @@
     document.getElementById('status').textContent='재생 중…';
     void todoEl.offsetWidth;
     todoEl.classList.add('show');
-    var delay=1400;
+    // 1) 판 뜨고 항목 순차 등장 (초반 빠르게)
+    var els=[];
+    var intro=1400, step=500;
     data.forEach(function(d,i){
       var el=document.createElement('div');
-      el.className='item';
-      el.style.opacity='0';   // 등장 전 확실히 숨김
-      var check='<svg viewBox="0 0 44 44"><path d="M9 23 L19 33 L36 12"/></svg>';
-      el.innerHTML='<div class="box">'+(d.done?check:'')+'</div><div class="txt">'+(d.t? fmt(d.t) : '\u00A0')+'</div>';
-      itemsEl.appendChild(el);
-      setTimeout(function(){
-        el.style.opacity='';
-        el.classList.add('in');
-        if(d.done) setTimeout(function(){ el.classList.add('checked'); }, 1000);
-      }, delay);
-      delay += d.done ? 2400 : 1600;
+      el.className='item'; el.style.opacity='0';
+      el.innerHTML='<div class="box"><svg viewBox="0 0 44 44"><path d="M9 23 L19 33 L36 12"/></svg></div><div class="txt">'+(d.t? fmt(d.t) : '\u00A0')+'</div>';
+      itemsEl.appendChild(el); els.push(el);
+      setTimeout(function(){ el.style.opacity=''; el.classList.add('in'); }, intro + i*step);
     });
+    // 2) 모든 항목 등장 후, 각 항목 dur 순차로 마지막 1초에 체크
+    var introEnd = intro + data.length*step + 300;
+    var acc = introEnd;
+    data.forEach(function(d,i){
+      var checkAt = acc + Math.max(d.dur*1000 - 1000, 0);   // dur 끝나기 1초 전
+      setTimeout(function(){ els[i].classList.add('checked'); }, checkAt);
+      acc += d.dur*1000;
+    });
+    // 3) 종료
     setTimeout(function(){
       document.getElementById('status').textContent='완료 ✓ (다시 재생 가능)';
       window.__playing=false;
-      // OBS 모드면 잠깐 뒤 판을 비우고 자동 반복 (겹침 없이)
       if(document.body.classList.contains('obs')){
         setTimeout(function(){
           itemsEl.innerHTML=''; todoEl.classList.remove('show');
           setTimeout(function(){ document.getElementById('playBtn').click(); }, 400);
         }, 2500);
       }
-    }, delay+200);
+    }, acc+300);
   };
+
 
   // OBS clean 모드: ?clean 이면 패널 숨기고, ?auto 면 자동재생
   (function(){
