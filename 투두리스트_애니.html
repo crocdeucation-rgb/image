@@ -27,7 +27,7 @@
   #stage{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden}
 
   /* 투두 카드 — 우측 */
-  .todo{position:absolute;right:5%;top:12%;width:min(42%,620px);max-width:620px;
+  .todo{position:absolute;right:6%;top:13%;width:560px;max-width:44%;
     background:var(--paper);border:3px solid var(--ink);border-radius:20px;
     padding:26px 30px 30px;box-shadow:6px 8px 0 rgba(0,0,0,.15);
     transform:scale(.9);opacity:0}
@@ -77,10 +77,11 @@
   body.clean #stage{aspect-ratio:auto;height:100vh}
 
   /* [OBS 모드] 버튼으로 토글: 투두판만 전체화면, 나머지 숨김 */
+  html,body{overflow-x:hidden}
   body.obs{background:#00B140;padding:0;overflow:hidden;margin:0}
   body.obs h1,body.obs .desc,body.obs .panel{display:none}
-  body.obs .stage-outer{width:100vw;height:100vh;border-radius:0;background:#00B140;background-image:none}
-  body.obs #stage{aspect-ratio:auto;width:100vw;height:100vh}
+  body.obs .stage-outer{width:100%;height:100vh;border-radius:0;background:#00B140;background-image:none}
+  body.obs #stage{aspect-ratio:auto;width:100%;height:100vh}
   .obs-toggle{position:fixed;right:14px;top:14px;z-index:100;background:#3B82F6;color:#fff;
     border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:800;cursor:pointer;font-family:system-ui,sans-serif}
   body.obs .obs-toggle{background:rgba(0,0,0,.4);opacity:.3}
@@ -162,22 +163,24 @@
 
   // 재생 애니메이션
   document.getElementById('playBtn').onclick=function(){
+    if(window.__playing) return;   // 재생 중 중복 실행 방지 (역류 방지)
+    window.__playing=true;
     var data=readRows();
     todoEl.classList.remove('show');
     itemsEl.innerHTML='';
     document.getElementById('status').textContent='재생 중…';
-    // 1) 판 팝
     void todoEl.offsetWidth;
     todoEl.classList.add('show');
-    // 2) 항목 순차 등장
     var delay=1400;
     data.forEach(function(d,i){
       var el=document.createElement('div');
       el.className='item';
+      el.style.opacity='0';   // 등장 전 확실히 숨김
       var check='<svg viewBox="0 0 44 44"><path d="M9 23 L19 33 L36 12"/></svg>';
       el.innerHTML='<div class="box">'+(d.done?check:'')+'</div><div class="txt">'+(d.t? fmt(d.t) : '\u00A0')+'</div>';
       itemsEl.appendChild(el);
       setTimeout(function(){
+        el.style.opacity='';
         el.classList.add('in');
         if(d.done) setTimeout(function(){ el.classList.add('checked'); }, 1000);
       }, delay);
@@ -185,9 +188,13 @@
     });
     setTimeout(function(){
       document.getElementById('status').textContent='완료 ✓ (다시 재생 가능)';
-      // OBS 모드면 2.5초 뒤 자동 반복 (녹화 타이밍 여유)
+      window.__playing=false;
+      // OBS 모드면 잠깐 뒤 판을 비우고 자동 반복 (겹침 없이)
       if(document.body.classList.contains('obs')){
-        setTimeout(function(){ document.getElementById('playBtn').click(); }, 2500);
+        setTimeout(function(){
+          itemsEl.innerHTML=''; todoEl.classList.remove('show');
+          setTimeout(function(){ document.getElementById('playBtn').click(); }, 400);
+        }, 2500);
       }
     }, delay+200);
   };
