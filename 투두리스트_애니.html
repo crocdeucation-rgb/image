@@ -176,23 +176,31 @@
     void todoEl.offsetWidth;
     todoEl.classList.add('show');
 
-    var APPEAR=500;   // 항목 등장 애니 시간
-    var acc=900;      // 판 뜨고 첫 항목까지 여유
-
+    // (0) 모든 항목 자리를 먼저 만들어 판 크기 고정 (내용은 숨김 = 높이만 확보)
+    var els=[];
     data.forEach(function(d,i){
-      // (1) 이 항목 등장
+      var el=document.createElement('div');
+      el.className='item'; el.id='ti_'+i;
+      el.style.visibility='hidden';   // 자리는 차지, 안 보임 (판 높이 고정)
+      el.innerHTML='<div class="box"><svg viewBox="0 0 44 44"><path d="M9 23 L19 33 L36 12"/></svg></div><div class="txt">'+(d.t? fmt(d.t) : '\u00A0')+'</div>';
+      itemsEl.appendChild(el);
+      els.push(el);
+    });
+
+    var APPEAR=500;
+    var acc=900;
+    data.forEach(function(d,i){
+      // (1) 이 항목 내용만 등장 (자리는 이미 있음)
       setTimeout(function(){
-        var el=document.createElement('div');
-        el.className='item'; el.id='ti_'+i; el.style.opacity='0';
-        el.innerHTML='<div class="box"><svg viewBox="0 0 44 44"><path d="M9 23 L19 33 L36 12"/></svg></div><div class="txt">'+(d.t? fmt(d.t) : '\u00A0')+'</div>';
-        itemsEl.appendChild(el);
+        var el=els[i];
+        el.style.visibility='';
+        el.style.opacity='0';
         void el.offsetWidth;
         el.style.opacity=''; el.classList.add('in');
       }, acc);
-      // (2) 이 항목 dur의 마지막 1초에 체크
+      // (2) dur 마지막 1초에 체크
       var checkAt = acc + APPEAR + Math.max(d.dur*1000 - 1000, 0);
-      setTimeout(function(){ var e=document.getElementById('ti_'+i); if(e) e.classList.add('checked'); }, checkAt);
-      // 다음 항목은 이 항목 (등장+dur) 끝난 뒤
+      setTimeout(function(){ els[i].classList.add('checked'); }, checkAt);
       acc += APPEAR + d.dur*1000;
     });
 
