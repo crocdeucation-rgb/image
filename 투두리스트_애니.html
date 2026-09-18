@@ -62,8 +62,10 @@
   .keyrow .hl{font-weight:700}
 
   /* SVG 강조 애니 */
-  .fade{opacity:0;transition:opacity .5s}
-  .fade.on{opacity:1}
+  .fade{opacity:0;transition:opacity .5s ease}
+  .fade.on{opacity:1 !important}
+  svg .fade{opacity:0}
+  svg .fade.on{opacity:1}
   .glow{filter:drop-shadow(0 0 0 transparent);transition:filter .4s}
   .glow.on{filter:drop-shadow(0 0 6px rgba(232,133,12,.7))}
 
@@ -133,9 +135,16 @@
       + '<text x="256" y="266" font-size="16" font-weight="700" fill="#5a6b85">D↔C</text></g>' : '';
     // BD/BC 밑변 호
     var base = o.base ? '<g class="fade '+(o.base==='on'?'on':'')+'" id="gBASE"><path d="M40,280 Q130,308 220,280" fill="none" stroke="#0f9d6e" stroke-width="4" stroke-dasharray="4 4"/><text x="108" y="322" font-size="19" font-weight="700" fill="#0f9d6e">BD=3</text><path d="M40,280 Q190,332 340,280" fill="none" stroke="#2b5fb0" stroke-width="4" stroke-dasharray="4 4"/><text x="172" y="350" font-size="19" font-weight="700" fill="#2b5fb0">BC=5</text></g>' : '';
+    // 이등분선 정리 강조: AB변↔BD (주황), AC변↔DC (파랑)
+    var bisect = o.bisect ? '<g class="fade '+(o.bisect==='on'?'on':'')+'" id="gBIS">'
+      + '<line x1="40" y1="280" x2="370" y2="60" stroke="#E8850C" stroke-width="5" opacity="0.6"/>'   // AB 변
+      + '<line x1="370" y1="60" x2="340" y2="280" stroke="#2b5fb0" stroke-width="5" opacity="0.6"/>'  // AC 변
+      + '<path d="M40,284 Q130,308 220,284" fill="none" stroke="#E8850C" stroke-width="4"/>'          // BD (AB와 같은 주황)
+      + '<path d="M224,290 Q282,308 340,290" fill="none" stroke="#2b5fb0" stroke-width="4"/>'         // DC (AC와 같은 파랑)
+      + '</g>' : '';
     var vb = o.tall ? '0 0 440 360' : '0 0 440 330';
     return '<svg viewBox="'+vb+'" xmlns="http://www.w3.org/2000/svg">'
-      + tri + abc + ebd + corr + base + lenAB + lenAC + ad + de
+      + tri + abc + ebd + corr + bisect + base + lenAB + lenAC + ad + de
       + '<circle cx="370" cy="60" r="5" fill="#1f2733"/><circle cx="40" cy="280" r="5" fill="#1f2733"/><circle cx="340" cy="280" r="5" fill="#1f2733"/>'
       + '<text x="376" y="55" font-size="22" font-weight="700" fill="#1f2733">A</text>'
       + '<text x="22" y="278" font-size="22" font-weight="700" fill="#1f2733">B</text>'
@@ -170,18 +179,18 @@
     // 2) 닮음 + 비율 (25초) — 색칠로 닮음 이해
     { no:'STEP 1', dur:25, kicker:'닮음과 비율', title:'△EBD ∽ △ABC',
       build:function(){
-        return '<div class="split"><div class="fig">'+fig({abc:1,ebd:1,corr:1,ad:1,base:1,de:1,tall:1})+'</div>'
+        return '<div class="split"><div class="fig">'+fig({abc:1,ebd:1,corr:1,ad:1,base:1,de:1,bisect:1,tall:1})+'</div>'
           +'<div class="txtcol">'
           +'<div class="cond" id="c1"><span class="b">큰 삼각형 ABC</span></div>'
           +'<div class="cond" id="c2"><span class="t">작은 삼각형 EBD</span><br><span style="font-size:24px">ED∥AC → 같은 모양 (닮음)</span></div>'
-          +'<div class="cond" id="c3">이등분선 정리<br>BD:DC = 18:12 = <span class="g">3 : 2</span></div>'
+          +'<div class="cond" id="c3">이등분선 정리<br><span class="g">AB:AC</span> = <span class="r">BD:DC</span><br>= 18:12 = <span class="g">3 : 2</span></div>'
           +'<div class="cond" id="c4">닮음비는 <b>전체</b>로!<br>BD : BC = 3 : (3+2) = <span class="b">3 : 5</span></div>'
           +'</div></div>';
       },
       steps:[
         {at:2,  el:'c1', svg:['gABC']},
         {at:8,  el:'c2', svg:['gEBD','gDE','gCORR']},
-        {at:15, el:'c3', svg:['gAD']},
+        {at:15, el:'c3', svg:['gAD','gBIS']},
         {at:20, el:'c4', svg:['gBASE']},
       ]},
 
