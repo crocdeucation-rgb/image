@@ -120,7 +120,10 @@
     var lenAB = o.lenAB ? '<g class="fade '+(o.lenAB==='on'?'on':'')+'" id="gAB"><path d="M40,280 Q187,143 370,60" fill="none" stroke="#E8850C" stroke-width="2.5" stroke-dasharray="5 4"/><text x="150" y="135" font-size="21" font-weight="700" fill="#E8850C">18cm</text></g>' : '';
     var lenAC = o.lenAC ? '<g class="fade '+(o.lenAC==='on'?'on':'')+'" id="gAC"><path d="M370,60 Q396,174 340,280" fill="none" stroke="#2b5fb0" stroke-width="2.5" stroke-dasharray="5 4"/><text x="400" y="180" font-size="21" font-weight="700" fill="#2b5fb0">12cm</text></g>' : '';
     // AD 이등분선
-    var ad = o.ad ? '<g class="fade '+(o.ad==='on'?'on':'')+'" id="gAD"><line x1="370" y1="60" x2="220" y2="280" stroke="#E8850C" stroke-width="3.5"/><path d="M362 82 A 24 24 0 0 1 372 76" fill="none" stroke="#E8850C" stroke-width="2"/><path d="M362 82 A 24 24 0 0 0 350 84" fill="none" stroke="#E8850C" stroke-width="2"/><circle cx="220" cy="280" r="5" fill="#E8850C"/><text x="212" y="306" font-size="21" font-weight="700" fill="#E8850C">D</text></g>' : '';
+    var ad = o.ad ? '<g class="fade '+(o.ad==='on'?'on':'')+'" id="gAD"><line x1="370" y1="60" x2="220" y2="280" stroke="#E8850C" stroke-width="3.5"/>'
+      + '<circle cx="346" cy="84" r="4" fill="#E8850C"/>'   // ∠BAD 안 점
+      + '<circle cx="358" cy="92" r="4" fill="#E8850C"/>'   // ∠DAC 안 점 (같은 각 표시)
+      + '<circle cx="220" cy="280" r="5" fill="#E8850C"/><text x="212" y="306" font-size="21" font-weight="700" fill="#E8850C">D</text></g>' : '';
     // DE 평행
     var de = o.de ? '<g class="fade '+(o.de==='on'?'on':'')+'" id="gDE"><line x1="238" y1="148" x2="220" y2="280" stroke="#0f9d6e" stroke-width="3.5" stroke-dasharray="7 5"/><circle cx="238" cy="148" r="5" fill="#0f9d6e"/><text x="244" y="145" font-size="21" font-weight="700" fill="#0f9d6e">E</text><text x="150" y="230" font-size="17" font-weight="700" fill="#0f9d6e">DE∥CA</text></g>' : '';
     // 작은삼각형 EBD 강조 (초록칠)
