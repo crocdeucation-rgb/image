@@ -577,7 +577,7 @@ function renderCombo(){
 
 function renderBranches(){
   var brCard=document.getElementById('brCard');
-  if(curDept==='쌤이다'){ if(brCard) brCard.style.display='none'; return; }  // 쌤이다는 지점 구분 없음
+  if(curDept==='쌤이다'||curDept==='수업강사'){ if(brCard) brCard.style.display='none'; return; }  // 쌤이다·수업강사는 지점 구분 없음
   if(brCard) brCard.style.display='';
   document.getElementById('brTitle').textContent=`${curDept} — 지점별 현황`;
   let gs=orderedGroups(curDept);
