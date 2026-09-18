@@ -2,253 +2,299 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TO DO LIST 애니메이션</title>
-<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Jua&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@700&display=swap" rel="stylesheet">
+<title>이등분선 문제 설명</title>
 <style>
   :root{
-    --paper:#FFFDF7; --ink:#2B2B2B; --line:#E4E0D5;
-    --accent:#FF7A45; --check:#E23A22; --hl:#3B82F6; --hl-bg:#DBEAFE;
-    --tab:#FFD43B;
+    --ink:#1f2733; --sub:#5a6b85; --paper:#FFFDF7;
+    --gold:#E8850C; --gold-bg:#FDF1DF;
+    --teal:#0f9d6e; --teal-bg:#e3f7ef;
+    --blue:#2b5fb0; --blue-bg:#e9f0fb;
+    --red:#E23A22; --red-bg:#fdeae7;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Jua','Gaegu',system-ui,sans-serif;background:#3a4150;padding:24px;color:#e7ecf3}
-  .wrap{max-width:1100px;margin:0 auto}
-  h1{font-size:17px;font-weight:700;margin-bottom:4px;font-family:system-ui,sans-serif}
-  .desc{font-size:13px;color:#9aa6b8;margin-bottom:18px;font-family:system-ui,sans-serif;line-height:1.6}
+  body{font-family:'Jua',system-ui,sans-serif;background:#2a3140;display:flex;flex-direction:column;align-items:center;gap:16px;padding:20px;color:#e7ecf3}
+  h1.pg{font-size:16px;font-family:system-ui;font-weight:700}
+  .hint{font-size:12px;color:#9aa6b8;font-family:system-ui}
 
-  /* 무대 = 투명(체커) 위에 투두판. 16:9 */
-  .stage-outer{border-radius:12px;overflow:hidden;
-    background:#d9dee6;
-    background-image:
-      linear-gradient(45deg,#c8cdd6 25%,transparent 25%),linear-gradient(-45deg,#c8cdd6 25%,transparent 25%),
-      linear-gradient(45deg,transparent 75%,#c8cdd6 75%),linear-gradient(-45deg,transparent 75%,#c8cdd6 75%);
+  /* 무대 1:1 */
+  .stage-outer{border-radius:26px;overflow:hidden;background:#c8cdd6;
+    background-image:linear-gradient(45deg,#b9bfc9 25%,transparent 25%),linear-gradient(-45deg,#b9bfc9 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#b9bfc9 75%),linear-gradient(-45deg,transparent 75%,#b9bfc9 75%);
     background-size:26px 26px;background-position:0 0,0 13px,13px -13px,-13px 0}
-  #stage{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden}
+  #stage{position:relative;width:900px;height:900px;max-width:92vw;background:var(--paper);overflow:hidden;padding:50px 56px;display:flex;flex-direction:column}
+  .tab{position:absolute;left:70px;top:-6px;width:26px;height:56px;background:#FFD43B;border-radius:0 0 7px 7px;z-index:5}
+  .scene-no{position:absolute;right:52px;top:52px;font-size:22px;color:#c3ccd8;font-weight:700}
+  h1{font-size:46px;color:var(--ink);letter-spacing:-1px;margin-bottom:20px;line-height:1.05}
+  .kicker{font-size:24px;color:var(--gold);font-weight:700}
 
-  /* 투두 카드 — 우측 */
-  .todo{position:absolute;left:5%;top:10%;width:560px;max-width:44%;
-    background:var(--paper);border:3px solid var(--ink);border-radius:20px;
-    padding:26px 30px 30px;box-shadow:6px 8px 0 rgba(0,0,0,.15);
-    transform:scale(.9);opacity:0}
-  .todo.show{animation:pop 1.2s cubic-bezier(.2,1.4,.4,1) forwards}
-  @keyframes pop{to{transform:scale(1);opacity:1}}
-  /* 상단 노란 탭 */
-  .tab{position:absolute;left:26px;top:-3px;width:18px;height:40px;background:var(--tab);border-radius:0 0 5px 5px}
-  .todo h2{font-size:clamp(20px,3.4vw,34px);font-weight:700;color:var(--ink);
-    letter-spacing:-.5px;margin-bottom:20px;padding-left:8px;white-space:nowrap}
-  .todo h2 .star{color:var(--accent);font-size:.75em;margin:0 4px}
+  .content{flex:1;display:flex;flex-direction:column;justify-content:center;gap:20px;min-height:0}
+  .split{display:flex;gap:34px;align-items:center}
+  .fig{background:#fff;border:3px solid #EEE7D6;border-radius:20px;padding:16px;flex:0 0 auto}
+  .fig svg{width:380px;height:auto}
+  .txtcol{flex:1;display:flex;flex-direction:column;gap:16px}
 
-  .item{display:flex;align-items:center;gap:14px;padding:9px 0;opacity:0;transform:translateX(18px)}
-  .item.in{animation:slidein 1.1s ease forwards}
-  @keyframes slidein{to{opacity:1;transform:translateX(0)}}
-  .box{position:relative;width:34px;height:34px;border:3px solid var(--ink);border-radius:7px;flex:none}
-  .txt{font-size:clamp(16px,2.4vw,25px);font-weight:400;font-family:'Gaegu',sans-serif;font-weight:700;color:var(--ink);white-space:nowrap}
-  /* 체크 SVG (그려지는 애니) */
-  .box svg{position:absolute;left:-4px;top:-8px;width:44px;height:44px;overflow:visible}
-  .box svg path{fill:none;stroke:var(--check);stroke-width:5;stroke-linecap:round;stroke-linejoin:round;
-    stroke-dasharray:48;stroke-dashoffset:48}
-  .item.checked svg path{animation:draw 1.2s ease forwards}
-  @keyframes draw{to{stroke-dashoffset:0}}
-  .item.checked .txt .hl{background:var(--hl-bg);color:var(--hl);padding:0 4px;border-radius:4px}
+  /* 조건 라인 (문제 설명) */
+  .cond{font-size:30px;color:var(--sub);font-family:'Gaegu',sans-serif;line-height:1.35;opacity:.25;transition:opacity .4s,transform .4s;transform:translateX(10px)}
+  .cond.on{opacity:1;transform:translateX(0)}
+  .cond b{color:var(--ink)}
+  .cond .g{color:var(--gold);font-weight:700}
+  .cond .t{color:var(--teal);font-weight:700}
+  .cond .b{color:var(--blue);font-weight:700}
+  .cond .r{color:var(--red);font-weight:700}
 
-  /* 편집 패널 */
-  .panel{background:#222a35;border-radius:12px;padding:18px 20px;margin-top:16px;font-family:system-ui,sans-serif}
-  .panel .lbl{font-size:12px;font-weight:700;color:#9fb0c3;margin-bottom:8px}
-  .rows{display:flex;flex-direction:column;gap:8px}
-  .erow{display:flex;gap:8px;align-items:center}
-  .erow input[type=text]{flex:1;background:#0d1218;border:1px solid #2a3542;border-radius:8px;
-    padding:9px 12px;color:#e7ecf3;font-size:14px;font-family:inherit}
-  .erow input:focus{outline:none;border-color:var(--hl)}
-  .erow .chk{display:flex;align-items:center;gap:5px;font-size:12px;color:#c3cfdb;white-space:nowrap}
-  .erow .del{background:#3a2530;border:none;color:#e88;border-radius:7px;width:30px;height:36px;cursor:pointer;font-size:16px}
-  .addbtn{background:#232d3a;border:none;color:#9fb0c3;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px;font-family:inherit}
-  .foot{display:flex;gap:10px;align-items:center;margin-top:16px;flex-wrap:wrap}
-  .foot button{border:none;border-radius:9px;padding:11px 24px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit}
-  .play{background:var(--hl);color:#fff}
-  .tip{font-size:12px;color:#7a8798;margin-top:12px;line-height:1.7;font-family:system-ui,sans-serif}
-  .tip b{color:#c3cfdb}
-  .hint{font-size:11px;color:#8a97a8}
+  .formula{font-size:52px;font-family:'Gaegu',sans-serif;color:var(--ink);text-align:center;line-height:1.4;opacity:.25;transition:opacity .5s}
+  .formula.on{opacity:1}
+  .formula b{font-size:60px}
+  .g{color:var(--gold);font-weight:700}.t{color:var(--teal);font-weight:700}.b{color:var(--blue);font-weight:700}.r{color:var(--red);font-weight:700}
 
-  /* OBS clean 모드 (?clean): 투두판만, 배경 투명 */
-  body.clean{background:transparent;padding:0}
-  body.clean h1,body.clean .desc,body.clean .panel{display:none}
-  body.clean .stage-outer{background:transparent;border-radius:0}
-  body.clean #stage{aspect-ratio:auto;height:100vh}
+  .ans{background:var(--teal-bg);border:4px solid #B6E5D2;border-radius:22px;padding:24px;text-align:center;opacity:.25;transition:opacity .6s;transform:scale(.9);transition:opacity .5s,transform .5s}
+  .ans.on{opacity:1;transform:scale(1)}
+  .ans .lb{font-size:26px;color:var(--teal);font-weight:700;display:block;margin-bottom:4px}
+  .ans .vv{font-size:80px;color:#0a6f4e;font-weight:700}
 
-  /* [OBS 모드] 버튼으로 토글: 투두판만 전체화면, 나머지 숨김 */
-  html,body{overflow-x:hidden}
-  body.obs{background:#00B140;padding:0;overflow:hidden;margin:0}
-  body.obs h1,body.obs .desc,body.obs .panel{display:none}
-  body.obs .stage-outer{width:100%;height:100vh;border-radius:0;background:#00B140;background-image:none}
-  body.obs #stage{aspect-ratio:auto;width:100%;height:100vh}
-  .obs-toggle{position:fixed;right:14px;top:14px;z-index:100;background:#3B82F6;color:#fff;
-    border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:800;cursor:pointer;font-family:system-ui,sans-serif}
-  body.obs .obs-toggle{display:none !important}
-  body.obs-url .obs-toggle{display:none !important}
+  /* 핵심 정리 */
+  .keyrow{display:flex;align-items:flex-start;gap:16px;font-size:32px;font-family:'Gaegu',sans-serif;color:var(--ink);line-height:1.3;opacity:.2;transition:opacity .5s,transform .5s;transform:translateY(8px)}
+  .keyrow.on{opacity:1;transform:translateY(0)}
+  .keyrow .num{flex:none;width:44px;height:44px;border-radius:50%;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:24px;font-family:'Jua'}
+  .keyrow.k1 .num{background:var(--gold)} .keyrow.k2 .num{background:var(--blue)} .keyrow.k3 .num{background:var(--red)}
+  .keyrow .kb{color:var(--ink)}
+  .keyrow .hl{font-weight:700}
 
-  .durwrap{display:flex;align-items:center;gap:3px;white-space:nowrap}
-  .erow input.dur{width:52px;background:#0d1218;border:1px solid #2a3542;border-radius:8px;padding:9px 6px;color:#e7ecf3;font-size:14px;font-family:inherit;text-align:center}
-  .durlb{font-size:12px;color:#9fb0c3}
+  /* SVG 강조 애니 */
+  .fade{opacity:0;transition:opacity .5s}
+  .fade.on{opacity:1}
+  .glow{filter:drop-shadow(0 0 0 transparent);transition:filter .4s}
+  .glow.on{filter:drop-shadow(0 0 6px rgba(232,133,12,.7))}
+
+  /* OBS 모드 (초록 크로마키) */
+  body.obs{background:#00B140;padding:0;overflow:hidden}
+  body.obs h1.pg,body.obs .hint,body.obs .ctrl{display:none}
+  body.obs .stage-outer{width:100%;height:100vh;border-radius:0;background:#00B140;background-image:none;display:flex;align-items:center;justify-content:center}
+  body.obs #stage{max-width:none}
+
+  .ctrl{display:flex;gap:10px;align-items:center;font-family:system-ui}
+  .ctrl button{border:none;border-radius:10px;padding:12px 22px;font-size:14px;font-weight:800;cursor:pointer}
+  .play{background:#3B82F6;color:#fff} .nav{background:#3a4657;color:#e7ecf3} .dl{background:#0f9d6e;color:#fff}
+  .pageinfo{font-size:13px;color:#9aa6b8;min-width:120px;text-align:center}
 </style>
 </head>
 <body>
-<button class="obs-toggle" id="obsToggle">OBS 모드</button>
-<div class="wrap">
-  <h1>TO DO LIST 애니메이션</h1>
-  <p class="desc">항목을 입력하고 [재생]하면 판이 뜨고 항목이 하나씩 나타나며 체크가 그려집니다. 화면녹화(투명배경)해서 영상에 얹으세요. <span class="hint">*별표*로 감싸면 파랑 강조</span></p>
+<h1 class="pg">이등분선 문제 설명 애니메이션</h1>
+<p class="hint">[재생]하면 씬별 타이밍(19·25·12·20·15초)에 맞춰 강조가 나타납니다. OBS는 <b>?obs</b> URL로 초록배경 자동재생.</p>
 
-  <div class="stage-outer">
-    <div id="stage">
-      <div class="todo" id="todo">
-        <div class="tab"></div>
-        <h2>오늘 <span class="star">✿</span>TO DO <span style="color:var(--accent)">LIST</span></h2>
-        <div id="items"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="panel">
-    <div class="lbl">할 일 항목 (체크 = 완료 표시로 그려짐)</div>
-    <div class="rows" id="rows"></div>
-    <button class="addbtn" id="add">+ 항목 추가</button>
-    <div class="foot">
-      <button class="play" id="playBtn">▶ 재생</button>
-      <span class="hint" id="status"></span>
-    </div>
-    <p class="tip">
-      <b>화면녹화 팁:</b> 이 투두판 영역만 녹화(맥 Cmd+Shift+5 / 윈도우 게임바 Win+G, 또는 OBS)해서 캡컷·프리미어에 얹으세요.<br>
-      체커무늬 배경은 미리보기용이라 화면엔 투두판만 녹화됩니다. 배경 완전 투명이 필요하면 OBS 브라우저소스로 이 페이지를 띄우세요.
-    </p>
+<div class="stage-outer">
+  <div id="stage">
+    <div class="tab"></div>
+    <div class="scene-no" id="sceneNo"></div>
+    <div class="kicker" id="kicker"></div>
+    <h1 id="title"></h1>
+    <div class="content" id="content"></div>
   </div>
 </div>
 
+<div class="ctrl">
+  <button class="play" id="play">▶ 처음부터 재생</button>
+  <button class="nav" id="prev">◀</button>
+  <button class="nav" id="next">▶ 씬</button>
+  <span class="pageinfo" id="pinfo"></span>
+  <button class="dl" id="obsBtn">OBS 모드</button>
+</div>
+
 <script>
-  // dur = 이 항목이 표시되는 시간(초). 그 시간의 마지막 1초에 체크됨. 순차로 진행.
-  var DEFAULT=[
-    {t:'*학교알리미* 시험기간 CHECK', dur:10},
-    {t:'다인이 필기 상태 꼼꼼히 CHECK', dur:8},
-    {t:'채린이 수학 학습 상태 점검', dur:16},
-    {t:'채린이 *영어 방탈출 게임* 추천', dur:9}
+  // ── 도형 SVG (DE∥AC, BD:DC=3:2) ──
+  // n×n 격자 (넓이 칸 시각화)
+  function grid(n, fillC, strokeC){
+    var cell=22, out='';
+    for(var r=0;r<n;r++) for(var c=0;c<n;c++){
+      out+='<rect x="'+(c*cell)+'" y="'+(r*cell)+'" width="'+cell+'" height="'+cell+'" fill="'+fillC+'" stroke="'+strokeC+'" stroke-width="1.5"/>';
+    }
+    return out;
+  }
+  function fig(o){
+    o=o||{};
+    var tri='<polygon points="40,280 340,280 370,60" fill="#EEF1F6" stroke="#1f2733" stroke-width="2.5"/>';
+    // AB(18) AC(12) 호+라벨
+    var lenAB = o.lenAB ? '<g class="fade '+(o.lenAB==='on'?'on':'')+'" id="gAB"><path d="M40,280 Q187,143 370,60" fill="none" stroke="#E8850C" stroke-width="2.5" stroke-dasharray="5 4"/><text x="150" y="135" font-size="21" font-weight="700" fill="#E8850C">18cm</text></g>' : '';
+    var lenAC = o.lenAC ? '<g class="fade '+(o.lenAC==='on'?'on':'')+'" id="gAC"><path d="M370,60 Q396,174 340,280" fill="none" stroke="#2b5fb0" stroke-width="2.5" stroke-dasharray="5 4"/><text x="400" y="180" font-size="21" font-weight="700" fill="#2b5fb0">12cm</text></g>' : '';
+    // AD 이등분선
+    var ad = o.ad ? '<g class="fade '+(o.ad==='on'?'on':'')+'" id="gAD"><line x1="370" y1="60" x2="220" y2="280" stroke="#E8850C" stroke-width="3.5"/><path d="M362 82 A 24 24 0 0 1 372 76" fill="none" stroke="#E8850C" stroke-width="2"/><path d="M362 82 A 24 24 0 0 0 350 84" fill="none" stroke="#E8850C" stroke-width="2"/><circle cx="220" cy="280" r="5" fill="#E8850C"/><text x="212" y="306" font-size="21" font-weight="700" fill="#E8850C">D</text></g>' : '';
+    // DE 평행
+    var de = o.de ? '<g class="fade '+(o.de==='on'?'on':'')+'" id="gDE"><line x1="238" y1="148" x2="220" y2="280" stroke="#0f9d6e" stroke-width="3.5" stroke-dasharray="7 5"/><circle cx="238" cy="148" r="5" fill="#0f9d6e"/><text x="244" y="145" font-size="21" font-weight="700" fill="#0f9d6e">E</text><text x="150" y="230" font-size="17" font-weight="700" fill="#0f9d6e">DE∥CA</text></g>' : '';
+    // 작은삼각형 EBD 강조 (초록칠)
+    var ebd = o.ebd ? '<polygon class="fade '+(o.ebd==='on'?'on':'')+'" id="gEBD" points="40,280 220,280 238,148" fill="'+(o.ebd==='fill'?'#7FD4B0':'#DFF3EA')+'" stroke="#0f9d6e" stroke-width="3" opacity="'+(o.ebd==='fill'?'0.75':'1')+'"/>' : '';
+    // 큰삼각형 ABC 강조 (파랑칠)
+    var abc = o.abc ? '<polygon class="fade '+(o.abc==='on'?'on':'')+'" id="gABC" points="40,280 340,280 370,60" fill="#9DBEEA" stroke="#2b5fb0" stroke-width="3" opacity="0.55"/>' : '';
+    // 대응 꼭짓점 강조 (E↔A, B공통, D↔C)
+    var corr = o.corr ? '<g class="fade '+(o.corr==='on'?'on':'')+'" id="gCORR">'
+      + '<circle cx="238" cy="148" r="9" fill="none" stroke="#0f9d6e" stroke-width="2.5"/><circle cx="370" cy="60" r="9" fill="none" stroke="#2b5fb0" stroke-width="2.5"/>'
+      + '<text x="255" y="120" font-size="16" font-weight="700" fill="#0f9d6e">E↔A</text>'
+      + '<circle cx="220" cy="280" r="9" fill="none" stroke="#0f9d6e" stroke-width="2.5"/><circle cx="340" cy="280" r="9" fill="none" stroke="#2b5fb0" stroke-width="2.5"/>'
+      + '<text x="256" y="266" font-size="16" font-weight="700" fill="#5a6b85">D↔C</text></g>' : '';
+    // BD/BC 밑변 호
+    var base = o.base ? '<g class="fade '+(o.base==='on'?'on':'')+'" id="gBASE"><path d="M40,280 Q130,308 220,280" fill="none" stroke="#0f9d6e" stroke-width="4" stroke-dasharray="4 4"/><text x="108" y="322" font-size="19" font-weight="700" fill="#0f9d6e">BD=3</text><path d="M40,280 Q190,332 340,280" fill="none" stroke="#2b5fb0" stroke-width="4" stroke-dasharray="4 4"/><text x="172" y="350" font-size="19" font-weight="700" fill="#2b5fb0">BC=5</text></g>' : '';
+    var vb = o.tall ? '0 0 440 360' : '0 0 440 330';
+    return '<svg viewBox="'+vb+'" xmlns="http://www.w3.org/2000/svg">'
+      + tri + abc + ebd + corr + base + lenAB + lenAC + ad + de
+      + '<circle cx="370" cy="60" r="5" fill="#1f2733"/><circle cx="40" cy="280" r="5" fill="#1f2733"/><circle cx="340" cy="280" r="5" fill="#1f2733"/>'
+      + '<text x="376" y="55" font-size="22" font-weight="700" fill="#1f2733">A</text>'
+      + '<text x="22" y="278" font-size="22" font-weight="700" fill="#1f2733">B</text>'
+      + '<text x="346" y="278" font-size="22" font-weight="700" fill="#1f2733">C</text>'
+      + '</svg>';
+  }
+
+  // ── 씬 정의: dur(초), build(html), steps[{at(초), do}] ──
+  var SCENES = [
+    // 1) 문제 (19초)
+    { no:'문제', dur:19, kicker:'삼각형 각의 이등분선', title:'다음을 읽고 넓이를 구하시오',
+      build:function(){
+        return '<div class="split"><div class="fig">'+fig({ad:1,de:1,lenAB:1,lenAC:1})+'</div>'
+          +'<div class="txtcol">'
+          +'<div class="cond" id="c1">∠A의 <span class="g">이등분선</span>이 BC와 만나는 점 <span class="g">D</span></div>'
+          +'<div class="cond" id="c2">점 D에서 AB 위의 점 <span class="t">E</span>, <span class="t">ED∥AC</span></div>'
+          +'<div class="cond" id="c3"><span class="g">AB = 18cm</span></div>'
+          +'<div class="cond" id="c4"><span class="b">AC = 12cm</span></div>'
+          +'<div class="cond" id="c5">△EBD = <span class="r">45cm²</span></div>'
+          +'<div class="cond" id="c6"><b>△ABC의 넓이 = ?</b></div>'
+          +'</div></div>';
+      },
+      steps:[
+        {at:1.5, el:'c1', svg:['gAD']},
+        {at:5,   el:'c2', svg:['gDE']},
+        {at:9,   el:'c3', svg:['gAB']},
+        {at:11.5,el:'c4', svg:['gAC']},
+        {at:14,  el:'c5', svg:['gEBD']},
+        {at:16.5,el:'c6'},
+      ]},
+
+    // 2) 닮음 + 비율 (25초) — 색칠로 닮음 이해
+    { no:'STEP 1', dur:25, kicker:'닮음과 비율', title:'△EBD ∽ △ABC',
+      build:function(){
+        return '<div class="split"><div class="fig">'+fig({abc:1,ebd:1,corr:1,ad:1,base:1,de:1,tall:1})+'</div>'
+          +'<div class="txtcol">'
+          +'<div class="cond" id="c1"><span class="b">큰 삼각형 ABC</span></div>'
+          +'<div class="cond" id="c2"><span class="t">작은 삼각형 EBD</span><br><span style="font-size:24px">ED∥AC → 같은 모양 (닮음)</span></div>'
+          +'<div class="cond" id="c3">이등분선 정리<br>BD:DC = 18:12 = <span class="g">3 : 2</span></div>'
+          +'<div class="cond" id="c4">닮음비는 <b>전체</b>로!<br>BD : BC = 3 : (3+2) = <span class="b">3 : 5</span></div>'
+          +'</div></div>';
+      },
+      steps:[
+        {at:2,  el:'c1', svg:['gABC']},
+        {at:8,  el:'c2', svg:['gEBD','gDE','gCORR']},
+        {at:15, el:'c3', svg:['gAD']},
+        {at:20, el:'c4', svg:['gBASE']},
+      ]},
+
+    // 3) 넓이비 (12초) — 칸 격자로 9:25 시각화
+    { no:'STEP 2', dur:12, kicker:'넓이비 = 닮음비²', title:'닮음비 3:5 → 넓이비',
+      build:function(){
+        return '<div class="content" style="gap:24px">'
+          +'<div class="formula" id="f1">길이비 <span class="b">3 : 5</span> → 넓이는 <span class="r">제곱!</span></div>'
+          +'<div class="fig" id="fbox" style="padding:26px;opacity:.25;transition:opacity .5s">'
+          +'<svg viewBox="0 0 480 180" xmlns="http://www.w3.org/2000/svg">'
+          // 3x3 = 9칸 (초록)
+          +'<g transform="translate(20,15)">'+grid(3,'#7FD4B0','#0f9d6e')+'<text x="30" y="130" font-size="22" font-weight="700" fill="#0f9d6e">9칸</text></g>'
+          +'<text x="150" y="90" font-size="34" font-weight="700" fill="#5a6b85">:</text>'
+          // 5x5 = 25칸 (파랑)
+          +'<g transform="translate(185,15)">'+grid(5,'#9DBEEA','#2b5fb0')+'<text x="45" y="130" font-size="22" font-weight="700" fill="#2b5fb0">25칸</text></g>'
+          +'</svg></div>'
+          +'<div class="formula" id="f2">3² : 5² = <b class="r">9 : 25</b></div>'
+          +'</div>';
+      },
+      steps:[
+        {at:1,  el:'f1'},
+        {at:4,  el:'fbox'},
+        {at:8,  el:'f2'},
+      ]},
+
+    // 4) 계산 (20초)
+    { no:'STEP 3', dur:20, kicker:'넓이 계산', title:'한 칸 = 5 → 125',
+      build:function(){
+        return '<div class="content" style="gap:22px">'
+          +'<div class="formula" id="f1">△EBD : △ABC = <b class="r">9 : 25</b> 칸</div>'
+          +'<div class="fig" id="fbox" style="padding:24px;opacity:.25;transition:opacity .5s">'
+          +'<svg viewBox="0 0 440 150" xmlns="http://www.w3.org/2000/svg">'
+          +'<text x="10" y="35" font-size="22" font-weight="700" fill="#0f9d6e">△EBD = 9칸 = 45cm²</text>'
+          +'<text x="10" y="80" font-size="26" font-weight="700" fill="#E23A22">→ 한 칸 = 45 ÷ 9 = 5</text>'
+          +'<text x="10" y="125" font-size="22" font-weight="700" fill="#2b5fb0">△ABC = 25칸 = 25 × 5</text>'
+          +'</svg></div>'
+          +'<div class="formula" id="f2">45 × <span class="r">25</span>/<span class="t">9</span> = <b class="r">125</b></div>'
+          +'<div class="ans" id="ans"><span class="lb">△ABC의 넓이</span><span class="vv">125 cm²</span></div>'
+          +'</div>';
+      },
+      steps:[
+        {at:1,  el:'f1'},
+        {at:4,  el:'fbox'},
+        {at:11, el:'f2'},
+        {at:15, el:'ans'},
+      ]},
+
+    // 5) 핵심 정리 (15초)
+    { no:'정리', dur:15, kicker:'꼭 기억할 3가지', title:'핵심 정리',
+      build:function(){
+        return '<div class="content" style="gap:30px;justify-content:center">'
+          +'<div class="keyrow k1" id="k1"><span class="num">1</span><span class="kb">이등분선은 밑변을 <span class="hl" style="color:#E8850C">D로 나눈다</span> (BD:DC = 변의 비)</span></div>'
+          +'<div class="keyrow k2" id="k2"><span class="num">2</span><span class="kb">닮음비는 <span class="hl" style="color:#2b5fb0">조각 말고 전체</span>로 (3:2 아니라 3:5)</span></div>'
+          +'<div class="keyrow k3" id="k3"><span class="num">3</span><span class="kb">넓이비는 <span class="hl" style="color:#E23A22">닮음비의 제곱</span> (3:5 → 9:25)</span></div>'
+          +'</div>';
+      },
+      steps:[
+        {at:1,  el:'k1'},
+        {at:5.5,el:'k2'},
+        {at:10, el:'k3'},
+      ]},
   ];
-  var rowsEl=document.getElementById('rows');
-  var itemsEl=document.getElementById('items');
-  var todoEl=document.getElementById('todo');
 
-  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-  function fmt(s){return esc(s).replace(/\*([^*]+)\*/g,'<span class="hl">$1</span>');}
+  var content=document.getElementById('content');
+  var timers=[];
+  function clearTimers(){ timers.forEach(clearTimeout); timers=[]; }
 
-  function readRows(){
-    return [...rowsEl.querySelectorAll('.erow')].map(function(r){
-      return { t:r.querySelector('input[type=text]').value, dur:parseFloat(r.querySelector('input.dur').value)||5 };
-    });
-  }
-  function renderPreview(){
-    var data=readRows();
-    // 편집 미리보기: 전 항목 표시(체크 안 됨)
-    itemsEl.innerHTML=data.map(function(d){
-      return '<div class="item in"><div class="box"></div><div class="txt">'+(d.t? fmt(d.t) : '\u00A0')+'</div></div>';
-    }).join('');
-    todoEl.classList.add('show');
-  }
-  function makeRow(d){
-    var row=document.createElement('div'); row.className='erow';
-    row.innerHTML='<input type="text" value="'+(d.t||'').replace(/"/g,'&quot;')+'" placeholder="할 일 입력">'
-      +'<span class="durwrap"><input type="number" class="dur" value="'+(d.dur||5)+'" min="1" step="1"><span class="durlb">초</span></span>'
-      +'<button class="del">×</button>';
-    row.querySelector('.del').onclick=function(){ row.remove(); renderPreview(); };
-    row.querySelector('input[type=text]').oninput=renderPreview;
-    row.querySelector('input.dur').oninput=renderPreview;
-    return row;
-  }
-  DEFAULT.forEach(function(d){ rowsEl.appendChild(makeRow(d)); });
-  document.getElementById('add').onclick=function(){ rowsEl.appendChild(makeRow({t:'',dur:5})); renderPreview(); };
-  renderPreview();
-
-  // 재생: 전 항목 먼저 표시 → 각 항목 dur의 마지막 1초에 순차 체크
-  document.getElementById('playBtn').onclick=function(){
-    if(window.__playing) return;
-    window.__playing=true;
-    var data=readRows();
-    todoEl.classList.remove('show');
-    itemsEl.innerHTML='';
-    document.getElementById('status').textContent='재생 중…';
-    void todoEl.offsetWidth;
-    todoEl.classList.add('show');
-
-    // (0) 모든 항목 자리를 먼저 만들어 판 크기 고정 (내용은 숨김 = 높이만 확보)
-    var els=[];
-    data.forEach(function(d,i){
-      var el=document.createElement('div');
-      el.className='item'; el.id='ti_'+i;
-      el.style.visibility='hidden';   // 자리는 차지, 안 보임 (판 높이 고정)
-      el.innerHTML='<div class="box"><svg viewBox="0 0 44 44"><path d="M9 23 L19 33 L36 12"/></svg></div><div class="txt">'+(d.t? fmt(d.t) : '\u00A0')+'</div>';
-      itemsEl.appendChild(el);
-      els.push(el);
-    });
-
-    var APPEAR=500;
-    var acc=900;
-    data.forEach(function(d,i){
-      // (1) 이 항목 내용만 등장 (자리는 이미 있음)
-      setTimeout(function(){
-        var el=els[i];
-        el.style.visibility='';
-        el.style.opacity='0';
-        void el.offsetWidth;
-        el.style.opacity=''; el.classList.add('in');
-      }, acc);
-      // (2) dur 마지막 1초에 체크
-      var checkAt = acc + APPEAR + Math.max(d.dur*1000 - 1000, 0);
-      setTimeout(function(){ els[i].classList.add('checked'); }, checkAt);
-      acc += APPEAR + d.dur*1000;
-    });
-
-    setTimeout(function(){
-      document.getElementById('status').textContent='완료 ✓ (다시 재생 가능)';
-      window.__playing=false;
-      if(document.body.classList.contains('obs')){
-        setTimeout(function(){
-          itemsEl.innerHTML=''; todoEl.classList.remove('show');
-          setTimeout(function(){ document.getElementById('playBtn').click(); }, 400);
-        }, 2500);
-      }
-    }, acc+300);
-  };
-
-
-  // OBS clean 모드: ?clean 이면 패널 숨기고, ?auto 면 자동재생
-  (function(){
-    var q=location.search;
-    if(q.indexOf('clean')>=0) document.body.classList.add('clean');
-    if(q.indexOf('obs')>=0){
-      document.body.classList.add('obs');
-      document.body.classList.add('obs-url');
-      document.getElementById('items').innerHTML='';   // 미리보기 완성본 제거 → 애니부터 시작
-      var _tg=document.getElementById('obsToggle'); if(_tg) _tg.textContent='편집으로';
-      setTimeout(function(){ document.getElementById('playBtn').click(); }, 700);
-    }
-    if(q.indexOf('auto')>=0) setTimeout(function(){ document.getElementById('playBtn').click(); }, 800);
-  })();
-
-  document.getElementById('obsToggle').onclick=function(){
-    document.body.classList.toggle('obs');
-    this.textContent=document.body.classList.contains('obs')?'편집으로':'OBS 모드';
-    if(document.body.classList.contains('obs')){
-      document.getElementById('items').innerHTML='';   // 완성본 제거 → 애니부터
-      setTimeout(function(){document.getElementById('playBtn').click();},600);
+  function showScene(i, animate){
+    clearTimers();
+    var s=SCENES[i];
+    document.getElementById('sceneNo').textContent=s.no;
+    document.getElementById('kicker').textContent=s.kicker;
+    document.getElementById('title').textContent=s.title;
+    content.innerHTML=s.build();
+    document.getElementById('pinfo').textContent=(i+1)+' / '+SCENES.length+' · '+s.dur+'초';
+    if(animate){
+      s.steps.forEach(function(st){
+        timers.push(setTimeout(function(){
+          var el=document.getElementById(st.el); if(el) el.classList.add('on');
+          if(st.svg) st.svg.forEach(function(id){ var g=document.getElementById(id); if(g) g.classList.add('on'); });
+        }, st.at*1000));
+      });
     } else {
-      renderPreview();   // 편집으로 돌아오면 미리보기 복원
+      // 정지 시엔 전부 표시
+      s.steps.forEach(function(st){
+        var el=document.getElementById(st.el); if(el) el.classList.add('on');
+        if(st.svg) st.svg.forEach(function(id){ var g=document.getElementById(id); if(g) g.classList.add('on'); });
+      });
     }
-  };
-  document.body.addEventListener('dblclick', function(){
-    if(document.body.classList.contains('obs')){
-      document.body.classList.remove('obs','obs-url');
-      window.__playing=false;
-      var _tg=document.getElementById('obsToggle'); if(_tg) _tg.textContent='OBS 모드';
-      renderPreview();
+  }
+
+  var cur=0;
+  function playAll(){
+    var i=0;
+    function playScene(){
+      if(i>=SCENES.length){ if(document.body.classList.contains('obs')){ setTimeout(function(){ i=0; cur=0; playScene(); },2000); } return; }
+      cur=i; showScene(i, true);
+      var dur=SCENES[i].dur*1000;
+      timers.push(setTimeout(function(){ i++; playScene(); }, dur));
     }
-  });
+    clearTimers(); playScene();
+  }
+
+  document.getElementById('play').onclick=playAll;
+  document.getElementById('prev').onclick=function(){ if(cur>0){cur--;showScene(cur,false);} };
+  document.getElementById('next').onclick=function(){ if(cur<SCENES.length-1){cur++;showScene(cur,false);} };
+
+  // OBS 모드
+  document.getElementById('obsBtn').onclick=function(){ document.body.classList.add('obs'); setTimeout(playAll,600); };
+  (function(){
+    if(location.search.indexOf('obs')>=0){ document.body.classList.add('obs'); setTimeout(playAll,700); }
+    else showScene(0,false);
+  })();
 </script>
 </body>
 </html>
