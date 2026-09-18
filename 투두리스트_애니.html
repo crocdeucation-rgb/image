@@ -195,41 +195,41 @@
     // 2) 닮음 + 비율 (25초) — 색칠로 닮음 이해
     { no:'STEP 1', dur:25, kicker:'닮음과 비율', title:'△EBD ∽ △ABC',
       build:function(){
-        return '<div class="split"><div class="fig">'+fig({abc:1,ebd:1,corr:1,ad:1,base:1,de:1,bisect:1,tall:1})+'</div>'
+        return '<div class="split"><div class="fig">'+fig({abc:1,ebd:1,corr:1,ad:1,de:1,bisect:1,tall:1})+'</div>'
           +'<div class="txtcol">'
           +'<div class="cond" id="c1"><span class="b">큰 삼각형 ABC</span></div>'
           +'<div class="cond" id="c2"><span class="t">작은 삼각형 EBD</span><br><span style="font-size:24px">ED∥AC → 같은 모양 (닮음)</span></div>'
-          +'<div class="cond" id="c3">이등분선 정리<br><span class="g">AB:AC</span> = <span class="r">BD:DC</span><br>= 18:12 = <span class="g">3 : 2</span></div>'
-          +'<div class="cond" id="c4">닮음비는 <b>전체</b>로!<br>BD : BC = 3 : (3+2) = <span class="b">3 : 5</span></div>'
+          +'<div class="cond" id="c3">이등분선 정리<br><span class="g">AB:AC</span> = <span class="r">BD:DC</span></div>'
+          +'<div class="cond" id="c4">= 18 : 12 = <span class="g">3 : 2</span></div>'
           +'</div></div>';
       },
       steps:[
-        {at:2,  el:'c1', svg:['gABC']},
-        {at:8,  el:'c2', svg:['gEBD','gDE','gCORR']},
-        {at:15, el:'c3', svg:['gAD','gBIS']},
-        {at:20, el:'c4', svg:['gBASE']},
+        {at:3,  el:'c1', svg:['gABC']},
+        {at:9,  el:'c2', svg:['gEBD','gDE','gCORR']},
+        {at:16, el:'c3', svg:['gAD','gBIS']},
+        {at:21, el:'c4'},
       ]},
 
-    // 3) 넓이비 (12초) — 칸 격자로 9:25 시각화
-    { no:'STEP 2', dur:12, kicker:'넓이비 = 닮음비²', title:'닮음비 3:5 → 넓이비',
+    // 3) 넓이비 (12초) — 3:5(전체) + 칸 격자로 9:25
+    { no:'STEP 2', dur:12, kicker:'닮음비 → 넓이비', title:'조각 말고 전체로!',
       build:function(){
-        return '<div class="content" style="gap:24px">'
-          +'<div class="formula" id="f1">길이비 <span class="b">3 : 5</span> → 넓이는 <span class="r">제곱!</span></div>'
-          +'<div class="fig" id="fbox" style="padding:26px;opacity:.25;transition:opacity .5s">'
-          +'<svg viewBox="0 0 480 180" xmlns="http://www.w3.org/2000/svg">'
-          // 3x3 = 9칸 (초록)
-          +'<g transform="translate(20,15)">'+grid(3,'#7FD4B0','#0f9d6e')+'<text x="30" y="130" font-size="22" font-weight="700" fill="#0f9d6e">9칸</text></g>'
-          +'<text x="150" y="90" font-size="34" font-weight="700" fill="#5a6b85">:</text>'
-          // 5x5 = 25칸 (파랑)
-          +'<g transform="translate(185,15)">'+grid(5,'#9DBEEA','#2b5fb0')+'<text x="45" y="130" font-size="22" font-weight="700" fill="#2b5fb0">25칸</text></g>'
+        return '<div class="content" style="gap:20px">'
+          +'<div class="formula" id="f0" style="font-size:40px">닮음비는 <span class="r">조각 아닌 전체</span><br>BD : BC = 3 : (3+2) = <span class="b">3 : 5</span></div>'
+          +'<div class="formula" id="f1" style="font-size:36px">넓이는 <span class="r">제곱!</span></div>'
+          +'<div class="fig" id="fbox" style="padding:20px;opacity:.25;transition:opacity .5s">'
+          +'<svg viewBox="0 0 480 175" xmlns="http://www.w3.org/2000/svg">'
+          +'<g transform="translate(20,12)">'+grid(3,'#7FD4B0','#0f9d6e')+'<text x="30" y="128" font-size="22" font-weight="700" fill="#0f9d6e">9칸</text></g>'
+          +'<text x="150" y="88" font-size="34" font-weight="700" fill="#5a6b85">:</text>'
+          +'<g transform="translate(185,12)">'+grid(5,'#9DBEEA','#2b5fb0')+'<text x="45" y="128" font-size="22" font-weight="700" fill="#2b5fb0">25칸</text></g>'
           +'</svg></div>'
-          +'<div class="formula" id="f2">3² : 5² = <b class="r">9 : 25</b></div>'
+          +'<div class="formula" id="f2" style="font-size:44px">3² : 5² = <b class="r">9 : 25</b></div>'
           +'</div>';
       },
       steps:[
-        {at:1,  el:'f1'},
-        {at:4,  el:'fbox'},
-        {at:8,  el:'f2'},
+        {at:1,  el:'f0'},
+        {at:5,  el:'f1'},
+        {at:6.5,el:'fbox'},
+        {at:9,  el:'f2'},
       ]},
 
     // 4) 계산 (20초)
@@ -289,7 +289,7 @@
           var el=document.getElementById(st.el); if(el) el.classList.add('on');
           if(st.svg) st.svg.forEach(function(id){
             var g=document.getElementById(id);
-            if(g){ g.classList.add('on'); g.classList.add('spark-on'); setTimeout(function(){g.classList.remove('spark-on');},900); }
+            if(g){ g.classList.add('on'); g.style.opacity='1'; g.style.transition='opacity .5s ease'; g.classList.add('spark-on'); setTimeout(function(){g.classList.remove('spark-on');},900); }
             if(id==='gDE'){ var dl=document.getElementById('deLine'); if(dl){
               dl.style.strokeDasharray='135'; dl.style.strokeDashoffset='135'; dl.style.transition='stroke-dashoffset .9s ease';
               setTimeout(function(){ dl.style.strokeDashoffset='0'; setTimeout(function(){dl.classList.add('spark');},900); },200);
@@ -303,7 +303,7 @@
         var el=document.getElementById(st.el); if(el) el.classList.add('on');
         if(st.svg) st.svg.forEach(function(id){
             var g=document.getElementById(id);
-            if(g){ g.classList.add('on'); g.classList.add('spark-on'); setTimeout(function(){g.classList.remove('spark-on');},900); }
+            if(g){ g.classList.add('on'); g.style.opacity='1'; g.style.transition='opacity .5s ease'; g.classList.add('spark-on'); setTimeout(function(){g.classList.remove('spark-on');},900); }
             if(id==='gDE'){ var dl=document.getElementById('deLine'); if(dl){
               dl.style.strokeDasharray='135'; dl.style.strokeDashoffset='135'; dl.style.transition='stroke-dashoffset .9s ease';
               setTimeout(function(){ dl.style.strokeDashoffset='0'; setTimeout(function(){dl.classList.add('spark');},900); },200);
