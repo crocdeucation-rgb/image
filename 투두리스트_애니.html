@@ -63,6 +63,9 @@
 
   /* SVG 강조 애니 */
   .fade{opacity:0;transition:opacity .5s ease}
+  /* DE 선 그려지는 효과 */
+  .draw-line{stroke-dasharray:140;stroke-dashoffset:140;transition:stroke-dashoffset 1s ease}
+  .draw-line.drawn{stroke-dashoffset:0}
   .fade.on{opacity:1 !important}
   svg .fade{opacity:0}
   svg .fade.on{opacity:1}
@@ -125,7 +128,7 @@
       + '<circle cx="358" cy="92" r="4" fill="#E8850C"/>'   // ∠DAC 안 점 (같은 각 표시)
       + '<circle cx="220" cy="280" r="5" fill="#E8850C"/><text x="212" y="306" font-size="21" font-weight="700" fill="#E8850C">D</text></g>' : '';
     // DE 평행
-    var de = o.de ? '<g class="fade '+(o.de==='on'?'on':'')+'" id="gDE"><line x1="238" y1="148" x2="220" y2="280" stroke="#0f9d6e" stroke-width="3.5" stroke-dasharray="7 5"/><circle cx="238" cy="148" r="5" fill="#0f9d6e"/><text x="244" y="145" font-size="21" font-weight="700" fill="#0f9d6e">E</text><text x="150" y="230" font-size="17" font-weight="700" fill="#0f9d6e">DE∥CA</text></g>' : '';
+    var de = o.de ? '<g class="fade '+(o.de==='on'?'on':'')+'" id="gDE"><line id="deLine" class="draw-line" x1="238" y1="148" x2="220" y2="280" stroke="#0f9d6e" stroke-width="3.5"/><circle cx="238" cy="148" r="5" fill="#0f9d6e"/><text x="244" y="145" font-size="21" font-weight="700" fill="#0f9d6e">E</text><text x="150" y="230" font-size="17" font-weight="700" fill="#0f9d6e">DE∥CA</text></g>' : '';
     // 작은삼각형 EBD 강조 (초록칠)
     var ebd = o.ebd ? '<polygon class="fade '+(o.ebd==='on'?'on':'')+'" id="gEBD" points="40,280 220,280 238,148" fill="'+(o.ebd==='fill'?'#7FD4B0':'#DFF3EA')+'" stroke="#0f9d6e" stroke-width="3" opacity="'+(o.ebd==='fill'?'0.75':'1')+'"/>' : '';
     // 큰삼각형 ABC 강조 (파랑칠)
@@ -245,19 +248,20 @@
         {at:15, el:'ans'},
       ]},
 
-    // 5) 핵심 정리 (15초)
+    // 5) 핵심 정리 (15초) — 도형 보여주며 표시
     { no:'정리', dur:15, kicker:'꼭 기억할 3가지', title:'핵심 정리',
       build:function(){
-        return '<div class="content" style="gap:30px;justify-content:center">'
-          +'<div class="keyrow k1" id="k1"><span class="num">1</span><span class="kb">이등분선은 밑변을 <span class="hl" style="color:#E8850C">D로 나눈다</span> (BD:DC = 변의 비)</span></div>'
-          +'<div class="keyrow k2" id="k2"><span class="num">2</span><span class="kb">닮음비는 <span class="hl" style="color:#2b5fb0">조각 말고 전체</span>로 (3:2 아니라 3:5)</span></div>'
-          +'<div class="keyrow k3" id="k3"><span class="num">3</span><span class="kb">넓이비는 <span class="hl" style="color:#E23A22">닮음비의 제곱</span> (3:5 → 9:25)</span></div>'
-          +'</div>';
+        return '<div class="split"><div class="fig">'+fig({abc:1,ebd:1,ad:1,de:1,base:1,tall:1})+'</div>'
+          +'<div class="txtcol">'
+          +'<div class="keyrow k1" id="k1"><span class="num">1</span><span class="kb">이등분선은 밑변을 <span class="hl" style="color:#E8850C">D로 나눈다</span></span></div>'
+          +'<div class="keyrow k2" id="k2"><span class="num">2</span><span class="kb">닮음비는 <span class="hl" style="color:#2b5fb0">조각 말고 전체</span>로<br><span style="font-size:24px">(3:2 아니라 3:5)</span></span></div>'
+          +'<div class="keyrow k3" id="k3"><span class="num">3</span><span class="kb">넓이비는 <span class="hl" style="color:#E23A22">닮음비의 제곱</span><br><span style="font-size:24px">(3:5 → 9:25)</span></span></div>'
+          +'</div></div>';
       },
       steps:[
-        {at:1,  el:'k1'},
-        {at:5.5,el:'k2'},
-        {at:10, el:'k3'},
+        {at:1,  el:'k1', svg:['gAD']},           // 이등분선·D
+        {at:5.5,el:'k2', svg:['gBASE']},         // BD:BC 전체
+        {at:10, el:'k3', svg:['gABC','gEBD']},   // 넓이 색칠
       ]},
   ];
 
@@ -277,14 +281,14 @@
       s.steps.forEach(function(st){
         timers.push(setTimeout(function(){
           var el=document.getElementById(st.el); if(el) el.classList.add('on');
-          if(st.svg) st.svg.forEach(function(id){ var g=document.getElementById(id); if(g) g.classList.add('on'); });
+          if(st.svg) st.svg.forEach(function(id){ var g=document.getElementById(id); if(g) g.classList.add('on'); if(id==='gDE'){ var dl=document.getElementById('deLine'); if(dl) setTimeout(function(){dl.classList.add('drawn');},200); } });
         }, st.at*1000));
       });
     } else {
       // 정지 시엔 전부 표시
       s.steps.forEach(function(st){
         var el=document.getElementById(st.el); if(el) el.classList.add('on');
-        if(st.svg) st.svg.forEach(function(id){ var g=document.getElementById(id); if(g) g.classList.add('on'); });
+        if(st.svg) st.svg.forEach(function(id){ var g=document.getElementById(id); if(g) g.classList.add('on'); if(id==='gDE'){ var dl=document.getElementById('deLine'); if(dl) setTimeout(function(){dl.classList.add('drawn');},200); } });
       });
     }
   }
