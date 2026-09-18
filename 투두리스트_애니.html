@@ -170,91 +170,80 @@
 
   // ── 씬 정의: dur(초), build(html), steps[{at(초), do}] ──
   var SCENES = [
-    // 1) 문제 (19초)
-    { no:'문제', dur:19, kicker:'삼각형 각의 이등분선', title:'다음을 읽고 넓이를 구하시오',
+    // 1) 이등분선 정리 (19초) — 닮음 없이! BD:DC=3:2까지
+    { no:'STEP 1', dur:19, kicker:'삼각형 각의 이등분선', title:'각의 이등분선 정리',
       build:function(){
-        return '<div class="split"><div class="fig">'+fig({ad:1,de:1,lenAB:1,lenAC:1})+'</div>'
+        return '<div class="split"><div class="fig">'+fig({ad:1,bisect:1,tall:1})+'</div>'
           +'<div class="txtcol">'
-          +'<div class="cond" id="c1">∠A의 <span class="g">이등분선</span>이 BC와 만나는 점 <span class="g">D</span></div>'
-          +'<div class="cond" id="c2">점 D에서 AB 위의 점 <span class="t">E</span>, <span class="t">ED∥AC</span></div>'
-          +'<div class="cond" id="c3"><span class="g">AB = 18cm</span></div>'
-          +'<div class="cond" id="c4"><span class="b">AC = 12cm</span></div>'
-          +'<div class="cond" id="c5">△EBD = <span class="r">45cm²</span></div>'
-          +'<div class="cond" id="c6"><b>△ABC의 넓이 = ?</b></div>'
-          +'</div></div>';
-      },
-      steps:[
-        {at:1.5, el:'c1', svg:['gAD']},
-        {at:5,   el:'c2', svg:['gDE']},
-        {at:9,   el:'c3', svg:['gAB']},
-        {at:11.5,el:'c4', svg:['gAC']},
-        {at:14,  el:'c5', svg:['gEBD']},
-        {at:16.5,el:'c6'},
-      ]},
-
-    // 2) 닮음 + 비율 (25초) — 색칠로 닮음 이해
-    { no:'STEP 1', dur:25, kicker:'닮음과 비율', title:'△EBD ∽ △ABC',
-      build:function(){
-        return '<div class="split"><div class="fig">'+fig({abc:1,ebd:1,corr:1,ad:1,de:1,bisect:1,tall:1})+'</div>'
-          +'<div class="txtcol">'
-          +'<div class="cond" id="c1"><span class="b">큰 삼각형 ABC</span></div>'
-          +'<div class="cond" id="c2"><span class="t">작은 삼각형 EBD</span><br><span style="font-size:24px">ED∥AC → 같은 모양 (닮음)</span></div>'
-          +'<div class="cond" id="c3">이등분선 정리<br><span class="g">AB:AC</span> = <span class="r">BD:DC</span></div>'
+          +'<div class="cond" id="c1">∠A의 <span class="g">이등분선</span>이<br>BC와 만나는 점 <span class="g">D</span></div>'
+          +'<div class="cond" id="c2">이등분선은 밑변을<br><span class="g">양옆 변의 비</span>로 나눈다</div>'
+          +'<div class="cond" id="c3"><span class="g">AB:AC</span> = <span class="r">BD:DC</span></div>'
           +'<div class="cond" id="c4">= 18 : 12 = <span class="g">3 : 2</span></div>'
           +'</div></div>';
       },
       steps:[
-        {at:3,  el:'c1', svg:['gABC']},
-        {at:9,  el:'c2', svg:['gEBD','gDE','gCORR']},
-        {at:16, el:'c3', svg:['gAD','gBIS']},
-        {at:21, el:'c4'},
+        {at:2,   el:'c1', svg:['gAD']},
+        {at:7,   el:'c2'},
+        {at:11,  el:'c3', svg:['gBIS']},
+        {at:15,  el:'c4'},
       ]},
 
-    // 3) 넓이비 (12초) — 3:5(전체) + 칸 격자로 9:25
-    { no:'STEP 2', dur:12, kicker:'닮음비 → 넓이비', title:'조각 말고 전체로!',
+    // 2) 닮음 (25초) — EBD→ABC 닮음(8초) + 3:2 아니라 3:5(17초)
+    { no:'STEP 2', dur:25, kicker:'닮음과 닮음비', title:'△EBD ∽ △ABC',
       build:function(){
-        return '<div class="content" style="gap:20px">'
-          +'<div class="formula" id="f0" style="font-size:40px">닮음비는 <span class="r">조각 아닌 전체</span><br>BD : BC = 3 : (3+2) = <span class="b">3 : 5</span></div>'
-          +'<div class="formula" id="f1" style="font-size:36px">넓이는 <span class="r">제곱!</span></div>'
-          +'<div class="fig" id="fbox" style="padding:20px;opacity:.25;transition:opacity .5s">'
-          +'<svg viewBox="0 0 480 175" xmlns="http://www.w3.org/2000/svg">'
-          +'<g transform="translate(20,12)">'+grid(3,'#7FD4B0','#0f9d6e')+'<text x="30" y="128" font-size="22" font-weight="700" fill="#0f9d6e">9칸</text></g>'
-          +'<text x="150" y="88" font-size="34" font-weight="700" fill="#5a6b85">:</text>'
-          +'<g transform="translate(185,12)">'+grid(5,'#9DBEEA','#2b5fb0')+'<text x="45" y="128" font-size="22" font-weight="700" fill="#2b5fb0">25칸</text></g>'
-          +'</svg></div>'
-          +'<div class="formula" id="f2" style="font-size:44px">3² : 5² = <b class="r">9 : 25</b></div>'
-          +'</div>';
+        return '<div class="split"><div class="fig">'+fig({de:1,ebd:1,abc:1,corr:1,base:1,tall:1})+'</div>'
+          +'<div class="txtcol">'
+          +'<div class="cond" id="c1"><span class="t">작은 삼각형 EBD</span></div>'
+          +'<div class="cond" id="c2"><span class="b">큰 삼각형 ABC</span> 와 <b>닮음</b><br><span style="font-size:24px">ED∥AC → 같은 모양</span></div>'
+          +'<div class="cond" id="c3">닮음비 주의!<br><span class="r">3:2 아니라</span> <span class="b">전체로</span></div>'
+          +'<div class="cond" id="c4">BD : BC = 3 : (3+2)<br>= <span class="b">3 : 5</span></div>'
+          +'</div></div>';
       },
       steps:[
-        {at:1,  el:'f0'},
-        {at:5,  el:'f1'},
-        {at:6.5,el:'fbox'},
-        {at:9,  el:'f2'},
+        {at:2,   el:'c1', svg:['gEBD','gDE']},
+        {at:8,   el:'c2', svg:['gABC','gCORR']},
+        {at:14,  el:'c3'},
+        {at:19,  el:'c4', svg:['gBASE']},
       ]},
 
-    // 4) 계산 (20초)
-    { no:'STEP 3', dur:20, kicker:'넓이 계산', title:'한 칸 = 5 → 125',
+    // 3) 넓이비 (12초) — 3:5 → 9:25
+    { no:'STEP 3', dur:12, kicker:'넓이비 = 닮음비²', title:'닮음비 3:5 → 넓이비',
       build:function(){
         return '<div class="content" style="gap:22px">'
-          +'<div class="formula" id="f1">△EBD : △ABC = <b class="r">9 : 25</b> 칸</div>'
-          +'<div class="fig" id="fbox" style="padding:24px;opacity:.25;transition:opacity .5s">'
-          +'<svg viewBox="0 0 440 150" xmlns="http://www.w3.org/2000/svg">'
-          +'<text x="10" y="35" font-size="22" font-weight="700" fill="#0f9d6e">△EBD = 9칸 = 45cm²</text>'
-          +'<text x="10" y="80" font-size="26" font-weight="700" fill="#E23A22">→ 한 칸 = 45 ÷ 9 = 5</text>'
-          +'<text x="10" y="125" font-size="22" font-weight="700" fill="#2b5fb0">△ABC = 25칸 = 25 × 5</text>'
+          +'<div class="formula" id="f1" style="font-size:44px">닮음비 <span class="b">3 : 5</span> → 넓이는 <span class="r">제곱</span></div>'
+          +'<div class="fig" id="fbox" style="padding:20px;opacity:.25;transition:opacity .5s">'
+          +'<svg viewBox="0 0 480 175" xmlns="http://www.w3.org/2000/svg">'
+          +'<g transform="translate(20,12)">'+grid(3,'#7FD4B0','#0f9d6e')+'<text x="30" y="128" font-size="22" font-weight="700" fill="#0f9d6e">3²=9칸</text></g>'
+          +'<text x="150" y="88" font-size="34" font-weight="700" fill="#5a6b85">:</text>'
+          +'<g transform="translate(185,12)">'+grid(5,'#9DBEEA','#2b5fb0')+'<text x="35" y="128" font-size="22" font-weight="700" fill="#2b5fb0">5²=25칸</text></g>'
           +'</svg></div>'
-          +'<div class="formula" id="f2">45 × <span class="r">25</span>/<span class="t">9</span> = <b class="r">125</b></div>'
-          +'<div class="ans" id="ans"><span class="lb">△ABC의 넓이</span><span class="vv">125 cm²</span></div>'
+          +'<div class="formula" id="f2" style="font-size:46px">3² : 5² = <b class="r">9 : 25</b></div>'
           +'</div>';
       },
       steps:[
         {at:1,  el:'f1'},
         {at:4,  el:'fbox'},
-        {at:11, el:'f2'},
-        {at:15, el:'ans'},
+        {at:8,  el:'f2'},
       ]},
 
-    // 5) 핵심 정리 (15초) — 도형 보여주며 표시
+    // 4) 계산 (20초) — 9칸=45→1칸=5(8초) + 25칸=125(7초)
+    { no:'STEP 4', dur:20, kicker:'넓이 계산', title:'한 칸 = 5 → 125',
+      build:function(){
+        return '<div class="content" style="gap:20px">'
+          +'<div class="formula" id="f1" style="font-size:40px"><span class="t">△EBD = 9칸 = 45cm²</span></div>'
+          +'<div class="formula" id="f2" style="font-size:44px">한 칸 = 45 ÷ 9 = <b class="r">5cm²</b></div>'
+          +'<div class="formula" id="f3" style="font-size:40px"><span class="b">△ABC = 25칸</span> = 5 × 25</div>'
+          +'<div class="ans" id="ans"><span class="lb">△ABC의 넓이</span><span class="vv">125 cm²</span></div>'
+          +'</div>';
+      },
+      steps:[
+        {at:1,  el:'f1'},
+        {at:5,  el:'f2'},
+        {at:9,  el:'f3'},
+        {at:13, el:'ans'},
+      ]},
+
+    // 5) 핵심 정리 (15초) — 도형 보여주며 3가지
     { no:'정리', dur:15, kicker:'꼭 기억할 3가지', title:'핵심 정리',
       build:function(){
         return '<div class="split"><div class="fig">'+fig({abc:1,ebd:1,ad:1,de:1,base:1,tall:1})+'</div>'
@@ -265,9 +254,9 @@
           +'</div></div>';
       },
       steps:[
-        {at:1,  el:'k1', svg:['gAD']},           // 이등분선·D
-        {at:5.5,el:'k2', svg:['gBASE']},         // BD:BC 전체
-        {at:10, el:'k3', svg:['gABC','gEBD']},   // 넓이 색칠
+        {at:1,  el:'k1', svg:['gAD']},
+        {at:5.5,el:'k2', svg:['gBASE']},
+        {at:10, el:'k3', svg:['gABC','gEBD']},
       ]},
   ];
 
