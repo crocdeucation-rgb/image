@@ -63,9 +63,15 @@
 
   /* SVG 강조 애니 */
   .fade{opacity:0;transition:opacity .5s ease}
-  /* DE 선 그려지는 효과 */
-  .draw-line{stroke-dasharray:140;stroke-dashoffset:140;transition:stroke-dashoffset 1s ease}
+  /* 선 그려지는 효과 (dasharray=선 길이) */
+  .draw-line{stroke-dasharray:135;stroke-dashoffset:135;transition:stroke-dashoffset .9s ease}
   .draw-line.drawn{stroke-dashoffset:0}
+  /* 다 그려진 뒤 반짝임 */
+  @keyframes sparkle{0%,100%{filter:drop-shadow(0 0 0 transparent)}50%{filter:drop-shadow(0 0 8px rgba(15,157,110,.9))}}
+  .draw-line.drawn.spark{animation:sparkle 1s ease 2}
+  /* 강조 요소 반짝임 */
+  @keyframes pop-glow{0%{transform:scale(1);filter:drop-shadow(0 0 0 transparent)}40%{transform:scale(1.06);filter:drop-shadow(0 0 10px rgba(232,133,12,.8))}100%{transform:scale(1);filter:drop-shadow(0 0 0 transparent)}}
+  svg .spark-on{animation:pop-glow .8s ease}
   .fade.on{opacity:1 !important}
   svg .fade{opacity:0}
   svg .fade.on{opacity:1}
@@ -281,14 +287,28 @@
       s.steps.forEach(function(st){
         timers.push(setTimeout(function(){
           var el=document.getElementById(st.el); if(el) el.classList.add('on');
-          if(st.svg) st.svg.forEach(function(id){ var g=document.getElementById(id); if(g) g.classList.add('on'); if(id==='gDE'){ var dl=document.getElementById('deLine'); if(dl) setTimeout(function(){dl.classList.add('drawn');},200); } });
+          if(st.svg) st.svg.forEach(function(id){
+            var g=document.getElementById(id);
+            if(g){ g.classList.add('on'); g.classList.add('spark-on'); setTimeout(function(){g.classList.remove('spark-on');},900); }
+            if(id==='gDE'){ var dl=document.getElementById('deLine'); if(dl){
+              dl.style.strokeDasharray='135'; dl.style.strokeDashoffset='135'; dl.style.transition='stroke-dashoffset .9s ease';
+              setTimeout(function(){ dl.style.strokeDashoffset='0'; setTimeout(function(){dl.classList.add('spark');},900); },200);
+            } }
+          });
         }, st.at*1000));
       });
     } else {
       // 정지 시엔 전부 표시
       s.steps.forEach(function(st){
         var el=document.getElementById(st.el); if(el) el.classList.add('on');
-        if(st.svg) st.svg.forEach(function(id){ var g=document.getElementById(id); if(g) g.classList.add('on'); if(id==='gDE'){ var dl=document.getElementById('deLine'); if(dl) setTimeout(function(){dl.classList.add('drawn');},200); } });
+        if(st.svg) st.svg.forEach(function(id){
+            var g=document.getElementById(id);
+            if(g){ g.classList.add('on'); g.classList.add('spark-on'); setTimeout(function(){g.classList.remove('spark-on');},900); }
+            if(id==='gDE'){ var dl=document.getElementById('deLine'); if(dl){
+              dl.style.strokeDasharray='135'; dl.style.strokeDashoffset='135'; dl.style.transition='stroke-dashoffset .9s ease';
+              setTimeout(function(){ dl.style.strokeDashoffset='0'; setTimeout(function(){dl.classList.add('spark');},900); },200);
+            } }
+          });
       });
     }
   }
