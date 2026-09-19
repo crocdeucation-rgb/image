@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>증원현황 · 통합채용</title><script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script><script src="gate.js"></script>
+<title>증원현황 · 통합채용</title><script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script><script src="gate.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <style>
 
@@ -504,6 +504,29 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 <div class="iv-modal-bg" id="ivModal" onclick="if(event.target===this)closeIv()"><div class="iv-card" id="ivBody"></div></div>
 <script>
 
+// [2026-09-19] 방식 D — Firestore execData 읽기 헬퍼. 저장은 파싱된 배열(rows).
+//   기존 파서(parseSheet/buildHireFromSheets)는 CSV텍스트를 받으므로 배열→CSV 재직렬화.
+async function _fsGet(coll, docId){
+  var db=firebase.firestore();
+  var doc=await db.collection(coll).doc(docId).get();
+  if(!doc.exists) throw new Error(coll+'/'+docId+' 없음');
+  var d=doc.data();
+  return d.json ? JSON.parse(d.json) : d;
+}
+function _rowsToCsv(rows){
+  return (rows||[]).map(function(row){
+    return (row||[]).map(function(cell){
+      var s=String(cell==null?'':cell);
+      if(/[",\n\r]/.test(s)) return '"'+s.replace(/"/g,'""')+'"';
+      return s;
+    }).join(',');
+  }).join('\n');
+}
+async function _fsCsv(docId){
+  try{ var o=await _fsGet('execData',docId); return _rowsToCsv(o.rows); }
+  catch(e){ return ''; }
+}
+
 // ── 면접일정 시트 (publish CSV) ──
 var CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSz4NSoTmHTebOTpuiy3qbJIRe_vFbC9jf9A4QGDEMlZC4aatoIkEaMqIQspaCNI3scpFhu5TEQEyPA/pub?output=csv";
 
@@ -635,8 +658,8 @@ function boot(){
     }
   }
   Promise.all([
-    fetch(CSV_URL+'&_='+Date.now()).then(function(r){return r.text();}).then(function(t){ parseSheet(t,false); }).catch(function(){}),
-    fetch(JISA_CSV+'&_='+Date.now()).then(function(r){return r.text();}).then(function(t){ parseSheet(t,true); }).catch(function(){})
+    _fsCsv('hire-iv').then(function(t){ parseSheet(t,false); }).catch(function(){}),
+    _fsCsv('hire-jisa').then(function(t){ parseSheet(t,true); }).catch(function(){})
   ]).then(function(){
     IVS.sort(function(a,b){ return a.date<b.date?-1:a.date>b.date?1:(a.time<b.time?-1:1); });
     var _upd=document.getElementById('upd'); if(_upd) _upd.textContent='실시간 · '+IVS.length+'건 · '+new Date().toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})+' 기준';
@@ -927,11 +950,10 @@ function buildHireFromSheets(amCsv,jkCsv,opCsv){
   return H;
 }
 function loadHireSheets(){
-  var bust='&_='+Date.now();
   return Promise.all([
-    fetch(WR_URLS.am+bust).then(function(r){return r.text();}).catch(function(){return '';}),
-    fetch(WR_URLS.jk+bust).then(function(r){return r.text();}).catch(function(){return '';}),
-    fetch(WR_URLS.op+bust).then(function(r){return r.text();}).catch(function(){return '';})
+    _fsCsv('hire-am'),
+    _fsCsv('hire-jk'),
+    _fsCsv('hire-op')
   ]).then(function(a){
     HIRE_DEPT=buildHireFromSheets(a[0],a[1],a[2]);
     return HIRE_DEPT;
