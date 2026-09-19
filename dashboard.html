@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>아라온스쿨 리드 현황</title>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script><script src="gate.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script><script src="gate.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard',-apple-system,system-ui,sans-serif; }
@@ -464,6 +464,28 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 
 <script>
 let allRows = [];
+// [2026-09-19] 방식 D — Firestore execData/dashData 읽기 헬퍼. 저장은 파싱된 배열(rows).
+//   기존 파서(parseCSV 기반 로직)는 CSV텍스트를 받으므로 배열→CSV 재직렬화해서 넘긴다.
+async function _fsGet(coll, docId){
+  var db=firebase.firestore();
+  var doc=await db.collection(coll).doc(docId).get();
+  if(!doc.exists) throw new Error(coll+'/'+docId+' 없음');
+  var d=doc.data();
+  return d.json ? JSON.parse(d.json) : d;
+}
+function _rowsToCsv(rows){
+  return (rows||[]).map(function(row){
+    return (row||[]).map(function(cell){
+      var s=String(cell==null?'':cell);
+      if(/[",\n\r]/.test(s)) return '"'+s.replace(/"/g,'""')+'"';
+      return s;
+    }).join(',');
+  }).join('\n');
+}
+async function _fsCsv(coll, docId){
+  try{ var o=await _fsGet(coll, docId); return _rowsToCsv(o.rows); }
+  catch(e){ return ''; }
+}
 // [2026-09-02] CSV 안전 파서 — 따옴표("...") 안의 콤마는 구분자로 안 셈.
 //   원인: getLeadStats가 매출을 "23,838.6만원"처럼 천단위 콤마로 저장하면
 //   단순 split(',')이 셀을 쪼개 그 행 뒤 컬럼이 전부 밀림 → ROAS 오독(우혜림 838 사건).
@@ -587,8 +609,7 @@ const RANK_CSV_URL = 'https://docs.google.com/spreadsheets/d/1bkKxvdFlEgP8EoNjMm
 let YRANK_MAP = {};
 async function loadYRank(){
   try{
-    const res = await fetch(RANK_CSV_URL);
-    const rows = parseCSV(await res.text());
+    const rows = parseCSV(await _fsCsv('execData','dash-rank'));
     rows.forEach(function(r){
       const nm = (r[0]||'').trim();          // A:이름 / B:어제순위
       if(nm && nm!=='담당자') YRANK_MAP[nm] = parseInt(r[1]||'0')||0;
@@ -604,22 +625,16 @@ var webCxaThisMonth = null;   // total JSON의 이번달 웹마 취소(web.cxa).
 var totalDataDate = null;     // total JSON 기준일 (예: 2026-09-15) — "N일까지 반영" 표시용
 async function loadCancel() {
   try {
-    const res = await fetch(CANCEL_CSV_URL);
-    const text = await res.text();
+    const text = await _fsCsv('execData','dash-cancel');
     const rows = parseCSV(text);
     // 원장(리드요약_원장) 컬럼: 날짜(0)|시간(1)|이름(2)|학년(3)|타입(4)|매출(5)|담당자(6)|pageId(7)|취소액(8)
     // 원장 취소액(8)엔 4~8월만 있음(과거월). 이번달 취소는 total JSON(web.cxa)에서 별도 로드.
     cancelData.rows = rows.filter(r => /^\d{4}-\d{2}-\d{2}/.test(String(r[0]||'').trim()) && (parseFloat(r[8])||0) > 0);
-    // [2026-09] 이번달 웹마 취소 = total(총매출_전사 JSON)의 web.cxa — total 카드와 동일값
+    // [2026-09-19] 이번달 웹마 취소·기준일 = Firestore dashData/current (파싱된 D객체) 직접 사용.
     try {
-      const jres = await fetch('https://docs.google.com/spreadsheets/d/1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU/gviz/tq?tqx=out:csv&headers=0&gid=1261488271&_=' + Date.now());
-      const jtext = await jres.text();
-      // ⚠️ 이 JSON은 매우 커서 전체 JSON.parse가 중간(~45000자)에서 깨짐(gviz 이스케이프).
-      //    web.cxa는 앞부분이라 정규식으로 값만 직접 추출 (""→" 이스케이프 감안, 따옴표 유무 모두 허용).
-      var mWeb = jtext.match(/web"*\s*:\s*\{[^}]*?cxa"*\s*:\s*(\d+)/);
-      if (mWeb) webCxaThisMonth = parseInt(mWeb[1], 10);          // 웹마 이번달 취소 (원 단위)
-      var mDate = jtext.match(/date"*\s*:\s*"+(\d{4}-\d{2}-\d{2})/);
-      if (mDate) totalDataDate = mDate[1];                        // total 기준일 (예: 2026-09-15)
+      const D = await _fsGet('dashData','current');
+      if (D && D.web && D.web.cxa!=null) webCxaThisMonth = D.web.cxa;   // 웹마 이번달 취소(원)
+      if (D && D.date) totalDataDate = D.date;                          // total 기준일
     } catch(_je) { webCxaThisMonth = null; }
     renderCancel();
     if(typeof render==='function' && allRows && allRows.length){ try{ render(); }catch(_e){} }   // [2026-09] 취소금액 담당자표 반영
@@ -687,8 +702,7 @@ function renderCancel() {
 async function loadData() {
   try {
     document.getElementById('updated').textContent = '불러오는 중...';
-    const res = await fetch(CSV_URL);
-    const text = await res.text();
+    const text = await _fsCsv('execData','dash-summary');
     allRows = parseCSV(text);
     recalcIdx();
     render();
@@ -1159,8 +1173,7 @@ function toggleOffCampaigns() {
 
 async function loadSchedule() {
   try {
-    const res = await fetch(SCHEDULE_CSV_URL);
-    const text = await res.text();
+    const text = await _fsCsv('execData','dash-schedule');
     const rows = parseCSV(text);
     rows.shift();
     const today = new Date();
