@@ -8,7 +8,7 @@
  */
 (function(){
   var CFG={apiKey:"AIzaSyCBDimk0MyGAHf762mvInS_H4K9HkW6Ol0",authDomain:"dashboard-88ba4.firebaseapp.com",projectId:"dashboard-88ba4",storageBucket:"dashboard-88ba4.firebasestorage.app",messagingSenderId:"857535538974",appId:"1:857535538974:web:999d190f28e14964eb4b0f"};
-  var ALLOW=['032100jesus@gmail.com','christuhm@gmail.com','crocdeucation@gmail.com','kanghansara@gmail.com','thestudydesign@gmail.com'];
+  var ALLOW=['032100jesus@gmail.com','christuhm@gmail.com','crocdeucation@gmail.com','kanghansara@gmail.com','thestudydesign@gmail.com','loityr123@gmail.com'];
 
   if(!window.firebase||!firebase.auth){ console.error('[gate] firebase SDK 필요'); return; }
   try{ firebase.app(); }catch(e){ firebase.initializeApp(CFG); }
