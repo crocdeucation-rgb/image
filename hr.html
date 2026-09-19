@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>인사 현황 — 경영 리포트</title>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script><script src="gate.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script><script src="gate.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <style>
 :root{--bg:#F1F4F9;--ink:#161C2B;--soft:#6B7688;--line:#E3E8F0;--v1:#4C6EF5;--red:#E23A22;--pos:#20A56D;--pur:#7048E8;--amber:#E8890C}
@@ -472,19 +472,58 @@ function parseSsamSchedule(csvText){
     }
   });
 }
+// [2026-09-19] 방식 D — Firestore execData(HR·경영진전용) + dashData/ledger(원장) 읽기.
+//   저장된 건 파싱된 2차원 배열(rows). 기존 파서(loadDept/buildSalesRecs/parseSsamSchedule)는
+//   CSV 텍스트를 받으므로, 배열을 CSV 문자열로 재직렬화해서 그대로 넘긴다(파서 무수정).
+function _rowsToCsv(rows){
+  return (rows||[]).map(function(row){
+    return (row||[]).map(function(cell){
+      var s=String(cell==null?'':cell);
+      if(/[",\n\r]/.test(s)) return '"'+s.replace(/"/g,'""')+'"';
+      return s;
+    }).join(',');
+  }).join('\n');
+}
+async function _fsGet(coll, docId){
+  var db=firebase.firestore();
+  var doc=await db.collection(coll).doc(docId).get();
+  if(!doc.exists) throw new Error(coll+'/'+docId+' 없음');
+  var d=doc.data();
+  return d.json ? JSON.parse(d.json) : d;   // {rows:[...]}
+}
 async function loadHR(){
-  var b='&_='+Date.now();
-  function f(u){return fetch(u+b).then(r=>r.text()).catch(_=>'');}
   try{
-    var res=await Promise.all([f(HR_URLS.sangdam),f(HR_URLS.saup),f(HR_URLS.coach),f(HR_URLS.suup),f(HR_URLS.ssam),f(HR_URLS.wolgyeol),f(HR_URLS.chongmae),f(HR_URLS.ssamSchedule)]);
-    var salesFn=makeSalesFn(buildSalesRecs([res[5],res[6]]));
-    parseSsamSchedule(res[7]);
+    // HR 인사시트 5개 + 시간표 = execData / 원장 2개 = dashData/ledger-2026,2025
+    var keys=['hr-sangdam','hr-saup','hr-coach','hr-suup','hr-ssam','hr-ssam-sched'];
+    var execP=keys.map(function(k){ return _fsGet('execData',k).then(function(o){return _rowsToCsv(o.rows);}).catch(function(){return '';}); });
+    var ledP=['ledger-2026','ledger-2025'].map(function(k){ return _fsGet('dashData',k).then(function(o){return o;}).catch(function(){return {rows:[]};}); });
+    var execRes=await Promise.all(execP);
+    var ledRes=await Promise.all(ledP);
+    // 원장은 저장 시 11필드 배열(cols=[date,sang,student,sales,saup,gubun,team,grade,cancelAmt,state,nopo]).
+    //   buildSalesRecs는 CSV 헤더행 자동탐지 + row[0]날짜·row[1]상담·row[3]매출·row[5]사업 를 씀.
+    //   → ledger 11필드를 buildSalesRecs가 기대하는 20열 원장 레이아웃으로 재매핑 후 CSV화.
+    function ledgerToWideCsv(rows){
+      // 헤더행 하나 깔아줌(자동탐지가 row[1]='상담'&row[17]='상태' 찾음)
+      var head=[]; head[0]='날짜'; head[1]='상담'; head[3]='매출'; head[5]='사업부'; head[17]='상태';
+      var out=[head];
+      (rows||[]).forEach(function(r){
+        var w=[]; w[0]=r[0]; w[1]=r[1]; w[2]=r[2]; w[3]=r[3]; w[5]=r[4]; w[17]=r[9];
+        out.push(w);
+      });
+      return _rowsToCsv(out);
+    }
+    var salesCsvs=[ ledgerToWideCsv(ledRes[0].rows), ledgerToWideCsv(ledRes[1].rows) ];
+    var res=execRes.concat(salesCsvs);   // [0-4]=HR, [5]=시간표, [6-7]=원장wide
+    // 기존 흐름 유지 — 인덱스만 재배치: res2 = [sangdam,saup,coach,suup,ssam,wolgyeol,chongmae,ssamSchedule]
+    var res2=[ res[0],res[1],res[2],res[3],res[4], res[6],res[7], res[5] ];
+    var salesFn=makeSalesFn(buildSalesRecs([res2[5],res2[6]]));
+    parseSsamSchedule(res2[7]);
     var depts={
-      '상담부':loadDept(res[0],h2branch,'부서명'),
-      '사업부':loadDept(res[1],saupBranch,'부서명'),
-      '코칭코치':loadDept(res[2],coachGrp,'팀'),
-      '수업강사':loadDept(res[3],function(x){return x||'미구분';},'과목'),
-      '쌤이다':loadDept(res[4],function(x){return x||'전체';},'과목')
+      '상담부':loadDept(res2[0],h2branch,'부서명'),
+      '사업부':loadDept(res2[1],saupBranch,'부서명'),
+      '코칭코치':loadDept(res2[2],coachGrp,'팀'),
+      '수업강사':loadDept(res2[3],function(x){return x||'미구분';},'과목'),
+      '쌤이다':loadDept(res2[4],function(x){return x||'전체';},'과목')
     };
     for(var d in depts){DATA[d]=buildDept(d,depts[d],salesFn);}
     return true;
