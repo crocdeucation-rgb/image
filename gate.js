@@ -140,12 +140,17 @@
     bar.innerHTML='<span class="gs-dot"></span><span>🔒 <b>'+nm+'</b>님 · 보안 세션 활성</span>'
       +'<button class="gs-out" onclick="try{firebase.auth().signOut();location.reload();}catch(e){}">로그아웃</button>';
     document.body.appendChild(bar); document.body.classList.add('gate-hasbar');
-    // 인증 토스트 (1회)
-    var t=document.createElement('div'); t.id='gSecToast';
-    t.innerHTML='<span class="gt-ic">✓</span><span>경영진 인증 완료 · 보안 세션 시작</span>';
-    document.body.appendChild(t);
-    requestAnimationFrame(function(){ t.classList.add('show'); });
-    setTimeout(function(){ t.classList.remove('show'); },1800);
-    setTimeout(function(){ if(t.parentNode)t.parentNode.removeChild(t); },2200);
+    // 인증 토스트 — 세션당 1회만 (새로고침 시 반복 안 뜸)
+    var _seen=false;
+    try{ _seen = sessionStorage.getItem('gateSecToast')==='1'; }catch(e){}
+    if(!_seen){
+      try{ sessionStorage.setItem('gateSecToast','1'); }catch(e){}
+      var t=document.createElement('div'); t.id='gSecToast';
+      t.innerHTML='<span class="gt-ic">✓</span><span>경영진 인증 완료 · 보안 세션 시작</span>';
+      document.body.appendChild(t);
+      requestAnimationFrame(function(){ t.classList.add('show'); });
+      setTimeout(function(){ t.classList.remove('show'); },1800);
+      setTimeout(function(){ if(t.parentNode)t.parentNode.removeChild(t); },2200);
+    }
   }
 })();
