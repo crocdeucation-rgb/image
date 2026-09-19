@@ -56,6 +56,15 @@
   #secToast.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
   #secToast .st-ic{width:26px;height:26px;border-radius:50%;background:#12b886;display:flex;align-items:center;justify-content:center;font-size:15px;}
   @media(max-width:600px){.uc-nm{display:none;}.sec-badge span.sb-word{display:none;}}
+  /* 파운더 전용 골드 연출 */
+  .user-chip.founder .uc-av{background:linear-gradient(135deg,#f5c518,#c99a06);color:#241c08;box-shadow:0 0 0 2px rgba(245,197,24,.35)}
+  .user-chip.founder .uc-nm{color:#a07d08}
+  .user-chip.founder .sec-badge{color:#a07d08;background:#faf3d8;border-color:#ecd9a3}
+  .user-chip.founder .sec-dot{background:#f5c518;box-shadow:0 0 0 0 rgba(245,197,24,.5);animation:secPulseGold 2s infinite}
+  @keyframes secPulseGold{0%{box-shadow:0 0 0 0 rgba(245,197,24,.5)}70%{box-shadow:0 0 0 6px rgba(245,197,24,0)}100%{box-shadow:0 0 0 0 rgba(245,197,24,0)}}
+  .sg-msg.founder b{color:#f5c518}
+  #secToast.founder{background:linear-gradient(135deg,#241c08,#3a2e10);border:1px solid #6b5416}
+  #secToast.founder .st-ic{background:#f5c518;color:#241c08}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -107,24 +116,29 @@ _sgAuth.onAuthStateChanged(function(u){
   if(!gate) return;
   if(u && SG_ALLOW.indexOf((u.email||'').toLowerCase())>=0){
     _sgPassed=true;
-    var nm=SG_NAME[(u.email||'').toLowerCase()]||(u.displayName||'');
+    var _em=(u.email||'').toLowerCase();
+    var nm=SG_NAME[_em]||(u.displayName||'');
+    var _isFounder=(_em==='032100jesus@gmail.com');   // 파운더 전용 연출
     // 우측 상단 로그인 상태 칩 채우기
     var chip=document.getElementById('userChip');
-    if(chip){ chip.classList.add('on');
+    if(chip){ chip.classList.add('on'); if(_isFounder) chip.classList.add('founder');
       var av=document.getElementById('ucAv'), nmEl=document.getElementById('ucNm');
-      var rk=SG_RANK[(u.email||'').toLowerCase()]||'';
-      if(av) av.textContent=(nm||'?').charAt(0);
+      var rk=SG_RANK[_em]||'';
+      if(av) av.textContent=_isFounder?'👑':(nm||'?').charAt(0);
       if(nmEl) nmEl.innerHTML=(nm||u.email)+(rk?'<span class="rk">'+rk+'</span>':'');
     }
     if(window._sgFreshLogin){
       // 버튼 눌러 방금 로그인 → 인사말 연출
       var _b=gate.querySelector('.sg-btn'); if(_b)_b.style.display='none';
       var _s=gate.querySelector('.sg-sub'); if(_s)_s.style.display='none';
-      if(msg){ msg.className='sg-msg ok'; msg.innerHTML=nm?'안녕하세요, <b>'+nm+'</b>님':'안녕하세요'; }
+      if(msg){
+        if(_isFounder){ msg.className='sg-msg ok founder'; msg.innerHTML='👑 <b>'+nm+' 파운더님</b>, 환영합니다<br><span style="font-size:12px;opacity:.8">최고 권한으로 접속되었습니다</span>'; }
+        else { msg.className='sg-msg ok'; msg.innerHTML=nm?'안녕하세요, <b>'+nm+'</b>님':'안녕하세요'; }
+      }
       gate.classList.add('ready');
-      setTimeout(function(){ gate.classList.add('bye'); }, 1400);
-      setTimeout(function(){ gate.classList.add('hidden'); gate.classList.remove('bye'); document.body.style.overflow=''; try{ parent.postMessage({t:'cardClose'},'*'); }catch(e){} }, 1900);
-      setTimeout(function(){ sgSecToast(nm); }, 2000);   // [2026-09] 통과 후 보안 인증 토스트
+      setTimeout(function(){ gate.classList.add('bye'); }, _isFounder?2000:1400);
+      setTimeout(function(){ gate.classList.add('hidden'); gate.classList.remove('bye'); document.body.style.overflow=''; try{ parent.postMessage({t:'cardClose'},'*'); }catch(e){} }, _isFounder?2500:1900);
+      setTimeout(function(){ sgSecToast(nm,_isFounder); }, _isFounder?2600:2000);   // [2026-09] 통과 후 보안 인증 토스트
     } else {
       // 세션 복원(새로고침) → 깜빡임 없이 즉시 통과
       gate.classList.add('hidden'); document.body.style.overflow=''; try{ parent.postMessage({t:'cardClose'},'*'); }catch(e){}
@@ -145,14 +159,19 @@ _sgAuth.onAuthStateChanged(function(u){
 });
 window.sgateLogout=function(){ try{_sgAuth.signOut();}catch(e){} };
 // [2026-09] 보안 인증 토스트 — 신규 로그인 시 1회
-function sgSecToast(nm){
+function sgSecToast(nm,isFounder){
   try{
     var t=document.createElement('div'); t.id='secToast';
-    t.innerHTML='<span class="st-ic">✓</span><span>경영진 인증 완료 · 보안 세션 시작</span>';
+    if(isFounder){
+      t.className='founder';
+      t.innerHTML='<span class="st-ic">👑</span><span>'+nm+' 파운더님 · 최고 권한 접속</span>';
+    } else {
+      t.innerHTML='<span class="st-ic">✓</span><span>경영진 인증 완료 · 보안 세션 시작</span>';
+    }
     document.body.appendChild(t);
     requestAnimationFrame(function(){ t.classList.add('show'); });
-    setTimeout(function(){ t.classList.remove('show'); }, 1800);
-    setTimeout(function(){ if(t.parentNode)t.parentNode.removeChild(t); }, 2200);
+    setTimeout(function(){ t.classList.remove('show'); }, isFounder?2400:1800);
+    setTimeout(function(){ if(t.parentNode)t.parentNode.removeChild(t); }, isFounder?2800:2200);
   }catch(e){}
 }
 window.sgateLogin=function(){
