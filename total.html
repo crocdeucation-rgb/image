@@ -1031,16 +1031,10 @@ function updateAsOfLabel(D, isLive){
   el.textContent='매일 갱신';
   if(window.__asOfDone) return; window.__asOfDone=true;
   try{
-    var url="https://docs.google.com/spreadsheets/d/1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU/gviz/tq?tqx=out:csv&headers=0&gid=698799247&_="+Date.now();
-    fetch(url).then(function(r){return r.text();}).then(function(csv){
-      var mx=0;
-      csv.split('\n').forEach(function(line){
-        var m=line.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*일/); // "09월 04일"
-        if(m){ var k=(+m[1])*100+(+m[2]); if(k>mx)mx=k; }
-        var m2=line.match(/"?(\d{4})-(\d{1,2})-(\d{1,2})/);
-        if(m2){ var k2=(+m2[2])*100+(+m2[3]); if(k2>mx)mx=k2; }
-      });
-      if(mx>0){ window.__asOfMx=mx; var mo=Math.floor(mx/100), dy=mx%100;
+    // [2026-09-19] 방식 D — 원장(Firestore) 최신일 사용. fdLoadLedger가 __ledgerMax 계산.
+    fdLoadLedger().then(function(){
+      var mx=window.__ledgerMax||0;   // YYYYMMDD
+      if(mx>0){ var mo=Math.floor(mx/100)%100, dy=mx%100; window.__asOfMx=mo*100+dy;
         el.innerHTML='📅 <b style="color:#4C6EF5">'+mo+'월 '+dy+'일</b>까지 반영 · 매일 갱신';
       }
     }).catch(function(){});
@@ -1665,6 +1659,31 @@ function pcReattach(){
 }
 window.pcReattach=pcReattach;
 window.clPeriod=function(cl,btn){ window.__cl=cl; document.querySelectorAll('.dtogbtn[data-cl]').forEach(function(b){b.classList.remove('on');}); btn.classList.add('on'); renderClutch(); pcReattach(); };
+// [2026-09-19] 방식 D — Firestore dashData/{key} 읽기 헬퍼.
+//   월별(json 문자열)→파싱된 D객체 / 원장(rows,cols)→그대로. Firebase SDK·_fdb 준비 대기.
+window.__fsCache = {};
+function _fsReady(){
+  return new Promise(function(resolve){
+    var n=0;
+    (function chk(){
+      if(typeof firebase!=='undefined' && firebase.firestore){ resolve(firebase.firestore()); return; }
+      if(++n>200){ resolve(null); return; }   // 최대 10초(50ms×200)
+      setTimeout(chk,50);
+    })();
+  });
+}
+async function fsLoad(key){
+  if(window.__fsCache[key]) return window.__fsCache[key];
+  var db = (typeof _fdb!=='undefined' && _fdb) ? _fdb : await _fsReady();
+  if(!db) throw new Error('Firestore 준비 안 됨');
+  var doc = await db.collection('dashData').doc(key).get();
+  if(!doc.exists) throw new Error('dashData/'+key+' 없음');
+  var d = doc.data();
+  var out = d.json ? JSON.parse(d.json) : d;   // 월별=json문자열 / 원장=rows,cols
+  window.__fsCache[key] = out;
+  return out;
+}
+window.fsLoad = fsLoad;
 window.__monthCache = {};   // [2026-09] 월별 데이터 캐시 — 재클릭 시 fetch 안 하고 즉시 렌더
 async function loadMonth(key){
   try{
@@ -1676,20 +1695,9 @@ async function loadMonth(key){
       document.querySelectorAll('.mo-sel-btn').forEach(function(x){ x.classList.toggle('on', x.dataset.mo===key); });
       return;
     }
-    var gid = MONTH_GIDS[key] || MONTH_GIDS['현재'];
-    var url = CSV_BASE + gid;
-    var res = await fetch(url + "&_=" + Date.now());
-    var raw = await res.text();
-    function uncsv(line){
-      var t = line.trim();
-      if(t.charAt(0)==='"' && t.charAt(t.length-1)==='"') t = t.substring(1, t.length-1);
-      return t.split('""').join('"');
-    }
-    var lines = raw.replace(/\r/g,'').split('\n').filter(function(l){ return l.trim()!==''; });
-    var text = lines.map(uncsv).join('');
-    var a = text.indexOf('{'), b = text.lastIndexOf('}');
-    if(a>=0 && b>a){ text = text.substring(a, b+1); }
-    var D = JSON.parse(text);
+    // [2026-09-19] 방식 D — Firestore dashData/{key} 읽기. 'current'는 dashData/current.
+    var _fsKey = (key==='현재') ? 'current' : key;
+    var D = await fsLoad(_fsKey);
     window.__monthCache[key] = D;   // 캐시 저장
     window.__D = D;
     window.__monthKey = key;
@@ -2399,14 +2407,9 @@ window.bdwDel=function(id){
 window.__HOF=null;
 var HOF_GID='500572718';
 (function loadHOF(){
-  var base="https://docs.google.com/spreadsheets/d/1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU/gviz/tq?tqx=out:csv&headers=0&gid=";
-  fetch(base+HOF_GID+"&_="+Date.now()).then(function(r){return r.text();}).then(function(raw){
-    function uncsv(line){var t=line.trim();if(t.charAt(0)==='"'&&t.charAt(t.length-1)==='"')t=t.substring(1,t.length-1);return t.split('""').join('"');}
-    var lines=raw.replace(/\r/g,'').split('\n').filter(function(l){return l.trim()!=='';});
-    var text=lines.map(uncsv).join('');
-    var a=text.indexOf('{'),b=text.lastIndexOf('}');
-    if(a>=0&&b>a)text=text.substring(a,b+1);
-    window.__HOF=JSON.parse(text);
+  // [2026-09-19] 방식 D — Firestore dashData/hall_of_fame 읽기.
+  fsLoad('hall_of_fame').then(function(hof){
+    window.__HOF=hof;
     if(window.attachCardClicks) window.attachCardClicks();   // [2026-09] HOF 늦게 도착 → 뱃지 재부착
   }).catch(function(e){ console.warn('HOF 로드 실패',e); window.__HOF={}; });
 })();
@@ -2857,16 +2860,33 @@ function fdParseRows(raw){
   }
   return out;
 }
-/* 원장 로딩 — 월종결(과거월) + 데일리실적(현재월) 병합 */
+/* [2026-09-19] 방식 D — Firestore rows([11필드 배열])를 fdParseRows와 동일한 객체로 변환.
+   cols 순서: [date,sang,student,sales,saup,gubun,team,grade,cancelAmt,state,nopo] */
+function fdRowsToObjs(rows){
+  var out=[];
+  (rows||[]).forEach(function(row){
+    var dt=fdDate(row[0]); if(!dt) return;
+    var sang=(row[1]||'').trim(); if(!sang) return;
+    out.push({
+      dt:dt, key:fdKey(dt),
+      sang:sang, student:(row[2]||'').trim(),
+      sales:fdNum(row[3])*1000, team:(row[6]||'').trim(),
+      saup:(row[4]||'').trim(),
+      grade:(row[7]||'').trim(), cancelAmt:fdNum(row[8])*1000,
+      state:(row[9]||'').trim(), gubun:(row[5]||'').trim(),
+      nopo:(row[10]||'').trim(), isWeb:(sang==='웹마케팅팀')
+    });
+  });
+  return out;
+}
+/* 원장 로딩 — Firestore ledger-2026 + ledger-2025 병합 */
 async function fdLoadLedger(){
   if(window.__ledger) return window.__ledger;
-  var base="https://docs.google.com/spreadsheets/d/1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU/gviz/tq?tqx=out:csv&headers=0&gid=";
-  var t=Date.now();
   var results=await Promise.all([
-    fetch(base+CLOSED_GID+"&_="+t).then(function(r){return r.text();}),
-    fetch(base+LEDGER_GID+"&_="+t).then(function(r){return r.text();})
+    fsLoad('ledger-2026').catch(function(){return {rows:[]};}),
+    fsLoad('ledger-2025').catch(function(){return {rows:[]};})
   ]);
-  var all=fdParseRows(results[0]).concat(fdParseRows(results[1]));
+  var all=fdRowsToObjs(results[0].rows).concat(fdRowsToObjs(results[1].rows));
   // 중복 제거 (혹시 종결월이 데일리에도 남아있을 때) — 날짜+상담+학생+매출 키
   var seen={}, dedup=[];
   all.forEach(function(r){ var k=r.key+'|'+r.sang+'|'+r.student+'|'+r.sales+'|'+r.state; if(!seen[k]){seen[k]=1;dedup.push(r);} });
@@ -3623,14 +3643,8 @@ setTimeout(function(){ if(window.__D&&window.__D.personCards)window.__liveD=wind
 // [2026-09] 개인카드 연도토글용 — 2025 연간 personCards(total_2025-12) 백그라운드 캐시.
 //   그 사람이 2025 실적 있으면 카드에 [2026][2025] 토글 노출. 없으면 미노출.
 (function(){
-  var GID_2025_DEC = (typeof MONTH_GIDS_2025!=='undefined' && MONTH_GIDS_2025['2025-12']) ? MONTH_GIDS_2025['2025-12'] : '542913962';
-  fetch(CSV_BASE + GID_2025_DEC + '&_=' + Date.now()).then(function(r){return r.text();}).then(function(raw){
-    function uncsv(line){ var t=line.trim(); if(t.charAt(0)==='"'&&t.charAt(t.length-1)==='"') t=t.substring(1,t.length-1); return t.split('""').join('"'); }
-    var lines=raw.replace(/\r/g,'').split('\n').filter(function(l){return l.trim()!=='';});
-    var text=lines.map(uncsv).join('');
-    var a=text.indexOf('{'), b=text.lastIndexOf('}');
-    if(a>=0&&b>a) text=text.substring(a,b+1);
-    var D=JSON.parse(text);
+  // [2026-09-19] 방식 D — Firestore dashData/2025-12 읽기.
+  fsLoad('2025-12').then(function(D){
     window.__D2025=D;   // 2025 연간 D 전체 (personCards 포함)
     // 이름 → 2025 카드 빠른 조회 맵
     var idx={}; ['sang','saup'].forEach(function(g){ (D.personCards&&D.personCards[g]||[]).forEach(function(p){ idx[p.name]=1; }); });
