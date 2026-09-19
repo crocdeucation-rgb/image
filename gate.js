@@ -101,6 +101,7 @@
       var m=document.getElementById('agMsg');
       if(u && ALLOW.indexOf((u.email||'').toLowerCase())>=0){
         g.classList.add('hidden'); document.body.style.overflow='';
+        try{ gateSecUI(u); }catch(e){}   // [2026-09] 보안 배지+인증 토스트 (단독 접속만)
       } else if(u){
         if(m){ m.className='m err'; m.textContent='접근 권한이 없는 계정입니다 ('+u.email+')'; }
         g.classList.remove('hidden'); g.classList.add('ready'); document.body.style.overflow='hidden';
@@ -111,4 +112,40 @@
       }
     });
   });
+  // [2026-09] 보안 세션 UI — 단독 접속 시 상단 배지 + 로그인 직후 인증 토스트
+  var GATE_NAME={'032100jesus@gmail.com':'오동근','christuhm@gmail.com':'엄현호','crocdeucation@gmail.com':'신상준','kanghansara@gmail.com':'김사라','thestudydesign@gmail.com':'김상현','loityr123@gmail.com':'이경훈'};
+  var _gateSecDone=false;
+  function gateSecUI(u){
+    if(window.self!==window.top) return;      // switcher iframe 안이면 스킵(부모가 이미 표시)
+    if(_gateSecDone) return; _gateSecDone=true;
+    var nm=GATE_NAME[(u.email||'').toLowerCase()]||(u.email||'').split('@')[0];
+    // CSS
+    var css=document.createElement('style');
+    css.textContent='#gSessBar{position:fixed;top:0;left:0;right:0;z-index:99997;background:#0F1626;color:#dfe6f2;'
+      +'font-family:Pretendard,sans-serif;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:12px;'
+      +'padding:6px 14px;padding-top:calc(6px + env(safe-area-inset-top,0px));box-shadow:0 1px 6px rgba(0,0,0,.15)}'
+      +'#gSessBar .gs-dot{width:6px;height:6px;border-radius:50%;background:#12b886;box-shadow:0 0 0 0 rgba(18,184,134,.5);animation:gsPulse 2s infinite}'
+      +'@keyframes gsPulse{0%{box-shadow:0 0 0 0 rgba(18,184,134,.5)}70%{box-shadow:0 0 0 6px rgba(18,184,134,0)}100%{box-shadow:0 0 0 0 rgba(18,184,134,0)}}'
+      +'#gSessBar b{color:#00e5c8;font-weight:700} #gSessBar .gs-out{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);'
+      +'color:#fff;border-radius:6px;padding:3px 11px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit}'
+      +'#gSessBar .gs-out:hover{background:rgba(255,255,255,.22)} body.gate-hasbar{padding-top:34px}'
+      +'#gSecToast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);z-index:100000;background:#0F1626;color:#fff;'
+      +'padding:18px 26px;border-radius:14px;font-size:14px;font-weight:700;display:flex;align-items:center;gap:10px;opacity:0;pointer-events:none;'
+      +'box-shadow:0 12px 40px rgba(0,0,0,.3);transition:opacity .3s,transform .3s;font-family:Pretendard,sans-serif}'
+      +'#gSecToast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}'
+      +'#gSecToast .gt-ic{width:26px;height:26px;border-radius:50%;background:#12b886;display:flex;align-items:center;justify-content:center;font-size:15px}';
+    document.head.appendChild(css);
+    // 상단 배너
+    var bar=document.createElement('div'); bar.id='gSessBar';
+    bar.innerHTML='<span class="gs-dot"></span><span>🔒 <b>'+nm+'</b>님 · 보안 세션 활성</span>'
+      +'<button class="gs-out" onclick="try{firebase.auth().signOut();location.reload();}catch(e){}">로그아웃</button>';
+    document.body.appendChild(bar); document.body.classList.add('gate-hasbar');
+    // 인증 토스트 (1회)
+    var t=document.createElement('div'); t.id='gSecToast';
+    t.innerHTML='<span class="gt-ic">✓</span><span>경영진 인증 완료 · 보안 세션 시작</span>';
+    document.body.appendChild(t);
+    requestAnimationFrame(function(){ t.classList.add('show'); });
+    setTimeout(function(){ t.classList.remove('show'); },1800);
+    setTimeout(function(){ if(t.parentNode)t.parentNode.removeChild(t); },2200);
+  }
 })();
