@@ -49,7 +49,13 @@
   .uc-out{width:26px;height:26px;border-radius:50%;border:none;background:transparent;color:#8A97AC;cursor:pointer;display:flex;align-items:center;justify-content:center;}
   .uc-out:hover{background:#E7ECF3;color:#E23A22;}
   .uc-out svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
-  @media(max-width:600px){.uc-nm{display:none;}}
+  .sec-badge{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:#0a8a5c;background:#e6f7f0;border:1px solid #b3e6d2;border-radius:20px;padding:3px 9px 3px 8px;margin-right:8px;letter-spacing:-.2px;}
+  .sec-dot{width:6px;height:6px;border-radius:50%;background:#12b886;box-shadow:0 0 0 0 rgba(18,184,134,.5);animation:secPulse 2s infinite;}
+  @keyframes secPulse{0%{box-shadow:0 0 0 0 rgba(18,184,134,.5)}70%{box-shadow:0 0 0 6px rgba(18,184,134,0)}100%{box-shadow:0 0 0 0 rgba(18,184,134,0)}}
+  #secToast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);z-index:100000;background:#0F1626;color:#fff;padding:18px 26px;border-radius:14px;font-size:14px;font-weight:700;display:flex;align-items:center;gap:10px;opacity:0;pointer-events:none;box-shadow:0 12px 40px rgba(0,0,0,.3);transition:opacity .3s,transform .3s;}
+  #secToast.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
+  #secToast .st-ic{width:26px;height:26px;border-radius:50%;background:#12b886;display:flex;align-items:center;justify-content:center;font-size:15px;}
+  @media(max-width:600px){.uc-nm{display:none;}.sec-badge span.sb-word{display:none;}}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -76,6 +82,7 @@
     <button class="tab" data-t="web" onclick="go(this)">웹마케팅</button>
     <button class="tab" data-t="ssamida" onclick="go(this)">쌤IDA</button>
     <div class="user-chip" id="userChip">
+      <span class="sec-badge" id="secBadge"><span class="sec-dot"></span>보안 세션</span>
       <span class="uc-av" id="ucAv"></span>
       <span class="uc-nm" id="ucNm"></span>
       <button class="uc-out" id="ucOut" onclick="sgateLogout()" title="로그아웃">
@@ -117,6 +124,7 @@ _sgAuth.onAuthStateChanged(function(u){
       gate.classList.add('ready');
       setTimeout(function(){ gate.classList.add('bye'); }, 1400);
       setTimeout(function(){ gate.classList.add('hidden'); gate.classList.remove('bye'); document.body.style.overflow=''; try{ parent.postMessage({t:'cardClose'},'*'); }catch(e){} }, 1900);
+      setTimeout(function(){ sgSecToast(nm); }, 2000);   // [2026-09] 통과 후 보안 인증 토스트
     } else {
       // 세션 복원(새로고침) → 깜빡임 없이 즉시 통과
       gate.classList.add('hidden'); document.body.style.overflow=''; try{ parent.postMessage({t:'cardClose'},'*'); }catch(e){}
@@ -136,6 +144,17 @@ _sgAuth.onAuthStateChanged(function(u){
   }
 });
 window.sgateLogout=function(){ try{_sgAuth.signOut();}catch(e){} };
+// [2026-09] 보안 인증 토스트 — 신규 로그인 시 1회
+function sgSecToast(nm){
+  try{
+    var t=document.createElement('div'); t.id='secToast';
+    t.innerHTML='<span class="st-ic">✓</span><span>경영진 인증 완료 · 보안 세션 시작</span>';
+    document.body.appendChild(t);
+    requestAnimationFrame(function(){ t.classList.add('show'); });
+    setTimeout(function(){ t.classList.remove('show'); }, 1800);
+    setTimeout(function(){ if(t.parentNode)t.parentNode.removeChild(t); }, 2200);
+  }catch(e){}
+}
 window.sgateLogin=function(){
   window._sgFreshLogin=true;   // [2026-09] 버튼 로그인 = 인사말 연출 / 세션복원 = 즉시통과 구분
   var msg=document.getElementById('sgateMsg');
