@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script>window.GATE_CFG={title:'경영진 전용 · 그로스 리포트',sub:'등록된 경영진 계정으로만 열람할 수 있습니다.<br>Google 계정으로 로그인해 주세요.',foot:'문의 · 신상준 이사'}</script>
+<script src="../gate.js"></script>
+<title>대시보드 데이터 보안 보고</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+:root{
+  --ink:#18202F; --sub:#586074; --faint:#8A93A6; --line:#E5E9F0;
+  --bg:#F4F6FA; --pan:#FFFFFF; --band:#0D1524;
+  --safe:#1C7F55; --safe-bg:#E7F4EE; --warn:#B8442A; --warn-bg:#FAEDE9;
+  --key:#2B54D4; --key-bg:#EAEFFC; --gold:#8C6E14; --gold-bg:#F6EFD6;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5}
+.wrap{max-width:860px;margin:0 auto;padding:0 20px 80px}
+
+.cover{background:var(--band);color:#fff;margin:0 -20px;padding:56px 24px 46px;position:relative;overflow:hidden}
+.cover::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:44px 44px;pointer-events:none}
+.cover .in{position:relative;max-width:860px;margin:0 auto}
+.cover .tag{font-size:12.5px;letter-spacing:3px;color:#7E9BD6;font-weight:700}
+.cover h1{font-size:29px;font-weight:800;letter-spacing:-.8px;margin-top:14px;line-height:1.3}
+.cover .lede{font-size:15px;color:#B9C4D8;margin-top:18px;max-width:660px;line-height:1.75}
+.cover .lede b{color:#E4EAF4;font-weight:600}
+.cover .meta{margin-top:26px;font-size:12.5px;color:#8493AC;display:flex;gap:18px;flex-wrap:wrap}
+.cover .meta b{color:#D6DEEC;font-weight:600}
+
+.sec{margin-top:44px}
+.sec-n{font-size:12px;font-weight:800;color:var(--key);letter-spacing:1px}
+.sec-h{font-size:22px;font-weight:800;letter-spacing:-.5px;margin-top:6px;line-height:1.35}
+.sec-h b{color:var(--key)}
+.sec-sub{font-size:14px;color:var(--sub);margin-top:11px;line-height:1.75}
+.sec-sub b{color:var(--ink);font-weight:700}
+
+.card{background:var(--pan);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-top:16px}
+.card h3{font-size:16px;font-weight:800;display:flex;align-items:center;gap:9px;line-height:1.4}
+.card p{font-size:14px;color:var(--sub);margin-top:10px;line-height:1.78}
+.card p b{color:var(--ink);font-weight:700}
+
+.qa{border-left:3px solid var(--warn);background:var(--warn-bg);border-radius:0 12px 12px 0;padding:15px 20px;margin-top:16px}
+.qa .q{font-size:15px;font-weight:800;color:var(--warn);line-height:1.55}
+.qa .q::before{content:'“'}.qa .q::after{content:'”'}
+.ans{background:var(--safe-bg);border-left:3px solid var(--safe);border-radius:0 12px 12px 0;padding:16px 20px;margin-top:10px}
+.ans .a-lb{font-size:12px;font-weight:800;color:var(--safe);letter-spacing:.5px;margin-bottom:6px}
+.ans p{font-size:14px;color:#204439;line-height:1.78}
+.ans p b{color:#0F3527;font-weight:800}
+.ans p+p{margin-top:9px}
+
+.analogy{background:linear-gradient(135deg,#0D1524,#1A2840);color:#fff;border-radius:14px;padding:24px 26px;margin-top:18px;position:relative;overflow:hidden}
+.analogy .lb{font-size:11.5px;font-weight:800;letter-spacing:1.5px;color:#8FA6D6}
+.analogy .big{font-size:18.5px;font-weight:800;margin-top:10px;line-height:1.55;letter-spacing:-.3px}
+.analogy .big em{font-style:normal;color:#FFD98A}
+.analogy p{font-size:13.5px;color:#B7C3DB;margin-top:12px;line-height:1.78}
+.analogy p b{color:#E4EAF4;font-weight:700}
+
+.where{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.where .box{border-radius:12px;padding:18px 18px;border:1px solid var(--line);background:#fff}
+.where .box .top{display:flex;align-items:center;gap:8px}
+.where .box .ic{font-size:19px}
+.where .box .nm{font-size:14px;font-weight:800}
+.where .box .role{font-size:12px;font-weight:700;margin-top:2px}
+.where .box.screen .role{color:var(--faint)}
+.where .box.data .role{color:var(--safe)}
+.where .box .d{font-size:13px;color:var(--sub);margin-top:10px;line-height:1.7}
+.where .box .d b{color:var(--ink);font-weight:700}
+.where .box.data{background:var(--safe-bg);border-color:#BFE3D0}
+.where .box.data .d{color:#2A5142}.where .box.data .d b{color:#123A2A}
+.where .box .addr{font-size:11.5px;color:var(--faint);margin-top:9px;word-break:break-all;font-weight:600}
+@media(max-width:600px){.where{grid-template-columns:1fr}}
+
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.ba .col{border-radius:12px;padding:18px 18px;border:1px solid var(--line)}
+.ba .before{background:#FBEDE9;border-color:#EFCDC3}
+.ba .after{background:var(--safe-bg);border-color:#BFE3D0}
+.ba .lb{font-size:12px;font-weight:800;letter-spacing:.5px}
+.ba .before .lb{color:var(--warn)}.ba .after .lb{color:var(--safe)}
+.ba .col p{font-size:13px;margin-top:9px;line-height:1.7}
+.ba .before p{color:#7A3020}.ba .after p{color:#204439}
+.ba .col p b{font-weight:800}
+.ba .before p b{color:#5C2216}.ba .after p b{color:#0F3527}
+@media(max-width:600px){.ba{grid-template-columns:1fr}}
+
+.layers{margin-top:18px;display:flex;flex-direction:column;gap:10px}
+.layer{display:flex;gap:14px;align-items:flex-start;background:var(--pan);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.layer .num{flex:none;width:30px;height:30px;border-radius:9px;background:var(--key-bg);color:var(--key);font-weight:900;font-size:14px;display:flex;align-items:center;justify-content:center}
+.layer .tx b.h{font-size:14.5px;font-weight:800;display:block}
+.layer .tx p{font-size:13px;color:var(--sub);margin-top:6px;line-height:1.7}
+.layer .tx p b{color:var(--ink);font-weight:700}
+
+.flow{background:var(--pan);border:1px solid var(--line);border-radius:14px;padding:22px 20px;margin-top:16px}
+.flow .cap{font-size:12px;font-weight:800;color:var(--faint);letter-spacing:.3px;margin-bottom:10px}
+.flow .step{display:flex;align-items:center;gap:12px;padding:8px 0}
+.flow .step .ic{flex:none;width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.flow .step .ic.b{background:var(--key-bg)}.flow .step .ic.g{background:var(--safe-bg)}.flow .step .ic.k{background:var(--gold-bg)}
+.flow .step .t{font-size:13.5px;color:var(--ink);line-height:1.55}
+.flow .step .t b{font-weight:800}
+.flow .arrow{color:var(--faint);font-size:15px;padding:1px 0 1px 15px}
+.flow hr{border:none;border-top:1px solid var(--line);margin:12px 0 0}
+.flow .note{font-size:12.5px;color:var(--sub);margin-top:12px;line-height:1.75}
+.flow .note b{color:var(--ink);font-weight:700}
+
+.own{background:linear-gradient(135deg,#F6EFD6,#FBF7E9);border:1px solid #E7D89A;border-radius:14px;padding:26px 26px;margin-top:18px}
+.own .lb{font-size:12px;font-weight:800;letter-spacing:1px;color:var(--gold)}
+.own .big{font-size:18px;font-weight:800;color:#463809;margin-top:10px;line-height:1.5}
+.own p{font-size:14px;color:#655723;margin-top:12px;line-height:1.8}
+.own p b{color:#463809;font-weight:800}
+.own .give{margin-top:14px;background:rgba(255,255,255,.6);border:1px dashed #D8C583;border-radius:11px;padding:14px 16px}
+.own .give .gh{font-size:13.5px;font-weight:800;color:#463809}
+.own .give ul{margin:8px 0 0;padding-left:17px}
+.own .give li{font-size:13px;color:#655723;margin-top:5px;line-height:1.5}
+
+.summary{background:var(--band);color:#fff;border-radius:16px;padding:28px 28px;margin-top:46px}
+.summary .lb{font-size:12px;font-weight:800;letter-spacing:2px;color:#7E9BD6}
+.summary h2{font-size:19px;font-weight:800;margin-top:10px}
+.summary .item{display:flex;gap:12px;align-items:flex-start;margin-top:15px}
+.summary .ck{flex:none;width:22px;height:22px;border-radius:7px;background:var(--safe);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;margin-top:1px}
+.summary .item .t{font-size:14px;color:#D6DEEC;line-height:1.7}
+.summary .item .t b{color:#fff;font-weight:700}
+
+.ptest{margin-top:14px;display:flex;flex-direction:column;gap:7px}
+.pt-row{display:flex;gap:11px;align-items:flex-start;background:#F7F9FC;border:1px solid var(--line);border-radius:10px;padding:11px 13px}
+.pt-x{flex:none;font-size:12px;font-weight:800;color:var(--safe);background:var(--safe-bg);border-radius:7px;padding:3px 9px;white-space:nowrap;margin-top:1px}
+.pt-d{font-size:13px;color:var(--sub);line-height:1.6}
+.pt-d b{color:var(--ink);font-weight:700}
+.code{margin-top:14px;background:#0D1524;border-radius:12px;padding:16px 18px;overflow-x:auto}
+.code pre{font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;font-size:12.5px;line-height:1.9;color:#C9D4E8;white-space:pre;margin:0}
+.code .cm{color:#5E8BE0;font-weight:600}
+.shot{margin-top:14px;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#0D1524}
+.shot img{width:100%;display:block}
+.shot-cap{font-size:12px;color:var(--sub);font-weight:600;padding:10px 14px;background:#F7F9FC;border-top:1px solid var(--line);line-height:1.5}
+.foot{text-align:center;font-size:12px;color:var(--faint);margin-top:40px;line-height:1.9}
+.foot b{color:var(--sub);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="cover">
+  <div class="in">
+    <div class="tag">경영진 대시보드 · 데이터 보안 보고</div>
+    <h1>대시보드 데이터는 어디에 있고,<br>누가 소유하며, 어떻게 잠겨 있는가</h1>
+    <div class="lede">
+      데이터 보안은 파운더님께서 늘 강조해 오신 부분이고, 저 역시 가장 중요하게 여기는 원칙입니다.
+      경영진이 회사의 핵심 지표(매출·인사·채용·광고)를 <b>한눈에</b> 보실 수 있도록 대시보드를 구축하면서,
+      <b>데이터가 어디에 있고, 누가 소유하며, 어떻게 잠겨 있는지</b>를 보안 원칙에 따라 설계했습니다.
+      그 구조를 아래에 정리해 보고드립니다.
+    </div>
+    <div class="meta">
+      <span>보고 <b>신상준 이사</b></span>
+      <span>대상 <b>경영진</b></span>
+      <span>일자 <b>2026. 9. 19</b></span>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-n">먼저, 이 대시보드가 무엇인가</div>
+  <div class="sec-h">회사 데이터를 새로 만든 것이 아니라,<br>흩어진 지표를 <b>경영진만</b> 한눈에 보게 모은 것입니다.</div>
+  <div class="sec-sub">
+    이 대시보드는 이미 회사가 가지고 있던 실적·인사·광고 데이터를, 경영 판단에 필요한 형태로 <b>한 화면에 모아 보여주는 도구</b>입니다.
+    새로운 데이터를 만들어낸 것이 아니며, 가장 민감한 정보(인사·급여·매출·채용)는 <b>경영진 5인만</b> 열람하도록
+    철저히 잠갔습니다. 아래에 「어디에 있고 / 누구 것이고 / 어떻게 잠겼는가」를 순서대로 정리했습니다.
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-n">물음 1 · 서버가 어디에 있는가</div>
+  <div class="sec-h">「우리 데이터는<br>대체 어디에 저장되어 있나?」</div>
+
+  <div class="ans">
+    <div class="a-lb">답</div>
+    <p>데이터가 저장되는 곳과, 화면이 놓인 곳은 <b>서로 다른 두 장소</b>입니다.</p>
+    <p><b>화면(입구)</b>은 <b>검색에 노출되지 않아 링크를 아는 사람만 닿을 수 있고</b>, 그 안에는 실제 숫자·이름이 없습니다. <b>데이터(내용물)</b>는 <b>구글이 운영하는 Firebase</b>라는 잠긴 금고에 따로 있습니다.</p>
+  </div>
+
+  <div class="where">
+    <div class="box screen">
+      <div class="top"><span class="ic">🖥️</span><div><div class="nm">화면 (입구)</div><div class="role">링크를 알아야 닿음 · 내용물 없음</div></div></div>
+      <div class="d">색·글꼴·표의 '모양'만 담긴 빈 그릇. <b>검색에 뜨지 않아 링크를 아는 사람만</b> 닿을 수 있고, 열어도 <b>데이터는 나오지 않음.</b></div>
+      <div class="addr">화면 입구 (검색에 노출되지 않음)</div>
+    </div>
+    <div class="box data">
+      <div class="top"><span class="ic">🔒</span><div><div class="nm">데이터 (내용물)</div><div class="role">구글 금고 · 잠김</div></div></div>
+      <div class="d">매출·인사·채용. <b>구글 서버가 로그인·명단을 확인한 뒤에만</b> 화면으로 내어줌.</div>
+      <div class="addr">Google Firebase (구글 데이터베이스)</div>
+    </div>
+  </div>
+
+  <div class="analogy">
+    <div class="lb">비유</div>
+    <div class="big">화면은 <em>은행 건물</em>, 데이터는 <em>금고 속 현금</em>입니다.</div>
+    <p>은행 건물 주소는 누구나 압니다. 하지만 주소를 안다고 금고가 열리지 않습니다. 금고에는 <b>Firebase 접근 규칙이라는 '자물쇠'</b>가 걸려 있고, 이 자물쇠는 <b>gate 인증(로그인+허가 명단)이라는 '열쇠'</b>를 가진 사람에게만 열립니다. 주소를 알아도, 자물쇠에 맞는 열쇠가 없으면 데이터는 나오지 않습니다.</p>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-n">물음 2 · AI와 구글에 맡긴 부분</div>
+  <div class="sec-h">「AI로 만들고 구글에 맡겼다는데,<br>그 판단은 왜 믿을 수 있는가?」</div>
+
+  <div class="ans">
+    <div class="a-lb">답</div>
+    <p>두 가지를 나눠 말씀드리겠습니다. <b>AI는 만드는 '도구'였고, 구글은 지키는 '인프라'</b>입니다.</p>
+    <p><b>AI</b>는 대시보드를 빠르게 만들기 위해 쓴 도구입니다. 목수가 전동 공구로 집을 짓는 것과 같습니다 — 공구가 집을 소유하거나 지키는 것이 아니라, 사람이 설계하고 짓는 데 쓰는 것뿐입니다. 무엇을 어떻게 잠글지는 <b>사람이 판단해 설계</b>했고, AI는 그 지시대로 화면을 그렸습니다.</p>
+    <p><b>구글 Firebase</b>는 그 데이터를 보관하고, <b>접근 규칙(자물쇠)</b>을 거는 곳으로 택했습니다. 핵심은 '구글이라서'가 아니라, <b>Firebase의 접근 규칙이 서버 단에서 강제된다</b>는 점입니다 — 규칙에 맞지 않는 요청은 데이터에 닿기 전에 거부되므로, 주소를 알아내거나 코드를 뜯어보는 방식의 침입이 규칙 단계에서 막힙니다.</p>
+  </div>
+
+  <div class="card">
+    <h3>🔐 왜 Firebase인가 — 규칙이 '서버 안에서' 강제되기 때문</h3>
+    <p>Firebase 잠금의 핵심은 <b>접근 규칙이 사용자 쪽이 아니라 서버 안에서 판정된다</b>는 점입니다. 보통의 허술한 방식은 '이 사람이 봐도 되나?'를 사용자 화면(브라우저)에서 확인하는데, 이러면 화면을 조작해 통과할 수 있습니다. Firebase는 그 판정을 <b>서버 내부에서</b> 수행하므로, 화면·코드를 아무리 뜯어봐도 규칙을 우회할 수 없습니다.</p>
+    <p style="margin-top:10px">또한 규칙에 맞지 않는 요청은 <b>데이터가 오가기 전에 거부</b>됩니다. 흔한 침입 방식 — 주소를 알아내 직접 요청하기, 로그인 화면을 건너뛰고 데이터만 호출하기, 코드에서 접근 경로를 찾아내기 — 이 모두가 규칙 단계에서 막힙니다.</p>
+  </div>
+
+  <div class="flow">
+    <div class="cap">화면에 데이터가 표시되기까지 — AI가 만든 것과, 구글이 지키는 것</div>
+    <div class="step"><span class="ic b">🤖</span><span class="t"><b>AI가 화면 틀을 그림</b> — 표·그래프의 '빈 모양'을 코드로 만듦 (여기에 실제 데이터 없음)</span></div>
+    <div class="arrow">↓</div>
+    <div class="step"><span class="ic k">🔒</span><span class="t">데이터는 <b>구글 금고에 별도 보관</b> — AI도, 화면 코드도 이 금고 열쇠가 없음</span></div>
+    <div class="arrow">↓</div>
+    <div class="step"><span class="ic g">🪪</span><span class="t">경영진이 로그인하면 <b>구글이 신원·명단을 확인</b>하고, 그때 금고가 데이터를 내어줌</span></div>
+    <div class="arrow">↓</div>
+    <div class="step"><span class="ic g">📊</span><span class="t">그제야 화면의 빈 표가 실제 숫자로 채워짐</span></div>
+    <hr>
+    <p class="note">데이터를 내어줄지 말지는 <b>우리가 설계한 접근 규칙</b>이 서버 안에서 판정합니다. AI가 만든 화면은 이 판정에 관여하지 못하고, 금고 열쇠도 쥐고 있지 않습니다. 그래서 <b>가장 민감한 열쇠(관리자 인증키)는 AI에게 전달하지 않습니다.</b></p>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-n">물음 3 · 주소만 알면 들어오지 않나</div>
+  <div class="sec-h">「주소(링크)만 알면<br>그냥 들어올 수 있는 것 아닌가?」</div>
+
+  <div class="ans">
+    <div class="a-lb">답</div>
+    <p>그 점을 인지하고 <b>전면 개편했습니다.</b> 지금은 세 가지가 겹칩니다 — ① 주소가 <b>검색에 노출되지 않아</b> 아는 사람만 입구에 닿고, ② 입구에 닿아도 <b>구글 로그인</b>을 해야 하며, ③ 로그인해도 <b>허가 명단에 없으면 즉시 차단</b>됩니다. 주소 하나만으로는 아무것도 열리지 않습니다.</p>
+  </div>
+
+  <div class="ba">
+    <div class="col before">
+      <div class="lb">개편 전</div>
+      <p><b>데이터를 시트에서 직접 읽던 방식</b><br>통제 지점이 화면·시트로 흩어져 있었음.</p>
+    </div>
+    <div class="col after">
+      <div class="lb">개편 후 (현재)</div>
+      <p><b>로그인 + 허가 명단 통과 필수</b><br>주소를 알아도 로그인·명단을 통과하지 못하면 데이터가 열리지 않음. 구글 서버가 강제.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🧪 대표적인 침입 경로를 점검하고 차단했습니다</h3>
+    <p>말로 '안전하다'가 아니라, 외부 침입자가 흔히 시도하는 방법들을 <b>직접 실행해 점검</b>했습니다. 로그아웃(미인증) 상태에서 아래를 하나씩 시도했고, 모두 「권한 없음」으로 <b>차단</b>되는 것을 확인했습니다.</p>
+    <div class="ptest">
+      <div class="pt-row"><span class="pt-x">✕ 차단</span><span class="pt-d"><b>대시보드에 로그인 없이 직접 접속</b> — 잠금 화면만 뜨고 내부로 넘어가지 못함</span></div>
+      <div class="pt-row"><span class="pt-x">✕ 차단</span><span class="pt-d"><b>로그인 화면을 건너뛰고 데이터만 호출</b> — 서버가 미인증으로 거부</span></div>
+      <div class="pt-row"><span class="pt-x">✕ 차단</span><span class="pt-d"><b>데이터 주소를 직접 입력해 매출·원장 읽기 시도</b> — 규칙 단계에서 거부(permission-denied)</span></div>
+      <div class="pt-row"><span class="pt-x">✕ 차단</span><span class="pt-d"><b>인사·채용 데이터 직접 호출</b> — 경영진 명단이 아니면 거부</span></div>
+      <div class="pt-row"><span class="pt-x">✕ 차단</span><span class="pt-d"><b>명단에 없는 계정으로 로그인</b> — 접근 권한 없음 안내 후 자동 로그아웃</span></div>
+    </div>
+    <p style="margin-top:12px">가장 흔하고 위험한 경로들을 점검한 결과, 매출·인사 자료 모두 <b>이 방법들로는 열리지 않았습니다.</b> 보안에 '완벽'은 없으므로, 앞으로도 <b>새로운 위험이 확인되면 규칙을 계속 보완</b>해 나가겠습니다.</p>
+  </div>
+  <div class="card">
+    <h3>🖥️ 로그인하지 않으면, 보이는 것은 이 화면뿐입니다</h3>
+    <p>주소를 알고 들어와도, 등록된 계정으로 로그인하기 전에는 아래 잠금 화면에서 <b>한 발짝도 넘어갈 수 없습니다.</b> 데이터는커녕 대시보드 화면 자체가 열리지 않습니다.</p>
+    <div class="shot">
+      <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBAUEBAYFBQUGBgYHCQ4JCQgICRINDQoOFRIWFhUSFBQXGiEcFxgfGRQUHScdHyIjJSUlFhwpLCgkKyEkJST/2wBDAQYGBgkICREJCREkGBQYJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCT/wAARCALSBXgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD51ooortMAooooAKKKKACiiigAoopaAEopaKAEpaKKACiiigAooooAKKKKACiiigAooooAKKKKACiiimAUUUUAFFFFABRRRQAUUtFACUUtFABRRRQIKKKKACiiigAooooAKKKKYBRRRQAUUUUAFFFFABRRRQAUUUUAFFLRQAlLRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUtFACUtFFABRRRQAUUUUAFFFFABRRS0AJRS0UAJS0UUAFFFFABRRRQAUUUUwCiiigAoopaAEoopaAEpaKKACiiigAooooAKKKKBBRRRQMKKKKBBRRRQMKKKKBBRRRQAUUUUAFFFLQAlFLRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFLRQAlLRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRS0UAJRS0UAJS0UUAFFFFABRRRTArUUUVmUFFFFABRS0UAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRTAKKKKACiiigAooooAKKWigBKWiigAooooEFFFFABRRRQAUUUUAFFFFMAooooAKKKKACiiigAooooAKKKKACilooASilooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKWigBKWiigAooooAKKKKACiiigAooooAKKWigBKWiigAooooAKKKKACiiigAooooAKKKWmAlFFLQAlFLRQAUUUUAFFFFABRRRQAUUUUAFFFFAgooooGFFFFAgooooAKKKKACiiloASilooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAopaKAEpaKKACiiigAooooAKKKKACiiigAooooAKKKWgAooooAKKKKACiiigAooopgFFFFABRRRQBWpaKKzKCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooopgFFFFABRRRQAUUUtACUUtFABRRRQAUUUUCCiiigAooooAKKKKACiiimAUUUUAFFFFABRRRQAUUUUAFFFLQAlFLRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUtACUUtFABRRRQAUUUUAFFFFABRRRQAUUUtACUtFFABRRRQAUUUUAFFFFABRRRTAKKKKACilooASilooAKKKKACiiigAooooAKKKKACiiigAooooEFFFFABRRRQAUUUUAFFFFABRS0UAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUtFABSUtFABRRRQAUUUUAFFFFABRRRQAUUUUAFFLRQAlLRRQAUUUUAFFFFABRRRQAUUUUwCiiikAUUtFMAooooAKKKKAK1FFFZlBRRRQAUUUUAFFFFABRRRTAKKKKACiiigAooooAKKKWgBKKWigAooooAKKKKBBRRRQAUUUUAFFFFABRRRTAKKKKACiiigAooooAKKKKACiiigApaSloASloooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAoopaAEopaKACiiigAooooAKKKKACiiigAopaSgApaKKACiiigAooooAKKKKACiiigAooopgFFFLQAlFLRQAlLRRQAUUUUAFFFFABRRRQAUUUUAFFFFAgooooAKKKKACiiigAooooAKKKWgBKWiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAoopaAEoopaACiiigAooooAKKKKACiiigAooooAKKKKACilooASilooAKKKKACiiigAooooAKKKKYBRRRQAUUUtACUtFFABRRRQAUUUUAFFFFABRRRQBWooorMoKKKKACiiimAUUUUAFFFFABRRRQAUUtFACUtFFABRRRQIKKKKACiiigAooooAKKKKYBRRRQAUUUUAFFFFABRRRQAUUUUAFFLRQAlFLRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUtFACUtFFABRRRQAUUUUAFFFFABRRRQAUUtFABRRRQAUUUUAFFFFABRRRQAUUUUwCiiigAopaKAEpaKKACiiigAooooAKKKKACiiigAooooEFFFFAwooooAKKKKBBRRRQAUUUtACUUtFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUtACUUtFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFLQAlFLRQAlLRRQAUUUUAFFFFABRRRQAUUUUwCiiloASilooASloooAKKKKACiiigAooooAKKKKACiiigAooooArUUUVBQUUUUAFFFFABRRS0AJRS0UAFFFFAgooooAKKKKACiiigAooooAKKKKYBRRRQAUUUUAFFFFABRRRQAUUUtACUUtFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRS0AJRS0UAFFFFABRRRQAUUUUAFFFLQAlFLRQAlLRRQAUUUUAFFFFABRRRQAUUUUwCiiigAopaKAEpaKKACiiigAooooAKKKKBBRRRQMKKKKACiiigQUUUUDCiiigQUUUUAFFFFABRS0UAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUtFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFLQAlFLRQAUUUUAFFFFABRRRTAKKKKQBRRRTAKKKKACilooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAoopaAEopaKAKtFLRUFCUUtFABRRRQAUUUUCCiiigAooooAKKKKACiiimAUUUUAFFFFABRRRQAUUUUAFFFFABS0UUAJS0UUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFLRRQAUUUUAFFFFABRRRQAUUUUAFFFLQAlFLRQAUUUUAFFFFABRRRQAUUUUAFFFFMAopaSgAopaKAEpaKKACiiigAooooAKKKKBBRRRQMKKKKBBRRRQAUUUUAFFFFABRS0lABRS0UAJS0UUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRS0UAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFLRQAlLRRQAUUUUAFFFFABRRRQAUUUUwCiiloASilooASloooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiloASilooAKKKKACiiigAooooArUUUVAwooooAKKKKACiiigAooopgFFFFABRRRQAUUUUAFFFFABRRRQAUUtFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUtFACUtFFABRRRQAUUUUAFFFFABRRRQAUtFFABRRRQAUUUUAFFFFABRRRQAUUUUwCiiloASilooASloooAKKKKACiiigAooooEFFFFABRRRQMKKKKBBRRRQAUUUUAFFFFABRRS0AJS0UUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRS0UAJS0UUAFFFFABRRRQAUUUUAFFFFABRRRQAUUtFACUUtFABRRRQAUUUUAFFFFABRRRQAUUUUwCiiloAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAopaSgAopaKACiiigAooooAKKKKACiiigAooooAKKKKAK1FFFQMKKKKACiiimAUUUUAFFFFABRRRQAUUUUAFFFLQAlLRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRS0AJRS0UAJS0UUAFFFFABRRRQAUUUUAFFFLQAlFLRQAUUUUAFFFFABRRRQAUUUUwCiiikAUUUUwCiiloASloooAKKKKACiiigAooooAKKKKBBRRRQMKKKKBBRRRQMKKKKBBRRRQAtJRRQAUUtFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRS0AJRS0UAJS0UUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFLRQAlLRRQAUUUUAFFFFABRRRQAUUUUwCiiigAopaKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKWigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigCtRRRUjCiiigAooooAKKKKACiiigAopaKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiloASilooAKKKKACiiigAooooAKKKWgBKKWigBKWiigAooooAKKKKACiiigAooopgFFFFABRS0UAJRS0UAFFFFABRRRQAUUUUAFFFFAgooooGFFFFABRRRQIKKKKACiiigAoopaAEopaKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKWigAooooAKKKKACiiigAooooAKKKKACiiigAopaKACiiigAooooAKKKKACiiigAooopgFFFFABRS0UAJS0UUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRS0UAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRS0AJRS0UAVaKKKkYUUUUAFFLRQAlLRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRS0AJRS0UAFFFFABRRRQAUUUUAFFFFABRS0UAJS0UUAFFFFABRRRQAUUUUAFFFFMAooopAFFLRTASloooAKKKKACiiigQUUUUDCiiigAooooAKKKKBBRRRQAUUUUAFFFFABRRRQAUUUtACUtFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRS0AJRS0UAJS0UUAFFFFABRRRQAUUUUAFFFFABRS0lABRS0UAFFFFABRRRQAUUUUAFFFFMAooopAFFFFMAopaKAEpaKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAopaKAEopaKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAopaKAEpaKKACiiigAooooEVaWiipKCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKWgBKKWigAooooAKKKKACiiigAooooAKKKKACilooAKKKKACiiigAooooAKKKKACiiimAUUUUAFFFLQAUUUUAFFFFABRRRQAUUUUAFFFFAgooooGFFFFAgooooAKKKKACiiigAopaKAEpaKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiloASiiloASloooAKKKKACiiigAooooAKKKKACiiigAoopaAEpaKKACiiigAooooAKKKKACiiimAUUUUAFFLRQAlFLRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRS0UAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFLQAlFLRQAlLRRQAUUUUAFFFFABRRRQAUUUUAFFFFAFaiiipGFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFLRQAlFLRQAUUUUAFFFFABRRRQAUUUtACUUtFABRRRQAUUUUAFFFFABRRRTAKKKKACiiigAopaKAEpaKKACiiigAooooAKKKKACiiigQUUUUAFFFFABRRRQAUUUUAFFFFABRRS0AJRS0UAFFFFABRRmkzQAtFJmjNAC0UmaM0ALRSZozQAtFJmjNAC0UmaM0ALRSZozQAtFJmjNAC0UZozQAUUZozQAUUZozQAtFJmjNAC0UmaM0ALRSZozQAtFGaKACiiigAooooAKKKWgAooooAKKKKACiiigAooooAKKKKYBRRS0AJRS0UAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFLSUAFFFFABRRS0AJS0UUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFLQAlLRRQAlLRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAVqKKKkYUUUUAFFFFABRRRQAUUtFACUtFFABRRRQAUUUUAFFFFABRRRQAUUtFACUtFFABRRRQAUUUUAFFFFMAooooAKKKKACiiloASilooASloooAKKKKBBRRRQMKKKKACiiigQUUUUDCiiigQUUUUDCiiigQUUUUAFFLRQAUUUUAFFFJmgBaTNFFABmiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAoopaACiiigBKKKKAFooooAKKKKACiiigAooooAXNGaSloAWikBpaACiiimAUUUUgCiilpgJRRS0AFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUtACUUtFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRS0AJS0UUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFLRQAlFLRQBVoooqRhRRRQAUtFFABRRRQAUUUUAFFFFABRRRQAUUUtACUUtFABRRRQAUUUUAFFFFABRRRQAUUUUwCiiloASilooAKKKKACiiigAooooAKKKKACiiigQUUUUDCiiigAooooEFFFFABRRRQAUUtFACUtFFABRRRQAUUUUAFFFFACGiiigAooooAKKKSgBaKazqn3mVfqcU3zov+esf/fQoGPzRmmedF/z1j/77FHnRf8APWP/AL6FAD80ZqPzov8AnrH/AN9Cjzov+esf/fYpASZoqPzov+esf/fYo86L/nrH/wB9igCSlqPzov8AnrH/AN9ijzov+esf/fYoAkoqPzov+esf/fYo86L/AJ6x/wDfYpgSUVH50X/PWP8A77FHnRf89Y/++xQBJRUfnRf89Y/++xR50X/PWP8A77FAElGaj86L/nrH/wB9ijzov+esf/fYoAkzRmo/Oi/56x/99ijzov8AnrH/AN9igCTNGaj86L/nrH/32KPOi/56x/8AfYoAkzRmo/Oi/wCesf8A32KPOi/56x/99CgCTNGaj86L/nrH/wB9Cl86L/nrH/30KBD80Uzzov8AnrH/AN9Cjzov+esf/fYoAkoqPzov+esf/fYpRNH/AM9Y/wDvoUAPopAc89RS0ALRSUtABRRRTAWigUtACUtFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUtACUtFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUtFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRS0UCEopaKBhRRRTAKKKKQBRRRTEVaWiioKCiiigAooooAKKKKACiiigAopaKACiiigAooooAKKKKACiiimAUUUUAFFFFABRS0UAFFFFABRRRQAUUUUCCiiigYUUUUCCiiigAooooGFFFFABRRRQIKKKKACiiloAKSlooAKKKKACiiigAooooAKKKKACiiigApDS0lABRRRQAUUUlABXt/wADP2fP+E9tl8ReJGnt9ELEW8EZ2SXmOC27+FM8ZHJwcYFeM6XYnVNTs7BW2m6uI7cH0LuFz+tfo3pWm2ujaba6dZRLFbWsSwxIowFVRgD9KxqzaVkXCN9zH0b4deEPD9utvpnhvSrZF7i2VmP1Ygk/ia0f+Ec0b/oE6f8A+Ayf4Vo0VzXZsZ3/AAjmjf8AQJ0//wABk/wo/wCEc0b/AKBOn/8AgMn+FaNFK4Gd/wAI5o3/AECdP/8AAZP8KP8AhHNG/wCgTp//AIDJ/hWjRRcDO/4RzRv+gTp//gMn+FH/AAjmjf8AQJ0//wABk/wrRoouBnf8I5o3/QJ0/wD8Bk/wo/4RzRv+gTp//gMn+FaNFFwM7/hHNG/6BOn/APgMn+FH/COaN/0CdP8A/AZP8K0aKLgZ3/COaN/0CdP/APAZP8KP+Ec0b/oE6f8A+Ayf4Vo0UXAzv+Ec0b/oE6f/AOAyf4Uf8I5o3/QJ0/8A8Bk/wrRoouBnf8I5o3/QJ0//AMBk/wAKP+Ec0b/oE6f/AOAyf4Vo0UXAzv8AhHNG/wCgTp//AIDJ/hR/wjmjf9AnT/8AwGT/AArRoouBnf8ACOaN/wBAnT//AAGT/Cj/AIRzRv8AoE6f/wCAyf4Vo0UXAzv+Ec0b/oE6f/4DJ/hR/wAI5o3/AECdP/8AAZP8K0aKLgZ3/COaN/0CdP8A/AZP8KP+Ec0b/oE6f/4DJ/hWjRRcDO/4RzRv+gTp/wD4DJ/hR/wjmjf9AnT/APwGT/CtGii4Gd/wjmjf9AnT/wDwGT/Ckbw1ojAq2kacwPUG2TB/StKii4HmXjr9nvwR4ztpWh02HRtRIJS7sEEfzf7aD5WH4Z9xXx5418G6r4C8R3Wg6xGFuIDlZEzsmjP3ZEPdT+hBB5FfohXz1+2D4egl8PaJ4hCKLi2uzZswHLJIpYAn2KZ/E1tSm72ZnOOlz5YpabS11GQtFFFABTqSgUwFooooAKKKKACiiigAooooAKKKKACiiigAopaKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACilpKACilooASloooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKWigQlLRRQMKKKKYBRRRQAUUUUCCiiigAooooArUUUVBQUUUUAFFLRQAUUUUAFFFFABRRRQAUUUUwCiiigAooooAKKKWgAooooAKKKKACiiigAooooAKKKKACiiigQUUUUAFFFFABRRRQAUUUUAFFFLQAlFLRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAAaSlNJQAUUUUAJSUppDSGa/g7/kb9B/7Cdp/wCjkr9GB0r85vB3/I36D/2E7T/0clfoyOlc9boaUwooorA0CiiigAooooAKKKKACiiigAooooAKKKKACioL2+tNNtZLu9uYLW3iGXmmcIiD1JPArE0f4i+DvEN59i0jxRot/dZwIbe8jdz9ADk/hQB0VFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABXiX7XP/JMbT/sLQf8AouWvba8S/a6/5Jhaf9heD/0XLV0/iRMtj4/paaKWu0wHUUlLQAtAoopgLRRRQAUUUUAFFFFABRS0UAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRS0AJS0UUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFLQAlLRRTAKKKKACiiigQUUUUDCiiigAooooEFFFFABRS0lABRS0UAVaWiioKCiiigAooooAKKKKACiiigAooopgFFLRQAlFLRQAUUUUAFFFFABRRRQIKKKKBhRRRQAUUUUCCiiigYUUUUCCiiigAoopaAEopaKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooADSUp60lABRRQaAEpppxptIZr+Dv+Rw0H/sJ2n/o5K/RkdK/OXwf/AMjfoP8A2E7T/wBHJX6NDpXNW3RrAKKKKxLCiiigAooooAKKKKACiiigAooooAKKKq6renTtLvL0IHNvA8u0nG7apOP0oA+Wfjn8QRca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nH05rmNf090v71obS5mWSFpBtRiGkdChwVQ9gOCcZNP1fw/dNHc3sMQld7UxbMgNt242hQhy2ec5yenShRQX1sdM9/aRM6vcwq0a7mUuMqPUjsOaWW8toHWOa4hjdvuq7gE/QGuO1TSbma+vdgmTdgLm1dlcsBuIKggcBRnrkHNa+v2An1CxnkFyUjDFWgt9+xv9rAJwQSB0weeuKOVaBzGu+p2MUaSSXluiPnazSABscHGaseYhUNvXaehzwa4S80nUYIbQWj3CbbeVDIkMgJBcnacAtnnI3ADr1rbOk3MlloxFtbym05aCYbAoKYAwAwyP6U3FBc3I7u3m3eXPE+wgNtYHBPSlW5hdyiyoWDbCA3IbGcfXHNcdpmh6rLa3doB9l82dJWklXpt+YBRjkbgAfbNOv9M1C5iuHFlK10t48yBADGx8pV6llO0knkelLlV9wude91BGMvNGgztyzAc+lNN7aqI2NzCBIdqEuPnPoPU1ykWj3CWluhsLt5I5pJTvjhZcuORtZz+BzmnanYSva2bPpt1nc8EqRxoP3Z+bOEDBeQBkYNPlXcLs6yOaOYExyK4BKnac4IOCPwNIl1BIoZJo2BJAIYckHB/Wud0ez1ESLqEVrHEzfaEaG5dkYbptwP3TkYHtUek6RexzxXbWVs+FkTbOxVoz5ztuHynqCPSlyhc6iKWOeNZInV0YZDKcginVk+G457bTLa2ninBWFWLSYABJPyY68e479a1qTVmNBRRRSGFFFFABRRRQAV4j+13/AMkwtP8AsLwf+i5a9urxH9rv/kmFp/2F4P8A0XLVw+JClsfHopwpBTq7EYCinCkFKKYhaKKKYCiigUUAFFFFABRRRQAUUtFACUtFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRS0UAJS0UUAFJS0UwCiiigAooooEFFFFABRRRQMKKKKBBRRS0AJRS0UAJS0UUAFFFFMAooooAKKKKACiiigAooooAKKKKACiiigAopaKAEpaKKACiiigCtRRRUFBRRRQAUUUUCCiiigAooooGFFFFAgooooAKKWigBKWiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKWigAooooAKKKKACiiigAooooAKKKKACiiigAopaKAEpaKKACiiigAooooAQ0lKaKAEpDS0hoAQ0004000hmt4P/wCRv0H/ALCdp/6OSv0aHSvzl8H/API36D/2E7T/ANHJX6NDpXNW3RrAKKKKxLCiiigAooooAKKKCM9aAMW08R/abwQNBHEDI0fzSNu4JAONmOcZ696is/FYvNSWyW04MjRl/M5XGeSpAPUUsPhZYr5bgzxsglaTb5PLA5wh52gDI5Cg8daevhKyiu47mJmUq+51ZQwdcH5emRgnI+lX7pLuR2Hitb6WKMWhjLziAhn+ZDtY8jHB+Xp71Jq/idNJn+zvZztIRuU5Xaw55yCSOncCiy8NrZ3EcgNmwjlMoYW5WTnOMsHwcA45FSap4atdSV2B8ud5PMMxG9vukYGTwMHoKXugrlG58ZrbzXEZs8+TGsmRKDuzjAwOeM8+mRnrV6bxCsM0v+iu1vDKIJJt6ghzgcL1I5H9AahufDMk0g2XuyPCDbsPyEfeKgMF+bvuBqxNoKzXv2w3J84HKv5ERK+gBK54pvlEuaxBJ4lK6gbWOyeZROIS8bZwcgEkY7Z55qbV9eOmXCwJbG4cx+YQr4IGcdMH0qs3hKNtQN+byTzid3+pixnOc/d6+/WptX8NR6xcpPLcumzG0CND07ZIyQfTpS00HrqTy6vNFZpd/wBm3BjMImf5kBTjJBBIORVWXxVAlx5S28hGwEMWUfMY/MA25zjHfpmpn0OaS3+zHVboQlPLMaxxBSuMY+76UkmiT+arx3cTKLf7Owng3EjnnKlcZBxRoGpQufHENsr7rKXKRRyEl1C/MAcZ9sjt37Vf1HXZbOxtbmGya6e4UMIEf94eAflGDnrzUN94Rs7y2MYPlSFVG4ZKAgAEhSeMhQPXAqxe+H4b3TktWbEscSxLOAcjGPQ+1N8oK/Ujm8TQW1hBdzoq+csjALICBtUtjOB6Y6cE0yPxKZ44hFZlppDIQjSqgCo2D8x78jip7rwzp1zEyCIxtsZUZWP7snqw56+vqOKpSeD0mgjglvpCkbSMqiJCMvnJ+YHnBpe6Gptafex6jZxXUSsqSrkBuoqxVPTtPk0+JIjeTTxxxrGquqjGO/AHOMD8KuUnvoNeYUUUUhhRRRQAUUUUAFeI/td/8kwtP+wvB/6Llr26vEf2u/8AkmFp/wBheD/0XLVw+JClsfHwp1NFOrsRgKKcKQUopiFooopgKKKBS0AJRS0UAJS0UUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUtFACUtFFAgooopjCiiigAooooAKKKKBBRRRQAUUUUDCiiigQUUUUAFLRRQAUUUUwCiiigAooooAKKKKACiiigAooooAKKKKACilooAKSlooAKKKKACiiigAooooEFFFFAytRRRUDCiiigYUUUUCCiiloASilooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAopaKAEpaKKACiiigAooooAKKKKACiiigAooooAKKKWgBKWiigAooooAKKKKACiiigAooopgFFFFACHrRQetFACUGlpDSAaaaaeaaaQzV8H/wDI36D/ANhO0/8ARyV+jQ6V+cvg/wD5G/Qf+wnaf+jkr9Gh0rmrbo1gFFFFYlhRQSB1NJuX1H50ALRSbl9R+dG5fUfnQAtFJuX1H50bl9R+dAC0Um5fUfnRuX1H50ALRSbl9R+dG5fUfnQAtFJuX1H50bl9R+dAC0Um5fUfnRuX1H50ALRSbl9R+dG5fUfnQAtFJuX1H50bl9R+dAC0Um5fUfnRuX1H50ALRSbl9R+dG5fUfnQAtFJuX1H50bl9R+dAC0Um5fUfnRuX1H50ALRRRQAV4j+13/yTC0/7C8H/AKLlr26vEf2u/wDkmFp/2F4P/RctXD4kTLY+PhTqaKdXYjEcKUUgpwqhBRRRQAopaQUtABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUtACUUtJQAUtFFABRRRTAKKKKACiiigQUUUUAFFFFABRRRQAUUUtACUUtFABRRRQAUUUUwCiiigAooooAKKKKACiiigAooooAKKKWgBKKWigAooooAKKKKACiiigAooooAKKKKACiiigQUUUUDK1FFFQMKKKWgBKWiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKWgBKWiigAooooAKKKKACiiigAooooAKKKKACiiloASloooASloooAKKKKACiiigAooooAKKKKYBRS0UAJS0UUAFFFFACGig0UAJSGlpKQCGmmnHpTTSGavg/8A5G/Qf+wnaf8Ao5K/RodK/OXwf/yN+g/9hO0/9HJX6NDpXNW3RrAKbIxVRjqTgU6o5fvR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UUUUAFFFFABRRRQBWoooqCgooooAKKKKACiiigAooooAKKKKACiiigAoopaAEoopaACiiigAooooAKKKKACiiigAooooAKKKWgBKKWigAooooAKKKKACiiigAooooAKKKKACiilpgJRS0UAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFACGig9aKACm06kNIBppppxpppMDW8Hf8AI4aD/wBhO0/9HJX6MjpX5zeDv+Rv0H/sJ2n/AKOSv0ZHSuetujaAUUUVgWNaJHOWRSfcUn2eL/nkn5U+ii4DPs8X/PJPyo+zxf8APJPyp9FO4DPs8X/PJPyo+zxf88k/Kn0UXAZ9ni/55J+VH2eL/nkn5U+ii4DPs8X/ADyT8qPs8X/PJPyp9FFwGfZ4v+eSflR9ni/55J+VPoouAz7PF/zyT8qPs8X/ADyT8qfRRcBn2eL/AJ5J+VH2eL/nkn5U+ii4DPs8X/PJPyo+zxf88k/Kn0UXAZ9ni/55J+VH2eL/AJ5J+VPoouAz7PF/zyT8qPs8X/PJPyp9FFwGfZ4v+eSflR9ni/55J+VPoouAz7PF/wA8k/KjyIv+eSflT6KLgAAUYAAHtRRRSAK8R/a6/wCSYWn/AGF4P/Rcte3V4j+11/yTC0/7C8H/AKLlq4fEiZbHx+KdTRTq7UYDhSikFKKYC0UUUAKKKBS0AFFFFABRRRTAKKKKACiiigAooooAKKKKBBRRRQMKKKKBBRRS0AJRRS0wCiiikAUUUUwCiiigAooooAKKKKACiiigAooooAKKWkoAKKWigBKKWigAooooAKKKKBBRRRQMKKKKACiiigQUUUtACUUtFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQBWoooqCgooooAKKKKACiiigAopaSgAopaKAEpaKKACiiigAooooAKKKKACiiigAooooAKKWigBKWiigAooooAKKKKACiiigAooopgFFFFABRS0UAJS0UUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUtFACGkpaKAEpDS0hpANNNNPNNNJgavg/8A5HDQf+wnaf8Ao5K/RkdK/Obwf/yOGg/9hO0/9HJX6MjpXPW6G0AooorAsKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigArxH9rr/kmFp/2F4P/Rcte3V4j+11/wAkwtP+wvB/6Llq4fEiZbHx+KdTRTq7TAcKcKaKcKYBRRRQAopaQUtMAooooAKKKKACiiigQUUUUAFFLSUAFFLRQAUlLRQAUUUUAFFFFMAooooAKKKKACiiigAooooAKKKKACiiloASilooAKKKKACiiigAooooAKKKKACiiigAooooEFFLRQAlFLRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAVqKKKgoKKKKACilooASloooAKKKKACiiigAooooAKKKKACiiigAoopaAEpaKKAEpaKKACiiigAooooAKKKKYBRRS0AJRS0UAJS0UUAJS0UUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFLQAlFLRQAUUUUAFFFFABRRRQAlJSmigBKQ06m0AIaaacaaaQGr4P/5G/Qf+wnaf+jkr9GR0r85vB/8AyN+g/wDYTtP/AEclfoyOlc1boa0wooorA0CiiigAooooAKjkuoInEck0aOeiswBqSsi+0+afUPM2OYjtyVK846cH0P1qopN6iZqefFu2+Ym7O3Gec+lOZ1T7zBe/JrJbSZluBIojILkkZPAIb+pqW+s5HeBlSR9kZX5HA2HAHQ9QRkUWXcLl/wA+LAPmJhsY5656fnTUu7eSTy0njZ/7oYE/lWS2l3BnjGxmjIiDkv1C4OOvGD0wD1PNSWGnzRXpmlSReT82UO7r949T2x6VXLHuK7NTzo9wXzEyTtxnv1xSrLGzbFdS2N2AecetZa6TPBMkkTxkhzg7cYGHwW55OWqSx02W0uTmUtGIRGjjAP3ieR6jPWlZdx3ZpUVQurS6eZGjlLIqbcmQrhv7xAGDmqp0zUVAWO6YHYBvMrH+HBGPc856ikoruFzZoDA5wQccH2rGfTtSZwY7gxLtIVfOZtnX1HPUfTFIml38YfypFj8xiSPNYleV5zjk/KR+NPlXcLmyHUsVDAsOozyKWsBdGvTJKyuIn5xIDyxPuDn9KmfTNQaRVW6Kwh2581twUnp7nFHKu4XNmiscadqZeJ3u8t1fa5ABz2GORjFSfYb0R26CTcIxhv37AsxA+YnHY5496OVdwualFYv9l6iwYG6YfKcYmb5nwcN7DOOOnFaVjBLbxMkrl/nYqSxYhSeBk0mkuoXLFFFFSMKKKKACiiigArxH9rr/AJJhaf8AYXg/9Fy17dXiX7XX/JMLT/sLwf8AouWrh8SJlsfHwp1NFPFdqMBRThSClFMApaKKYAKWgUUCCiiigAooooAKKKKACilooAKSlopgFFFFIAooopgFFFFABRRRQAUUUUAFFFFABRRRQAUUtFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAgooooAKKKWgBKWiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiloASilopgFFFFABRRRQBVopaKzKCiiigAooooAKKKKACiiigAooooAKKKKACilooASloooAKKKKACiiigAooopgFFFFIAoopaYCUUtFACUtFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUtACUtFFABRRRQAUUUUAFFFFABRRRQAUUUUAIetFBooAKSlpKAGmkNKaSkBq+D/+Rv0H/sJ2n/o5K/RgdK/N7Qr1NM13Tb6T7lrdwzt9EkVj/Kv0fikSaNZI2Do4DKw6EHkGuav0NaY6iiisDQKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigArxL9rr/AJJhaf8AYXg/9Fy17bXg37X+pww+BtI01j++utSEqD/ZjjfJ/wDHxV0/iRMtj5LFOFNFPFdpgKKWkpwpgFFFFMQoooFLQAlFLRQAlFLRTASloopAFFFFMAooooAKKKKACiiigAooooAKKKKACiiloASloooAKKKKACiiigAooooAKKKKBBRRRQMKKKKBBRS0UAJS0UUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUwClpKWgBKWiigAooooAKKKKACiiigAooooArUUUVmUFFFFABRRRQAUUUtACUUtFABRRRQAUUUUAFFFFABRRRQAUUUUwCiiloASilooAKSlooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACilooASloooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigANJSmkoAKQ0tFADTTTTzTTSAaRX1P+z58e9OudItPCPiq+S0vrVRDZ3k7YjuIxwqMx4Dgcc8EAd6+WSKaRntUTgpKzKi7H6XBgRkEEHvS5HqK/O7SPiB4v0CAW+leJ9ZsoR0jhu3Cj6AnAq+fjB8RP+h21/8A8CjWHsX3NOc/QLI9RRkeor8/P+FwfET/AKHbX/8AwKNJ/wALg+Iv/Q76/wD+BRo9iw50foJkeooyPUV+ff8AwuD4i/8AQ7a//wCBRo/4XB8Rf+h21/8A8CjS9iw5z9BMj1FGR6ivz6/4XB8Rf+h31/8A8CjR/wALg+Iv/Q7a/wD+BRo9kw5z9Bcj1FGR6ivz7/4XB8RP+h21/wD8CjR/wuD4i/8AQ76//wCBRo9iw5z9BMj1FGR6ivz7/wCFwfET/od9f/8AAo0f8Lg+In/Q76//AOBRo9iw5z9BMj1FGR6ivz7/AOFwfET/AKHbX/8AwKNH/C4PiJ/0O2v/APgUaPYsOc/QTI9RRkeor8+/+FwfET/odtf/APAo0f8AC4PiJ/0O+v8A/gUaPYsOc/QTI9RRkeor8+/+FwfET/odtf8A/Ao0f8Lg+In/AEO+v/8AgUafsWHOj9BMj1FGR6ivz7/4XB8RP+h21/8A8CjR/wALg+In/Q7a/wD+BRo9iw5z9BMj1FGR6ivz7/4XB8RP+h21/wD8CjR/wuD4if8AQ7a//wCBRo9iw5z9BMj1FGR6ivz7/wCFwfET/odtf/8AAo0f8Lg+In/Q7a//AOBRpexYc5+gmR6ijI9RX59/8Lg+In/Q7a//AOBRo/4XB8RP+h21/wD8CjT9iw50foJkeooyPUV+fn/C4PiJ/wBDtr//AIFGj/hb/wARP+h217/wKNHsWHOfoHkeooyPUV+fv/C3/iJ/0O2v/wDgUaD8XviGwIPjXX8H/p6NHsWHOj7r8UeLtE8G6XJqeu6jBY2yA4MjfM5/uqvVj7CviL4v/E65+KPittSKPBp1spgsbduqR5yWbtuY8n0wB2rkNS1bUdauTdanf3d9Of8AlpczNI35knH4VVFawpqOpEpXFFOFIKcK1ICnUlLTAKKKKoQtLRRSAKKKKACiiimAUUUUAFFFFABRRRQAUUUUAFFLRQAlLRRQAUUUUAFFFFABRRRQAUUUUCCiiigYUUUUCCiiloAKSlooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKWigBKKWimAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUtFAFWiiisygoopaAEpaKKACiiigAooooAKKKKYBRRRQAUUUUAFFLRQAlLRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFLQAUlLRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFLQAhpKWkoAKKWigBppDTqQ0ANxSEU4ikpAMIpMU/FJikMZijFOxRikAzFGKdijFFgG4oxTsUYosFxuKMU7FGKLANxRinYpcUWC4zFGKdijFFguNxS4p2KMUWC43FGKdijFFguNxRinYoxRYLjcUYp2KMUWC43FGKdijFFgG4oxTsUuKLAMxS4p2KMU7AJilApcUoFACAU4CjFKBTEApaKWmAtFFLTEJS0UCmAtFFFABRRRQAUUUUAFFFFABRRS0AJRS0UAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUCCiiloASilooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAoopaAEoopaYBRRRQAlLRRQAUUUUAFFFFABRRRQAUUUtACUUtJQAUUtJQAUtFFABSUtFABRRRQBWooorMoKKKKACiiigAooopgFFFFABRS0UAJS0UUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRS0AJS0UUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRS0AJS0UUAFFFFABRRRQAUhpaQigAooooASilooAaRSYp1GKAGYop2KMUgGYoxTsUYoAbijFOxRigBuKMU7FGKAG4oxTsUYoAbijFOxRigBuKMU7FGKAG4oxT8UmKAG4pcU7FGKAG4oxTsUYoAbijFOxRigBuKMU7FGKAG4oxTsUYoAbijFOxS4oAbilxS4opgGKKWloEJSijFLTASilooAKUUgpaYBRRRQAUUtFACUUtJQAtFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAgoopaAEpaKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKYC0lLRQAlLRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRS0AJRS0UAFJS0UAJS0UUAFFFFABRRRQAUUUUAVqKKKzKCiiimAUUUtACUUtFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUtACUUtFACUtFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUtFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFACGilpMUAFFFFABRRRQAYpMUtFACYoxS0UAJijFLRQAmKKWigBKKWloAbijFOooAbRTqKAG0U6jFAhMUYpaMUDExRilxRQITFGKWigBMUYpaMUAJijFLijFACUYpaKAExS4paKYCYpaKKLAFFFFMAoopQKAAUUUtACUtFFABRRRQAUUUUAFFFFABRRRQIKKKKACiiigAoopaAEpaKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACloopgJS0UUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFLQAUlLRQAlLRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQBWopaKgoSloooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiloASloooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKWgBKKWigApKWigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACilooATFJinUUANopcUYpgJRS4oxQAlFLiigBKKWigQUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUtACUUtFACUtFFABRRRTAKKMUUAFFGKMUAFFLijFACUuKKWgBKWiigAooooAKKKKACiiigAooooAKKKKACilooEJRS0UAJS0UUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRS0lMAoopaACkpaKACiiigAooooAKKKKACiiigAooooAKWkooAKKWigBKKWigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACilooAKKKKAK1FFFQUFFFFABRRRQAUUUUAFFFFABRRRQAtJRS0AJRS0UAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFLQAlFLRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUtACUUtFAgooopjCkpaKACiiigAooooEFFFFABRRRQAUUUUAFFLSUALRRRQAUUUUwCiiigAooooAKKKKACiiigAooooAKKKKACiiloASilooAKKKKACiiigAooooAKKKKACiiigQUUUUAFFLSUAFLRRQAlLRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUtFFMBKWiigAooooAKKKKACiiigAooooAKKKKACiiigApaSloASloooAKKKKACiiigAooooAKKKKACiiigAooooAKKKWgBKKWigBKKWigAooooEFFFFABRRRQMrUUUVBQUUUUAFFFFABRRS0AJRS0UAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFLQAlFLRQAlFLRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRS0AJRS0lAC0UUUAFJS0UwCiiigAooooAKKKKBBRRRQMKKKKBBRRS0AJS0UUAFJS0UAFFFFMAooooAKKKKACiiigAooooAKKKKACiiigAopaKAEpaKKACiiigAooooEFFFFAwooooAKKKKBBRRRQAUUtFACUtFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFMApaKKAEopaKACiiigAooooAKKKKACiiigAooooAKKWigApKWkoAWkpaKACkpaKACiiigAooooAKKKKACiiigAooooAKKKKACilooASilooASloooAKKKKBBRRRQAUUUUAFFFFABRRRQBWoooqCwopaKAEpaKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiloASilooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKWkpgFLRRSEFFFFMYUUUUAFFFFABRRRQIKKKKACiiigAopaKAEopaSmAUtJS0gCiiimAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUtFABSUtFABRRRQAUUUUAFFFFABRRRQAUUUUCCiiigAoopaACkpaKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAFpKWigBKWiimAUUUUAFFFFABRRRQAUUUUAFFFFABRRS0AJRRRQAUUtFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUtACUUtFABRRRQAUUUUAFFFFABRRRQAUUUUCCiiigAooooAKKKWgBKKWigCtRRRUFhRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFLQAlFLRQAlLRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRS0AJS0UUAJS0UUwCiiigAooooAKKKKBBRRRQAUUUUAFFFFABRRRQAUUtFABRRRTAKKKKACiiigAooooAKKKKACiiigAooooAKKKWgBKWiigAooooAKKKKACiiigAooooAKKKKBBRRRQAUUUtACUUtFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFLTASilopAJS0UUwCiiigAooooAKKKKACiiigAooooAKKKWgBKKWkoAKKWigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKWgBKWkpaACiiigAooooEFFFFABRRRQAUUUUAFFFFABRRRQAUUUtACUUtFABRRRQAUUUUAFFFFAFaiiioLCiiigAooooAKKKKACiiigAooooAKKKWgBKKWigBKWiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiloASilooASloooEFFFFMYUUUUAFFFFAgooooAKKKKACiiigAooooAKKWigAooooAKKKKYBRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRS0UAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUCCiiloASilooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKWmAlFLRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUtFACUUtFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFLRQAUUUUAFFFFABRRRQIKKKKACiiigAooooAKKKKACiiigAopaKACiiigAooooAKKKKACiiigAooooAKKKKAK1FFFQWFFFFABRRRQAUUUUAFFLRQAlLRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUtFABRSUtAgooopjCiiigAooooEFFFFABRRRQAUUUUAFFFLQAUlLRTASilopAFFFFMAooooAKKKKACiiigAooooAKKKKACiiigAopaKACiiigAooooAKKKKACiiigAooooAKKKKBBRRS0AJRRS0AJS0UUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUwClpKWkAUUUUwCiiigAooooAKKKKACiiigAooooAKKKKAFpKWigBKKWigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKWgBKWiigQUUUUDCiiigQUUUUAFFFFAwooooEFFFFABRRRQAUUtFAxKWiigQUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAFaiiioLCiiloASilooASloooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAopaKACiiigAooooAKKKKYBRRRQAUUUUAFFFFAgooooGFFFLQISiilpgJRS0UAFFFFIAooopgFFFFABRRRQAUUUUAFFFFABRRRQAUUtJQAtFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAgopaKAEpaKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiilpgJS0UUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFLRQAlFLRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABS0UUAJS0UUAFFFFABRRRQIKKKKACiiigAooooAKKKKACiiloASilooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAopaKACiiigAooopgVqKKKzLCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKWgBKWiimAUUlLSAKKKKACiiimAUUUUCCiiigAooooAKKKKACilooASilooAKKKKACiiimAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUtFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAgooooAKWiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigApaSlpgJRS0UAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFLRQAlLRRQAlLRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFLRQAUlLRQIKKKKBhRRRQIKKKKACiiigAooooAKKKKACilpKACilooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAoopaAEopaKYBRRRSAKKKKYBRRRQAUUUUAVqKKKzLCiiigAooooAKKKKACiiigAooooAKKKKAClpKWmAlLRRSAKKKKYgooooAKKKKBhRRRQIKKKKACiiloASiiigBaKKKACiiimAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUtFACUtFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAgooooAKKWigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiimAUUUUgCilopgJS0UUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFLRRQAlLRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFLQAlLRRQAUUUUAFFFFABRRRQIKKKKACiiigAooooAKKWigBKKWigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACilooASilopgFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFLRQBVooorMsKKKKACiiigAoopaAEopaSgBaKKKACiiimAUUUUAFFFFABRRRQAUUUUCCiiigAooooAKWiigAooopgJS0UUgCiiimAUUUUAFFFFABRRRQAUUUUAFFFFABRS0UAFFFFABRRRQAUUUUAFFFFAgooooGFFFFABRRRQIKKWigBKWiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiimAtJS0UAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAC0lLRQAlFLRQAlLRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFLRQAUUUUCCiiigYUUUUCCiiigAooooGFFFFAgooooAKKWigBKWiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACilooAKKKKYBRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABS0UUAFFFFABRRRQBVooorMsKKWigAoopKAFooooAKKKKYBRRRQAUUUUAFFFFAgooooAKKWkoAKWkpaAEopaKYBRRRSAKKKKYBRRRQAUUUUAFFFFABRRRQAUUUUAFFLRQAlLRRQAUUUUAFFFFABRRRQAUUUUCCiiigYUUUtAhKKKWgBKKWigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAoopaYBRRRQAUUUUAFFFFABRRRQAUUUUAFFFLQAlFFFABRRS0AFJS0UAJS0UUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFLSUAFLRRQAUUUUAFFFFAgooooAKKKKACiiigAooooAKKKKACilooASloooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAopaKAEpaKKYBRRRSAKKKKYBRRRQAUUUUAFFFFABRRRQAUUUtABSUtFABRRRQAUUUUAFFFFABRRRQBWoooqCwooopAFFFFABRRRTAKKKKACiiigAooooAKKKKYgooooAKWiigAooopAFFFFMAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKBi0UUUCCiiigAooooEFFFFABRRRQAUUUUAFFFFAC0UUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABS0UUAFFFFMAooooAKKKKACiiigAooooAKKKKACiiigAooooAKWiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKWiigAooooEFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUtFFABRRRQMKKKKBBRRRQAUUUUAFFFFAC0UUUAFFFFABRRRQAUUUUAFFFFMAooooAKKKKACiiigAooooAKKKKAFooooAKKKKACiiigAooooAKKKKACiiigAooooA//9k=" alt="로그인 잠금 화면">
+      <div class="shot-cap">🔒 미로그인 상태에서 대시보드 주소로 접속했을 때 — 로그인 전에는 이 벽만 보입니다</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🚫 로그인에 성공해도, 명단에 없으면 튕겨 나갑니다</h3>
+    <p>여기서 한 겹이 더 있습니다. <b>로그인 자체는 누구나 할 수 있지만</b>(구글 계정은 누구나 있으니까요), 로그인에 성공해도 <b>허가 명단에 이메일이 없으면</b> 「접근 권한이 없는 계정입니다」라는 안내가 뜨고 <b>몇 초 뒤 자동으로 로그아웃</b>됩니다. 데이터는 물론, 대시보드 안으로 단 한 걸음도 들어오지 못합니다.</p>
+    <p style="margin-top:10px">즉 잠금은 「로그인했는가」가 아니라 <b>「허가 명단에 있는가」</b>로 결정됩니다. 로그인은 신원 확인일 뿐이고, <b>실제 문을 여는 것은 명단</b>입니다.</p>
+  </div>
+
+  <div class="card">
+    <h3>📋 그 명단(허가 명단)은 어떻게 관리되나</h3>
+    <p>대시보드를 볼 수 있는 사람은 <b>'허가 명단'에 이메일이 등록된 사람뿐</b>입니다. 이 명단은 구글 금고 안에 별도로 보관되며, 명단에 없는 이메일은 앞서처럼 자동으로 차단됩니다.</p>
+    <p style="margin-top:10px"><b>입·퇴사에 따른 관리도 이 명단에서 이뤄집니다.</b> 새 임직원이 오면 관리자가 이름(이메일)을 명단에 <b>추가</b>하고, <b>퇴사하면 명단에서 삭제</b>합니다. 삭제하는 순간 그 사람은 로그인해도 즉시 차단되어, 더 이상 어떤 데이터도 볼 수 없습니다. 오늘 이경훈 이사를 추가한 것도 이 명단에 이메일 한 줄을 더한 작업입니다.</p>
+  </div>
+</div>
+
+<!-- 3-b. 우회 경로를 어떻게 막았나 (상세) -->
+<div class="sec">
+  <div class="sec-n">핵심 · 데이터 처리와 잠금 규칙</div>
+  <div class="sec-h">데이터를 어떻게 처리하고,<br><b>어떤 규칙으로</b> 막았는지 쉽게 정리했습니다.</div>
+
+  <div class="card">
+    <h3>① 어디를, 왜 새로 잠갔는가</h3>
+    <p>기존에는 데이터를 <b>구글 시트에서 바로 읽어오는 방식</b>이었습니다. 편리했지만, 화면의 로그인과 별개로 <b>데이터 원본 쪽의 접근 통제가 느슨</b>했습니다. 그래서 이번에 <b>데이터를 시트에서 분리해, 구글이 규칙으로 지키는 금고(Firebase)로 옮기고</b>, 그 금고에 「로그인 + 허가 명단」을 통과해야만 열리는 잠금을 걸었습니다.</p>
+    <p style="margin-top:10px">핵심은 <b>데이터가 드나드는 길을 하나로 좁히고, 그 길목을 구글 서버가 지키게 만든 것</b>입니다. 아래에서 그 방법을 구체적으로 설명드립니다.</p>
+  </div>
+
+  <div class="flow">
+    <div class="cap">데이터가 드나드는 길이 이렇게 바뀌었습니다</div>
+    <div class="step"><span class="ic b">📄</span><span class="t"><b>전</b> — 화면이 시트에서 데이터를 직접 읽음 (통제 지점이 흩어져 있음)</span></div>
+    <div class="arrow">↓</div>
+    <div class="step"><span class="ic g">🔒</span><span class="t"><b>후</b> — 화면은 <b>구글 금고를 통해서만</b> 데이터를 받음. 시트로 통하던 옛길은 닫음</span></div>
+    <div class="arrow">↓</div>
+    <div class="step"><span class="ic g">🪪</span><span class="t">금고는 <b>로그인 + 허가 명단</b>을 통과한 사람에게만 데이터를 내어줌</span></div>
+  </div>
+
+  <div class="card">
+    <h3>② 막은 방법 — 데이터를 '규칙이 지키는 금고'로 옮겼습니다</h3>
+    <p>두 가지를 동시에 처리했습니다.</p>
+    <p class="tight" style="margin-top:12px">
+      <b>㉮ 데이터 원본을 화면이 직접 읽지 않게 바꿈</b> — 이제 화면은 시트를 직접 열지 않고, <b>구글 금고(Firebase)를 통해서만</b> 데이터를 받습니다. 시트로 통하던 옛길을 끊었습니다.
+    </p>
+    <p class="tight" style="margin-top:10px">
+      <b>㉯ 그 금고에 '접근 규칙'이라는 잠금 코드를 걸었음</b> — 「로그인했고, 허가 명단에 이름이 있는 사람에게만 데이터를 내어준다」는 규칙을 걸었습니다. 이 규칙이 없으면 금고는 아무것도 내주지 않습니다.
+    </p>
+  </div>
+
+  <div class="analogy">
+    <div class="lb">이 '접근 규칙'이 왜 확실한가</div>
+    <div class="big">잠금 코드가 <em>내 컴퓨터가 아니라 구글 서버 안</em>에 있습니다.</div>
+    <p>보통 앱은 '이 사람 봐도 되나?'를 사용자 컴퓨터에서 판단합니다. 그러면 컴퓨터를 조작해 통과할 수 있습니다. 우리는 그 판단을 <b>구글 서버 내부에</b> 심었습니다. 데이터를 요청하면, 구글이 서버 안에서 「로그인했나 → 명단에 있나」를 직접 확인하고, 통과하지 못하면 <b>데이터를 한 글자도 내보내지 않습니다.</b> 외부인이 우리 코드나 컴퓨터를 아무리 뜯어봐도, 이 판단은 구글 서버 안에서만 일어나므로 <b>손댈 수 없습니다.</b></p>
+  </div>
+
+  <div class="card">
+    <h3>③ 규칙(잠금 코드)은 어디에 있는가</h3>
+    <p>이 규칙은 대시보드 화면 코드가 아니라, <b>구글 Firebase 프로젝트의 '보안 규칙(Security Rules)'</b>이라는 곳에 별도로 저장·적용됩니다. 화면 코드를 통째로 복사해 가도, 이 규칙은 <b>구글 서버에만 있어 함께 딸려 나가지 않습니다.</b> 규칙을 바꿀 수 있는 사람은 프로젝트 관리 권한을 가진 회사 관리자뿐입니다.</p>
+    <p style="margin-top:10px">그리고 마지막으로, <b>데이터 원본 시트의 공개 설정 자체도 「제한됨」으로 닫아</b> 옛 우회 경로를 물리적으로 없앨 예정입니다. (현재 화면 전환은 완료, 시트 공개 차단은 마무리 단계)</p>
+  </div>
+
+  <div class="card">
+    <h3>④ 실제 잠금 규칙 (그대로 보여드립니다)</h3>
+    <p>데이터를 지키는 실제 규칙을 그대로 보여드립니다. 아래는 구글 Firebase 서버에 등록된 잠금 규칙의 핵심이며, <b>파란 글씨</b>가 각 줄의 뜻입니다.</p>
+    <div class="code">
+<pre><span class="cm">// ── 매출·실적 데이터 ──</span>
+match /dashData {
+  allow read: if 로그인함                 <span class="cm">← 로그인한 사람만</span>
+    &amp;&amp; 허가명단에 이메일이 있음           <span class="cm">← 명단에 있어야 함</span>
+  allow write: if false;                 <span class="cm">← 아무도 못 고침(회사 서버만 기록)</span>
+}
+
+<span class="cm">// ── 인사·급여·채용 (경영진 전용) ──</span>
+match /execData {
+  allow read: if 이메일 in [
+    파운더, 엄현호, 신상준,               <span class="cm">← 이 5명</span>
+    김상현, 이경훈                        <span class="cm">   경영진만 열람 가능</span>
+  ];
+  allow write: if false;                 <span class="cm">← 아무도 못 고침</span>
+}</pre>
+    </div>
+    <p style="margin-top:12px"><b>핵심은 세 가지입니다.</b> ① 로그인 안 한 사람은 첫 줄에서 막힘 · ② 명단(또는 경영진)에 없으면 그 다음 줄에서 막힘 · ③ <b>「고치기(write)는 아무도 불가」</b> — 데이터를 몰래 바꾸거나 지울 수 없고, 오직 회사 서버만 기록합니다. 이 판정은 전부 <b>구글 서버 안에서</b> 이뤄집니다.</p>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-n">잠금 구조</div>
+  <div class="sec-h">한 겹이 아니라, <b>네 개의 관문</b>을 차례로 통과해야 합니다</div>
+  <div class="sec-sub">데이터에 닿으려면 아래 네 관문을 모두 지나야 합니다. 하나라도 막히면 그 자리에서 멈춥니다.</div>
+
+  <div class="layers">
+    <div class="layer">
+      <div class="num">1</div>
+      <div class="tx"><b class="h">주소(링크)를 알아야 함</b>
+        <p>대시보드 주소는 <b>검색에 노출되지 않으며</b>, 아는 사람만 접근할 수 있습니다. 주소를 모르면 입구 자체를 찾지 못합니다.</p></div>
+    </div>
+    <div class="layer">
+      <div class="num">2</div>
+      <div class="tx"><b class="h">구글 로그인(본인 인증)</b>
+        <p>입구에 닿아도, 회사가 인정한 <b>구글 계정으로 로그인</b>해야 화면이 열립니다. 비밀번호 관리·부정 로그인 차단은 구글이 전 세계 계정에 적용하는 시스템을 그대로 씁니다.</p></div>
+    </div>
+    <div class="layer">
+      <div class="num">3</div>
+      <div class="tx"><b class="h">허가 명단(Firebase 등록 이메일)</b>
+        <p>로그인에 성공해도, <b>Firebase에 등록된 이메일이 아니면</b> 「접근 권한 없음」으로 튕겨 나갑니다(자동 로그아웃). 로그인은 신원 확인일 뿐, 문을 여는 것은 이 명단입니다.</p></div>
+    </div>
+    <div class="layer">
+      <div class="num">4</div>
+      <div class="tx"><b class="h">데이터 잠금 규칙 (구글 서버가 최종 강제)</b>
+        <p>앞의 셋을 통과해도, 데이터를 실제로 내어줄지는 <b>구글 서버가 규칙으로 최종 판정</b>합니다. 이 판정은 사용자 컴퓨터가 아니라 구글 서버 안에서 이뤄져 조작이 불가능하며, <b>민감도에 따라 또 나뉩니다</b> — 실적은 상담·웹마케팅까지, 인사·급여·채용은 <b>경영진 5인만</b>.</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-n">물음 4 · 소유와 승계</div>
+  <div class="sec-h">「지금 데이터가 담당자 개인 계정에 걸려 있는 것 아닌가?<br>담당자가 바뀌면 어떻게 되나?」</div>
+
+  <div class="ans">
+    <div class="a-lb">답</div>
+    <p>정확한 지적입니다. 현재 일부 데이터 원본이 <b>담당자 개인 구글 계정</b>에 연결되어 있는 것이 사실이며, 이는 소유·승계 측면에서 정리가 필요한 부분입니다.</p>
+    <p>그래서 이 보고와 함께, <b>계정·비밀번호를 파운더님께 이관</b>하여 소유를 명확히 회사로 귀속시키고자 합니다. 데이터·인증·권한은 이미 <b>구글의 회사 프로젝트</b> 위에 있어, 담당자가 바뀌어도 시스템은 그대로 유지됩니다.</p>
+  </div>
+
+  <div class="own">
+    <div class="lb">소유·승계 조치</div>
+    <div class="big">소유는 개인이 아니라 회사입니다.<br>이를 '말'이 아니라 '계정 이관'으로 확정합니다.</div>
+    <p>
+      · <b>데이터·인증·권한</b>은 회사 구글 프로젝트에 귀속 — 담당자 PC나 사적 소유물이 아님<br>
+      · <b>접근 권한</b>은 명단으로 관리 — 입사 시 이름을 더하고, 퇴사 시 삭제 (오늘 이경훈 이사 추가도 이 방식)<br>
+      · 담당자가 바뀌어도 <b>데이터·명단·시스템은 회사에 그대로</b> 남음
+    </p>
+    <div class="give">
+      <div class="gh">🔑 파운더님께 — 소유권 이관</div>
+      <ul>
+        <li>데이터 원본이 연결된 <b>구글 계정 및 비밀번호</b>를 파운더님께 전달</li>
+        <li>파운더님은 이 계정으로 <b>언제든 전체를 열람·통제·회수</b>할 수 있음 — 시스템의 최종 소유·감독권이 회사에 있음을 실물로 확정</li>
+        <li>일상 관리는 담당자가 대행하되, <b>열쇠(계정)의 주인은 회사</b>임</li>
+      </ul>
+    </div>
+    <div class="give" style="margin-top:10px">
+      <div class="gh">📢 경영진 방 — 투명 공유</div>
+      <ul>
+        <li>대시보드 접속 링크와 오늘 <b>이경훈 이사 권한 추가</b> 내역을 경영진 방에 공유</li>
+        <li><b>누가 무엇을 볼 수 있는지 경영진이 상시 확인</b>할 수 있도록 공개 운영</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<div class="summary">
+  <div class="lb">한 장 요약</div>
+  <h2>경영진께 드리는 답</h2>
+  <div class="item"><span class="ck">✓</span><span class="t"><b>화면과 데이터는 다른 장소</b> — 데이터는 Firebase의 <b>접근 규칙(자물쇠)</b>과 <b>gate 인증(열쇠)</b>을 통과해야만 열림.</span></div>
+  <div class="item"><span class="ck">✓</span><span class="t"><b>AI는 만드는 도구일 뿐</b> — AI는 화면을 그리는 공구였고, 데이터는 우리가 설계한 <b>접근 규칙</b>이 서버 단에서 막아섭니다.</span></div>
+  <div class="item"><span class="ck">✓</span><span class="t"><b>주요 침입 경로를 직접 점검</b> — 우회 접속·로그인 건너뛰기·데이터 직접 호출·비인가 로그인을 시도해 차단 확인. 새 위험은 계속 보완.</span></div>
+  <div class="item"><span class="ck">✓</span><span class="t"><b>4단계 관문</b> — 주소 · 로그인 · 허가 명단 · 서버 규칙을 모두 통과해야 함. 실적은 상담·웹마케팅까지, 인사·채용은 경영진 5인만.</span></div>
+  <div class="item"><span class="ck">✓</span><span class="t"><b>소유는 회사</b> — 이를 확정하기 위해 담당자 <b>계정·비밀번호를 파운더님께 이관</b>합니다.</span></div>
+</div>
+
+<div class="foot">
+  본 문서는 경영진 대상 데이터 보안 보고 자료입니다.<br>
+  <b>기술 용어는 비유로 옮겼으며, 실제 구현은 업계 표준(구글 Firebase 인증·서버 접근 규칙)을 따릅니다.</b>
+</div>
+
+</div>
+</body>
+</html>
