@@ -28,10 +28,15 @@
     +'#agate .m.err{color:#E23A22}#agate .m.wait{color:#8A97AC}'
     +'#agate .f{margin-top:20px;font-size:11px;color:#B6C2DC;font-weight:600}';
 
-  var HTML='<div class="c"><div class="lg">🔒</div><div class="t">아라온 스태티즈</div>'
-    +'<div class="s">사내 임직원 전용 대시보드입니다.<br>등록된 계정으로 로그인해 주세요.</div>'
+  // [2026-09] 페이지별 문구 지정 — 페이지 head에 window.GATE_CFG={title,sub,foot} 넣으면 덮어씀. 없으면 기본(스태티즈).
+  var _gc=(window.GATE_CFG||{});
+  var _gTitle=_gc.title||'아라온 스태티즈';
+  var _gSub=_gc.sub||'사내 임직원 전용 대시보드입니다.<br>등록된 계정으로 로그인해 주세요.';
+  var _gFoot=_gc.foot||'문의: 신상준 이사 · crocedu@naver.com';
+  var HTML='<div class="c"><div class="lg">🔒</div><div class="t">'+_gTitle+'</div>'
+    +'<div class="s">'+_gSub+'</div>'
     +'<button class="b" id="agBtn"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1Z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23Z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84Z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38Z"/></svg>Google로 로그인</button>'
-    +'<div class="m" id="agMsg"></div><div class="f">문의: 신상준 이사 · crocedu@naver.com</div></div>';
+    +'<div class="m" id="agMsg"></div><div class="f">'+_gFoot+'</div></div>';
 
   function mount(){
     if(document.getElementById('agate')) return;
