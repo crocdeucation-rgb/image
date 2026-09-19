@@ -114,11 +114,16 @@
   });
   // [2026-09] 보안 세션 UI — 단독 접속 시 상단 배지 + 로그인 직후 인증 토스트
   var GATE_NAME={'032100jesus@gmail.com':'오동근','christuhm@gmail.com':'엄현호','crocdeucation@gmail.com':'신상준','kanghansara@gmail.com':'김사라','thestudydesign@gmail.com':'김상현','loityr123@gmail.com':'이경훈'};
+  var GATE_RANK={'032100jesus@gmail.com':'파운더님','christuhm@gmail.com':'대표이사','crocdeucation@gmail.com':'이사','kanghansara@gmail.com':'경영총괄','thestudydesign@gmail.com':'이사','loityr123@gmail.com':'이사'};
   var _gateSecDone=false;
   function gateSecUI(u){
     if(window.self!==window.top) return;      // switcher iframe 안이면 스킵(부모가 이미 표시)
     if(_gateSecDone) return; _gateSecDone=true;
-    var nm=GATE_NAME[(u.email||'').toLowerCase()]||(u.email||'').split('@')[0];
+    var em=(u.email||'').toLowerCase();
+    var nm=GATE_NAME[em]||(u.email||'').split('@')[0];
+    var rk=GATE_RANK[em]||'';
+    var nmrk=nm+(rk?' '+rk:'');
+    var isFounder=(em==='032100jesus@gmail.com');   // 파운더 전용 연출
     // CSS
     var css=document.createElement('style');
     css.textContent='#gSessBar{position:fixed;top:0;left:0;right:0;z-index:99997;background:#0F1626;color:#dfe6f2;'
@@ -133,12 +138,24 @@
       +'padding:18px 26px;border-radius:14px;font-size:14px;font-weight:700;display:flex;align-items:center;gap:10px;opacity:0;pointer-events:none;'
       +'box-shadow:0 12px 40px rgba(0,0,0,.3);transition:opacity .3s,transform .3s;font-family:Pretendard,sans-serif}'
       +'#gSecToast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}'
-      +'#gSecToast .gt-ic{width:26px;height:26px;border-radius:50%;background:#12b886;display:flex;align-items:center;justify-content:center;font-size:15px}';
+      +'#gSecToast .gt-ic{width:26px;height:26px;border-radius:50%;background:#12b886;display:flex;align-items:center;justify-content:center;font-size:15px}'
+      +'#gSessBar.founder{background:linear-gradient(90deg,#1a1408,#2e2410,#1a1408);border-bottom:1px solid #6b5416}'
+      +'#gSessBar.founder .gs-dot{background:#f5c518;box-shadow:0 0 0 0 rgba(245,197,24,.6);animation:gsPulseGold 2s infinite}'
+      +'@keyframes gsPulseGold{0%{box-shadow:0 0 0 0 rgba(245,197,24,.6)}70%{box-shadow:0 0 0 7px rgba(245,197,24,0)}100%{box-shadow:0 0 0 0 rgba(245,197,24,0)}}'
+      +'#gSessBar.founder b{color:#f5c518} #gSessBar.founder{color:#f0e4c0}'
+      +'#gSecToast.founder{background:linear-gradient(135deg,#241c08,#3a2e10);border:1px solid #6b5416}'
+      +'#gSecToast.founder .gt-ic{background:#f5c518;color:#241c08}';
     document.head.appendChild(css);
     // 상단 배너
     var bar=document.createElement('div'); bar.id='gSessBar';
-    bar.innerHTML='<span class="gs-dot"></span><span>🔒 <b>'+nm+'</b>님 · 보안 세션 활성</span>'
-      +'<button class="gs-out" onclick="try{firebase.auth().signOut();location.reload();}catch(e){}">로그아웃</button>';
+    if(isFounder){
+      bar.className='founder';
+      bar.innerHTML='<span class="gs-dot"></span><span>👑 <b>'+nmrk+'</b> · 최고 권한 접속</span>'
+        +'<button class="gs-out" onclick="try{firebase.auth().signOut();location.reload();}catch(e){}">로그아웃</button>';
+    } else {
+      bar.innerHTML='<span class="gs-dot"></span><span>🔒 <b>'+nmrk+'</b> · 보안 세션 활성</span>'
+        +'<button class="gs-out" onclick="try{firebase.auth().signOut();location.reload();}catch(e){}">로그아웃</button>';
+    }
     document.body.appendChild(bar); document.body.classList.add('gate-hasbar');
     // 인증 토스트 — 세션당 1회만 (새로고침 시 반복 안 뜸)
     var _seen=false;
@@ -146,7 +163,12 @@
     if(!_seen){
       try{ sessionStorage.setItem('gateSecToast','1'); }catch(e){}
       var t=document.createElement('div'); t.id='gSecToast';
-      t.innerHTML='<span class="gt-ic">✓</span><span>경영진 인증 완료 · 보안 세션 시작</span>';
+      if(isFounder){
+        t.className='founder';
+        t.innerHTML='<span class="gt-ic">👑</span><span>'+nm+' 파운더님, 환영합니다 · 최고 권한</span>';
+      } else {
+        t.innerHTML='<span class="gt-ic">✓</span><span>경영진 인증 완료 · 보안 세션 시작</span>';
+      }
       document.body.appendChild(t);
       requestAnimationFrame(function(){ t.classList.add('show'); });
       setTimeout(function(){ t.classList.remove('show'); },1800);
