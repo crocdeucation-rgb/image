@@ -1,5 +1,9 @@
 <!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>쌤IDA 프로젝트</title>
+<script>window.GATE_CFG={title:'경영진 전용 · 쌤이다',sub:'등록된 경영진 계정으로만 열람할 수 있습니다.<br>Google 계정으로 로그인해 주세요.',foot:'문의 · 신상준 이사'}</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="gate.js"></script>
+<title>쌤이다 프로젝트</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <style>
 :root{--ink:#1B2436;--soft:#6B7688;--line:#E7ECF3;--bg:#F1F4F9}
@@ -68,11 +72,24 @@ body{background:var(--bg);font-family:'Pretendard',sans-serif;color:var(--ink);p
 .item .tx b{font-weight:800}
 .item .tx .memo{display:block;font-size:11px;color:#98A4B6;font-weight:500;margin-top:1px}
 .item.done .tx{color:#8A94A6}
+.docsec{margin-top:26px}
+.docsec-hd{font-size:14px;font-weight:800;color:#3A4557;display:flex;align-items:center;gap:9px;margin-bottom:11px}
+.docsec-lock{font-size:10.5px;font-weight:700;color:#8A6D0F;background:#faf3df;border:1px solid #ecd9a3;border-radius:20px;padding:3px 9px;letter-spacing:-.2px}
+.docsec-card{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #E4E9F0;border-left:3px solid #4C6EF5;border-radius:13px;padding:17px 19px;text-decoration:none;color:inherit;transition:.14s}
+.docsec-card:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(15,22,35,.08);border-left-color:#3B5BDB}
+.dc-ic{flex:none;width:40px;height:40px;border-radius:11px;background:#eaf0fe;color:#3B5BDB;display:flex;align-items:center;justify-content:center;font-size:20px}
+.dc-body{flex:1;min-width:0}
+.dc-tt{font-size:14.5px;font-weight:800;letter-spacing:-.3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dc-cnt{font-size:10px;font-weight:800;color:#fff;background:#4C6EF5;border-radius:5px;padding:2px 6px}
+.dc-ds{font-size:12.5px;color:#5A6478;margin-top:4px;line-height:1.5}
+.dc-note{font-size:11px;color:#98A4B6;margin-top:5px;font-weight:500}
+.dc-arrow{flex:none;color:#C4C4C4;font-size:18px;transition:.14s}
+.docsec-card:hover .dc-arrow{color:#3B5BDB;transform:translateX(2px)}
 .ft{text-align:center;font-size:11px;color:#B6C2DC;font-weight:600;margin-top:22px;line-height:1.7}
 </style></head><body>
 <div class="wrap">
 <div class="hd">
-  <h1>🚀 쌤IDA 프로젝트</h1>
+  <h1>🚀 쌤이다 프로젝트</h1>
   <div class="sub">신사업 구축 진행판 · <b>4개 영역</b> · 기존 아라 업무와 별개 · <span id="today"></span> 기준</div>
 </div>
 
@@ -81,24 +98,37 @@ body{background:var(--bg);font-family:'Pretendard',sans-serif;color:var(--ink);p
 <div class="sumbar" id="sumbar"></div>
 <div class="areas" id="areas"></div>
 
+<div class="docsec">
+  <div class="docsec-hd">📎 설계 · 기획 문서 <span class="docsec-lock">🔒 경영진 전용</span></div>
+  <a class="docsec-card" href="https://drive.google.com/drive/folders/1KpFnQUkVEuOAVYaTitwStNJ-evLeSkhv?usp=drive_link" target="_blank" rel="noopener">
+    <div class="dc-ic">📁</div>
+    <div class="dc-body">
+      <div class="dc-tt">쌤이다 설계 문서 모음 <span class="dc-cnt">4건</span></div>
+      <div class="dc-ds">강사 정산 설계서 · 정산 실제화면 · 계약/약관 분석 · 화면/채널 설계서</div>
+      <div class="dc-note">엄현호 이사 기획 · 대외비 드라이브 폴더 (등록 경영진만 열람)</div>
+    </div>
+    <div class="dc-arrow">→</div>
+  </a>
+</div>
+
 <div class="ft">각 담당자가 별도 신사업으로 진행 중 · 기존 아라 업무(면접·상담·매출)는 전체실적·증원현황 탭 참조</div>
 </div>
 
 <script>
-// ── 쌤IDA 프로젝트 데이터 (하드코딩 · 매주 갱신) ──
+// ── 쌤이다 프로젝트 데이터 (하드코딩 · 매주 갱신) ──
 // status: done(완료) / doing(진행중) / plan(예정·기획중) / talk(협의중) / review(심사중)
-var OPEN_DATE = '2026-10-01';   // 1차 오픈 목표 (파운더님 지시)
+var OPEN_DATE = '2026-10-10';   // 1차 오픈 목표 (10/10~12, 9/19 변경)
 var AREAS = [
   { key:'web', ic:'🎨', nm:'브랜딩 · 프론트엔드', who:'김상현 이사',
     groups:[
       { hd:'완료', items:[
-        {st:'done', t:'쌤IDA 사이트 1차 제작'},
+        {st:'done', t:'쌤이다 사이트 1차 제작'},
         {st:'done', t:'아이스캔 사이트 1차 제작'},
-        {st:'done', t:'쌤IDA 인허가 표찰·포스터 설치'},
+        {st:'done', t:'쌤이다 인허가 표찰·포스터 설치'},
         {st:'done', t:'네이버 브랜드검색 2학기 대비 변경'}
       ]},
       { hd:'진행중', items:[
-        {st:'doing', t:'쌤IDA 사이트 보완', due:'9/19', memo:'가격·메뉴 정리, 수행평가·대입 내용 추가, 최종 (참고: 에듀플렉스/상상코칭/이지수능)'},
+        {st:'doing', t:'쌤이다 사이트 보완', due:'9/19', memo:'가격·메뉴 정리, 수행평가·대입 내용 추가, 최종 (참고: 에듀플렉스/상상코칭/이지수능)'},
         {st:'doing', t:'아이스캔 사이트', due:'9/25', memo:'연혁 수정, 실제 이미지 추가'},
         {st:'doing', t:'카페 바이럴', memo:'오디플랜 모니터링, 댓글 기획 3건, 네이버 미노출 문제제기'}
       ]},
@@ -111,15 +141,19 @@ var AREAS = [
       { hd:'진행중', items:[
         {st:'doing', t:'가입 파이프라인', memo:'방문장등록 → 결과입력 → 회원정보 → 가입링크 → 회원가입 → 매칭 → 아이디오픈 → 선생님 배정'},
         {st:'doing', t:'openWCMS 사업부 결과입력', memo:'외부 접근 가능하게 (기존 아라 방식)'},
-        {st:'doing', t:'쌤IDA CMS 어드민 구축'}
+        {st:'doing', t:'쌤이다 CMS 어드민 구축'}
       ]},
       { hd:'예정', items:[
+        {st:'plan', t:'강사 중심 정산 시스템', memo:'강사별 수업·매출 기반 자동 정산 (9/19 신규)'},
+        {st:'plan', t:'강사 급여체계 구축', memo:'정산 연동 급여 산정 체계 (9/19 신규)'},
+        {st:'plan', t:'자체 메신저 · 자율 통제', memo:'자체 메신저로 입장 등 강사 자율 통제 시스템 구축 (9/19 신규)'},
         {st:'plan', t:'관리자강사 권한 레벨 추가', memo:'대표강사 어드민 접근 (기존 강사=본인 수업만)'},
         {st:'plan', t:'배정조율 개인 스케줄만 노출', memo:'타 사업부 방문·미배정 숨김'},
         {st:'plan', t:'전자계약서 API 연결', memo:'유캔싸인 → 타 업체 교체(사장님 지시), 업체 선정 필요'}
       ]},
       { hd:'논의·협의', items:[
-        {st:'talk', t:'KISPG 결제', memo:'3·6개월 무이자(반값 수수료) / 카드 직접입력 단점 → 에스크로 협의 예정'},
+        {st:'talk', t:'결제 업체 재선정', memo:'기존 KISPG(키스정보통신)가 카카오페이·네이버페이 미지원 → 간편결제 되는 타 업체 물색 중'},
+        {st:'talk', t:'키스·메신저 검토', memo:'키스 및 자체 메신저 관련은 강사단 쪽에서 알아보기로'},
         {st:'review', t:'알림톡 채널', memo:'외부 API 연동·심사, 친구추가 없이 발송 (solapi 등)'},
         {st:'talk', t:'고객센터 운영', memo:'운영시간 12시~7시 검토 / 카톡 응대 / 강사 핸드폰 직접 연결'}
       ]}
@@ -147,7 +181,7 @@ var AREAS = [
         {st:'plan', t:'광고 크리에이티브', memo:'캠페인별 소재·문구·후킹 기획 (기말저격·비평준화·5단계루틴 등 — 캠페인마다 무→유)'}
       ]},
       { hd:'그로스 인프라 1차 (기획중)', items:[
-        {st:'plan', t:'전환 퍼널 구축', memo:'상세페이지 → 픽셀 설치 → GTM 연결 → 리드 요약(쌤IDA CRM) → 유입 알림톡 → 카톡 응대'}
+        {st:'plan', t:'전환 퍼널 구축', memo:'상세페이지 → 픽셀 설치 → GTM 연결 → 리드 요약(쌤이다 CRM) → 유입 알림톡 → 카톡 응대'}
       ]},
       { hd:'그로스 인프라 2차 (기획중)', items:[
         {st:'plan', t:'캠페인 운영·최적화', memo:'캠페인별 소재 A/B, 예산 배분, ROAS 관리 (기존 아라 방식)'}
@@ -164,9 +198,9 @@ function render(){
   var ddayCls = dleft<0?'over':dleft<=7?'urgent':'';
   var ddayTxt = dleft>0?('D-'+dleft):dleft===0?'D-DAY':('D+'+(-dleft));
   document.getElementById('dday').innerHTML=
-    '<div class="dday-box '+ddayCls+'"><div class="dl"><span class="dgoal">🎯 1차 오픈 목표</span><span class="ddate">'+(od.getMonth()+1)+'월 '+od.getDate()+'일 오픈</span></div>'
+    '<div class="dday-box '+ddayCls+'"><div class="dl"><span class="dgoal">🎯 1차 오픈 목표</span><span class="ddate">10월 10~12일 오픈</span></div>'
    +'<div class="dcnt">'+ddayTxt+'</div>'
-   +'<div class="dnote">파운더님 지시 · 전 영역 10/1 오픈 목표로 총력 대응</div></div>';
+   +'<div class="dnote">파운더님 지시 · 전 영역 10/10~12 오픈 목표로 총력 대응</div></div>';
   // 전체 집계
   var tot={done:0,doing:0,plan:0};
   AREAS.forEach(function(a){ a.groups.forEach(function(g){ g.items.forEach(function(it){
