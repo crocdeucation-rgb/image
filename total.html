@@ -2065,11 +2065,32 @@ function showSessionBar(u){
   if(!nav) return;
   var nm=(_me&&_me.name)?_me.name:(u.email||'').split('@')[0];
   var rk=(_me&&_me.rank)?_me.rank:'';
+  var isF=((u.email||'').toLowerCase()==='032100jesus@gmail.com');
+  // 프로필 칩 (이름·직급 표시)
+  var chip=document.createElement('span');
+  chip.id='soloChip'; chip.className='solo-chip'+(isF?' founder':'');
+  chip.innerHTML='<span class="sc-av">'+(isF?'👑':(nm||'?').charAt(0))+'</span>'
+    +'<span class="sc-nm">'+nm+(rk?'<span class="sc-rk">'+rk+'</span>':'')+'</span>';
+  // 로그아웃 버튼
   var btn=document.createElement('button');
   btn.id='soloOut'; btn.className='tnav-btn';
-  btn.title='로그아웃 ('+nm+(rk?' '+rk:'')+')';
+  btn.title='로그아웃';
   btn.onclick=function(){ try{firebase.auth().signOut();location.reload();}catch(e){} };
   btn.innerHTML='<svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg><span>로그아웃</span>';
+  // 스타일 (1회)
+  if(!document.getElementById('soloChipCss')){
+    var st=document.createElement('style'); st.id='soloChipCss';
+    st.textContent='.solo-chip{display:inline-flex;align-items:center;gap:7px;padding:4px 10px 4px 4px;background:#F3F5F9;border:1px solid #E4E9F0;border-radius:20px;margin-right:6px;vertical-align:middle}'
+      +'.solo-chip .sc-av{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#4C6EF5,#7048E8);color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center}'
+      +'.solo-chip .sc-nm{font-size:12.5px;font-weight:800;color:#1B2436;letter-spacing:-.3px}'
+      +'.solo-chip .sc-rk{font-size:10.5px;font-weight:600;color:#8A97AC;margin-left:3px}'
+      +'.solo-chip.founder{background:#faf3d8;border-color:#ecd9a3}'
+      +'.solo-chip.founder .sc-av{background:linear-gradient(135deg,#f5c518,#c99a06);color:#241c08}'
+      +'.solo-chip.founder .sc-nm{color:#a07d08} .solo-chip.founder .sc-rk{color:#b8942a}'
+      +'@media(max-width:600px){.solo-chip .sc-nm{display:none}}';
+    document.head.appendChild(st);
+  }
+  nav.appendChild(chip);
   nav.appendChild(btn);
 }
 _fauth.onAuthStateChanged(function(u){
