@@ -1041,6 +1041,8 @@ function updateAsOfLabel(D, isLive){
       var mx=window.__ledgerMax||0;   // YYYYMMDD
       if(mx>0){ var mo=Math.floor(mx/100)%100, dy=mx%100; window.__asOfMx=mo*100+dy;
         el.innerHTML='📅 <b style="color:#4C6EF5">'+mo+'월 '+dy+'일</b>까지 반영 · 매일 갱신';
+      } else {
+        el.innerHTML='<span style="color:#94a0b8">집계 전 · 원장 갱신 대기</span>';   // [2026-09] 원장 최신일 없으면 오늘로 위장 금지
       }
     }).catch(function(){});
   }catch(e){}
@@ -3004,9 +3006,15 @@ async function fdLoadLedger(){
   all.forEach(function(r){ var k=r.key+'|'+r.sang+'|'+r.student+'|'+r.sales+'|'+r.state; if(!seen[k]){seen[k]=1;dedup.push(r);} });
   window.__ledger=dedup;
   // [2026-09] 기준일(최신일)은 오늘까지만 — 미래 완납예정일(12월 등)이 기준일 오염 방지
+  //   ★ 폴백을 오늘 날짜로 넣으면 원장이 비었을 때 "오늘까지 반영"이라 거짓 표시됨(2026-09 버그).
+  //     order 매출이 실제 있는 마지막 날만 기준일로 삼는다. 없으면 0(라벨 미표시).
   var _now=new Date(); var _todayKey=_now.getFullYear()*10000+(_now.getMonth()+1)*100+_now.getDate();
-  window.__ledgerMax=dedup.reduce(function(mx,r){return (r.key<=_todayKey && r.key>mx)?r.key:mx;},0);
-  if(!window.__ledgerMax) window.__ledgerMax=_todayKey;   // 폴백
+  window.__ledgerMax=dedup.reduce(function(mx,r){
+    // 실제 order 매출이 있는 행만 기준일 후보 (결보·빈행은 제외)
+    var hasOrder=(r.state==='order' && r.sales>0);
+    return (hasOrder && r.key<=_todayKey && r.key>mx)?r.key:mx;
+  },0);
+  // 폴백 제거: __ledgerMax가 0이면 라벨 쪽에서 미표시 처리 (오늘 날짜로 위장 금지)
   return dedup;
 }
 /* 조직 판별 → 표시 그룹키 */
