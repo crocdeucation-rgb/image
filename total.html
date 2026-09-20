@@ -271,6 +271,8 @@ body.is-live .closed-only{display:none !important}
 .pcard{width:400px;max-width:100%;background:#fff;border-radius:20px;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 20px 60px rgba(15,20,34,.4);position:relative;animation:pcpop .22s cubic-bezier(.2,.9,.3,1.2)}
 @keyframes pcpop{from{transform:translateY(14px) scale(.97);opacity:0}to{transform:none;opacity:1}}
 .pc-close{position:sticky;top:10px;z-index:20;width:30px;height:30px;margin:10px 12px -40px auto;flex-shrink:0;border-radius:50%;background:rgba(27,36,54,.42);border:1px solid rgba(255,255,255,.45);color:#fff;font-size:16px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center}
+.pc-back{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));left:16px;z-index:10001;padding:8px 14px 8px 11px;border-radius:20px;background:rgba(27,36,54,.72);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;line-height:1;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.pc-back:hover{background:rgba(27,36,54,.9)}
 .pc-hd{padding:28px 20px 22px;position:relative;overflow:hidden;text-align:center}
 .pc-hd.t-A,.pc-hd.t-B{background:linear-gradient(135deg,#4C6EF5,#5C7CFA)}
 .pc-hd.t-C,.pc-hd.t-D,.pc-hd.t-E,.pc-hd.t-F{background:linear-gradient(135deg,#7A8699,#95A0B2)}
@@ -1771,6 +1773,7 @@ window.loadMonth = loadMonth;
 </script>
 <!-- ②-a  </body> 앞에 붙일 MODAL HTML ─────────────────────────── -->
 <div class="pc-modal-bg" id="pcModal" onclick="if(event.target===this)closeCard()">
+  <button class="pc-back" id="pcBack" onclick="cardBack()" style="display:none">‹ 뒤로</button>
   <div class="pcard" id="pcBody"></div>
 </div>
 
@@ -2790,7 +2793,18 @@ function openCard(name, forceF){
   // [역할탭] 상담/사업 개인카드 — 겸직이면 상단 탭. useF면 사업, 아니면 상담 활성
   try{ _injectRoleTabs(name, (f.useF?'saup':'sang')); }catch(e){}
 }
-function closeCard(){ window.__pcEdit=false; window.__ecEdit=false; window.__ocForceD=null; document.getElementById('pcModal').classList.remove('on'); try{ parent.postMessage({t:'cardClose'}, '*'); }catch(e){} document.body.style.overflow=''; window.__curCardName=null; if(window.__likeUnsub){window.__likeUnsub();window.__likeUnsub=null;} if(window.__cmtUnsub){window.__cmtUnsub();window.__cmtUnsub=null;} pcRestoreScroll(); }
+function closeCard(){
+  window.__cardStack = [];   // [2026-09] 완전히 닫을 땐 스택 비우기
+  if(typeof _updateBackBtn==='function') _updateBackBtn();
+  window.__pcEdit=false; window.__ecEdit=false; window.__ocForceD=null; document.getElementById('pcModal').classList.remove('on'); try{ parent.postMessage({t:'cardClose'}, '*'); }catch(e){} document.body.style.overflow=''; window.__curCardName=null; if(window.__likeUnsub){window.__likeUnsub();window.__likeUnsub=null;} if(window.__cmtUnsub){window.__cmtUnsub();window.__cmtUnsub=null;} pcRestoreScroll(); }
+/* [2026-09] 카드 뒤로가기 — 스택에 이전 카드가 있으면 그 카드로 복귀 */
+window.cardBack=function(){
+  if(window.__cardStack && window.__cardStack.length){
+    var prev = window.__cardStack.pop();
+    if(_reopenCard(prev)){ _updateBackBtn(); return; }
+  }
+  closeCard();   // 스택 비었으면 그냥 닫기
+};
 
 // [2026-09] 개인카드 연도 토글 — 그 연도 personCards로 강제 세팅 후 카드 재렌더.
 //   2025는 __D2025(연간 완성본) / 2026은 __liveD. openCard가 __ocForceD를 우선 참조함.
@@ -3386,16 +3400,52 @@ var EXEC_CARD={
 };
 window.__ecEdit=false;
 function isExec(name){ return !!EXEC_CARD[name]; }
+/* [2026-09] 뒤로 버튼 표시 갱신 — 스택에 이전 카드가 있을 때만 노출 */
+function _updateBackBtn(){
+  var b=document.getElementById('pcBack'); if(!b) return;
+  b.style.display = (window.__cardStack && window.__cardStack.length) ? '' : 'none';
+}
+window._updateBackBtn=_updateBackBtn;
+/* [2026-09] 카드 히스토리 스택 — 댓글로 다른 카드 이동 시 이전 카드 기억, 닫으면 복귀 */
+window.__cardStack = window.__cardStack || [];
+// 현재 열린 카드를 {name, type}으로 반환 (복귀용)
+function _curCardEntry(){
+  var nm = window.__curCardName;
+  if(!nm) return null;
+  if(isExec(nm)) return {name:nm, type:'exec'};
+  // 지점 카드인지: branchTrend에 이름이 있으면 지점
+  var isBr = !!(window.__DK && window.__DK.branchTrend && (window.__DK.branchTrend.branches||[]).some(function(b){return b.name===nm;}));
+  if(isBr) return {name:nm, type:'branch'};
+  return {name:nm, type:'person'};
+}
+// 스택에 쌓인 카드 하나를 다시 연다
+function _reopenCard(entry){
+  if(!entry) return false;
+  window.__ecEdit=false;
+  if(entry.type==='exec' && isExec(entry.name)){ openExecCard(entry.name); return true; }
+  if(entry.type==='branch'){ openBranchCard(entry.name); return true; }
+  var f=(typeof pcFind==='function')?pcFind(entry.name):null;
+  if(f){ openCard(entry.name); return true; }
+  return false;
+}
 /* [2026-09] 댓글 작성자 클릭 → 그 사람 카드로 이동 (경영진→헌정 / 지사·지점장→지점 / 그외→개인) */
 window.openCardByName=function(name){
   if(!name) return;
+  if(name===window.__curCardName) return;   // 같은 카드면 무시
   window.__ecEdit=false;
-  if(isExec(name)){ openExecCard(name); return; }
+  // 이동 대상 카드가 실제로 열릴 수 있는지 먼저 확인 (없는 카드로 이동하면 스택 안 쌓음)
+  var willOpen = isExec(name)
+    || ((typeof _headBranchOf==='function') && _headBranchOf(name))
+    || ((typeof pcFind==='function') && pcFind(name));
+  if(!willOpen) return;   // 실적 카드 없는 직원 — 조용히 무시
+  // 현재 카드를 스택에 저장 (복귀용)
+  var cur = _curCardEntry();
+  if(cur && cur.name!==name) window.__cardStack.push(cur);
+  if(isExec(name)){ openExecCard(name); _updateBackBtn(); return; }
   var _bt=(typeof _headBranchOf==='function')?_headBranchOf(name):null;
-  if(_bt){ openBranchCard(_bt); return; }
+  if(_bt){ openBranchCard(_bt); _updateBackBtn(); return; }
   var f=(typeof pcFind==='function')?pcFind(name):null;
-  if(f){ openCard(name); return; }
-  // 실적 카드가 없는 직원 — 조용히 무시(알림 팝업 없이)
+  if(f){ openCard(name); _updateBackBtn(); return; }
 };
 window.openExecCard=function(name){
   var d=EXEC_CARD[name]; if(!d) return;
