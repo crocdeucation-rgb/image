@@ -328,29 +328,49 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   .kpis{grid-template-columns:repeat(2,1fr) !important}
 }
 
-/* [2026-09] 모바일 가로 스와이프 — 좁은 화면(폴드8 접힘 등)에서 KPI·소재 갤러리를
-   세로로 주욱 늘어놓지 않고 옆으로 넘겨 보게 한다. 넓은 화면(폴드8 펼침·태블릿·PC)은
-   원래 그리드 그대로. 폭 기준이라 가로/세로 모드가 자동 전환된다. */
+/* [2026-09 v2] 모바일 레이아웃 재설계
+   - KPI·요약: 스와이프 X → 2열 그리드로 다 보이게 (핵심지표는 한눈에)
+   - 소재표(1행=1소재 카드)·이미지 갤러리: 가로 스와이프로 옆으로 넘김
+   폭 기준이라 폴드8 접힘/펼침 자동 전환. */
 @media(max-width:560px){
-  /* KPI: 가로 스크롤 캐러셀, 카드가 안 눌리게 폭 고정 */
+  /* KPI: 2열 그리드로 다 보이게 (스와이프 아님) */
   .kpis{
-    display:flex !important;
-    grid-template-columns:none !important;
-    overflow-x:auto;
+    display:grid !important;
+    grid-template-columns:repeat(2,1fr) !important;
+    gap:8px;
+  }
+  .kpis>.kpi{max-width:none}
+  /* 요약 4칸도 2열 그리드 */
+  .thisweek .tw-grid{
+    display:grid !important;
+    grid-template-columns:repeat(2,1fr) !important;
+    gap:8px;
+  }
+  .thisweek .tw-grid>.tw-cell{max-width:none}
+
+  /* 소재표(swipe 지정)만: 1행=1소재를 가로 스와이프 카드로 */
+  .tbl-scroll.swipe.cards{
+    overflow-x:auto !important;
     scroll-snap-type:x mandatory;
     -webkit-overflow-scrolling:touch;
-    gap:10px;
     padding-bottom:8px;
-    margin-left:-4px;margin-right:-4px;padding-left:4px;padding-right:4px;
   }
-  .kpis::-webkit-scrollbar{height:4px}
-  .kpis::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:4px}
-  .kpis>.kpi{
-    flex:0 0 76%;      /* 한 화면에 1.3장 정도 — 옆에 다음 카드가 살짝 보여 스와이프 유도 */
-    max-width:76%;
+  .tbl-scroll.swipe.cards::-webkit-scrollbar{height:4px}
+  .tbl-scroll.swipe.cards::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);border-radius:4px}
+  .tbl.swipe.cards tbody{
+    display:flex !important;
+    gap:10px;
+  }
+  .tbl.swipe.cards tr{
+    flex:0 0 82%;       /* 한 소재 카드 82% — 옆 소재 살짝 보여 스와이프 유도 */
+    max-width:82%;
     scroll-snap-align:start;
+    margin-bottom:0 !important;
+    align-self:flex-start;
   }
-  /* 소재 갤러리도 동일하게 가로 스와이프 (원본 이미지 폭발 방지) */
+  .tbl.swipe.cards tr.sum{background:#f7f9fc;border-color:#d8e0ee}
+
+  /* 이미지 갤러리: 가로 스와이프 */
   .gal{
     display:flex !important;
     grid-template-columns:none !important;
@@ -361,31 +381,12 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
     padding-bottom:8px;
   }
   .gal::-webkit-scrollbar{height:4px}
-  .gal::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:4px}
+  .gal::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);border-radius:4px}
   .gal>.gcard{
-    flex:0 0 70%;
-    max-width:70%;
+    flex:0 0 62%;
+    max-width:62%;
     scroll-snap-align:start;
   }
-  /* tw-grid(요약 4칸)도 가로 스와이프로 통일 */
-  .thisweek .tw-grid{
-    display:flex !important;
-    grid-template-columns:none !important;
-    overflow-x:auto;
-    scroll-snap-type:x mandatory;
-    -webkit-overflow-scrolling:touch;
-    gap:10px;
-    padding-bottom:6px;
-  }
-  .thisweek .tw-grid::-webkit-scrollbar{height:4px}
-  .thisweek .tw-grid::-webkit-scrollbar-thumb{background:rgba(76,110,245,.25);border-radius:4px}
-  .thisweek .tw-grid>.tw-cell{
-    flex:0 0 72%;
-    max-width:72%;
-    scroll-snap-align:start;
-  }
-  /* 스와이프 힌트 — 캐러셀임을 알리는 작은 안내 */
-  .kpis::after,.gal::after{content:none}
 }
 /* 소재 갤러리 이미지가 원본 크기로 터지지 않게 — 모든 갤러리 공통 상한 */
 .gal>.gcard img,.gal>.gcard .gimg img{max-width:100%;height:auto;display:block}
@@ -1503,7 +1504,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   <div class="knote" style="margin-bottom:12px">
     이번 주는 <b>새로 올린 소재가 없습니다.</b> 위너테스트 세트(한 캠페인 안에서 소재들이 예산을 두고 경쟁하는 구조) 안에서 <b>반응이 죽은 소재를 정지</b>하고, 메타가 예산을 몰아준 검증 소재만 남겼습니다. 소재를 계속 늘리기보다 세트가 지저분해지면 정리해 <b>깨끗한 경쟁 풀을 유지</b>하는 것이 2026 운용 원칙입니다. 분모는 2주차 소재 광고비(메타 9/7~12 실측), 분자는 그 소재로 <b>이번 주 들어온 리드(신청 9/7~13)</b>가 만든 매출입니다.
   </div>
-  <div class="tbl-scroll"><table class="tbl">
+  <div class="tbl-scroll swipe"><table class="tbl swipe">
     <thead><tr><th class="l">소재</th><th class="l">상태</th><th class="r">광고비</th><th class="r">리드</th><th class="r">CPL</th><th class="r">CPM</th><th class="r">CTR</th><th class="r">빈도</th><th class="r">코호트 오더</th><th class="r">코호트 매출</th><th class="r">ROAS 코호트</th></tr></thead>
     <tbody>
       <tr><td class="l"><b>노트릴스 재편집</b></td><td class="l"><span class="badge b-best">위너</span></td><td class="r">2,324,209</td><td class="r">68</td><td class="r">34,180</td><td class="r">35,789</td><td class="r">1.77%</td><td class="r">1.58</td><td class="r">1</td><td class="r">7,803,000</td><td class="r"><b>3.36</b></td></tr>
@@ -1729,7 +1730,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   <div class="knote" style="margin-bottom:12px">
     소재는 위너테스트 세트(한 캠페인 안 경쟁 구조) + 노트릴스 영상 + 방학점검으로 운용했습니다. 분모는 소재별 메타 광고비(9/14~19 실측), 분자는 그 소재로 <b>이번 주 들어온 리드(신청 9/14~20)</b>가 만든 매출입니다. 리드·CPL은 노션 DB 기준(메타 lead 필드는 1.6~1.7배 과대).
   </div>
-  <div class="tbl-scroll"><table class="tbl">
+  <div class="tbl-scroll swipe"><table class="tbl swipe">
     <thead><tr><th class="l">소재</th><th class="l">상태</th><th class="r">광고비</th><th class="r">리드</th><th class="r">CPL</th><th class="r">CPM</th><th class="r">CTR</th><th class="r">코호트 오더</th><th class="r">코호트 매출</th><th class="r">결제일 오더</th><th class="r">결제일 매출</th><th class="r">ROAS 결제일</th></tr></thead>
     <tbody>
       <tr><td class="l"><b>노트릴스 재편집</b></td><td class="l"><span class="badge b-best">위너</span></td><td class="r">2,280,890</td><td class="r">49</td><td class="r">46,549</td><td class="r">43,636</td><td class="r">1.73%</td><td class="r">3</td><td class="r">13,294,000</td><td class="r"><b>5</b></td><td class="r"><b>21,386,000</b></td><td class="r"><b>9.38</b></td></tr>
