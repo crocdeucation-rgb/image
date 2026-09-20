@@ -654,6 +654,9 @@ body.is-live .closed-only{display:none !important}
 .pc-cmt b{font-weight:800;color:#1B2436;margin-right:5px}
 .pc-cmt .tx{color:#3A4456}
 .pc-cmt .del{color:#B6C2DC;font-size:11px;cursor:pointer;margin-left:5px;flex-shrink:0}
+.cmt-open{cursor:pointer}
+.cmt-open:hover{opacity:.7;text-decoration:underline;text-underline-offset:2px}
+.king-cmt .cmt-open:hover,.founder-cmt .cmt-open:hover{text-decoration:none;opacity:.8}
 .pc-cmt-in{display:flex;gap:7px}
 .pc-cmt-in input{flex:1;border:1px solid #E3E8F0;border-radius:20px;padding:8px 13px;font-family:inherit;font-size:12.5px;outline:none}
 .pc-cmt-in input:focus{border-color:#4C6EF5}
@@ -3383,6 +3386,17 @@ var EXEC_CARD={
 };
 window.__ecEdit=false;
 function isExec(name){ return !!EXEC_CARD[name]; }
+/* [2026-09] 댓글 작성자 클릭 → 그 사람 카드로 이동 (경영진→헌정 / 지사·지점장→지점 / 그외→개인) */
+window.openCardByName=function(name){
+  if(!name) return;
+  window.__ecEdit=false;
+  if(isExec(name)){ openExecCard(name); return; }
+  var _bt=(typeof _headBranchOf==='function')?_headBranchOf(name):null;
+  if(_bt){ openBranchCard(_bt); return; }
+  var f=(typeof pcFind==='function')?pcFind(name):null;
+  if(f){ openCard(name); return; }
+  // 실적 카드가 없는 직원 — 조용히 무시(알림 팝업 없이)
+};
 window.openExecCard=function(name){
   var d=EXEC_CARD[name]; if(!d) return;
   window.__curCardName=name;
@@ -3615,6 +3629,16 @@ function renderSocial(name){
     +'<div class="pc-cmts" id="pcCmts"></div>'
     +(canWrite?'<div class="pc-cmt-in"><input id="pcCmtInput" placeholder="'+name+'님께 한마디..." onkeydown="if(event.key===\'Enter\')pcAddComment()"><button onclick="pcAddComment()">등록</button></div>':'')
     +loginRow;
+  // [2026-09] 댓글 작성자 클릭 → 그 사람 카드 (이벤트 위임, 한 번만 바인딩)
+  var _cmtsBox=document.getElementById('pcCmts');
+  if(_cmtsBox && !_cmtsBox.__openBound){
+    _cmtsBox.__openBound=true;
+    _cmtsBox.addEventListener('click',function(e){
+      var t=e.target.closest('[data-open]'); if(!t)return;
+      if(e.target.closest('.del'))return;   // 삭제 버튼은 제외
+      var nm=t.getAttribute('data-open'); if(nm && window.openCardByName) window.openCardByName(nm);
+    });
+  }
   // 좋아요 실시간
   if(window.__likeUnsub)window.__likeUnsub();
   window.__likeUnsub=_fdb.collection('cardLikes').doc(name).onSnapshot(function(doc){
@@ -3643,7 +3667,7 @@ function renderSocial(name){
       // 파운더 = 격이 다른 헌정 (최상위)
       if(c.rank==='파운더'){
         return '<div class="pc-cmt founder-cmt"><div class="fc-crown">♔</div>'
-          +'<div class="fc-body"><div class="fc-nm">'+(c.name||'')+' <span class="fc-rk">FOUNDER</span></div>'
+          +'<div class="fc-body"><div class="fc-nm cmt-open" data-open="'+pcEsc(c.name||'')+'">'+(c.name||'')+' <span class="fc-rk">FOUNDER</span></div>'
           +'<div class="fc-tx">'+pcEsc(c.text)+'</div></div>'+_delH+'</div>';
       }
       // 이달 1위 = 왕관(달리는 중) / 2위 = 추격 중
@@ -3654,11 +3678,11 @@ function renderSocial(name){
       else if(c.name===_saup2){ _kt='saup'; _klbl='사업 2위 추격 중'; }
       if(_kt){
         var _ic = _rank1 ? '👑' : '🔥';
-        return '<div class="pc-cmt king-cmt king-'+_kt+(_rank1?'':' king-2nd')+'"><span class="kc-crown">'+_ic+'</span>'+avatarMini(c.name,22)
-          +'<div class="kc-body"><div class="kc-nm">'+(c.name||'')+(c.rank?' '+c.rank+'님':'')+' <span class="kc-rk">'+_klbl+'</span></div>'
+        return '<div class="pc-cmt king-cmt king-'+_kt+(_rank1?'':' king-2nd')+'"><span class="kc-crown">'+_ic+'</span><span class="cmt-open" data-open="'+pcEsc(c.name||'')+'">'+avatarMini(c.name,22)+'</span>'
+          +'<div class="kc-body"><div class="kc-nm cmt-open" data-open="'+pcEsc(c.name||'')+'">'+(c.name||'')+(c.rank?' '+c.rank+'님':'')+' <span class="kc-rk">'+_klbl+'</span></div>'
           +'<div class="kc-tx">'+pcEsc(c.text)+'</div></div>'+_delH+'</div>';
       }
-      return '<div class="pc-cmt">'+avatarMini(c.name,22)+'<div class="cmt-body"><b>'+(c.name||'익명')+(c.rank?' '+c.rank+'님':'')+'</b><span class="tx">'+pcEsc(c.text)+'</span></div>'+_delH+'</div>';
+      return '<div class="pc-cmt"><span class="cmt-open" data-open="'+pcEsc(c.name||'')+'">'+avatarMini(c.name,22)+'</span><div class="cmt-body"><b class="cmt-open" data-open="'+pcEsc(c.name||'')+'">'+(c.name||'익명')+(c.rank?' '+c.rank+'님':'')+'</b><span class="tx">'+pcEsc(c.text)+'</span></div>'+_delH+'</div>';
     }).join('')||'<div style="font-size:12px;color:#B6C2DC">첫 응원을 남겨보세요</div>'; }
   },function(e){console.warn('cmt snap',e);});
 }
