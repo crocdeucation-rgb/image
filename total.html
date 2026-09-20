@@ -3000,7 +3000,11 @@ async function fdLoadLedger(){
     fsLoad('ledger-2026').catch(function(){return {rows:[]};}),
     fsLoad('ledger-2025').catch(function(){return {rows:[]};})
   ]);
-  var all=fdRowsToObjs(results[0].rows).concat(fdRowsToObjs(results[1].rows));
+  // [2026-09] 연도 교차 오염 차단 — ledger-2026은 2026 데이터만, ledger-2025는 2025 데이터만.
+  //   (월종결_2025 시트에 2026-09 날짜가 잘못 박혀 total 기준일이 9/21로 오염되던 버그)
+  var y26=fdRowsToObjs(results[0].rows).filter(function(r){ return r.dt && r.dt.y===2026; });
+  var y25=fdRowsToObjs(results[1].rows).filter(function(r){ return r.dt && r.dt.y===2025; });
+  var all=y26.concat(y25);
   // 중복 제거 (혹시 종결월이 데일리에도 남아있을 때) — 날짜+상담+학생+매출 키
   var seen={}, dedup=[];
   all.forEach(function(r){ var k=r.key+'|'+r.sang+'|'+r.student+'|'+r.sales+'|'+r.state; if(!seen[k]){seen[k]=1;dedup.push(r);} });
