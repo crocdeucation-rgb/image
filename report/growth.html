@@ -333,6 +333,19 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
    - 소재표(1행=1소재 카드)·이미지 갤러리: 가로 스와이프로 옆으로 넘김
    폭 기준이라 폴드8 접힘/펼침 자동 전환. */
 @media(max-width:560px){
+  /* 근본 원인: .wrap 좌우 패딩 40px + .thisweek 20px 이 화면 폭을 먹어
+     카드가 좁아지고 좌우 여백이 과했다. 모바일에선 패딩을 확 줄여 폭을 회복. */
+  .wrap{padding:16px 12px 48px !important}
+  .thisweek{padding:14px 12px !important}
+  .kpis{gap:8px !important}
+}
+@media(max-width:400px){
+  .wrap{padding:14px 10px 40px !important}
+  .thisweek{padding:12px 10px !important}
+  .tw-cell{padding:13px 12px !important}
+  .kpi{padding:13px 12px !important}
+}
+@media(max-width:560px){
   /* KPI: 2열 그리드로 다 보이게 (스와이프 아님) */
   .kpis{
     display:grid !important;
