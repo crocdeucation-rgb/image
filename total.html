@@ -1809,6 +1809,60 @@ window.loadMonth = loadMonth;
 .gd-tro-item{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#3A4456;background:#F7F9FC;border:1px solid #EAEFF6;border-radius:9px;padding:6px 11px}
 .gd-tro-item .i{font-size:15px}
 .gd-note{font-size:11px;color:#B6C2DC;font-weight:600;margin-top:10px;line-height:1.5}
+/* ══════ 경영진 헌정 카드 (EXEC CARD) ══════ */
+.ec-card{position:relative;border-radius:20px;padding:32px 26px 26px;display:flex;flex-direction:column;color:#f3f5f8}
+.ec-card.founder{background:radial-gradient(120% 80% at 50% -10%,rgba(201,165,92,.10),transparent 55%),linear-gradient(168deg,#100d09,#1a140c 48%,#0c0a07);border:1px solid #3a2f18;box-shadow:0 30px 80px rgba(0,0,0,.6),inset 0 1px 0 rgba(201,165,92,.15)}
+.ec-card.founder::before{content:'';position:absolute;inset:0;border-radius:20px;pointer-events:none;background:repeating-linear-gradient(90deg,rgba(201,165,92,.03) 0 1px,transparent 1px 3px);opacity:.5}
+.ec-card.exec{background:linear-gradient(168deg,#161b24,#1e2530 52%,#141922);border:1px solid #313a48;box-shadow:0 24px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(168,178,192,.10)}
+.ec-crown{font-size:10.5px;font-weight:800;letter-spacing:3px;margin-bottom:18px;display:flex;align-items:center;gap:7px;position:relative;z-index:1}
+.ec-card.founder .ec-crown{color:#c9a55c}
+.ec-card.exec .ec-crown{color:#8b98ac}
+.ec-crown .d{width:5px;height:5px;border-radius:50%}
+.ec-card.founder .ec-crown .d{background:#c9a55c;box-shadow:0 0 8px rgba(201,165,92,.8)}
+.ec-card.exec .ec-crown .d{background:#8b98ac}
+.ec-av{width:88px;height:88px;border-radius:50%;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800;overflow:hidden;position:relative;z-index:1}
+.ec-card.founder .ec-av{background:linear-gradient(145deg,#2a2110,#15100a);color:#c9a55c;box-shadow:0 0 0 1px #4a3a1c,0 0 0 5px rgba(201,165,92,.12),0 10px 30px rgba(0,0,0,.5)}
+.ec-card.exec .ec-av{background:linear-gradient(145deg,#28303d,#1a212b);color:#c3cad6;box-shadow:0 0 0 1px #3d4756,0 0 0 5px rgba(168,178,192,.08)}
+.ec-av img{width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.ec-av .ec-cam{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);cursor:pointer}
+.ec-av .ec-cam svg{width:26px;height:26px;fill:none;stroke:#fff;stroke-width:1.6}
+.ec-av .ec-cam input{display:none}
+.ec-name{font-size:22px;font-weight:800;color:#f3f5f8;letter-spacing:-.6px;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;position:relative;z-index:1}
+.ec-rank{font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;letter-spacing:.2px}
+.ec-card.founder .ec-rank{background:rgba(201,165,92,.12);color:#c9a55c;border:1px solid rgba(201,165,92,.28)}
+.ec-card.exec .ec-rank{background:rgba(168,178,192,.10);color:#a8b6cc;border:1px solid rgba(168,178,192,.22)}
+.ec-title{font-size:14.5px;font-weight:800;margin-top:11px;text-align:center;letter-spacing:-.2px;position:relative;z-index:1}
+.ec-card.founder .ec-title{color:#d9bd7e}
+.ec-card.exec .ec-title{color:#c3d0e4}
+.ec-sub{font-size:12px;margin-top:5px;text-align:center;font-weight:500;line-height:1.45;position:relative;z-index:1}
+.ec-card.founder .ec-sub{color:rgba(217,189,126,.5)}
+.ec-card.exec .ec-sub{color:rgba(195,208,228,.45)}
+.ec-status{font-size:12.5px;font-weight:600;text-align:center;margin-top:12px;position:relative;z-index:1}
+.ec-card.founder .ec-status{color:#d9bd7e}
+.ec-card.exec .ec-status{color:#b8c6de}
+.ec-rule{height:1px;margin:20px 0 16px;position:relative;z-index:1}
+.ec-card.founder .ec-rule{background:linear-gradient(90deg,transparent,rgba(201,165,92,.3),transparent)}
+.ec-card.exec .ec-rule{background:linear-gradient(90deg,transparent,rgba(168,178,192,.2),transparent)}
+.ec-lines{display:flex;flex-direction:column;gap:8px;position:relative;z-index:1}
+.ec-line{display:flex;align-items:flex-start;gap:12px;padding:9px 2px}
+.ec-ic{flex-shrink:0;width:19px;height:19px;margin-top:1px}
+.ec-card.founder .ec-ic{color:#b89148}
+.ec-card.exec .ec-ic{color:#7e8ea6}
+.ec-tx{display:flex;flex-direction:column;gap:2px;min-width:0}
+.ec-tx b{font-size:13px;font-weight:700;color:#eef1f5;letter-spacing:-.2px}
+.ec-tx span{font-size:11.5px;font-weight:500;line-height:1.4}
+.ec-card.founder .ec-tx span{color:rgba(230,220,200,.5)}
+.ec-card.exec .ec-tx span{color:rgba(200,210,228,.5)}
+.ec-edit{margin-top:20px;border-radius:9px;padding:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:7px;background:transparent;width:100%;position:relative;z-index:1}
+.ec-card.founder .ec-edit{border:1px solid rgba(201,165,92,.3);color:#c9a55c}
+.ec-card.exec .ec-edit{border:1px solid rgba(168,178,192,.25);color:#a8b6cc}
+.ec-editbox{margin-top:16px;position:relative;z-index:1}
+.ec-editbox label{display:block;font-size:11px;font-weight:700;color:#8b98ac;margin-bottom:6px}
+.ec-se{display:flex;gap:8px}
+.ec-se input{flex:1;min-width:0;background:rgba(255,255,255,.05);border:1px solid rgba(168,178,192,.25);border-radius:8px;padding:9px 11px;color:#f3f5f8;font-family:inherit;font-size:13px}
+.ec-se button{border:none;border-radius:8px;padding:0 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;background:#a8b6cc;color:#141922}
+.ec-card.founder .ec-se button{background:#c9a55c;color:#1a140c}
+.ec-done{margin-top:10px;width:100%;border-radius:9px;padding:10px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff}
 </style>
 
 
@@ -1834,7 +1888,11 @@ function profilesStart(){
       var m={}; qs.forEach(function(d){ var v=d.data()||{};
         m[d.id]={photoURL:v.photoURL||'', statusMsg:v.statusMsg||''}; });
       window.__profiles=m;
-      if(window.__curCardName) pcApplyProfile(window.__curCardName);
+      if(window.__curCardName){
+        if(typeof EXEC_CARD!=='undefined' && EXEC_CARD[window.__curCardName]){
+          if(!window.__ecEdit) openExecCard(window.__curCardName);  // [2026-09] 헌정카드 사진·상태 실시간 반영 (편집중엔 스킵)
+        } else pcApplyProfile(window.__curCardName);
+      }
       // [2026-09] 프로필(사진) 로드/변경 → 순위표 썸네일도 갱신
       if(window.__D && typeof renderAll==='function' && !window.__profReRendered){
         window.__profReRendered=true;
@@ -2729,7 +2787,7 @@ function openCard(name, forceF){
   // [역할탭] 상담/사업 개인카드 — 겸직이면 상단 탭. useF면 사업, 아니면 상담 활성
   try{ _injectRoleTabs(name, (f.useF?'saup':'sang')); }catch(e){}
 }
-function closeCard(){ window.__pcEdit=false; window.__ocForceD=null; document.getElementById('pcModal').classList.remove('on'); try{ parent.postMessage({t:'cardClose'}, '*'); }catch(e){} document.body.style.overflow=''; window.__curCardName=null; if(window.__likeUnsub){window.__likeUnsub();window.__likeUnsub=null;} if(window.__cmtUnsub){window.__cmtUnsub();window.__cmtUnsub=null;} pcRestoreScroll(); }
+function closeCard(){ window.__pcEdit=false; window.__ecEdit=false; window.__ocForceD=null; document.getElementById('pcModal').classList.remove('on'); try{ parent.postMessage({t:'cardClose'}, '*'); }catch(e){} document.body.style.overflow=''; window.__curCardName=null; if(window.__likeUnsub){window.__likeUnsub();window.__likeUnsub=null;} if(window.__cmtUnsub){window.__cmtUnsub();window.__cmtUnsub=null;} pcRestoreScroll(); }
 
 // [2026-09] 개인카드 연도 토글 — 그 연도 personCards로 강제 세팅 후 카드 재렌더.
 //   2025는 __D2025(연간 완성본) / 2026은 __liveD. openCard가 __ocForceD를 우선 참조함.
@@ -3257,17 +3315,134 @@ window.toggleNav=function(e){ if(e)e.stopPropagation(); document.getElementById(
 document.addEventListener('click',function(e){ var nv=document.getElementById('topnav'); if(nv&&nv.classList.contains('open')&&!nv.contains(e.target)) nv.classList.remove('open'); });
 /* 메뉴 항목 누르면 드롭다운 닫기 (모바일) */
 function navClose(){ var nv=document.getElementById('topnav'); if(nv)nv.classList.remove('open'); }
+/* ══════ 경영진 헌정 카드 (EXEC CARD) [2026-09] ══════ */
+/* 실적판이라 경영진은 실적 카드가 없음 → "내 카드" 클릭 시 헌정 카드 표시.
+   본인이면 사진(myUploadPhoto)·상태메시지(mySaveStatus) 편집 재사용, profiles/{이름} 공용. */
+var _ecIcon={
+ crown:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l4 4 5-7 5 7 4-4-2 11H5z"/></svg>',
+ dine:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3v7a3 3 0 006 0V3M7 3v18M17 3c-1.5 0-3 2-3 5s1 4 3 4 3-1 3-4-1.5-5-3-5zM17 12v9"/></svg>',
+ brief:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2M3 12h18"/></svg>',
+ book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 012-2h12v18H6a2 2 0 01-2-2zM8 3v16"/></svg>',
+ cafe:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13v5a4 4 0 01-4 4H8a4 4 0 01-4-4zM17 9h2a2 2 0 010 4h-2M6 3v2M10 3v2M14 3v2"/></svg>',
+ golf:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v14M12 3l6 3-6 3"/><circle cx="12" cy="20" r="1.5"/></svg>',
+ design:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/><path d="M7 7l3 3M17 7l-3 3M7 17l3-3M17 17l-3-3"/></svg>',
+ building:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h.01M14 7h.01M9 11h.01M14 11h.01M9 15h.01M14 15h.01M9 21v-3h6v3"/></svg>',
+ chart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M8 15l3-4 3 2 4-6"/></svg>',
+ cash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>',
+ rocket:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15c-1 2-1 4-1 4s2 0 4-1M9 11a10 10 0 018-6c1 0 2 0 2 0s0 1 0 2a10 10 0 01-6 8l-4-4zM15 9l0 0"/><circle cx="15" cy="9" r="1"/></svg>',
+ panel:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v16"/></svg>',
+ link:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 005.66 0l3-3a4 4 0 00-5.66-5.66l-1 1M14 10a4 4 0 00-5.66 0l-3 3a4 4 0 105.66 5.66l1-1"/></svg>',
+ server:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="7" rx="1.5"/><rect x="3" y="13" width="18" height="7" rx="1.5"/><path d="M7 7.5h.01M7 16.5h.01"/></svg>',
+ chat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 01-11.5 7.2L4 20l1-4.3A8 8 0 1121 12z"/></svg>',
+ target:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>',
+ ai:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="7" width="14" height="12" rx="2"/><path d="M9 7V4M15 7V4M9 13h.01M15 13h.01M2 12h3M19 12h3"/></svg>',
+ film:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M7 4v5M17 4v5M7 20v-5M17 20v-5"/></svg>',
+ phone:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg>',
+ globe:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 010 18M12 3a15 15 0 000 18"/></svg>',
+ search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>',
+ tag:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9-9 9zM12 8v8M8 12h8"/></svg>'
+};
+var EXEC_CARD={
+ '오동근':{rank:'파운더',tier:'founder',title:'오스페이스그룹 창립자',sub:'무(無)에서 유(有)를 만들어낸 리더',
+  lines:[
+   {i:'dine',t:'외식사업',d:'오스테리아 오스 · 오스치킨 · 파티오스 · 카페오스'},
+   {i:'brief',t:'프랜차이즈 컨설팅',d:'오스페이스 컴퍼니'},
+   {i:'book',t:'온라인 교육',d:'아라온스쿨 · 공부밥'},
+   {i:'building',t:'스터디카페',d:'디플레이스'},
+   {i:'golf',t:'골프 교육 · 레저',d:'오스페이스 골프스튜디오 · 골프존파크 운정'},
+   {i:'design',t:'디자인 · 인테리어',d:'오스페이스 플래닝'}
+  ]},
+ '엄현호':{rank:'대표이사',tier:'exec',title:'판매 · 확장 총괄',sub:'인투에듀 대표이사',
+  lines:[
+   {i:'building',t:'조직',d:'직영 5 · 독립 3 지점 / 상담 53 · 방문 21'},
+   {i:'chart',t:'채용 · 확장',d:'통합 채용체계 · 정예 80명'},
+   {i:'cash',t:'매출 · 영업',d:'전사 영업 총괄'},
+   {i:'rocket',t:'신사업',d:'쌤이다 사업 총괄'}
+  ]},
+ '이경훈':{rank:'이사 · EBIZ',tier:'exec',title:'시스템 · 운영 총괄',sub:'EBIZ',
+  lines:[
+   {i:'panel',t:'운영센터',d:'전사 운영 · 취소 관리'},
+   {i:'link',t:'가입 파이프라인',d:'방문 → 가입 → 배정 전 과정'},
+   {i:'server',t:'쌤이다 시스템',d:'CMS 어드민 · 강사 정산 · 급여체계'},
+   {i:'chat',t:'인프라',d:'자체 메신저 · 전자계약'}
+  ]},
+ '신상준':{rank:'이사 · CGO',tier:'exec',title:'그로스 총괄',sub:'퍼포먼스 · AI · 바이럴',
+  lines:[
+   {i:'target',t:'퍼포먼스 광고',d:'기획 · 운영 · 데이터'},
+   {i:'ai',t:'AI 그로스',d:'Claude 기반 자동화 · 대시보드'},
+   {i:'film',t:'바이럴',d:'아라온스쿨 · 쌤이다 콘텐츠 CF'},
+   {i:'phone',t:'채널',d:'SNS · 유튜브'}
+  ]},
+ '김상현':{rank:'이사 · CCO',tier:'exec',title:'브랜딩 · 프론트엔드',sub:'브랜드 자산 총괄',
+  lines:[
+   {i:'globe',t:'웹',d:'쌤이다 · 아이스캔 사이트 제작'},
+   {i:'search',t:'브랜드검색',d:'네이버 브랜드검색 운영'},
+   {i:'cafe',t:'카페 바이럴',d:'모니터링 · 댓글 기획'},
+   {i:'tag',t:'오프라인',d:'인허가 표찰 · 포스터'}
+  ]}
+};
+window.__ecEdit=false;
+function isExec(name){ return !!EXEC_CARD[name]; }
+window.openExecCard=function(name){
+  var d=EXEC_CARD[name]; if(!d) return;
+  window.__curCardName=name;
+  var _esc=function(t){return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');};
+  var isF=d.tier==='founder';
+  var _isMe=!!(_me && _me.name===name);
+  var _editing=_isMe && window.__ecEdit;
+  var pr=(window.__profiles&&window.__profiles[name])||{};
+  var photo=pr.photoURL||'', status=pr.statusMsg||'';
+  var _camSvg='<svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
+  // 아바타 내용: 사진 > 이니셜(파운더는 왕관)
+  var avInner = photo ? '<img src="'+_esc(photo)+'" alt="">' : (isF?_ecIcon.crown:name.charAt(0));
+  var camHtml = _editing ? '<label class="ec-cam" title="사진 수정">'+_camSvg+'<input type="file" accept="image/*" onchange="myUploadPhoto(this)"></label>' : '';
+  var lines=d.lines.map(function(l){
+    return '<div class="ec-line"><span class="ec-ic">'+(_ecIcon[l.i]||'')+'</span><span class="ec-tx"><b>'+_esc(l.t)+'</b><span>'+_esc(l.d)+'</span></span></div>';
+  }).join('');
+  // 상태메시지 표시 (있을 때만)
+  var statusHtml = status ? '<div class="ec-status">“'+_esc(status)+'”</div>' : '';
+  // 편집 블록
+  var editBlock='';
+  if(_editing){
+    editBlock='<div class="ec-editbox"><label>상태메시지</label>'
+      +'<div class="ec-se"><input id="myStatusInput" maxlength="40" placeholder="예: 무에서 유를" value="'+_esc(status)+'"><button onclick="mySaveStatus()">저장</button></div></div>'
+      +'<button class="ec-done" onclick="window.__ecEdit=false;openExecCard(\''+name.replace(/'/g,"")+'\')">완료</button>';
+  } else if(_isMe){
+    editBlock='<button class="ec-edit">'+_camSvg.replace('<svg','<svg style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8"')+'&nbsp;프로필 편집</button>';
+  }
+  var html='<div class="ec-card '+d.tier+'">'
+   +'<div class="ec-crown"><span class="d"></span>'+(isF?'FOUNDER':'EXECUTIVE')+'</div>'
+   +'<div class="ec-av">'+avInner+camHtml+'</div>'
+   +'<div class="ec-name">'+_esc(name)+'<span class="ec-rank">'+_esc(d.rank)+'</span></div>'
+   +'<div class="ec-title">'+_esc(d.title)+'</div><div class="ec-sub">'+_esc(d.sub)+'</div>'
+   +statusHtml
+   +'<div class="ec-rule"></div>'
+   +'<div class="ec-lines">'+lines+'</div>'
+   +editBlock
+   +'</div>';
+  document.getElementById('pcBody').innerHTML=html;
+  // "프로필 편집" 버튼에 핸들러 (edit 진입)
+  if(_isMe && !_editing){
+    var eb=document.getElementById('pcBody').querySelector('.ec-edit');
+    if(eb) eb.onclick=function(){ window.__ecEdit=true; openExecCard(name); };
+  }
+  document.getElementById('pcModal').classList.add('on');
+  document.body.style.overflow='hidden';
+  try{ parent.postMessage({t:'cardOpen'}, '*'); }catch(e){}
+};
+
 function updateMyCardBtn(){
   var btn=document.getElementById('myCardBtn'); if(!btn) return;
   if(!_me){ btn.classList.add('hidden'); return; }
   btn.classList.remove('hidden');
   var lbl=btn.querySelector('span');
   var f=pcFind(_me.name);
-  if(f){ btn.classList.remove('dim'); if(lbl)lbl.textContent='내 카드'; }
+  if(f || isExec(_me.name)){ btn.classList.remove('dim'); if(lbl)lbl.textContent='내 카드'; }  // [2026-09] 경영진=헌정카드
   else { btn.classList.add('dim'); if(lbl)lbl.textContent='카드 준비중'; }
 }
 window.openMyCard=function(){
   if(!_me){ if(window.pcLogin)pcLogin(); return; }
+  if(isExec(_me.name)){ window.__ecEdit=false; openExecCard(_me.name); return; }  // [2026-09] 경영진 → 헌정카드
   var _bt=_headBranchOf(_me.name);   // [2026-09] 지사장·지점장 → 내 지점카드
   if(_bt){ openBranchCard(_bt); return; }
   var f=pcFind(_me.name);
