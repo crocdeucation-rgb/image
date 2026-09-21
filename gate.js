@@ -7,6 +7,8 @@
  * switcher.html 안 iframe으로 뜰 땐 이미 부모가 인증했으므로 자동 통과(로그인 세션 공유).
  */
 (function(){
+  // [2026-09] 콘텐츠 선노출 차단은 각 HTML <head> 인라인(__pregate)이 담당.
+  //   gate.js는 인증 통과 시 그 스타일을 제거만 한다(아래 onAuthStateChanged).
   var CFG={apiKey:"AIzaSyCBDimk0MyGAHf762mvInS_H4K9HkW6Ol0",authDomain:"dashboard-88ba4.firebaseapp.com",projectId:"dashboard-88ba4",storageBucket:"dashboard-88ba4.firebasestorage.app",messagingSenderId:"857535538974",appId:"1:857535538974:web:999d190f28e14964eb4b0f"};
   var ALLOW=['032100jesus@gmail.com','christuhm@gmail.com','crocdeucation@gmail.com','kanghansara@gmail.com','thestudydesign@gmail.com','loityr123@gmail.com'];
 
@@ -101,6 +103,7 @@
       var m=document.getElementById('agMsg');
       if(u && ALLOW.indexOf((u.email||'').toLowerCase())>=0){
         g.classList.add('hidden'); document.body.style.overflow='';
+        var _pg=document.getElementById('__pregate'); if(_pg) _pg.parentNode.removeChild(_pg);  // [2026-09] 콘텐츠 표시
         try{ gateSecUI(u); }catch(e){}   // [2026-09] 보안 배지+인증 토스트 (단독 접속만)
       } else if(u){
         if(m){ m.className='m err'; m.textContent='접근 권한이 없는 계정입니다 ('+u.email+')'; }
