@@ -4,95 +4,67 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@700&display=swap" rel="stylesheet">
-<title>이등분선 문제 설명</title>
+<title>이등분선 설명영상 v3</title>
 <style>
-  :root{
-    --ink:#1f2733; --sub:#5a6b85; --paper:#FFFDF7;
-    --gold:#E8850C; --gold-bg:#FDF1DF;
-    --teal:#0f9d6e; --teal-bg:#e3f7ef;
-    --blue:#2b5fb0; --blue-bg:#e9f0fb;
-    --red:#E23A22; --red-bg:#fdeae7;
-  }
+  :root{ --ink:#1f2733; --sub:#5a6b85; --paper:#FFFDF7;
+    --gold:#E8850C; --teal:#0f9d6e; --blue:#2b5fb0; --red:#E23A22; }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Jua',system-ui,sans-serif;background:#2a3140;display:flex;flex-direction:column;align-items:center;gap:16px;padding:20px;color:#e7ecf3}
-  h1.pg{font-size:16px;font-family:system-ui;font-weight:700}
-  .hint{font-size:12px;color:#9aa6b8;font-family:system-ui}
-
-  /* 무대 1:1 */
-  .stage-outer{border-radius:26px;overflow:hidden;background:#c8cdd6;
-    background-image:linear-gradient(45deg,#b9bfc9 25%,transparent 25%),linear-gradient(-45deg,#b9bfc9 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#b9bfc9 75%),linear-gradient(-45deg,transparent 75%,#b9bfc9 75%);
-    background-size:26px 26px;background-position:0 0,0 13px,13px -13px,-13px 0}
-  #stage{position:relative;width:900px;height:900px;max-width:92vw;background:var(--paper);overflow:hidden;padding:44px 52px;display:flex;flex-direction:column}
-  .tab{position:absolute;left:36px;top:0;width:22px;height:40px;background:#FFD43B;border-radius:0 0 6px 6px;z-index:1}
-  .scene-no{position:absolute;right:52px;top:52px;font-size:22px;color:#c3ccd8;font-weight:700}
-  h1{font-size:46px;color:var(--ink);letter-spacing:-1px;margin-bottom:8px;line-height:1.05}
-  .kicker{font-size:23px;color:var(--gold);font-weight:700;margin-bottom:4px;padding-left:2px}
-
-  .content{flex:1;display:flex;flex-direction:column;justify-content:center;gap:24px;min-height:0;padding-top:10px}
-  .split{display:flex;gap:40px;align-items:center;flex:1}
-  .fig{background:#fff;border:3px solid #EEE7D6;border-radius:20px;padding:20px;flex:0 0 auto}
-  .fig svg{width:430px;height:auto}
-  .txtcol{flex:1;display:flex;flex-direction:column;justify-content:center;gap:26px}
-
-  /* 조건 라인 (문제 설명) */
-  .cond{font-size:38px;color:#8a97a8;font-family:'Gaegu',sans-serif;line-height:1.4;opacity:.35;transition:opacity .4s,transform .4s;transform:translateX(10px)}
-  .cond.on{opacity:1;transform:translateX(0);color:var(--ink)}
+  body{font-family:'Jua',system-ui,sans-serif;background:#2a3140;display:flex;flex-direction:column;align-items:center;gap:14px;padding:18px;color:#e7ecf3}
+  h1.pg{font-size:15px;font-family:system-ui;font-weight:700}
+  .hint{font-size:12px;color:#9aa6b8;font-family:system-ui;text-align:center;line-height:1.6}
+  .stage-outer{border-radius:24px;overflow:hidden;background:#c8cdd6}
+  #stage{position:relative;width:900px;height:900px;max-width:92vw;background:var(--paper);overflow:hidden;padding:44px 50px;display:flex;flex-direction:column}
+  .tab{position:absolute;left:64px;top:-6px;width:26px;height:54px;background:#FFD43B;border-radius:0 0 7px 7px;z-index:5}
+  .scene-no{position:absolute;right:48px;top:46px;font-size:20px;color:#c3ccd8;font-weight:700}
+  .kicker{font-size:22px;color:var(--gold);font-weight:700}
+  h1{font-size:40px;color:var(--ink);letter-spacing:-1px;margin:6px 0 14px;line-height:1.05}
+  .content{flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px;min-height:0}
+  .split{display:flex;gap:28px;align-items:center}
+  .fig{background:#fff;border:3px solid #EEE7D6;border-radius:18px;padding:12px;flex:0 0 auto}
+  .fig svg{width:420px;height:auto;display:block}
+  .txtcol{flex:1;display:flex;flex-direction:column;gap:13px}
+  /* 대사 줄 — 기본 흐림, 활성 시 뚜렷 + 살짝 확대 */
+  .cond{font-size:27px;color:var(--sub);font-family:'Gaegu',sans-serif;line-height:1.3;opacity:.18;transition:opacity .35s,transform .35s;transform:translateX(8px)}
+  .cond.on{opacity:1;transform:translateX(0)}
+  .cond.hot{opacity:1;transform:translateX(0) scale(1.04);transform-origin:left center}
   .cond b{color:var(--ink)}
-  .cond .g{color:var(--gold);font-weight:700}
-  .cond .t{color:var(--teal);font-weight:700}
-  .cond .b{color:var(--blue);font-weight:700}
-  .cond .r{color:var(--red);font-weight:700}
-
-  .formula{font-size:58px;font-family:'Gaegu',sans-serif;color:var(--ink);text-align:center;line-height:1.4;opacity:.4;transition:opacity .5s}
-  .formula.on{opacity:1}
-  .formula b{font-size:60px}
   .g{color:var(--gold);font-weight:700}.t{color:var(--teal);font-weight:700}.b{color:var(--blue);font-weight:700}.r{color:var(--red);font-weight:700}
-
-  .ans{background:var(--teal-bg);border:4px solid #B6E5D2;border-radius:22px;padding:24px;text-align:center;opacity:.25;transition:opacity .6s;transform:scale(.9);transition:opacity .5s,transform .5s}
+  .formula{font-size:42px;font-family:'Gaegu',sans-serif;color:var(--ink);text-align:center;line-height:1.35;opacity:.18;transition:opacity .5s,transform .5s}
+  .formula.on{opacity:1}
+  .formula b{font-size:50px}
+  .box{opacity:.18;transition:opacity .5s,transform .5s;transform:scale(.96)}
+  .box.on{opacity:1;transform:scale(1)}
+  .ans{background:#e3f7ef;border:4px solid #B6E5D2;border-radius:20px;padding:22px;text-align:center;opacity:.18;transform:scale(.9);transition:opacity .5s,transform .5s}
   .ans.on{opacity:1;transform:scale(1)}
-  .ans .lb{font-size:26px;color:var(--teal);font-weight:700;display:block;margin-bottom:4px}
-  .ans .vv{font-size:80px;color:#0a6f4e;font-weight:700}
-
-  /* 핵심 정리 */
-  .keyrow{display:flex;align-items:flex-start;gap:16px;font-size:32px;font-family:'Gaegu',sans-serif;color:var(--ink);line-height:1.3;opacity:.2;transition:opacity .5s,transform .5s;transform:translateY(8px)}
+  .ans .lb{font-size:23px;color:var(--teal);font-weight:700;display:block;margin-bottom:4px}
+  .ans .vv{font-size:72px;color:#0a6f4e;font-weight:700}
+  .keyrow{display:flex;align-items:flex-start;gap:14px;font-size:30px;font-family:'Gaegu',sans-serif;color:var(--ink);line-height:1.3;opacity:.16;transition:opacity .5s,transform .5s;transform:translateY(8px)}
   .keyrow.on{opacity:1;transform:translateY(0)}
-  .keyrow .num{flex:none;width:44px;height:44px;border-radius:50%;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:24px;font-family:'Jua'}
-  .keyrow.k1 .num{background:var(--gold)} .keyrow.k2 .num{background:var(--blue)} .keyrow.k3 .num{background:var(--red)}
-  .keyrow .kb{color:var(--ink)}
-  .keyrow .hl{font-weight:700}
-
-  /* SVG 강조 애니 */
-  .fade{opacity:0;transition:opacity .5s ease}
-  /* 선 그려지는 효과 (dasharray=선 길이) */
-  .draw-line{stroke-dasharray:135;stroke-dashoffset:135;transition:stroke-dashoffset .9s ease}
-  .draw-line.drawn{stroke-dashoffset:0}
-  /* 다 그려진 뒤 반짝임 */
-  @keyframes sparkle{0%,100%{filter:drop-shadow(0 0 0 transparent)}50%{filter:drop-shadow(0 0 8px rgba(15,157,110,.9))}}
-  .draw-line.drawn.spark{animation:sparkle 1s ease 2}
-  /* 강조 요소 반짝임 */
-  @keyframes pop-glow{0%{filter:drop-shadow(0 0 0 transparent)}45%{filter:drop-shadow(0 0 11px rgba(232,133,12,.85))}100%{filter:drop-shadow(0 0 0 transparent)}}
-  svg .spark-on{animation:pop-glow .9s ease}
-  .fade.on{opacity:1 !important}
-  svg .fade{opacity:0}
-  svg .fade.on{opacity:1}
-  .glow{filter:drop-shadow(0 0 0 transparent);transition:filter .4s}
-  .glow.on{filter:drop-shadow(0 0 6px rgba(232,133,12,.7))}
-
-  /* OBS 모드 (초록 크로마키) */
+  .keyrow .num{flex:none;width:42px;height:42px;border-radius:50%;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:22px;font-family:'Jua'}
+  .keyrow.k1 .num{background:var(--gold)}.keyrow.k2 .num{background:var(--blue)}.keyrow.k3 .num{background:var(--red)}
+  /* SVG 요소: 선 그리기(draw) — 기본 숨김 */
+  .dr{opacity:0;transition:opacity .01s}
+  .dr.show{opacity:1}
+  .drawline{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);}
+  .drawline.go{transition:stroke-dashoffset .6s ease;stroke-dashoffset:0;}
+  .pop{opacity:0;transform-box:fill-box;transform-origin:center;transition:opacity .3s ease .25s}
+  .pop.show{opacity:1}
+  /* EBD 반짝임 강조 */
+  .sparkle.show{animation:sparkle 1.1s ease-in-out 3}
+  @keyframes sparkle{0%,100%{filter:none}50%{filter:drop-shadow(0 0 10px rgba(15,157,110,0.9)) brightness(1.15)}}
   body.obs{background:#00B140;padding:0;overflow:hidden}
   body.obs h1.pg,body.obs .hint,body.obs .ctrl{display:none}
-  body.obs .stage-outer{width:100%;height:100vh;border-radius:0;background:#00B140;background-image:none;display:flex;align-items:center;justify-content:center}
+  body.obs .stage-outer{width:100%;height:100vh;border-radius:0;background:#00B140;display:flex;align-items:center;justify-content:center}
   body.obs #stage{max-width:none}
-
-  .ctrl{display:flex;gap:10px;align-items:center;font-family:system-ui}
-  .ctrl button{border:none;border-radius:10px;padding:12px 22px;font-size:14px;font-weight:800;cursor:pointer}
-  .play{background:#3B82F6;color:#fff} .nav{background:#3a4657;color:#e7ecf3} .dl{background:#0f9d6e;color:#fff}
-  .pageinfo{font-size:13px;color:#9aa6b8;min-width:120px;text-align:center}
+  .ctrl{display:flex;gap:9px;align-items:center;font-family:system-ui;flex-wrap:wrap;justify-content:center}
+  .ctrl button{border:none;border-radius:10px;padding:11px 20px;font-size:14px;font-weight:800;cursor:pointer}
+  .play{background:#3B82F6;color:#fff}.nav{background:#3a4657;color:#e7ecf3}
+  .pageinfo{font-size:13px;color:#9aa6b8;min-width:150px;text-align:center}
 </style>
 </head>
 <body>
-<h1 class="pg">이등분선 문제 설명 애니메이션</h1>
-<p class="hint">[재생]하면 씬별 타이밍(19·25·12·20·15초)에 맞춰 강조가 나타납니다. OBS는 <b>?obs</b> URL로 초록배경 자동재생.</p>
+<h1 class="pg">이등분선 설명영상 v3 (선 그리기 애니메이션)</h1>
+<p class="hint">[▶ 처음부터 재생] = 대사 타이밍대로 선이 그려지며 강조 · [◀ ▶ 씬] 씬별 확인<br>OBS: <b>?obs</b> URL → 초록배경 자동재생</p>
 
 <div class="stage-outer">
   <div id="stage">
@@ -109,160 +81,252 @@
   <button class="nav" id="prev">◀</button>
   <button class="nav" id="next">▶ 씬</button>
   <span class="pageinfo" id="pinfo"></span>
-  <button class="dl" id="obsBtn">OBS 모드</button>
+  <button class="nav" id="obsBtn">OBS 모드</button>
 </div>
 
 <script>
-  // ── 도형 SVG (DE∥AC, BD:DC=3:2) ──
-  // n×n 격자 (넓이 칸 시각화)
-  function grid(n, fillC, strokeC){
-    var cell=22, out='';
-    for(var r=0;r<n;r++) for(var c=0;c<n;c++){
-      out+='<rect x="'+(c*cell)+'" y="'+(r*cell)+'" width="'+cell+'" height="'+cell+'" fill="'+fillC+'" stroke="'+strokeC+'" stroke-width="1.5"/>';
-    }
-    return out;
+  // 좌표 (검증됨): A(323,70) B(60,300) C(360,300) D(240,300) E(218,162)
+  var P={A:[323,70],B:[60,300],C:[360,300],D:[240,300],E:[218,162]};
+  function L(a,b){return Math.hypot(P[b][0]-P[a][0],P[b][1]-P[a][1]);}
+  // 선 그리기용 line (dasharray=길이)
+  function drawLine(id,a,b,color,w,dash){
+    var len=L(a,b).toFixed(0);
+    var da=dash?'stroke-dasharray:'+dash+';':'';
+    return '<line class="dr drawline" id="'+id+'" x1="'+P[a][0]+'" y1="'+P[a][1]+'" x2="'+P[b][0]+'" y2="'+P[b][1]
+      +'" stroke="'+color+'" stroke-width="'+w+'" stroke-linecap="round" style="--len:'+len+';'+da+'"/>';
   }
-  function fig(o){
-    o=o||{};
-    var tri='<polygon points="40,280 340,280 370,60" fill="#EEF1F6" stroke="#1f2733" stroke-width="2.5"/>';
-    // AB(18) AC(12) 호+라벨
-    var lenAB = o.lenAB ? '<g class="fade '+(o.lenAB==='on'?'on':'')+'" id="gAB"><path d="M40,280 Q187,143 370,60" fill="none" stroke="#E8850C" stroke-width="2.5" stroke-dasharray="5 4"/><text x="150" y="135" font-size="21" font-weight="700" fill="#E8850C">18cm</text></g>' : '';
-    var lenAC = o.lenAC ? '<g class="fade '+(o.lenAC==='on'?'on':'')+'" id="gAC"><path d="M370,60 Q396,174 340,280" fill="none" stroke="#2b5fb0" stroke-width="2.5" stroke-dasharray="5 4"/><text x="400" y="180" font-size="21" font-weight="700" fill="#2b5fb0">12cm</text></g>' : '';
-    // AD 이등분선
-    var ad = o.ad ? '<g class="fade '+(o.ad==='on'?'on':'')+'" id="gAD"><line x1="370" y1="60" x2="220" y2="280" stroke="#E8850C" stroke-width="3.5"/>'
-      + '<circle cx="346" cy="84" r="4" fill="#E8850C"/>'   // ∠BAD 안 점
-      + '<circle cx="358" cy="92" r="4" fill="#E8850C"/>'   // ∠DAC 안 점 (같은 각 표시)
-      + '<circle cx="220" cy="280" r="5" fill="#E8850C"/><text x="212" y="306" font-size="21" font-weight="700" fill="#E8850C">D</text></g>' : '';
-    // DE 평행
-    var de = o.de ? '<g class="fade '+(o.de==='on'?'on':'')+'" id="gDE"><line id="deLine" class="draw-line" x1="238" y1="148" x2="220" y2="280" stroke="#0f9d6e" stroke-width="3.5"/><circle cx="238" cy="148" r="5" fill="#0f9d6e"/><text x="244" y="145" font-size="21" font-weight="700" fill="#0f9d6e">E</text><text x="150" y="230" font-size="17" font-weight="700" fill="#0f9d6e">DE∥CA</text></g>' : '';
-    // 작은삼각형 EBD 강조 (초록칠)
-    var ebd = o.ebd ? '<polygon class="fade '+(o.ebd==='on'?'on':'')+'" id="gEBD" points="40,280 220,280 238,148" fill="'+(o.ebd==='fill'?'#7FD4B0':'#DFF3EA')+'" stroke="#0f9d6e" stroke-width="3" opacity="'+(o.ebd==='fill'?'0.75':'1')+'"/>' : '';
-    // 큰삼각형 ABC 강조 (파랑칠)
-    var abc = o.abc ? '<polygon class="fade '+(o.abc==='on'?'on':'')+'" id="gABC" points="40,280 340,280 370,60" fill="#9DBEEA" stroke="#2b5fb0" stroke-width="3" opacity="0.55"/>' : '';
-    // 대응 꼭짓점 강조 (E↔A, B공통, D↔C)
-    var corr = o.corr ? '<g class="fade '+(o.corr==='on'?'on':'')+'" id="gCORR">'
-      + '<circle cx="238" cy="148" r="9" fill="none" stroke="#0f9d6e" stroke-width="2.5"/><circle cx="370" cy="60" r="9" fill="none" stroke="#2b5fb0" stroke-width="2.5"/>'
-      + '<text x="255" y="120" font-size="16" font-weight="700" fill="#0f9d6e">E↔A</text>'
-      + '<circle cx="220" cy="280" r="9" fill="none" stroke="#0f9d6e" stroke-width="2.5"/><circle cx="340" cy="280" r="9" fill="none" stroke="#2b5fb0" stroke-width="2.5"/>'
-      + '<text x="256" y="266" font-size="16" font-weight="700" fill="#5a6b85">D↔C</text></g>' : '';
-    // BD/BC 밑변 호
-    var base = o.base ? '<g class="fade '+(o.base==='on'?'on':'')+'" id="gBASE"><path d="M40,280 Q130,308 220,280" fill="none" stroke="#0f9d6e" stroke-width="4" stroke-dasharray="4 4"/><text x="108" y="322" font-size="19" font-weight="700" fill="#0f9d6e">BD=3</text><path d="M40,280 Q190,332 340,280" fill="none" stroke="#2b5fb0" stroke-width="4" stroke-dasharray="4 4"/><text x="172" y="350" font-size="19" font-weight="700" fill="#2b5fb0">BC=5</text></g>' : '';
-    // 이등분선 정리 강조: AB변↔BD (주황), AC변↔DC (파랑)
-    var bisect = o.bisect ? '<g class="fade '+(o.bisect==='on'?'on':'')+'" id="gBIS">'
-      + '<line x1="40" y1="280" x2="370" y2="60" stroke="#E8850C" stroke-width="5" opacity="0.6"/>'   // AB 변
-      + '<line x1="370" y1="60" x2="340" y2="280" stroke="#2b5fb0" stroke-width="5" opacity="0.6"/>'  // AC 변
-      + '<line x1="36" y1="273" x2="44" y2="287" stroke="#E8850C" stroke-width="3.5"/><line x1="366" y1="53" x2="374" y2="67" stroke="#E8850C" stroke-width="3.5"/>'  // AB 양끝 눈금
-      + '<line x1="378" y1="61" x2="362" y2="59" stroke="#2b5fb0" stroke-width="3.5"/><line x1="348" y1="281" x2="332" y2="279" stroke="#2b5fb0" stroke-width="3.5"/>'  // AC 양끝 눈금
-      + '<text x="150" y="130" font-size="20" font-weight="700" fill="#E8850C">18cm</text>'           // AB=18
-      + '<text x="358" y="180" font-size="20" font-weight="700" fill="#2b5fb0">12cm</text>'           // AC=12
-      + '<path d="M40,284 Q130,308 220,284" fill="none" stroke="#E8850C" stroke-width="4"/>'          // BD (AB와 같은 주황)
-      + '<path d="M224,290 Q282,308 340,290" fill="none" stroke="#2b5fb0" stroke-width="4"/>'         // DC (AC와 같은 파랑)
-      + '</g>' : '';
-    var vb = o.tall ? '0 0 440 360' : '0 0 440 330';
-    return '<svg viewBox="'+vb+'" xmlns="http://www.w3.org/2000/svg">'
-      + tri + abc + ebd + corr + bisect + base + lenAB + lenAC + ad + de
-      + '<circle cx="370" cy="60" r="5" fill="#1f2733"/><circle cx="40" cy="280" r="5" fill="#1f2733"/><circle cx="340" cy="280" r="5" fill="#1f2733"/>'
-      + '<text x="376" y="55" font-size="22" font-weight="700" fill="#1f2733">A</text>'
-      + '<text x="22" y="278" font-size="22" font-weight="700" fill="#1f2733">B</text>'
-      + '<text x="346" y="278" font-size="22" font-weight="700" fill="#1f2733">C</text>'
+  function pop(id,inner){ return '<g class="dr pop" id="'+id+'">'+inner+'</g>'; }
+
+  // ── 베이스 삼각형 (항상 보임) ──
+  function baseTri(extra){
+    return '<svg viewBox="0 0 440 372" xmlns="http://www.w3.org/2000/svg">'
+      + '<polygon points="60,300 360,300 323,70" fill="#EEF1F6" stroke="#1f2733" stroke-width="2.5"/>'
+      + (extra||'')
+      + '<circle cx="323" cy="70" r="5" fill="#1f2733"/><circle cx="60" cy="300" r="5" fill="#1f2733"/><circle cx="360" cy="300" r="5" fill="#1f2733"/>'
+      + '<text x="330" y="64" font-size="22" font-weight="700" fill="#1f2733">A</text>'
+      + '<text x="36" y="298" font-size="22" font-weight="700" fill="#1f2733">B</text>'
+      + '<text x="366" y="296" font-size="22" font-weight="700" fill="#1f2733">C</text>'
       + '</svg>';
   }
 
-  // ── 씬 정의: dur(초), build(html), steps[{at(초), do}] ──
-  var SCENES = [
-    // 1) 이등분선 정리 (19초) — 닮음 없이! BD:DC=3:2까지
-    { no:'STEP 1', dur:19, kicker:'삼각형 각의 이등분선', title:'각의 이등분선 정리',
+  // 선 그리기 발동 (show + go)
+  function draw(id){ var e=document.getElementById(id); if(!e)return; e.classList.add('show'); if(e.classList.contains('drawline')){ void e.getBBox(); e.classList.add('go'); } }
+  function showEl(id){ var e=document.getElementById(id); if(e) e.classList.add('show'); }
+
+  var SCENES=[
+    // ═══ 1) 문제 ═══
+    { no:'문제', dur:22, kicker:'삼각형 각의 이등분선', title:'문제를 읽어봅시다',
       build:function(){
-        return '<div class="split"><div class="fig">'+fig({ad:1,bisect:1,tall:1})+'</div>'
+        var extra=''
+          // 이등분선 AD (그려짐) + 같은각 호2개+점
+          + drawLine('gAD','A','D','#E8850C',3.5)
+          + pop('gANG','<path d="M289.9,99.0 A44,44 0 0 0 308.1,111.4" fill="none" stroke="#E8850C" stroke-width="2.2"/>'
+              +'<path d="M308.1,111.4 A44,44 0 0 0 330.0,113.4" fill="none" stroke="#E8850C" stroke-width="2.2"/>'
+              +'<circle cx="298.2" cy="106.3" r="3" fill="#E8850C"/><circle cx="318.9" cy="113.8" r="3" fill="#E8850C"/>')
+          + pop('gDP','<circle cx="240" cy="300" r="6" fill="#E8850C"/><text x="232" y="324" font-size="21" font-weight="700" fill="#E8850C">D</text>')
+          // AB 변 (그려짐) — E 찾기
+          + drawLine('gAB','B','A','#0f9d6e',5)
+          + pop('gEP','<circle cx="218" cy="162" r="6" fill="#0f9d6e"/><text x="196" y="160" font-size="21" font-weight="700" fill="#0f9d6e">E</text>')
+          // DE 변 (그려짐) + 평행마커
+          + drawLine('gDE','E','D','#0f9d6e',4)
+          + pop('gDEmk','<g stroke="#0f9d6e" stroke-width="2.4" fill="none"><path d="M235.7,241.1 L229.8,235.9 L225.8,242.6"/><path d="M234.1,231.2 L228.2,226.1 L224.2,232.8"/></g>')
+          // CA 변 (그려짐) + 평행마커 (같은 화살촉=평행)
+          + drawLine('gCA','C','A','#2b5fb0',4)
+          + pop('gCAmk','<g stroke="#2b5fb0" stroke-width="2.4" fill="none"><path d="M348.2,195.1 L342.3,189.9 L338.3,196.7"/><path d="M346.6,185.2 L340.7,180.1 L336.7,186.8"/></g>')
+          // 길이 라벨
+          + pop('gL18','<text x="150" y="175" font-size="20" font-weight="800" fill="#0f9d6e" transform="rotate(-41 175 190)">18cm</text>')
+          + pop('gL12','<text x="352" y="185" font-size="20" font-weight="800" fill="#2b5fb0" transform="rotate(81 352 185)">12cm</text>')
+          // EBD 칠
+          + '<polygon class="dr pop sparkle" id="gEBD" points="60,300 240,300 218,162" fill="#DFF3EA" stroke="#0f9d6e" stroke-width="2.5" opacity="0"/>'
+          // ABC 전체 강조 (마지막 "넓이=?")
+          + '<polygon class="dr pop" id="gABC" points="60,300 360,300 323,70" fill="none" stroke="#E23A22" stroke-width="4" opacity="0"/>';
+        return '<div class="split"><div class="fig">'+baseTri(extra)+'</div>'
           +'<div class="txtcol">'
-          +'<div class="cond" id="c1">∠A의 <span class="g">이등분선</span>이<br>BC와 만나는 점 <span class="g">D</span></div>'
-          +'<div class="cond" id="c2">이등분선은 밑변을<br><span class="g">양옆 변의 비</span>로 나눈다</div>'
-          +'<div class="cond" id="c3"><span class="g">AB:AC</span> = <span class="r">BD:DC</span></div>'
-          +'<div class="cond" id="c4">= 18 : 12 = <span class="g">3 : 2</span></div>'
+          +'<div class="cond" id="c1">∠A의 <span class="g">이등분선</span>이 BC와 만나는 점 <span class="g">D</span></div>'
+          +'<div class="cond" id="c2">D가 <span class="t">AB</span>와 만나는 점 <span class="t">E</span></div>'
+          +'<div class="cond" id="c3"><span class="t">DE</span> ∥ <span class="b">CA</span> (평행)</div>'
+          +'<div class="cond" id="cAB"><span class="g">AB = 18cm</span> · <span class="b">AC = 12cm</span></div>'
+          +'<div class="cond" id="c4">△EBD = <span class="r">45cm²</span></div>'
+          +'<div class="cond" id="c5"><b>△ABC의 넓이 = ?</b></div>'
           +'</div></div>';
       },
       steps:[
-        {at:2,   el:'c1', svg:['gAD']},
-        {at:7,   el:'c2'},
-        {at:11,  el:'c3', svg:['gBIS']},
-        {at:15,  el:'c4'},
+        {at:0.5, el:'c1', fn:function(){draw('gAD');setTimeout(function(){showEl('gANG');showEl('gDP');},550);}},   // 3.56"
+        {at:4.0, el:'c2', fn:function(){draw('gAB');setTimeout(function(){showEl('gEP');},550);}},                 // 4.46"
+        {at:8.5, el:'c3', fn:function(){draw('gDE');draw('gCA');setTimeout(function(){showEl('gDEmk');showEl('gCAmk');},600);}}, // 4.04"
+        {at:12.0,el:'cAB',fn:function(){showEl('gL18');showEl('gL12');}},   // 조건(대사없음)
+        {at:14.5,el:'c4', fn:function(){showEl('gEBD');}},                  // 4.34"
+        {at:19.0,el:'c5', fn:function(){showEl('gABC');}},                  // 2.40"
       ]},
 
-    // 2) 닮음 (25초) — EBD→ABC 닮음(8초) + 3:2 아니라 3:5(17초)
-    { no:'STEP 2', dur:25, kicker:'닮음과 닮음비', title:'△EBD ∽ △ABC',
+    // ═══ 2) 각의 이등분선 정리 ═══
+    { no:'STEP 1', dur:20, kicker:'각의 이등분선 정리', title:'AD를 그으면, 밑변이 3:2로 나뉜다',
       build:function(){
-        return '<div class="split"><div class="fig">'+fig({de:1,ebd:1,abc:1,corr:1,base:1,tall:1})+'</div>'
+        var extra=''
+          // AB / AC 순차로 강조해 그림
+          + drawLine('gAB2','B','A','#0f9d6e',6)
+          + drawLine('gAC2','C','A','#2b5fb0',6)
+          + pop('gL18b','<text x="140" y="172" font-size="20" font-weight="800" fill="#0f9d6e" transform="rotate(-41 175 190)">AB=18</text>')
+          + pop('gL12b','<text x="352" y="178" font-size="20" font-weight="800" fill="#2b5fb0" transform="rotate(81 352 185)">AC=12</text>')
+          // 이등분선 AD
+          + drawLine('gAD2','A','D','#E8850C',4)
+          + pop('gANG2','<path d="M289.9,99.0 A44,44 0 0 0 308.1,111.4" fill="none" stroke="#E8850C" stroke-width="2.2"/>'
+              +'<path d="M308.1,111.4 A44,44 0 0 0 330.0,113.4" fill="none" stroke="#E8850C" stroke-width="2.2"/>')
+          + pop('gDP2','<circle cx="240" cy="300" r="6" fill="#E8850C"/><text x="232" y="326" font-size="21" font-weight="700" fill="#E8850C">D</text>')
+          // 밑변 BD(3칸 초록) — B(60)→D(240), 60px씩
+          + pop('gBD','<line x1="60" y1="312" x2="240" y2="312" stroke="#0f9d6e" stroke-width="7" stroke-linecap="round"/>'
+              +'<line x1="120" y1="306" x2="120" y2="318" stroke="#fff" stroke-width="2.5"/>'
+              +'<line x1="180" y1="306" x2="180" y2="318" stroke="#fff" stroke-width="2.5"/>'
+              +'<text x="150" y="338" font-size="19" font-weight="800" fill="#0f9d6e" text-anchor="middle">BD = 3</text>')
+          // 밑변 DC(2칸 파랑) — D(240)→C(360)
+          + pop('gDC','<line x1="240" y1="312" x2="360" y2="312" stroke="#2b5fb0" stroke-width="7" stroke-linecap="round"/>'
+              +'<line x1="300" y1="306" x2="300" y2="318" stroke="#fff" stroke-width="2.5"/>'
+              +'<text x="300" y="338" font-size="19" font-weight="800" fill="#2b5fb0" text-anchor="middle">DC = 2</text>');
+        return '<div class="split"><div class="fig">'+baseTri(extra)+'</div>'
           +'<div class="txtcol">'
-          +'<div class="cond" id="c1"><span class="t">작은 삼각형 EBD</span></div>'
-          +'<div class="cond" id="c2"><span class="b">큰 삼각형 ABC</span> 와 <b>닮음</b><br><span style="font-size:24px">ED∥AC → 같은 모양</span></div>'
-          +'<div class="cond" id="c3">닮음비 주의!<br><span class="r">3:2 아니라</span> <span class="b">전체로</span></div>'
-          +'<div class="cond" id="c4">BD : BC = 3 : (3+2)<br>= <span class="b">3 : 5</span></div>'
+          +'<div class="cond" id="s2a">각을 <span class="g">이등분</span>하면…</div>'
+          +'<div class="cond" id="s2b">밑변이 <b>양 옆 변의 비</b>로 나뉜다</div>'
+          +'<div class="formula" id="s2f" style="text-align:left;font-size:32px"><span class="t">AB</span> : <span class="b">AC</span> = <span class="t">BD</span> : <span class="b">DC</span></div>'
+          +'<div class="formula" id="s2g" style="text-align:left;font-size:34px;white-space:nowrap"><span class="t">18</span> : <span class="b">12</span> = <b><span class="t">3</span> : <span class="b">2</span></b></div>'
           +'</div></div>';
       },
       steps:[
-        {at:2,   el:'c1', svg:['gEBD','gDE']},
-        {at:8,   el:'c2', svg:['gABC','gCORR']},
-        {at:14,  el:'c3'},
-        {at:19,  el:'c4', svg:['gBASE']},
+        {at:0.5, el:'s2a', fn:function(){draw('gAD2');setTimeout(function(){showEl('gANG2');showEl('gDP2');},600);}},
+        {at:4.0, el:'s2b', fn:function(){draw('gAB2');draw('gAC2');setTimeout(function(){showEl('gL18b');showEl('gL12b');},600);}},
+        {at:9.0, el:'s2f', fn:function(){showEl('gBD');showEl('gDC');}},
+        {at:14.0,el:'s2g'},
       ]},
 
-    // 3) 넓이비 (12초) — 3:5 → 9:25
-    { no:'STEP 3', dur:12, kicker:'넓이비 = 닮음비²', title:'닮음비 3:5 → 넓이비',
+    // ═══ 3) 닮음 ═══
+    { no:'STEP 2', dur:25, kicker:'DE ∥ CA → 닮음', title:'△EBD 와 △ABC 는 닮음',
       build:function(){
-        return '<div class="content" style="gap:22px">'
-          +'<div class="formula" id="f1" style="font-size:44px">닮음비 <span class="b">3 : 5</span> → 넓이는 <span class="r">제곱</span></div>'
-          +'<div class="fig" id="fbox" style="padding:20px;opacity:.25;transition:opacity .5s">'
-          +'<svg viewBox="0 0 480 175" xmlns="http://www.w3.org/2000/svg">'
-          +'<g transform="translate(20,12)">'+grid(3,'#7FD4B0','#0f9d6e')+'<text x="30" y="128" font-size="22" font-weight="700" fill="#0f9d6e">3²=9칸</text></g>'
-          +'<text x="150" y="88" font-size="34" font-weight="700" fill="#5a6b85">:</text>'
-          +'<g transform="translate(185,12)">'+grid(5,'#9DBEEA','#2b5fb0')+'<text x="35" y="128" font-size="22" font-weight="700" fill="#2b5fb0">5²=25칸</text></g>'
-          +'</svg></div>'
-          +'<div class="formula" id="f2" style="font-size:46px">3² : 5² = <b class="r">9 : 25</b></div>'
-          +'</div>';
-      },
-      steps:[
-        {at:1,  el:'f1'},
-        {at:4,  el:'fbox'},
-        {at:8,  el:'f2'},
-      ]},
-
-    // 4) 계산 (20초) — 9칸=45→1칸=5(8초) + 25칸=125(7초)
-    { no:'STEP 4', dur:20, kicker:'넓이 계산', title:'한 칸 = 5 → 125',
-      build:function(){
-        return '<div class="content" style="gap:20px">'
-          +'<div class="formula" id="f1" style="font-size:40px"><span class="t">△EBD = 9칸 = 45cm²</span></div>'
-          +'<div class="formula" id="f2" style="font-size:44px">한 칸 = 45 ÷ 9 = <b class="r">5cm²</b></div>'
-          +'<div class="formula" id="f3" style="font-size:40px"><span class="b">△ABC = 25칸</span> = 5 × 25</div>'
-          +'<div class="ans" id="ans"><span class="lb">△ABC의 넓이</span><span class="vv">125 cm²</span></div>'
-          +'</div>';
-      },
-      steps:[
-        {at:1,  el:'f1'},
-        {at:5,  el:'f2'},
-        {at:9,  el:'f3'},
-        {at:13, el:'ans'},
-      ]},
-
-    // 5) 핵심 정리 (15초) — 도형 보여주며 3가지
-    { no:'정리', dur:15, kicker:'꼭 기억할 3가지', title:'핵심 정리',
-      build:function(){
-        return '<div class="split"><div class="fig">'+fig({abc:1,ebd:1,ad:1,de:1,base:1,tall:1})+'</div>'
+        var extra=''
+          // 작은 삼각형 EBD 강조 칠
+          + '<polygon class="dr pop" id="gsEBD" points="60,300 240,300 218,162" fill="#DFF3EA" stroke="#0f9d6e" stroke-width="3" opacity="0"/>'
+          + drawLine('gDE3','E','D','#0f9d6e',4)
+          + drawLine('gCA3','C','A','#2b5fb0',4)
+          + pop('gEP3','<circle cx="218" cy="162" r="6" fill="#0f9d6e"/><text x="196" y="160" font-size="21" font-weight="700" fill="#0f9d6e">E</text>')
+          + pop('gDP3','<circle cx="240" cy="300" r="6" fill="#E8850C"/><text x="248" y="295" font-size="21" font-weight="700" fill="#E8850C">D</text>')
+          // 평행마커
+          + pop('gpar3','<g stroke="#0f9d6e" stroke-width="2.4" fill="none"><path d="M235.7,241.1 L229.8,235.9 L225.8,242.6"/><path d="M234.1,231.2 L228.2,226.1 L224.2,232.8"/></g>'
+              +'<g stroke="#2b5fb0" stroke-width="2.4" fill="none"><path d="M348.2,195.1 L342.3,189.9 L338.3,196.7"/><path d="M346.6,185.2 L340.7,180.1 L336.7,186.8"/></g>')
+          // 밑변 강조: BD(초록 3) / BC(빨강 5) — 삼각형·D점서 충분히 아래로
+          + pop('g3BC','<line x1="60" y1="338" x2="360" y2="338" stroke="#E23A22" stroke-width="7" stroke-linecap="round"/>'
+              +'<text x="300" y="358" font-size="18" font-weight="800" fill="#E23A22" text-anchor="middle">BC = 5</text>')
+          + pop('g3BD','<line x1="60" y1="326" x2="240" y2="326" stroke="#0f9d6e" stroke-width="7" stroke-linecap="round"/>'
+              +'<text x="150" y="322" font-size="16" font-weight="800" fill="#0f9d6e" text-anchor="middle">BD = 3</text>');
+        return '<div class="split"><div class="fig">'+baseTri(extra)+'</div>'
           +'<div class="txtcol">'
-          +'<div class="keyrow k1" id="k1"><span class="num">1</span><span class="kb">이등분선은 밑변을 <span class="hl" style="color:#E8850C">D로 나눈다</span></span></div>'
-          +'<div class="keyrow k2" id="k2"><span class="num">2</span><span class="kb">닮음비는 <span class="hl" style="color:#2b5fb0">조각 말고 전체</span>로<br><span style="font-size:24px">(3:2 아니라 3:5)</span></span></div>'
-          +'<div class="keyrow k3" id="k3"><span class="num">3</span><span class="kb">넓이비는 <span class="hl" style="color:#E23A22">닮음비의 제곱</span><br><span style="font-size:24px">(3:5 → 9:25)</span></span></div>'
+          +'<div class="cond" id="s3a"><span class="t">DE</span> ∥ <span class="b">CA</span> 이므로</div>'
+          +'<div class="cond" id="s3b">두 삼각형은 <span class="g">닮음</span> (AA)</div>'
+          +'<div class="cond" id="s3c">닮음비 = <b>밑변의 비</b> <span class="r" style="font-size:22px">(조각❌ 전체⭕)</span></div>'
+          +'<div class="formula" id="s3f" style="text-align:left;font-size:32px"><s style="color:#b3bccb">BD:DC</s> 아니라 <span class="t">BD</span>:<span class="r">BC</span></div>'
+          +'<div class="formula" id="s3g" style="text-align:left;font-size:32px;white-space:nowrap">3 : (3+2) = <b><span class="t">3</span> : <span class="r">5</span></b></div>'
           +'</div></div>';
       },
       steps:[
-        {at:1,  el:'k1', svg:['gAD']},
-        {at:5.5,el:'k2', svg:['gBASE']},
-        {at:10, el:'k3', svg:['gABC','gEBD']},
+        {at:0.5, el:'s3a', fn:function(){draw('gDE3');draw('gCA3');setTimeout(function(){showEl('gEP3');showEl('gDP3');showEl('gpar3');},600);}},
+        {at:4.0, el:'s3b', fn:function(){showEl('gsEBD');}},
+        {at:8.5, el:'s3c', fn:function(){showEl('g3BC');setTimeout(function(){showEl('g3BD');},400);}},
+        {at:14.0,el:'s3f'},
+        {at:19.0,el:'s3g'},
+      ]},
+
+    // ═══ 4) 넓이비 ═══
+    { no:'STEP 3', dur:18, kicker:'닮음비 → 넓이비', title:'넓이비 = 닮음비의 제곱',
+      build:function(){
+        // ABC 25칸 격자선 (닮음비 격자, 각 변 5등분)
+        var grid='<line x1="112.6" y1="254" x2="352.6" y2="254" stroke="#9fb4d6" stroke-width="1"/><line x1="165.2" y1="208" x2="345.2" y2="208" stroke="#9fb4d6" stroke-width="1"/><line x1="217.8" y1="162" x2="337.8" y2="162" stroke="#9fb4d6" stroke-width="1"/><line x1="270.4" y1="116" x2="330.4" y2="116" stroke="#9fb4d6" stroke-width="1"/><line x1="120" y1="300" x2="330.4" y2="116" stroke="#9fb4d6" stroke-width="1"/><line x1="180" y1="300" x2="337.8" y2="162" stroke="#9fb4d6" stroke-width="1"/><line x1="240" y1="300" x2="345.2" y2="208" stroke="#9fb4d6" stroke-width="1"/><line x1="300" y1="300" x2="352.6" y2="254" stroke="#9fb4d6" stroke-width="1"/><line x1="112.6" y1="254" x2="120" y2="300" stroke="#9fb4d6" stroke-width="1"/><line x1="165.2" y1="208" x2="180" y2="300" stroke="#9fb4d6" stroke-width="1"/><line x1="217.8" y1="162" x2="240" y2="300" stroke="#9fb4d6" stroke-width="1"/><line x1="270.4" y1="116" x2="300" y2="300" stroke="#9fb4d6" stroke-width="1"/>';
+        var extra=''
+          // 큰 삼각형 ABC (파랑 옅게)
+          + '<polygon class="dr pop" id="g4ABC" points="60,300 360,300 323,70" fill="#E5EDF9" stroke="#2b5fb0" stroke-width="3.5" opacity="0"/>'
+          // 작은 삼각형 EBD (초록 반투명 — 격자 비치게)
+          + '<polygon class="dr pop" id="g4EBD" points="60,300 240,300 217.8,162" fill="#7fd3ad" fill-opacity="0.55" stroke="#0f9d6e" stroke-width="3.5" opacity="0"/>'
+          // 격자 (25칸 전체 — 초록/파랑 위에 모두 표시)
+          + '<g class="dr pop" id="g4grid" opacity="0">'+grid+'</g>'
+          + pop('gEP4','<circle cx="217.8" cy="162" r="5" fill="#0f9d6e"/><text x="196" y="160" font-size="20" font-weight="700" fill="#0f9d6e">E</text>')
+          + pop('gDP4','<circle cx="240" cy="300" r="5" fill="#E8850C"/><text x="232" y="326" font-size="20" font-weight="700" fill="#E8850C">D</text>')
+          // 칸수 라벨 — 9칸=EBD안, 25칸=삼각형 밖 상단(전체 가리킴 리더선)
+          + pop('g4lbS','<rect x="108" y="252" width="58" height="24" rx="8" fill="#0a6f4e"/><text x="137" y="269" font-size="15" font-weight="800" fill="#fff" text-anchor="middle">9칸</text>')
+          + pop('g4lbB','<rect x="284" y="30" width="80" height="24" rx="8" fill="#2b5fb0"/><text x="324" y="47" font-size="15" font-weight="800" fill="#fff" text-anchor="middle">전체 25칸</text><line x1="324" y1="54" x2="324" y2="66" stroke="#2b5fb0" stroke-width="1.5"/>');
+        return '<div class="split"><div class="fig">'+baseTri(extra)+'</div>'
+          +'<div class="txtcol">'
+          +'<div class="cond" id="s4a">닮음비가 <b>3 : 5</b> 이면</div>'
+          +'<div class="cond" id="s4b">넓이비는 <span class="g">제곱</span>!</div>'
+          +'<div class="formula" id="s4f" style="text-align:left;font-size:34px;white-space:nowrap">3² : 5² = <b><span class="t">9</span> : <span class="b">25</span></b></div>'
+          +'<div class="box" id="s4box"><div class="ans" style="opacity:1;transform:none"><span class="lb">△EBD : △ABC</span><span class="vv" style="font-size:56px"><span style="color:#0a6f4e">9</span> : <span style="color:#2b5fb0">25</span></span></div></div>'
+          +'</div></div>';
+      },
+      steps:[
+        {at:0.5, el:'s4a', fn:function(){showEl('g4ABC');showEl('g4EBD');setTimeout(function(){showEl('gEP4');showEl('gDP4');},400);}},
+        {at:4.0, el:'s4b', fn:function(){showEl('g4grid');}},
+        {at:7.5, el:'s4f', fn:function(){showEl('g4lbS');showEl('g4lbB');}},
+        {at:11.0,el:'s4box'},
+      ]},
+
+    // ═══ 5) 최종 계산 ═══
+    { no:'STEP 4', dur:21, kicker:'칸 → 넓이(cm²)', title:'△ABC 의 넓이는?',
+      build:function(){
+        var grid='<line x1="112.6" y1="254" x2="352.6" y2="254" stroke="#9fb4d6" stroke-width="1"/><line x1="165.2" y1="208" x2="345.2" y2="208" stroke="#9fb4d6" stroke-width="1"/><line x1="217.8" y1="162" x2="337.8" y2="162" stroke="#9fb4d6" stroke-width="1"/><line x1="270.4" y1="116" x2="330.4" y2="116" stroke="#9fb4d6" stroke-width="1"/><line x1="120" y1="300" x2="330.4" y2="116" stroke="#9fb4d6" stroke-width="1"/><line x1="180" y1="300" x2="337.8" y2="162" stroke="#9fb4d6" stroke-width="1"/><line x1="240" y1="300" x2="345.2" y2="208" stroke="#9fb4d6" stroke-width="1"/><line x1="300" y1="300" x2="352.6" y2="254" stroke="#9fb4d6" stroke-width="1"/><line x1="112.6" y1="254" x2="120" y2="300" stroke="#9fb4d6" stroke-width="1"/><line x1="165.2" y1="208" x2="180" y2="300" stroke="#9fb4d6" stroke-width="1"/><line x1="217.8" y1="162" x2="240" y2="300" stroke="#9fb4d6" stroke-width="1"/><line x1="270.4" y1="116" x2="300" y2="300" stroke="#9fb4d6" stroke-width="1"/>';
+        var extra=''
+          + '<polygon class="dr pop" id="g5ABC" points="60,300 360,300 323,70" fill="#E5EDF9" stroke="#2b5fb0" stroke-width="3.5" opacity="0"/>'
+          + '<polygon class="dr pop" id="g5EBD" points="60,300 240,300 217.8,162" fill="#7fd3ad" fill-opacity="0.55" stroke="#0f9d6e" stroke-width="3.5" opacity="0"/>'
+          + '<g class="dr pop" id="g5grid" opacity="0">'+grid+'</g>'
+          + pop('gEP5','<circle cx="217.8" cy="162" r="5" fill="#0f9d6e"/><text x="196" y="160" font-size="20" font-weight="700" fill="#0f9d6e">E</text>')
+          + pop('gDP5','<circle cx="240" cy="300" r="5" fill="#E8850C"/><text x="248" y="295" font-size="20" font-weight="700" fill="#E8850C">D</text>')
+          // 9칸=45cm² → 1칸=5cm² → 25칸=125cm²
+          + pop('g5lb45','<rect x="98" y="250" width="98" height="24" rx="8" fill="#0a6f4e"/><text x="147" y="267" font-size="14" font-weight="800" fill="#fff" text-anchor="middle">9칸=45cm²</text>')
+          + pop('g5lb1','<rect x="150" y="196" width="86" height="22" rx="7" fill="#E8850C"/><text x="193" y="212" font-size="13" font-weight="800" fill="#fff" text-anchor="middle">1칸=5cm²</text>')
+          + pop('g5lb125','<rect x="278" y="30" width="104" height="24" rx="8" fill="#2b5fb0"/><text x="330" y="47" font-size="14" font-weight="800" fill="#fff" text-anchor="middle">25칸=125cm²</text><line x1="330" y1="54" x2="324" y2="66" stroke="#2b5fb0" stroke-width="1.5"/>');
+        return '<div class="split"><div class="fig">'+baseTri(extra)+'</div>'
+          +'<div class="txtcol" style="gap:15px">'
+          +'<div class="formula" id="s5a" style="text-align:left;font-size:26px;white-space:nowrap"><span class="t">9칸</span> = <b>45cm²</b></div>'
+          +'<div class="formula" id="s5b" style="text-align:left;font-size:26px;white-space:nowrap">→ <span class="g">1칸</span> = 45÷9 = <b>5cm²</b></div>'
+          +'<div class="formula" id="s5c" style="text-align:left;font-size:26px;white-space:nowrap"><span class="b">25칸</span> = 5 × 25</div>'
+          +'<div class="box" id="s5box"><div class="ans" style="opacity:1;transform:none"><span class="lb">△ABC 의 넓이</span><span class="vv" style="font-size:58px">125 cm²</span></div></div>'
+          +'</div></div>';
+      },
+      steps:[
+        {at:0.5, el:'s5a', fn:function(){showEl('g5ABC');showEl('g5EBD');showEl('g5grid');setTimeout(function(){showEl('gEP5');showEl('gDP5');showEl('g5lb45');},400);}},
+        {at:5.5, el:'s5b', fn:function(){showEl('g5lb1');}},
+        {at:11.0,el:'s5c'},
+        {at:15.5,el:'s5box', fn:function(){showEl('g5lb125');}},
+      ]},
+
+    // ═══ 6) 핵심 정리 ═══
+    { no:'정리', dur:16, kicker:'오늘의 핵심', title:'이 3개만 기억하자',
+      build:function(){
+        var extra=''
+          // 1번: 이등분선 AD + 밑변 3:2 (밑변 아래쪽에)
+          + drawLine('k6AD','A','D','#E8850C',3)
+          + pop('k6DP','<circle cx="240" cy="300" r="5" fill="#E8850C"/><text x="232" y="326" font-size="19" font-weight="700" fill="#E8850C">D</text>')
+          + pop('k6base','<line x1="60" y1="314" x2="240" y2="314" stroke="#0f9d6e" stroke-width="6" stroke-linecap="round"/>'
+              +'<line x1="240" y1="314" x2="360" y2="314" stroke="#2b5fb0" stroke-width="6" stroke-linecap="round"/>'
+              +'<text x="150" y="333" font-size="15" font-weight="800" fill="#0f9d6e" text-anchor="middle">3</text>'
+              +'<text x="300" y="333" font-size="15" font-weight="800" fill="#2b5fb0" text-anchor="middle">2</text>')
+          // 2번: DE + 작은삼각형 채움
+          + drawLine('k6DE','E','D','#0f9d6e',3.5)
+          + pop('k6EP','<circle cx="217.8" cy="162" r="5" fill="#0f9d6e"/><text x="196" y="160" font-size="19" font-weight="700" fill="#0f9d6e">E</text>')
+          + '<polygon class="dr pop" id="k6EBD" points="60,300 240,300 217.8,162" fill="#DFF3EA" stroke="#0f9d6e" stroke-width="2.5" opacity="0"/>'
+          // 3번: 넓이 9:25 (EBD 안쪽 / 사다리꼴 쪽)
+          + pop('k6area','<text x="172" y="258" font-size="17" font-weight="800" fill="#0a6f4e" text-anchor="middle">9</text>'
+              +'<text x="298" y="150" font-size="19" font-weight="800" fill="#2b5fb0" text-anchor="middle">25</text>');
+        return '<div class="split"><div class="fig">'+baseTri(extra)+'</div>'
+          +'<div class="txtcol" style="gap:22px;justify-content:center">'
+          +'<div class="keyrow k1" id="k1" style="font-size:25px"><span class="num">1</span><span>각의 이등분선 → 밑변이 <b>양 변의 비(3:2)</b>로 나뉜다</span></div>'
+          +'<div class="keyrow k2" id="k2" style="font-size:25px"><span class="num">2</span><span>평행선 → 닮음, 닮음비 <b>BD:BC = 3:5</b></span></div>'
+          +'<div class="keyrow k3" id="k3" style="font-size:25px"><span class="num">3</span><span>넓이비 = <b>닮음비의 제곱(9:25)</b></span></div>'
+          +'</div></div>';
+      },
+      steps:[
+        {at:0.5, el:'k1', fn:function(){draw('k6AD');setTimeout(function(){showEl('k6DP');showEl('k6base');},500);}},
+        {at:5.0, el:'k2', fn:function(){draw('k6DE');setTimeout(function(){showEl('k6EP');showEl('k6EBD');},500);}},
+        {at:9.5, el:'k3', fn:function(){showEl('k6area');}},
       ]},
   ];
 
   var content=document.getElementById('content');
-  var timers=[];
-  function clearTimers(){ timers.forEach(clearTimeout); timers=[]; }
+  var timers=[]; function clearTimers(){timers.forEach(clearTimeout);timers=[];}
 
   function showScene(i, animate){
     clearTimers();
@@ -275,29 +339,17 @@
     if(animate){
       s.steps.forEach(function(st){
         timers.push(setTimeout(function(){
-          var el=document.getElementById(st.el); if(el) el.classList.add('on');
-          if(st.svg) st.svg.forEach(function(id){
-            var g=document.getElementById(id);
-            if(g){ g.classList.add('on'); g.style.opacity='1'; g.style.transition='opacity .5s ease'; g.classList.add('spark-on'); setTimeout(function(){g.classList.remove('spark-on');},900); }
-            if(id==='gDE'){ var dl=document.getElementById('deLine'); if(dl){
-              dl.style.strokeDasharray='135'; dl.style.strokeDashoffset='135'; dl.style.transition='stroke-dashoffset .9s ease';
-              setTimeout(function(){ dl.style.strokeDashoffset='0'; setTimeout(function(){dl.classList.add('spark');},900); },200);
-            } }
-          });
+          var el=document.getElementById(st.el); if(el) el.classList.add('on','hot');
+          // 이전 hot 제거
+          s.steps.forEach(function(o){ if(o.el!==st.el){var oe=document.getElementById(o.el); if(oe)oe.classList.remove('hot');} });
+          if(st.fn) st.fn();
         }, st.at*1000));
       });
     } else {
-      // 정지 시엔 전부 표시
+      // 정지 프리뷰 = 전부 표시 (선 즉시 그림)
       s.steps.forEach(function(st){
         var el=document.getElementById(st.el); if(el) el.classList.add('on');
-        if(st.svg) st.svg.forEach(function(id){
-            var g=document.getElementById(id);
-            if(g){ g.classList.add('on'); g.style.opacity='1'; g.style.transition='opacity .5s ease'; g.classList.add('spark-on'); setTimeout(function(){g.classList.remove('spark-on');},900); }
-            if(id==='gDE'){ var dl=document.getElementById('deLine'); if(dl){
-              dl.style.strokeDasharray='135'; dl.style.strokeDashoffset='135'; dl.style.transition='stroke-dashoffset .9s ease';
-              setTimeout(function(){ dl.style.strokeDashoffset='0'; setTimeout(function(){dl.classList.add('spark');},900); },200);
-            } }
-          });
+        if(st.fn) st.fn();
       });
     }
   }
@@ -306,24 +358,18 @@
   function playAll(){
     var i=0;
     function playScene(){
-      if(i>=SCENES.length){ if(document.body.classList.contains('obs')){ setTimeout(function(){ i=0; cur=0; playScene(); },2000); } return; }
-      cur=i; showScene(i, true);
-      var dur=SCENES[i].dur*1000;
-      timers.push(setTimeout(function(){ i++; playScene(); }, dur));
+      if(i>=SCENES.length){ if(document.body.classList.contains('obs')){setTimeout(function(){i=0;cur=0;playScene();},2500);} return; }
+      cur=i; showScene(i,true);
+      timers.push(setTimeout(function(){i++;playScene();}, SCENES[i].dur*1000));
     }
     clearTimers(); playScene();
   }
 
   document.getElementById('play').onclick=playAll;
-  document.getElementById('prev').onclick=function(){ if(cur>0){cur--;showScene(cur,false);} };
-  document.getElementById('next').onclick=function(){ if(cur<SCENES.length-1){cur++;showScene(cur,false);} };
-
-  // OBS 모드
-  document.getElementById('obsBtn').onclick=function(){ document.body.classList.add('obs'); setTimeout(playAll,600); };
-  (function(){
-    if(location.search.indexOf('obs')>=0){ document.body.classList.add('obs'); setTimeout(playAll,700); }
-    else showScene(0,false);
-  })();
+  document.getElementById('prev').onclick=function(){if(cur>0){cur--;showScene(cur,false);}};
+  document.getElementById('next').onclick=function(){if(cur<SCENES.length-1){cur++;showScene(cur,false);}};
+  document.getElementById('obsBtn').onclick=function(){document.body.classList.add('obs');setTimeout(playAll,600);};
+  (function(){ if(location.search.indexOf('obs')>=0){document.body.classList.add('obs');setTimeout(playAll,700);} else showScene(0,false); })();
 </script>
 </body>
 </html>
