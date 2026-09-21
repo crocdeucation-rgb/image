@@ -12,7 +12,21 @@
   var CFG={apiKey:"AIzaSyCBDimk0MyGAHf762mvInS_H4K9HkW6Ol0",authDomain:"dashboard-88ba4.firebaseapp.com",projectId:"dashboard-88ba4",storageBucket:"dashboard-88ba4.firebasestorage.app",messagingSenderId:"857535538974",appId:"1:857535538974:web:999d190f28e14964eb4b0f"};
   var ALLOW=['032100jesus@gmail.com','christuhm@gmail.com','crocdeucation@gmail.com','kanghansara@gmail.com','thestudydesign@gmail.com','loityr123@gmail.com'];
 
-  if(!window.firebase||!firebase.auth){ console.error('[gate] firebase SDK 필요'); return; }
+  // [2026-09] firebase SDK가 gate.js보다 늦게 로드되는 경우(카톡·인스타 인앱 웹뷰에서 gstatic 지연)
+  //   기존엔 여기서 즉시 return → onAuthStateChanged 미등록 → __pregate가 안 지워져 빈 화면이 됐다.
+  //   SDK가 올 때까지 폴링하고, 끝내 안 오면(네트워크 차단) __pregate를 풀어 최소한 로그인벽이라도 보이게 한다.
+  var _fbTries=0;
+  (function waitFirebase(){
+    if(window.firebase && firebase.auth){ initGate(); return; }
+    if(_fbTries++ > 100){   // 약 10초(100×100ms) 대기해도 SDK 없으면 포기
+      console.error('[gate] firebase SDK 로드 실패');
+      try{ var _pg=document.getElementById('__pregate'); if(_pg) _pg.parentNode.removeChild(_pg); }catch(e){}
+      return;
+    }
+    setTimeout(waitFirebase, 100);
+  })();
+
+  function initGate(){
   try{ firebase.app(); }catch(e){ firebase.initializeApp(CFG); }
   var auth=firebase.auth();
 
@@ -177,5 +191,6 @@
       setTimeout(function(){ t.classList.remove('show'); },1800);
       setTimeout(function(){ if(t.parentNode)t.parentNode.removeChild(t); },2200);
     }
+  }
   }
 })();
