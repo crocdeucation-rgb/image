@@ -29,7 +29,7 @@
     transform:rotate(-2deg);transform-origin:left center;}
   .hlbox.on{opacity:1;}
   /* 우측 피드백 */
-  .fbCol{flex:1;position:relative;padding:48px 56px 40px;display:flex;flex-direction:column;gap:18px;
+  .fbCol{flex:1;position:relative;padding:48px 56px 40px;justify-content:flex-start;display:flex;flex-direction:column;gap:18px;
     background:#FFFBF5;
     background-image:
       linear-gradient(#F0E6D6 1px, transparent 1px),
@@ -49,13 +49,13 @@
   .cmt .n1{background:var(--red);} .cmt .n2{background:var(--blue);}
   .cmt.big{font-size:31px;}
   /* 예시 카드 */
-  .exwrap{margin-top:2px;margin-right:150px;background:linear-gradient(135deg,#EAF1FF,#F3F7FF);border:2px solid #C7D8FF;border-radius:18px;box-shadow:0 8px 20px rgba(46,91,255,.10);
+  .exwrap{margin-top:2px;margin-right:230px;background:linear-gradient(135deg,#EAF1FF,#F3F7FF);border:2px solid #C7D8FF;border-radius:18px;box-shadow:0 8px 20px rgba(46,91,255,.10);
     padding:22px 26px;opacity:0;transform:scale(.96);transition:opacity .5s,transform .5s;align-self:flex-start;max-width:100%;}
   .exwrap.on{opacity:1;transform:none;}
   .extag{font-family:'Pretendard';font-size:15px;font-weight:800;color:#fff;
     background:var(--blue);border-radius:8px;padding:3px 14px;display:inline-block;margin-bottom:12px;letter-spacing:1px;}
   .exline{font-family:'Nanum Pen Script','Gaegu',cursive;color:var(--hand);
-    font-size:40px;line-height:1.4;white-space:nowrap;min-height:50px;transform:rotate(-1deg);}
+    font-size:42px;line-height:1.35;white-space:nowrap;min-height:48px;transform:rotate(-1deg);}
   /* 얼굴 자리 안내(가이드, OBS선 투명) */
   .facehint{position:absolute;border:2px dashed rgba(120,130,150,.5);border-radius:50%;
     display:flex;align-items:center;justify-content:center;font-size:12px;color:#8892a6;font-family:system-ui;pointer-events:none;}
@@ -92,7 +92,8 @@
       <div class="cmt" id="c4"><span class="num n2">2</span>정리 밑에 <b>예시 한 줄</b> 적어두자<br><span style="font-size:22px;color:#5a6b85">예시가 있어야 복습할 때 안 헷갈려</span></div>
       <div class="exwrap" id="ex">
         <span class="extag">예시</span>
-        <div class="exline" id="exln"></div>
+        <div class="exline" id="exln1"></div>
+        <div class="exline" id="exln2" style="margin-top:2px;padding-left:120px"></div>
       </div>
     </div>
     <div class="facehint" id="faceL">선생님 얼굴</div>
@@ -114,7 +115,8 @@
     ['fh','c1','c2','c3','c4','ex'].forEach(function(id){var e=document.getElementById(id);if(e)e.classList.remove('on');});
     ['hlbox'].forEach(function(id){var e=document.getElementById(id);if(e)e.classList.remove('on');});
     ['ul1','ul2'].forEach(function(id){var e=document.getElementById(id);if(e)e.classList.remove('go');});
-    document.getElementById('exln').textContent='';
+    document.getElementById('exln1').textContent='';
+    document.getElementById('exln2').textContent='';
   }
   function typeLine(id,text,cps){
     return new Promise(function(res){
@@ -170,9 +172,9 @@
     //   → 예시 카드 천천히 등장(텍스트 안 늘림). 음성이 메인.
     at(17.28, function(){on('ex');});
     // 30.22s "3.24 나누기 1.2는" (2.59)
-    at(30.22, function(){typeLine('exln','3.24 ÷ 1.2', 11);});
+    at(30.22, function(){typeLine('exln1','3.24 ÷ 1.2 = 324 ÷ 120', 12);});
     // 32.81s "324 나누기 120은 2.7" (4.58)
-    at(32.81, function(){typeLine('exln','3.24 ÷ 1.2 = 324 ÷ 120 = 2.7', 12);});
+    at(32.81, function(){typeLine('exln2','= 2.7', 10);});
     // 총 ~37.4s
   }
   document.getElementById('play').onclick=playAll;
