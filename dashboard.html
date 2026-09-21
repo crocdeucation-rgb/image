@@ -62,6 +62,7 @@ body { background: #f8f9fa; padding: 20px 0 0; overflow-x: hidden; }
 .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
 .title { font-size: 13px; font-weight: 600; color: #1a1a1a; }
 .updated { font-size: 10px; color: #999; margin-top: 2px; }
+.updated .asof{color:#1a73e8;font-weight:800;background:#eaf1fe;padding:1px 7px;border-radius:6px;font-size:10.5px}
 .refresh { font-size: 11px; padding: 3px 9px; border: 1px solid #ddd; border-radius: 6px; background: white; cursor: pointer; color: #555; }
 .tabs { display: flex; gap: 5px; margin-bottom: 10px; }
 .tab { padding: 4px 11px; font-size: 11px; border-radius: 16px; border: 1px solid #ddd; background: white; color: #666; cursor: pointer; }
@@ -643,7 +644,7 @@ async function loadCancel() {
       var _u = document.getElementById('updated');
       if (_u && _u.textContent.indexOf('까지 반영') < 0 && _u.textContent.indexOf('업데이트') === 0) {
         var _m = totalDataDate.split('-');
-        _u.textContent += ' · ' + parseInt(_m[1],10) + '월 ' + parseInt(_m[2],10) + '일까지 반영';
+        _u.innerHTML += ' · <b class="asof">' + parseInt(_m[1],10) + '월 ' + parseInt(_m[2],10) + '일까지 반영</b>';
       }
     }
   } catch(e) {
@@ -711,9 +712,9 @@ async function loadData() {
     var _upd = '업데이트: ' + now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
     if (totalDataDate) {
       var _md = totalDataDate.split('-');   // yyyy-mm-dd
-      _upd += ' · ' + parseInt(_md[1],10) + '월 ' + parseInt(_md[2],10) + '일까지 반영';
+      _upd += ' · <b class="asof">' + parseInt(_md[1],10) + '월 ' + parseInt(_md[2],10) + '일까지 반영</b>';
     }
-    document.getElementById('updated').textContent = _upd;
+    document.getElementById('updated').innerHTML = _upd;
   } catch(e) {
     document.getElementById('updated').textContent = '로드 실패';
   }
