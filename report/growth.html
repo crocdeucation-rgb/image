@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8"><style id="__pregate">body{visibility:hidden!important}#agate{visibility:visible!important}</style><script>try{if(window.self!==window.top){var e=document.getElementById("__pregate");if(e)e.remove();}}catch(_){}</script>
+<meta charset="UTF-8"><style id="__pregate">body{visibility:hidden!important}#agate{visibility:visible!important}</style><script>try{if(window.self!==window.top){var e=document.getElementById("__pregate");if(e)e.remove();}}catch(_){}
+/* fail-safe: gate.js가 __pregate를 못 지우는 옛 버전이어도, 로그인벽(#agate)이 떠서 콘텐츠를 덮고 있으면 body를 풀어준다(agate가 가리므로 노출 안 됨). agate가 없으면(게이트 로드 실패) 계속 숨김 유지. */
+setTimeout(function(){try{var pg=document.getElementById("__pregate");if(pg&&document.getElementById("agate")){pg.parentNode.removeChild(pg);}}catch(_){}} ,2500);</script>
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -1150,4 +1152,4 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
       <tr><td class="l">릴스_방으로</td><td class="l"><span class="badge b-new">신규</span></td><td class="r">314,903</td><td class="r">8</td><td class="r">39,363</td><td class="r">0</td><td class="r">—</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
       <tr><td class="l">너만본다</td><td class="l"><span class="badge b-end">정지</span></td><td class="r">270,649</td><td class="r">1</td><td class="r red">270,649</td><td class="r">0</td><td class="r">—</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
       <tr><td class="l">기초부족</td><td class="l"><span class="badge b-end">정지</span></td><td class="r">267,069</td><td class="r">3</td><td class="r">89,023</td><td class="r">0</td><td class="r">—</td><td class="r">0</td><td class="r">—</td><td class="r">—</td></tr>
-      <tr><td class="l" style="color:var(--sub)">기타 <span style="font-size:10px;color:var(--faint)">비메타 채널 · 소재 미귀속</span></td><td class="l"></td><td class="r" style="color:var(--faint)">—</td><td class="r" style="color:var(--faint)">—</td><td class="r" style="color:var(--faint)">—</td><td class="r" style="color:var(--sub)">5</td><td class="r" style="color:var(--sub)">22,542,000원</td><td class="r" style="color:var(--sub)">5</td><td class="r
+      <tr><td class="l" style="color:var(--sub)">기타 <span style="font-size:10px;color:var(--faint)">비메타 채널 · 소재 미귀속</span></td><td class
