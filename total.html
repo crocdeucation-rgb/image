@@ -1036,25 +1036,29 @@ function updateAsOfLabel(D, isLive){
     return;
   }
   el.textContent='매일 갱신';
-  if(window.__asOfDone) return; window.__asOfDone=true;
+  if(window.__asOfDone) return;   // 성공적으로 기준일 채운 경우만 스킵
+  if(window.__asOfRunning) return; window.__asOfRunning=true;
   try{
     // [2026-09-19] 방식 D — 원장(Firestore) 최신일 사용. fdLoadLedger가 __ledgerMax 계산.
     fdLoadLedger().then(function(){
       var mx=window.__ledgerMax||0;   // YYYYMMDD
       if(mx>0){ var mo=Math.floor(mx/100)%100, dy=mx%100; window.__asOfMx=mo*100+dy;
         el.innerHTML='📅 <b style="color:#4C6EF5">'+mo+'월 '+dy+'일</b>까지 반영 · 매일 갱신';
+        window.__asOfDone=true;   // 기준일 확정 성공
       } else {
         el.innerHTML='<span style="color:#94a0b8">집계 전 · 원장 갱신 대기</span>';   // [2026-09] 원장 최신일 없으면 오늘로 위장 금지
       }
-    }).catch(function(){});
-  }catch(e){}
+      window.__asOfRunning=false;
+    }).catch(function(){ window.__asOfRunning=false; });
+  }catch(e){ window.__asOfRunning=false; }
 }
 /* [2026-09] 어제매출 — 오늘 요일 기준. 월=토·일 2줄 / 화~토=어제 1줄 / 일=없음.
    원장(리드요약_원장) order매출을 날짜별로 웹마(isWeb)·상담(그외)·전사로 나눠 카드에 표시. */
 function updateYesterdaySales(){
   var H=document.getElementById('h_yst'), W=document.getElementById('w_yst'), S=document.getElementById('s_yst');
   if(!H) return;
-  if(window.__ystDone) return; window.__ystDone=true;
+  if(window.__ystDone) return;   // 이미 성공적으로 채운 경우만 스킵 (플래그는 콜백 성공 후 찍음)
+  if(window.__ystRunning) return; window.__ystRunning=true;   // 동시 중복 실행만 차단
   // 표시할 날짜 결정 (오늘 요일)
   var now=new Date(), dow=now.getDay(); // 0=일
   var targets=[]; // {label, dateObj}
@@ -1071,10 +1075,12 @@ function updateYesterdaySales(){
   }
   // 원장 로드 후 날짜별 집계
   fdLoadLedger().then(function(rows){
-    // [2026-09] 원장에 실제 존재하는 최신 order 날짜 → 이후 날짜는 "반영 전"
+    // [2026-09] 원장에 실제 매출(order)이 있는 최신 날짜 → 이후 날짜는 "반영 전"
+    //   ★ sales>0 필수 — 매출 0인 order 행(취소·결보 등)만 있는 날은 "실적 반영된 날"이 아님.
+    //     (이 조건 없으면 전날 실적 업로드 전 공백 상태가 "반영 전" 대신 0으로 잘못 표시됨)
     var _maxRd='';
     rows.forEach(function(r){
-      if(r.state!=='order') return;
+      if(r.state!=='order' || r.sales<=0) return;
       var rd=r.dt.y+'-'+('0'+r.dt.m).slice(-2)+'-'+('0'+r.dt.d).slice(-2);
       if(rd>_maxRd) _maxRd=rd;
     });
@@ -1106,7 +1112,8 @@ function updateYesterdaySales(){
     if(H) H.innerHTML=hb.join('');
     if(W) W.innerHTML=wb.join('');
     if(S) S.innerHTML=sb.join('');
-  }).catch(function(){});
+    window.__ystDone=true; window.__ystRunning=false;   // 렌더 성공 → 확정 (첫 로드 race 방지)
+  }).catch(function(){ window.__ystRunning=false; });    // 실패 → 다음 renderAll에서 재시도
 }
 function renderAll(D){
   window.__D = D;
