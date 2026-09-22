@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko"><head>
-<meta charset="UTF-8"><style id="__pregate">body{visibility:hidden!important}#agate{visibility:visible!important}</style><script>try{if(window.self!==window.top){var e=document.getElementById("__pregate");if(e)e.remove();}}catch(_){}</script>
+<meta charset="UTF-8"><style id="__pregate">body{visibility:hidden!important}#agate{visibility:visible!important}
+</style><script>try{if(window.self!==window.top){var e=document.getElementById("__pregate");if(e)e.remove();}}catch(_){}</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <script>window.GATE_CFG={title:'파운더님 전용 · 일일 업무보고',sub:'등록된 계정으로만 열람할 수 있습니다.<br>Google 계정으로 로그인해 주세요.',foot:'보고 · 신상준 이사'}</script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -82,6 +83,23 @@
   .adnote .tx b{color:#7a5b00;font-weight:800}
   @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .adnote .tx,:root:not([data-theme="light"]) .adnote .tx b{color:#e0b45a}}
   .foot{text-align:center;font-size:12.5px;color:var(--gray2);margin-top:28px;padding-top:18px;border-top:1px solid var(--line)}
+
+  /* 로드맵 압축 */
+  .rm-hd{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+  .rm-dday{font-size:22px;font-weight:900;color:var(--purple);letter-spacing:-1px}
+  .rm-dday span{font-size:13px}
+  .rm-obar{flex:1;min-width:140px;height:10px;background:var(--soft);border-radius:100px;overflow:hidden;border:1px solid var(--line)}
+  .rm-ofill{height:100%;background:linear-gradient(90deg,var(--purple),#8b6ff0);border-radius:100px}
+  .rm-opct{font-size:16px;font-weight:900;color:var(--purple)}
+  .rm-list{display:flex;flex-direction:column;gap:9px}
+  .rm-item{display:flex;align-items:center;gap:11px}
+  .rm-nm{font-size:13px;font-weight:700;color:var(--ink);min-width:150px;letter-spacing:-.3px}
+  .rm-nm .fx{font-size:10px;font-weight:800;color:var(--gray2);background:var(--soft);padding:1px 6px;border-radius:5px;margin-left:4px}
+  .rm-bar{flex:1;height:8px;background:var(--soft);border-radius:100px;overflow:hidden}
+  .rm-fill{height:100%;border-radius:100px}
+  .rm-pct{font-size:12.5px;font-weight:800;min-width:38px;text-align:right;color:var(--gray)}
+  .rm-fill.f-orange{background:var(--orange)}.rm-fill.f-blue{background:var(--blue)}.rm-fill.f-green{background:var(--green)}.rm-fill.f-gray{background:#9aa8c0}.rm-fill.f-red{background:var(--red)}
+  @media(max-width:560px){.rm-nm{min-width:110px;font-size:12px}}
 </style></head>
 <body>
 <div class="wrap">
@@ -156,7 +174,7 @@
   <div class="sec c-o">
     <div class="sh"><div class="no">4</div><div class="tt">콘텐츠 제작</div></div>
     <ul>
-      <li>코칭 비하인드 영상 (EP.01) <b>최종 편집 완료</b> — <a href="https://youtu.be/s_nlq7gakEM" target="_blank">영상 링크</a> · 내일 10:30 공개</li>
+      <li>코칭 비하인드 다큐 (EP.01) — "코칭쌤들은 어떻게 하루를 준비할까요" · <a href="https://youtu.be/s_nlq7gakEM" target="_blank">영상 링크</a> · 내일 10:30 공개</li>
       <li>썸네일 A/B 테스트용 <b>6종</b> 제작 완료 ↓</li>
       <li>국세청 글짓기 입상 후기 캐러셀 6장 (1:1 규격) 제작</li>
     </ul>
@@ -184,6 +202,26 @@
       <div><div class="t">운영본부 대시보드 통합</div><div class="d">운본 지표를 통합 대시보드로 — 기획 착수</div><span class="s">기획 중</span></div>
       <div><div class="t">쌤이다 현황판</div><div class="d">구글시트 연결 → 각자 직접 입력 가능하게</div><span class="s">착수</span></div>
     </div>
+  </div>
+
+    <div class="sec c-p" style="border-left:none">
+    <div class="sh"><div class="no" style="background:#6D5AE6">7</div><div class="tt" style="color:#6D5AE6">10/10 로드맵 진척</div><div class="ex">전 과제 10/10 마감</div></div>
+    <div class="rm-hd">
+      <div class="rm-dday">D-<span>17</span></div>
+      <div class="rm-obar"><div class="rm-ofill" style="width:28%"></div></div>
+      <div class="rm-opct">28%</div>
+    </div>
+    <div class="rm-list">
+      <div class="rm-item"><div class="rm-nm">쌤이다 랜딩페이지 <span class="fx">핵심</span></div><div class="rm-bar"><div class="rm-fill f-orange" style="width:12%"></div></div><div class="rm-pct">12%</div></div>
+      <div class="rm-item"><div class="rm-nm">광고소재(오퍼 포장)</div><div class="rm-bar"><div class="rm-fill f-orange" style="width:15%"></div></div><div class="rm-pct">15%</div></div>
+      <div class="rm-item"><div class="rm-nm">아라온 신규 소재</div><div class="rm-bar"><div class="rm-fill f-blue" style="width:20%"></div></div><div class="rm-pct">20%</div></div>
+      <div class="rm-item"><div class="rm-nm">쌤이다 블로그</div><div class="rm-bar"><div class="rm-fill f-blue" style="width:40%"></div></div><div class="rm-pct">40%</div></div>
+      <div class="rm-item"><div class="rm-nm">코칭 비하인드 다큐</div><div class="rm-bar"><div class="rm-fill f-green" style="width:90%"></div></div><div class="rm-pct">90%</div></div>
+      <div class="rm-item"><div class="rm-nm">최정민쌤 영상 <span class="fx">유동</span></div><div class="rm-bar"><div class="rm-fill f-gray" style="width:10%"></div></div><div class="rm-pct">10%</div></div>
+      <div class="rm-item"><div class="rm-nm">쌤캐스트 <span class="fx">유동</span></div><div class="rm-bar"><div class="rm-fill f-gray" style="width:5%"></div></div><div class="rm-pct">5%</div></div>
+      <div class="rm-item"><div class="rm-nm">수행평가 데이터허브 <span class="fx">유동</span></div><div class="rm-bar"><div class="rm-fill f-gray" style="width:25%"></div></div><div class="rm-pct">25%</div></div>
+    </div>
+    <div class="note" style="margin-top:14px">전 과제 10/10 완수 목표(D-17). 확정 5개 + 시도(유동) 3개. <b>코칭 다큐</b> 내일 공개로 마무리, <b>쌤이다 랜딩</b>이 최우선 착수 과제.</div>
   </div>
 
   <div class="adnote">
