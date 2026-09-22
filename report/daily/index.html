@@ -59,7 +59,7 @@
 <script>
 /* [파운더 전용] 파운더 아니면 차단 */
 (function(){
-  var FOUNDER='032100jesus@gmail.com';
+  var ALLOW=['032100jesus@gmail.com','crocdeucation@gmail.com'];
   function block(email){
     document.body.style.overflow='hidden';
     var w=document.querySelector('.wrap'); if(w) w.style.display='none';
@@ -73,7 +73,7 @@
       if(typeof firebase==='undefined'||!firebase.auth){ setTimeout(check,300); return; }
       firebase.auth().onAuthStateChanged(function(u){
         if(!u) return;
-        if((u.email||'').toLowerCase()!==FOUNDER){ block(u.email); }
+        if(ALLOW.indexOf((u.email||'').toLowerCase())<0){ block(u.email); }
       });
     }catch(e){ setTimeout(check,300); }
   }
