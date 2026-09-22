@@ -21,6 +21,7 @@
   --film:#e06a2c;   --film-bg:#fdf0e8;   --film-line:#f5d2bd;
   --dash:#3f6fd0;   --dash-bg:#eaf1fc;   --dash-line:#c8daf5;
   --sec:#b07d0a;    --sec-bg:#faf3df;    --sec-line:#ecd9a3;
+  --init:#6D5AE6;   --init-bg:#EDEAFC;   --init-line:#cfc7f5;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
@@ -55,8 +56,9 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 .s-film   .sect-ic{background:var(--film-bg);color:var(--film)}
 .s-dash   .sect-ic{background:var(--dash-bg);color:var(--dash)}
 .s-sec    .sect-ic{background:var(--sec-bg);color:var(--sec)}
+.s-init   .sect-ic{background:var(--init-bg);color:var(--init)}
 .s-weekly .sect-tt{color:var(--weekly)} .s-film .sect-tt{color:var(--film)}
-.s-dash .sect-tt{color:var(--dash)} .s-sec .sect-tt{color:var(--sec)}
+.s-dash .sect-tt{color:var(--dash)} .s-sec .sect-tt{color:var(--sec)} .s-init .sect-tt{color:var(--init)}
 
 /* 리포트 카드 리스트 */
 .rlist{display:flex;flex-direction:column;gap:9px}
@@ -66,6 +68,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 .s-film   .rcard{border-left-color:var(--film)}   .s-film .rcard:hover{border-color:var(--film-line)}
 .s-dash   .rcard{border-left-color:var(--dash)}   .s-dash .rcard:hover{border-color:var(--dash-line)}
 .s-sec    .rcard{border-left-color:var(--sec)}    .s-sec .rcard:hover{border-color:var(--sec-line)}
+.s-init   .rcard{border-left-color:var(--init)}   .s-init .rcard:hover{border-color:var(--init-line)}
 .rc-body{flex:1;min-width:0}
 .rc-tt{font-size:14.5px;font-weight:700;letter-spacing:-.3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .rc-new{font-size:9.5px;font-weight:800;color:#fff;background:var(--weekly);border-radius:5px;padding:2px 6px;letter-spacing:.3px}
@@ -172,6 +175,32 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
         <div class="rc-ds">대시보드 → 시트 분리 → Firebase 4단 잠금 → 문서 관리까지, 전체 구축 과정과 소유 구조</div>
       </div>
       <div class="rc-meta">2026.09.19</div>
+      <div class="rc-arrow">→</div>
+    </a>
+  </div>
+</div>
+
+<div class="sect s-init">
+  <div class="sect-hd">
+    <div class="sect-ic">🚀</div>
+    <div class="sect-tt">신규 이니셔티브</div>
+    <div class="sect-ds">블로그 자동화 · 데이터허브 · 콘텐츠 기획</div>
+  </div>
+  <div class="rlist">
+    <a class="rcard" href="blog_agent.html">
+      <div class="rc-body">
+        <div class="rc-tt">1부 · 블로그 에이전트 기획 <span class="rc-new">NEW</span></div>
+        <div class="rc-ds">Claude 에이전트로 입시뉴스 블로그 매일 자동 생성 — 뉴스 원고 예시 포함</div>
+      </div>
+      <div class="rc-meta">2026.09.22</div>
+      <div class="rc-arrow">→</div>
+    </a>
+    <a class="rcard" href="data_hub.html">
+      <div class="rc-body">
+        <div class="rc-tt">2부 · 수행평가 데이터허브 구축 <span class="rc-new">NEW</span></div>
+        <div class="rc-ds">전국 학교 평가계획을 표(DB)로 구축 → 조회기·코칭·블로그 재사용. 아라온 독점 데이터</div>
+      </div>
+      <div class="rc-meta">2026.09.22</div>
       <div class="rc-arrow">→</div>
     </a>
   </div>
