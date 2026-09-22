@@ -1097,7 +1097,7 @@ function updateYesterdaySales(){
       var lbl=(targets.length>1? wd : '어제')+'('+md+')';
       // [2026-09] 그 날짜가 원장 최신일 이후면 아직 반영 전 → 0 대신 "반영 전"
       if(_maxRd && ds>_maxRd){
-        var _wait='<span class="yb" style="opacity:.6">'+lbl+' <b style="color:#94a0b8;font-weight:600">반영 전</b></span>';
+        var _wait='<span class="yb" style="background:#FFF0E0;color:#E8850C;font-weight:800">'+lbl+' <b style="color:#E8850C;font-weight:800">· 반영 전</b></span>';
         hb.push(_wait); wb.push(_wait); sb.push(_wait);
         return;
       }
