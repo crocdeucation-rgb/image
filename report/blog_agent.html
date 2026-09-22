@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<script>window.GATE_CFG={title:'경영진 전용 · 블로그 에이전트 기획',sub:'등록된 경영진 계정으로만 열람할 수 있습니다.<br>Google 계정으로 로그인해 주세요.',foot:'문의 · 신상준 이사'}</script>
+<script src="../gate.js"></script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>블로그 에이전트 기획 · 아라온 그로스</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  :root{
+    --navy:#1B2A4A; --blue:#2E5BFF; --blue-l:#EEF2FF; --gray:#5A6B85; --line:#E3E9F4;
+    --green:#0F9D6E; --green-l:#E5F6EF; --orange:#E8850C; --orange-l:#FDF1E2; --red:#E5533D;
+    --bg:#FFFFFF; --ink:#1F2A3D; --card:#F8FAFF; --hl:#FFF3C4;
+    box-sizing:border-box; padding-top:env(safe-area-inset-top,0); padding-bottom:env(safe-area-inset-bottom,0);
+  }
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0F1420;--ink:#E7ECF5;--navy:#CBD8F5;--gray:#93A2BE;--line:#26324A;--card:#161D2C;--blue-l:#182444;--green-l:#123027;--orange-l:#2A2114;--hl:#3A3417;}}
+  :root[data-theme="dark"]{--bg:#0F1420;--ink:#E7ECF5;--navy:#CBD8F5;--gray:#93A2BE;--line:#26324A;--card:#161D2C;--blue-l:#182444;--green-l:#123027;--orange-l:#2A2114;--hl:#3A3417;}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Pretendard',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.65}
+  .wrap{max-width:940px;margin:0 auto;padding:56px 24px 100px}
+  .doctag{display:inline-block;font-size:12px;font-weight:800;color:#fff;background:var(--blue);padding:4px 12px;border-radius:100px;margin-bottom:14px}
+  .ey{font-size:14px;font-weight:800;color:var(--blue);letter-spacing:.3px;margin-bottom:10px}
+  h1.title{font-size:clamp(30px,5vw,46px);font-weight:900;color:var(--navy);letter-spacing:-1.5px;line-height:1.12}
+  .sub{font-size:clamp(16px,2.4vw,20px);color:var(--gray);font-weight:600;margin-top:14px}
+  .meta{font-size:13.5px;color:var(--gray);margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+  .hero{background:linear-gradient(135deg,var(--blue),#4C6EF5);color:#fff;border-radius:20px;padding:30px 32px;margin:34px 0 8px;box-shadow:0 14px 40px rgba(46,91,255,.22)}
+  .hero .k{font-size:13px;font-weight:800;opacity:.85;letter-spacing:1px;margin-bottom:10px}
+  .hero .v{font-size:clamp(18px,2.6vw,23px);font-weight:800;line-height:1.5}
+  .hero .v b{background:rgba(255,255,255,.22);padding:1px 8px;border-radius:6px}
+  /* 목차 */
+  .toc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin:28px 0}
+  .toc .tt{font-size:13px;font-weight:800;color:var(--gray);margin-bottom:8px}
+  .toc a{display:inline-block;font-size:14.5px;color:var(--blue);text-decoration:none;margin-right:18px;font-weight:600}
+  h2{font-size:clamp(21px,3vw,27px);font-weight:900;color:var(--navy);letter-spacing:-.8px;margin:52px 0 6px;padding-bottom:12px;border-bottom:2px solid var(--blue);scroll-margin-top:20px}
+  h3{font-size:18.5px;font-weight:800;color:var(--blue);margin:26px 0 10px}
+  p{font-size:16px;color:var(--ink);margin:10px 0}
+  p.lead{font-size:17px}
+  .muted{color:var(--gray);font-size:14.5px}
+  b,strong{font-weight:800}
+  .hl{background:linear-gradient(transparent 58%,var(--hl) 58%);font-weight:800}
+  .flow{display:flex;flex-direction:column;gap:12px;margin:20px 0}
+  .step{display:flex;gap:16px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .step .n{flex:none;width:34px;height:34px;border-radius:10px;background:var(--blue);color:#fff;font-weight:900;font-size:17px;display:flex;align-items:center;justify-content:center}
+  .step .tx b{font-size:16.5px;color:var(--navy);font-weight:800}
+  .step .tx span{font-size:15px;color:var(--gray)}
+  .call{border-radius:14px;padding:18px 20px;margin:20px 0;font-size:15.5px}
+  .call.g{background:var(--green-l);border-left:4px solid var(--green)}
+  .call.o{background:var(--orange-l);border-left:4px solid var(--orange)}
+  .call.b{background:var(--blue-l);border-left:4px solid var(--blue)}
+  .call b{color:var(--navy)}
+  .tw{overflow-x:auto;margin:20px 0;border-radius:14px;border:1px solid var(--line)}
+  table{width:100%;border-collapse:collapse;font-size:14.5px;min-width:540px}
+  th{background:var(--blue);color:#fff;font-weight:800;text-align:left;padding:12px 14px;font-size:14px}
+  td{padding:12px 14px;border-top:1px solid var(--line);color:var(--ink);vertical-align:top}
+  tr:nth-child(even) td{background:var(--card)}
+  td .tag{display:inline-block;font-size:12px;font-weight:800;padding:2px 8px;border-radius:6px}
+  .t-auto{background:var(--green-l);color:var(--green)} .t-semi{background:var(--orange-l);color:var(--orange)} .t-no{background:#FBE9E6;color:var(--red)}
+  .best{font-weight:800;color:var(--navy)}
+  .star{color:var(--orange)}
+  ul.b{list-style:none;margin:12px 0;padding:0}
+  ul.b li{position:relative;padding-left:22px;margin:8px 0;font-size:15.5px}
+  ul.b li::before{content:'';position:absolute;left:2px;top:9px;width:7px;height:7px;border-radius:50%;background:var(--blue)}
+  ul.b.g li::before{background:var(--green)}
+  .vgrid{display:grid;grid-template-columns:1fr;gap:14px;margin:20px 0}
+  @media(min-width:680px){.vgrid{grid-template-columns:1fr 1fr 1fr}}
+  .vcard{border:1px solid var(--line);border-radius:16px;padding:20px;background:var(--card)}
+  .vcard .era{font-size:12px;font-weight:800;color:var(--gray);letter-spacing:.5px}
+  .vcard .nm{font-size:18px;font-weight:900;color:var(--navy);margin:6px 0 12px}
+  .vcard.now{border:2px solid var(--blue);background:var(--blue-l)}
+  .vcard.now .nm{color:var(--blue)}
+  .vcard ul{list-style:none;padding:0;margin:0}
+  .vcard li{font-size:14px;color:var(--ink);padding:5px 0 5px 18px;position:relative}
+  .vcard li::before{content:'—';position:absolute;left:0;color:var(--gray)}
+  .badge{display:inline-block;font-size:11px;font-weight:800;background:var(--blue);color:#fff;padding:2px 9px;border-radius:100px;margin-top:10px}
+  /* 부록 뉴스 원고 */
+  .appendix{margin-top:60px;border:2px solid var(--blue);border-radius:20px;overflow:hidden}
+  .apx-head{background:var(--blue);color:#fff;padding:16px 24px;font-size:15px;font-weight:800}
+  .apx-body{padding:30px 28px}
+  .n-cat{font-size:12.5px;font-weight:800;color:var(--blue)}
+  .n-h1{font-size:clamp(21px,3.5vw,27px);font-weight:900;color:var(--navy);line-height:1.3;margin:10px 0 14px;letter-spacing:-.6px}
+  .n-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+  .n-tags span{font-size:12px;font-weight:700;color:var(--blue);background:var(--blue-l);padding:2px 10px;border-radius:100px}
+  .n-by{font-size:13px;color:var(--gray);padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:20px}
+  .n-lead{font-size:16px;color:var(--navy);font-weight:600;background:var(--card);border-radius:12px;padding:16px 18px;margin-bottom:18px}
+  .n-h2{font-size:17.5px;font-weight:900;color:var(--navy);border-left:4px solid var(--blue);padding-left:12px;margin:26px 0 10px}
+  .n-p{font-size:15.5px;color:var(--ink);margin:11px 0;line-height:1.8}
+  .n-q{margin:16px 0;padding:14px 18px;background:var(--blue-l);border-radius:10px;font-size:15px;font-style:italic;color:var(--navy);border-left:3px solid var(--blue)}
+  .n-card{margin:18px 0;border-radius:14px;overflow:hidden;border:1px solid var(--line);box-shadow:0 6px 20px rgba(27,42,74,.07)}
+  .n-card .ch{background:linear-gradient(135deg,var(--blue),#4C6EF5);color:#fff;padding:14px 18px}
+  .n-card .ch .t{font-size:15.5px;font-weight:900}
+  .n-card .ch .s{font-size:12px;opacity:.9;margin-top:2px}
+  .n-card table{min-width:0;font-size:14px}
+  .n-card th{display:none}
+  .n-card td{padding:11px 16px;font-size:14px}
+  .n-card td.k{font-weight:800;color:var(--navy);white-space:nowrap;width:32%}
+  .n-chk{list-style:none;padding:0;margin:12px 0}
+  .n-chk li{position:relative;padding-left:26px;margin:9px 0;font-size:15px}
+  .n-chk li::before{content:'✔';position:absolute;left:0;color:var(--green);font-weight:900}
+  .n-cta{margin:24px 0 6px;background:linear-gradient(135deg,#1B2A4A,#2E4270);color:#fff;border-radius:14px;padding:20px;text-align:center}
+  .n-cta .h{font-size:16.5px;font-weight:900;margin-bottom:6px}
+  .n-cta .p{font-size:13.5px;opacity:.9}
+  .n-src{margin-top:18px;font-size:12px;color:var(--gray);border-top:1px solid var(--line);padding-top:12px}
+  .fnote{margin-top:52px;padding:22px 24px;background:var(--card);border-radius:16px;border:1px dashed var(--line);font-size:15px;color:var(--gray)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="doctag">1부 / 2부작</div>
+  <div class="ey">아라온스쿨 · 그로스</div>
+  <h1 class="title">블로그 에이전트 기획</h1>
+  <div class="sub">Claude 에이전트 기반 · 입시정보 블로그 매일 자동 생성 (뉴스 원고 예시 포함)</div>
+  <div class="meta">작성 2026-09-22 · 신상준(CGO) · 쌤이다/아라온 블로그 대상 · 연계 문서: 2부「수행평가 데이터허브 구축 기획」</div>
+
+  <div class="hero">
+    <div class="k">한 줄 요약</div>
+    <div class="v">입시 주제 하나만 던지면, Claude 에이전트가 최신 정보를 스스로 <b>수집</b>·<b>작성</b>·<b>카드 생성</b>해 네이버 블로그에 <b>발행</b>합니다. 사람은 검토·승인만. <b>사진은 자동화 불가 → 정보 카드로 대체.</b></div>
+  </div>
+
+  <div class="toc">
+    <div class="tt">목차</div>
+    <a href="#s1">1. 무엇을 자동화하나</a>
+    <a href="#s2">2. 이미지 해결(핵심)</a>
+    <a href="#s3">3. 이전 봇과의 차이</a>
+    <a href="#s4">4. 자동화 단계</a>
+    <a href="#s5">5. 콘텐츠 주제</a>
+    <a href="#s6">6. 로드맵</a>
+    <a href="#apx">부록. 뉴스 원고 예시 1부</a>
+  </div>
+
+  <!-- 1 -->
+  <h2 id="s1">1. 무엇을 자동화하는가</h2>
+  <p class="lead">지금은 블로그 한 편을 쓰려면 <b>자료조사 → 글작성 → 이미지제작 → 발행</b>을 사람이 전부 수동으로 합니다. 이 네 단계를 에이전트가 자동 수행하고, 사람은 '검토·승인'만 담당합니다.</p>
+  <div class="flow">
+    <div class="step"><div class="n">1</div><div class="tx"><b>키워드 입력</b> &nbsp;<span>입시 주제 하나 (예: '2028 통합사회 중등 준비'). 사람이 주거나 주제 풀에서 자동 선택.</span></div></div>
+    <div class="step"><div class="n">2</div><div class="tx"><b>자료 수집</b> &nbsp;<span>웹검색으로 교육부 발표·입시 일정·전형 정보를 실시간 수집.</span></div></div>
+    <div class="step"><div class="n">3</div><div class="tx"><b>글 작성</b> &nbsp;<span>아라온 톤 + 학부모 눈높이. 불안 마케팅 배제, 자기주도학습 자연 연결, SEO·출처 명시.</span></div></div>
+    <div class="step"><div class="n">4</div><div class="tx"><b>이미지 생성</b> &nbsp;<span>글 핵심을 '정보 카드'(요약표)로 자동 제작 → PNG. 저작권 0, 브랜드 통일.</span></div></div>
+    <div class="step"><div class="n">5</div><div class="tx"><b>자동 발행</b> &nbsp;<span>네이버 블로그 글쓰기 API로 제목·본문·이미지·태그 발행.</span></div></div>
+  </div>
+  <div class="call g"><b>총 소요:</b> 글 한 편당 사람 개입 5분 이내(검토·승인). <b>매일 1~3편 발행 가능.</b></div>
+
+  <!-- 2 -->
+  <h2 id="s2">2. 이미지는 어떻게 하는가 <span class="star">— 핵심</span></h2>
+  <p><b>글은 완전 자동이지만, 사진은 100% 자동이 불가능합니다.</b> 아무 사진이나 자동으로 가져다 쓰면 저작권 위반·네이버 저품질 위험이 있기 때문입니다.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>방법</th><th>자동화</th><th>저작권</th><th>품질 · 비고</th></tr></thead>
+      <tbody>
+        <tr><td class="best">정보 카드 (직접 생성)</td><td><span class="tag t-semi">반자동</span></td><td><span class="tag t-auto">안전</span></td><td><span class="star">★추천.</span> 요약표·일정표를 브랜드 카드로. 입시글엔 사진보다 표가 강함</td></tr>
+        <tr><td>AI 이미지 생성</td><td><span class="tag t-auto">자동</span></td><td><span class="tag t-auto">안전</span></td><td>입시 정보글엔 어색할 수 있음. 감성글엔 적합</td></tr>
+        <tr><td>무료 스톡</td><td><span class="tag t-auto">자동</span></td><td><span class="tag t-auto">안전</span></td><td>무난하나 뻔함. 다른 블로그와 겹침</td></tr>
+        <tr><td>직접 촬영 사진</td><td><span class="tag t-no">수동</span></td><td><span class="tag t-auto">안전</span></td><td>품질 좋으나 손이 감. 후기·현장글용</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="call b"><b>결론 — 입시 블로그는 '사진'보다 '정보 카드'가 맞다.</b> 학부모는 예쁜 사진보다 <b>요약표·일정표</b>를 원함. 이 카드는 아라온이 이미 쓰는 방식(HTML→PNG)이라 파이프라인에 바로 붙고, 저작권 0 + 브랜드 통일 + 정보 전달력 최고. <b>→ 부록 뉴스 원고의 파란 표가 실제 예시.</b></div>
+
+  <!-- 3 -->
+  <h2 id="s3">3. 이전 봇들과 무엇이 다른가</h2>
+  <p>"클로드로 블로그 자동 발행"은 예전에도 있었지만, 2026년의 <b>에이전트</b>는 근본적으로 다릅니다. 사람이 단계마다 개입하던 '스크립트'에서, 스스로 판단하고 도구를 쓰는 '에이전트'로 진화했습니다.</p>
+  <div class="vgrid">
+    <div class="vcard">
+      <div class="era">1세대 · ~2024</div>
+      <div class="nm">단순 API 스크립트</div>
+      <ul><li>프롬프트 넣으면 글만 받음</li><li>웹검색·자료수집 없음</li><li>발행·이미지 사람이 다</li><li>최신 입시정보 반영 불가</li></ul>
+    </div>
+    <div class="vcard">
+      <div class="era">2세대 · 2025</div>
+      <div class="nm">도구 연결 봇</div>
+      <ul><li>웹검색·컴퓨터사용 등장</li><li>흐름은 사람이 조립</li><li>MCP 초기 — 연결마다 수작업</li><li>단발성 작업 위주</li></ul>
+    </div>
+    <div class="vcard now">
+      <div class="era">3세대 · 2026 (지금)</div>
+      <div class="nm">자율 에이전트</div>
+      <ul><li>수집→작성→카드→발행 <b>스스로</b></li><li>MCP 표준화 — 상시 연결</li><li>스케줄러로 <b>매일 자동</b></li><li>검토·승인만 사람</li></ul>
+      <span class="badge">이 기획이 채택</span>
+    </div>
+  </div>
+  <h3>기술 스펙 (2026 최신)</h3>
+  <div class="tw">
+    <table>
+      <thead><tr><th>구성요소</th><th>역할</th><th>2026 현황</th></tr></thead>
+      <tbody>
+        <tr><td class="best">Claude Agent SDK</td><td>수집·작성·발행 자동 루프 엔진</td><td>2026.3 개명. Python·TS, 캐싱·기본도구 내장</td></tr>
+        <tr><td class="best">MCP</td><td>클로드↔블로그·검색 표준 통로</td><td>서버 200종 돌파. 앤트로픽 공동제정</td></tr>
+        <tr><td class="best">네이버 블로그 API</td><td>글쓰기 발행 (writePost.json)</td><td>공식 API. 개발자센터 앱 등록으로 사용</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4 -->
+  <h2 id="s4">4. 자동화 수준 (단계적 도입)</h2>
+  <div class="tw">
+    <table>
+      <thead><tr><th>단계</th><th>방식</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr><td class="best">1단계 (시작)</td><td><span class="tag t-semi">반자동</span></td><td>에이전트가 글+카드 완성 → 사람이 검토 후 발행</td></tr>
+        <tr><td class="best">2단계</td><td><span class="tag t-auto">자동 발행</span></td><td>네이버 API 연결 → 초안 바로 발행, 사후 점검</td></tr>
+        <tr><td class="best">3단계 (완성)</td><td><span class="tag t-auto">완전 자동</span></td><td>스케줄러가 매일 자동 발행</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="call o"><b>주의:</b> 처음부터 3단계로 가지 않음. 1단계로 글 몇 편 쌓아 <b>네이버 검색 노출</b>과 품질을 검증한 뒤 올림. <b>API 발행 글의 노출 여부가 첫 관문.</b></div>
+
+  <!-- 5 -->
+  <h2 id="s5">5. 발행할 콘텐츠 주제</h2>
+  <div class="tw">
+    <table>
+      <thead><tr><th>주제</th><th>소스</th><th>비고</th></tr></thead>
+      <tbody>
+        <tr><td class="best">입시뉴스·전형</td><td>웹검색 (교육부·입시매체)</td><td><span class="tag t-auto">완전자동</span> 이번 기획의 주력. 남들도 쓰는 소스라 빠른 검증용</td></tr>
+        <tr><td class="best">수행평가 (학교별)</td><td>자체 데이터허브 (독점)</td><td>→ <b>2부 문서 참조.</b> 뉴스로 못 만드는 아라온만의 차별화</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="call b"><b>2축 전략:</b> 뉴스형(입시)은 남들도 쓰는 소스라 <b>빠른 검증·가동용</b>. 데이터형(수행평가)은 아라온만의 <b>독점 무기</b>(2부). 뉴스형으로 먼저 돌리고, 데이터형은 병렬 구축.</div>
+
+  <!-- 6 -->
+  <h2 id="s6">6. 실행 로드맵</h2>
+  <div class="flow">
+    <div class="step"><div class="n">1</div><div class="tx"><b>다음 주 월요일</b> &nbsp;<span>쌤이다 <b>사업자 단체 아이디</b>로 네이버 블로그 개설 (사업자등록증 필요 → 월요일 발급 예정)</span></div></div>
+    <div class="step"><div class="n">2</div><div class="tx"><b>즉시</b> &nbsp;<span>네이버 개발자센터 앱 등록 → 블로그 글쓰기 API 권한 신청</span></div></div>
+    <div class="step"><div class="n">3</div><div class="tx"><b>1차 검증</b> &nbsp;<span>입시뉴스 주제로 글+카드 1편 발행 → 네이버 검색 노출 확인 (관문)</span></div></div>
+    <div class="step"><div class="n">4</div><div class="tx"><b>노출 정상 시</b> &nbsp;<span>완전자동 구축 → 데일리 업무 편입 (매일 초안 생성 → 검토·발행)</span></div></div>
+  </div>
+  <div class="call g"><b>운영 편입:</b> 단체 아이디가 다음 주 월요일 발급되면, 블로그 자동 발행이 <b>데일리 업무에 추가</b>됩니다.</div>
+
+  <!-- 부록 뉴스 원고 -->
+  <h2 id="apx">부록. 뉴스 원고 예시 1부</h2>
+  <p class="muted">에이전트가 입시뉴스 기사 1건을 받아 자동 생성한 실제 형태입니다. 본문 중간 파란 표가 '정보 카드'(자동 생성). 실제 발행 시 이 형태 그대로 네이버에 올라갑니다.</p>
+
+  <div class="appendix">
+    <div class="apx-head">📄 자동 생성 블로그 원고 — 입시뉴스</div>
+    <div class="apx-body">
+      <div class="n-cat">📌 입시뉴스 · 2028 대입</div>
+      <div class="n-h1">현 중3부터 바뀌는 2028 수능, '통합사회·통합과학'이 학부모 부담 키운다?</div>
+      <div class="n-tags"><span>#2028수능</span><span>#통합사회</span><span>#통합과학</span><span>#중등학부모</span><span>#자기주도학습</span></div>
+      <div class="n-by">아라온스쿨 · 입시정보 &nbsp;|&nbsp; 2026.09.22</div>
+
+      <div class="n-lead">"2028년부터 수능에 통합사회·통합과학이 생긴다는데, 우리 아이는 뭘 준비해야 하나요?" — 요즘 초중등 학부모님들께서 가장 많이 하시는 질문입니다. 이 변화가 실제로 무엇을 요구하는지 정리해 드립니다.</div>
+
+      <div class="n-h2">무슨 일이 있었나</div>
+      <div class="n-p">교육부와 한국교육과정평가원은 현재 중3이 치를 <b>2028학년도 수능</b>에 새로 도입되는 <b>통합사회·통합과학</b> 예시 문항을 공개했습니다. 통합사회 14문항, 통합과학 12문항입니다. 핵심은 <b>하나의 문항에 여러 과목이 융합</b>되어 출제된다는 점입니다.</div>
+      <div class="n-q">"개별 과목에 한정된 평가에서 벗어나, 사회·과학 전반을 다루고 논리적 사고 역량을 기르는 융합 평가로 개선한다." — 교육부</div>
+
+      <div class="n-h2">한눈에 보기</div>
+      <div class="n-card">
+        <div class="ch"><div class="t">2028 수능 통합사회·통합과학 핵심 요약</div><div class="s">현 중3부터 적용 · 예시문항 공개 기준</div></div>
+        <table><tbody>
+          <tr><td class="k">적용 대상</td><td>현재 중학교 3학년 (2028 수능 응시)</td></tr>
+          <tr><td class="k">신설 과목</td><td>통합사회 · 통합과학 (탐구영역)</td></tr>
+          <tr><td class="k">공개 예시문항</td><td>통합사회 14 · 통합과학 12문항</td></tr>
+          <tr><td class="k">출제 방식</td><td>한 문항에 여러 과목·영역 융합</td></tr>
+          <tr><td class="k">우려 지점</td><td>신유형 → 학습량·변별력 상승 가능성</td></tr>
+        </tbody></table>
+      </div>
+
+      <div class="n-h2">학부모님이 진짜 주목할 점</div>
+      <ul class="n-chk">
+        <li><b>암기가 아니라 연결</b> — 여러 과목이 섞이므로 개념을 따로 외우면 안 풀림</li>
+        <li><b>단기 대비 안 통함</b> — 융합·논리 사고력은 초중등 습관에서 나옴</li>
+        <li><b>초중등이 승부처</b> — 지금 스스로 이해·정리하는 훈련이 토대</li>
+      </ul>
+
+      <div class="n-h2">그래서, 지금 무엇을 준비해야 할까</div>
+      <div class="n-p">정답은 <b>자기주도학습 습관</b>입니다. 통합형 수능도 결국 "스스로 이해하고 연결하는 힘"을 요구합니다. 아라온스쿨이 초4~고1 <b>자기주도학습 플랜과 담임 관리</b>에 집중하는 이유입니다.</div>
+
+      <div class="n-cta"><div class="h">우리 아이, 스스로 공부하는 힘이 있을까요?</div><div class="p">아라온스쿨 담임 선생님이 자녀의 학습 습관을 함께 점검해 드립니다. →</div></div>
+      <div class="n-src">참고 출처: 교육부·한국교육과정평가원 「2028 수능 통합사회·통합과학 예시문항」 보도자료. 세부는 향후 '2028 수능 기본계획'에서 확정.</div>
+    </div>
+  </div>
+
+  <div class="fnote">
+    핵심: 사람이 4명분(조사·작성·디자인·발행)으로 하던 일을 에이전트가 <b>생산</b>하고 사람은 <b>판단·검토</b>만. 매일 블로그가 쌓이며 네이버 검색 유입(무료 자산)이 늘어난다. <b>사진 자동화는 불가 — 정보 카드로 대체.</b> 학교별 독점 콘텐츠는 2부「수행평가 데이터허브 구축 기획」참조.
+  </div>
+
+</div>
+</body>
+</html>
