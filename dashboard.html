@@ -631,11 +631,32 @@ async function loadCancel() {
     // 원장(리드요약_원장) 컬럼: 날짜(0)|시간(1)|이름(2)|학년(3)|타입(4)|매출(5)|담당자(6)|pageId(7)|취소액(8)
     // 원장 취소액(8)엔 4~8월만 있음(과거월). 이번달 취소는 total JSON(web.cxa)에서 별도 로드.
     cancelData.rows = rows.filter(r => /^\d{4}-\d{2}-\d{2}/.test(String(r[0]||'').trim()) && (parseFloat(r[8])||0) > 0);
+    // [2026-09-22] ★ 기준일 = 원장에서 order+매출>0인 최신 날짜를 자체 계산 (total의 __ledgerMax와 동일).
+    //   D.date(buildTotalData가 오늘 날짜로 저장 → 하루 밀림 버그)를 믿지 않고 원장 실제 최신일 사용.
+    //   ★ 오늘(KST) 이후 날짜 제외 — 25종결시트가 26년으로 읽히거나 완납예정일(미래)이 최신일로 잡히는 반복버그 차단.
+    (function(){
+      var _now = new Date(); var _todayKey = _now.getFullYear()*10000 + (_now.getMonth()+1)*100 + _now.getDate();
+      var _mx = 0;
+      rows.forEach(function(r){
+        var _ds = String(r[0]||'').trim();
+        if (!/^\d{4}-\d{2}-\d{2}/.test(_ds)) return;
+        var _state = String(r[4]||'').trim();
+        var _sales = parseFloat(r[5])||0;
+        if (_state !== 'order' || _sales <= 0) return;   // 실제 매출 있는 order만 = 반영된 날
+        var _p = _ds.substring(0,10).split('-');
+        var _key = parseInt(_p[0],10)*10000 + parseInt(_p[1],10)*100 + parseInt(_p[2],10);
+        if (_key <= _todayKey && _key > _mx) _mx = _key;   // 오늘 이후(미래 오염) 제외
+      });
+      if (_mx > 0) {
+        var _mo = Math.floor(_mx/100)%100, _dy = _mx%100;
+        totalDataDate = _mx.toString().slice(0,4)+'-'+('0'+_mo).slice(-2)+'-'+('0'+_dy).slice(-2);
+      }
+    })();
     // [2026-09-19] 이번달 웹마 취소·기준일 = Firestore dashData/current (파싱된 D객체) 직접 사용.
     try {
       const D = await _fsGet('dashData','current');
       if (D && D.web && D.web.cxa!=null) webCxaThisMonth = D.web.cxa;   // 웹마 이번달 취소(원)
-      if (D && D.date) totalDataDate = D.date;                          // total 기준일
+      if (D && D.date && !totalDataDate) totalDataDate = D.date;        // [2026-09-22] 원장 자체계산 실패시에만 폴백 (D.date는 오늘날짜라 부정확)
     } catch(_je) { webCxaThisMonth = null; }
     renderCancel();
     if(typeof render==='function' && allRows && allRows.length){ try{ render(); }catch(_e){} }   // [2026-09] 취소금액 담당자표 반영
