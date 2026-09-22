@@ -1084,6 +1084,14 @@ function updateYesterdaySales(){
       var rd=r.dt.y+'-'+('0'+r.dt.m).slice(-2)+'-'+('0'+r.dt.d).slice(-2);
       if(rd>_maxRd) _maxRd=rd;
     });
+    // [임시 디버그] 어제 판정 진단 — 확인 후 제거
+    try{
+      var _dbg921=rows.filter(function(r){return r.dt&&r.dt.y===2026&&r.dt.m===9&&r.dt.d===21;});
+      console.log('🔍[어제진단] _maxRd=',_maxRd,'| __ledgerMax=',window.__ledgerMax);
+      console.log('🔍[어제진단] 9/21 전체행수=',_dbg921.length);
+      console.log('🔍[어제진단] 9/21 order+sales>0 행=', _dbg921.filter(function(r){return r.state==='order'&&r.sales>0;}).map(function(r){return {학생:r.student,상담:r.sang,매출:r.sales,상태:r.state,웹:r.isWeb};}));
+      console.log('🔍[어제진단] 9/21 전체상태=', _dbg921.map(function(r){return r.state+'('+r.sales+')';}));
+    }catch(_dberr){ console.log('디버그오류',_dberr); }
     function calc(ds){
       var web=0, sang=0;
       rows.forEach(function(r){
