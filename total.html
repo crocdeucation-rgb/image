@@ -1679,15 +1679,23 @@ function _fsReady(){
   return new Promise(function(resolve){
     var n=0;
     (function chk(){
-      if(typeof firebase!=='undefined' && firebase.firestore){ resolve(firebase.firestore()); return; }
-      if(++n>200){ resolve(null); return; }   // 최대 10초(50ms×200)
+      // [2026-09-23] firestore 존재 + 로그인 완료(currentUser)까지 대기.
+      //   인증 전 dashData 읽으면 규칙(auth!=null)에 막혀 빈값 굳음 → 새로고침 시에만 보이던 버그.
+      if(typeof firebase!=='undefined' && firebase.firestore){
+        var authed = false;
+        try{ authed = !!(firebase.auth && firebase.auth().currentUser); }catch(_e){ authed = false; }
+        if(authed){ resolve(firebase.firestore()); return; }
+      }
+      if(++n>200){ resolve((typeof firebase!=='undefined'&&firebase.firestore)?firebase.firestore():null); return; }   // 최대 10초, 그래도 시도
       setTimeout(chk,50);
     })();
   });
 }
 async function fsLoad(key){
   if(window.__fsCache[key]) return window.__fsCache[key];
-  var db = (typeof _fdb!=='undefined' && _fdb) ? _fdb : await _fsReady();
+  // [2026-09-23] _fdb가 있어도 로그인 완료를 보장하려 _fsReady를 항상 거침(인증 대기 포함).
+  var db = await _fsReady();
+  if(!db && typeof _fdb!=='undefined' && _fdb) db = _fdb;   // 폴백
   if(!db) throw new Error('Firestore 준비 안 됨');
   var doc = await db.collection('dashData').doc(key).get();
   if(!doc.exists) throw new Error('dashData/'+key+' 없음');
