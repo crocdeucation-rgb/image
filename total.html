@@ -1779,7 +1779,42 @@ window.loadMonth = loadMonth;
 })();
 
 </script>
-<!-- ②-a  </body> 앞에 붙일 MODAL HTML ─────────────────────────── -->
+<!-- ②-a  
+<!-- [2026-09] 싸이월드식 방문 카운터 (TODAY/TOTAL, 중복포함) -->
+<div id="cyCounter" style="position:fixed;right:14px;bottom:14px;z-index:8000;background:linear-gradient(135deg,#2a3550,#1a2438);border:1px solid rgba(120,150,255,.3);border-radius:12px;padding:9px 14px;font-family:'Pretendard',system-ui,sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.3);font-size:12px;color:#cdd8ef;line-height:1.7;opacity:.94">
+  <div style="font-weight:800;font-size:10px;letter-spacing:1px;color:#8fa8e0;margin-bottom:3px">👣 아라온 스태티즈</div>
+  <div>TODAY <b id="cyToday" style="color:#4DA3FF;font-weight:900">-</b></div>
+  <div>TOTAL <b id="cyTotal" style="color:#FFD84D;font-weight:900">-</b></div>
+</div>
+<script>
+(function(){
+  function ymd(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
+  function run(){
+    try{
+      if(typeof firebase==='undefined'||!firebase.firestore){ setTimeout(run,400); return; }
+      var db=firebase.firestore();
+      var today=ymd();
+      var inc=firebase.firestore.FieldValue.increment(1);
+      // 오늘 카운터 +1
+      db.collection('pageviews').doc(today).set({count:inc,date:today},{merge:true});
+      // 전체 카운터 +1
+      db.collection('pageviews').doc('_total').set({count:inc},{merge:true});
+      // 읽어서 표시 (increment 직후라 약간의 지연 후)
+      setTimeout(function(){
+        db.collection('pageviews').doc(today).get().then(function(d){
+          document.getElementById('cyToday').textContent=(d.exists?(d.data().count||0):0).toLocaleString();
+        });
+        db.collection('pageviews').doc('_total').get().then(function(d){
+          document.getElementById('cyTotal').textContent=(d.exists?(d.data().count||0):0).toLocaleString();
+        });
+      },600);
+    }catch(e){ /* 조용히 무시 */ }
+  }
+  // 세션당 1회만 카운트하고 싶으면 아래 주석 해제 (지금은 열 때마다 = 새로고침도 카운트)
+  run();
+})();
+</script>
+</body> 앞에 붙일 MODAL HTML ─────────────────────────── -->
 <div class="pc-modal-bg" id="pcModal" onclick="if(event.target===this)closeCard()">
   <div class="pcard" id="pcBody"></div>
 </div>
