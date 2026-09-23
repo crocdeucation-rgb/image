@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>네이버 인증 · 쌤이다 블로그</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Pretendard',system-ui,sans-serif;background:#0b1730;color:#e7ecf5;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .box{max-width:560px;width:100%;background:#131d33;border:1px solid #26324a;border-radius:18px;padding:34px 32px}
+  h1{font-size:22px;font-weight:900;margin-bottom:6px}
+  .sub{font-size:13px;color:#8fa0c0;margin-bottom:24px}
+  .step{font-size:13px;color:#9aa8c0;margin:18px 0 8px;font-weight:800;letter-spacing:.5px}
+  .btn{display:inline-block;background:#03C75A;color:#fff;font-weight:800;font-size:15px;padding:14px 26px;border-radius:10px;text-decoration:none;border:none;cursor:pointer;width:100%;text-align:center}
+  .field{margin:10px 0}
+  .field label{font-size:12px;color:#8fa0c0;font-weight:700;display:block;margin-bottom:4px}
+  .field input{width:100%;padding:11px 13px;background:#0d1524;border:1px solid #26324a;border-radius:9px;color:#e7ecf5;font-size:13px;font-family:monospace}
+  .out{margin-top:18px;background:#0d1524;border:1px solid #26324a;border-radius:10px;padding:16px;display:none}
+  .out.show{display:block}
+  .out .lb{font-size:11px;color:#8fa0c0;font-weight:800;margin-bottom:5px}
+  .out .val{font-size:12px;font-family:monospace;color:#4DD07E;word-break:break-all;background:#0b1220;padding:10px;border-radius:7px;line-height:1.5;user-select:all}
+  .copy{margin-top:8px;font-size:12px;background:#2E5BFF;color:#fff;border:none;border-radius:7px;padding:7px 14px;cursor:pointer;font-weight:700}
+  .warn{font-size:12px;color:#E8850C;margin-top:14px;line-height:1.6;background:#2a2114;padding:12px;border-radius:9px}
+  .note{font-size:12px;color:#8fa0c0;margin-top:14px;line-height:1.7}
+</style></head>
+<body>
+<div class="box">
+  <h1>🔑 네이버 블로그 인증</h1>
+  <div class="sub">쌤이다 블로그 자동발행용 토큰 발급</div>
+
+  <div class="step">STEP 1 — Client ID 입력</div>
+  <div class="field">
+    <label>네이버 앱 Client ID (개발자센터에서 확인)</label>
+    <input id="cid" type="text" placeholder="여기에 Client ID 붙여넣기">
+  </div>
+
+  <div class="step">STEP 2 — 네이버 로그인</div>
+  <button class="btn" onclick="login()">네이버로 로그인하고 코드 받기 →</button>
+
+  <div class="out" id="out">
+    <div class="lb">✅ 인증 코드 (code) — 이걸 복사해서 Apps Script에 넣으세요</div>
+    <div class="val" id="codeVal">-</div>
+    <button class="copy" onclick="copyCode()">📋 코드 복사</button>
+    <div class="lb" style="margin-top:14px">state (같이 필요)</div>
+    <div class="val" id="stateVal">-</div>
+    <div class="warn">⏱ 이 코드는 <b>10분 안에</b> Apps Script에서 토큰으로 교환해야 합니다. 만료되면 다시 로그인하세요.</div>
+  </div>
+
+  <div class="note" id="note">
+    처음이면 STEP 1에 Client ID 넣고 로그인 버튼을 누르세요.<br>
+    로그인 후 이 페이지로 돌아오면 인증 코드가 표시됩니다.
+  </div>
+</div>
+
+<script>
+var REDIRECT = 'https://crocdeucation-rgb.github.io/image/naver_callback.html';
+
+// Client ID를 localStorage에 저장(재사용)
+var savedCid = localStorage.getItem('naver_cid');
+if(savedCid) document.getElementById('cid').value = savedCid;
+
+function login(){
+  var cid = document.getElementById('cid').value.trim();
+  if(!cid){ alert('Client ID를 입력하세요'); return; }
+  localStorage.setItem('naver_cid', cid);
+  var state = Math.random().toString(36).slice(2) + Date.now();
+  localStorage.setItem('naver_state', state);
+  var url = 'https://nid.naver.com/oauth2.0/authorize?response_type=code'
+    + '&client_id=' + encodeURIComponent(cid)
+    + '&redirect_uri=' + encodeURIComponent(REDIRECT)
+    + '&state=' + encodeURIComponent(state);
+  location.href = url;
+}
+
+// 콜백 처리 — URL에 code가 있으면 표시
+(function(){
+  var params = new URLSearchParams(location.search);
+  var code = params.get('code');
+  var state = params.get('state');
+  var error = params.get('error');
+  if(error){
+    document.getElementById('note').innerHTML = '❌ 로그인 실패: ' + error + '<br>' + (params.get('error_description')||'');
+    return;
+  }
+  if(code){
+    document.getElementById('codeVal').textContent = code;
+    document.getElementById('stateVal').textContent = state || '(없음)';
+    document.getElementById('out').classList.add('show');
+    document.getElementById('note').style.display = 'none';
+    window._code = code;
+  }
+})();
+
+function copyCode(){
+  var t = document.getElementById('codeVal').textContent;
+  navigator.clipboard.writeText(t).then(function(){ alert('코드 복사됨! Apps Script에 붙여넣으세요.'); });
+}
+</script>
+</body></html>
