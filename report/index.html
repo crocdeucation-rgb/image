@@ -1,216 +1,91 @@
 <!DOCTYPE html>
-<html lang="ko">
-<head>
+<html lang="ko"><head>
 <meta charset="UTF-8"><style id="__pregate">body{visibility:hidden!important}#agate{visibility:visible!important}</style><script>try{if(window.self!==window.top){var e=document.getElementById("__pregate");if(e)e.remove();}}catch(_){}</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<script>window.GATE_CFG={title:'파운더님 전용 · 일일 업무보고',sub:'등록된 계정으로만 열람할 수 있습니다.<br>Google 계정으로 로그인해 주세요.',foot:'보고 · 신상준 이사'}</script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script>window.GATE_CFG={title:'경영진 전용 · 그로스 리포트',sub:'등록된 경영진 계정으로만 열람할 수 있습니다.<br>Google 계정으로 로그인해 주세요.',foot:'문의 · 신상준 이사'}</script>
-<script src="../gate.js"></script>
+<script src="../../gate.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
-<title>ARAON GROWTH · 신상준 이사 리포트</title>
+<title>일일 업무보고 · 목록</title>
 <style>
-:root{
-  --bg:#f5f5f3; --card:#fff;
-  --hd:#0f1623; --hd2:#161f30;
-  --teal:#00e5c8; --teal-d:#0a8a5c;
-  --text:#111; --sub:#3f3f3f; --faint:#6a6a6a;
-  --border:#e8e8e8;
-  /* 계열색 */
-  --weekly:#0a8a5c; --weekly-bg:#e6f7f0; --weekly-line:#b3e6d2;
-  --film:#e06a2c;   --film-bg:#fdf0e8;   --film-line:#f5d2bd;
-  --dash:#3f6fd0;   --dash-bg:#eaf1fc;   --dash-line:#c8daf5;
-  --sec:#b07d0a;    --sec-bg:#faf3df;    --sec-line:#ecd9a3;
-  --init:#6D5AE6;   --init-bg:#EDEAFC;   --init-line:#cfc7f5;
-  box-sizing:border-box;
-  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han Sans Neo',-apple-system,system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6;font-variant-numeric:tabular-nums}
-.wrap{max-width:1080px;margin:0 auto;padding:28px 24px 72px}
-
-/* 헤더 */
-.hd{background:var(--hd);border-radius:18px;padding:30px 30px 28px;position:relative;overflow:hidden;margin-bottom:22px}
-.hd::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,229,200,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,200,.035) 1px,transparent 1px);background-size:38px 38px;pointer-events:none}
-.hd .in{position:relative}
-.hd-logo{font-size:10px;color:rgba(255,255,255,.42);letter-spacing:3px;font-weight:600;margin-bottom:9px}
-.hd-title{font-size:clamp(21px,3vw,28px);font-weight:800;color:#fff;letter-spacing:-1px;line-height:1.3}
-.hd-title em{color:var(--teal);font-style:normal}
-.hd-sub{font-size:13px;color:rgba(255,255,255,.5);margin-top:11px;line-height:1.7;max-width:640px}
-.hd-meta{margin-top:16px;display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:rgba(255,255,255,.4)}
-.hd-meta b{color:rgba(255,255,255,.7);font-weight:600}
-.hd-lock{position:absolute;top:26px;right:26px;font-size:11px;color:rgba(255,255,255,.5);font-weight:600;display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:5px 12px}
-@media(max-width:560px){.hd-lock{position:static;margin-top:14px;display:inline-flex}}
-
-/* 계열 섹션 */
-.sect{margin-top:22px}
-.sect-hd{display:flex;align-items:center;gap:10px;margin:0 2px 12px}
-.sect-ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
-.sect-tt{font-size:16px;font-weight:800;letter-spacing:-.4px}
-.sect-ds{font-size:12.5px;color:var(--faint);font-weight:500;margin-left:2px}
-@media(max-width:560px){.sect-ds{display:block;margin:2px 0 0 44px;width:100%}}
-
-/* 계열 색 적용 */
-.s-weekly .sect-ic{background:var(--weekly-bg);color:var(--weekly)}
-.s-film   .sect-ic{background:var(--film-bg);color:var(--film)}
-.s-dash   .sect-ic{background:var(--dash-bg);color:var(--dash)}
-.s-sec    .sect-ic{background:var(--sec-bg);color:var(--sec)}
-.s-init   .sect-ic{background:var(--init-bg);color:var(--init)}
-.s-weekly .sect-tt{color:var(--weekly)} .s-film .sect-tt{color:var(--film)}
-.s-dash .sect-tt{color:var(--dash)} .s-sec .sect-tt{color:var(--sec)} .s-init .sect-tt{color:var(--init)}
-
-/* 리포트 카드 리스트 */
-.rlist{display:flex;flex-direction:column;gap:9px}
-.rcard{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:16px 18px;display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit;transition:.14s;position:relative;border-left-width:3px}
-.rcard:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(15,22,35,.07)}
-.s-weekly .rcard{border-left-color:var(--weekly)} .s-weekly .rcard:hover{border-color:var(--weekly-line)}
-.s-film   .rcard{border-left-color:var(--film)}   .s-film .rcard:hover{border-color:var(--film-line)}
-.s-dash   .rcard{border-left-color:var(--dash)}   .s-dash .rcard:hover{border-color:var(--dash-line)}
-.s-sec    .rcard{border-left-color:var(--sec)}    .s-sec .rcard:hover{border-color:var(--sec-line)}
-.s-init   .rcard{border-left-color:var(--init)}   .s-init .rcard:hover{border-color:var(--init-line)}
-.rc-body{flex:1;min-width:0}
-.rc-tt{font-size:14.5px;font-weight:700;letter-spacing:-.3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.rc-new{font-size:9.5px;font-weight:800;color:#fff;background:var(--weekly);border-radius:5px;padding:2px 6px;letter-spacing:.3px}
-.rc-ds{font-size:12.5px;color:var(--faint);margin-top:3px;line-height:1.5}
-.rc-meta{font-size:11.5px;color:#a0a0a0;flex-shrink:0;text-align:right;font-weight:500}
-.rc-arrow{flex-shrink:0;color:#c4c4c4;font-size:17px;transition:.14s}
-.rcard:hover .rc-arrow{color:var(--sub);transform:translateX(2px)}
-.rc-ext{flex-shrink:0;font-size:10px;color:#b0b0b0;border:1px solid var(--border);border-radius:6px;padding:2px 7px;font-weight:600}
-
-/* 빈 항목(준비중) */
-.rcard.soon{opacity:.6;pointer-events:none;background:#fafafa}
-.rcard.soon .rc-arrow{display:none}
-.rc-soon-badge{font-size:10px;color:var(--faint);border:1px dashed #d0d0d0;border-radius:6px;padding:2px 8px;font-weight:600;flex-shrink:0}
-
-.foot{text-align:center;font-size:11.5px;color:#a8a8a8;margin-top:40px;line-height:1.9}
-.foot b{color:var(--sub);font-weight:600}
-</style>
-</head>
+  :root{--navy:#0b1730;--ink:#16223d;--blue:#2E5BFF;--teal:#0E9C8A;--gray:#6b7a94;--gray2:#9aa8c0;--line:#e7edf7;--bg:#eaeef6;--card:#fff;--soft:#f4f7fd;box-sizing:border-box;padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,0)}
+  @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--navy:#060d1e;--ink:#dde5f5;--gray:#8c9bb8;--gray2:#68789a;--line:#1f2a42;--bg:#080d18;--card:#111a2e;--soft:#0c1424}}
+  :root[data-theme="dark"]{--navy:#060d1e;--ink:#dde5f5;--gray:#8c9bb8;--gray2:#68789a;--line:#1f2a42;--bg:#080d18;--card:#111a2e;--soft:#0c1424}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Pretendard',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;letter-spacing:-.2px}
+  .wrap{max-width:720px;margin:0 auto;padding:26px 18px 70px}
+  .hero{position:relative;background:linear-gradient(120deg,#0a1631,#16294f 55%,#243a66);border-radius:20px;padding:30px 32px;overflow:hidden;box-shadow:0 18px 44px rgba(11,23,48,.4)}
+  .hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:40px 40px}
+  .hero .tag{position:relative;font-size:11px;font-weight:800;letter-spacing:3px;color:#7fa8ff}
+  .hero h1{position:relative;font-size:34px;font-weight:900;color:#fff;letter-spacing:-1.5px;margin:7px 0 5px;line-height:1}
+  .hero .meta{position:relative;font-size:13.5px;color:#aebfdd}
+  .hero .pill{position:absolute;top:26px;right:28px;font-size:11.5px;font-weight:800;color:#cfe0ff;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);padding:6px 13px;border-radius:100px}
+  .list{margin-top:18px;display:flex;flex-direction:column;gap:12px}
+  .row{display:flex;align-items:center;gap:16px;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--teal);border-radius:14px;padding:18px 22px;text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s}
+  .row:hover{transform:translateX(4px);box-shadow:0 8px 22px rgba(20,40,80,.1)}
+  .row .dnum{font-size:15px;font-weight:900;color:var(--teal);min-width:96px;letter-spacing:-.5px}
+  .row .dinfo{flex:1}
+  .row .dt{font-size:16px;font-weight:800;color:var(--navy);letter-spacing:-.4px}
+  .row .ds{font-size:12.5px;color:var(--gray);margin-top:2px}
+  .row .new{font-size:10.5px;font-weight:800;color:#fff;background:var(--teal);padding:2px 9px;border-radius:100px}
+  .row .arr{color:var(--gray2);font-size:18px}
+  .foot{text-align:center;font-size:12.5px;color:var(--gray2);margin-top:28px;padding-top:18px;border-top:1px solid var(--line)}
+</style></head>
 <body>
 <div class="wrap">
-
-<div class="hd">
-  <div class="hd-lock">🔒 경영진 전용</div>
-  <div class="in">
-    <div class="hd-logo">ARAON GROWTH REPORT</div>
-    <div class="hd-title">바이럴 · 그로스 리포트 <em>허브</em></div>
-    <div class="hd-sub">광고 운영 · 소재/촬영 · 대시보드 · 보안까지, 그로스 업무 전반을 한 곳에 정리했습니다. 각 항목은 등록된 경영진 계정으로만 열립니다.</div>
-    <div class="hd-meta">
-      <span>담당 <b>신상준 이사</b></span>
-      <span>범위 <b>바이럴 · 퍼포먼스 · 인프라</b></span>
-      <span>갱신 <b>주간</b></span>
-    </div>
+  <div class="hero">
+    <div class="pill">🔒 파운더님 전용</div>
+    <div class="tag">ARAON GROWTH · DAILY REPORT</div>
+    <h1>일일 업무보고</h1>
+    <div class="meta">날짜별 보고 아카이브 · 신상준 CGO</div>
   </div>
-</div>
 
-<!-- 📊 주간 그로스 -->
-<div class="sect s-weekly">
-  <div class="sect-hd">
-    <div class="sect-ic">📊</div>
-    <div class="sect-tt">주간 그로스 보고</div>
-    <div class="sect-ds">매주 · 광고비·리드·매출·소재 운용</div>
-  </div>
-  <div class="rlist">
-    <a class="rcard" href="growth.html">
-      <div class="rc-body">
-        <div class="rc-tt">아라온 그로스 리포트 <span class="rc-new">진행중</span></div>
-        <div class="rc-ds">월별 결산(5~8월) · 9월 주차별 · CRM 패치 — 한 리포트에서 탭으로 열람</div>
+  <div class="list" id="list">
+    <!-- 새 보고 추가: 이 아래에 .row 한 줄씩 (최신이 위로) -->
+    <a class="row" href="2026-09-24.html">
+      <div class="dnum">09.24<br><span style="font-size:11px;color:var(--gray2);font-weight:600">목</span></div>
+      <div class="dinfo">
+        <div class="dt">9/24 업무보고 <span class="new">최신</span></div>
+        <div class="ds">유입38 · 세팅4 · 방문장5 · 코칭영상 공개 · 블로그 자동발행 가동 · 소재 병목 진단</div>
       </div>
-      <div class="rc-meta">최신 9월 2주차</div>
-      <div class="rc-arrow">→</div>
+      <div class="arr">→</div>
+    </a>
+    <a class="row" href="2026-09-23.html">
+      <div class="dnum">09.23<br><span style="font-size:11px;color:var(--gray2);font-weight:600">수</span></div>
+      <div class="dinfo">
+        <div class="dt">9/23 업무보고</div>
+        <div class="ds">유입34 · 세팅5 · 방문장6 · 코칭영상 편집완료 · 네이버 단체ID 개설</div>
+      </div>
+      <div class="arr">→</div>
     </a>
   </div>
+
+  <div class="foot">아라온스쿨 · 그로스 &nbsp;|&nbsp; 보고 · 신상준 이사</div>
 </div>
 
-<!-- 🎬 소재·촬영 -->
-<div class="sect s-film">
-  <div class="sect-hd">
-    <div class="sect-ic">🎬</div>
-    <div class="sect-tt">소재 · 촬영</div>
-    <div class="sect-ds">촬영 기획·진행 자료 · 대외비</div>
-  </div>
-  <div class="rlist">
-    <a class="rcard" href="https://drive.google.com/drive/folders/1fycsXzXwgt-uICE4NKqDmfoJJy0BnoFv?usp=drive_link" target="_blank" rel="noopener">
-      <div class="rc-body">
-        <div class="rc-tt">채린이네 후기영상 (9/12 촬영)</div>
-        <div class="rc-ds">스토리보드 · 촬영안내(학부모용) — 드라이브 대외비 폴더</div>
-      </div>
-      <div class="rc-ext">드라이브</div>
-      <div class="rc-arrow">→</div>
-    </a>
-  </div>
-</div>
-
-<!-- 🖥️ 대시보드·인프라 -->
-<div class="sect s-dash">
-  <div class="sect-hd">
-    <div class="sect-ic">🖥️</div>
-    <div class="sect-tt">대시보드 · 인프라</div>
-    <div class="sect-ds">실적판 · 인사/채용 · 광고 대시보드</div>
-  </div>
-  <div class="rlist">
-    <a class="rcard" href="../switcher.html">
-      <div class="rc-body">
-        <div class="rc-tt">아라온 스태티즈 (통합 대시보드)</div>
-        <div class="rc-ds">실적판 · 인사 · 채용 · 광고 — 로그인 후 항목 선택</div>
-      </div>
-      <div class="rc-ext">대시보드</div>
-      <div class="rc-arrow">→</div>
-    </a>
-  </div>
-</div>
-
-<!-- 🔒 데이터 보안 -->
-<div class="sect s-sec">
-  <div class="sect-hd">
-    <div class="sect-ic">🔒</div>
-    <div class="sect-tt">보안 인프라</div>
-    <div class="sect-ds">구축 전 과정 · 4단 잠금 · 회사 자산화</div>
-  </div>
-  <div class="rlist">
-    <a class="rcard" href="security.html">
-      <div class="rc-body">
-        <div class="rc-tt">보안 인프라 구축 보고서</div>
-        <div class="rc-ds">대시보드 → 시트 분리 → Firebase 4단 잠금 → 문서 관리까지, 전체 구축 과정과 소유 구조</div>
-      </div>
-      <div class="rc-meta">2026.09.19</div>
-      <div class="rc-arrow">→</div>
-    </a>
-  </div>
-</div>
-
-<div class="sect s-init">
-  <div class="sect-hd">
-    <div class="sect-ic">🚀</div>
-    <div class="sect-tt">신규 이니셔티브</div>
-    <div class="sect-ds">블로그 자동화 · 데이터허브 · 콘텐츠 기획</div>
-  </div>
-  <div class="rlist">
-    <a class="rcard" href="blog_agent.html">
-      <div class="rc-body">
-        <div class="rc-tt">1부 · 블로그 에이전트 기획 <span class="rc-new">NEW</span></div>
-        <div class="rc-ds">Claude 에이전트로 입시뉴스 블로그 매일 자동 생성 — 뉴스 원고 예시 포함</div>
-      </div>
-      <div class="rc-meta">2026.09.22</div>
-      <div class="rc-arrow">→</div>
-    </a>
-    <a class="rcard" href="data_hub.html">
-      <div class="rc-body">
-        <div class="rc-tt">2부 · 수행평가 데이터허브 구축 <span class="rc-new">NEW</span></div>
-        <div class="rc-ds">전국 학교 평가계획을 표(DB)로 구축 → 조회기·코칭·블로그 재사용. 아라온 독점 데이터</div>
-      </div>
-      <div class="rc-meta">2026.09.22</div>
-      <div class="rc-arrow">→</div>
-    </a>
-  </div>
-</div>
-
-<div class="foot">
-  본 허브와 하위 보고서는 <b>등록된 경영진 계정</b>으로만 열람할 수 있습니다.<br>
-  문의 · 신상준 이사
-</div>
-
-</div>
-</body>
-</html>
+<script>
+/* [파운더 전용] 파운더 아니면 차단 */
+(function(){
+  var ALLOW=['032100jesus@gmail.com','crocdeucation@gmail.com'];
+  function block(email){
+    document.body.style.overflow='hidden';
+    var w=document.querySelector('.wrap'); if(w) w.style.display='none';
+    var ov=document.createElement('div');
+    ov.style.cssText='position:fixed;inset:0;z-index:99999;background:#0b1730;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font-family:Pretendard,system-ui,sans-serif;padding:24px;text-align:center';
+    ov.innerHTML='<div style="font-size:40px">🔒</div><div style="font-size:20px;font-weight:900;color:#fff">파운더님 전용 문서입니다</div><div style="font-size:14px;color:#9aa8c0;max-width:340px;line-height:1.6">오동근 파운더님만 열람하실 수 있습니다.'+(email?'<br><span style="font-size:12px;color:#68789a">현재 로그인: '+email+'</span>':'')+'</div>';
+    document.body.appendChild(ov);
+  }
+  function check(){
+    try{
+      if(typeof firebase==='undefined'||!firebase.auth){ setTimeout(check,300); return; }
+      firebase.auth().onAuthStateChanged(function(u){
+        if(!u) return;
+        if(ALLOW.indexOf((u.email||'').toLowerCase())<0){ block(u.email); }
+      });
+    }catch(e){ setTimeout(check,300); }
+  }
+  check();
+})();
+</script>
+</body></html>
