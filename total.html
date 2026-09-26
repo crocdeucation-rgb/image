@@ -874,6 +874,41 @@ body.is-live .closed-only{display:none !important}
 @media(max-width:900px){.ops-grid{grid-template-columns:repeat(2,1fr)}.owk-cols,.owk-g3{grid-template-columns:1fr}.ops-flow{display:none}}
 @media(max-width:560px){.ops-grid{grid-template-columns:1fr}}
 </style>
+
+<style id="ops-detail-css">
+.omd-sec{margin-bottom:22px}.omd-sec:last-child{margin-bottom:0}
+.omd-st{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:900;color:#1B2436;margin-bottom:11px}
+.omd-st::before{content:'';width:4px;height:16px;border-radius:3px;background:#7048E8}
+.omd-lead{font-size:13.5px;color:#55617a;line-height:1.7;word-break:keep-all}
+.omd-note{font-size:11.5px;color:#8A94A6;margin-top:8px}
+.omd-step{display:flex;gap:12px;align-items:flex-start;background:#F7F9FC;border:1px solid #EAEEF5;border-radius:12px;padding:14px 16px;margin-bottom:9px}
+.omd-step:last-child{margin-bottom:0}
+.omd-n{flex-shrink:0;width:26px;height:26px;border-radius:50%;background:#7048E8;color:#fff;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.omd-stt{font-size:14px;font-weight:800;color:#1B2436;margin-bottom:4px}
+.omd-std{font-size:12.5px;color:#6B7688;line-height:1.55;word-break:keep-all}
+.omd-banner{margin:0 0 14px;border-radius:12px;overflow:hidden;border:1px solid #EAEEF5}
+.omd-banner:last-child{margin-bottom:0}.omd-banner img{width:100%;display:block}
+.omd-tbl{border:1px solid #EAEEF5;border-radius:12px;overflow:hidden}
+.omd-tr{display:flex;font-size:12.5px;border-bottom:1px solid #F0F3F8}
+.omd-tr:last-child{border-bottom:none}
+.omd-tr span{padding:10px 12px;color:#43506a;flex:1}
+.omd-tr span:first-child{flex:0 0 90px;font-weight:700;color:#1B2436;border-right:1px solid #F0F3F8}
+.omd-tr span:last-child{flex:0 0 110px;text-align:center;font-weight:700}
+.omd-th{background:#F3F0FC}.omd-th span{color:#3E2F86;font-weight:800}
+.omd-stat{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.omd-si{background:#F7F9FC;border:1px solid #EAEEF5;border-radius:11px;padding:13px;text-align:center}
+.omd-si .k{font-size:11px;color:#8A94A6;font-weight:700;margin-bottom:4px}
+.omd-si .v{font-size:17px;font-weight:900;color:#1B2436}
+.omd-days{display:flex;flex-direction:column;gap:9px}
+.omd-day{border:1px solid #EAEEF5;border-radius:12px;padding:14px 16px;transition:.15s}
+.omd-day:hover{border-color:#D4CBF5;background:#FAF9FE}
+.omd-dn{font-size:11.5px;font-weight:800;color:#7048E8;letter-spacing:.3px;margin-bottom:6px}
+.omd-dt{font-size:14.5px;font-weight:800;color:#1B2436;letter-spacing:-.3px;word-break:keep-all}
+.omd-dd{font-size:12.5px;color:#7c8699;line-height:1.6;margin-top:5px;word-break:keep-all}
+.omd-chips{display:flex;flex-wrap:wrap;gap:8px}
+.omd-chip{font-size:12.5px;font-weight:600;color:#3d4759;background:#F3F0FC;border:1px solid #E3DBF7;border-radius:8px;padding:8px 12px;word-break:keep-all}
+</style>
+<style id="ops-detail-css2"></style>
 </head><body>
 <div id="authGate">
   <div class="gate-card">
@@ -4117,6 +4152,7 @@ setTimeout(function(){ if(window.__D&&window.__D.personCards)window.__liveD=wind
   run();
 })();
 </script>
+<script src="ops_details.js"></script>
 <script>
 // ═══ [2026-09] 콘텐츠 위젯 — dashData/ops-content 읽어 렌더 (종료일 자동필터) ═══
 (function(){
@@ -4157,14 +4193,17 @@ setTimeout(function(){ if(window.__D&&window.__D.personCards)window.__liveD=wind
     var L=window.__opsData&&window.__opsData._live; if(!L||!L[idx]) return;
     var it=L[idx];
     if(it.link){ window.open(it.link,'_blank'); return; }   // 링크 있으면 이동
-    var hero=(KIND[it.kind]||KIND['특강']).h;
+    // [코딩 상세] 제목 매칭 — OPS_DETAIL 우선, 없으면 시트 detail, 그것도 없으면 준비중
+    var coded=(window.OPS_DETAIL&&window.OPS_DETAIL[it.title])||null;
+    var hero=coded?coded.hero:((KIND[it.kind]||KIND['특강']).h);
     var kindLabel=(it.status==='news')?'소식':(it.kind||'특강');
+    var bodyHtml=coded?coded.html:(detailHtml(it.detail)||'<div class="ocm-lead">상세 준비 중입니다.</div>');
     var box=document.getElementById('ocmBox');
     box.innerHTML='<div class="ocm-hero '+hero+'"><button class="ocm-x" onclick="opsClose()">×</button>'+
       '<div class="eb">'+esc(kindLabel)+(it.target?' · '+esc(it.target):'')+'</div>'+
       '<h2>'+esc(it.title)+'</h2>'+(it.teacher?'<div class="sb">'+esc(it.teacher)+' 선생님</div>':'')+
       (it.when?'<div class="wh">'+esc(it.when)+'</div>':'')+'</div>'+
-      '<div class="ocm-body">'+(detailHtml(it.detail)||'<div class="ocm-lead">상세 준비 중입니다.</div>')+'</div>';
+      '<div class="ocm-body">'+bodyHtml+'</div>';
     document.getElementById('ocModal').classList.add('on');
     document.body.style.overflow='hidden';
   };
