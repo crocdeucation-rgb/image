@@ -812,6 +812,39 @@ body.is-live .closed-only{display:none !important}
 .ops-gf{font-size:12.5px;font-weight:800;padding:7px 15px;border-radius:999px;background:#F0F3F8;color:#6B7688;cursor:pointer;border:1px solid transparent;transition:.15s}
 .ops-gf:hover{background:#E8ECF3}
 .ops-gf.on{background:#7048E8;color:#fff}
+.ops-vbar{max-width:1560px;margin:0 auto 18px;background:var(--pan,#fff);border:1px solid var(--line,#E3E8F0);border-radius:14px;box-shadow:0 3px 12px rgba(20,30,50,.05);padding:14px 18px}
+.ovb-head{display:flex;align-items:center;gap:9px;margin-bottom:12px}
+.ovb-ico{font-size:15px}
+.ovb-lbl{font-size:14px;font-weight:900;color:var(--ink,#1B2436)}
+.ovb-cnt{font-size:11px;font-weight:800;background:#FFEEE6;color:#F76707;padding:2px 9px;border-radius:999px}
+.ovb-track{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.ovb-track::-webkit-scrollbar{height:6px}
+.ovb-track::-webkit-scrollbar-thumb{background:#D0D5DD;border-radius:3px}
+.ovb-card{flex:0 0 200px;cursor:pointer;transition:.15s}
+.ovb-card:hover{transform:translateY(-2px)}
+.ovb-thumb{position:relative;aspect-ratio:16/9;border-radius:10px;background-size:cover;background-position:center;background-color:#111;overflow:hidden}
+.ovb-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:13px;display:flex;align-items:center;justify-content:center;padding-left:2px;transition:.15s}
+.ovb-card:hover .ovb-play{background:#E23A22}
+.ovb-tt{margin-top:7px;font-size:12.5px;font-weight:700;color:var(--ink,#1B2436);line-height:1.35;word-break:keep-all;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ovid-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.ovid{cursor:pointer;border:1px solid var(--line,#E3E8F0);border-radius:13px;overflow:hidden;background:#fff;transition:.16s}
+.ovid:hover{border-color:rgba(112,72,232,.35);box-shadow:0 8px 22px rgba(112,72,232,.12);transform:translateY(-2px)}
+.ovid-thumb{position:relative;aspect-ratio:16/9;background-size:cover;background-position:center;background-color:#111}
+.ovid-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;padding-left:3px}
+.ovid:hover .ovid-play{background:#E23A22}
+.ovid-info{padding:13px 15px 15px}
+.ovid-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.ovid-tt{font-size:15px;font-weight:900;letter-spacing:-.3px;line-height:1.3;word-break:keep-all}
+.ovid-sb{margin-top:5px;font-size:12px;color:var(--soft,#6B7688);line-height:1.5;word-break:keep-all}
+.ovid-dt{margin-top:8px;font-size:11px;color:#A0AABF;font-weight:700}
+.ocm-vhero{position:relative}
+.ocm-embed{aspect-ratio:16/9;background:#000}
+.ocm-embed iframe{width:100%;height:100%;display:block}
+.ocm-vhero .ocm-x{background:rgba(0,0,0,.5)}
+.ovid-mtags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.ovid-mtt{font-size:22px;font-weight:900;letter-spacing:-.5px;color:#1B2436;line-height:1.3;word-break:keep-all}
+@media(max-width:900px){.ovid-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.ovid-grid{grid-template-columns:1fr}}
 .ops-page.on{display:block}
 .ops-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
 .occ{display:block;text-decoration:none;color:var(--ink,#1B2436);position:relative;background:var(--pan,#fff);border:1px solid var(--line,#E3E8F0);border-radius:13px;padding:14px 15px 13px;transition:.16s;cursor:pointer;overflow:hidden}
@@ -961,6 +994,7 @@ body.is-live .closed-only{display:none !important}
 <div class="wrap">
 <div id="birthday-bar" class="birthday-bar" style="display:none"></div>
 <div id="opsContent" class="ops-cw" style="display:none"></div>
+<div id="opsVideos" class="ops-vbar" style="display:none"></div>
 <div class="ocm" id="ocModal" onclick="if(event.target===this)opsClose()"><div class="ocm-box" id="ocmBox"></div></div>
 <div class="hd"><div class="k">전부서 실적</div><h1>전체실적 대시보드</h1>
 <div class="m">취소 반영 확정 · 미납 포함/취소 제외/연장 포함 · <span id="asOfLabel">매일 갱신</span></div></div>
@@ -4293,7 +4327,7 @@ setTimeout(function(){ if(window.__D&&window.__D.personCards)window.__liveD=wind
 
   function render(D){
     var box=document.getElementById('opsContent'); if(!box) return;
-    var lec=(D&&D.lectures)||[], wk=(D&&D.weekly)||[];
+    var lec=(D&&D.lectures)||[], wk=(D&&D.weekly)||[], vids=(D&&D.videos)||[];
     var t0=today0();
     // 종료일 필터 + 최신(아래=나중) 먼저
     var live=lec.filter(function(it){ var e=pend(it.end); return !e || e>=t0; });
@@ -4362,6 +4396,9 @@ setTimeout(function(){ if(window.__D&&window.__D.personCards)window.__liveD=wind
         (wk.length?'<div class="ops-page" id="ops-p2">'+wkHtml+'</div>':'')+
       '</div>';
 
+    // 영상 별도 블록 렌더
+    _renderVideoBar(vids);
+
     // roll 키프레임 1회 주입
     if(!document.getElementById('ops-roll-kf')){
       var st=document.createElement('style'); st.id='ops-roll-kf';
@@ -4370,6 +4407,57 @@ setTimeout(function(){ if(window.__D&&window.__D.personCards)window.__liveD=wind
     }
   }
 
+  // 영상 별도 블록 — 작은 썸네일 가로 슬라이드
+  window.__opsVids=null;
+  function _renderVideoBar(vids){
+    var box=document.getElementById('opsVideos'); if(!box) return;
+    if(!vids.length){ box.style.display='none'; return; }
+    box.style.display='';
+    var arr=vids.slice().reverse();
+    window.__opsVids=arr;
+    var cards=arr.map(function(v,i){
+      var thumb='https://img.youtube.com/vi/'+esc(v.vid)+'/mqdefault.jpg';
+      return '<div class="ovb-card" onclick="opsVideo('+i+')">'+
+        '<div class="ovb-thumb" style="background-image:url('+thumb+')"><span class="ovb-play">▶</span></div>'+
+        '<div class="ovb-tt">'+esc(v.title)+'</div></div>';
+    }).join('');
+    box.innerHTML='<div class="ovb-head"><span class="ovb-ico">🎬</span><span class="ovb-lbl">신규 콘텐츠</span>'+
+      '<span class="ovb-cnt">'+arr.length+'</span></div>'+
+      '<div class="ovb-track">'+cards+'</div>';
+  }
+  function _videoHtml(vids){
+    var arr=vids.slice().reverse();
+    window.__opsVids=arr;
+    var cards=arr.map(function(v,i){
+      var thumb='https://img.youtube.com/vi/'+esc(v.vid)+'/hqdefault.jpg';
+      var subj=v.subject?v.subject.split('·').map(function(s){return '<span class="otag subj">'+esc(s.trim())+'</span>';}).join(''):'';
+      return '<div class="ovid" onclick="opsVideo('+i+')">'+
+        '<div class="ovid-thumb" style="background-image:url('+thumb+')"><span class="ovid-play">▶</span></div>'+
+        '<div class="ovid-info">'+
+          '<div class="ovid-tags">'+(v.target?'<span class="otag tgt">'+esc(v.target)+'</span>':'')+subj+'</div>'+
+          '<div class="ovid-tt">'+esc(v.title)+'</div>'+
+          (v.detail?'<div class="ovid-sb">'+esc(v.detail)+'</div>':'')+
+          (v.date?'<div class="ovid-dt">'+esc(v.date)+'</div>':'')+
+        '</div></div>';
+    }).join('');
+    return '<div class="ovid-grid">'+cards+'</div>';
+  }
+  window.opsVideo=function(i){
+    var v=window.__opsVids&&window.__opsVids[i]; if(!v)return;
+    var box=document.getElementById('ocmBox');
+    box.innerHTML='<div class="ocm-vhero"><button class="ocm-x" onclick="opsClose()">×</button>'+
+      '<div class="ocm-embed"><iframe src="https://www.youtube.com/embed/'+esc(v.vid)+'?rel=0" frameborder="0" allow="accelerometer;autoplay;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe></div></div>'+
+      '<div class="ocm-body">'+
+        '<div class="omd-sec"><div class="ovid-mtags">'+(v.target?'<span class="otag tgt">'+esc(v.target)+'</span>':'')+
+          (v.subject?v.subject.split('·').map(function(s){return '<span class="otag subj">'+esc(s.trim())+'</span>';}).join(''):'')+'</div>'+
+          '<h2 class="ovid-mtt">'+esc(v.title)+'</h2>'+
+          (v.detail?'<div class="omd-lead">'+esc(v.detail)+'</div>':'')+
+          (v.date?'<div class="omd-note">'+esc(v.date)+'</div>':'')+'</div>'+
+        '<div class="ocm-social"><div id="pcSocial"></div></div>'+
+      '</div>';
+    document.getElementById('ocModal').classList.add('on'); document.body.style.overflow='hidden';
+    try{ window.__curCardName='[영상] '+v.title; if(typeof renderSocial==='function') renderSocial('[영상] '+v.title); }catch(e){}
+  };
   window.__wkAll=null;
   function _weeklyHtml(wk){
     if(!wk.length) return '';
