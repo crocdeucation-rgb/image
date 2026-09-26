@@ -784,7 +784,7 @@ body.is-live .closed-only{display:none !important}
 .notif-empty{padding:26px 16px;text-align:center;font-size:12.5px;color:#B6C2DC}
 </style>
 <style id="ops-content-css">
-.ops-cw{max-width:1560px;margin:0 auto 14px;background:var(--pan,#fff);border:1px solid var(--line,#E3E8F0);border-radius:14px;box-shadow:0 3px 12px rgba(20,30,50,.05);overflow:hidden}
+.ops-cw{max-width:1560px;margin:16px auto 18px;background:var(--pan,#fff);border:1px solid var(--line,#E3E8F0);border-radius:14px;box-shadow:0 4px 16px rgba(112,72,232,.07);overflow:hidden}
 .ops-bar{display:flex;align-items:center;gap:12px;padding:13px 18px;cursor:pointer;user-select:none;transition:background .15s}
 .ops-bar:hover{background:#F7F9FC}
 .ops-ico{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#7048E8,#4C6EF5);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
@@ -4294,7 +4294,7 @@ setTimeout(function(){ if(window.__D&&window.__D.personCards)window.__liveD=wind
     box.innerHTML=
       '<div class="ops-bar" onclick="this.closest(\'.ops-cw\').classList.toggle(\'open\')">'+
         '<div class="ops-ico">📢</div>'+
-        '<div><div class="ops-ttl">진행중인 콘텐츠 <span class="c">'+cnt+'</span></div>'+
+        '<div><div class="ops-ttl">아라온 콘텐츠 라운지 <span class="c">'+cnt+'</span></div>'+
         '<div class="ops-sub">특강 '+kinds['특강']+' · 이벤트/프로그램 '+(kinds['이벤트']+kinds['프로그램'])+(kinds['소식']?' · 소식 '+kinds['소식']:'')+'</div></div>'+
         '<div class="ops-flow"><div class="ops-track" style="animation:opsroll '+(Math.max(20,flow.length*4))+'s linear infinite">'+flowLoop+'</div></div>'+
         '<div class="ops-tg">전체보기 <span class="ops-chev">▾</span></div>'+
