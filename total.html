@@ -783,6 +783,96 @@ body.is-live .closed-only{display:none !important}
 .notif-dot{width:7px;height:7px;border-radius:50%;background:#E23A22;flex-shrink:0;margin-top:5px}
 .notif-empty{padding:26px 16px;text-align:center;font-size:12.5px;color:#B6C2DC}
 </style>
+<style id="ops-content-css">
+.ops-cw{max-width:1560px;margin:0 auto 14px;background:var(--pan,#fff);border:1px solid var(--line,#E3E8F0);border-radius:14px;box-shadow:0 3px 12px rgba(20,30,50,.05);overflow:hidden}
+.ops-bar{display:flex;align-items:center;gap:12px;padding:13px 18px;cursor:pointer;user-select:none;transition:background .15s}
+.ops-bar:hover{background:#F7F9FC}
+.ops-ico{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#7048E8,#4C6EF5);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.ops-ttl{font-size:14.5px;font-weight:900;letter-spacing:-.3px;color:var(--ink,#1B2436)}
+.ops-ttl .c{color:#7048E8}
+.ops-sub{font-size:11.5px;color:var(--soft,#6B7688);font-weight:600;margin-top:1px}
+.ops-flow{flex:1;overflow:hidden;position:relative;height:20px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);margin:0 6px}
+.ops-track{position:absolute;top:0;display:flex;align-items:center;gap:20px;white-space:nowrap;height:20px}
+.ops-bar:hover .ops-track{animation-play-state:paused}
+.ops-mi{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#48566e}
+.ops-mi .mt{font-size:9px;font-weight:800;padding:1px 6px;border-radius:4px;background:#EEF0FF;color:#5B5FE0}
+.ops-tg{flex-shrink:0;display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:800;color:#7048E8}
+.ops-chev{transition:transform .25s;font-size:10px}
+.ops-cw.open .ops-chev{transform:rotate(180deg)}
+.ops-panel{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.4,0,.2,1)}
+.ops-cw.open .ops-panel{max-height:3000px}
+.ops-tabs{display:flex;gap:4px;padding:4px 16px 0;border-bottom:1px solid var(--line,#E3E8F0)}
+.ops-tab{padding:10px 15px;font-size:12.5px;font-weight:800;color:var(--soft,#6B7688);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;display:flex;align-items:center;gap:6px}
+.ops-tab:hover{color:var(--ink,#1B2436)}
+.ops-tab.on{color:#7048E8;border-bottom-color:#7048E8}
+.ops-tab .b{font-size:10px;font-weight:800;background:#EEF0FF;color:#5B5FE0;padding:1px 7px;border-radius:999px}
+.ops-tab.on .b{background:#7048E8;color:#fff}
+.ops-page{display:none;padding:16px}
+.ops-page.on{display:block}
+.ops-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
+.occ{display:block;text-decoration:none;color:var(--ink,#1B2436);position:relative;background:var(--pan,#fff);border:1px solid var(--line,#E3E8F0);border-radius:13px;padding:14px 15px 13px;transition:.16s;cursor:pointer;overflow:hidden}
+.occ:hover{border-color:rgba(112,72,232,.35);box-shadow:0 8px 22px rgba(112,72,232,.12);transform:translateY(-2px)}
+.occ-bar{position:absolute;left:0;top:0;bottom:0;width:4px}
+.occ-tags{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:9px}
+.otag{font-size:10px;font-weight:800;padding:3px 7px;border-radius:6px;letter-spacing:.2px}
+.otag.kind{color:#fff}
+.otag.tgt{background:#EEF0FF;color:#4C5BD4;border:1px solid #DDE1FF}
+.otag.subj{background:#F0F3F8;color:#5B6880;border:1px solid #E3E8F0}
+.occ-st{margin-left:auto;font-size:9.5px;font-weight:800;display:inline-flex;align-items:center;gap:4px}
+.occ-st .dot{width:6px;height:6px;border-radius:50%}
+.st-live{color:#20A56D}.st-live .dot{background:#20A56D;animation:opl 1.6s infinite}
+@keyframes opl{0%,100%{opacity:.5}50%{opacity:1}}
+.st-soon{color:#F76707}.st-soon .dot{background:#F76707}
+.st-news{color:#4C6EF5}.st-news .dot{background:#4C6EF5}
+.occ-tt{font-size:15px;font-weight:900;letter-spacing:-.4px;line-height:1.25;word-break:keep-all}
+.occ-sb{margin-top:5px;font-size:11.5px;color:var(--soft,#6B7688);line-height:1.5;word-break:keep-all}
+.occ-mt{margin-top:11px;display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid #EEF1F6}
+.occ-dt{font-size:11px;font-weight:800;color:#404a5e}
+.occ-go{font-size:11px;font-weight:800;color:#7048E8}
+.ohj-tabs{display:inline-flex;gap:3px;margin-bottom:8px}
+.ohj{font-size:10px;font-weight:800;padding:3px 9px;border-radius:6px;background:#F0F3F8;color:#7a869c;cursor:pointer}
+.ohj.on{background:#c9a55c;color:#fff}
+.ohj-body .ohb{display:none}.ohj-body .ohb.on{display:block}
+.ok-lecture{background:#7048E8}.ok-event{background:#F76707}.ok-program{background:#4C6EF5}.ok-news{background:#20A56D}.ok-hanja{background:#c9a55c}
+.owk-head{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.owk-badge{font-size:12px;font-weight:900;color:#fff;background:linear-gradient(135deg,#4C6EF5,#7048E8);padding:6px 13px;border-radius:8px}
+.owk-range{font-size:13px;font-weight:700;color:var(--soft,#6B7688)}
+.owk-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.owk-card{background:#F7F9FC;border:1px solid var(--line,#E3E8F0);border-radius:12px;padding:15px 16px}
+.owk-card h4{font-size:13px;font-weight:900;margin-bottom:11px}
+.owk-plan{font-size:12.5px;line-height:1.9;color:#3d4759}
+.owk-plan .t2{font-size:10px;font-weight:800;padding:1px 7px;border-radius:5px;margin-right:6px}
+.t2-evt{background:#FFEEE6;color:#F76707}.t2-study{background:#EEF0FF;color:#5B5FE0}.t2-cal{background:#EAF7F0;color:#20A56D}
+.owk-up{background:#F7F9FC;border:1px solid var(--line,#E3E8F0);border-radius:12px;padding:15px 16px}
+.owk-up h4{font-size:13px;font-weight:900;margin-bottom:13px}
+.owk-g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.owk-s h5{font-size:11.5px;font-weight:900;color:#7048E8;margin-bottom:9px;padding-bottom:6px;border-bottom:1px solid var(--line,#E3E8F0)}
+.owk-it{font-size:12px;color:#43506a;line-height:1.75;padding:2px 0}
+.owk-it .nm{font-weight:800;color:var(--ink,#1B2436)}
+.ocm{position:fixed;inset:0;z-index:9000;display:none;align-items:flex-start;justify-content:center;padding:40px 16px;background:rgba(6,9,18,.72);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);overflow-y:auto}
+.ocm.on{display:flex}
+.ocm-box{width:100%;max-width:620px;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.4)}
+.ocm-hero{position:relative;padding:32px 30px 24px;color:#fff}
+.ocm-hero .eb{font-size:12px;font-weight:700;letter-spacing:2px;opacity:.9;margin-bottom:10px}
+.ocm-hero h2{font-weight:900;font-size:28px;line-height:1.2;letter-spacing:-1px;word-break:keep-all}
+.ocm-hero .sb{margin-top:9px;font-size:13.5px;font-weight:600;opacity:.94;word-break:keep-all}
+.ocm-hero .wh{margin-top:15px;display:inline-flex;font-size:13px;font-weight:800;background:rgba(0,0,0,.25);padding:8px 14px;border-radius:9px}
+.ocm-x{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;border:none;background:rgba(0,0,0,.28);color:#fff;font-size:18px;cursor:pointer;z-index:5}
+.ocm-body{padding:24px 30px 32px}
+.ocm-sec{margin-bottom:20px}.ocm-sec:last-child{margin-bottom:0}
+.ocm-sec h3{font-size:14px;font-weight:900;color:#1B2436;margin-bottom:9px}
+.ocm-lead{font-size:13.5px;color:#4a5568;line-height:1.7;word-break:keep-all}
+.ocm-chips{display:flex;flex-wrap:wrap;gap:7px}
+.ocm-chip{font-size:12.5px;font-weight:600;color:#3d4759;background:#F0F3F8;border:1px solid #E3E8F0;border-radius:8px;padding:7px 11px;word-break:keep-all}
+.oh-lecture{background:linear-gradient(150deg,#5B3AC4,#3A1D8A)}
+.oh-event{background:linear-gradient(150deg,#F76707,#C9500A)}
+.oh-program{background:linear-gradient(150deg,#3A6FD6,#1D4FA8)}
+.oh-news{background:linear-gradient(150deg,#1BA97A,#12805C)}
+.oh-hanja{background:linear-gradient(150deg,#c9a55c,#a07f3a)}
+@media(max-width:1200px){.ops-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:900px){.ops-grid{grid-template-columns:repeat(2,1fr)}.owk-cols,.owk-g3{grid-template-columns:1fr}.ops-flow{display:none}}
+@media(max-width:560px){.ops-grid{grid-template-columns:1fr}}
+</style>
 </head><body>
 <div id="authGate">
   <div class="gate-card">
@@ -822,6 +912,8 @@ body.is-live .closed-only{display:none !important}
 <div class="notif-panel" id="notifPanel"><div class="notif-hd">🔔 내 알림 <span class="clr" onclick="notifMarkAllSeen()">모두 읽음</span></div><div class="notif-list" id="notifList"></div></div>
 <div class="wrap">
 <div id="birthday-bar" class="birthday-bar" style="display:none"></div>
+<div id="opsContent" class="ops-cw" style="display:none"></div>
+<div class="ocm" id="ocModal" onclick="if(event.target===this)opsClose()"><div class="ocm-box" id="ocmBox"></div></div>
 <div class="hd"><div class="k">전부서 실적</div><h1>전체실적 대시보드</h1>
 <div class="m">취소 반영 확정 · 미납 포함/취소 제외/연장 포함 · <span id="asOfLabel">매일 갱신</span></div></div>
 <div class="tophead">
@@ -4022,6 +4114,193 @@ setTimeout(function(){ if(window.__D&&window.__D.personCards)window.__liveD=wind
     }catch(e){}
   }
   run();
+})();
+</script>
+<script>
+// ═══ [2026-09] 콘텐츠 위젯 — dashData/ops-content 읽어 렌더 (종료일 자동필터) ═══
+(function(){
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function today0(){ var d=new Date(); return new Date(d.getFullYear(),d.getMonth(),d.getDate()); }
+  function pend(s){ if(!s) return null; var m=String(s).match(/(\d{4})[-.\/](\d{1,2})[-.\/](\d{1,2})/); return m? new Date(+m[1],+m[2]-1,+m[3]) : null; }
+  var KIND={ '특강':{k:'ok-lecture',h:'oh-lecture'}, '이벤트':{k:'ok-event',h:'oh-event'}, '프로그램':{k:'ok-program',h:'oh-program'}, '소식':{k:'ok-news',h:'oh-news'} };
+  function stCls(s){ return s==='live'?'st-live':(s==='news'?'st-news':'st-soon'); }
+  function stTxt(s){ return s==='live'?'LIVE':(s==='news'?'NEWS':(s==='soon'?'진행중':'상시')); }
+
+  // 상세 파싱: ■제목 줄 → 섹션 / 그 아래 줄 → 내용 / '/'로 나뉘면 칩
+  function parseDetail(txt){
+    if(!txt) return [];
+    var lines=String(txt).split(/\r?\n/), secs=[], cur=null;
+    lines.forEach(function(ln){
+      ln=ln.replace(/\s+$/,'');
+      if(!ln.trim()) return;
+      if(ln.indexOf('■')===0){ if(cur) secs.push(cur); cur={title:ln.replace(/^■\s*/,''),body:[]}; }
+      else { if(!cur) cur={title:'',body:[]}; cur.body.push(ln.trim()); }
+    });
+    if(cur) secs.push(cur);
+    return secs;
+  }
+  function detailHtml(txt){
+    var secs=parseDetail(txt); if(!secs.length) return '';
+    return secs.map(function(s){
+      var body=s.body.join(' ');
+      var chips = body.indexOf('/')>=0;
+      var inner = chips
+        ? '<div class="ocm-chips">'+body.split('/').map(function(x){return '<span class="ocm-chip">'+esc(x.trim())+'</span>';}).join('')+'</div>'
+        : '<div class="ocm-lead">'+esc(body)+'</div>';
+      return '<div class="ocm-sec">'+(s.title?'<h3>'+esc(s.title)+'</h3>':'')+inner+'</div>';
+    }).join('');
+  }
+
+  window.__opsData=null;
+  window.opsOpen=function(idx){
+    var L=window.__opsData&&window.__opsData._live; if(!L||!L[idx]) return;
+    var it=L[idx];
+    if(it.link){ window.open(it.link,'_blank'); return; }   // 링크 있으면 이동
+    var hero=(KIND[it.kind]||KIND['특강']).h;
+    var kindLabel=(it.status==='news')?'소식':(it.kind||'특강');
+    var box=document.getElementById('ocmBox');
+    box.innerHTML='<div class="ocm-hero '+hero+'"><button class="ocm-x" onclick="opsClose()">×</button>'+
+      '<div class="eb">'+esc(kindLabel)+(it.target?' · '+esc(it.target):'')+'</div>'+
+      '<h2>'+esc(it.title)+'</h2>'+(it.teacher?'<div class="sb">'+esc(it.teacher)+' 선생님</div>':'')+
+      (it.when?'<div class="wh">'+esc(it.when)+'</div>':'')+'</div>'+
+      '<div class="ocm-body">'+(detailHtml(it.detail)||'<div class="ocm-lead">상세 준비 중입니다.</div>')+'</div>';
+    document.getElementById('ocModal').classList.add('on');
+    document.body.style.overflow='hidden';
+  };
+  window.opsClose=function(){ document.getElementById('ocModal').classList.remove('on'); document.body.style.overflow=''; };
+  window.opsTab=function(el,id){
+    var root=el.closest('.ops-cw');
+    root.querySelectorAll('.ops-tab').forEach(function(t){t.classList.remove('on');});
+    root.querySelectorAll('.ops-page').forEach(function(p){p.classList.remove('on');});
+    el.classList.add('on'); document.getElementById(id).classList.add('on');
+  };
+  window.opsHanja=function(el,id,e){
+    e.stopPropagation();
+    var card=el.closest('.occ');
+    card.querySelectorAll('.ohj').forEach(function(t){t.classList.remove('on');});
+    card.querySelectorAll('.ohb').forEach(function(b){b.classList.remove('on');});
+    el.classList.add('on'); card.querySelector('#'+id).classList.add('on');
+  };
+
+  function cardHtml(it, idx, grouped){
+    var K=KIND[it.kind]||KIND['특강'];
+    var tbar='#7048E8';
+    var top='<div class="occ-tags"><span class="otag kind '+K.k+'">'+esc(it.kind||'특강')+'</span>'+
+            (it.target?'<span class="otag tgt">'+esc(it.target)+'</span>':'')+
+            (it.subject?'<span class="otag subj">'+esc(it.subject)+'</span>':'')+
+            '<span class="occ-st '+stCls(it.status)+'"><span class="dot"></span>'+stTxt(it.status)+'</span></div>';
+    var body;
+    if(grouped && grouped.length>1){
+      // 한자처럼 그룹 여러개 → 미니탭
+      var uid='ohj_'+idx;
+      var tabs=grouped.map(function(g,i){ return '<span class="ohj'+(i===0?' on':'')+'" onclick="opsHanja(this,\''+uid+'_'+i+'\',event)">'+esc(g.tabLabel)+'</span>'; }).join('');
+      var bodies=grouped.map(function(g,i){ return '<div class="ohb'+(i===0?' on':'')+'" id="'+uid+'_'+i+'"><div class="occ-tt">'+esc(g.title)+'</div><div class="occ-sb">'+esc(g.sub)+'</div></div>'; }).join('');
+      body='<div class="ohj-tabs">'+tabs+'</div><div class="ohj-body">'+bodies+'</div>';
+    } else {
+      body='<div class="occ-tt">'+esc(it.title)+'</div>'+(it.sub?'<div class="occ-sb">'+esc(it.sub)+'</div>':'');
+    }
+    return '<div class="occ" onclick="opsOpen('+idx+')"><span class="occ-bar" style="background:'+tbar+'"></span>'+
+      top+body+'<div class="occ-mt"><span class="occ-dt">'+esc(it.when||'')+'</span><span class="occ-go">자세히 →</span></div></div>';
+  }
+
+  function render(D){
+    var box=document.getElementById('opsContent'); if(!box) return;
+    var lec=(D&&D.lectures)||[], wk=(D&&D.weekly)||[];
+    var t0=today0();
+    // 종료일 필터 + 최신(아래=나중) 먼저
+    var live=lec.filter(function(it){ var e=pend(it.end); return !e || e>=t0; });
+    live.reverse();  // 시트 아래 추가분이 앞으로
+    // 한줄 요약(sub) 자동 채움: detail 첫 내용
+    live.forEach(function(it){
+      if(!it.sub){ var s=String(it.detail||'').split(/\r?\n/).filter(function(x){return x.trim()&&x.indexOf('■')!==0;}); it.sub=s.length?s[0].trim():''; }
+    });
+    window.__opsData={ _live:live };
+
+    if(!live.length && !wk.length){ box.style.display='none'; return; }
+    box.style.display='';
+
+    // 그룹 묶기(한자5·6급): group 값 같은 것 하나로
+    var seen={}, cards=[], flow=[];
+    live.forEach(function(it,idx){
+      if(it.group){
+        if(seen[it.group]!=null){ // 이미 대표카드 있음 → 그룹에 추가
+          cards[seen[it.group]].grouped.push({ tabLabel:_grpLabel(it), title:it.title, sub:_subLine(it) });
+          return;
+        }
+        seen[it.group]=cards.length;
+        cards.push({ it:it, idx:idx, grouped:[{ tabLabel:_grpLabel(it), title:it.title, sub:_subLine(it) }] });
+      } else {
+        cards.push({ it:it, idx:idx, grouped:null });
+      }
+      flow.push('<span class="ops-mi"><span class="mt">'+esc(it.target||'전체')+'</span>'+esc(it.title)+'</span>');
+    });
+    function _grpLabel(it){ var m=String(it.title).match(/([0-9]+급)/); return m?m[1]:(it.when||'옵션'); }
+    function _subLine(it){ return (it.teacher?it.teacher+' T · ':'')+(it.when||''); }
+
+    var gridHtml=cards.map(function(c){ return cardHtml(c.it,c.idx,c.grouped?c.grouped:null); }).join('');
+
+    // 주간 콘텐츠
+    var wkHtml=_weeklyHtml(wk);
+
+    var cnt=live.length;
+    var kinds={특강:0,이벤트:0,프로그램:0,소식:0};
+    live.forEach(function(it){ if(kinds[it.kind]!=null)kinds[it.kind]++; });
+    var flowLoop=flow.concat(flow).join('');
+    var wkRange=(wk[0]&&wk[0].week)||'';
+
+    box.innerHTML=
+      '<div class="ops-bar" onclick="this.closest(\'.ops-cw\').classList.toggle(\'open\')">'+
+        '<div class="ops-ico">📢</div>'+
+        '<div><div class="ops-ttl">진행중인 콘텐츠 <span class="c">'+cnt+'</span></div>'+
+        '<div class="ops-sub">특강 '+kinds['특강']+' · 이벤트/프로그램 '+(kinds['이벤트']+kinds['프로그램'])+(kinds['소식']?' · 소식 '+kinds['소식']:'')+'</div></div>'+
+        '<div class="ops-flow"><div class="ops-track" style="animation:opsroll '+(Math.max(20,flow.length*4))+'s linear infinite">'+flowLoop+'</div></div>'+
+        '<div class="ops-tg">전체보기 <span class="ops-chev">▾</span></div>'+
+      '</div>'+
+      '<div class="ops-panel">'+
+        '<div class="ops-tabs">'+
+          '<div class="ops-tab on" onclick="opsTab(this,\'ops-p1\')">진행중 특강·이벤트 <span class="b">'+cnt+'</span></div>'+
+          (wk.length?'<div class="ops-tab" onclick="opsTab(this,\'ops-p2\')">주간 콘텐츠 <span class="b">'+esc(wkRange)+'</span></div>':'')+
+        '</div>'+
+        '<div class="ops-page on" id="ops-p1"><div class="ops-grid">'+gridHtml+'</div></div>'+
+        (wk.length?'<div class="ops-page" id="ops-p2">'+wkHtml+'</div>':'')+
+      '</div>';
+
+    // roll 키프레임 1회 주입
+    if(!document.getElementById('ops-roll-kf')){
+      var st=document.createElement('style'); st.id='ops-roll-kf';
+      st.textContent='@keyframes opsroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}';
+      document.head.appendChild(st);
+    }
+  }
+
+  function _weeklyHtml(wk){
+    if(!wk.length) return '';
+    var range=(wk[0]&&wk[0].week)||'';
+    var byS={신규:[],차주예정:[],정규:[],직투:[],문제풀이:[]};
+    wk.forEach(function(w){ if(byS[w.section]) byS[w.section].push(w); });
+    function t2(txt){ if(/이벤트/.test(txt))return 't2-evt'; if(/연휴|추석|일정/.test(txt))return 't2-cal'; return 't2-study'; }
+    var newHtml=byS['신규'].map(function(w){ return '<div><span class="t2 '+t2(w.text)+'">신규</span>'+esc(w.text)+'</div>'; }).join('');
+    var nextHtml=byS['차주예정'].map(function(w){ return '<div><span class="t2 '+t2(w.text)+'">예정</span>'+esc(w.text)+'</div>'; }).join('');
+    function col(title,arr){ return '<div class="owk-s"><h5>'+title+'</h5>'+arr.map(function(w){ return '<div class="owk-it">'+(w.who?'<span class="nm">'+esc(w.who)+'</span> ':'')+esc(w.text)+'</div>'; }).join('')+'</div>'; }
+    return '<div class="owk-head"><span class="owk-badge">WEEKLY</span><span class="owk-range">'+esc(range)+' 콘텐츠 현황</span></div>'+
+      '<div class="owk-cols">'+
+        '<div class="owk-card"><h4>🆕 신규 특강 및 이벤트</h4><div class="owk-plan">'+(newHtml||'<div style="color:#8A94A6">없음</div>')+'</div></div>'+
+        '<div class="owk-card"><h4>📅 차주 예정</h4><div class="owk-plan">'+(nextHtml||'<div style="color:#8A94A6">없음</div>')+'</div></div>'+
+      '</div>'+
+      '<div class="owk-up"><h4>📚 콘텐츠 업데이트 현황</h4><div class="owk-g3">'+
+        col('정규 강의',byS['정규'])+col('직투 강의',byS['직투'])+col('문제풀이 콘텐츠',byS['문제풀이'])+
+      '</div></div>';
+  }
+
+  // 로그인/Firestore 준비되면 로드 (total의 fsLoad 재사용)
+  function boot(){
+    if(typeof window.fsLoad!=='function'){ setTimeout(boot,400); return; }
+    window.fsLoad('ops-content').then(function(D){ render(D); }).catch(function(e){
+      // 데이터 없으면 위젯 숨김(조용히)
+      var box=document.getElementById('opsContent'); if(box) box.style.display='none';
+    });
+  }
+  boot();
 })();
 </script>
 </body></html>
