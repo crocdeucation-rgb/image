@@ -808,6 +808,10 @@ body.is-live .closed-only{display:none !important}
 .ops-tab .b{font-size:10px;font-weight:800;background:#EEF0FF;color:#5B5FE0;padding:1px 7px;border-radius:999px}
 .ops-tab.on .b{background:#7048E8;color:#fff}
 .ops-page{display:none;padding:16px}
+.ops-gfilter{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.ops-gf{font-size:12.5px;font-weight:800;padding:7px 15px;border-radius:999px;background:#F0F3F8;color:#6B7688;cursor:pointer;border:1px solid transparent;transition:.15s}
+.ops-gf:hover{background:#E8ECF3}
+.ops-gf.on{background:#7048E8;color:#fff}
 .ops-page.on{display:block}
 .ops-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
 .occ{display:block;text-decoration:none;color:var(--ink,#1B2436);position:relative;background:var(--pan,#fff);border:1px solid var(--line,#E3E8F0);border-radius:13px;padding:14px 15px 13px;transition:.16s;cursor:pointer;overflow:hidden}
@@ -860,6 +864,7 @@ body.is-live .closed-only{display:none !important}
 .ocm-hero .wh{margin-top:15px;display:inline-flex;font-size:13px;font-weight:800;background:rgba(0,0,0,.25);padding:8px 14px;border-radius:9px}
 .ocm-x{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;border:none;background:rgba(0,0,0,.28);color:#fff;font-size:18px;cursor:pointer;z-index:5}
 .ocm-body{padding:24px 30px 32px}
+.ocm-social{margin-top:24px;padding-top:20px;border-top:1px solid #EAEEF5}
 .ocm-sec{margin-bottom:20px}.ocm-sec:last-child{margin-bottom:0}
 .ocm-sec h3{font-size:14px;font-weight:900;color:#1B2436;margin-bottom:9px}
 .ocm-lead{font-size:13.5px;color:#4a5568;line-height:1.7;word-break:keep-all}
@@ -4210,11 +4215,17 @@ setTimeout(function(){ if(window.__D&&window.__D.personCards)window.__liveD=wind
       '<div class="eb">'+esc(kindLabel)+(it.target?' · '+esc(it.target):'')+'</div>'+
       '<h2>'+esc(it.title)+'</h2>'+(it.teacher?'<div class="sb">'+esc(it.teacher)+' 선생님</div>':'')+
       (it.when?'<div class="wh">'+esc(it.when)+'</div>':'')+'</div>'+
-      '<div class="ocm-body">'+bodyHtml+'</div>';
+      '<div class="ocm-body">'+bodyHtml+
+        '<div class="ocm-social"><div id="pcSocial"></div></div>'+
+      '</div>';
     document.getElementById('ocModal').classList.add('on');
     document.body.style.overflow='hidden';
+    try{ window.__curCardName = it.title; if(typeof renderSocial==='function') renderSocial(it.title); }catch(e){ console.warn('social',e); }
   };
-  window.opsClose=function(){ document.getElementById('ocModal').classList.remove('on'); document.body.style.overflow=''; };
+  window.opsClose=function(){
+    document.getElementById('ocModal').classList.remove('on'); document.body.style.overflow='';
+    try{ if(window.__likeUnsub)window.__likeUnsub(); if(window.__cmtUnsub)window.__cmtUnsub(); window.__curCardName=null; }catch(e){}
+  };
   window.opsTab=function(el,id){
     var root=el.closest('.ops-cw');
     root.querySelectorAll('.ops-tab').forEach(function(t){t.classList.remove('on');});
@@ -4236,13 +4247,34 @@ setTimeout(function(){ if(window.__D&&window.__D.personCards)window.__liveD=wind
     el.classList.add('on'); card.querySelector('#'+id).classList.add('on');
   };
 
+  // 대상 딱지 → 학년 클래스(초/중/고, 겹치면 여러개)
+  function _gradeClass(target){
+    var t=String(target||''); var g=[];
+    if(/초|전체/.test(t)) g.push('el');
+    if(/중|전체/.test(t)) g.push('mid');
+    if(/고|전체/.test(t)) g.push('hi');
+    if(!g.length) g.push('etc');
+    return g.join(' ');
+  }
+  window.opsGrade=function(el,grade){
+    var bar=el.closest('.ops-gfilter');
+    bar.querySelectorAll('.ops-gf').forEach(function(b){b.classList.remove('on');});
+    el.classList.add('on');
+    var grid=document.querySelector('#ops-p1 .ops-grid');
+    if(!grid)return;
+    grid.querySelectorAll('.occ').forEach(function(c){
+      if(grade==='all'){ c.style.display=''; return; }
+      var gc=(c.getAttribute('data-grade')||'').split(' ');
+      c.style.display=(gc.indexOf(grade)>=0)?'':'none';
+    });
+  };
   function cardHtml(it, idx, grouped){
     var K=KIND[it.kind]||KIND['특강'];
     var BARC={'특강':'#7048E8','이벤트':'#F76707','프로그램':'#4C6EF5','소식':'#20A56D'};
     var tbar=(it.group?'#c9a55c':(BARC[it.kind]||'#7048E8'));  // 한자그룹=골드
     var top='<div class="occ-tags"><span class="otag kind '+K.k+'">'+esc(it.kind||'특강')+'</span>'+
             (it.target?'<span class="otag tgt">'+esc(it.target)+'</span>':'')+
-            (it.subject?'<span class="otag subj">'+esc(it.subject)+'</span>':'')+
+            (it.subject?it.subject.split('·').map(function(s){return '<span class="otag subj">'+esc(s.trim())+'</span>';}).join(''):'')+
             '<span class="occ-st '+stCls(it.status)+'"><span class="dot"></span>'+stTxt(it.status)+'</span></div>';
     var body;
     if(grouped && grouped.length>1){
@@ -4254,7 +4286,8 @@ setTimeout(function(){ if(window.__D&&window.__D.personCards)window.__liveD=wind
     } else {
       body='<div class="occ-tt">'+esc(it.title)+'</div>'+(it.sub?'<div class="occ-sb">'+esc(it.sub)+'</div>':'');
     }
-    return '<div class="occ" onclick="opsOpen('+idx+')"><span class="occ-bar" style="background:'+tbar+'"></span>'+
+    var _gr=_gradeClass(it.target);
+    return '<div class="occ" data-grade="'+_gr+'" onclick="opsOpen('+idx+')"><span class="occ-bar" style="background:'+tbar+'"></span>'+
       top+body+'<div class="occ-mt"><span class="occ-dt">'+esc(it.when||'')+'</span><span class="occ-go">자세히 →</span></div></div>';
   }
 
@@ -4318,7 +4351,14 @@ setTimeout(function(){ if(window.__D&&window.__D.personCards)window.__liveD=wind
           '<div class="ops-tab on" onclick="opsTab(this,\'ops-p1\')">진행중 특강·이벤트 <span class="b">'+cnt+'</span></div>'+
           (wk.length?'<div class="ops-tab" onclick="opsTab(this,\'ops-p2\')">주간 콘텐츠 <span class="b">'+esc(wkRange)+'</span></div>':'')+
         '</div>'+
-        '<div class="ops-page on" id="ops-p1"><div class="ops-grid">'+gridHtml+'</div></div>'+
+        '<div class="ops-page on" id="ops-p1">'+
+          '<div class="ops-gfilter">'+
+            '<span class="ops-gf on" onclick="opsGrade(this,\'all\')">전체</span>'+
+            '<span class="ops-gf" onclick="opsGrade(this,\'el\')">초등</span>'+
+            '<span class="ops-gf" onclick="opsGrade(this,\'mid\')">중등</span>'+
+            '<span class="ops-gf" onclick="opsGrade(this,\'hi\')">고등</span>'+
+          '</div>'+
+          '<div class="ops-grid">'+gridHtml+'</div></div>'+
         (wk.length?'<div class="ops-page" id="ops-p2">'+wkHtml+'</div>':'')+
       '</div>';
 
