@@ -837,6 +837,7 @@ body.is-live .closed-only{display:none !important}
 .owk-head{display:flex;align-items:center;gap:10px;margin-bottom:16px}
 .owk-badge{font-size:12px;font-weight:900;color:#fff;background:linear-gradient(135deg,#4C6EF5,#7048E8);padding:6px 13px;border-radius:8px}
 .owk-range{font-size:13px;font-weight:700;color:var(--soft,#6B7688)}
+.owk-sel{font-size:13px;font-weight:700;color:#3E2F86;background:#F3F0FC;border:1px solid #DDD5F5;border-radius:8px;padding:6px 12px;cursor:pointer;outline:none}
 .owk-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
 .owk-card{background:#F7F9FC;border:1px solid var(--line,#E3E8F0);border-radius:12px;padding:15px 16px}
 .owk-card h4{font-size:13px;font-weight:900;margin-bottom:11px}
@@ -4210,7 +4211,7 @@ setTimeout(function(){ if(window.__D&&window.__D.personCards)window.__liveD=wind
     var t0=today0();
     // 종료일 필터 + 최신(아래=나중) 먼저
     var live=lec.filter(function(it){ var e=pend(it.end); return !e || e>=t0; });
-    // 시트 순서 그대로 (위=앞 카드)
+    live.reverse();  // 시트 아래 추가분 = 최신 = 앞 카드
     // 한줄 요약(sub) 자동 채움: detail 첫 내용
     live.forEach(function(it){
       if(!it.sub){ var s=String(it.detail||'').split(/\r?\n/).filter(function(x){return x.trim()&&x.indexOf('■')!==0;}); it.sub=s.length?s[0].trim():''; }
@@ -4247,7 +4248,9 @@ setTimeout(function(){ if(window.__D&&window.__D.personCards)window.__liveD=wind
     var kinds={특강:0,이벤트:0,프로그램:0,소식:0};
     live.forEach(function(it){ if(kinds[it.kind]!=null)kinds[it.kind]++; });
     var flowLoop=flow.concat(flow).join('');
-    var wkRange=(wk[0]&&wk[0].week)||'';
+    // 주차 목록(등장순=시트순, 최신이 뒤) → 최신 기본
+    var _wkOrder=[]; wk.forEach(function(w){ if(w.week && _wkOrder.indexOf(w.week)<0) _wkOrder.push(w.week); });
+    var wkRange=_wkOrder.length? _wkOrder[_wkOrder.length-1] : '';
 
     box.innerHTML=
       '<div class="ops-bar" onclick="this.closest(\'.ops-cw\').classList.toggle(\'open\')">'+
@@ -4274,24 +4277,40 @@ setTimeout(function(){ if(window.__D&&window.__D.personCards)window.__liveD=wind
     }
   }
 
+  window.__wkAll=null;
   function _weeklyHtml(wk){
     if(!wk.length) return '';
-    var range=(wk[0]&&wk[0].week)||'';
-    var byS={신규:[],차주예정:[],정규:[],직투:[],문제풀이:[]};
+    // 주차별 그룹 (등장순 유지, 최신=뒤)
+    var order=[], groups={};
+    wk.forEach(function(w){ var k=w.week||''; if(!k)return; if(!groups[k]){groups[k]=[];order.push(k);} groups[k].push(w); });
+    window.__wkAll={order:order, groups:groups};
+    var latest=order[order.length-1];
+    // 드롭다운(주차 선택) — 최신이 위로 오게 역순 표시
+    var sel='<select class="owk-sel" onchange="opsWkShow(this.value)">'+
+      order.slice().reverse().map(function(k,i){ return '<option value="'+esc(k)+'"'+(k===latest?' selected':'')+'>'+esc(k)+(k===latest?' (최신)':'')+'</option>'; }).join('')+
+      '</select>';
+    return '<div class="owk-head"><span class="owk-badge">WEEKLY</span>'+sel+'</div>'+
+      '<div id="owkBody">'+_weekBody(latest)+'</div>';
+  }
+  function _weekBody(weekKey){
+    var G=window.__wkAll; if(!G||!G.groups[weekKey]) return '';
+    var wk=G.groups[weekKey];
+    var byS={신규:[],차주예정:[],정규:[],직투:[],문제풀이:[],모의고사:[]};
     wk.forEach(function(w){ if(byS[w.section]) byS[w.section].push(w); });
-    function t2(txt){ if(/이벤트/.test(txt))return 't2-evt'; if(/연휴|추석|일정/.test(txt))return 't2-cal'; return 't2-study'; }
+    function t2(txt){ if(/이벤트|스윗아|위기/.test(txt))return 't2-evt'; if(/연휴|추석|일정/.test(txt))return 't2-cal'; return 't2-study'; }
     var newHtml=byS['신규'].map(function(w){ return '<div><span class="t2 '+t2(w.text)+'">신규</span>'+esc(w.text)+'</div>'; }).join('');
     var nextHtml=byS['차주예정'].map(function(w){ return '<div><span class="t2 '+t2(w.text)+'">예정</span>'+esc(w.text)+'</div>'; }).join('');
-    function col(title,arr){ return '<div class="owk-s"><h5>'+title+'</h5>'+arr.map(function(w){ return '<div class="owk-it">'+(w.who?'<span class="nm">'+esc(w.who)+'</span> ':'')+esc(w.text)+'</div>'; }).join('')+'</div>'; }
-    return '<div class="owk-head"><span class="owk-badge">WEEKLY</span><span class="owk-range">'+esc(range)+' 콘텐츠 현황</span></div>'+
-      '<div class="owk-cols">'+
+    function col(title,arr){ if(!arr.length)return ''; return '<div class="owk-s"><h5>'+title+'</h5>'+arr.map(function(w){ return '<div class="owk-it">'+(w.who?'<span class="nm">'+esc(w.who)+'</span> ':'')+esc(w.text)+'</div>'; }).join('')+'</div>'; }
+    var moText=byS['모의고사'].length? '<div class="owk-up" style="margin-top:12px"><h4>📝 모의고사 해설</h4><div class="owk-plan">'+byS['모의고사'].map(function(w){return '<div>'+esc(w.text)+'</div>';}).join('')+'</div></div>':'';
+    return '<div class="owk-cols">'+
         '<div class="owk-card"><h4>🆕 신규 특강 및 이벤트</h4><div class="owk-plan">'+(newHtml||'<div style="color:#8A94A6">없음</div>')+'</div></div>'+
         '<div class="owk-card"><h4>📅 차주 예정</h4><div class="owk-plan">'+(nextHtml||'<div style="color:#8A94A6">없음</div>')+'</div></div>'+
       '</div>'+
       '<div class="owk-up"><h4>📚 콘텐츠 업데이트 현황</h4><div class="owk-g3">'+
         col('정규 강의',byS['정규'])+col('직투 강의',byS['직투'])+col('문제풀이 콘텐츠',byS['문제풀이'])+
-      '</div></div>';
+      '</div></div>'+moText;
   }
+  window.opsWkShow=function(k){ var b=document.getElementById('owkBody'); if(b) b.innerHTML=_weekBody(k); };
 
   // 로그인/Firestore 준비되면 로드 (total의 fsLoad 재사용)
   function boot(){
