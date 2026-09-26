@@ -104,9 +104,9 @@
   </div>
   <!-- [2026-09-24] 방문 카운터 B안: total이 postMessage로 값 전달 → switcher가 화면 우하단 고정 표시 (전체실적 탭에서만) -->
   <style>
-  #cyBadge{display:none;position:fixed;right:16px;bottom:16px;z-index:8000;background:linear-gradient(135deg,#2a3550,#1a2438);border:1px solid rgba(120,150,255,.3);border-radius:12px;padding:9px 14px;font-family:'Pretendard',system-ui,sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.3);font-size:12px;color:#cdd8ef;line-height:1.7;opacity:.94}
+  #cyBadge{display:none;position:fixed;right:16px;top:72px;z-index:8000;background:linear-gradient(135deg,#2a3550,#1a2438);border:1px solid rgba(120,150,255,.3);border-radius:12px;padding:9px 14px;font-family:'Pretendard',system-ui,sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.3);font-size:12px;color:#cdd8ef;line-height:1.7;opacity:.94}
   #cyBadge.on{display:block}
-  @media(max-width:768px){ #cyBadge{right:12px;bottom:12px;padding:7px 12px;font-size:11px;opacity:.9} }
+  @media(max-width:768px){ #cyBadge{top:auto;bottom:16px;right:12px;padding:7px 12px;font-size:11px;opacity:.9} }
   </style>
   <div id="cyBadge">
     <div style="font-weight:800;font-size:10px;letter-spacing:1px;color:#8fa8e0;margin-bottom:3px">👣 아라온 스태티즈</div>
