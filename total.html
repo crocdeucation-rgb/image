@@ -4131,10 +4131,10 @@ setTimeout(function(){ if(window.__D&&window.__D.personCards)window.__liveD=wind
     if(!txt) return [];
     var lines=String(txt).split(/\r?\n/), secs=[], cur=null;
     lines.forEach(function(ln){
-      ln=ln.replace(/\s+$/,'');
-      if(!ln.trim()) return;
+      ln=ln.trim();                       // [수정] 앞뒤 공백 제거 — 셀 줄바꿈 들여쓰기 대응
+      if(!ln) return;
       if(ln.indexOf('■')===0){ if(cur) secs.push(cur); cur={title:ln.replace(/^■\s*/,''),body:[]}; }
-      else { if(!cur) cur={title:'',body:[]}; cur.body.push(ln.trim()); }
+      else { if(!cur) cur={title:'',body:[]}; cur.body.push(ln); }
     });
     if(cur) secs.push(cur);
     return secs;
@@ -4143,9 +4143,9 @@ setTimeout(function(){ if(window.__D&&window.__D.personCards)window.__liveD=wind
     var secs=parseDetail(txt); if(!secs.length) return '';
     return secs.map(function(s){
       var body=s.body.join(' ');
-      var chips = body.indexOf('/')>=0;
+      var chips = / \/ /.test(body);   // ' / ' (공백 슬래시)만 칩 — 날짜 9/2 보호
       var inner = chips
-        ? '<div class="ocm-chips">'+body.split('/').map(function(x){return '<span class="ocm-chip">'+esc(x.trim())+'</span>';}).join('')+'</div>'
+        ? '<div class="ocm-chips">'+body.split(/ \/ /).map(function(x){return '<span class="ocm-chip">'+esc(x.trim())+'</span>';}).join('')+'</div>'
         : '<div class="ocm-lead">'+esc(body)+'</div>';
       return '<div class="ocm-sec">'+(s.title?'<h3>'+esc(s.title)+'</h3>':'')+inner+'</div>';
     }).join('');
@@ -4184,7 +4184,8 @@ setTimeout(function(){ if(window.__D&&window.__D.personCards)window.__liveD=wind
 
   function cardHtml(it, idx, grouped){
     var K=KIND[it.kind]||KIND['특강'];
-    var tbar='#7048E8';
+    var BARC={'특강':'#7048E8','이벤트':'#F76707','프로그램':'#4C6EF5','소식':'#20A56D'};
+    var tbar=(it.group?'#c9a55c':(BARC[it.kind]||'#7048E8'));  // 한자그룹=골드
     var top='<div class="occ-tags"><span class="otag kind '+K.k+'">'+esc(it.kind||'특강')+'</span>'+
             (it.target?'<span class="otag tgt">'+esc(it.target)+'</span>':'')+
             (it.subject?'<span class="otag subj">'+esc(it.subject)+'</span>':'')+
@@ -4209,7 +4210,7 @@ setTimeout(function(){ if(window.__D&&window.__D.personCards)window.__liveD=wind
     var t0=today0();
     // 종료일 필터 + 최신(아래=나중) 먼저
     var live=lec.filter(function(it){ var e=pend(it.end); return !e || e>=t0; });
-    live.reverse();  // 시트 아래 추가분이 앞으로
+    // 시트 순서 그대로 (위=앞 카드)
     // 한줄 요약(sub) 자동 채움: detail 첫 내용
     live.forEach(function(it){
       if(!it.sub){ var s=String(it.detail||'').split(/\r?\n/).filter(function(x){return x.trim()&&x.indexOf('■')!==0;}); it.sub=s.length?s[0].trim():''; }
