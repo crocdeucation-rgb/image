@@ -907,6 +907,12 @@ body.is-live .closed-only{display:none !important}
 .omd-dd{font-size:12.5px;color:#7c8699;line-height:1.6;margin-top:5px;word-break:keep-all}
 .omd-chips{display:flex;flex-wrap:wrap;gap:8px}
 .omd-chip{font-size:12.5px;font-weight:600;color:#3d4759;background:#F3F0FC;border:1px solid #E3DBF7;border-radius:8px;padding:8px 12px;word-break:keep-all}
+.omd-gtabs{display:inline-flex;gap:4px;margin-bottom:12px;background:#F3F0FC;padding:4px;border-radius:10px}
+.omd-gt{font-size:12.5px;font-weight:800;padding:7px 14px;border-radius:7px;color:#8579b8;cursor:pointer;transition:.15s}
+.omd-gt.on{background:#c9a55c;color:#fff}
+.omd-gbody .omd-gb{display:none}
+.omd-gbody .omd-gb.on{display:block}
+.omd-tr span b{color:#1B2436}
 </style>
 <style id="ops-detail-css2"></style>
 </head><body>
@@ -4213,6 +4219,13 @@ setTimeout(function(){ if(window.__D&&window.__D.personCards)window.__liveD=wind
     root.querySelectorAll('.ops-tab').forEach(function(t){t.classList.remove('on');});
     root.querySelectorAll('.ops-page').forEach(function(p){p.classList.remove('on');});
     el.classList.add('on'); document.getElementById(id).classList.add('on');
+  };
+  window.opsG=function(el,id,e){   // 모달 안 급수 탭(한자 6/5급)
+    e.stopPropagation();
+    var box=el.closest('.ocm-body');
+    box.querySelectorAll('.omd-gt').forEach(function(t){t.classList.remove('on');});
+    box.querySelectorAll('.omd-gb').forEach(function(b){b.classList.remove('on');});
+    el.classList.add('on'); box.querySelector('#'+id).classList.add('on');
   };
   window.opsHanja=function(el,id,e){
     e.stopPropagation();
