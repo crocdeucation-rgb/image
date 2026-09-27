@@ -1709,13 +1709,23 @@ window.renderLegendLine=renderLegendLine;
 // [2026-09] 2025 연간 MVP — 상담·사업 연간 매출 1위 명예 표시 (26년 도전 동기부여)
 function renderYearMvp(){
   var el=document.getElementById('yearMvpBanner'); if(!el) return;
-  var d25=window.__D2025||{};
-  var pc=d25.personCards||{};
+  // [2026-09 파운더 요청] 2025 연간 → 2026 상반기(1~6월) 우수자. 소스=라이브(2026) personCards, 기간=2026-01~06 합산
+  var lv=window.__liveD||window.__D||{};
+  var pc=lv.personCards||{};
+  // series.m 포맷이 'YYYY-MM' 문자열 또는 월 숫자(1~6) 둘 다 대응
+  function inH1(m){
+    if(m==null) return false;
+    if(typeof m==='number') return m>=1&&m<=6;
+    var ms=String(m);
+    if(/^2026-0[1-6]$/.test(ms)) return true;          // 2026-01~06
+    if(/^0?[1-6]$/.test(ms)) return true;               // '1'~'6'
+    return false;
+  }
   function top1(grp){
     var best=null,bv=-1;
     (pc[grp]||[]).forEach(function(p){
       if(/웹마|운영팀|인투본사|웹마케팅/.test(p.name) || ['최혜영','김동원','박종현'].indexOf(p.name.replace(/[ABab]$/,''))>=0) return;
-      var t=(p.series||[]).reduce(function(a,s){return a+(s.sales||0);},0);
+      var t=(p.series||[]).reduce(function(a,s){return a+(inH1(s.m)?(s.sales||0):0);},0);
       if(t>bv){bv=t;best={name:p.name,total:t};}
     });
     return best;
@@ -1726,11 +1736,11 @@ function renderYearMvp(){
   function card(lb,x,cls){
     if(!x) return '';
     return '<div class="ymvp-card '+cls+'"><div class="ymvp-crown">🏆</div>'
-      +'<div class="ymvp-body"><div class="ymvp-lb">2025 연간 최우수 · '+lb+'</div>'
+      +'<div class="ymvp-body"><div class="ymvp-lb">2026 상반기 최우수 · '+lb+'</div>'
       +'<div class="ymvp-nm">'+avatarMini(x.name,26)+'<span class="ymvp-nmtxt">'+x.name+'</span></div>'
       +'<div class="ymvp-v">'+pcEok(x.total)+'</div></div></div>';
   }
-  el.innerHTML='<div class="ymvp-hd">🏆 2025 명예의 전당 <span>연간 매출 1위 · 2026에도 도전하세요</span></div>'
+  el.innerHTML='<div class="ymvp-hd">🏆 2026 상반기 명예의 전당 <span>1~6월 매출 1위 · 하반기도 도전하세요</span></div>'
     +'<div class="ymvp-grid">'+card('상담',sang,'ymvp-sang')+card('사업',saup,'ymvp-saup')+'</div>';
   setTimeout(function(){ if(window.attachCardClicks) window.attachCardClicks(); }, 60);
 }
