@@ -439,6 +439,18 @@ details[open]>.more::before{content:'▾ '}
 .dgh .dgt{font-size:12.5px;font-weight:800;padding:3px 11px;border-radius:7px}
 .dgh .dgt.해피콜{background:#EEF1F6;color:var(--soft)}.dgh .dgt.개통{background:var(--v1s);color:var(--v1)}.dgh .dgt.입학식{background:var(--purs);color:var(--pur)}.dgh .dgt.첫만남{background:var(--ambers);color:#9A5B06}.dgh .dgt.첫수업{background:var(--poss);color:#16784C}
 .dgh b{font-size:15px;font-weight:900}
+
+/* 오늘 상세 단계 그룹 — PC 다열 */
+@media(min-width:900px){
+  .dgrp .jlist{display:grid;grid-template-columns:repeat(2,1fr);gap:1px 10px;background:transparent;border:0}
+  .dgrp .jrow{border:1px solid var(--line);border-radius:10px}
+}
+@media(min-width:1300px){
+  .dgrp .jlist{grid-template-columns:repeat(3,1fr)}
+}
+
+/* 취소 담당별 그룹 카드 더 촘촘히 */
+.cgrp .cgrid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
 .calcsub{margin-top:3px;font-size:12.5px;font-weight:500;color:#6B5A9A;line-height:1.5}
 .rdot{display:inline-block;font-size:9px;font-weight:900;color:#fff;background:#9A5B06;border-radius:50%;width:13px;height:13px;line-height:13px;text-align:center;margin-left:3px;vertical-align:middle}
 .bsc{display:inline-block;font-size:11.5px;background:#EEF1F6;border-radius:6px;padding:2px 8px;margin:2px 4px 2px 0}
@@ -1841,7 +1853,8 @@ function coachTab(){
    '<td class="c" style="color:var(--pur)">'+T.mo+'</td><td class="c" style="color:var(--pos)">'+T.mk+'</td><td class="c" style="color:var(--red)">'+T.md2+'</td>'+
    '<td class="c">'+(T.live?Math.round(T.mw/T.live*1000)/10+'%':'')+'</td><td class="c">'+T.can+'</td><td></td><td class="c">'+T.gap+'</td><td class="c">'+T.nolog+'</td><td class="c">'+T.noexp+'</td><td class="c">'+T.end+'</td></tr>'+
    '</tbody></table></div>',true);
-  return summary+chips+
+  return '<div class="chips stickysel" style="margin-bottom:10px">'+chips.replace('<div class="chips stickysel">','').replace('<div class="chips">','').replace('</div>','')+'</div>'+
+   '<details style="margin-bottom:12px"><summary class="jmoreb" style="list-style:none">담당 전체표 '+names.length+'명 보기 ▾</summary><div style="margin-top:8px">'+summary+'</div></details>'+
    '<div class="kpi">'+kpi.map(function(x){return '<div class="'+x[2]+'"><div class="l">'+x[0]+'</div><b>'+x[1]+'</b></div>';}).join('')+'</div>'+
    (function(){
      var TM=(D.tm||{})[cur]; if(!TM) return '';
