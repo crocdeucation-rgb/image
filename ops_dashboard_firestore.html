@@ -390,6 +390,7 @@ details[open]>.more::before{content:'▾ '}
   .jd i{width:13px;height:13px}
 }
 .jmoreb{width:100%;border:1px dashed var(--line);background:#fff;border-radius:10px;padding:11px;margin-top:8px;font:inherit;font-size:13px;font-weight:800;color:var(--soft);cursor:pointer}.jmoreb:hover{border-color:var(--v1);color:var(--v1)}
+.stickysel{position:sticky;top:0;z-index:15;background:var(--bg);padding:8px 0 10px;margin:0 -2px 12px;border-bottom:1px solid var(--line)}
 .calcsub{margin-top:3px;font-size:12.5px;font-weight:500;color:#6B5A9A;line-height:1.5}
 .rdot{display:inline-block;font-size:9px;font-weight:900;color:#fff;background:#9A5B06;border-radius:50%;width:13px;height:13px;line-height:13px;text-align:center;margin-left:3px;vertical-align:middle}
 .bsc{display:inline-block;font-size:11.5px;background:#EEF1F6;border-radius:6px;padding:2px 8px;margin:2px 4px 2px 0}
@@ -703,7 +704,11 @@ function dayBox(dd,inner){
   var rowsAll=[];
   KIND.forEach(function(k){ byk[k].forEach(function(o){ rowsAll.push(o); }); });
   rowsAll.sort(function(a,b){return (a.k.time||'~').localeCompare(b.k.time||'~');});
-  var cards='<div class="jlist">'+rowsAll.map(function(o){
+  // 진행 중(다음 단계 남음) vs 온보딩 완료(첫수업 끝) 분리
+  var jGrad=function(o){var j=JM[o.n];return j&&j.grad;};
+  var ing=rowsAll.filter(function(o){return !jGrad(o);});
+  var don=rowsAll.filter(jGrad);
+  var jrowHtml=function(o){
     var e0=o.L[0], j=JM[o.n];
     var todayKinds=o.L.map(function(x){return x.kind+(x.time?' '+x.time:'')+(x.st==='done'?'✓':'');}).join(' · ');
     var nx=j?j.nextStep:null;
@@ -715,7 +720,10 @@ function dayBox(dd,inner){
       '<div class="jr-meta">'+esc(e0.br||'')+' · '+esc(todayKinds)+'</div></div>'+
       '<div class="jr-c">'+jbar(j)+'</div>'+
       '<div class="jr-r">'+(nx?'<div class="jr-next">다음 <b>'+esc(nx)+'</b></div>':'<div class="jr-next done">온보딩 완료</div>')+memo+'</div></div>';
-  }).join('')+'</div>';
+  };
+  var cards='<div class="lead">진행 중 <b>'+ing.length+'</b>명 · 온보딩 완료 <b>'+don.length+'</b>명</div>'+
+    (ing.length?'<div class="jlist">'+ing.map(jrowHtml).join('')+'</div>':'<div class="empty" style="padding:14px">진행 중(다음 단계 남은) 회원이 없습니다.</div>')+
+    (don.length?'<details style="margin-top:10px"><summary class="jmoreb" style="list-style:none">온보딩 완료 '+don.length+'명 보기 ▾</summary><div class="jlist" style="margin-top:6px">'+don.map(jrowHtml).join('')+'</div></details>':'');
   var y=add(d,-1), nj=[],seen={};
   EV.forEach(function(e){if(e.join===y&&!seen[e.name]){seen[e.name]=1;nj.push(e);}});
   var njb=nj.length?'<div class="grp">전날('+md(y)+') 가입 '+nj.length+'명 — 해피콜 대상</div>'+
@@ -1635,7 +1643,7 @@ function coachTab(){
   var didW=M.filter(function(m){return (m.wks||[]).indexOf(WK)>=0;}).length;
   var hasLog=M.filter(function(m){return m.log;}).length;
   var canN=M.filter(function(m){return m.can;}).length;
-  var chips='<div class="chips">'+names.map(function(n){
+  var chips='<div class="chips stickysel">'+names.map(function(n){
     var s2=CO[n].live.filter(function(m){return m.wk==='w0'||m.wk==='w1';}).length;
     var w2=mwC(CO[n].live,'진행');
     return '<button class="chip'+(n===cur?' on':'')+'" data-coach="'+esc(n)+'">'+esc(n)+
@@ -1847,7 +1855,7 @@ function teachTab(){
     })();
   var SJ=window.__tsj||'전체';
   var sjList=['전체'].concat(order);
-  var sjChips='<div class="chips">'+sjList.map(function(x){
+  var sjChips='<div class="chips stickysel">'+sjList.map(function(x){
      var n2=x==='전체'?names.length:grp[x].length;
      var p2=x==='전체'?SUB.length:grp[x].reduce(function(a,n){return a+pk(n);},0);
      return '<button class="chip'+(SJ===x?' on':'')+'" data-tsj="'+esc(x)+'">'+esc(x)+'<span>'+n2+'명'+(p2?' · 대타'+p2:'')+'</span></button>';}).join('')+'</div>';
@@ -2022,6 +2030,7 @@ function render(){
   else if(TAB==='coach') el.innerHTML=(BR?branchStaffBox(BR):'')+coachTab();
   else el.innerHTML=teachTab();
   document.getElementById('ovl').innerHTML=CARD?card(CARD):'';
+  try{ if(window.self!==window.top){ parent.postMessage({t:CARD?'cardOpen':'cardClose'},'*'); } }catch(e){}
   try{ if(window.self!==window.top){ var h=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight); parent.postMessage({t:'frameH',h:h},'*'); parent.postMessage({type:'resize-iframe',height:h+40},'*'); } }catch(e){}
 }
 document.addEventListener('click',function(e){
