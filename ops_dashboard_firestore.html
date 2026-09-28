@@ -434,6 +434,11 @@ details[open]>.more::before{content:'▾ '}
 .ccard .cbs{margin:5px 0 4px}
 .cgrid{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:6px}
 @media(max-width:768px){.cgrid{grid-template-columns:1fr}.ccard{padding:9px 12px}}
+.dgrp{margin-bottom:14px}
+.dgh{display:flex;align-items:center;gap:8px;margin:0 2px 6px}
+.dgh .dgt{font-size:12.5px;font-weight:800;padding:3px 11px;border-radius:7px}
+.dgh .dgt.해피콜{background:#EEF1F6;color:var(--soft)}.dgh .dgt.개통{background:var(--v1s);color:var(--v1)}.dgh .dgt.입학식{background:var(--purs);color:var(--pur)}.dgh .dgt.첫만남{background:var(--ambers);color:#9A5B06}.dgh .dgt.첫수업{background:var(--poss);color:#16784C}
+.dgh b{font-size:15px;font-weight:900}
 .calcsub{margin-top:3px;font-size:12.5px;font-weight:500;color:#6B5A9A;line-height:1.5}
 .rdot{display:inline-block;font-size:9px;font-weight:900;color:#fff;background:#9A5B06;border-radius:50%;width:13px;height:13px;line-height:13px;text-align:center;margin-left:3px;vertical-align:middle}
 .bsc{display:inline-block;font-size:11.5px;background:#EEF1F6;border-radius:6px;padding:2px 8px;margin:2px 4px 2px 0}
@@ -777,8 +782,21 @@ function dayBox(dd,inner){
       '<div class="jr-c todo">'+todo+'</div>'+
       '<div class="jr-r">'+memo+'</div></div>';
   };
-  var cards='<div class="lead">진행 중 <b>'+ing.length+'</b>명 · 온보딩 완료 <b>'+don.length+'</b>명</div>'+
-    (ing.length?'<div class="jlist">'+ing.map(jrowHtml).join('')+'</div>':'<div class="empty" style="padding:14px">진행 중(다음 단계 남은) 회원이 없습니다.</div>')+
+  // 다음 단계별로 그룹 분류 (오늘 그날 하는 단계 기준)
+  var GST=['해피콜','개통','입학식','첫만남','첫수업'];
+  var grpBy={};GST.forEach(function(k){grpBy[k]=[];});var etcG=[];
+  ing.forEach(function(o){
+    // 오늘 일정 중 첫 미완 단계 = 이 회원의 오늘 단계
+    var todo=o.L.filter(function(x){return x.st!=='done';})[0]||o.L[0];
+    var k=todo.kind;
+    if(grpBy[k]) grpBy[k].push(o); else etcG.push(o);
+  });
+  var grpHtml=GST.filter(function(k){return grpBy[k].length;}).map(function(k){
+    return '<div class="dgrp"><div class="dgh"><span class="dgt '+k+'">'+k+'</span><b>'+grpBy[k].length+'</b></div>'+
+      '<div class="jlist">'+grpBy[k].map(jrowHtml).join('')+'</div></div>';
+  }).join('');
+  var cards='<div class="lead">진행 중 <b>'+ing.length+'</b>명 · 온보딩 완료 <b>'+don.length+'</b>명 — 오늘 <b>할 단계별</b>로 묶었습니다.</div>'+
+    (ing.length?grpHtml:'<div class="empty" style="padding:14px">진행 중(다음 단계 남은) 회원이 없습니다.</div>')+
     (don.length?'<details style="margin-top:10px"><summary class="jmoreb" style="list-style:none">온보딩 완료 '+don.length+'명 보기 ▾</summary><div class="jlist" style="margin-top:6px">'+don.map(jrowHtml).join('')+'</div></details>':'');
   var y=add(d,-1), nj=[],seen={};
   EV.forEach(function(e){if(e.join===y&&!seen[e.name]){seen[e.name]=1;nj.push(e);}});
