@@ -337,6 +337,58 @@ details[open]>.more::before{content:'▾ '}
 .hm small{font-size:10px;color:var(--soft);font-weight:700}
 .fdist{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:6px}@media(max-width:800px){.fdist{grid-template-columns:1fr}}
 .byrow{cursor:pointer}.byrow:hover{background:#FAFBFD}.byrow.on{background:#FFF5F3}.byrow.on td{border-color:#F3C6BE}
+
+/* ── 신규 회원 여정 (배민식 추적기) ── */
+.jfun{display:flex;align-items:stretch;gap:4px;flex-wrap:wrap;margin-bottom:16px}
+.jfs{flex:1 1 130px;border:1px solid var(--line);border-radius:12px;padding:11px 13px;background:#fff;cursor:pointer;transition:.12s}
+.jfs:hover{border-color:#C5D0FA;box-shadow:0 2px 10px rgba(76,110,245,.1)}
+.jfs.haswait{border-color:#F3C6BE;background:#FFFBFA}
+.jfs-h{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.jfs-h b{font-size:13.5px;font-weight:800}
+.jfs-w{font-size:11px;font-weight:800;color:var(--red);background:var(--reds);padding:1px 7px;border-radius:5px;white-space:nowrap}
+.jfs-bar{height:5px;background:#EEF1F6;border-radius:3px;overflow:hidden;margin:7px 0 5px}
+.jfs-bar i{display:block;height:100%;background:var(--v1);border-radius:3px}
+.jfs-d{font-size:10.5px;color:var(--mute);line-height:1.4}
+.jfs-n{font-size:11px;color:var(--soft);font-weight:700;margin-top:3px}
+.jfs-arw{display:flex;align-items:center;color:#D0D8E6;font-weight:900;font-size:16px}
+.jlist{display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.jrow{display:grid;grid-template-columns:1.4fr 1.6fr 1fr;gap:12px;align-items:center;background:#fff;padding:11px 14px;cursor:pointer;transition:.1s}
+.jrow:hover{background:#F7F9FF}
+.jr-nm b{font-size:14px;font-weight:800}
+.jr-g{font-size:11px;color:var(--mute);font-weight:600;margin-left:5px}
+.jr-meta{font-size:11px;color:var(--soft);margin-top:2px}
+.jbar{display:flex;align-items:center}
+.jd{display:flex;align-items:center;flex:1}
+.jd i{width:11px;height:11px;border-radius:50%;background:#DDE3EC;flex:none;border:2px solid #DDE3EC}
+.jd em{flex:1;height:2px;background:#DDE3EC;min-width:8px}
+.jd.d i{background:var(--pos);border-color:var(--pos)}
+.jd.d em{background:var(--pos)}
+.jd.nx i{background:#fff;border-color:var(--v1);box-shadow:0 0 0 3px var(--v1s)}
+.jd.pl i{background:var(--amber);border-color:var(--amber)}
+.jr-r{text-align:right}
+.jr-next{font-size:12px;color:var(--soft);font-weight:700}
+.jr-next b{color:var(--v1);font-weight:800}
+.jr-next.done{color:var(--pos)}
+.jr-stuck{font-size:11px;color:var(--mute);font-weight:700;margin-top:2px}
+.jmemo{display:inline-block;font-size:10.5px;color:#9A5B06;background:var(--ambers);padding:2px 7px;border-radius:5px;margin-top:3px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.jwk{font-size:12.5px;font-weight:800;color:var(--v1);background:var(--v1s);padding:3px 10px;border-radius:6px}
+.jwk-n{font-size:11px;color:var(--soft);font-weight:700;margin-left:6px}
+.jrow.grad{grid-template-columns:1.4fr 1fr auto}
+/* 여정 모바일 */
+@media(max-width:768px){
+  .jfun{gap:6px}
+  .jfs{flex:1 1 44%;padding:9px 11px}
+  .jfs-arw{display:none}
+  .jfs-d{display:none}
+  .jrow{grid-template-columns:1fr;gap:7px;padding:12px 13px}
+  .jrow.grad{grid-template-columns:1fr}
+  .jr-c{order:3}
+  .jr-r{text-align:left;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .jr-stuck{margin-top:0}
+  .jbar{margin:2px 0}
+  .jd i{width:13px;height:13px}
+}
+.jmoreb{width:100%;border:1px dashed var(--line);background:#fff;border-radius:10px;padding:11px;margin-top:8px;font:inherit;font-size:13px;font-weight:800;color:var(--soft);cursor:pointer}.jmoreb:hover{border-color:var(--v1);color:var(--v1)}
 .calcsub{margin-top:3px;font-size:12.5px;font-weight:500;color:#6B5A9A;line-height:1.5}
 .rdot{display:inline-block;font-size:9px;font-weight:900;color:#fff;background:#9A5B06;border-radius:50%;width:13px;height:13px;line-height:13px;text-align:center;margin-left:3px;vertical-align:middle}
 .bsc{display:inline-block;font-size:11.5px;background:#EEF1F6;border-radius:6px;padding:2px 8px;margin:2px 4px 2px 0}
@@ -782,7 +834,7 @@ function expBox(){
    '<div class="lead">관리 기간이 끝나는 회원입니다.</div>'+
    '<div class="lead">사전 안내(방식·발송일·재시도) 칸이 시트에 없습니다 — 관리만료 시트 253명 중 안내 방식을 알 수 있는 건 4건뿐입니다.</div>'+
    cards+(cs?'<div class="grp">담당별 — '+cs+'</div>':'')+'<div class="grp">'+(({w0:'이번 주',w1:'다음 주',w2:'2주 뒤',m0:'이달 안'})[sel]||'')+' 만료 '+L.length+'명</div>'+etoggle+list+
-   (noexp?'<div class="lead" style="margin-top:10px">관리만료일이 시트에 없는 회원이 <b>'+noexp+'명</b> 있습니다. 이 회원들은 만료가 와도 미리 보이지 않습니다.</div>':''),true);
+   (noexp?'<div class="lead" style="margin-top:10px">관리만료일이 시트에 없는 회원이 <b>'+noexp+'명</b> 있습니다. 이 회원들은 만료가 와도 미리 보이지 않습니다.</div>':''),false);
 }
 function guardBox(){
   var TM=D.tm||{}, M=(D.mon2||[]).filter(function(x){return x.tab&&x.m>='2026-05';});
@@ -830,7 +882,7 @@ function guardBox(){
       '<td>'+spark(x.tr)+'</td></tr>';}).join('')+'</tbody></table></div>';
   return zone('guard','var(--pos)','민원 방어',(+G.slice(5))+'월 '+(dr(cur)==null?'—':dr(cur)+'%'),'달을 골라 그 달 관리·접수·결과를 전월과 같이',
    '<div class="lead">민원 시트 월 탭 기준. <b>방어율</b>=유지÷(유지+해지), <b>접수율</b>=접수÷그 달 관리중. 당일취소는 방어 기회가 없던 건이라 방어율에서 뺍니다. 담당은 민원 시트 "관리교사" 칸 그대로 — 현 코칭 명단에 없는 교사로 적힌 접수는 이 표에 안 잡힙니다.</div>'+
-   mseg+'<div class="kpi">'+head+'</div>'+sortSeg+tbl,true);
+   mseg+'<div class="kpi">'+head+'</div>'+sortSeg+tbl,false);
 }
 function planBox(){
   var mon=monday(CUR), w=[[mon,add(mon,6)],[add(mon,7),add(mon,13)]];
@@ -960,7 +1012,7 @@ function canBox(){
    '<div class="lead">운영본부 <b>민원 시트</b>가 기준입니다. 결과 칸이 <b>해지</b>이거나 당취 표시된 건을 취소로 셉니다(1월 탭은 게시판접수). 같은 회원이 여러 번 접수되면 마지막 해지 1건. 2~4월은 탭이 없어 비어 있습니다. '+
    '금액은 민원 시트 순취소액, 비어 있으면 취소입력 금액(<sup>*</sup>) — 그래도 없는 '+L.filter(function(x){return !x.can.amt;}).length+'건은 —.</div>'+
    calcBanner+monSeg+chips+cats+
-   '<div class="lead">선택 '+S.length+'건 · '+won_(samt)+(noAmt?' (금액 없음 '+noAmt+'건)':'')+' · 한 장이 회원 한 명</div>'+body+catsum,true);
+   '<div class="lead">선택 '+S.length+'건 · '+won_(samt)+(noAmt?' (금액 없음 '+noAmt+'건)':'')+' · 한 장이 회원 한 명</div>'+body+catsum,false);
 }
 function devBox(){
   var L=(D.device||[]).filter(inBr);
@@ -984,7 +1036,7 @@ function devBox(){
   return zone('dev','var(--amber)','기기 · 설치 트러블',L.length+'건','노트북·프로그램·캠 관련 기록',
    '<div class="lead">오티·코칭 메모에서 기기·설치 관련 문구를 모았습니다. 분류는 문구 기준이라 정확하지 않을 수 있습니다.</div>'+
    '<div class="seg">'+tabs.map(function(t){
-     return '<button class="'+(F===t[0]?'on':'')+'" data-df="'+esc(t[0])+'">'+t[1]+' '+t[2]+'</button>';}).join('')+'</div>'+body,true);
+     return '<button class="'+(F===t[0]?'on':'')+'" data-df="'+esc(t[0])+'">'+t[1]+' '+t[2]+'</button>';}).join('')+'</div>'+body,false);
 }
 /* ── 코칭부서 퍼널: 관리 → 민원 → 취소 → 방어 ── */
 function branchStaffBox(fix){
@@ -1074,7 +1126,7 @@ function funnelBox(){
   var dists='<div class="fdist">'+dist(function(x){return x.can.teach||(x.can.resp==='당일취소'?'배정 전(당일취소)':'');},'코칭 담당')+dist(function(x){return x.br;},'지점')+'</div>';
   return zone('funnel','var(--v1)','진단 — 월별','관리 → 민원 → 방어 → 취소','달을 고르면 그 달 흐름 · 원인은 달마다 나란히',
     '<div class="lead">민원 시트 월 탭 기준(2~4월 탭 없음). 위 카드는 고른 달과 전월 비교, 아래 표는 달마다 취소가 <b>어떤 원인·어떤 경로</b>로 났는지 나란히 놓은 것입니다. 색이 진할수록 그 항목 건수가 많은 달.</div>'+
-    seg+funnel+mat+dists,true);
+    seg+funnel+mat+dists,false);
 }
 function byBox(){
   var C=(D.can2||[]).filter(function(m){return inBr(m);});
@@ -1143,7 +1195,7 @@ function byBox(){
   return zone('by','var(--red)','취소가 몰리는 곳','',''+F+'별 취소 — 총량이 아니라 월 추이·원인으로',
    seg+
    '<div class="lead">6~9월 취소를 '+F+'별로. 막대는 월별 건수 추이(총합 아님), <b>전월비</b>는 8월→9월 증감. 점검=고객 오해·관리·수업 사유. 눌러서 상세.</div>'+
-   table+detail,true);
+   table+detail,false);
 }
 function cleanNm(n){return String(n||'').replace(/\(.*?\)/g,'').replace(/[A-Za-z\s]/g,'');}
 function alertData(){
@@ -1192,10 +1244,97 @@ function alertData(){
   Object.keys(A).forEach(function(k){A[k].sort(function(a,b){return (b.dt||'').localeCompare(a.dt||'');});});
   return A;
 }
+function journeyBox(){
+  var J=(D.journey||[]).filter(function(j){return inBr(j);});
+  if(!J.length) return '';
+  var STEPS=['해피콜','개통','입학식','첫만남','첫수업'];
+  var STEPDESC={'해피콜':'가입 후 첫 통화','개통':'기기·계정 개통','입학식':'OT 시작','첫만남':'담임 첫 대면','첫수업':'정규수업 시작 (여기부터 코칭)'};
+  var onb=J.filter(function(j){return !j.grad && !j.can;});   // 온보딩 진행 중
+  var grad=J.filter(function(j){return j.grad && !j.can;});    // 졸업(코칭 단계)
+  var view=window.__jv||'onb';
+  // 단계별 대기 집계 (다음 단계 기준)
+  var byNext={};onb.forEach(function(j){var k=j.nextStep||'완료';(byNext[k]=byNext[k]||[]).push(j);});
+  // 퍼널 요약
+  var funnel=STEPS.map(function(s,i){
+    var doneN=J.filter(function(j){return j.prog>i;}).length;     // 이 단계 넘은 수
+    var waitN=(byNext[s]||[]).length;                             // 이 단계 대기
+    return {s:s,done:doneN,wait:waitN};
+  });
+  var maxDone=funnel[0].done||1;
+  var funnelHtml='<div class="jfun">'+funnel.map(function(f,i){
+    var pct=Math.round(f.done/maxDone*100);
+    return '<div class="jfs'+(f.wait?' haswait':'')+'" data-jnext="'+esc(f.s)+'">'+
+      '<div class="jfs-h"><b>'+esc(f.s)+'</b>'+(f.wait?'<span class="jfs-w">대기 '+f.wait+'</span>':'')+'</div>'+
+      '<div class="jfs-bar"><i style="width:'+pct+'%"></i></div>'+
+      '<div class="jfs-d">'+esc(STEPDESC[f.s])+'</div>'+
+      '<div class="jfs-n">'+f.done+'명 통과</div></div>'+
+      (i<STEPS.length-1?'<div class="jfs-arw">→</div>':'');
+  }).join('')+'</div>';
+  // 회원 여정 리스트 (배민식)
+  var NF=window.__jnext||'';   // 특정 단계 대기만 필터
+  var list = NF ? (byNext[NF]||[]) : onb.slice();
+  // 정렬: 멈춘 지 오래된 순
+  list.sort(function(a,b){return (b.stuck||0)-(a.stuck||0);});
+  var stepDot=function(j){
+    return '<div class="jbar">'+STEPS.map(function(s,i){
+      var st=j.steps[i], cls=st.st==='done'?'d':(i===j.topIdx+1?'nx':(st.st==='plan'?'pl':'')); 
+      return '<span class="jd '+cls+'" title="'+esc(s)+(st.day?' '+md(st.day):'')+'">'+
+        '<i></i>'+(i<STEPS.length-1?'<em></em>':'')+'</span>';
+    }).join('')+'</div>';
+  };
+  var memoTag=function(j){
+    // 예정일/메모 있으면 병기 (판정 대신 사실)
+    if(j.note && /(\d{1,2}월|예정|시작|대기|이사|학원)/.test(j.note))
+      return '<span class="jmemo" title="'+esc(j.note)+'">✎ '+esc(j.note.length>18?j.note.slice(0,18)+'…':j.note)+'</span>';
+    return '';
+  };
+  var rowHtml=function(j){
+    var nx=j.nextStep;
+    var stuckTxt=j.stuck!=null?j.stuck+'일째':'';
+    return '<div class="jrow" data-name="'+esc(j.n)+'">'+
+      '<div class="jr-l">'+
+        '<div class="jr-nm"><b>'+esc(j.n)+'</b>'+(j.g?'<span class="jr-g">'+esc(j.g)+'</span>':'')+'</div>'+
+        '<div class="jr-meta">'+esc(j.br||'지점 미확인')+' · 가입 '+(j.join?md(j.join):'—')+(j.saup?' · 방문 '+esc(j.saup):'')+'</div>'+
+      '</div>'+
+      '<div class="jr-c">'+stepDot(j)+'</div>'+
+      '<div class="jr-r">'+
+        (nx?'<div class="jr-next">다음 <b>'+esc(nx)+'</b></div>':'<div class="jr-next done">온보딩 완료</div>')+
+        (stuckTxt?'<div class="jr-stuck">'+stuckTxt+'</div>':'')+
+        memoTag(j)+
+      '</div></div>';
+  };
+  var LIM=window.__jmore?9999:12;
+  var shown=list.slice(0,LIM), moreN=list.length-shown.length;
+  var listHtml = view==='onb'
+    ? (list.length?'<div class="jlist">'+shown.map(rowHtml).join('')+'</div>'+(moreN>0?'<button class="jmoreb" data-jmore="1">외 '+moreN+'명 더 보기 ▾</button>':'')+(window.__jmore&&list.length>12?'<button class="jmoreb" data-jmore="0">접기 ▴</button>':''):'<div class="empty">온보딩 진행 중인 회원이 없습니다.</div>')
+    : gradHtml();
+  function gradHtml(){
+    // 졸업 = 코칭 단계. 주차별.
+    var g=grad.slice().sort(function(a,b){return (b.firstClass||'').localeCompare(a.firstClass||'');});
+    var byWk={};g.forEach(function(j){var w=j.curWk||0;(byWk[w]=byWk[w]||[]).push(j);});
+    return '<div class="lead">첫수업을 마치고 코칭 단계로 넘어간 회원입니다. 주차는 첫수업일 기준.</div>'+
+      '<div class="jlist">'+g.slice(0,60).map(function(j){
+        return '<div class="jrow grad" data-name="'+esc(j.n)+'">'+
+          '<div class="jr-l"><div class="jr-nm"><b>'+esc(j.n)+'</b>'+(j.g?'<span class="jr-g">'+esc(j.g)+'</span>':'')+'</div>'+
+          '<div class="jr-meta">'+esc(j.br||'')+' · 첫수업 '+(j.firstClass?md(j.firstClass):'—')+' · 담임 '+esc(j.coach||'—')+'</div></div>'+
+          '<div class="jr-c"><span class="jwk">코칭 '+(j.curWk||'?')+'주차</span> <span class="jwk-n">기록 '+j.wksN+'주</span></div>'+
+          '<div class="jr-r">'+(j.exp?'<div class="jr-stuck">만료 '+md(j.exp)+'</div>':'')+'</div></div>';
+      }).join('')+'</div>'+(g.length>60?'<div class="empty">외 '+(g.length-60)+'명</div>':'');
+  }
+  var tog='<div class="seg" style="margin-bottom:12px">'+
+    '<button class="'+(view==='onb'?'on':'')+'" data-jv="onb">온보딩 진행 '+onb.length+'</button>'+
+    '<button class="'+(view==='grad'?'on':'')+'" data-jv="grad">코칭 단계 '+grad.length+'</button></div>';
+  var nextFilter = view==='onb' ? '<div class="chips" style="margin:0 0 12px">'+
+    '<button class="chip'+(NF===''?' on':'')+'" data-jnext="">전체 '+onb.length+'</button>'+
+    STEPS.map(function(s){var n=(byNext[s]||[]).length;return n?'<button class="chip'+(NF===s?' on':'')+'" data-jnext="'+esc(s)+'">'+esc(s)+' 대기<span>'+n+'</span></button>':'';}).join('')+
+    '</div>' : '';
+  return zone('journey','var(--v1)','신규 회원 여정','가입 '+J.length+'명','가입 → 해피콜 → 개통 → 입학식 → 첫만남 → 첫수업 → 코칭',
+    '<div class="lead">배달 추적처럼 <b>회원 한 명이 지금 어디까지 왔는지</b>를 봅니다. 색으로 문제를 단정하지 않고 <b>진행 상태와 다음 단계</b>만 보여줍니다 — 가입 시 "다음 달 시작" 같은 약속은 메모로 병기됩니다.</div>'+
+    funnelHtml+tog+nextFilter+listHtml,true);
+}
 function alertBox(){
   var A=alertData();
-  var T=[['onb','온보딩 멈춤','가입 14일+ · 첫수업 기록 없음 · 다음 일정 없음 (불참은 기간 무관)','일'],
-         ['call','코칭 전화 부재','코칭 시트 주차 칸에 부재 연속 2회+ (휴강 제외) · 온보딩 부재는 온보딩 멈춤에','회'],
+  var T=[['call','코칭 전화 부재','코칭 시트 주차 칸에 부재 연속 2회+ (휴강 제외) · 온보딩 부재는 온보딩 멈춤에','회'],
          ['dev','기기 해결 기록 없음','기기·설치 기록 후 7일+ · 첫수업 기록 없음','일'],
          ['mw','민원 결론 없음','접수 14일+ · 유지/해지 칸 비어 있음','일'],
          ['orphan','담임 없음','담임이 현직 명단에 없음 · 재배정 대기 / 이관 중','명'],
@@ -1322,7 +1461,7 @@ function fillBox(){
      return '<tr><td style="width:130px"><b>'+r[0]+'</b></td>'+
       '<td style="width:180px"><div style="display:inline-block;width:110px;height:7px;background:#F1F4F9;border-radius:4px;overflow:hidden;vertical-align:middle;margin-right:8px"><i style="display:block;height:100%;width:'+Math.round(r[1]/mx*100)+'%;background:var(--amber)"></i></div><b>'+r[1]+'</b></td>'+
       '<td class="z" style="width:110px">'+esc(r[2])+'</td>'+
-      '<td class="org">'+esc(r[3])+'</td></tr>';}).join('')+'</tbody></table>',true);
+      '<td class="org">'+esc(r[3])+'</td></tr>';}).join('')+'</tbody></table>',false);
 }
 function dataBox(){
   var g=(D.gap&&D.gap.months)?D.gap.months.filter(function(m){return m.m>='2026-01'&&m.n;}):[];
@@ -1348,7 +1487,7 @@ function dataBox(){
    '<div class="lead">아래는 <b>일이 안 된 것이 아니라 기록이 안 된 것</b>입니다. 실제로는 대부분 진행됐고 시트에만 빠진 경우로 보입니다. 이 수치만큼 판의 숫자가 실제보다 적게 잡힙니다.</div>'+
    '<table class="tbl"><tbody>'+rows.map(function(r){
      return '<tr><td><b>'+r[0]+'</b><div class="org">'+r[2]+'</div></td><td class="c" style="white-space:nowrap;font-weight:800">'+r[1]+'</td></tr>';}).join('')+'</tbody></table>'+
-   nobrList()+'<div class="grp">월별 추이</div>'+trendCharts(),true);
+   nobrList()+'<div class="grp">월별 추이</div>'+trendCharts(),false);
 }
 /* ── 흐름 ── */
 function flowBox(){
@@ -1395,7 +1534,7 @@ function flowBox(){
     '</tbody></table></div>';
   return zone('flow','var(--pos)','월별 흐름','','관리 → 민원 → 결과 → 취소를 달마다',
     '<div class="lead">총합은 시점이 섞여 흐름이 안 보여서 <b>달마다</b> 나눕니다. ▲▼는 전월 대비. 민원·취소는 민원 시트 월 탭 기준 — 2~4월은 탭이 없고 1월 탭은 30건만 적혀 있습니다. '+
-    '관리중은 가입·만료일로 역산(5~9월), 가입·만료 도래는 코칭 시트에 날짜가 적힌 회원만 셉니다 — 정예영 담당 회원은 가입일이 대부분 비어 있어 관리중에서 약 90명이 빠져 있습니다.</div>'+tbl,true);
+    '관리중은 가입·만료일로 역산(5~9월), 가입·만료 도래는 코칭 시트에 날짜가 적힌 회원만 셉니다 — 정예영 담당 회원은 가입일이 대부분 비어 있어 관리중에서 약 90명이 빠져 있습니다.</div>'+tbl,false);
 }
 /* ── 코칭 탭 ── */
 function mwRes(m){var r=(m.mw&&m.mw.res)||'';return r==='유지'?'유지':((r==='해지'||r==='당취')?'해지':'진행');}
@@ -1832,7 +1971,7 @@ function render(){
     return '<button class="'+(TAB===t[0]?'on':'')+'" data-tab="'+t[0]+'">'+t[1]+'</button>';}).join('');
   var el=document.getElementById('app');
   if(TAB==='all'){
-    var SEC=[['오늘·이번 주',[['week','이번 주 · 다음 주',weekBox],['alert','확인 필요',alertBox],['miss','시트에 안 적힌 것',missBox]]],
+    var SEC=[['오늘·이번 주',[['journey','신규 회원 여정',journeyBox],['week','이번 주 · 다음 주',weekBox],['alert','확인 필요',alertBox]]],
              ['흐름',[['exp','만료 예정',expBox],['can','취소',canBox],['flow','월별 흐름',flowBox],['guard','민원 방어',guardBox]]],
              ['진단',[['funnel','월별 진단',funnelBox],['fill','채워야 할 칸',fillBox],['by','취소가 몰리는 곳',byBox],['dev','기기 · 설치 트러블',devBox],['data','데이터 상태',dataBox]]]];
     var anchor='<div class="anch sticky">'+SEC.map(function(g){
@@ -1847,7 +1986,7 @@ function render(){
 document.addEventListener('click',function(e){
   var c=e.target.closest('[data-close]');
   if(c&&(e.target.classList.contains('ov')||e.target.closest('.cls'))){CARD=null;render();return;}
-  var b=e.target.closest('button,[data-z],.qrow,[data-bsel2]');
+  var b=e.target.closest('button,[data-z],.qrow,[data-bsel2],[data-jnext],[data-jmore]');
   if(!b) return;
   if(b.dataset.tab){TAB=b.dataset.tab;OPENZ={};render();window.scrollTo(0,0);}
   else if(b.dataset.mv){CUR=add(CUR,7*(+b.dataset.mv));SEL=null;render();}
@@ -1866,6 +2005,9 @@ document.addEventListener('click',function(e){
   else if(b.dataset.al){window.__al=b.dataset.al;render();}
   else if(b.dataset.df){window.__df=b.dataset.df;render();}
   else if(b.dataset.bf){window.__bf=b.dataset.bf;window.__bsel2="";render();}
+  else if(b.dataset.jv){window.__jv=b.dataset.jv;window.__jnext="";render();}
+  else if(b.dataset.jnext!==undefined){window.__jnext=b.dataset.jnext;window.__jv="onb";window.__jmore=false;render();}
+  else if(b.dataset.jmore!==undefined){window.__jmore=(b.dataset.jmore==='1');render();}
   else if(b.dataset.bsel2){window.__bsel2=(window.__bsel2===b.dataset.bsel2?'':b.dataset.bsel2);render();}
   else if(b.dataset.g){window.__g=b.dataset.g;OPENZ={};render();window.scrollTo(0,0);}
   else if(b.dataset.anch!==undefined){var t=document.getElementById('z-'+b.dataset.anch);
