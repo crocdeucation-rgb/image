@@ -391,6 +391,25 @@ details[open]>.more::before{content:'▾ '}
 }
 .jmoreb{width:100%;border:1px dashed var(--line);background:#fff;border-radius:10px;padding:11px;margin-top:8px;font:inherit;font-size:13px;font-weight:800;color:var(--soft);cursor:pointer}.jmoreb:hover{border-color:var(--v1);color:var(--v1)}
 .stickysel{position:sticky;top:0;z-index:15;background:var(--bg);padding:8px 0 10px;margin:0 -2px 12px;border-bottom:1px solid var(--line)}
+.wk-mo{display:none}
+@media(max-width:768px){
+  .wk-pc{display:none}
+  .wk-mo{display:block;margin-bottom:12px}
+  .wstrip{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+  .wsday{border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px 2px 9px;cursor:pointer;font:inherit;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative}
+  .wsday.today{border-color:var(--v1)}
+  .wsday.sel{background:var(--ink);border-color:var(--ink)}
+  .wsw{font-size:11px;font-weight:700;color:var(--soft)}
+  .wsn{font-size:17px;font-weight:900;color:var(--ink)}
+  .wsday.today .wsn{color:var(--v1)}
+  .wsday.sel .wsw,.wsday.sel .wsn{color:#fff}
+  .wsdots{display:flex;gap:2px;height:5px}
+  .wsd{width:5px;height:5px;border-radius:50%}
+  .wsd.해피콜{background:#ADB5BD}.wsd.개통{background:var(--v1)}.wsd.입학식{background:var(--pur)}.wsd.첫만남{background:var(--amber)}.wsd.첫수업{background:var(--pos)}
+  .wsday.sel .wsd{background:rgba(255,255,255,.85)}
+  .wsc{position:absolute;top:3px;right:5px;font-size:9px;font-weight:800;color:var(--red)}
+  .wsday.sel .wsc{color:#fff}
+}
 .calcsub{margin-top:3px;font-size:12.5px;font-weight:500;color:#6B5A9A;line-height:1.5}
 .rdot{display:inline-block;font-size:9px;font-weight:900;color:#fff;background:#9A5B06;border-radius:50%;width:13px;height:13px;line-height:13px;text-align:center;margin-left:3px;vertical-align:middle}
 .bsc{display:inline-block;font-size:11.5px;background:#EEF1F6;border-radius:6px;padding:2px 8px;margin:2px 4px 2px 0}
@@ -671,7 +690,20 @@ function weekBox(){
        '<td>'+(m.mw?'<span class="tag '+(rr==='유지'?'ok':(rr==='해지'?'ng':'wait'))+'">'+rr+' '+md(m.mw.d)+'</span>':'<span class="z">—</span>')+'</td>'+
        '<td class="note" style="margin:0">'+(m.note?hi(m.note):'<span class="z">—</span>')+'</td></tr>';}).join('')+'</tbody></table>':'';
   return zone('week','var(--v1)','이번 주 · 다음 주',md(mon)+' ~ '+md(add(mon,4)),'주간 일정 → 이번·다음 주 쌓인 일 → 날짜별 상세',
-    '<div class="wknav"><button data-mv="-1">‹ 지난 주</button><b>'+md(mon)+' ~ '+md(add(mon,6))+'</b>'+(monday(TODAY)===mon?'<span class="wknow">이번 주</span>':'')+'<button data-mv="1">다음 주 ›</button></div>'+planBox()+'<div class="grp">'+md(mon)+' 주간 일정</div>'+kpi+'<div class="scrollx"><div class="wk" style="grid-template-columns:repeat('+days.length+',minmax(170px,1fr)) minmax(200px,1.15fr)">'+cols+callCol+'</div></div>'+
+    '<div class="wknav"><button data-mv="-1">‹ 지난 주</button><b>'+md(mon)+' ~ '+md(add(mon,6))+'</b>'+(monday(TODAY)===mon?'<span class="wknow">이번 주</span>':'')+'<button data-mv="1">다음 주 ›</button></div>'+planBox()+'<div class="grp">'+md(mon)+' 주간 일정</div>'+kpi+(function(){
+      // 모바일 요일 스트립 (카카오식) — 날짜 탭하면 아래 선택일 상세로
+      var strip='<div class="wstrip">'+days.map(function(dstr){
+        var E=evOf(dstr), cnt=E.length, isT=(dstr===TODAY), isSel=(dstr===sel);
+        var kinds={};E.forEach(function(e){kinds[e.kind]=1;});
+        var dots=Object.keys(kinds).slice(0,4).map(function(k){return '<span class="wsd '+k+'"></span>';}).join('');
+        var wd=dw(dstr);
+        return '<button class="wsday'+(isSel?' sel':'')+(isT?' today':'')+'" data-go="'+dstr+'">'+
+          '<span class="wsw">'+wd+'</span><span class="wsn">'+(+dstr.slice(8))+'</span>'+
+          '<span class="wsdots">'+dots+'</span>'+(cnt?'<span class="wsc">'+cnt+'</span>':'')+'</button>';
+      }).join('')+'</div>';
+      return '<div class="wk-pc"><div class="scrollx"><div class="wk" style="grid-template-columns:repeat('+days.length+',minmax(170px,1fr)) minmax(200px,1.15fr)">'+cols+callCol+'</div></div></div>'+
+             '<div class="wk-mo">'+strip+'</div>';
+    })()+
     '<div class="sech2">'+md(sel)+' ('+dw(sel)+')'+(sel===TODAY?' · 오늘':(sel===add(TODAY,1)?' · 내일':''))+' 상세</div>'+dayBox(sel,true)+xTbl,true);
 }
 
