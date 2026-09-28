@@ -690,25 +690,32 @@ function dayBox(dd,inner){
     var first=L.filter(function(x){return x.st!=='done';})[0]||L[L.length-1];
     (byk[first.kind]=byk[first.kind]||[]).push({n:n,L:L,k:first});
   });
-  var cards=KIND.filter(function(k){return byk[k].length;}).map(function(k){
-    var L=byk[k].sort(function(a,b){return (a.k.time||'~').localeCompare(b.k.time||'~');});
-    var wide=L.length>=6?' wide':(L.length>=3?' mid':'');
-    return '<div class="dcol'+wide+'"><div class="dch '+k+'">'+k+' <b>'+L.length+'</b></div><div class="dcards">'+
-      L.map(function(o){
-        var e0=o.L[0], dpn=e0.join?diff(e0.join,d):null;
-        var chain=o.L.map(function(x){return '<span class="mini2 '+x.kind+(x.st==='done'?' done':'')+'">'+x.kind+(x.time?' '+x.time:'')+(x.st==='done'?'✓':'')+'</span>';}).join('');
-        var who=[];o.L.forEach(function(x){if(x.who&&who.indexOf(x.who)<0)who.push(x.who);});
-        var note=o.L.map(function(x){return x.note;}).filter(Boolean)[0]||'';
-        var stn=STAT[o.n]; if(stn&&stn.note) note=stn.note+(note?' / '+note:'');
-        var alldone=o.L.every(function(x){return x.st==='done';});
-        return '<div class="dcard'+(alldone?' ok':'')+'"><div class="dtop"><button data-name="'+esc(o.n)+'" class="dnm">'+esc(o.n)+'</button>'+
-          '<span class="dtm">'+(alldone?'<span class="okb">완료</span>':(o.k.time||'—'))+'</span></div>'+
-          '<div class="org">'+esc(e0.grade||'')+' · '+orgline(e0)+
-          (e0.join?'<br>가입 '+md(e0.join)+' <b>D+'+dpn+'</b>':'')+(who.length?' · 진행 '+esc(who.join('·')):'')+'</div>'+
-          '<div class="dchain">'+chain+'</div>'+
-          '<div class="note'+(note?'':' none')+'">'+(note?hi(note):'특이사항 칸 비어 있음')+'</div></div>';
-      }).join('')+'</div></div>';
-  }).join('');
+  var STEPS2=['해피콜','개통','입학식','첫만남','첫수업'];
+  var JM={}; (D.journey||[]).forEach(function(j){JM[j.n]=j;});
+  var jbar=function(j){
+    if(!j) return '';
+    return '<div class="jbar">'+STEPS2.map(function(sp,i){
+      var st=j.steps[i], cls=st.st==='done'?'d':(i===j.topIdx+1?'nx':(st.st==='plan'?'pl':''));
+      return '<span class="jd '+cls+'"><i></i>'+(i<STEPS2.length-1?'<em></em>':'')+'</span>';
+    }).join('')+'</div>';
+  };
+  // 회원별 한 줄 (그날 일정 순 = 시간순)
+  var rowsAll=[];
+  KIND.forEach(function(k){ byk[k].forEach(function(o){ rowsAll.push(o); }); });
+  rowsAll.sort(function(a,b){return (a.k.time||'~').localeCompare(b.k.time||'~');});
+  var cards='<div class="jlist">'+rowsAll.map(function(o){
+    var e0=o.L[0], j=JM[o.n];
+    var todayKinds=o.L.map(function(x){return x.kind+(x.time?' '+x.time:'')+(x.st==='done'?'✓':'');}).join(' · ');
+    var nx=j?j.nextStep:null;
+    var note=o.L.map(function(x){return x.note;}).filter(Boolean)[0]||'';
+    var stn=STAT[o.n]; if(stn&&stn.note) note=stn.note+(note?' / '+note:'');
+    var memo=note&&/(월|예정|시작|형제|병행|이사|재조율|변경)/.test(note)?'<span class="jmemo" title="'+esc(note)+'">✎ '+esc(note.length>22?note.slice(0,22)+'…':note)+'</span>':'';
+    return '<div class="jrow" data-name="'+esc(o.n)+'">'+
+      '<div class="jr-l"><div class="jr-nm"><b>'+esc(o.n)+'</b>'+(e0.grade?'<span class="jr-g">'+esc(e0.grade)+'</span>':'')+'</div>'+
+      '<div class="jr-meta">'+esc(e0.br||'')+' · '+esc(todayKinds)+'</div></div>'+
+      '<div class="jr-c">'+jbar(j)+'</div>'+
+      '<div class="jr-r">'+(nx?'<div class="jr-next">다음 <b>'+esc(nx)+'</b></div>':'<div class="jr-next done">온보딩 완료</div>')+memo+'</div></div>';
+  }).join('')+'</div>';
   var y=add(d,-1), nj=[],seen={};
   EV.forEach(function(e){if(e.join===y&&!seen[e.name]){seen[e.name]=1;nj.push(e);}});
   var njb=nj.length?'<div class="grp">전날('+md(y)+') 가입 '+nj.length+'명 — 해피콜 대상</div>'+
@@ -731,7 +738,7 @@ function dayBox(dd,inner){
        '<div'+(ms?' class="r"':'')+'><div class="l">칸 비어 있음</div><b>'+ms+'</b></div>'+
        '<div><div class="l">회원</div><b>'+names.length+'</b></div></div>';
    })()+
-   (cards?'<div class="drow">'+cards+'</div>':'<div class="empty">이 날짜에 잡힌 일정이 없습니다.</div>')+njb,true);
+   (cards?cards:'<div class="empty">이 날짜에 잡힌 일정이 없습니다.</div>')+njb,true);
 }
 /* ── 안 된 것 ── */
 function gapList(){
@@ -840,7 +847,7 @@ function expBox(){
    '<div class="lead">관리 기간이 끝나는 회원입니다.</div>'+
    '<div class="lead">사전 안내(방식·발송일·재시도) 칸이 시트에 없습니다 — 관리만료 시트 253명 중 안내 방식을 알 수 있는 건 4건뿐입니다.</div>'+
    cards+(cs?'<div class="grp">담당별 — '+cs+'</div>':'')+'<div class="grp">'+(({w0:'이번 주',w1:'다음 주',w2:'2주 뒤',m0:'이달 안'})[sel]||'')+' 만료 '+L.length+'명</div>'+etoggle+list+
-   (noexp?'<div class="lead" style="margin-top:10px">관리만료일이 시트에 없는 회원이 <b>'+noexp+'명</b> 있습니다. 이 회원들은 만료가 와도 미리 보이지 않습니다.</div>':''),false);
+   (noexp?'<div class="lead" style="margin-top:10px">관리만료일이 시트에 없는 회원이 <b>'+noexp+'명</b> 있습니다. 이 회원들은 만료가 와도 미리 보이지 않습니다.</div>':''),true);
 }
 function guardBox(){
   var TM=D.tm||{}, M=(D.mon2||[]).filter(function(x){return x.tab&&x.m>='2026-05';});
@@ -888,7 +895,7 @@ function guardBox(){
       '<td>'+spark(x.tr)+'</td></tr>';}).join('')+'</tbody></table></div>';
   return zone('guard','var(--pos)','민원 방어',(+G.slice(5))+'월 '+(dr(cur)==null?'—':dr(cur)+'%'),'달을 골라 그 달 관리·접수·결과를 전월과 같이',
    '<div class="lead">민원 시트 월 탭 기준. <b>방어율</b>=유지÷(유지+해지), <b>접수율</b>=접수÷그 달 관리중. 당일취소는 방어 기회가 없던 건이라 방어율에서 뺍니다. 담당은 민원 시트 "관리교사" 칸 그대로 — 현 코칭 명단에 없는 교사로 적힌 접수는 이 표에 안 잡힙니다.</div>'+
-   mseg+'<div class="kpi">'+head+'</div>'+sortSeg+tbl,false);
+   mseg+'<div class="kpi">'+head+'</div>'+sortSeg+tbl,true);
 }
 function planBox(){
   var mon=monday(CUR), w=[[mon,add(mon,6)],[add(mon,7),add(mon,13)]];
@@ -1021,7 +1028,7 @@ function canBox(){
    '<div class="lead">운영본부 <b>민원 시트</b>가 기준입니다. 결과 칸이 <b>해지</b>이거나 당취 표시된 건을 취소로 셉니다(1월 탭은 게시판접수). 같은 회원이 여러 번 접수되면 마지막 해지 1건. 2~4월은 탭이 없어 비어 있습니다. '+
    '금액은 민원 시트 순취소액, 비어 있으면 취소입력 금액(<sup>*</sup>) — 그래도 없는 '+L.filter(function(x){return !x.can.amt;}).length+'건은 —.</div>'+
    calcBanner+monSeg+chips+cats+
-   '<div class="lead">선택 '+S.length+'건 · '+won_(samt)+(noAmt?' (금액 없음 '+noAmt+'건)':'')+' · 한 장이 회원 한 명</div>'+body+catsum,false);
+   '<div class="lead">선택 '+S.length+'건 · '+won_(samt)+(noAmt?' (금액 없음 '+noAmt+'건)':'')+' · 한 장이 회원 한 명</div>'+body+catsum,true);
 }
 function devBox(){
   var L=(D.device||[]).filter(inBr);
@@ -1045,7 +1052,7 @@ function devBox(){
   return zone('dev','var(--amber)','기기 · 설치 트러블',L.length+'건','노트북·프로그램·캠 관련 기록',
    '<div class="lead">오티·코칭 메모에서 기기·설치 관련 문구를 모았습니다. 분류는 문구 기준이라 정확하지 않을 수 있습니다.</div>'+
    '<div class="seg">'+tabs.map(function(t){
-     return '<button class="'+(F===t[0]?'on':'')+'" data-df="'+esc(t[0])+'">'+t[1]+' '+t[2]+'</button>';}).join('')+'</div>'+body,false);
+     return '<button class="'+(F===t[0]?'on':'')+'" data-df="'+esc(t[0])+'">'+t[1]+' '+t[2]+'</button>';}).join('')+'</div>'+body,true);
 }
 /* ── 코칭부서 퍼널: 관리 → 민원 → 취소 → 방어 ── */
 function branchStaffBox(fix){
@@ -1135,7 +1142,7 @@ function funnelBox(){
   var dists='<div class="fdist">'+dist(function(x){return x.can.teach||(x.can.resp==='당일취소'?'배정 전(당일취소)':'');},'코칭 담당')+dist(function(x){return x.br;},'지점')+'</div>';
   return zone('funnel','var(--v1)','진단 — 월별','관리 → 민원 → 방어 → 취소','달을 고르면 그 달 흐름 · 원인은 달마다 나란히',
     '<div class="lead">민원 시트 월 탭 기준(2~4월 탭 없음). 위 카드는 고른 달과 전월 비교, 아래 표는 달마다 취소가 <b>어떤 원인·어떤 경로</b>로 났는지 나란히 놓은 것입니다. 색이 진할수록 그 항목 건수가 많은 달.</div>'+
-    seg+funnel+mat+dists,false);
+    seg+funnel+mat+dists,true);
 }
 function byBox(){
   var C=(D.can2||[]).filter(function(m){return inBr(m);});
@@ -1204,7 +1211,7 @@ function byBox(){
   return zone('by','var(--red)','취소가 몰리는 곳','',''+F+'별 취소 — 총량이 아니라 월 추이·원인으로',
    seg+
    '<div class="lead">6~9월 취소를 '+F+'별로. 막대는 월별 건수 추이(총합 아님), <b>전월비</b>는 8월→9월 증감. 점검=고객 오해·관리·수업 사유. 눌러서 상세.</div>'+
-   table+detail,false);
+   table+detail,true);
 }
 function cleanNm(n){return String(n||'').replace(/\(.*?\)/g,'').replace(/[A-Za-z\s]/g,'');}
 function alertData(){
@@ -1470,7 +1477,7 @@ function fillBox(){
      return '<tr><td style="width:130px"><b>'+r[0]+'</b></td>'+
       '<td style="width:180px"><div style="display:inline-block;width:110px;height:7px;background:#F1F4F9;border-radius:4px;overflow:hidden;vertical-align:middle;margin-right:8px"><i style="display:block;height:100%;width:'+Math.round(r[1]/mx*100)+'%;background:var(--amber)"></i></div><b>'+r[1]+'</b></td>'+
       '<td class="z" style="width:110px">'+esc(r[2])+'</td>'+
-      '<td class="org">'+esc(r[3])+'</td></tr>';}).join('')+'</tbody></table>',false);
+      '<td class="org">'+esc(r[3])+'</td></tr>';}).join('')+'</tbody></table>',true);
 }
 function dataBox(){
   var g=(D.gap&&D.gap.months)?D.gap.months.filter(function(m){return m.m>='2026-01'&&m.n;}):[];
@@ -1496,7 +1503,7 @@ function dataBox(){
    '<div class="lead">아래는 <b>일이 안 된 것이 아니라 기록이 안 된 것</b>입니다. 실제로는 대부분 진행됐고 시트에만 빠진 경우로 보입니다. 이 수치만큼 판의 숫자가 실제보다 적게 잡힙니다.</div>'+
    '<table class="tbl"><tbody>'+rows.map(function(r){
      return '<tr><td><b>'+r[0]+'</b><div class="org">'+r[2]+'</div></td><td class="c" style="white-space:nowrap;font-weight:800">'+r[1]+'</td></tr>';}).join('')+'</tbody></table>'+
-   nobrList()+'<div class="grp">월별 추이</div>'+trendCharts(),false);
+   nobrList()+'<div class="grp">월별 추이</div>'+trendCharts(),true);
 }
 /* ── 흐름 ── */
 function flowBox(){
@@ -1543,7 +1550,7 @@ function flowBox(){
     '</tbody></table></div>';
   return zone('flow','var(--pos)','월별 흐름','','관리 → 민원 → 결과 → 취소를 달마다',
     '<div class="lead">총합은 시점이 섞여 흐름이 안 보여서 <b>달마다</b> 나눕니다. ▲▼는 전월 대비. 민원·취소는 민원 시트 월 탭 기준 — 2~4월은 탭이 없고 1월 탭은 30건만 적혀 있습니다. '+
-    '관리중은 가입·만료일로 역산(5~9월), 가입·만료 도래는 코칭 시트에 날짜가 적힌 회원만 셉니다 — 정예영 담당 회원은 가입일이 대부분 비어 있어 관리중에서 약 90명이 빠져 있습니다.</div>'+tbl,false);
+    '관리중은 가입·만료일로 역산(5~9월), 가입·만료 도래는 코칭 시트에 날짜가 적힌 회원만 셉니다 — 정예영 담당 회원은 가입일이 대부분 비어 있어 관리중에서 약 90명이 빠져 있습니다.</div>'+tbl,true);
 }
 /* ── 코칭 탭 ── */
 function mwRes(m){var r=(m.mw&&m.mw.res)||'';return r==='유지'?'유지':((r==='해지'||r==='당취')?'해지':'진행');}
