@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>[미리보기·레포 업로드 금지] 운영본부</title>
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>운영본부</title>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -592,6 +592,42 @@ body.gate-hasbar{padding-top:calc(34px + var(--sat))}
   .wsday.sat .wsn{color:#4C6EF5}.wsday.sun .wsn,.wsday.hol .wsn{color:#E23A22}
   .wsday.sel .wsn{color:#fff!important}
   .wsc{right:3px!important}
+}
+
+
+/* 취소: 다량 데이터 표준 표 (그룹헤더 소계 + 한줄 명단) */
+.cgT{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.cgT details{border-bottom:1px solid var(--line)}.cgT details:last-child{border-bottom:0}
+.cgT summary{list-style:none;cursor:pointer;display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:9px 14px;background:#F7F9FC;border-bottom:1px solid var(--line)}
+.cgT summary::-webkit-details-marker{display:none}
+.cgT details:not([open])>summary{border-bottom:0}
+.cgT summary::before{content:'▾';color:var(--mute);font-size:12px;width:12px}
+.cgT details:not([open])>summary::before{content:'▸'}
+.cgT summary .gname{font-size:14px;font-weight:900;color:var(--ink)}
+.cgT summary .gmeta{font-size:11.5px;color:var(--soft)}
+.cgT summary .gsp{margin-left:auto;display:flex;flex-wrap:wrap;gap:4px}
+.cgT .p{font-size:11px;font-weight:800;padding:2px 8px;border-radius:20px;line-height:1.5;white-space:nowrap}
+.cgT .p.chk{background:#C0392B;color:#fff}.cgT .p.red{background:#FDECEC;color:#C0392B}
+.cgT .p.amber{background:#FEF3E2;color:#B9770E}.cgT .p.slate,.cgT .p.mute{background:#EEF1F6;color:#5B6472}
+.cgT .chead{display:grid;grid-template-columns:140px 82px 150px 1fr;gap:10px;padding:6px 14px;font-size:10.5px;color:var(--mute);font-weight:700;background:#FCFDFE;border-top:1px solid var(--line)}
+.crow{display:grid;grid-template-columns:140px 82px 150px 1fr;gap:10px;align-items:center;padding:8px 14px;border-top:1px solid #F0F3F8;cursor:pointer;font-size:12.5px}
+.crow:hover{background:#FAFBFE}.crow.hot{background:#FFFBFA}
+.crow .cnm{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crow .cnm .yr{color:var(--mute);font-weight:600;font-size:11px;margin-left:4px}
+.crow .camt{text-align:right;font-weight:800;color:#C0392B;white-space:nowrap}
+.crow .camt.z{color:#C9D1DE;font-weight:600}
+.crow .cbdg{display:flex;gap:3px;flex-wrap:wrap}
+.crow .cbdg .b{font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:12px;white-space:nowrap}
+.crow .cbdg .b.red{background:#FDECEC;color:#C0392B}.crow .cbdg .b.amber{background:#FEF3E2;color:#B9770E}.crow .cbdg .b.slate,.crow .cbdg .b.mute{background:#EEF1F6;color:#5B6472}
+.crow .cwhy1{color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.crow .cwhy1 .z{color:#C9D1DE}
+@media(max-width:768px){
+  .cgT summary .gsp{margin-left:0;width:100%}
+  .cgT .chead{display:none}
+  .crow{grid-template-columns:1fr auto;gap:2px 10px;padding:10px 14px}
+  .crow .cnm{grid-area:1/1}.crow .camt{grid-area:1/2}
+  .crow .cbdg{grid-area:2/1/3/3;margin:1px 0}
+  .crow .cwhy1{grid-area:3/1/4/3;white-space:normal;font-size:11.5px}
 }
 
 /* 모바일 정리 2차: 가로 스크롤 줄·KPI 압축·표 카드·주간표 요일 선택 */
@@ -1335,19 +1371,42 @@ function canBox(){
   var flat='<div class="cgrid">'+cShown.map(canCard).join('')+'</div>'+
     (cMore>0?'<button class="jmoreb" data-canmore="1">외 '+cMore+'건 더 보기 ▾ (월·분류로 좁힐 수도 있어요)</button>':'')+
     (window.__canmore&&S.length>24?'<button class="jmoreb" data-canmore="0">접기 ▴</button>':'');
+  // ── 취소 명단 행 (다량 데이터 표준: 한 줄 스캔, 클릭 시 회원 팝업) ──
+  var canRow=function(m){
+    var c=m.can, cat=c.cat||'미분류', cc=CATC[cat]||'mute';
+    var resp=(!c.is_calc&&c.resp)?'<span class="b '+(RESPC[c.resp]||'mute')+'">'+c.resp+'</span>':'';
+    var bdg=resp+'<span class="b '+cc+'">'+esc(cat)+'</span>';
+    var won=c.amt?won_(c.amt):'금액 없음';
+    var why=c.why?esc(c.why):(c.note?esc(c.note):'<span class="z">사유 칸 비어 있음</span>');
+    var hot=(c.resp==='당일취소');
+    return '<div class="crow'+(hot?' hot':'')+'" data-name="'+esc(m.n)+'">'+
+      '<div class="cnm">'+esc(m.n)+'<span class="yr">'+esc(m.g||'')+'</span></div>'+
+      '<div class="camt'+(c.amt?'':' z')+'">'+won+'</div>'+
+      '<div class="cbdg">'+bdg+'</div>'+
+      '<div class="cwhy1">'+why+'</div></div>';
+  };
   var grouped=function(keyf){
     var G={};S.forEach(function(m){var k=keyf(m)||'미확인';(G[k]=G[k]||[]).push(m);});
     var ks=Object.keys(G).sort(function(a,b){return G[b].length-G[a].length;});
-    return '<div class="cgrpcols">'+ks.map(function(k){
+    var chead='<div class="chead"><div>회원</div><div>금액</div><div>분류</div><div>사유</div></div>';
+    return '<div class="cgT">'+ks.map(function(k){
       var Q=G[k], oa=Q.filter(isChk).length;
-      var td=Q.filter(function(m){return m.can.resp==='당일취소';}).length, re=Q.filter(function(m){return m.can.resp==='재이탈';}).length;
+      var td=Q.filter(function(m){return m.can.resp==='당일취소';}).length,
+          mw=Q.filter(function(m){return m.can.resp==='민원 후 해지';}).length,
+          re=Q.filter(function(m){return m.can.resp==='재이탈';}).length;
       var a=Q.reduce(function(x,y){return x+(y.can.amt||0);},0);
-      var cc={};Q.forEach(function(m){var c=m.can.cat||'기타';if(c!=='미분류')cc[c]=(cc[c]||0)+1;});
-      var rep=Object.keys(cc).sort(function(x,y){return cc[y]-cc[x];}).filter(function(c){return cc[c]>=2;})
-        .map(function(c){return '<span class="cb '+(CATC[c]||"mute")+'">'+esc(c)+' '+cc[c]+'</span>';}).join('');
-      return '<details class="cgrp"'+(window.innerWidth<=768?'':' open')+'><summary class="cgh"><b>'+esc(k)+'</b><span class="cgn">'+Q.length+'건 · '+won_(a)+
-        (oa?' · <b class="hot">점검 필요 '+oa+'</b>':'')+(td?' · 당일 '+td:'')+(re?' · 재이탈 '+re:'')+'</span>'+
-        (rep?'<span class="cgrep">반복 '+rep+'</span>':'')+'</summary><div class="cgrid">'+Q.map(canCard).join('')+'</div></details>';
+      var tn=Q.map(function(m){return m.ten;}).filter(function(x){return x>=0;}).sort(function(a2,b2){return a2-b2;});
+      var med=tn.length?tn[Math.floor(tn.length/2)]:null;
+      var sp='';
+      if(oa) sp+='<span class="p chk">점검 필요 '+oa+'</span>';
+      if(td) sp+='<span class="p red">당일취소 '+td+'</span>';
+      if(mw) sp+='<span class="p amber">민원 후 '+mw+'</span>';
+      if(re) sp+='<span class="p red">재이탈 '+re+'</span>';
+      // 큰 그룹(담임 배정 전 등 12건+)은 기본 접기, 나머지는 펼침
+      var big=Q.length>=12, opened=!big;
+      return '<details'+(opened?' open':'')+'><summary><span class="gname">'+esc(k)+'</span>'+
+        '<span class="gmeta">'+Q.length+'건 · '+won_(a)+(med!==null?' · 재원중앙 '+med+'일':'')+'</span>'+
+        '<span class="gsp">'+sp+'</span></summary>'+chead+Q.map(canRow).join('')+'</details>';
     }).join('')+'</div>';
   };
   var toggle='<div class="seg" style="margin-bottom:12px">'+
