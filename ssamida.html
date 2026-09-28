@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko"><head>
-<meta charset="UTF-8"><style id="__pregate">body{visibility:hidden!important}#agate{visibility:visible!important}</style><script>try{if(window.self!==window.top){var e=document.getElementById("__pregate");if(e)e.remove();}}catch(_){}</script>
+<meta charset="UTF-8"><style id="__pregate">body{visibility:hidden!important}#agate{visibility:visible!important}
+
+</style>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <script>window.GATE_CFG={title:'경영진 전용 · 쌤이다 프로젝트 현황',sub:'등록된 경영진 계정으로만 열람할 수 있습니다.<br>Google 계정으로 로그인해 주세요.',foot:'문의 · 신상준 이사'}</script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -73,8 +75,23 @@
   .docsec-card:hover .dc-arrow{color:#3B5BDB;transform:translateX(2px)}
   .foot{text-align:center;font-size:12.5px;color:var(--gray2);margin-top:24px;padding-top:16px;border-top:1px solid var(--line)}
   .updated{font-size:11px;color:var(--gray2);text-align:right;margin-top:8px}
+
+#opsnav{display:none}
+body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sgate.hidden) #opsnav{display:flex}
+#opsnav{position:sticky;top:0;z-index:200;background:#fff;border-bottom:1px solid #E3E8F0;display:flex;align-items:center;gap:14px;padding:9px 16px;flex-wrap:wrap}#opsnav .onav-logo{font-size:14px;font-weight:800;letter-spacing:-.3px;white-space:nowrap}#opsnav .onav-logo b{color:#4C6EF5}#opsnav .onav-tabs{display:flex;gap:5px;overflow-x:auto;-webkit-overflow-scrolling:touch}#opsnav .onav-tabs a{text-decoration:none;background:#EEF1F6;color:#6B7688;font-size:13px;font-weight:700;padding:8px 16px;border-radius:22px;white-space:nowrap}#opsnav .onav-tabs a:hover{color:#1B2436}#opsnav .onav-tabs a.on{background:#4C6EF5;color:#fff}body.gate-hasbar #opsnav{top:34px}@media(max-width:768px){#opsnav{padding:7px 10px;gap:8px}#opsnav .onav-logo{font-size:12.5px}#opsnav .onav-tabs a{padding:7px 13px;font-size:12.5px}}
 </style></head>
 <body>
+<div id="opsnav">
+  <span class="onav-logo">아라온 <b>스태티즈</b></span>
+  <nav class="onav-tabs">
+    <a href="total.html">전체실적</a>
+    <a href="ops_dashboard_firestore.html">운영본부</a>
+    <a href="hire.html">증원현황</a>
+    <a href="hr.html">인사기록</a>
+    <a href="dashboard.html">웹마케팅</a>
+    <a href="ssamida.html" class="on">쌤이다</a>
+  </nav>
+</div>
 <div class="wrap">
   <div class="hero">
     <div class="pill">🔒 경영진 전용</div>
