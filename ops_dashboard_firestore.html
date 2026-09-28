@@ -515,6 +515,197 @@ body.gate-hasbar{padding-top:calc(34px + var(--sat))}
 @media(min-width:769px) and (max-width:900px){
   .wk{min-width:0}
 }
+
+/* 모바일: 확인필요·만료예정 표 → 카드 한 줄 */
+@media(max-width:768px){
+.tbl.mrow,.tbl.mrow tbody{display:block}
+.tbl.mrow thead{display:none}
+.tbl.mrow tr{display:grid;column-gap:8px;row-gap:3px;padding:10px 4px;border-bottom:1px solid #F0F3F8;align-items:baseline}
+.tbl.mrow tr.hot{background:#FFFBFA}
+.tbl.mrow td{padding:0;border:0;min-width:0;background:none!important;max-width:none!important}
+.tbl.mrow .org{display:inline;margin:0}
+.tbl.mrow .one{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbl.mrow td.note{font-size:12px;line-height:1.5;margin:0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.tbl.mrow td.note.none{-webkit-line-clamp:1;font-size:11px;color:var(--mute)}
+.tbl.mrow td.note:has(>.z:only-child){display:none}
+/* 확인 필요: 이름·학년 | 경과  /  지점·상담·방문  /  마지막 기록  /  원문 */
+.tbl.mrow.al tr{grid-template-columns:1fr auto}
+.tbl.mrow.al td:nth-child(2){grid-area:1/1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbl.mrow.al td:nth-child(2) .nmbtn{font-size:14.5px;margin-right:6px}
+.tbl.mrow.al td:nth-child(1){grid-area:1/2;text-align:right}
+.tbl.mrow.al td:nth-child(3){grid-area:2/1/3/3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px}
+.tbl.mrow.al td:nth-child(3) .org::before{content:' · '}
+.tbl.mrow.al td:nth-child(4){grid-area:3/1/4/3;font-size:11.5px;color:var(--soft)}
+.tbl.mrow.al td:nth-child(4)::before{content:'마지막 기록 ';color:var(--mute)}
+.tbl.mrow.al td:nth-child(5){grid-area:4/1/5/3}
+/* 만료 예정: 이름·학년·지점 | 만료일 D-n  /  담당 · 코칭 · 상태  /  특이사항 */
+.tbl.mrow.ex tr{grid-template-columns:auto auto 1fr auto}
+.tbl.mrow.ex td:nth-child(2){grid-area:1/1/2/4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbl.mrow.ex td:nth-child(2) button{font-size:14.5px!important;margin-right:6px}
+.tbl.mrow.ex td:nth-child(1){grid-area:1/4;text-align:right}
+.tbl.mrow.ex td:nth-child(3){grid-area:2/1;font-size:12px}
+.tbl.mrow.ex td:nth-child(4){grid-area:2/2;font-size:12px;color:var(--soft)}
+.tbl.mrow.ex td:nth-child(4)::before{content:'· '}
+.tbl.mrow.ex td:nth-child(5){display:none}
+.tbl.mrow.ex td:nth-child(6){grid-area:2/3}
+.tbl.mrow.ex td:nth-child(6) .z{display:none}
+.tbl.mrow.ex td:nth-child(7){grid-area:3/1/4/5}
+}
+@media(max-width:768px){.tbl.mrow.ex td:nth-child(4):has(>.z:only-child){display:none}}
+
+/* 모바일: 오늘 상세 세로 리스트 + 선택일 만료 카드 */
+@media(max-width:768px){
+/* 오늘 상세: 단계 그룹을 세로 1열 풀폭 리스트로 (flex 줄바꿈 때문에 폭이 들쭉날쭉하던 것) */
+.drow{display:block}
+.sech2+.lead{display:none}
+.drow>.lead{margin-bottom:8px}
+.dgrp{margin-bottom:10px}
+.dgh{margin:0 2px 5px}
+.dgh .dgt{font-size:11.5px;padding:2px 9px}
+.dgh b{font-size:13px}
+.dgrp .jrow{grid-template-columns:minmax(0,1fr) auto!important}
+.dgrp .jrow .jr-c.todo{display:flex!important;grid-area:1/2/3/3;align-self:center;flex-direction:column;align-items:flex-end;gap:3px}
+.dgrp .jrow .dtodo{margin:0;white-space:nowrap}
+.dgrp .jrow .jr-r{display:none}
+.jr-nm,.jr-meta{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drow details summary.jmoreb{display:block}
+.dcard{padding:9px 12px}
+/* 선택일 만료 표 → 카드 */
+.tbl.mrow.xd tr{grid-template-columns:1fr auto}
+.tbl.mrow.xd td:nth-child(1){grid-area:1/1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbl.mrow.xd td:nth-child(1) .nmbtn{font-size:14.5px;margin-right:6px}
+.tbl.mrow.xd td:nth-child(5){grid-area:1/2;text-align:right}
+.tbl.mrow.xd td:nth-child(5):has(>.z:only-child){display:none}
+.tbl.mrow.xd td:nth-child(2){grid-area:2/1/3/3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px}
+.tbl.mrow.xd td:nth-child(2) .org::before{content:' · '}
+.tbl.mrow.xd td:nth-child(3){grid-area:3/1/4/3;font-size:12px;white-space:nowrap}
+.tbl.mrow.xd td:nth-child(3) .org::before{content:' · '}
+.tbl.mrow.xd td:nth-child(4){display:none}
+.tbl.mrow.xd td:nth-child(6){grid-area:4/1/5/3}
+}
+
+/* 모바일 요일 스트립 월~일 7칸 (hire 방식) */
+@media(max-width:768px){
+  .wstrip{grid-template-columns:repeat(7,1fr)!important;gap:3px!important}
+  .wsday{padding:7px 0 8px!important;border-radius:11px!important}
+  .wsn{font-size:16px!important}
+  .wsday.sat .wsn{color:#4C6EF5}.wsday.sun .wsn,.wsday.hol .wsn{color:#E23A22}
+  .wsday.sel .wsn{color:#fff!important}
+  .wsc{right:3px!important}
+}
+
+/* 모바일 정리 2차: 가로 스크롤 줄·KPI 압축·표 카드·주간표 요일 선택 */
+details.cgrp>summary{list-style:none;cursor:pointer}
+details.cgrp>summary::-webkit-details-marker{display:none}
+.ttday{display:none}
+@media(max-width:768px){
+/* 칩·세그·앵커: 여러 줄로 쌓지 말고 가로 한 줄 스크롤 */
+.chips,.anch,.anch.sticky{flex-wrap:nowrap!important;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;white-space:nowrap}
+.chips::-webkit-scrollbar,.anch::-webkit-scrollbar,.seg::-webkit-scrollbar{display:none}
+.chip,.anch button,.anch-g,.anch-sep{flex:none}
+.seg{display:flex!important;flex-wrap:nowrap!important;max-width:100%;width:max-content;overflow-x:auto;scrollbar-width:none}
+.seg button{flex:none;white-space:nowrap}
+/* 넓은 표: 가로 스크롤 + 첫 열 고정 */
+.scrollx{overflow-x:auto!important;-webkit-overflow-scrolling:touch}
+.scrollx>.tbl th,.scrollx>.tbl td:first-child{white-space:nowrap}
+.scrollx>.tbl th:first-child,.scrollx>.tbl td:first-child{position:sticky;left:0;z-index:1;background:#fff;box-shadow:1px 0 0 var(--line)}
+.zb{overflow-x:auto}
+/* KPI: 4열 압축 */
+.kpi{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:0;background:#fff}
+.kpi>div{background:#fff;border:0!important;padding:7px 8px!important;min-width:0;box-shadow:1px 0 0 var(--line),0 1px 0 var(--line)}
+.kpi>div div{padding:0!important;border:0!important}
+.kpi .l{font-size:10.5px!important;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.kpi b{font-size:16px!important;margin-top:1px!important}
+.kpi .org{font-size:9.5px!important;line-height:1.35;margin-top:1px}
+/* 이번 주·다음 주 카드 압축 */
+.pgrid{gap:8px!important}
+.pcard{padding:9px 12px}.pch{margin-bottom:4px}.pch b{font-size:14.5px}
+.pl{padding:5px 0}.pll span{font-size:12.5px}.pll b{font-size:16px}.pls{font-size:10.5px;margin-top:0}
+/* 진단 요약: KPI와 같은 톤 (2×2 압축) */
+.fflow{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:12px}
+.fstep{border:0!important;border-radius:0!important;padding:8px 10px!important}
+.fsn{font-size:10.5px}.fstep b{font-size:17px!important;margin:1px 0!important}.fss{font-size:10px;line-height:1.35}
+/* 채워야 할 칸: 고정 폭 풀고 2줄 카드 */
+#z-fill .tbl,#z-fill .tbl tbody{display:block}
+#z-fill .tbl tr{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:10px;row-gap:2px;padding:8px 2px;border-bottom:1px solid #F0F3F8;align-items:center}
+#z-fill .tbl td{width:auto!important;padding:0;border:0}
+#z-fill .tbl td:nth-child(2){text-align:right;white-space:nowrap}
+#z-fill .tbl td:nth-child(3){grid-area:2/1;font-size:11px}
+#z-fill .tbl td:nth-child(4){grid-area:2/2;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 취소 그룹: 헤더만 보이고 눌러서 펼침 */
+details.cgrp{border:1px solid var(--line);border-radius:12px;background:#fff;padding:0 10px;margin-bottom:8px}
+details.cgrp>summary.cgh{border-bottom:0;margin:0;padding:10px 2px}
+details.cgrp>summary.cgh::after{content:'▸';margin-left:auto;color:var(--mute);font-size:12px}
+details.cgrp[open]>summary.cgh::after{content:'▾'}
+details.cgrp .cgrep{margin-left:0;flex-wrap:wrap}
+details.cgrp[open]{padding-bottom:4px}
+/* 코칭 탭 표 → 카드 */
+.tbl.mrow.cx tr,.tbl.mrow.cm tr,.tbl.mrow.ce tr,.tbl.mrow.dv tr{grid-template-columns:minmax(0,1fr) auto}
+.tbl.mrow.cx td:nth-child(2),.tbl.mrow.cm td:nth-child(2){white-space:normal!important}
+.tbl.mrow.cx .org,.tbl.mrow.cm .org{display:block!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbl.mrow.ce td:nth-child(3):has(>.z:only-child){display:none}
+.tt.dsel tr:first-child{display:none}
+.tbl.mrow.cx td:nth-child(2),.tbl.mrow.cm td:nth-child(2){grid-area:1/1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbl.mrow.cx td:nth-child(2) button,.tbl.mrow.cm td:nth-child(2) button{font-size:14.5px!important;margin-right:6px}
+.tbl.mrow.cx td:nth-child(1),.tbl.mrow.cm td:nth-child(1){grid-area:1/2;text-align:right}
+.tbl.mrow.cx td:nth-child(3),.tbl.mrow.cm td:nth-child(3){grid-area:2/1;font-size:12px}
+.tbl.mrow.cx td:nth-child(3)::before,.tbl.mrow.cm td:nth-child(3)::before{content:'코칭 ';color:var(--mute)}
+.tbl.mrow.cx td:nth-child(4){display:none}
+.tbl.mrow.cx td:nth-child(5),.tbl.mrow.cm td:nth-child(4){grid-area:2/2;text-align:right}
+.tbl.mrow.cx td:nth-child(5):has(>.z:only-child){display:none}
+.tbl.mrow.cx td:nth-child(6),.tbl.mrow.cm td:nth-child(5){grid-area:3/1/4/3}
+.tbl.mrow.ce td:nth-child(1){grid-area:1/1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbl.mrow.ce td:nth-child(1) button{font-size:14.5px!important;margin-right:6px}
+.tbl.mrow.ce td:nth-child(2){grid-area:1/2;text-align:right;font-weight:800}
+.tbl.mrow.ce td:nth-child(3){grid-area:2/1/3/3}
+.tbl.mrow.ce td:nth-child(4){grid-area:3/1/4/3}
+.tbl.mrow.dv td:nth-child(2){grid-area:1/1}
+.tbl.mrow.dv td:nth-child(2) button{font-size:14.5px!important}
+.tbl.mrow.dv td:nth-child(1){grid-area:1/2;text-align:right}
+.tbl.mrow.dv td:nth-child(1) .org::before{content:' · '}
+.tbl.mrow.dv td:nth-child(3){grid-area:2/1;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbl.mrow.dv td:nth-child(3) .org::before{content:' · '}
+.tbl.mrow.dv td:nth-child(4){grid-area:2/2;text-align:right;font-size:11.5px}
+.tbl.mrow.dv td:nth-child(5){grid-area:3/1/4/3;-webkit-line-clamp:3!important}
+/* 주간 코칭표·수업표: 요일 하나씩 (hire식) */
+.ttday{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin:0 0 8px}
+.ttday button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:6px 0;font:inherit;font-size:13px;font-weight:800;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px}
+.ttday button small{font-size:10px;color:var(--mute);font-weight:700}
+.ttday button.on{background:var(--ink);border-color:var(--ink);color:#fff}.ttday button.on small{color:#C9D1DE}
+.tt.dsel{min-width:0!important}
+.tt.dsel th:not(:first-child),.tt.dsel td:not(:first-child){display:none}
+.tt.dsel.d1 tr>:nth-child(2),.tt.dsel.d2 tr>:nth-child(3),.tt.dsel.d3 tr>:nth-child(4),.tt.dsel.d4 tr>:nth-child(5),.tt.dsel.d5 tr>:nth-child(6){display:table-cell}
+.tt.dsel.d1 tr.r:not(.h1),.tt.dsel.d2 tr.r:not(.h2),.tt.dsel.d3 tr.r:not(.h3),.tt.dsel.d4 tr.r:not(.h4),.tt.dsel.d5 tr.r:not(.h5){display:none}
+.tt.dsel td{min-width:0!important}
+}
+@media(max-width:768px){
+.scrollx>.tbl td[colspan]{position:static!important;box-shadow:none!important}
+.secl{position:sticky;left:10px}
+.tbl.mrow.nb tr{grid-template-columns:minmax(0,1fr) auto}
+.tbl.mrow.nb td:nth-child(1){grid-area:1/1}
+.tbl.mrow.nb td:nth-child(4){grid-area:1/2;text-align:right}
+.tbl.mrow.nb td:nth-child(2){grid-area:2/1;font-size:12px;display:inline}
+.tbl.mrow.nb td:nth-child(3){grid-area:2/2;font-size:12px;text-align:right;white-space:nowrap}
+.tbl.mrow.nb td:nth-child(3) .org::before{content:' · '}
+.tbl.mrow.nb td:nth-child(5){grid-area:3/1/4/3}
+}
+@media(max-width:768px){
+.tbl.mrow.tc colgroup{display:none}
+.tbl.mrow.tc tr{display:grid!important;grid-template-columns:repeat(5,auto) minmax(0,1fr);column-gap:10px;row-gap:3px;align-items:baseline}
+.tbl.mrow.tc td{white-space:nowrap!important;overflow:visible!important;font-size:12px;text-align:left!important}
+.tbl.mrow.tc td:nth-child(1){grid-area:1/1/2/6}
+.tbl.mrow.tc td:nth-child(1) button{font-size:14.5px!important}
+.tbl.mrow.tc td:nth-child(2){grid-area:1/6;text-align:right!important;font-size:11px}
+.tbl.mrow.tc td:nth-child(3){grid-area:2/1}.tbl.mrow.tc td:nth-child(4){grid-area:2/2}.tbl.mrow.tc td:nth-child(5){grid-area:2/3}.tbl.mrow.tc td:nth-child(6){grid-area:2/4}.tbl.mrow.tc td:nth-child(7){grid-area:2/5}
+.tbl.mrow.tc td:nth-child(3)::before{content:'주 ';color:var(--mute);font-weight:600}
+.tbl.mrow.tc td:nth-child(3)::after{content:'타임';color:var(--mute);font-weight:600}
+.tbl.mrow.tc td:nth-child(4)::before{content:'대타 ';color:var(--mute)}
+.tbl.mrow.tc td:nth-child(5)::before{content:'못 구함 ';color:var(--mute)}
+.tbl.mrow.tc td:nth-child(6)::before{content:'남 대타 ';color:var(--mute)}
+.tbl.mrow.tc td:nth-child(7)::before{content:'대타율 ';color:var(--mute)}
+.tbl.mrow.tc td:nth-child(8){grid-area:3/1/4/7;white-space:normal!important}
+.tbl.mrow.tc td:nth-child(8):not(:has(.tag)):has(.note.none){display:none}
+}
 </style></head><body>
 <script>
 /* 운영본부 — Firestore 로더 (gate.js 인증 후 opsData 6문서 읽어 조립)
@@ -721,7 +912,8 @@ function expOn(d){var L=[];Object.keys(CO).forEach(function(c){CO[c].live.forEac
 function weekBox(){
   var mon=monday(CUR), days=[0,1,2,3,4,5,6].map(function(i){return add(mon,i);})
     .filter(function(x){var w=P(x).getDay();return (w>=1&&w<=5)||HOL[x];});
-  var sel=SEL&&days.indexOf(SEL)>=0?SEL:(days.indexOf(TODAY)>=0?TODAY:days[0]);
+  var all7=[0,1,2,3,4,5,6].map(function(i){return add(mon,i);});   // 모바일 스트립: 월~일 7칸
+  var sel=SEL&&all7.indexOf(SEL)>=0?SEL:(all7.indexOf(TODAY)>=0?TODAY:days[0]);
   var KIND=['해피콜','개통','입학식','첫만남','첫수업'];
   var A=alertData();
   var mwOpen=IN.filter(function(i){return i.type==='민원'&&i.state==='open'&&inBr(i);})
@@ -773,7 +965,7 @@ function weekBox(){
     '<div'+(wi.filter(function(i){return i.type==='취소';}).length?' class="r"':'')+'><div class="l">취소</div><b>'+wi.filter(function(i){return i.type==='취소';}).length+'</b></div></div>';
   // 선택한 날 상세
   var X=expOn(sel);
-  var xTbl=X.length?'<div class="grp">'+md(sel)+' 만료 '+X.length+'명 — 사전 안내 대상</div><table class="tbl"><thead><tr><th>회원</th><th>소속</th><th>코칭</th><th>사전 안내</th><th>민원</th><th>특이사항</th></tr></thead><tbody>'+
+  var xTbl=X.length?'<div class="grp">'+md(sel)+' 만료 '+X.length+'명 — 사전 안내 대상</div><table class="tbl mrow xd"><thead><tr><th>회원</th><th>소속</th><th>코칭</th><th>사전 안내</th><th>민원</th><th>특이사항</th></tr></thead><tbody>'+
     X.map(function(o){var m=o.m,rr=m.mw?mwRes(m):'';
       return '<tr><td><button class="nmbtn" data-name="'+esc(m.n)+'">'+esc(m.n)+'</button><div class="org">'+esc(m.g||'')+'</div></td>'+
        '<td><b>'+esc(m.br||'지점 미확인')+'</b><div class="org">상담 '+esc(m.sang||'—')+' · 방문 '+esc(m.saup||'—')+'</div></td>'+
@@ -784,12 +976,13 @@ function weekBox(){
   return zone('week','var(--v1)','이번 주 · 다음 주',md(mon)+' ~ '+md(add(mon,4)),'주간 일정 → 이번·다음 주 쌓인 일 → 날짜별 상세',
     '<div class="wknav"><button data-mv="-1">‹ 지난 주</button><b>'+md(mon)+' ~ '+md(add(mon,6))+'</b>'+(monday(TODAY)===mon?'<span class="wknow">이번 주</span>':'')+'<button data-mv="1">다음 주 ›</button></div>'+planBox()+'<div class="grp">'+md(mon)+' 주간 일정</div>'+kpi+(function(){
       // 모바일 요일 스트립 (카카오식) — 날짜 탭하면 아래 선택일 상세로
-      var strip='<div class="wstrip">'+days.map(function(dstr){
+      var strip='<div class="wstrip">'+all7.map(function(dstr){
         var E=evOf(dstr), cnt=E.length, isT=(dstr===TODAY), isSel=(dstr===sel);
         var kinds={};E.forEach(function(e){kinds[e.kind]=1;});
         var dots=Object.keys(kinds).slice(0,4).map(function(k){return '<span class="wsd '+k+'"></span>';}).join('');
         var wd=dw(dstr);
-        return '<button class="wsday'+(isSel?' sel':'')+(isT?' today':'')+'" data-go="'+dstr+'">'+
+        var wk=P(dstr).getDay();
+        return '<button class="wsday'+(isSel?' sel':'')+(isT?' today':'')+(wk===6?' sat':'')+(wk===0?' sun':'')+(HOL[dstr]?' hol':'')+'" data-go="'+dstr+'">'+
           '<span class="wsw">'+wd+'</span><span class="wsn">'+(+dstr.slice(8))+'</span>'+
           '<span class="wsdots">'+dots+'</span>'+(cnt?'<span class="wsc">'+cnt+'</span>':'')+'</button>';
       }).join('')+'</div>';
@@ -963,7 +1156,7 @@ function expBox(){
   var L=B[sel].slice().sort(function(a,b){return (a.exp||'~').localeCompare(b.exp||'~');});
   var byc={};L.forEach(function(m){(byc[m.coach]=byc[m.coach]||[]).push(m);});
   var EV2=window.__expview||'flat';
-  var head='<table class="tbl"><thead><tr><th>만료일</th><th>회원</th><th>담당</th><th>코칭</th><th>사전 안내</th><th>상태</th><th>특이사항</th></tr></thead><tbody>';
+  var head='<table class="tbl mrow ex"><thead><tr><th>만료일</th><th>회원</th><th>담당</th><th>코칭</th><th>사전 안내</th><th>상태</th><th>특이사항</th></tr></thead><tbody>';
   var erow=function(m){
       var dd=diff(TODAY,m.exp);
       var stt=m.can?'<span class="tag ng">'+(m.can.is_calc?'계약변경':'취소')+'</span>':(m.mw?'<span class="tag wait">민원</span>':'<span class="z">—</span>');
@@ -1152,9 +1345,9 @@ function canBox(){
       var cc={};Q.forEach(function(m){var c=m.can.cat||'기타';if(c!=='미분류')cc[c]=(cc[c]||0)+1;});
       var rep=Object.keys(cc).sort(function(x,y){return cc[y]-cc[x];}).filter(function(c){return cc[c]>=2;})
         .map(function(c){return '<span class="cb '+(CATC[c]||"mute")+'">'+esc(c)+' '+cc[c]+'</span>';}).join('');
-      return '<div class="cgrp"><div class="cgh"><b>'+esc(k)+'</b><span class="cgn">'+Q.length+'건 · '+won_(a)+
+      return '<details class="cgrp"'+(window.innerWidth<=768?'':' open')+'><summary class="cgh"><b>'+esc(k)+'</b><span class="cgn">'+Q.length+'건 · '+won_(a)+
         (oa?' · <b class="hot">점검 필요 '+oa+'</b>':'')+(td?' · 당일 '+td:'')+(re?' · 재이탈 '+re:'')+'</span>'+
-        (rep?'<span class="cgrep">반복 '+rep+'</span>':'')+'</div><div class="cgrid">'+Q.map(canCard).join('')+'</div></div>';
+        (rep?'<span class="cgrep">반복 '+rep+'</span>':'')+'</summary><div class="cgrid">'+Q.map(canCard).join('')+'</div></details>';
     }).join('')+'</div>';
   };
   var toggle='<div class="seg" style="margin-bottom:12px">'+
@@ -1183,7 +1376,7 @@ function devBox(){
   var tabs=[['all','전체',L.length],['우리쪽','우리쪽 — 설치·발송',(by['우리쪽']||[]).length],
             ['상대쪽','회원쪽 — 기기·사양',(by['상대쪽']||[]).length],['구분 필요','구분 필요',(by['구분 필요']||[]).length]];
   var S=F==='all'?L:(by[F]||[]);
-  var body=S.length?'<table class="tbl"><thead><tr><th>날짜</th><th>회원</th><th>소속</th><th>단계</th><th>내용</th></tr></thead><tbody>'+
+  var body=S.length?'<table class="tbl mrow dv"><thead><tr><th>날짜</th><th>회원</th><th>소속</th><th>단계</th><th>내용</th></tr></thead><tbody>'+
     S.slice(0,30).map(function(x){
       var fin=EV.filter(function(e){return e.name===x.n&&e.kind==='첫수업'&&e.st==='done';})[0];
       return '<tr'+(false?' class="hot"':'')+'><td style="white-space:nowrap"><b>'+md(x.d)+'</b><div class="org">'+esc(x.side)+'</div></td>'+
@@ -1528,7 +1721,7 @@ function alertBox(){
      '<td><button data-name="'+esc(x.n)+'" class="nmbtn">'+esc(x.n)+'</button><div class="org">'+esc(x.sub)+'</div></td>'+
      '<td><b>'+esc(x.br||'지점 미확인')+'</b><div class="org">상담 '+esc(x.sang||'—')+' · 방문 '+esc(x.saup||'—')+'</div></td>'+
      '<td style="white-space:nowrap">'+esc(x.st)+'</td><td class="note" style="margin:0">'+(x.note?hi(x.note):'<span class="z">—</span>')+'</td></tr>';};
-  var head='<table class="tbl"><thead><tr><th>경과</th><th>회원</th><th>소속</th><th>마지막 기록</th><th>원문</th></tr></thead><tbody>';
+  var head='<table class="tbl mrow al"><thead><tr><th>경과</th><th>회원</th><th>소속</th><th>마지막 기록</th><th>원문</th></tr></thead><tbody>';
   var body=L.length?head+L.slice(0,20).map(row).join('')+'</tbody></table>'+
     (L.length>20?'<details><summary class="more">나머지 '+(L.length-20)+'건</summary>'+head+L.slice(20).map(row).join('')+'</tbody></table></details>':'')
     :'<div class="empty">해당 없음</div>';
@@ -1592,7 +1785,7 @@ function nobrList(){
   var L=[],cnt={};
   Object.keys(CO).forEach(function(c){CO[c].live.forEach(function(m){var k=cleanNm(m.n);cnt[k]=(cnt[k]||0)+1;if(!m.br)L.push({c:c,t:CO[c].team,m:m});});});
   if(!L.length) return '';
-  return '<div class="lead">이 회원들은 원장에서 학생은 찾았으나 <b>원장에 지점 칸이 비어 있어</b> 소속을 못 넣은 경우입니다. 원장 쪽 지점을 채워야 반영됩니다.</div><details open><summary class="more">해당 회원 '+L.length+'명</summary><table class="tbl"><thead><tr><th>명단 표기(원문)</th><th>학년</th><th>담당</th><th>만료일</th><th>특이사항 원문</th></tr></thead><tbody>'+
+  return '<div class="lead">이 회원들은 원장에서 학생은 찾았으나 <b>원장에 지점 칸이 비어 있어</b> 소속을 못 넣은 경우입니다. 원장 쪽 지점을 채워야 반영됩니다.</div><details'+(window.innerWidth<=768?'':' open')+'><summary class="more">해당 회원 '+L.length+'명</summary><table class="tbl mrow nb"><thead><tr><th>명단 표기(원문)</th><th>학년</th><th>담당</th><th>만료일</th><th>특이사항 원문</th></tr></thead><tbody>'+
    L.map(function(x){var m=x.m,dup=cnt[cleanNm(m.n)]>1;
     return '<tr><td><b>'+esc(m.n)+'</b>'+(dup?' <span class="tag wait">담당 2곳에 중복</span>':'')+'</td><td>'+esc(m.g||'—')+'</td><td>'+esc(x.c)+'<div class="org">'+esc(x.t)+'</div></td>'+
      '<td style="white-space:nowrap">'+(m.exp?md(m.exp):'<span class="tag empty2">칸 비어 있음</span>')+'</td><td class="note" style="margin:0">'+(m.note?hi(m.note):'<span class="z">—</span>')+'</td></tr>';}).join('')+
@@ -1686,7 +1879,7 @@ function flowBox(){
         var p=i?col[i-1]:null, pv=p&&(p.tab||!o.mw)?p[k]:null;
         var txt=o.money?(v?Math.round(v/10000).toLocaleString('ko-KR')+'만':'<span class="z">0</span>'):(o.pct?v+'%':v.toLocaleString('ko-KR'));
         return '<td class="c"'+(o.col?' style="color:'+o.col+';font-weight:700"':'')+'>'+txt+(o.delta?dlt(v,pv,o.delta):'')+'</td>';}).join('')+'</tr>';};
-  var sec=function(t){return '<tr><td colspan="'+(col.length+1)+'" style="background:#F6F8FB;font-size:11.5px;font-weight:800;color:var(--soft);letter-spacing:.5px">'+t+'</td></tr>';};
+  var sec=function(t){return '<tr><td colspan="'+(col.length+1)+'" style="background:#F6F8FB;font-size:11.5px;font-weight:800;color:var(--soft);letter-spacing:.5px"><span class="secl">'+t+'</span></td></tr>';};
   var tbl='<div class="scrollx"><table class="tbl mtbl"><thead><tr>'+th+'</tr></thead><tbody>'+
     sec('회원')+
     row('관리중','active',{tip:'각 달 시점 역산 (5~9월)',delta:'n'})+
@@ -1838,7 +2031,7 @@ function coachTab(){
   var expBody='<div class="seg">'+W.map(function(w){
       return '<button class="'+(ew===w[0]?'on':'')+'" data-cew="'+w[0]+'">'+w[1]+' '+wkcnt(w[0])+'</button>';}).join('')+'</div>'+
     '<div class="lead">사전 안내(방식·발송일·재시도) 칸이 시트에 없습니다 — 관리만료 시트 253명 중 안내 방식을 알 수 있는 건 4건.</div>'+
-    (EL.length?'<table class="tbl"><thead><tr><th>만료일</th><th>회원</th><th>코칭</th><th>사전 안내</th><th>상태</th><th>특이사항</th></tr></thead><tbody>'+
+    (EL.length?'<table class="tbl mrow cx"><thead><tr><th>만료일</th><th>회원</th><th>코칭</th><th>사전 안내</th><th>상태</th><th>특이사항</th></tr></thead><tbody>'+
      EL.map(function(m){
        var dd=diff(TODAY,m.exp);
        var rr=m.mw?mwRes(m):'';
@@ -1852,7 +2045,7 @@ function coachTab(){
      '</tbody></table>':'<div class="empty">해당 기간에 만료되는 회원이 없습니다.</div>');
   // 민원 접수
   var ML=M.filter(function(m){return m.mw;}).sort(function(a,b){return (b.mw.d||'').localeCompare(a.mw.d||'');});
-  var mwBody=ML.length?'<table class="tbl"><thead><tr><th>접수일</th><th>회원</th><th>코칭</th><th>결과</th><th>사유</th></tr></thead><tbody>'+
+  var mwBody=ML.length?'<table class="tbl mrow cm"><thead><tr><th>접수일</th><th>회원</th><th>코칭</th><th>결과</th><th>사유</th></tr></thead><tbody>'+
     ML.map(function(m){
       var r=mwRes(m);
       var tg=r==='유지'?'<span class="tag ok">유지</span>':(r==='해지'?'<span class="tag ng">해지</span>':'<span class="tag wait">'+esc(r)+'</span>');
@@ -1950,7 +2143,7 @@ function coachTab(){
          '<div'+(none/E.length>=0.5?' class="r"':'')+'><div class="l">기록 없음</div><b>'+none+'</b></div></div>'+
          '<div class="lead">만료 후 <b>어떻게 됐는지 기록이 없는 회원이 '+none+'명('+Math.round(none/E.length*100)+'%)</b>입니다. 연장했는지·이탈했는지 판이 알 수 없습니다. 연장은 '+ext+'명만 기록됨 — 만료 후 관리·안내 기록 칸이 필요합니다.</div>';
      })()+
-     (E.length?'<table class="tbl"><thead><tr><th>회원</th><th>만료일</th><th>상태</th><th>특이사항</th></tr></thead><tbody>'+
+     (E.length?'<table class="tbl mrow ce"><thead><tr><th>회원</th><th>만료일</th><th>상태</th><th>특이사항</th></tr></thead><tbody>'+
       E.slice(0,40).map(function(m){
         var stt=m.can?'<span class="tag ng">취소 '+md(m.can.d)+'</span>':(m.ext?'<span class="tag ok">연장</span>':(m.mw?'<span class="tag wait">민원</span>':'<span class="z">칸 비어 있음</span>'));
         return '<tr><td><button data-name="'+esc(m.n)+'" style="border:0;background:none;font:inherit;font-weight:800;cursor:pointer;padding:0">'+esc(m.n)+'</button>'+
@@ -2017,7 +2210,7 @@ function teachTab(){
    show.map(function(sj){
      var L=grp[sj].sort(function(a,b){return pk(b)-pk(a)||tim(b)-tim(a);});
      return '<div class="grp" style="margin-top:14px">'+esc(sj)+' <span style="color:var(--soft);font-weight:700">'+L.length+'명 · 주 '+L.reduce(function(a,n){return a+tim(n);},0)+'타임 · 대타 '+L.reduce(function(a,n){return a+pk(n);},0)+'</span></div>'+
-      '<table class="tbl tfix"><colgroup><col style="width:110px"><col style="width:190px"><col style="width:90px"><col style="width:70px"><col style="width:100px"><col style="width:80px"><col style="width:70px"><col></colgroup><thead><tr><th>강사</th><th>학년</th><th class="c">주간 타임</th><th class="c">대타 발생<div class="org" style="font-weight:600">6/1~8/20</div></th><th class="c">대타 못 구함</th><th class="c">남 대타</th><th class="c">주당 대타율</th><th>수업 관련 민원</th></tr></thead><tbody>'+
+      '<table class="tbl tfix mrow tc"><colgroup><col style="width:110px"><col style="width:190px"><col style="width:90px"><col style="width:70px"><col style="width:100px"><col style="width:80px"><col style="width:70px"><col></colgroup><thead><tr><th>강사</th><th>학년</th><th class="c">주간 타임</th><th class="c">대타 발생<div class="org" style="font-weight:600">6/1~8/20</div></th><th class="c">대타 못 구함</th><th class="c">남 대타</th><th class="c">주당 대타율</th><th>수업 관련 민원</th></tr></thead><tbody>'+
       L.map(function(n){
         var p=PR[n]||{};
         return '<tr'+(n===cur?' style="background:#F3F6FD"':'')+'><td><button data-teach="'+esc(n)+'" style="border:0;background:none;font:inherit;font-weight:800;cursor:pointer;padding:0'+(n===cur?';color:var(--v1)':'')+'">'+esc(n)+'</button></td>'+
@@ -2230,6 +2423,31 @@ document.addEventListener('click',function(e){
 document.addEventListener('input',function(e){
   if(e.target.id==='q'){Q=e.target.value.trim();document.getElementById('qres').innerHTML=searchBox();}
 });
+/* ── 모바일 후처리: 월별 표 최신달로 스크롤 · 주간표 요일 선택 ── */
+function moPost(){
+  if(window.innerWidth>768) return;
+  document.querySelectorAll('#z-flow .scrollx,#z-funnel .scrollx,#z-cmon .scrollx').forEach(function(x){x.scrollLeft=x.scrollWidth;});
+  document.querySelectorAll('#app .chips').forEach(function(c){var on=c.querySelector('.chip.on'); if(on&&on.offsetLeft>c.clientWidth-40) c.scrollLeft=on.offsetLeft-12;});
+  var tbs=document.querySelectorAll('#app table.tt'); if(!tbs.length) return;
+  var wd=P(TODAY).getDay(), sel=window.__ttd||((wd>=1&&wd<=5)?wd:1);
+  tbs.forEach(function(t){
+    var hr=t.rows[0]; if(!hr) return;
+    for(var r=1;r<t.rows.length;r++){var cs=t.rows[r].cells;t.rows[r].classList.add('r');
+      for(var i=1;i<cs.length;i++){ if(cs[i].querySelector('.slot')) t.rows[r].classList.add('h'+i); }}
+    var bar='<div class="ttday">'+[1,2,3,4,5].map(function(i){var th=hr.cells[i]; if(!th) return '';
+      var sm=th.querySelector('small');
+      return '<button data-ttd="'+i+'" class="'+(i===sel?'on':'')+'">'+esc(th.childNodes[0].textContent)+(sm?'<small>'+esc(sm.textContent)+'</small>':'')+'</button>';}).join('')+'</div>';
+    (t.closest('.scrollx')||t).insertAdjacentHTML('beforebegin',bar);
+    t.classList.add('dsel','d'+sel);
+  });
+}
+document.addEventListener('click',function(e){
+  var b=e.target.closest('[data-ttd]'); if(!b) return; e.stopPropagation();
+  var i=+b.dataset.ttd; window.__ttd=i;
+  document.querySelectorAll('#app table.tt.dsel').forEach(function(t){t.className=t.className.replace(/\bd[1-5]\b/,'d'+i);});
+  document.querySelectorAll('.ttday button').forEach(function(x){x.classList.toggle('on',+x.dataset.ttd===i);});
+},true);
+var _render0=render; render=function(){_render0(); try{moPost();}catch(err){}};
 render();
 })();
 };
