@@ -457,7 +457,14 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 #opsnav{display:none}
 body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sgate.hidden) #opsnav{display:flex}
 #opsnav{position:sticky;top:0;z-index:200;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:9px 16px;flex-wrap:wrap}#opsnav .onav-logo{font-size:14px;font-weight:800;letter-spacing:-.3px;white-space:nowrap}#opsnav .onav-logo b{color:var(--v1)}#opsnav .onav-tabs{display:flex;gap:5px;overflow-x:auto;-webkit-overflow-scrolling:touch}#opsnav .onav-tabs a{text-decoration:none;background:var(--bg);color:var(--soft);font-size:13px;font-weight:700;padding:8px 16px;border-radius:22px;white-space:nowrap}#opsnav .onav-tabs a:hover{color:var(--ink)}#opsnav .onav-tabs a.on{background:var(--v1);color:#fff}body.gate-hasbar #opsnav{top:34px}@media(max-width:768px){#opsnav{padding:7px 10px;gap:8px}#opsnav .onav-logo{font-size:12.5px}#opsnav .onav-tabs a{padding:7px 13px;font-size:12.5px}}
-</style></head><body><div id="opsnav">
+</style></head><body><style id="opsnav-mo">@media(max-width:768px){
+#opsnav{flex-wrap:nowrap;gap:0;padding:0;padding-top:var(--sat,0px)}
+#opsnav .onav-logo{display:none}
+#opsnav .onav-tabs{flex:1;min-width:0;gap:0;padding:0 4px;scrollbar-width:none}
+#opsnav .onav-tabs::-webkit-scrollbar{display:none}
+#opsnav .onav-tabs a{flex:1 1 0;min-width:0;text-align:center;background:none!important;border-radius:0;padding:13px 0 11px;font-size:13px;letter-spacing:-.4px;color:#6B7688;border-bottom:2.5px solid transparent}
+#opsnav .onav-tabs a.on{color:#1B2436!important;border-bottom-color:#4C6EF5}
+}</style><div id="opsnav">
   <span class="onav-logo">아라온 <b>스태티즈</b></span>
   <nav class="onav-tabs">
     <a href="total.html">전체실적</a>
