@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>운영본부</title>
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>[미리보기·레포 업로드 금지] 운영본부</title>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -336,6 +336,7 @@ details[open]>.more::before{content:'▾ '}
 .hm{display:inline-flex;gap:4px;align-items:baseline;justify-content:center;min-width:56px;padding:3px 6px;border-radius:6px}
 .hm small{font-size:10px;color:var(--soft);font-weight:700}
 .fdist{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:6px}@media(max-width:800px){.fdist{grid-template-columns:1fr}}
+.byrow{cursor:pointer}.byrow:hover{background:#FAFBFD}.byrow.on{background:#FFF5F3}.byrow.on td{border-color:#F3C6BE}
 .calcsub{margin-top:3px;font-size:12.5px;font-weight:500;color:#6B5A9A;line-height:1.5}
 .rdot{display:inline-block;font-size:9px;font-weight:900;color:#fff;background:#9A5B06;border-radius:50%;width:13px;height:13px;line-height:13px;text-align:center;margin-left:3px;vertical-align:middle}
 .bsc{display:inline-block;font-size:11.5px;background:#EEF1F6;border-radius:6px;padding:2px 8px;margin:2px 4px 2px 0}
@@ -1076,25 +1077,74 @@ function funnelBox(){
     seg+funnel+mat+dists,true);
 }
 function byBox(){
-  var B=D.canBy||{};
+  var C=(D.can2||[]).filter(function(m){return inBr(m);});
+  if(!C.length) return '';
   var F=window.__bf||'지점';
-  var L=(B[F]||[]).slice(0,14);
-  if(!L.length) return '';
-  var mx=Math.max.apply(null,L.map(function(x){return x.r;}).concat([1]));
-  var all=(B[F]||[]).reduce(function(a,x){a.n+=x.n;a.c+=x.c;return a;},{n:0,c:0});
-  var avg=all.n?Math.round(all.c/all.n*1000)/10:0;
-  return zone('by','var(--red)','취소가 몰리는 곳','','지점 · 상담 · 방문 · 코칭별 취소율 (모수 15명 이상)',
-   '<div class="seg">'+['지점','상담','방문','코칭'].map(function(k){
-     return '<button class="'+(F===k?'on':'')+'" data-bf="'+k+'">'+k+'</button>';}).join('')+'</div>'+
-   '<div class="lead">취소 건수는 실제 취소(당일취소 포함) 전체 기준입니다. 대상(모수)은 현재 파악되는 회원 수라 일부 과소할 수 있어 취소율은 참고치 — 취소 <b>건수</b>가 더 신뢰됩니다. 모수 15명 이상만 표시.</div>'+
-   '<table class="tbl"><thead><tr><th>'+F+'</th><th class="c">대상</th><th class="c">취소</th><th>취소율</th></tr></thead><tbody>'+
-   L.map(function(x){
-     return '<tr'+(x.r>=avg*1.5?' class="hot"':'')+'><td><b>'+esc(x.k)+'</b></td><td class="c">'+x.n+'</td>'+
-      '<td class="c" style="color:var(--red);font-weight:700">'+x.c+'</td>'+
-      '<td><div style="display:inline-block;width:110px;height:7px;background:#F1F4F9;border-radius:4px;overflow:hidden;vertical-align:middle;margin-right:8px"><i style="display:block;height:100%;width:'+Math.round(x.r/mx*100)+'%;background:'+(x.r>=avg*1.5?'var(--red)':'var(--amber)')+'"></i></div><b'+(x.r>=avg*1.5?' style="color:var(--red)"':'')+'>'+x.r+'%</b></td></tr>';
-   }).join('')+'</tbody></table>',true);
+  var keyf={'지점':function(x){return x.br||'기타';},'상담':function(x){return x.sang||'미기재';},
+            '방문':function(x){return x.saup||'미기재';},'코칭':function(x){return x.can.teach||(x.can.resp==='당일취소'?'배정 전(당일취소)':'미기재');}}[F];
+  var SEL=window.__bsel2||'';
+  var ms=['2026-06','2026-07','2026-08','2026-09'];
+  var CATC={'고객 오해':'red','관리·코칭 품질':'red','수업·효과 불만':'red','학원·대면전환':'amber','시간·병행':'amber','비용':'amber','가정·이사':'amber','준수 후 해지':'pur','계약철회·변심':'pur','학생 의지·거부':'mute','보호자 반대':'mute','진도 안 맞음':'mute','미분류':'mute'};
+  var won=function(a){return Math.round(a/10000).toLocaleString('ko-KR')+'만';};
+  var mk=function(x){return x.can.mon?'2026-'+('0'+x.can.mon).slice(-2):(x.can.d||'').slice(0,7);};
+  // 그룹 집계
+  var G={};C.forEach(function(x){var k=keyf(x)||'미기재';(G[k]=G[k]||[]).push(x);});
+  var groups=Object.keys(G).sort(function(a,b){return G[b].length-G[a].length;});
+  var seg='<div class="seg">'+['지점','상담','방문','코칭'].map(function(k){
+    return '<button class="'+(F===k?'on':'')+'" data-bf="'+k+'">'+k+'</button>';}).join('')+'</div>';
+  // 상단 = 그룹별 월별 추이 미니 막대 (통갯수 아님, 월 흐름)
+  var mxMonth=1; groups.forEach(function(k){ms.forEach(function(m){var n=G[k].filter(function(x){return mk(x)===m;}).length;if(n>mxMonth)mxMonth=n;});});
+  var rows=groups.map(function(k){
+    var Q=G[k];
+    var spark=ms.map(function(m){
+      var n=Q.filter(function(x){return mk(x)===m;}).length, h=Math.max(2,Math.round(n/mxMonth*24));
+      return '<span title="'+(+m.slice(5))+'월 '+n+'건"><i style="height:'+h+'px;background:'+(SEL===k?'var(--red)':'#E39B93')+'"></i><em>'+(n||'·')+'</em></span>';
+    }).join('');
+    var chk=Q.filter(function(x){return x.can.big==='점검 필요';}).length;
+    var re=Q.filter(function(x){return x.can.resp==='재이탈';}).length;
+    var last=Q.filter(function(x){return mk(x)==='2026-09';}).length, prev=Q.filter(function(x){return mk(x)==='2026-08';}).length;
+    var trend=last>prev?'<span style="color:var(--red);font-weight:800">▲'+(last-prev)+'</span>':(last<prev?'<span style="color:var(--pos);font-weight:800">▼'+(prev-last)+'</span>':'');
+    return '<tr class="byrow'+(SEL===k?' on':'')+'" data-bsel2="'+esc(k)+'"><td><b>'+esc(k)+'</b></td>'+
+      '<td class="c"><b>'+Q.length+'</b></td>'+
+      '<td><div class="spk">'+spark+'</div></td>'+
+      '<td class="c">'+(trend||'<span class="z">·</span>')+'</td>'+
+      '<td class="c">'+(chk?'<b class="hot">'+chk+'</b>':'<span class="z">·</span>')+'</td>'+
+      '<td class="c">'+(re||'<span class="z">·</span>')+'</td></tr>';
+  }).join('');
+  var table='<div class="scrollx"><table class="tbl"><thead><tr><th>'+F+'</th><th class="c">취소</th><th>6~9월 추이</th><th class="c">전월비</th><th class="c">점검</th><th class="c">재이탈</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  // 하단 = 선택한 그룹 상세
+  var detail='';
+  if(SEL && G[SEL]){
+    var Q=G[SEL].slice().sort(function(a,b){return (b.can.d||'').localeCompare(a.can.d||'');});
+    // 월별
+    var monLine=ms.map(function(m){var n=Q.filter(function(x){return mk(x)===m;}).length;return '<b'+(n?'':' class="z"')+'>'+(+m.slice(5))+'월 '+n+'</b>';}).join(' · ');
+    // 원인 구성
+    var cc={};Q.forEach(function(x){var c=x.can.cat||'미분류';cc[c]=(cc[c]||0)+1;});
+    var catLine=Object.keys(cc).sort(function(a,b){return cc[b]-cc[a];}).map(function(c){return '<span class="cb '+(CATC[c]||'mute')+'">'+esc(c)+' '+cc[c]+'</span>';}).join(' ');
+    // 회원 카드
+    var cards=Q.map(function(m){
+      var c=m.can, cc2=CATC[c.cat||'미분류']||'mute';
+      var respTag=c.resp?'<span class="cb '+(c.resp==='재이탈'?'red':(c.resp==='당일취소'?'mute':'amber'))+'">'+c.resp+'</span>':'';
+      return '<div class="ccard'+(c.resp==='재이탈'?' hot':'')+'">'+
+        '<div class="cc1"><button class="nmbtn" data-name="'+esc(m.n)+'">'+esc(m.n)+'</button>'+(m.g?'<span class="gr">'+esc(m.g)+'</span>':'')+
+        '<b class="camt">'+(c.amt?won(c.amt):'—')+'</b></div>'+
+        '<div class="org cc2">상담 '+esc(m.sang||'—')+' · 방문 '+esc(m.saup||'—')+' · 담임 '+esc(c.teach||'미기재')+(m.ten>=0?' · 재원 '+m.ten+'일':'')+'</div>'+
+        '<div class="cbs">'+respTag+'<span class="cb '+cc2+'">'+esc(c.cat||'미분류')+'</span></div>'+
+        '<div class="cflow"><span class="cf j">가입 '+(m.join?md(m.join):'—')+'</span><span class="cf r">'+md(c.d)+' '+(c.kind==='당일취소'?'당일취소':'해지')+'</span></div>'+
+        '<div class="cwhy">'+(c.why?hi(c.why):'<span class="z">사유 칸 비어 있음</span>')+'</div></div>';
+    }).join('');
+    detail='<div class="sech2">'+esc(SEL)+' 취소 상세 · '+Q.length+'건</div>'+
+      '<div class="lead">월별 '+monLine+'</div>'+
+      '<div class="lead">원인 '+catLine+'</div>'+
+      '<div class="cgrid">'+cards+'</div>';
+  } else {
+    detail='<div class="lead" style="margin-top:10px;color:var(--mute)">위에서 '+F+'을 누르면 그 '+F+'의 월별 흐름·원인·회원별 취소가 펼쳐집니다.</div>';
+  }
+  return zone('by','var(--red)','취소가 몰리는 곳','',''+F+'별 취소 — 총량이 아니라 월 추이·원인으로',
+   seg+
+   '<div class="lead">6~9월 취소를 '+F+'별로. 막대는 월별 건수 추이(총합 아님), <b>전월비</b>는 8월→9월 증감. 점검=고객 오해·관리·수업 사유. 눌러서 상세.</div>'+
+   table+detail,true);
 }
-/* ── 경고 — 확인 필요 ── */
 function cleanNm(n){return String(n||'').replace(/\(.*?\)/g,'').replace(/[A-Za-z\s]/g,'');}
 function alertData(){
   var A={onb:[],call:[],dev:[],mw:[],orphan:[]};
@@ -1797,7 +1847,7 @@ function render(){
 document.addEventListener('click',function(e){
   var c=e.target.closest('[data-close]');
   if(c&&(e.target.classList.contains('ov')||e.target.closest('.cls'))){CARD=null;render();return;}
-  var b=e.target.closest('button,[data-z],.qrow');
+  var b=e.target.closest('button,[data-z],.qrow,[data-bsel2]');
   if(!b) return;
   if(b.dataset.tab){TAB=b.dataset.tab;OPENZ={};render();window.scrollTo(0,0);}
   else if(b.dataset.mv){CUR=add(CUR,7*(+b.dataset.mv));SEL=null;render();}
@@ -1815,7 +1865,8 @@ document.addEventListener('click',function(e){
   else if(b.dataset.cp){window.__cp=b.dataset.cp;render();}
   else if(b.dataset.al){window.__al=b.dataset.al;render();}
   else if(b.dataset.df){window.__df=b.dataset.df;render();}
-  else if(b.dataset.bf){window.__bf=b.dataset.bf;render();}
+  else if(b.dataset.bf){window.__bf=b.dataset.bf;window.__bsel2="";render();}
+  else if(b.dataset.bsel2){window.__bsel2=(window.__bsel2===b.dataset.bsel2?'':b.dataset.bsel2);render();}
   else if(b.dataset.g){window.__g=b.dataset.g;OPENZ={};render();window.scrollTo(0,0);}
   else if(b.dataset.anch!==undefined){var t=document.getElementById('z-'+b.dataset.anch);
     if(t) window.scrollTo({top:t.getBoundingClientRect().top+window.scrollY-64,behavior:'smooth'});}
