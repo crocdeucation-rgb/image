@@ -2077,7 +2077,7 @@ function render(){
   else if(TAB==='coach') el.innerHTML=(BR?branchStaffBox(BR):'')+coachTab();
   else el.innerHTML=teachTab();
   document.getElementById('ovl').innerHTML=CARD?card(CARD):'';
-  try{ if(window.self!==window.top){ parent.postMessage({t:CARD?'cardOpen':'cardClose'},'*'); } }catch(e){}
+  try{ if(window.self!==window.top){ var _cs=!!CARD; if(_cs!==window.__lastCard){ window.__lastCard=_cs; parent.postMessage({t:_cs?'cardOpen':'cardClose'},'*'); if(_cs){ setTimeout(function(){ try{ var c=document.querySelector('.card'); if(c) c.scrollIntoView({block:'center'}); }catch(e){} },30); } } } }catch(e){}
   try{ if(window.self!==window.top){ var h=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight); parent.postMessage({t:'frameH',h:h},'*'); parent.postMessage({type:'resize-iframe',height:h+40},'*'); } }catch(e){}
 }
 document.addEventListener('click',function(e){
