@@ -1403,6 +1403,21 @@ function alertBox(){
       '<span class="alt">'+t[1]+'</span><b>'+L.length+'<small>건</small></b>'+
       '<span class="alc">'+t[2]+'</span>'+(hot?'<span class="alh">'+({onb:'불참 ',call:'3회+ ',dev:'21일+ ',mw:'21일+ ',orphan:'재배정 대기 '})[t[0]]+hot+'</span>':'')+'</button>';}).join('')+'</div>';
   var cur=T.filter(function(t){return t[0]===F;})[0], L=A[F];
+  // 민원(mw)은 기간 필터 — 기본 이번주. 오래된 건 '전체' 눌러야 나옴
+  var perBar='';
+  if(F==='mw'){
+    var PF=window.__mwper||'w1';
+    var days={'w1':7,'w2':14,'m1':30}[PF];
+    var full=L.slice();
+    L=days?full.filter(function(x){return x.d<=days;}):full;
+    perBar='<div class="seg" style="margin:2px 0 12px">'+
+      [['w1','이번 주',full.filter(function(x){return x.d<=7;}).length],
+       ['w2','최근 2주',full.filter(function(x){return x.d<=14;}).length],
+       ['m1','최근 1달',full.filter(function(x){return x.d<=30;}).length],
+       ['all','전체',full.length]].map(function(o){
+        return '<button class="'+(PF===o[0]?'on':'')+'" data-mwper="'+o[0]+'">'+o[1]+' '+o[2]+'</button>';}).join('')+
+      '</div><div class="lead" style="margin-top:0">접수 후 경과 기준. 오래된 건은 대부분 결론이 났는데 칸만 빈 경우라, 기본은 <b>이번 주</b>만 — 필요하면 기간을 넓히세요.</div>';
+  }
   var row=function(x){
     return '<tr'+(x.bad?' class="hot"':'')+'><td style="white-space:nowrap"><b style="font-size:15px;'+(x.bad?'color:var(--red)':'')+'">'+x.d+'</b><span class="org" style="display:inline">'+(cur[3]==='회'?'회':'일')+'</span></td>'+
      '<td><button data-name="'+esc(x.n)+'" class="nmbtn">'+esc(x.n)+'</button><div class="org">'+esc(x.sub)+'</div></td>'+
@@ -1413,7 +1428,7 @@ function alertBox(){
     (L.length>20?'<details><summary class="more">나머지 '+(L.length-20)+'건</summary>'+head+L.slice(20).map(row).join('')+'</tbody></table></details>':'')
     :'<div class="empty">해당 없음</div>';
   return zone('alert','var(--red)','확인 필요',tot+'건','기준일 '+md(DATA)+' · 전부 최신순',tiles+
-    '<div class="grp" style="margin-top:14px">'+cur[1]+' — '+cur[2]+'</div>'+body,true);
+    '<div class="grp" style="margin-top:14px">'+cur[1]+' — '+cur[2]+'</div>'+perBar+body,true);
 }
 /* ── 추이 차트 (막대=건수 / 선=비율·금액, 띠 분리) ── */
 function combo(o){
@@ -2068,7 +2083,7 @@ function render(){
 document.addEventListener('click',function(e){
   var c=e.target.closest('[data-close]');
   if(c&&(e.target.classList.contains('ov')||e.target.closest('.cls'))){CARD=null;render();return;}
-  var b=e.target.closest('button,[data-z],.qrow,[data-bsel2],[data-jnext],[data-jmore],[data-expmore],[data-canmore]');
+  var b=e.target.closest('button,[data-z],.qrow,[data-bsel2],[data-jnext],[data-jmore],[data-expmore],[data-canmore],[data-mwper]');
   if(!b) return;
   if(b.dataset.tab){TAB=b.dataset.tab;OPENZ={};render();window.scrollTo(0,0);}
   else if(b.dataset.mv){CUR=add(CUR,7*(+b.dataset.mv));SEL=null;render();}
@@ -2092,6 +2107,7 @@ document.addEventListener('click',function(e){
   else if(b.dataset.jmore!==undefined){window.__jmore=(b.dataset.jmore==='1');render();}
   else if(b.dataset.expmore!==undefined){window.__expmore=(b.dataset.expmore==='1');render();}
   else if(b.dataset.canmore!==undefined){window.__canmore=(b.dataset.canmore==='1');render();}
+  else if(b.dataset.mwper){window.__mwper=b.dataset.mwper;render();}
   else if(b.dataset.bsel2){window.__bsel2=(window.__bsel2===b.dataset.bsel2?'':b.dataset.bsel2);render();}
   else if(b.dataset.g){window.__g=b.dataset.g;OPENZ={};render();window.scrollTo(0,0);}
   else if(b.dataset.anch!==undefined){var t=document.getElementById('z-'+b.dataset.anch);
