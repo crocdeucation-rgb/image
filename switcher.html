@@ -152,8 +152,8 @@ _sgAuth.onAuthStateChanged(function(u){
       setTimeout(function(){ gate.classList.add('hidden'); gate.classList.remove('bye'); document.body.style.overflow=''; try{ parent.postMessage({t:'cardClose'},'*'); }catch(e){} }, _isFounder?2500:1900);
       setTimeout(function(){ sgSecToast(nm,_isFounder); }, _isFounder?2600:2000);   // [2026-09] 통과 후 보안 인증 토스트
     } else {
-      // 세션 복원(새로고침) → 깜빡임 없이 즉시 통과
-      gate.classList.add('hidden'); document.body.style.overflow=''; try{ parent.postMessage({t:'cardClose'},'*'); }catch(e){}
+      // 세션 복원(새로고침) → 즉시 전체실적으로 이동
+      location.replace('total.html');
     }
   } else if(u){
     if(msg){ msg.className='sg-msg err'; msg.textContent='접근 권한이 없는 계정입니다 ('+u.email+')'; }
