@@ -451,6 +451,10 @@ details[open]>.more::before{content:'▾ '}
 
 /* 취소 담당별 그룹 카드 더 촘촘히 */
 .cgrp .cgrid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+
+.cgrpcols{column-gap:14px}
+@media(min-width:900px){.cgrpcols{column-count:2}.cgrpcols .cgrp{break-inside:avoid;margin-bottom:14px}.cgrpcols .cgrid{grid-template-columns:1fr}}
+@media(min-width:1400px){.cgrpcols{column-count:3}}
 .calcsub{margin-top:3px;font-size:12.5px;font-weight:500;color:#6B5A9A;line-height:1.5}
 .rdot{display:inline-block;font-size:9px;font-weight:900;color:#fff;background:#9A5B06;border-radius:50%;width:13px;height:13px;line-height:13px;text-align:center;margin-left:3px;vertical-align:middle}
 .bsc{display:inline-block;font-size:11.5px;background:#EEF1F6;border-radius:6px;padding:2px 8px;margin:2px 4px 2px 0}
@@ -1094,7 +1098,7 @@ function canBox(){
   var grouped=function(keyf){
     var G={};S.forEach(function(m){var k=keyf(m)||'미확인';(G[k]=G[k]||[]).push(m);});
     var ks=Object.keys(G).sort(function(a,b){return G[b].length-G[a].length;});
-    return ks.map(function(k){
+    return '<div class="cgrpcols">'+ks.map(function(k){
       var Q=G[k], oa=Q.filter(isChk).length;
       var td=Q.filter(function(m){return m.can.resp==='당일취소';}).length, re=Q.filter(function(m){return m.can.resp==='재이탈';}).length;
       var a=Q.reduce(function(x,y){return x+(y.can.amt||0);},0);
@@ -1104,7 +1108,7 @@ function canBox(){
       return '<div class="cgrp"><div class="cgh"><b>'+esc(k)+'</b><span class="cgn">'+Q.length+'건 · '+won_(a)+
         (oa?' · <b class="hot">점검 필요 '+oa+'</b>':'')+(td?' · 당일 '+td:'')+(re?' · 재이탈 '+re:'')+'</span>'+
         (rep?'<span class="cgrep">반복 '+rep+'</span>':'')+'</div><div class="cgrid">'+Q.map(canCard).join('')+'</div></div>';
-    }).join('');
+    }).join('')+'</div>';
   };
   var toggle='<div class="seg" style="margin-bottom:12px">'+
     [['coach','코칭 담당별'],['saup','방문사업부별'],['br','지점별'],['flat','시간순']]
