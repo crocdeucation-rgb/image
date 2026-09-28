@@ -198,8 +198,9 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',-apple-syste
 .more::-webkit-details-marker{display:none}
 .more::before{content:'▸ ';color:var(--mute)}
 details[open]>.more::before{content:'▾ '}
-.ov{position:fixed;inset:0;background:rgba(22,28,43,.42);display:flex;align-items:flex-start;justify-content:center;padding:36px 14px;z-index:50;overflow:auto}
-.card{background:#fff;border-radius:16px;max-width:620px;width:100%;padding:20px 22px}
+.ov{position:fixed;inset:0;background:rgba(22,28,43,.5);display:flex;align-items:center;justify-content:center;padding:24px 14px;z-index:2147483000;overflow:auto}
+@media(max-width:768px){.ov{align-items:flex-end;padding:0}.card{max-width:100%;border-radius:18px 18px 0 0;max-height:90vh}}
+.card{background:#fff;border-radius:16px;max-width:620px;width:100%;padding:20px 22px;max-height:88vh;overflow-y:auto}
 .card h3{font-size:18px;font-weight:800}
 .card .cls{float:right;border:0;background:#EEF1F6;border-radius:8px;width:28px;height:28px;cursor:pointer;color:var(--soft)}
 .hi{display:grid;grid-template-columns:58px 1fr;gap:9px;font-size:12.5px;padding:7px 0;border-bottom:1px solid #F3F5F9}
@@ -455,6 +456,14 @@ details[open]>.more::before{content:'▾ '}
 .cgrpcols{column-gap:14px}
 @media(min-width:900px){.cgrpcols{column-count:2}.cgrpcols .cgrp{break-inside:avoid;margin-bottom:14px}.cgrpcols .cgrid{grid-template-columns:1fr}}
 @media(min-width:1400px){.cgrpcols{column-count:3}}
+#opsnav{position:sticky;top:0;z-index:200;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:9px 16px;flex-wrap:wrap;padding-top:calc(9px + var(--sat,0px))}
+#opsnav .onav-logo{font-size:14px;font-weight:800;letter-spacing:-.3px;white-space:nowrap}
+#opsnav .onav-logo b{color:var(--v1)}
+#opsnav .onav-tabs{display:flex;gap:5px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+#opsnav .onav-tabs a{text-decoration:none;background:var(--bg);color:var(--soft);font-size:13px;font-weight:700;padding:8px 16px;border-radius:22px;white-space:nowrap}
+#opsnav .onav-tabs a:hover{color:var(--ink)}
+#opsnav .onav-tabs a.on{background:var(--v1);color:#fff}
+@media(max-width:768px){#opsnav{padding:7px 10px;gap:8px}#opsnav .onav-logo{font-size:12.5px}#opsnav .onav-tabs a{padding:7px 13px;font-size:12.5px}}
 .calcsub{margin-top:3px;font-size:12.5px;font-weight:500;color:#6B5A9A;line-height:1.5}
 .rdot{display:inline-block;font-size:9px;font-weight:900;color:#fff;background:#9A5B06;border-radius:50%;width:13px;height:13px;line-height:13px;text-align:center;margin-left:3px;vertical-align:middle}
 .bsc{display:inline-block;font-size:11.5px;background:#EEF1F6;border-radius:6px;padding:2px 8px;margin:2px 4px 2px 0}
@@ -540,6 +549,17 @@ body.gate-hasbar{padding-top:calc(34px + var(--sat))}
 </script>
 
 <div class="wrap">
+<div id="opsnav">
+  <span class="onav-logo">아라온 <b>스태티즈</b></span>
+  <nav class="onav-tabs">
+    <a href="total.html">전체실적</a>
+    <a href="ops_dashboard_firestore.html" class="on">운영본부</a>
+    <a href="hire.html">증원현황</a>
+    <a href="hr.html">인사기록</a>
+    <a href="dashboard.html">웹마케팅</a>
+    <a href="ssamida.html">쌤이다</a>
+  </nav>
+</div>
  <div class="top">
    <div class="brand">운영본부<span id="sub"></span></div>
    
@@ -2136,12 +2156,13 @@ function render(){
   else if(TAB==='coach') el.innerHTML=(BR?branchStaffBox(BR):'')+coachTab();
   else el.innerHTML=teachTab();
   document.getElementById('ovl').innerHTML=CARD?card(CARD):'';
+  document.body.style.overflow=CARD?'hidden':'';
   try{ if(window.self!==window.top){ var _cs=!!CARD; if(_cs!==window.__lastCard){ window.__lastCard=_cs; parent.postMessage({t:_cs?'cardOpen':'cardClose'},'*'); if(_cs){ setTimeout(function(){ try{ var c=document.querySelector('.card'); if(c) c.scrollIntoView({block:'center'}); }catch(e){} },30); } } } }catch(e){}
   try{ if(window.self!==window.top){ var h=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight); parent.postMessage({t:'frameH',h:h},'*'); parent.postMessage({type:'resize-iframe',height:h+40},'*'); } }catch(e){}
 }
 document.addEventListener('click',function(e){
   var c=e.target.closest('[data-close]');
-  if(c&&(e.target.classList.contains('ov')||e.target.closest('.cls'))){CARD=null;render();return;}
+  if(c&&(e.target.classList.contains('ov')||e.target.closest('.cls'))){CARD=null;render();if(window.__cardScrollY!=null){window.scrollTo(0,window.__cardScrollY);}return;}
   var b=e.target.closest('button,[data-z],.qrow,[data-bsel2],[data-jnext],[data-jmore],[data-expmore],[data-canmore],[data-mwper],[data-name]');
   if(!b) return;
   if(b.dataset.tab){TAB=b.dataset.tab;OPENZ={};render();window.scrollTo(0,0);}
@@ -2176,7 +2197,7 @@ document.addEventListener('click',function(e){
   else if(b.dataset.tsj){window.__tsj=b.dataset.tsj;window.__t=null;render();}
   else if(b.dataset.br!==undefined&&b.classList.contains('chip')){BR=b.dataset.br;render();}
   else if(b.dataset.ctab){CTAB=b.dataset.ctab;render();}
-  else if(b.dataset.name){CARD=b.dataset.name;render();}
+  else if(b.dataset.name){window.__cardScrollY=window.pageYOffset||document.documentElement.scrollTop||0;CARD=b.dataset.name;render();}
   else if(b.dataset.z){var k=b.dataset.z;OPENZ[k]=!(OPENZ[k]!==undefined?OPENZ[k]:b.querySelector('.ar').textContent==='▾');render();}
 });
 document.addEventListener('input',function(e){
