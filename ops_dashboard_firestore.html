@@ -2083,7 +2083,7 @@ function render(){
 document.addEventListener('click',function(e){
   var c=e.target.closest('[data-close]');
   if(c&&(e.target.classList.contains('ov')||e.target.closest('.cls'))){CARD=null;render();return;}
-  var b=e.target.closest('button,[data-z],.qrow,[data-bsel2],[data-jnext],[data-jmore],[data-expmore],[data-canmore],[data-mwper]');
+  var b=e.target.closest('button,[data-z],.qrow,[data-bsel2],[data-jnext],[data-jmore],[data-expmore],[data-canmore],[data-mwper],[data-name]');
   if(!b) return;
   if(b.dataset.tab){TAB=b.dataset.tab;OPENZ={};render();window.scrollTo(0,0);}
   else if(b.dataset.mv){CUR=add(CUR,7*(+b.dataset.mv));SEL=null;render();}
