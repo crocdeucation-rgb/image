@@ -1984,7 +1984,7 @@ window.loadMonth = loadMonth;
     + '</div>'
     + '<div id="mo-btns" style="display:flex;gap:6px;flex-wrap:wrap">' + _renderMonthBtns('2026') + '</div>'
     + '</div>';
-  document.body.insertAdjacentHTML('afterbegin', bar);
+  (function(){ var _nav=document.getElementById('opsnav'); if(_nav) _nav.insertAdjacentHTML('afterend', bar); else document.body.insertAdjacentHTML('afterbegin', bar); })();
   // 활성 스타일
   var st=document.createElement('style');
   st.textContent='.mo-sel-btn.on{background:#5B5FE0 !important;color:#fff !important;border-color:#5B5FE0 !important}'
