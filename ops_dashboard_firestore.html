@@ -410,6 +410,30 @@ details[open]>.more::before{content:'▾ '}
   .wsc{position:absolute;top:3px;right:5px;font-size:9px;font-weight:800;color:var(--red)}
   .wsday.sel .wsc{color:#fff}
 }
+
+/* 모바일 여정 축약 (카카오식 한 줄) */
+@media(max-width:768px){
+  .jrow{grid-template-columns:1fr auto;gap:6px;padding:10px 12px;align-items:center}
+  .jrow .jr-c{display:none}                 /* 진행바 숨김 — 단계 필터가 대신 */
+  .jr-l .jr-meta{font-size:10.5px}
+  .jr-r{text-align:right}
+  .jr-next{font-size:11px}
+  .jr-stuck{display:inline-block;margin-left:6px}
+  .jmemo{display:none}                       /* 메모는 탭 상세에서 */
+  .jfun{gap:5px}.jfs{flex:1 1 30%;padding:7px 8px}.jfs-bar,.jfs-d{display:none}
+  .jfs-h b{font-size:12px}.jfs-n{font-size:10px}
+  .chips.stickysel,.jrow{}
+}
+.dtodo{display:inline-block;font-size:11.5px;font-weight:700;color:var(--v1);background:var(--v1s);padding:2px 8px;border-radius:6px;margin:1px 3px 1px 0}.dtodo.done{color:var(--pos);background:var(--poss)}.jr-c.todo{display:flex;flex-wrap:wrap;justify-content:flex-end}
+
+/* 취소 카드 컴팩트 */
+.ccard{padding:8px 11px}
+.ccard .cc2{font-size:10.5px;margin-top:1px}
+.ccard .cflow{margin-bottom:4px;font-size:10px}
+.ccard .cwhy{padding-top:4px;font-size:11px;line-height:1.4}
+.ccard .cbs{margin:5px 0 4px}
+.cgrid{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:6px}
+@media(max-width:768px){.cgrid{grid-template-columns:1fr}.ccard{padding:9px 12px}}
 .calcsub{margin-top:3px;font-size:12.5px;font-weight:500;color:#6B5A9A;line-height:1.5}
 .rdot{display:inline-block;font-size:9px;font-weight:900;color:#fff;background:#9A5B06;border-radius:50%;width:13px;height:13px;line-height:13px;text-align:center;margin-left:3px;vertical-align:middle}
 .bsc{display:inline-block;font-size:11.5px;background:#EEF1F6;border-radius:6px;padding:2px 8px;margin:2px 4px 2px 0}
@@ -742,16 +766,16 @@ function dayBox(dd,inner){
   var don=rowsAll.filter(jGrad);
   var jrowHtml=function(o){
     var e0=o.L[0], j=JM[o.n];
-    var todayKinds=o.L.map(function(x){return x.kind+(x.time?' '+x.time:'')+(x.st==='done'?'✓':'');}).join(' · ');
+    var todo=o.L.map(function(x){return '<span class="dtodo'+(x.st==='done'?' done':'')+'">'+esc(x.kind)+(x.time?' '+x.time:'')+(x.st==='done'?'✓':'')+'</span>';}).join('');
     var nx=j?j.nextStep:null;
     var note=o.L.map(function(x){return x.note;}).filter(Boolean)[0]||'';
     var stn=STAT[o.n]; if(stn&&stn.note) note=stn.note+(note?' / '+note:'');
     var memo=note&&/(월|예정|시작|형제|병행|이사|재조율|변경)/.test(note)?'<span class="jmemo" title="'+esc(note)+'">✎ '+esc(note.length>22?note.slice(0,22)+'…':note)+'</span>':'';
-    return '<div class="jrow" data-name="'+esc(o.n)+'">'+
+    return '<div class="jrow today" data-name="'+esc(o.n)+'">'+
       '<div class="jr-l"><div class="jr-nm"><b>'+esc(o.n)+'</b>'+(e0.grade?'<span class="jr-g">'+esc(e0.grade)+'</span>':'')+'</div>'+
-      '<div class="jr-meta">'+esc(e0.br||'')+' · '+esc(todayKinds)+'</div></div>'+
-      '<div class="jr-c">'+jbar(j)+'</div>'+
-      '<div class="jr-r">'+(nx?'<div class="jr-next">다음 <b>'+esc(nx)+'</b></div>':'<div class="jr-next done">온보딩 완료</div>')+memo+'</div></div>';
+      '<div class="jr-meta">'+esc(e0.br||'')+(nx?' · 다음 '+esc(nx):'')+'</div></div>'+
+      '<div class="jr-c todo">'+todo+'</div>'+
+      '<div class="jr-r">'+memo+'</div></div>';
   };
   var cards='<div class="lead">진행 중 <b>'+ing.length+'</b>명 · 온보딩 완료 <b>'+don.length+'</b>명</div>'+
     (ing.length?'<div class="jlist">'+ing.map(jrowHtml).join('')+'</div>':'<div class="empty" style="padding:14px">진행 중(다음 단계 남은) 회원이 없습니다.</div>')+
@@ -764,10 +788,10 @@ function dayBox(dd,inner){
       return '<div class="dcard"><div class="dtop"><button data-name="'+esc(e.name)+'" class="dnm">'+esc(e.name)+'</button></div>'+
        '<div class="org">'+esc(e.grade||'')+' · '+orgline(e)+'</div>'+
        '<div class="note'+(note?'':' none')+'">'+(note?hi(note):'상담 특이사항 칸 비어 있음')+'</div></div>';}).join('')+'</div>':'';
-  if(inner) return (cards?'<div class="lead">온보딩 '+names.length+'명 · '+E.length+'건 — 각 회원의 <b>다음에 할 단계</b>로 묶었습니다.</div><div class="drow">'+cards+'</div>':'<div class="empty">이 날짜에 잡힌 온보딩 일정이 없습니다.</div>')+njb;
+  if(inner) return (cards?'<div class="lead">온보딩 '+names.length+'명 · '+E.length+'건 — 오늘 잡힌 일정입니다. 회원별 여정은 위 <b>신규 회원 여정</b>에서.</div><div class="drow">'+cards+'</div>':'<div class="empty">이 날짜에 잡힌 온보딩 일정이 없습니다.</div>')+njb;
   return zone('day','var(--v1)',(d===TODAY?'오늘 하는 일':md(d)+'('+dw(d)+') 일정'),names.length+'명 · '+E.length+'건',
    '단계별 · 사람 단위',
-   seg+'<div class="lead">각 회원의 <b>다음에 할 단계</b>로 묶었습니다. 카드에 소속·가입일·담당·사정이 함께 있습니다.</div>'+
+   seg+'<div class="lead">오늘 잡힌 일정입니다. 회원별 여정은 위 <b>신규 회원 여정</b>에서. 카드에 소속·가입일·담당·사정이 함께 있습니다.</div>'+
    (function(){
      var dn=E.filter(function(x){return x.st==='done';}).length,
          ms=E.filter(function(x){return x.st==='miss';}).length,
@@ -1327,10 +1351,10 @@ function journeyBox(){
       (i<STEPS.length-1?'<div class="jfs-arw">→</div>':'');
   }).join('')+'</div>';
   // 회원 여정 리스트 (배민식)
-  var NF=window.__jnext||'';   // 특정 단계 대기만 필터
+  var NF=(window.__jnext!==undefined)?window.__jnext:'해피콜';   // 특정 단계 대기만 필터
   var list = NF ? (byNext[NF]||[]) : onb.slice();
   // 정렬: 멈춘 지 오래된 순
-  list.sort(function(a,b){return (b.stuck||0)-(a.stuck||0);});
+  list.sort(function(a,b){return (b.join||'').localeCompare(a.join||'');});
   var stepDot=function(j){
     return '<div class="jbar">'+STEPS.map(function(s,i){
       var st=j.steps[i], cls=st.st==='done'?'d':(i===j.topIdx+1?'nx':(st.st==='plan'?'pl':'')); 
@@ -1405,7 +1429,7 @@ function alertBox(){
   var cur=T.filter(function(t){return t[0]===F;})[0], L=A[F];
   // 민원(mw)은 기간 필터 — 기본 이번주. 오래된 건 '전체' 눌러야 나옴
   var perBar='';
-  if(F==='mw'){
+  if(F==='mw'||F==='dev'){
     var PF=window.__mwper||'w1';
     var days={'w1':7,'w2':14,'m1':30}[PF];
     var full=L.slice();
@@ -1416,7 +1440,7 @@ function alertBox(){
        ['m1','최근 1달',full.filter(function(x){return x.d<=30;}).length],
        ['all','전체',full.length]].map(function(o){
         return '<button class="'+(PF===o[0]?'on':'')+'" data-mwper="'+o[0]+'">'+o[1]+' '+o[2]+'</button>';}).join('')+
-      '</div><div class="lead" style="margin-top:0">접수 후 경과 기준. 오래된 건은 대부분 결론이 났는데 칸만 빈 경우라, 기본은 <b>이번 주</b>만 — 필요하면 기간을 넓히세요.</div>';
+      '</div><div class="lead" style="margin-top:0">경과 기준. 오래된 건은 대부분 처리됐는데 칸만 빈 경우라, 기본은 <b>이번 주</b>만 — 필요하면 기간을 넓히세요.</div>';
   }
   var row=function(x){
     return '<tr'+(x.bad?' class="hot"':'')+'><td style="white-space:nowrap"><b style="font-size:15px;'+(x.bad?'color:var(--red)':'')+'">'+x.d+'</b><span class="org" style="display:inline">'+(cur[3]==='회'?'회':'일')+'</span></td>'+
