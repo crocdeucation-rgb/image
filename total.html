@@ -979,7 +979,11 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
     <div class="gate-foot">문의: 신상준 이사 · crocedu@naver.com</div>
   </div>
 </div>
-<style id="opsnav-mo">@media(max-width:768px){
+<style id="topnav-below">/* 탭바(#opsnav) 아래로 — 겹침 방지 */
+.topnav{top:61px!important}
+body.gate-hasbar .topnav{top:95px!important}
+@media(max-width:768px){.topnav{top:53px!important}body.gate-hasbar .topnav{top:87px!important}}
+</style><style id="opsnav-mo">@media(max-width:768px){
 #opsnav{flex-wrap:nowrap;gap:0;padding:0;padding-top:var(--sat,0px)}
 #opsnav .onav-logo{display:none}
 #opsnav .onav-tabs{flex:1;min-width:0;gap:0;padding:0 4px;scrollbar-width:none}
