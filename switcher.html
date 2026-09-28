@@ -268,19 +268,12 @@ window.sgateLogin=function(){
     }
   });
   function go(btn){
-    // [2026-09] 게이트가 아직 떠있으면(미통과) 무시. 통과했으면 정상 동작.
     var g=document.getElementById('sgate');
     if(g && !g.classList.contains('hidden')) return;
-    document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
-    btn.classList.add('on');
+    var map={total:'total.html',ops:'ops_dashboard_firestore.html',hire:'hire.html',hr:'hr.html',web:'dashboard.html',ssamida:'ssamida.html'};
     var t=btn.dataset.t;
-    _curTab=t; var _cb=document.getElementById('cyBadge'); if(_cb) _cb.classList.remove('on');  // 탭 이동 시 숨김, total 재로드 후 다시 표시
-    if(_ro){ try{_ro.disconnect();}catch(e){} _ro=null; }
-    if(t==='ops'){ location.href='ops_dashboard_firestore.html'; return; }
-    var fr=document.getElementById('frame');
-    if(fr && FRAMES[t]){ fr.style.height=FRAMES[t].h+'px'; fr.src=FRAMES[t].src; }
-    document.title=btn.textContent.trim()+' · 아라온 그로스';  // 탭별 제목
-  }
+    if(map[t]) location.href=map[t];
+  }}
   window.addEventListener('load', function(){ setTimeout(fitHeight,500); });
 </script>
 </body>
