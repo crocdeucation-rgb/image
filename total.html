@@ -3221,9 +3221,11 @@ async function fdLoadLedger(){
   //     order 매출이 실제 있는 마지막 날만 기준일로 삼는다. 없으면 0(라벨 미표시).
   var _now=new Date(); var _todayKey=_now.getFullYear()*10000+(_now.getMonth()+1)*100+_now.getDate();
   window.__ledgerMax=dedup.reduce(function(mx,r){
-    // 실제 order 매출이 있는 행만 기준일 후보 (결보·빈행은 제외)
-    var hasOrder=(r.state==='order' && r.sales>0);
-    return (hasOrder && r.key<=_todayKey && r.key>mx)?r.key:mx;
+    // [2026-09 수정] 원장에 실제 기록이 있는 마지막 날 = 반영일.
+    //   order 매출뿐 아니라 결보·취소 등 상태가 찍힌 행도 그날 반영된 것.
+    //   (결보만 있는 9/27이 24로 후퇴하던 버그) 상태값이 있고 미래가 아닌 행이면 후보.
+    var hasRec=(r.state && String(r.state).trim()!=='');
+    return (hasRec && r.key<=_todayKey && r.key>mx)?r.key:mx;
   },0);
   // 폴백 제거: __ledgerMax가 0이면 라벨 쪽에서 미표시 처리 (오늘 날짜로 위장 금지)
   return dedup;
