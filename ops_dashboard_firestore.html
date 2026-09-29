@@ -346,7 +346,7 @@ details[open]>.more::before{content:'▾ '}
 .jfs:hover{border-color:#C5D0FA;box-shadow:0 2px 10px rgba(76,110,245,.1)}
 .jfs.haswait{border-color:#F3C6BE;background:#FFFBFA}
 .jfs-h{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
-.jfs-h b{font-size:13.5px;font-weight:800}
+.jfs-h b{font-size:13.5px;font-weight:800;white-space:nowrap}
 .jfs-w{font-size:11px;font-weight:800;color:var(--red);background:var(--reds);padding:1px 7px;border-radius:5px;white-space:nowrap}
 .jfs-bar{height:5px;background:#EEF1F6;border-radius:3px;overflow:hidden;margin:7px 0 5px}
 .jfs-bar i{display:block;height:100%;background:var(--v1);border-radius:3px}
@@ -1699,10 +1699,12 @@ function alertSummary(){
   // 만료 이번주(w0)
   var expW0=0;
   Object.keys(CO).forEach(function(k){CO[k].live.forEach(function(m){ if(m.wk==='w0'&&!m.can&&inBr(m)) expW0++; });});
+  // 민원 미결: 접수 7~21일 골든존만 (7일미만=처리중, 21일+=방치·칸빔이라 경고 아님)
+  var mwActive=A.mw.filter(function(x){return x.d>=7&&x.d<=21;});
   var tiles=[
     {k:'onb', anch:'alert', label:'온보딩 멈춤', n:A.onb.length, hot:A.onb.filter(function(x){return x.bad;}).length, hotL:'불참', desc:'가입 후 첫수업 못 감'},
     {k:'call',anch:'alert', label:'연락 두절', n:A.call.length, hot:A.call.filter(function(x){return x.bad;}).length, hotL:'3회+', desc:'코칭 부재 연속'},
-    {k:'mw',  anch:'alert', label:'민원 미결', n:A.mw.length, hot:A.mw.filter(function(x){return x.bad;}).length, hotL:'21일+', desc:'접수 후 결론 없음'},
+    {k:'mw',  anch:'alert', label:'민원 미결', n:mwActive.length, hot:mwActive.filter(function(x){return x.d>=14;}).length, hotL:'14일+', desc:'접수 후 결론 없음'},
     {k:'exp', anch:'exp',   label:'이번주 만료', n:expW0, hot:0, hotL:'', desc:'사전 안내 필요'}
   ];
   var totHot=tiles.reduce(function(a,t){return a+t.hot;},0);
