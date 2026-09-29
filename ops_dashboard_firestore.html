@@ -805,6 +805,64 @@ details.cgrp[open]{padding-bottom:4px}
   .zb>.lead{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;line-height:1.5;margin-bottom:10px}
 }
 /* ⚠️ 지금 확인 — 경고 요약 4타일 */
+/* ═══ 처리목록 (지금 처리할 것) ═══ */
+.todobox{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 16px 14px;margin-bottom:16px;box-shadow:0 2px 10px rgba(30,40,60,.04)}
+.tb-head{font-size:16px;font-weight:900;color:var(--ink);display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.tb-badge{font-size:11px;font-weight:800;color:#fff;background:var(--red);border-radius:20px;padding:2px 10px}
+.tb-sub{font-size:11.5px;font-weight:600;color:var(--mute);margin-left:auto}
+/* 요약 타일 */
+.ttiles{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:16px}
+.ttile{border:1px solid var(--line);border-radius:12px;padding:11px 8px 10px;background:#FAFBFD;cursor:pointer;text-align:center;font:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;transition:.12s}
+.ttile:hover{border-color:#C5D0FA;box-shadow:0 3px 12px rgba(76,110,245,.12);transform:translateY(-1px)}
+.ttile.hot{border-color:#F3C6BE;background:#FFF7F5}
+.ttile.z{opacity:.45}
+.tt-ic{font-size:16px;line-height:1}
+.tt-n{font-size:26px;font-weight:900;color:var(--ink);line-height:1.05}
+.ttile.hot .tt-n{color:var(--red)}
+.tt-l{font-size:11.5px;font-weight:800;color:var(--soft)}
+.tt-d{font-size:10px;font-weight:600;color:var(--mute);line-height:1.2}
+/* 목록 블록 */
+.tlists{display:flex;flex-direction:column;gap:12px}
+.tl{border:1px solid var(--line);border-radius:13px;padding:12px 13px;background:#FCFDFF}
+.tl.empty-tl{background:#fff;opacity:.7}
+.tl-h{display:flex;align-items:center;gap:7px;margin-bottom:10px;font-weight:800}
+.tl-ic{font-size:15px}
+.tl-t{font-size:13.5px;color:var(--ink)}
+.tl-n{font-size:12px;font-weight:900;color:#fff;background:var(--soft);border-radius:20px;padding:1px 9px;min-width:22px;text-align:center}
+.tl-n.z{background:var(--mute);opacity:.6}
+.tl-d{font-size:11px;font-weight:600;color:var(--mute);margin-left:2px}
+.tl-empty{font-size:12px;color:var(--mute);padding:2px 2px 4px}
+.tl-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
+/* 접기형 */
+.tl-fold>summary{list-style:none;cursor:pointer;margin-bottom:0}
+.tl-fold>summary::-webkit-details-marker{display:none}
+.tl-foldh::after{content:'▸';margin-left:auto;color:var(--mute);font-size:14px}
+.tl-fold[open]>.tl-foldh::after{content:'▾'}
+.tl-fold[open]>.tl-foldh{margin-bottom:10px}
+/* 건별 카드 */
+.tcard{border:1px solid var(--line);border-radius:10px;padding:9px 11px;background:#fff;cursor:pointer;text-align:left;font:inherit;display:flex;flex-direction:column;gap:4px;transition:.1s}
+.tcard:hover{border-color:#C5D0FA;box-shadow:0 2px 8px rgba(76,110,245,.1)}
+.tc-top{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.tc-nm{font-size:13.5px;font-weight:800;color:var(--ink)}
+.tc-nm small{font-size:11px;font-weight:700;color:var(--soft)}
+.tc-time{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tb-dday{font-size:12px;font-weight:900;color:var(--amber);background:var(--ambers);border-radius:6px;padding:1px 8px}
+.tb-dday.hot{color:#fff;background:var(--red)}
+.tb-t{font-size:11.5px;font-weight:700;color:var(--soft)}
+.tb-t2{font-size:11px;font-weight:600;color:var(--mute)}
+.tc-meta{font-size:11.5px;font-weight:600;color:var(--soft)}
+.tc-why{font-size:12px;color:var(--ink);background:#F6F8FC;border-radius:7px;padding:5px 8px;line-height:1.4;font-weight:500}
+.tb-res{font-size:11px;font-weight:800;color:var(--soft);background:#EEF1F6;border-radius:5px;padding:1px 7px}
+.tb-bd{font-size:10.5px;font-weight:800;border-radius:5px;padding:1px 7px}
+.tb-bd.tb-red{color:var(--red);background:var(--reds)}
+.tb-bd.tb-amber{color:var(--amber);background:var(--ambers)}
+.tb-bd.tb-gray{color:var(--soft);background:#EEF1F6}
+@media(max-width:768px){
+  .ttiles{grid-template-columns:repeat(4,1fr)}
+  .tt-n{font-size:22px}
+  .tl-cards{grid-template-columns:1fr}
+  .tb-sub{width:100%;margin-left:0;margin-top:2px}
+}
 .warnbox{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px 16px;margin-bottom:16px;box-shadow:0 2px 10px rgba(30,40,60,.04)}
 .warnbox-h{font-size:15px;font-weight:900;color:var(--ink);display:flex;align-items:center;gap:8px;margin-bottom:12px}
 .warnbox-badge{font-size:11px;font-weight:800;color:#fff;background:var(--red);border-radius:20px;padding:2px 10px;margin-left:auto}
@@ -1716,6 +1774,150 @@ function cleanNm(n){return String(n||'').replace(/\(.*?\)/g,'').replace(/[A-Za-z
 /* 회원명 → 코칭 명단 담당 (민원 시트 관리교사 칸이 비었을 때 폴백) */
 var _COACHOF=(function(){var o={};Object.keys(CO).forEach(function(k){CO[k].live.concat(CO[k].exp).forEach(function(m){if(!o[m.n])o[m.n]=k;});});return o;})();
 function teachName(m){return (m.can&&m.can.teach)||_COACHOF[m.n]||(m.can&&m.can.resp==='당일취소'?'담임 배정 전 (당일취소)':'관리교사 칸 비어 있음');}
+/* ═══════════ 처리목록 (지금 처리할 것) — A 2단계 ═══════════
+   D.todo = {golden,recent,mid,old,expCancel,comply}  (GAS opsBuildInbox_)
+   📅 만료임박(expiring) = coach exp에서 여기서 조립
+   각 건 카드: 회원·학년·관리배지·가입/접수·D-day or 경과·사유원문·지점·상담·담임
+   학년·지점은 민원시트에 없어 coach 데이터에서 이름조인 보강 */
+
+// 회원 이름 → coach 데이터(학년·지점·상담·담임) lookup 인덱스 (1회 생성)
+function todoMemberIndex(){
+  if(window.__tmIdx) return window.__tmIdx;
+  var idx={};
+  function nrm(n){return String(n||'').replace(/\(.*?\)/g,'').replace(/\s/g,'');}
+  Object.keys(CO).forEach(function(c){
+    ['live','exp'].forEach(function(kk){ (CO[c][kk]||[]).forEach(function(m){
+      var k=nrm(m.n); if(!idx[k]) idx[k]={g:m.g||'',br:m.br||'',sang:m.sang||'',coach:c};
+    });});
+  });
+  window.__tmIdx=idx; return idx;
+}
+function todoLook(name){ var i=todoMemberIndex()[String(name||'').replace(/\(.*?\)/g,'').replace(/\s/g,'')]; return i||{g:'',br:'',sang:'',coach:''}; }
+
+// 📅 만료임박 = coach live 중 이번주(w0) 만료, 취소·휴강 제외
+function todoExpiring(){
+  var out=[];
+  Object.keys(CO).forEach(function(c){ (CO[c].live||[]).forEach(function(m){
+    if(m.wk==='w0' && !m.can && !m.hold && inBrM(m)){
+      out.push({name:m.n, grade:m.g||'', exp:m.exp||'', mst:'만료임박', br:m.br||'', sang:m.sang||'', coach:c});
+    }
+  });});
+  return out;
+}
+function inBrM(m){ return !BR || m.br===BR; }
+// 처리목록 각 건 지점필터 (민원건은 lookup 지점)
+function todoInBr(x){ if(!BR) return true; var L=todoLook(x.name); return (L.br===BR)||(x.br===BR); }
+
+// 배지 HTML
+function todoBadges(x){
+  var b=[];
+  if(x.absent) b.push('<span class="tb-bd tb-red">📞 부재</span>');
+  if(x.mst==='만료') b.push('<span class="tb-bd tb-amber">관리만료</span>');
+  if(x.comply===true) b.push('<span class="tb-bd tb-gray">준수기간 채움</span>');
+  if(x.empty) b.push('<span class="tb-bd tb-gray">결과 미기재</span>');
+  return b.join('');
+}
+
+// 한 건 카드
+function todoCard(x, mode){
+  var L=todoLook(x.name);
+  var g = x.grade || L.g || '';
+  var br = L.br || x.br || '';
+  var sang = x.sang || L.sang || '';
+  var coach = x.teach || L.coach || '';
+  var meta=[];
+  if(br) meta.push(esc(br));
+  if(sang) meta.push('상담 '+esc(sang));
+  if(coach) meta.push('담임 '+esc(coach));
+  // 시간 표기: 골든타임=D-day, 만료임박=만료일, 나머지=접수 경과
+  var timeHtml='';
+  if(mode==='golden'){
+    var dd=14-diff(x.join,x.recv);
+    timeHtml='<span class="tb-dday'+(dd<=3?' hot':'')+'">D-'+dd+'</span>';
+  } else if(mode==='expiring'){
+    timeHtml='<span class="tb-t">만료 '+md(x.exp)+'</span>';
+  } else {
+    var age=diff(x.recv,TODAY);
+    timeHtml='<span class="tb-t">접수 '+md(x.recv)+' · '+age+'일 경과</span>';
+  }
+  var joinHtml = x.join?('<span class="tb-t2">가입 '+md(x.join)+'</span>'):'';
+  var why = x.why?('<div class="tb-why">'+esc(x.why)+'</div>'):(x.empty?'':'');
+  var resHtml = x.res?('<span class="tb-res">'+esc(x.res)+'</span>'):'';
+  return '<button class="tcard" data-name="'+esc(x.name)+'">'+
+    '<div class="tc-top"><span class="tc-nm">'+esc(x.name)+(g?' <small>'+esc(g)+'</small>':'')+'</span>'+
+      resHtml+todoBadges(x)+'</div>'+
+    '<div class="tc-time">'+timeHtml+joinHtml+'</div>'+
+    (meta.length?'<div class="tc-meta">'+meta.join(' · ')+'</div>':'')+
+    why+
+  '</button>';
+}
+
+// 목록 블록 (제목+건수+카드들, 접기옵션)
+function todoList(icon, title, arr, mode, desc, foldDefault, anchId){
+  arr=arr.filter(todoInBr);
+  var n=arr.length;
+  var head='<div class="tl-h"><span class="tl-ic">'+icon+'</span><span class="tl-t">'+title+'</span>'+
+    '<span class="tl-n'+(n?'':' z')+'">'+n+'</span>'+(desc?'<span class="tl-d">'+desc+'</span>':'')+'</div>';
+  var idAttr=anchId?(' id="z-'+anchId+'"'):'';
+  if(!n) return '<div class="tl empty-tl"'+idAttr+'>'+head+'<div class="tl-empty">해당 건 없음</div></div>';
+  var cards=arr.map(function(x){return todoCard(x,mode);}).join('');
+  if(foldDefault){
+    return '<details class="tl tl-fold"'+idAttr+'><summary class="tl-h tl-foldh"><span class="tl-ic">'+icon+'</span><span class="tl-t">'+title+'</span><span class="tl-n">'+n+'</span>'+(desc?'<span class="tl-d">'+desc+'</span>':'')+'</summary><div class="tl-cards">'+cards+'</div></details>';
+  }
+  return '<div class="tl"'+idAttr+'>'+head+'<div class="tl-cards">'+cards+'</div></div>';
+}
+
+// 상단 요약 타일 (탭하면 해당 목록으로 스크롤)
+function todoTiles(counts){
+  var T=[
+    {k:'gold', ic:'⚡', lab:'골든타임', n:counts.golden, d:'가입14일내 취소요청', hot:counts.golden>0, anch:'todo-gold'},
+    {k:'rec', ic:'🔴', lab:'최근 민원', n:counts.recent, d:'접수 14일내', hot:counts.recent>0, anch:'todo-rec'},
+    {k:'mid', ic:'🟡', lab:'1달내 민원', n:counts.mid, d:'접수 15~30일', hot:false, anch:'todo-mid'},
+    {k:'exp', ic:'📅', lab:'만료 임박', n:counts.expiring, d:'이번주 관리만료', hot:false, anch:'todo-exp'},
+    {k:'ec', ic:'🔻', lab:'만료후 취소', n:counts.expCancel, d:'미연장 이탈', hot:false, anch:'todo-ec'},
+    {k:'cp', ic:'⚖️', lab:'준수기간 취소', n:counts.comply, d:'절반 채우고 해지', hot:false, anch:'todo-cp'},
+    {k:'old', ic:'🟠', lab:'이전 민원', n:counts.old, d:'접수 30일+', hot:false, anch:'todo-old'}
+  ];
+  return '<div class="ttiles">'+T.map(function(t){
+    var z=t.n===0;
+    return '<button class="ttile'+(z?' z':'')+(t.hot&&!z?' hot':'')+'" data-anch="'+t.anch+'">'+
+      '<span class="tt-ic">'+t.ic+'</span>'+
+      '<span class="tt-n">'+t.n+'</span>'+
+      '<span class="tt-l">'+t.lab+'</span>'+
+      '<span class="tt-d">'+t.d+'</span>'+
+    '</button>';
+  }).join('')+'</div>';
+}
+
+function todoBox(){
+  var TD=D.todo||{}; var exp=todoExpiring();
+  var counts={
+    golden:(TD.golden||[]).filter(todoInBr).length,
+    recent:(TD.recent||[]).filter(todoInBr).length,
+    mid:(TD.mid||[]).filter(todoInBr).length,
+    old:(TD.old||[]).filter(todoInBr).length,
+    expCancel:(TD.expCancel||[]).filter(todoInBr).length,
+    comply:(TD.comply||[]).filter(todoInBr).length,
+    expiring:exp.filter(function(x){return !BR||x.br===BR;}).length
+  };
+  var urgent=counts.golden+counts.recent;
+  // 최우선(골든+최근)은 펼침, 나머지는 접기
+  var body=
+    todoList('⚡','골든타임 — 가입 14일내 취소요청',(TD.golden||[]),'golden','환불·위약금 없이 나감. 빠른 응대',false,'todo-gold')+
+    todoList('🔴','최근 민원 — 접수 14일내',(TD.recent||[]),'recent','',false,'todo-rec')+
+    todoList('🟡','1달내 민원 — 접수 15~30일',(TD.mid||[]),'mid','',true,'todo-mid')+
+    todoList('📅','만료 임박 — 이번주 관리만료',exp,'expiring','연장 안내 대상',true,'todo-exp')+
+    todoList('🔻','만료후 미연장 취소',(TD.expCancel||[]),'expCancel','안내 후 미연장 이탈',true,'todo-ec')+
+    todoList('⚖️','준수기간 취소 — 절반 채우고 해지',(TD.comply||[]),'comply','',true,'todo-cp')+
+    todoList('🟠','이전 민원 — 접수 30일+',(TD.old||[]),'old','오래된 건. 기록만 안 됐을 수도',true,'todo-old');
+  return '<div class="todobox">'+
+    '<div class="tb-head">📋 지금 처리할 것'+(urgent?'<span class="tb-badge">급함 '+urgent+'</span>':'')+
+      '<span class="tb-sub">시간 민감 순 · '+md(DATA)+' 반영</span></div>'+
+    todoTiles(counts)+
+    '<div class="tlists">'+body+'</div>'+
+  '</div>';
+}
+
 /* ⚠️ 지금 확인 — 경고 요약 4타일 (온보딩멈춤·연락두절·민원미결·만료임박). 탭하면 아래 섹션으로 */
 function alertSummary(){
   var A=alertData();
@@ -2568,7 +2770,7 @@ function render(){
              ['분석',[['flow','월별 흐름',flowBox],['funnel','월별 진단',funnelBox],['fill','채워야 할 칸',fillBox],['dev','기기 · 설치 트러블',devBox],['data','데이터 상태',dataBox]]]];
     var anchor='<div class="anch sticky">'+SEC.map(function(g){
         return '<span class="anch-g">'+g[0]+'</span>'+g[1].map(function(z){return '<button data-anch="'+z[0]+'">'+esc(z[1])+'</button>';}).join('');}).join('<span class="anch-sep"></span>')+'</div>';
-    el.innerHTML=alertSummary()+anchor+SEC.map(function(g,gi){
+    el.innerHTML=todoBox()+anchor+SEC.map(function(g,gi){
         var inner=g[1].map(function(z){return z[2]();}).join('');
         // '분석' 묶음(마지막)은 모바일에서 기본 접힘 — 매일 안 보는 것
         if(g[0]==='분석') return '<details class="secfold"><summary class="sech secfold-h">'+g[0]+' <span class="secfold-hint">— 월별 추이·진단·데이터 상태 (탭하여 펼치기)</span></summary>'+inner+'</details>';
