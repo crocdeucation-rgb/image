@@ -469,11 +469,14 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
 @media(max-width:768px){#opsnav{padding:7px 10px;gap:8px}#opsnav .onav-logo{font-size:12.5px}#opsnav .onav-tabs a{padding:7px 13px;font-size:12.5px}}
 
 /* sticky 계층 (iframe 해방 후) */
-:root{--navH:53px;--anchH:76px}
-.anch.sticky{top:var(--navH)!important}
-body.gate-hasbar .anch.sticky{top:calc(34px + var(--navH))}
-.stickysel{top:calc(var(--navH) + var(--anchH))!important}
-body.gate-hasbar .stickysel{top:calc(34px + var(--navH) + var(--anchH))}
+:root{--navH:53px;--anchH:76px;--tabH:52px}
+.anch.sticky{top:calc(var(--navH) + var(--tabH))!important}
+body.gate-hasbar .anch.sticky{top:calc(34px + var(--navH) + var(--tabH))}
+.stickysel{top:calc(var(--navH) + var(--tabH) + var(--anchH))!important}
+body.gate-hasbar .stickysel{top:calc(34px + var(--navH) + var(--tabH) + var(--anchH))}
+/* 코칭·강사 탭엔 앵커바(anch) 없음 → stickysel을 tabbar 바로 밑으로 */
+body.tab-coach .stickysel, body.tab-teach .stickysel{top:calc(var(--navH) + var(--tabH))!important}
+body.gate-hasbar.tab-coach .stickysel, body.gate-hasbar.tab-teach .stickysel{top:calc(34px + var(--navH) + var(--tabH))!important}
 /* 섹션 내부 필터 sticky */
 .zb .seg.stkfilter{position:sticky;top:calc(var(--navH) + var(--anchH));z-index:12;background:var(--pan);padding:8px 0;margin-bottom:10px}
 body.gate-hasbar .zb .seg.stkfilter{top:calc(34px + var(--navH) + var(--anchH))}
@@ -778,13 +781,19 @@ details.cgrp[open]{padding-bottom:4px}
 @media(max-width:768px){
   .tsumfold>summary{display:block}
   .tsumfold:not([open])>*:not(summary){display:none}
+  .tsf-sum{display:flex!important;align-items:center;gap:6px}
+  .tsf-sum::after{content:'▸';margin-left:auto;color:var(--mute)}
+  .tsumfold[open]>.tsf-sum::after{content:'▾'}
 }
 /* 분석 묶음: PC는 항상 펼침, 모바일만 접기 */
 .secfold>summary{list-style:none}
 .secfold>summary::-webkit-details-marker{display:none}
 .secfold-hint{font-size:12px;font-weight:600;color:var(--mute)}
 .secfold>*:not(summary){display:block}
-@media(min-width:769px){ .secfold-h{cursor:default} .secfold-hint{display:none} }
+@media(min-width:769px){
+  .secfold-h{cursor:default} .secfold-hint{display:none}
+  .secfold>*:not(summary){display:block!important}   /* PC는 details 닫혀도 내용 표시 */
+}
 @media(max-width:768px){
   .secfold:not([open])>*:not(summary){display:none}
   .secfold-h{cursor:pointer;display:flex;align-items:center;gap:6px}
@@ -817,6 +826,18 @@ details.cgrp[open]{padding-bottom:4px}
   .wtile{padding:11px 12px}
   .wtile .wt-n{font-size:26px}
 }
+/* 탭+검색 한 줄 sticky (opsnav 바로 밑 고정) */
+.tabbar{position:sticky;top:var(--navH,53px);z-index:100;background:var(--bg);display:flex;align-items:center;gap:12px;padding:8px 0;margin-bottom:10px;border-bottom:1px solid var(--line)}
+body.gate-hasbar .tabbar{top:calc(34px + var(--navH,53px))}
+.tabbar .tabs{margin-bottom:0;flex:none}
+.tabbar .qsearch{margin-left:auto;flex:0 1 280px;min-width:120px;border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 13px;font:inherit;font-size:13px;outline:none}
+.tabbar .qsearch:focus{border-color:var(--v1)}
+@media(max-width:768px){
+  .tabbar{gap:8px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .tabbar::-webkit-scrollbar{display:none}
+  .tabbar .qsearch{flex:0 0 150px}
+}
+.mdswitch{display:none!important}   /* 하단 플로팅 뒤로가기 전역 제거(PC 포함) — 상단 sticky 뒤로가기로 통일 */
 </style></head><body>
 <script>
 /* 운영본부 — Firestore 로더 (gate.js 인증 후 opsData 6문서 읽어 조립)
@@ -891,10 +912,12 @@ details.cgrp[open]{padding-bottom:4px}
 <div class="wrap">
  <div class="top">
    <div class="brand">운영본부<span id="sub"></span></div>
-   
  </div>
- <div class="tabs" id="tabs"></div>
- <div class="fbar"><input id="q" placeholder="회원·담당·강사 이름 검색" autocomplete="off"><div id="brsel" class="chips" style="margin:0"></div></div>
+ <div class="tabbar" id="tabbar">
+   <div class="tabs" id="tabs"></div>
+   <input id="q" class="qsearch" placeholder="🔍 회원·담당·강사 검색" autocomplete="off">
+ </div>
+ <div class="fbar"><div id="brsel" class="chips" style="margin:0"></div></div>
  <div id="qres"></div>
  <div id="app"></div>
 </div>
@@ -2346,7 +2369,7 @@ function teachTab(){
     '<div><div class="l">주간 타임</div><b>'+allT+'</b></div>'+
     '<div class="r"><div class="l">대타 발생</div><b>'+allP+'</b></div>'+
     '<div><div class="l">대타 못 구함</div><b>'+allN+'</b></div></div>'+
-    '<details class="tsumfold"><summary class="jmoreb" style="margin:6px 0 4px;list-style:none">📊 대타 요약 자세히 (최다·사유·대타율·민원) ▾</summary>'+
+    '<details class="tsumfold"><summary class="jmoreb tsf-sum" style="margin:6px 0 4px;list-style:none">📊 대타 요약 자세히 (최다·사유·대타율·민원)</summary>'+
     '<div class="lead" style="margin:2px 0 10px"><b>대타 발생</b> = 담당 강사가 수업을 못 해 대타로 돌린 횟수의 6/1~8/20(약 12주) 누적. 주간 타임(정규 시간표 칸 수)과 분모가 달라 직접 비교하지 말 것 — 아래 표의 <b>주당 대타율</b>이 주간 타임 대비 비율입니다.</div>'+
     '<div class="lead" style="margin:0 0 10px"><b>월별 대타</b> &nbsp;'+((TC.subMonths||[]).map(function(x){return '<b>'+(+x.m.slice(5))+'월 '+x.n+'</b>';}).join(' · ')||'—')+'</div>'+
     '<div class="lead" style="margin-bottom:0">'+
@@ -2524,8 +2547,11 @@ function searchBox(){
     return '<div class="qrow" data-'+o.act+'="'+esc(o.n)+'"><b>'+esc(o.n)+'</b><span>'+esc(o.t)+' · '+esc(o.d)+'</span></div>';
   }).join('')+(out.length>12?'<div class="empty" style="padding:6px">외 '+(out.length-12)+'건</div>':'')+'</div>';
 }
+
 function render(){
   var mon=monday(CUR);
+  document.body.classList.remove('tab-all','tab-coach','tab-teach');
+  document.body.classList.add('tab-'+TAB);
   var BL=(D.branchList||[]);
   document.getElementById('brsel').innerHTML=(TAB==='teach')?'':('<button class="chip'+(BR===''?' on':'')+'" data-br="">전체 지점</button>'+
     BL.map(function(b){return '<button class="chip'+(BR===b?' on':'')+'" data-br="'+esc(b)+'">'+esc(b)+'</button>';}).join(''));
@@ -2608,8 +2634,8 @@ function moPost(){
   var tbs=document.querySelectorAll('#app table.tt'); if(!tbs.length) return;
   var wd=P(TODAY).getDay(), sel=window.__ttd||((wd>=1&&wd<=5)?wd:1);
   tbs.forEach(function(t){
-    // 시간표는 요일 분할 안 하고 주간 전체 표시(가로 스크롤). 강사개인(#z-ttt)·코칭담당(#z-ctt) 모두
-    if(t.closest('#z-ttt')||t.closest('#z-ctt')) return;
+    // 시간표는 요일 분할 안 하고 주간 전체 표시(가로 스크롤). 강사개인·코칭담당·과목별수업표 모두
+    if(t.closest('#z-ttt')||t.closest('#z-ctt')||t.closest('#z-tsj')) return;
     var hr=t.rows[0]; if(!hr) return;
     for(var r=1;r<t.rows.length;r++){var cs=t.rows[r].cells;t.rows[r].classList.add('r');
       for(var i=1;i<cs.length;i++){ if(cs[i].querySelector('.slot')) t.rows[r].classList.add('h'+i); }}
