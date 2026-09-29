@@ -2718,7 +2718,7 @@ function collections_count(arr){
 }
 /* ── 회원 카드 ── */
 function card(name){
-  var E=EV.filter(function(e){return e.name===name;}).sort(function(a,b){return a.day.localeCompare(b.day);});
+  var E=EV.filter(function(e){return e.name===name;}).sort(function(a,b){return (a.day||'').localeCompare(b.day||'');});
   var I=IN.filter(function(i){return i.name===name;});
   var cm=null,coach=null;
   Object.keys(CO).forEach(function(k){
@@ -2733,9 +2733,9 @@ function card(name){
   var his=[];
   if(o.join) his.push([o.join,'가입']);
   E.forEach(function(e){his.push([e.day,e.kind+(e.time?' '+e.time:'')+(e.who?' · '+e.who:'')+(e.st==='miss'?' — 기록 없음':'')]);});
-  I.forEach(function(i){his.push([i.day,i.type+' · '+i.label+(i.note?' — '+i.note:'')]);});
+  I.forEach(function(i){his.push([i.recv||i.day, '민원'+(i.res?' · '+i.res:'')+(i.why?' — '+i.why:'')]);});
   if(cm&&cm.can) his.push([cm.can.d,'취소 · '+(cm.can.kind||'')+' — '+(cm.can.why||'')]);
-  his.sort(function(a,b){return a[0].localeCompare(b[0]);});
+  his.sort(function(a,b){return (a[0]||'').localeCompare(b[0]||'');});
   var notes=[];
   var stn=STAT[name]; if(stn&&stn.note) notes.push(['어드민',stn.note]);
   var sn=E.map(function(e){return e.note;}).filter(Boolean)[0]; if(sn) notes.push(['오티리스트',sn]);
