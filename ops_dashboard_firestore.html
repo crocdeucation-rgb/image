@@ -1476,137 +1476,90 @@ function planBox(){
 }
 
 function canBox(){
-  var L=(D.can2||[]).filter(function(m){return inBr(m);}).map(function(m){return Object.assign({},m);});
-  var COACHOF=_COACHOF, teachOf=teachName;
-  var LC=[];
-  Object.keys(CO).forEach(function(k){CO[k].live.concat(CO[k].exp).forEach(function(m){
-    if(m.can&&m.can.is_calc&&inBr(m)) LC.push(Object.assign({coach:k},m));});});
-  L.sort(function(a,b){return (b.can.d||'').localeCompare(a.can.d||'');});
-  var F=window.__cf||'all';
-  var byc={};L.forEach(function(m){var c=m.can.cat||'미분류';(byc[c]=byc[c]||[]).push(m);});
-  var order=['고객 오해','관리·코칭 품질','수업·효과 불만','학원·대면전환','시간·병행','비용','가정·이사','준수 후 해지','계약철회·변심','학생 의지·거부','보호자 반대','진도 안 맞음','미분류'];
+  // inbox 단일소스 (GAS v2: status·cat·big·resp·tags·comply 부착). 취소 문의 = 민원 전량
+  var IB=(D.inbox||[]).filter(function(m){return inBrC(m);});
+  if(!IB.length) return zone('can','var(--red)','취소 문의','—','민원 시트 기준',
+    '<div class="empty">데이터 없음</div>',true);
+  var COACHOF=_COACHOF;
+  function inBrC(m){ if(!BR)return true; var L=_cLook(m.name); return (L.br===BR)||(m.br===BR); }
+  function _cLook(nm){ return (typeof todoLook==='function')?todoLook(nm):{br:'',g:'',sang:'',coach:''}; }
+  function won_(a){ a=parseInt(String(a||'').replace(/[^0-9]/g,''),10)||0; return a?Math.round(a/10000).toLocaleString('ko-KR')+'만':'—'; }
+  function meta(m){ var L=_cLook(m.name); return {g:m.grade||L.g||'', br:L.br||m.br||'', sang:m.sang||L.sang||'', coach:m.teach||L.coach||COACHOF[m.name]||''}; }
+
+  // ── 1차 축: 결과 상태 (진행중/유지/완결) ──
+  var ST=window.__cst||'완결';   // 기본 완결(분석 핵심)
+  var byStatus={진행중:[],유지:[],완결:[]};
+  IB.forEach(function(m){ if(byStatus[m.status]) byStatus[m.status].push(m); });
+  var statTabs=[['진행중','진행중',byStatus.진행중.length],['유지','유지(방어)',byStatus.유지.length],['완결','완결(해지·당취)',byStatus.완결.length]];
+  var P=byStatus[ST]||[];
+  P.sort(function(a,b){return (b.recv||'').localeCompare(a.recv||'');});
+
+  // ── 2차 필터: 성격태그 ──
+  var TF=window.__ctag||'';   // 청약철회·준수기간·만료후·재이탈·부재
+  var TAGS=['청약철회','준수기간','만료후','재이탈','부재'];
+  var TAGIC={'청약철회':'⚡','준수기간':'⚖️','만료후':'🔻','재이탈':'🔄','부재':'📞'};
+  var tagCnt={}; TAGS.forEach(function(t){tagCnt[t]=P.filter(function(m){return (m.tags||[]).indexOf(t)>=0;}).length;});
+  // ── 3차 필터: 원인 ──
+  var CF=window.__ccat||'';
+  var order=['고객 오해','관리·코칭 품질','수업·효과 불만','학원·대면전환','시간·병행','가정·이사','준수 후 해지','계약철회·변심','학생 의지·거부','진도 안 맞음','보호자 반대','미분류'];
   var CHK=['고객 오해','관리·코칭 품질','수업·효과 불만'];
-  var isChk=function(m){return CHK.indexOf(m.can.cat)>=0;};
-  var R_={'today':'당일취소','after':'민원 후 해지','re':'재이탈'};
-  /* 월 선택 — 민원 시트 월 탭 기준 */
-  var mk=function(m){return m.can.mon?'2026-'+('0'+m.can.mon).slice(-2):(m.can.d||'').slice(0,7);};
-  var MS={};L.forEach(function(m){var k=mk(m);MS[k]=(MS[k]||0)+1;});
-  var months=Object.keys(MS).sort().reverse();
-  var PW=window.__cp; if(!PW||(PW!=='all'&&!MS[PW])) PW=months[0]||'all';
-  var P=L.filter(function(m){return PW==='all'||mk(m)===PW;});
-  var cnt=function(fn){return P.filter(fn).length;};
-  var tabs=[['all','전체',P.length],['chk','점검 필요',cnt(isChk)],['today','당일취소',cnt(function(m){return m.can.resp==='당일취소';})],
-            ['after','민원 후 해지',cnt(function(m){return m.can.resp==='민원 후 해지';})],['re','재이탈',cnt(function(m){return m.can.resp==='재이탈';})]];
-  var monSeg='<div class="seg" style="margin-bottom:10px">'+months.map(function(k){
-      return '<button class="'+(PW===k?'on':'')+'" data-cp="'+k+'">'+(+k.slice(5))+'월 '+MS[k]+'</button>';}).join('')+
-      '<button class="'+(PW==='all'?'on':'')+'" data-cp="all">전체 '+L.length+'</button></div>';
-  var chips='<div class="seg">'+tabs.map(function(t){
-      return '<button class="'+(F===t[0]?'on':'')+'" data-cf="'+t[0]+'">'+t[1]+' '+t[2]+'</button>';}).join('')+'</div>';
-  var pbc={};P.forEach(function(m){var c=m.can.cat||'미분류';pbc[c]=(pbc[c]||0)+1;});
-  var cats='<div class="chips" style="margin-bottom:10px">'+order.filter(function(c){return pbc[c];}).map(function(c){
-      return '<button class="chip'+(F===('c:'+c)?' on':'')+'" data-cf="c:'+esc(c)+'">'+esc(c)+'<span>'+pbc[c]+'</span></button>';}).join('')+'</div>';
-  var S = F==='all'?P
-    : F==='chk'?P.filter(isChk)
-    : R_[F]?P.filter(function(m){return m.can.resp===R_[F];})
-    : P.filter(function(m){return (m.can.cat||'미분류')===F.slice(2);});
-  var won_=function(a){return Math.round(a/10000).toLocaleString('ko-KR')+'만';};
-  var samt=S.reduce(function(a,x){return a+(x.can.amt||0);},0), noAmt=S.filter(function(x){return !x.can.amt;}).length;
-  var CATC={'고객 오해':'red','관리·코칭 품질':'red','수업·효과 불만':'red','학원·대면전환':'amber','시간·병행':'amber','비용':'amber','가정·이사':'amber','준수 후 해지':'pur','계약철회·변심':'pur','학생 의지·거부':'mute','보호자 반대':'mute','진도 안 맞음':'mute','미분류':'mute'};
+  var catCnt={}; order.forEach(function(c){catCnt[c]=P.filter(function(m){return (m.cat||'미분류')===c;}).length;});
+
+  // 필터 적용
+  var S=P.slice();
+  if(TF) S=S.filter(function(m){return (m.tags||[]).indexOf(TF)>=0;});
+  if(CF) S=S.filter(function(m){return (m.cat||'미분류')===CF;});
+
+  // ── UI: 탭·필터칩 ──
+  var statSeg='<div class="seg" style="margin-bottom:10px">'+statTabs.map(function(t){
+    return '<button class="'+(ST===t[0]?'on':'')+'" data-cst="'+t[0]+'">'+t[1]+' '+t[2]+'</button>';}).join('')+'</div>';
+  var tagChips='<div class="chips" style="margin-bottom:8px"><button class="chip'+(TF===''?' on':'')+'" data-ctag="">전체 '+P.length+'</button>'+
+    TAGS.filter(function(t){return tagCnt[t];}).map(function(t){
+      return '<button class="chip'+(TF===t?' on':'')+'" data-ctag="'+t+'">'+TAGIC[t]+' '+t+'<span>'+tagCnt[t]+'</span></button>';}).join('')+'</div>';
+  var catChips=order.filter(function(c){return catCnt[c];}).length?
+    '<div class="chips" style="margin-bottom:10px"><button class="chip'+(CF===''?' on':'')+'" data-ccat="">원인 전체</button>'+
+    order.filter(function(c){return catCnt[c];}).map(function(c){
+      return '<button class="chip'+(CF===c?' on':'')+(CHK.indexOf(c)>=0?' chk':'')+'" data-ccat="'+esc(c)+'">'+esc(c)+'<span>'+catCnt[c]+'</span></button>';}).join('')+'</div>':'';
+
+  // ── 상태별 요약(전체그림) ──
+  var CATC={'고객 오해':'red','관리·코칭 품질':'red','수업·효과 불만':'red','학원·대면전환':'amber','시간·병행':'amber','가정·이사':'amber','준수 후 해지':'pur','계약철회·변심':'pur','학생 의지·거부':'mute','진도 안 맞음':'mute','보호자 반대':'mute','미분류':'mute'};
+  var chkN=P.filter(function(m){return CHK.indexOf(m.cat)>=0;}).length;
+  var lead=ST==='진행중'?'취소 문의 왔으나 아직 결론 안 남 — 지금 붙잡을 수 있는 것':
+           ST==='유지'?'취소 문의 왔으나 막아낸 것 — 방어 성공 사례':
+           '취소 확정(해지·당취) — 왜 못 막았나 분석. 점검 필요(우리쪽) '+chkN+'건';
+
+  // ── 카드 ──
   var RESPC={'당일취소':'red','민원 후 해지':'amber','재이탈':'red'};
-  var catsum=F==='all'?'<div class="grp">분류별 요약 — '+(PW==='all'?'전체':(+PW.slice(5))+'월')+'</div><div class="scrollx"><table class="tbl"><thead><tr><th>분류</th><th class="c">건수</th><th class="c">비중</th><th class="c">금액</th><th class="c">당일취소</th><th class="c">재이탈</th><th class="c">학습기간 중앙</th></tr></thead><tbody>'+
-    order.filter(function(c){return pbc[c];}).map(function(c){
-      var G=P.filter(function(m){return (m.can.cat||'미분류')===c;}), a=G.reduce(function(x,y){return x+(y.can.amt||0);},0);
-      var td=G.filter(function(m){return m.can.resp==='당일취소';}).length, re=G.filter(function(m){return m.can.resp==='재이탈';}).length;
-      var tn=G.map(function(m){return m.ten;}).filter(function(x){return x>=0;}).sort(function(a2,b2){return a2-b2;});
-      var med=tn.length?tn[Math.floor(tn.length/2)]:null;
-      return '<tr'+(CHK.indexOf(c)>=0?' class="hot"':'')+'><td><b>'+esc(c)+'</b></td>'+
-       '<td class="c"><b>'+G.length+'</b></td><td class="c z">'+Math.round(G.length/P.length*1000)/10+'%</td>'+
-       '<td class="c">'+won_(a)+'</td><td class="c">'+(td||'<span class="z">·</span>')+'</td><td class="c">'+(re||'<span class="z">·</span>')+'</td>'+
-       '<td class="c">'+(med!==null?med+'일':'<span class="z">—</span>')+'</td></tr>';}).join('')+
-    '</tbody></table></div>':'';
-  var canCard=function(m){
-    var c=m.can, cat=c.cat||'미분류', cc=CATC[cat]||'mute';
-    var calcTag=c.is_calc?'<span class="cb pur">계약변경·위험유지</span>':'';
-    var respTag=(!c.is_calc&&c.resp)?'<span class="cb '+(RESPC[c.resp]||'mute')+'">'+c.resp+'</span>':'';
-    var endTxt=c.is_calc?'취소':(c.kind==='당일취소'?'당일취소':'해지');
+  var card=function(m){
+    var M=meta(m), cat=m.cat||'미분류', cc=CATC[cat]||'mute';
+    var tagBadges=(m.tags||[]).map(function(t){return '<span class="cb '+(t==='청약철회'?'red':t==='준수기간'?'pur':t==='만료후'?'amber':'mute')+'">'+TAGIC[t]+' '+t+'</span>';}).join('');
+    var respTag=m.resp?'<span class="cb '+(RESPC[m.resp]||'mute')+'">'+m.resp+'</span>':'';
     var flow='<span class="cf j">가입 '+(m.join?md(m.join):'—')+'</span>'+
-      (c.resp==='재이탈'&&m.mw?'<span class="cf a">민원 '+md(m.mw.d)+' · 유지</span>':'')+
-      (c.is_calc&&m.mw?'<span class="cf a">민원 '+md(m.mw.d)+(m.mw.res?' · '+esc(m.mw.res):'')+'</span>':'')+
-      '<span class="cf r">'+(c.is_calc?'':'접수 ')+md(c.d)+' '+endTxt+'</span>';
-    var badges=calcTag+respTag+'<span class="cb '+cc+'">'+esc(cat)+'</span>'+(c.noRes?'<span class="cb mute">결과 칸 비어 있음</span>':'');
-    var why=c.why?hi(c.why):'<span class="z">사유 칸 비어 있음</span>';
-    var nt=(c.note&&c.note!==c.why)?'<span class="z"> · 특이사항 </span>'+hi(c.note):'';
-    var pre=(c.resp==='재이탈'&&m.mw&&m.mw.why)?'<span class="z"> · 첫 민원 당시 </span>'+hi(m.mw.why):'';
-    return '<div class="ccard'+(c.resp==='당일취소'?' hot':'')+'">'+
-      '<div class="cc1"><button class="nmbtn" data-name="'+esc(m.n)+'">'+esc(m.n)+'</button><span class="z">'+esc(m.g||'')+'</span>'+
-        '<b class="camt"'+(c.amtSrc==='취소입력'?' title="민원 시트에 금액 없어 취소입력 금액"':'')+'>'+(c.amt?won_(c.amt)+(c.amtSrc==='취소입력'?'<sup style="color:#9AA6B8">*</sup>':''):'—')+'</b></div>'+
-      '<div class="org cc2"><b>'+esc(m.br||'지점 미확인')+'</b> · 상담 '+esc(m.sang||'—')+' · 방문 '+esc(m.saup||'—')+' · 담임 '+esc(c.teach||COACHOF[m.n]||m.coach||'미기재')+(m.ten>=0?' · <b>학습기간 '+m.ten+'일</b>':'')+'</div>'+
+      '<span class="cf r">접수 '+(m.recv?md(m.recv):'—')+(m.status==='완결'?' · '+(m.res||'해지'):m.status==='유지'?' · 유지':' · 진행중')+'</span>'+
+      (m.use!=null&&m.tot?'<span class="cf a">사용 '+m.use+'/총'+m.tot+(m.comply?' · 준수채움':'')+'</span>':'');
+    var why=m.why?hi(m.why):'<span class="z">사유 칸 비어 있음</span>';
+    var badges=respTag+'<span class="cb '+cc+'">'+esc(cat)+'</span>'+tagBadges;
+    return '<div class="ccard'+(m.resp==='당일취소'?' hot':'')+'">'+
+      '<div class="cc1"><button class="nmbtn" data-name="'+esc(m.name)+'">'+esc(m.name)+'</button><span class="z">'+esc(M.g)+'</span>'+
+        (m.amt?'<b class="camt">'+won_(m.amt)+'</b>':'')+'</div>'+
+      '<div class="org cc2"><b>'+esc(M.br||'지점 미확인')+'</b> · 상담 '+esc(M.sang||'—')+' · 담임 '+esc(M.coach||'미기재')+'</div>'+
       '<div class="cbs">'+badges+'</div>'+
       '<div class="cflow">'+flow+'</div>'+
-      '<div class="cwhy">'+why+nt+pre+'</div></div>';};
-  var GV=window.__cg||'coach';
+      '<div class="cwhy">'+why+'</div></div>';
+  };
+
+  // ── 담당별 그룹(완결·유지) or 접수순(진행중) ──
+  var body='';
   var cLim=window.__canmore?9999:24, cShown=S.slice(0,cLim), cMore=S.length-cShown.length;
-  var flat='<div class="cgrid">'+cShown.map(canCard).join('')+'</div>'+
-    (cMore>0?'<button class="jmoreb" data-canmore="1">외 '+cMore+'건 더 보기 ▾ (월·분류로 좁힐 수도 있어요)</button>':'')+
+  body='<div class="grp" style="margin:6px 0 8px">'+lead+' · <b>'+S.length+'건</b></div>'+
+    '<div class="cgrid">'+cShown.map(card).join('')+'</div>'+
+    (cMore>0?'<button class="jmoreb" data-canmore="1">외 '+cMore+'건 더 보기 ▾</button>':'')+
     (window.__canmore&&S.length>24?'<button class="jmoreb" data-canmore="0">접기 ▴</button>':'');
-  // ── 취소 명단 행 (다량 데이터 표준: 한 줄 스캔, 클릭 시 회원 팝업) ──
-  var canRow=function(m){
-    var c=m.can, cat=c.cat||'미분류', cc=CATC[cat]||'mute';
-    var resp=(!c.is_calc&&c.resp)?'<span class="b '+(RESPC[c.resp]||'mute')+'">'+c.resp+'</span>':'';
-    var bdg=resp+'<span class="b '+cc+'">'+esc(cat)+'</span>';
-    var won=c.amt?won_(c.amt):'금액 없음';
-    var why=c.why?esc(c.why):(c.note?esc(c.note):'<span class="z">사유 칸 비어 있음</span>');
-    var hot=(c.resp==='당일취소');
-    return '<div class="crow'+(hot?' hot':'')+'" data-name="'+esc(m.n)+'">'+
-      '<div class="cnm">'+esc(m.n)+'<span class="yr">'+esc(m.g||'')+'</span></div>'+
-      '<div class="camt'+(c.amt?'':' z')+'">'+won+'</div>'+
-      '<div class="cbdg">'+bdg+'</div>'+
-      '<div class="cwhy1">'+why+'</div></div>';
-  };
-  var grouped=function(keyf){
-    var G={};S.forEach(function(m){var k=keyf(m)||'미확인';(G[k]=G[k]||[]).push(m);});
-    var ks=Object.keys(G).sort(function(a,b){return G[b].length-G[a].length;});
-    var maxN=ks.length?G[ks[0]].length:1;   // 최다 그룹 = 막대 100%
-    var chead='<div class="chead"><div>회원</div><div>금액</div><div>분류</div><div>사유</div></div>';
-    return '<div class="cgT">'+ks.map(function(k){
-      var Q=G[k], oa=Q.filter(isChk).length;
-      var td=Q.filter(function(m){return m.can.resp==='당일취소';}).length,
-          mw=Q.filter(function(m){return m.can.resp==='민원 후 해지';}).length,
-          re=Q.filter(function(m){return m.can.resp==='재이탈';}).length;
-      var a=Q.reduce(function(x,y){return x+(y.can.amt||0);},0);
-      var tn=Q.map(function(m){return m.ten;}).filter(function(x){return x>=0;}).sort(function(a2,b2){return a2-b2;});
-      var med=tn.length?tn[Math.floor(tn.length/2)]:null;
-      var sp='';
-      if(oa) sp+='<span class="p chk">점검 필요 '+oa+'</span>';
-      if(td) sp+='<span class="p red">당일취소 '+td+'</span>';
-      if(mw) sp+='<span class="p amber">민원 후 '+mw+'</span>';
-      if(re) sp+='<span class="p red">재이탈 '+re+'</span>';
-      // 큰 그룹(담임 배정 전 등 12건+)은 기본 접기, 나머지는 펼침
-      // 기본 접힘 — 명단 나열 대신 요약 줄만. 점검 필요(우리 잘못) 있는 그룹만 펼쳐 강조
-      var opened = oa>0;
-      return '<details'+(opened?' open':'')+'><summary><span class="gname">'+esc(k)+'</span>'+
-        '<span class="gbar"><i style="width:'+Math.round(Q.length/maxN*100)+'%"></i></span>'+
-        '<span class="gmeta">'+Q.length+'건 · '+won_(a)+(med!==null?' · 학습기간중앙 '+med+'일':'')+'</span>'+
-        '<span class="gsp">'+sp+'</span></summary>'+chead+Q.map(canRow).join('')+'</details>';
-    }).join('')+'</div>';
-  };
-  var toggle='<div class="seg" style="margin-bottom:12px">'+
-    [['coach','코칭 담당별'],['saup','방문사업부별'],['br','지점별'],['flat','시간순']]
-    .map(function(x){return '<button class="'+(GV===x[0]?'on':'')+'" data-cg="'+x[0]+'">'+x[1]+'</button>';}).join('')+'</div>';
-  var body=S.length?toggle+(
-     GV==='flat'?flat
-     :GV==='saup'?grouped(function(m){return m.saup;})
-     :GV==='br'?grouped(function(m){return m.br;})
-     :grouped(function(m){return teachOf(m);})
-   ):'<div class="empty">해당하는 건이 없습니다.</div>';
-  var calcBanner='';
-  var tot=L.reduce(function(a,x){return a+(x.can.amt||0);},0);
-  return zone('can','var(--red)','취소',L.length+'건',
-   '민원 시트 기준 · 결과 해지 + 당일취소 · 월 탭 1·5~9월',
-   '<div class="lead">운영본부 <b>민원 시트</b>가 기준입니다. 결과 칸이 <b>해지</b>이거나 당취 표시된 건을 취소로 셉니다(1월 탭은 게시판접수). 같은 회원이 여러 번 접수되면 마지막 해지 1건. 2~4월은 탭이 없어 비어 있습니다. '+
-   '금액은 민원 시트 순취소액, 비어 있으면 취소입력 금액(<sup>*</sup>) — 그래도 없는 '+L.filter(function(x){return !x.can.amt;}).length+'건은 —.</div>'+
-   calcBanner+monSeg+chips+cats+
-   '<div class="lead">선택 '+S.length+'건 · '+won_(samt)+(noAmt?' (금액 없음 '+noAmt+'건)':'')+' · 한 장이 회원 한 명</div>'+body+catsum,true);
+
+  return zone('can','var(--red)','취소 문의',byStatus.진행중.length+'진행 · '+byStatus.유지.length+'유지 · '+byStatus.완결.length+'완결',
+    '민원 시트 = 취소하겠다고 온 것 전부. 결과 상태로 나눠 분석',
+    '<div class="lead">민원 시트에 올라온 건 모두 <b>취소 문의</b>입니다. 막아냈으면 유지, 못 막았으면 완결, 아직이면 진행중. 성격·원인으로 좁혀 보세요.</div>'+
+    statSeg+tagChips+catChips+body, true);
 }
 function devBox(){
   var L=(D.device||[]).filter(inBr);
@@ -2851,6 +2804,9 @@ document.addEventListener('click',function(e){
   else if(b.dataset.ew){window.__ew=b.dataset.ew;render();}
   else if(b.dataset.cew){window.__cew=b.dataset.cew;render();}
   else if(b.dataset.cf){window.__cf=b.dataset.cf;render();}
+  else if(b.dataset.cst){window.__cst=b.dataset.cst;window.__ctag="";window.__ccat="";window.__canmore=false;render();}
+  else if(b.dataset.ctag!==undefined){window.__ctag=b.dataset.ctag;render();}
+  else if(b.dataset.ccat!==undefined){window.__ccat=b.dataset.ccat;render();}
   else if(b.dataset.gm){window.__gm=b.dataset.gm;render();}
   else if(b.dataset.fm){window.__fm=b.dataset.fm;render();}
   else if(b.dataset.cg){window.__cg=b.dataset.cg;render();}
