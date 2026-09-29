@@ -28,6 +28,14 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',-apple-syste
 .nav em{font-style:normal;font-size:12px;color:var(--v1);font-weight:700}
 .zone{margin-bottom:12px;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
 .zh{display:flex;align-items:center;gap:9px;padding:13px 17px;border-bottom:1px solid var(--line);cursor:pointer}
+
+/* 섹션 헤더 우측 슬롯 (주간 이동 등) */
+.zh-right{margin-left:auto;display:flex;align-items:center;gap:2px}
+.wknav{display:flex;align-items:center;gap:6px}
+.wkbtn{width:30px;height:30px;border:1px solid var(--line);background:#fff;border-radius:8px;font-size:17px;font-weight:700;color:var(--soft);cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0;transition:.1s}
+.wkbtn:hover{border-color:var(--v1);color:var(--v1);background:var(--v1s)}
+.wklab{font-size:12.5px;font-weight:800;color:var(--ink);white-space:nowrap;min-width:96px;text-align:center}
+@media(max-width:768px){.wklab{font-size:11.5px;min-width:auto}.wkbtn{width:28px;height:28px;font-size:15px}.zh-right{gap:1px}}
 .zh .ar{font-size:11px;color:var(--mute);width:11px}
 .zh i{width:8px;height:8px;border-radius:50%;flex:none}
 .zh h2{font-size:15px;font-weight:800}
@@ -1017,10 +1025,10 @@ function md2(s){return s?s.slice(2,4)+"'"+(+s.slice(5,7))+'/'+(+s.slice(8,10)):'
 function diff(a,b){return Math.round((P(b)-P(a))/864e5);}
 function monday(s){var d=P(s),n=(d.getDay()+6)%7;d.setDate(d.getDate()-n);return F(d);}
 function hi(t){return esc(t).replace(/(취소|해지|부재|미납|올미납|노트북|기기|맥북|설치|변경|보류|불만|환불|휴강|연기|반품|재결제|연장|형제|자매|남매)/g,'<mark>$1</mark>');}
-function zone(id,dot,title,cnt,desc,body,op){
+function zone(id,dot,title,cnt,desc,body,op,right){
   op=OPENZ[id]!==undefined?OPENZ[id]:op;
   return '<div class="zone" id="z-'+id+'"><div class="zh" data-z="'+id+'"><span class="ar">'+(op?'▾':'▸')+'</span>'+(dot?'<i style="background:'+dot+'"></i>':'')+
-   '<h2>'+title+'</h2><span class="n">'+cnt+'</span>'+(desc?'<span class="d">'+desc+'</span>':'')+'</div>'+(op?'<div class="zb">'+body+'</div>':'')+'</div>';
+   '<h2>'+title+'</h2><span class="n">'+cnt+'</span>'+(desc?'<span class="d">'+desc+'</span>':'')+(right?'<div class="zh-right">'+right+'</div>':'')+'</div>'+(op?'<div class="zb">'+body+'</div>':'')+'</div>';
 }
 function inBr(x){return !BR||x.br===BR;}
 function evOf(day){return EV.filter(function(e){return e.day===day&&inBr(e);});}
@@ -1186,8 +1194,11 @@ function weekBox(){
        '<td><span class="tag empty2">칸 없음</span></td>'+
        '<td>'+(m.mw?'<span class="tag '+(rr==='유지'?'ok':(rr==='해지'?'ng':'wait'))+'">'+rr+' '+md(m.mw.d)+'</span>':'<span class="z">—</span>')+'</td>'+
        '<td class="note" style="margin:0">'+(m.note?hi(m.note):'<span class="z">—</span>')+'</td></tr>';}).join('')+'</tbody></table>':'';
+  var wknav='<div class="wknav"><button class="wkbtn" data-mv="-1" title="지난 주">‹</button>'+
+    '<span class="wklab">'+md(mon)+' ~ '+md(add(mon,6))+(monday(TODAY)===mon?' · 이번 주':'')+'</span>'+
+    '<button class="wkbtn" data-mv="1" title="다음 주">›</button></div>';
   return zone('week','var(--v1)','이번 주 · 다음 주',md(mon)+' ~ '+md(add(mon,4)),'주간 일정 → 이번·다음 주 쌓인 일 → 날짜별 상세',
-    '<div class="wknav"><button data-mv="-1">‹ 지난 주</button><b>'+md(mon)+' ~ '+md(add(mon,6))+'</b>'+(monday(TODAY)===mon?'<span class="wknow">이번 주</span>':'')+'<button data-mv="1">다음 주 ›</button></div>'+planBox()+'<div class="grp">'+md(mon)+' 주간 일정</div>'+kpi+(function(){
+    planBox()+'<div class="grp">'+md(mon)+' 주간 일정</div>'+kpi+(function(){
       // 모바일 요일 스트립 (카카오식) — 날짜 탭하면 아래 선택일 상세로
       var strip='<div class="wstrip">'+all7.map(function(dstr){
         var E=evOf(dstr), cnt=E.length, isT=(dstr===TODAY), isSel=(dstr===sel);
@@ -1202,7 +1213,7 @@ function weekBox(){
       return '<div class="wk-pc"><div class="scrollx"><div class="wk" style="grid-template-columns:repeat('+days.length+',minmax(170px,1fr))">'+cols+'</div></div></div>'+
              '<div class="wk-mo">'+strip+'</div>';
     })()+
-    '<div class="sech2">'+md(sel)+' ('+dw(sel)+')'+(sel===TODAY?' · 오늘':(sel===add(TODAY,1)?' · 내일':''))+' 상세</div>'+dayBox(sel,true)+xTbl,true);
+    '<div class="sech2">'+md(sel)+' ('+dw(sel)+')'+(sel===TODAY?' · 오늘':(sel===add(TODAY,1)?' · 내일':''))+' 상세</div>'+dayBox(sel,true)+xTbl,true,wknav);
 }
 
 /* ── 그날의 사건 ── */
@@ -1498,6 +1509,7 @@ function canBox(){
   var TF=window.__ctag||'';   // 청약철회·준수기간·만료후·재이탈·부재
   var TAGS=['청약철회','준수기간','만료후','재이탈','부재'];
   var TAGIC={'청약철회':'⚡','준수기간':'⚖️','만료후':'🔻','재이탈':'🔄','부재':'📞'};
+  var TAGLAB={'청약철회':'청약철회','준수기간':'준수기간 채우고 취소','만료후':'관리기간 만료 후 취소','재이탈':'재이탈','부재':'연락부재'};
   var tagCnt={}; TAGS.forEach(function(t){tagCnt[t]=P.filter(function(m){return (m.tags||[]).indexOf(t)>=0;}).length;});
   // ── 3차 필터: 원인 ──
   var CF=window.__ccat||'';
@@ -1515,7 +1527,7 @@ function canBox(){
     return '<button class="'+(ST===t[0]?'on':'')+'" data-cst="'+t[0]+'">'+t[1]+' '+t[2]+'</button>';}).join('')+'</div>';
   var tagChips='<div class="chips" style="margin-bottom:8px"><button class="chip'+(TF===''?' on':'')+'" data-ctag="">전체 '+P.length+'</button>'+
     TAGS.filter(function(t){return tagCnt[t];}).map(function(t){
-      return '<button class="chip'+(TF===t?' on':'')+'" data-ctag="'+t+'">'+TAGIC[t]+' '+t+'<span>'+tagCnt[t]+'</span></button>';}).join('')+'</div>';
+      return '<button class="chip'+(TF===t?' on':'')+'" data-ctag="'+t+'">'+TAGIC[t]+' '+TAGLAB[t]+'<span>'+tagCnt[t]+'</span></button>';}).join('')+'</div>';
   var catChips=order.filter(function(c){return catCnt[c];}).length?
     '<div class="chips" style="margin-bottom:10px"><button class="chip'+(CF===''?' on':'')+'" data-ccat="">원인 전체</button>'+
     order.filter(function(c){return catCnt[c];}).map(function(c){
@@ -1532,7 +1544,7 @@ function canBox(){
   var RESPC={'당일취소':'red','민원 후 해지':'amber','재이탈':'red'};
   var card=function(m){
     var M=meta(m), cat=m.cat||'미분류', cc=CATC[cat]||'mute';
-    var tagBadges=(m.tags||[]).map(function(t){return '<span class="cb '+(t==='청약철회'?'red':t==='준수기간'?'pur':t==='만료후'?'amber':'mute')+'">'+TAGIC[t]+' '+t+'</span>';}).join('');
+    var tagBadges=(m.tags||[]).map(function(t){return '<span class="cb '+(t==='청약철회'?'red':t==='준수기간'?'pur':t==='만료후'?'amber':'mute')+'">'+TAGIC[t]+' '+TAGLAB[t]+'</span>';}).join('');
     var respTag=m.resp?'<span class="cb '+(RESPC[m.resp]||'mute')+'">'+m.resp+'</span>':'';
     var flow='<span class="cf j">가입 '+(m.join?md(m.join):'—')+'</span>'+
       '<span class="cf r">접수 '+(m.recv?md(m.recv):'—')+(m.status==='완결'?' · '+(m.res||'해지'):m.status==='유지'?' · 유지':' · 진행중')+'</span>'+
@@ -1972,7 +1984,7 @@ function _churnLook(name){
 function churnData(){
   var IB=D.inbox||[], risk=[], fresh=[], seenR={}, seenF={};
   IB.forEach(function(x){
-    if(!x.open) return;                          // 진행중만 (완결=취소섹션)
+    if(x.status!=='진행중') return;              // 진행중만 (완결·유지=취소섹션)
     var L=_churnLook(x.name), br=L.br||x.br||'';
     if(BR && br!==BR) return;                    // 지점필터
     var base={name:x.name, join:x.join, recv:x.recv, why:x.why, res:x.res,
@@ -2781,7 +2793,7 @@ function render(){
     el.innerHTML=anchor+SEC.map(function(g,gi){
         var inner=g[1].map(function(z){return z[2]();}).join('');
         // '분석' 묶음(마지막)은 모바일에서 기본 접힘 — 매일 안 보는 것
-        if(g[0]==='분석') return '<details class="secfold"><summary class="sech secfold-h">'+g[0]+' <span class="secfold-hint">— 월별 추이·진단·데이터 상태 (탭하여 펼치기)</span></summary>'+inner+'</details>';
+        if(g[0]==='분석') return '<details class="secfold"'+(window.innerWidth>768?' open':'')+'><summary class="sech secfold-h">'+g[0]+' <span class="secfold-hint">— 월별 추이·진단·데이터 상태 (탭하여 펼치기)</span></summary>'+inner+'</details>';
         return '<div class="sech">'+g[0]+'</div>'+inner;
       }).join('');
   }
