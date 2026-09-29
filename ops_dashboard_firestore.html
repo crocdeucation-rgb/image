@@ -1997,7 +1997,8 @@ function churnData(){
       if(sj>=0&&sj<=14 && !seenR[x.name]){ seenR[x.name]=1; risk.push(Object.assign({dleft:14-sj},base)); } }
     // 🔴갓취소: 접수 ≤3일 (막 들어옴)
     if(x.recv){ var age=diff(x.recv,TODAY);
-      if(age>=0&&age<=3 && !seenF[x.name]){ seenF[x.name]=1; fresh.push(Object.assign({age:age, isChurn:!!(x.join&&diff(x.join,TODAY)<=14)},base)); } }
+      var isChurn=!!(x.join&&diff(x.join,TODAY)>=0&&diff(x.join,TODAY)<=14);
+      if(age>=0&&age<=3 && !isChurn && !seenF[x.name]){ seenF[x.name]=1; fresh.push(Object.assign({age:age},base)); } }
   });
   risk.sort(function(a,b){return a.dleft-b.dleft;});   // 남은기간 적은순
   fresh.sort(function(a,b){return a.age-b.age;});       // 최근순
