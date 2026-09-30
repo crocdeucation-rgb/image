@@ -616,7 +616,7 @@ body.gate-hasbar{padding-top:calc(34px + var(--sat))}
 /* PC 마스터-디테일: 강사/코칭 상세 열리면 좌우 분할 */
 @media(min-width:769px){
   body.md-teach-open #app, body.md-coach-open #app{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1.35fr);gap:16px;align-items:start}
-  body.md-teach-open .md-master, body.md-coach-open .md-master{position:sticky;top:var(--navH,60px);max-height:calc(100vh - 80px);overflow:auto}
+  body.md-teach-open .md-master, body.md-coach-open .md-master{min-width:0}
   body.md-teach-open .md-detail, body.md-coach-open .md-detail{min-width:0}
   body.md-teach-open .md-master .tbl.tfix.tc th:nth-child(2),body.md-teach-open .md-master .tbl.tfix.tc td:nth-child(2),body.md-teach-open .md-master .tbl.tfix.tc col:nth-child(2),body.md-teach-open .md-master .tbl.tfix.tc th:nth-child(5),body.md-teach-open .md-master .tbl.tfix.tc td:nth-child(5),body.md-teach-open .md-master .tbl.tfix.tc col:nth-child(5),body.md-teach-open .md-master .tbl.tfix.tc th:nth-child(6),body.md-teach-open .md-master .tbl.tfix.tc td:nth-child(6),body.md-teach-open .md-master .tbl.tfix.tc col:nth-child(6),body.md-teach-open .md-master .tbl.tfix.tc th:nth-child(8),body.md-teach-open .md-master .tbl.tfix.tc td:nth-child(8),body.md-teach-open .md-master .tbl.tfix.tc col:nth-child(8){display:none}
   body.md-coach-open #app > .zone:not(.md-master):not(.md-detail){display:none}
@@ -2427,7 +2427,7 @@ function coachTab(){
       '<span>'+CO[n].team+' · '+CO[n].live.length+(s2?' · <b class="exb">만료 안내 '+s2+'</b>':'')+(w2?' · <b class="hot">민원 진행 '+w2+'</b>':'')+'</span></button>';}).join('')+'</div>';
   var kpi=[['관리중',M.length,''],[md(WK)+' 주 코칭',didW+(hasLog?' / '+hasLog:''),didW?'g':''],
            ['이번 주 만료',wkcnt('w0'),wkcnt('w0')?'b':''],['다음 주 만료',wkcnt('w1'),wkcnt('w1')?'b':''],
-           ['민원 진행',mwC(M,'진행'),mwC(M,'진행')?'r':''],['민원 유지(주시)',mwC(M,'유지'),mwC(M,'유지')?'b':''],['민원 해지',mwC(M,'해지'),mwC(M,'해지')?'r':''],['코칭 칸 15일+ 비어 있음',M.filter(function(m){return m.log&&m.log.gap>=15;}).length,''],
+           ['민원 진행',mwC(M,'진행'),mwC(M,'진행')?'r':''],['민원 유지(주시)',mwC(M,'유지'),mwC(M,'유지')?'b':''],['민원 해지',mwC(M,'해지'),mwC(M,'해지')?'r':''],
            ['만료일 미기재',M.filter(function(m){return !m.exp;}).length,''],['관리 종료',E.length,'']];
   var DAYS=['월','화','수','목','금'];
   var slots=[];M.forEach(function(m){if(m.t&&m.dw&&slots.indexOf(m.t)<0)slots.push(m.t);});
@@ -2508,7 +2508,7 @@ function coachTab(){
   });
   var T=sum.reduce(function(a,x){['live','w0','w1','mw','mo','mk','md2','can','noexp','end','gap','nolog'].forEach(function(k){a[k]=(a[k]||0)+x[k];});return a;},{});
   var summary=zone('csum','var(--ink)','담당 전체',names.length+'명','한 줄이 담당 한 명 · 이름을 누르면 아래가 그 담당으로 바뀝니다',
-   '<div class="scrollx"><table class="tbl"><thead><tr><th>담당</th><th>팀</th><th class="c">관리중</th><th class="c">이번 주 만료</th><th class="c">다음 주 만료</th><th class="c">민원 진행</th><th class="c">민원 유지</th><th class="c">민원 해지</th><th class="c">민원율</th><th class="c">취소</th><th class="c">방어율</th><th class="c">주차칸 15일+</th><th class="c">칸 비어 있음</th><th class="c">만료일 미기재</th><th class="c">특이 신호</th><th class="c">기록률</th><th class="c">관리 종료</th></tr></thead><tbody>'+
+   '<div class="scrollx"><table class="tbl"><thead><tr><th>담당</th><th>팀</th><th class="c">관리중</th><th class="c">이번 주 만료</th><th class="c">다음 주 만료</th><th class="c">민원 진행</th><th class="c">민원 유지</th><th class="c">민원 해지</th><th class="c">민원율</th><th class="c">취소</th><th class="c">방어율</th><th class="c">만료일 미기재</th><th class="c">특이 신호</th><th class="c">기록률</th><th class="c">관리 종료</th></tr></thead><tbody>'+
    sum.map(function(x){
      return '<tr'+(x.n===cur?' style="background:#F3F6FD"':'')+'><td><button data-coach="'+esc(x.n)+'" style="border:0;background:none;font:inherit;font-weight:800;cursor:pointer;padding:0'+(x.n===cur?';color:var(--v1)':'')+'">'+esc(x.n)+'</button></td>'+
       '<td class="z">'+x.team+'</td><td class="c"><b>'+x.live+'</b></td>'+
@@ -2520,14 +2520,13 @@ function coachTab(){
       '<td class="c">'+(x.live?'<span'+(x.mw/x.live>=0.18?' style="color:var(--red);font-weight:700"':'')+'>'+Math.round(x.mw/x.live*1000)/10+'%</span>':'<span class="z">—</span>')+'</td>'+
       '<td class="c"'+(x.can?' style="color:var(--red);font-weight:700"':'')+'>'+(x.can||'<span class="z">·</span>')+'</td>'+
       '<td class="c">'+(x.r===null?'<span class="z">—</span>':'<b'+(x.r>=70?' style="color:var(--pos)"':(x.r<=45?' style="color:var(--red)"':''))+'>'+x.r+'%</b>')+'</td>'+
-      '<td class="c"'+(x.gap?' style="color:var(--red);font-weight:800"':'')+'>'+(x.gap||'<span class="z">·</span>')+'</td>'+
-      '<td class="c z">'+(x.nolog||'·')+'</td>'+
+
       '<td class="c">'+(x.noexp||'<span class="z">·</span>')+'</td>'+'<td class="c"'+(x.risk?' style="color:var(--pur);font-weight:700"':'')+'>'+(x.risk||'<span class="z">·</span>')+'</td>'+'<td class="c"><span'+(x.noted/x.live<0.4?' style="color:var(--red)"':'')+'>'+Math.round(x.noted/x.live*100)+'%</span></td>'+'<td class="c z">'+x.end+'</td></tr>';
    }).join('')+
    '<tr style="border-top:2px solid var(--line);font-weight:800"><td>합계</td><td></td><td class="c">'+T.live+'</td>'+
    '<td class="c" style="color:var(--v1)">'+T.w0+'</td><td class="c" style="color:#5C7CFA">'+T.w1+'</td>'+
    '<td class="c" style="color:var(--pur)">'+T.mo+'</td><td class="c" style="color:var(--pos)">'+T.mk+'</td><td class="c" style="color:var(--red)">'+T.md2+'</td>'+
-   '<td class="c">'+(T.live?Math.round(T.mw/T.live*1000)/10+'%':'')+'</td><td class="c">'+T.can+'</td><td></td><td class="c">'+T.gap+'</td><td class="c">'+T.nolog+'</td><td class="c">'+T.noexp+'</td><td class="c">'+T.end+'</td></tr>'+
+   '<td class="c">'+(T.live?Math.round(T.mw/T.live*1000)/10+'%':'')+'</td><td class="c">'+T.can+'</td><td></td><td class="c">'+T.noexp+'</td><td class="c">'+T.end+'</td></tr>'+
    '</tbody></table></div>',true);
   return '<div class="md-master"><div class="chips stickysel" style="margin-bottom:10px">'+chips.replace('<div class="chips stickysel">','').replace('<div class="chips">','').replace('</div>','')+'</div>'+
    '<details style="margin-bottom:12px"'+(cur?'':' open')+'><summary class="jmoreb" style="list-style:none">담당 전체표 '+names.length+'명 보기 ▾</summary><div style="margin-top:8px">'+summary+'</div></details>'+
