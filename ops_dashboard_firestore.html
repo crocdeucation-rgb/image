@@ -1403,7 +1403,7 @@ function expBox(){
       var stt=m.can?'<span class="tag ng">'+(m.can.is_calc?'계약변경':'취소')+'</span>':(m.mw?'<span class="tag wait">민원</span>':'<span class="z">—</span>');
       return '<tr'+(sel==='w0'?' class="hot"':'')+'><td style="white-space:nowrap;font-weight:800">'+md(m.exp)+' <span class="dpn">D-'+dd+'</span></td>'+
        '<td><button data-name="'+esc(m.n)+'" style="border:0;background:none;font:inherit;font-weight:800;cursor:pointer;padding:0">'+esc(m.n)+'</button>'+
-       '<div class="org">'+esc(m.g||'')+' · '+esc(m.br||'지점 미확인')+'</div></td>'+
+       '<div class="org">'+esc(m.g||'')+' · '+esc(m.br||'지점 미확인')+(m.sang?' · 상담 '+esc(m.sang):'')+(m.saup?' · 사업 '+esc(m.saup):'')+'</div></td>'+
        '<td style="white-space:nowrap">'+esc(m.coach)+' <span class="z">'+m.team+'</span></td>'+
        '<td style="white-space:nowrap">'+(m.dw?esc(m.dw)+' '+esc(m.t||''):'<span class="z">—</span>')+'</td>'+
        '<td><span class="tag empty2">칸 없음</span></td><td>'+stt+'</td>'+
