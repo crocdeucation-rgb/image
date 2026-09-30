@@ -613,6 +613,16 @@ body.gate-hasbar{padding-top:calc(34px + var(--sat))}
 
 /* ── 코칭/강사 마스터-디테일 (모바일 전용 전환) ── */
 .md-detail .mdbar{display:none}
+/* PC 마스터-디테일: 강사/코칭 상세 열리면 좌우 분할 */
+@media(min-width:769px){
+  body.md-teach-open #app, body.md-coach-open #app{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1.35fr);gap:16px;align-items:start}
+  body.md-teach-open .md-master, body.md-coach-open .md-master{position:sticky;top:var(--navH,60px);max-height:calc(100vh - 80px);overflow:auto}
+  body.md-teach-open .md-detail, body.md-coach-open .md-detail{min-width:0}
+  body.md-coach-open #app > .zone:not(.md-master):not(.md-detail){display:none}
+  body.md-teach-open .md-detail .mdbar, body.md-coach-open .md-detail .mdbar{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  body.md-teach-open .md-detail .mdbar button, body.md-coach-open .md-detail .mdbar button{border:0;background:var(--v1);color:#fff;font:inherit;font-weight:800;font-size:13px;border-radius:20px;padding:7px 14px;display:inline-flex;align-items:center;gap:4px;cursor:pointer}
+  body.md-teach-open .md-detail .mdbar b, body.md-coach-open .md-detail .mdbar b{font-size:15px}
+}
 @media(max-width:768px){
   /* 코칭 탭 */
   body.md-coach-open .md-master{display:none}
@@ -2848,9 +2858,9 @@ document.addEventListener('click',function(e){
   else if(b.dataset.g){window.__g=b.dataset.g;OPENZ={};render();window.scrollTo(0,0);}
   else if(b.dataset.anch!==undefined){var t=document.getElementById('z-'+b.dataset.anch);
     if(t) window.scrollTo({top:t.getBoundingClientRect().top+window.scrollY-64,behavior:'smooth'});}
-  else if(b.dataset.coach){window.__c=b.dataset.coach;CTAB='live';window.__cOpen=1;render();syncMDClass();}
+  else if(b.dataset.coach){TAB='coach';window.__c=b.dataset.coach;CTAB='live';window.__cOpen=1;render();syncMDClass();window.scrollTo(0,0);}
   else if(b.dataset.mdback!==undefined){window.__cOpen=0;window.__tOpen=0;render();syncMDClass();}
-  else if(b.dataset.teach){window.__tOpen=1;setTimeout(syncMDClass,0);window.__t=b.dataset.teach;render();}
+  else if(b.dataset.teach){TAB='teach';window.__tOpen=1;setTimeout(syncMDClass,0);window.__t=b.dataset.teach;render();window.scrollTo(0,0);}
   else if(b.dataset.tsj){window.__tsj=b.dataset.tsj;window.__t=null;render();}
   else if(b.dataset.br!==undefined&&b.classList.contains('chip')){BR=b.dataset.br;render();}
   else if(b.dataset.ctab){CTAB=b.dataset.ctab;render();}
