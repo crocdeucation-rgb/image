@@ -2511,6 +2511,7 @@ function coachTab(){
       w0:L.filter(function(m){return m.wk==='w0';}).length,
       w1:L.filter(function(m){return m.wk==='w1';}).length,
       mw:L.filter(function(m){return m.mw;}).length,mo:mwC(L,'진행'),mk:mwC(L,'유지'),md2:mwC(L,'해지'),
+      keep:st.keep,drop:st.drop,
       gap:L.filter(function(m){return m.log&&m.log.gap>=15;}).length,
       nolog:L.filter(function(m){return !m.log;}).length,
       can:L.filter(function(m){return m.can;}).length,
@@ -2519,7 +2520,7 @@ function coachTab(){
       noted:L.filter(function(m){return String(m.note||'').trim();}).length,
       risk:L.filter(function(m){return ['ADHD','adhd','자폐','정신과','뚜렛','틱장애','우울','불안','상담치료','상담 치료','메니에르','거부','예민','산만','하기싫','하기 싫','무례','거짓말'].some(function(k){return String(m.note||'').indexOf(k)>=0;});}).length};
   });
-  var T=sum.reduce(function(a,x){['live','w0','w1','mw','mo','mk','md2','can','noexp','end','gap','nolog'].forEach(function(k){a[k]=(a[k]||0)+x[k];});return a;},{});
+  var T=sum.reduce(function(a,x){['live','w0','w1','mw','mo','mk','md2','keep','drop','can','noexp','end','gap','nolog'].forEach(function(k){a[k]=(a[k]||0)+x[k];});return a;},{});
   var summary=zone('csum','var(--ink)','담당 전체',names.length+'명','한 줄이 담당 한 명 · 이름을 누르면 아래가 그 담당으로 바뀝니다',
    '<div class="scrollx"><table class="tbl"><thead><tr><th>담당</th><th>팀</th><th class="c">관리중</th><th class="c">이번 주 만료</th><th class="c">다음 주 만료</th><th class="c">민원 진행</th><th class="c">민원 유지</th><th class="c">민원 해지</th><th class="c">민원율</th><th class="c">취소</th><th class="c">방어율</th><th class="c">만료일 미기재</th><th class="c">특이 신호</th><th class="c">기록률</th><th class="c">관리 종료</th></tr></thead><tbody>'+
    sum.map(function(x){
@@ -2544,7 +2545,7 @@ function coachTab(){
   // 전체 코칭 현황 요약 KPI (전 담당 종합, 항상 상단)
   // 코칭 현황 요약 (A안: 측정 가능한 것만 · 순위/평가 아닌 상태 파악)
   var _top=function(key,n){return sum.slice().filter(function(x){return x[key]>0;}).sort(function(a,b){return b[key]-a[key];}).slice(0,n||5);};
-  var _defRate=(T.mk+T.md2)?Math.round(T.mk/(T.mk+T.md2)*1000)/10:null;
+  var _defRate=(T.keep+T.drop)?Math.round(T.keep/(T.keep+T.drop)*1000)/10:null;  // 담당별 표와 동일 기준(당일취소 제외)
   var chead='<div class="kpi">'+
     '<div><div class="l">코칭 담당</div><b>'+names.length+'</b></div>'+
     '<div><div class="l">전체 관리중</div><b>'+T.live+'</b></div>'+
@@ -2557,7 +2558,7 @@ function coachTab(){
     '<div class="lead" style="margin:0 0 8px"><b>민원 접수가 많은 담당</b> '+(_top('mw').map(function(x){return esc(x.n)+' '+x.mw+' <span class="z">('+(x.live?Math.round(x.mw/x.live*1000)/10:0)+'%)</span>';}).join(' · ')||'—')+' <span class="z">(접수÷관리중)</span></div>'+
     '<div class="lead" style="margin:0 0 8px"><b>관리 부담 — 특이신호</b> '+(_top('risk').map(function(x){return esc(x.n)+' '+x.risk;}).join(' · ')||'—')+' <span class="z">(특이사항에 적힌 것만)</span></div>'+
     '<div class="lead" style="margin:0 0 8px"><b>관리 부담 — 만료 임박</b> '+(_top('w0').map(function(x){return esc(x.n)+' '+x.w0;}).join(' · ')||'—')+'</div>'+
-    '<div class="lead" style="margin:0"><b>방어 결과</b> 유지 '+T.mk+' · 해지 '+T.md2+' → 전체 방어율 '+(_defRate!=null?_defRate+'%':'—')+' <span class="z">(유지÷(유지+해지) · 방어는 상담팀 담당)</span></div>'+
+    '<div class="lead" style="margin:0"><b>방어 결과</b> 유지 '+T.keep+' · 해지 '+T.drop+' → 전체 방어율 '+(_defRate!=null?_defRate+'%':'—')+' <span class="z">(유지÷(유지+해지) · 당일취소 제외 · 방어는 상담팀 담당)</span></div>'+
     '</details>';
   // 담당 미선택 = 전체 현황요약 + 전체표. 이름 클릭하면 좌우분할로.
   if(!cur) return chead+summary;
