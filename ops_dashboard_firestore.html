@@ -2829,7 +2829,7 @@ document.addEventListener('click',function(e){
   if(c&&(e.target.classList.contains('ov')||e.target.closest('.cls'))){CARD=null;render();if(window.__cardScrollY!=null){window.scrollTo(0,window.__cardScrollY);}return;}
   var b=e.target.closest('button,[data-z],.qrow,[data-bsel2],[data-jnext],[data-jmore],[data-expmore],[data-canmore],[data-mwper],[data-name]');
   if(!b) return;
-  if(b.dataset.tab){TAB=b.dataset.tab;OPENZ={};render();window.scrollTo(0,0);}
+  if(b.dataset.tab){TAB=b.dataset.tab;OPENZ={};window.__tOpen=0;window.__cOpen=0;syncMDClass();render();window.scrollTo(0,0);}
   else if(b.dataset.mv){CUR=add(CUR,7*(+b.dataset.mv));SEL=null;render();}
   else if(b.dataset.go){SEL=b.dataset.go;render();}
   else if(b.dataset.miss){MISS=b.dataset.miss;render();}
