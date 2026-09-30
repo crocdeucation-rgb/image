@@ -2531,10 +2531,28 @@ function coachTab(){
    '<td class="c" style="color:var(--pur)">'+T.mo+'</td><td class="c" style="color:var(--pos)">'+T.mk+'</td><td class="c" style="color:var(--red)">'+T.md2+'</td>'+
    '<td class="c">'+(T.live?Math.round(T.mw/T.live*1000)/10+'%':'')+'</td><td class="c">'+T.can+'</td><td></td><td class="c">'+T.noexp+'</td><td class="c">'+T.end+'</td></tr>'+
    '</tbody></table></div>',true);
-  // 담당 미선택 = 전체표(명단)만. 이름 클릭하면 좌우분할로.
-  if(!cur) return summary;
-  // 담당 선택 = 좌우분할: 왼쪽 전체표(마스터) + 오른쪽 상세(디테일)
-  return '<div class="md-master">'+summary+'</div>'+  /* 마스터 = 전체표 */
+  // 전체 코칭 현황 요약 KPI (전 담당 종합, 항상 상단)
+  // 코칭 현황 요약 (A안: 측정 가능한 것만 · 순위/평가 아닌 상태 파악)
+  var _top=function(key,n){return sum.slice().filter(function(x){return x[key]>0;}).sort(function(a,b){return b[key]-a[key];}).slice(0,n||5);};
+  var _defRate=(T.mk+T.md2)?Math.round(T.mk/(T.mk+T.md2)*1000)/10:null;
+  var chead='<div class="kpi">'+
+    '<div><div class="l">코칭 담당</div><b>'+names.length+'</b></div>'+
+    '<div><div class="l">전체 관리중</div><b>'+T.live+'</b></div>'+
+    '<div class="b"><div class="l">이번 주 만료</div><b>'+T.w0+'</b></div>'+
+    '<div'+(T.mo?' class="r"':'')+'><div class="l">민원 진행</div><b>'+T.mo+'</b></div>'+
+    '<div><div class="l">방어율</div><b>'+(_defRate!=null?_defRate+'%':'—')+'</b></div></div>'+
+    '<details class="tsumfold" style="margin-bottom:12px"'+(window.innerWidth>768?' open':'')+'><summary class="jmoreb tsf-sum" style="margin:6px 0 4px;list-style:none">📋 코칭 현황 자세히 (민원 몰림·방어·관리 부담)</summary>'+
+    '<div class="lead" style="margin:2px 0 10px"><b>지금 시트로 볼 수 있는 것만 표시</b> — 담당별 관리 성실도(주간 전화·카톡 체크 여부)는 기록 칸이 없어 측정하지 않습니다. 아래는 순위·평가가 아니라 <b>어디를 봐야 하는지</b>의 신호입니다.</div>'+
+    '<div class="lead" style="margin:0 0 8px"><b>민원 진행이 몰린 담당</b> '+(_top('mo').map(function(x){return esc(x.n)+' '+x.mo;}).join(' · ')||'—')+' <span class="z">(진행 '+T.mo+'건이 어디에)</span></div>'+
+    '<div class="lead" style="margin:0 0 8px"><b>민원 접수가 많은 담당</b> '+(_top('mw').map(function(x){return esc(x.n)+' '+x.mw+' <span class="z">('+(x.live?Math.round(x.mw/x.live*1000)/10:0)+'%)</span>';}).join(' · ')||'—')+' <span class="z">(접수÷관리중 — 많이 받거나 기록을 잘 남긴 것, 좋고 나쁨 아님)</span></div>'+
+    '<div class="lead" style="margin:0 0 8px"><b>관리 부담 — 특이신호</b> '+(_top('risk').map(function(x){return esc(x.n)+' '+x.risk;}).join(' · ')||'—')+' <span class="z">(특이사항에 적힌 것만 · 도움 필요할 수 있는 곳)</span></div>'+
+    '<div class="lead" style="margin:0 0 8px"><b>관리 부담 — 만료 임박</b> '+(_top('w0').map(function(x){return esc(x.n)+' '+x.w0;}).join(' · ')||'—')+' <span class="z">(이번 주 만료 — 연장 안내 대상)</span></div>'+
+    '<div class="lead" style="margin:0"><b>방어 결과</b> 유지 '+T.mk+' · 해지 '+T.md2+' → 전체 방어율 '+(_defRate!=null?_defRate+'%':'—')+' <span class="z">(넘어온 민원의 유지÷(유지+해지) · 방어는 별도 상담팀 담당)</span></div>'+
+    '</details>';
+  // 담당 미선택 = 전체 요약 + 전체표. 이름 클릭하면 좌우분할로.
+  if(!cur) return chead+summary;
+  // 담당 선택 = 전체 요약 위에 + 좌우분할(왼쪽 전체표 마스터 + 오른쪽 상세)
+  return chead+'<div class="md-master">'+summary+'</div>'+  /* 마스터 = 전체표 */
    '<div class="md-detail"><div class="mdbar"><button data-mdback>‹ 담당 목록</button><b>'+esc(cur)+'</b></div>'+
    '<div class="kpi">'+kpi.map(function(x){return '<div class="'+x[2]+'"><div class="l">'+x[0]+'</div><b>'+x[1]+'</b></div>';}).join('')+'</div>'+
    (function(){
