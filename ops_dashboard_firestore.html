@@ -190,7 +190,10 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',-apple-syste
 .fbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
 .fbar input{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 13px;font:inherit;font-size:13px;width:240px;outline:none}
 .fbar input:focus{border-color:var(--v1)}
-.qcard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:12px}
+.qwrap{position:relative;margin-left:auto;flex:0 1 280px;min-width:120px}
+.qwrap .qsearch{width:100%;margin-left:0}
+#qres{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:300}
+.qcard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;box-shadow:0 8px 28px rgba(20,30,60,.16)}
 .qrow{display:flex;gap:10px;align-items:baseline;padding:6px 0;border-top:1px solid #F3F5F9;cursor:pointer}
 .qrow:first-child{border-top:0}
 .qrow b{font-size:13px}
@@ -1005,10 +1008,9 @@ body.gate-hasbar .tabbar{top:calc(34px + var(--navH,53px))}
  </div>
  <div class="tabbar" id="tabbar">
    <div class="tabs" id="tabs"></div>
-   <input id="q" class="qsearch" placeholder="🔍 회원·담당·강사 검색" autocomplete="off">
+   <div class="qwrap"><input id="q" class="qsearch" placeholder="🔍 회원·담당·강사 검색" autocomplete="off"><div id="qres"></div></div>
  </div>
  <div class="fbar"><div id="brsel" class="chips" style="margin:0"></div></div>
- <div id="qres"></div>
  <div id="app"></div>
 </div>
 <div id="ovl"></div>
