@@ -1497,7 +1497,7 @@ function planBox(){
       line('온보딩 일정',r.obn,top(r.ob),'week')+
       line('관리 만료 도래',r.ex,r.ex?'담당 '+top(r.exBy):'','exp')+
       (i?'' : line('민원 접수',openMw,'결과(유지/해지) 전인 접수','miss')+
-              line('확인 필요',A.call.length+A.dev.length+A.mw.length,'코칭 부재 '+A.call.length+' · 기기 '+A.dev.length+' · 민원 '+A.mw.length,'alert')+
+
               line('재배정 대기',A.orphan.filter(function(x){return x.bad;}).length,'담임이 현직 명단에 없는 회원','alert'))+
     '</div>';};
   return '<div class="pgrid">'+card(0,monday(TODAY)===mon?'이번 주':md(mon)+' 주')+card(1,monday(TODAY)===mon?'다음 주':md(add(mon,7))+' 주')+'</div>';
@@ -1590,8 +1590,13 @@ function canBox(){
     '<div class="lead">민원 시트에 올라온 건 모두 <b>취소 문의</b>입니다. 막아냈으면 유지, 못 막았으면 완결, 아직이면 진행중. 성격·원인으로 좁혀 보세요.</div>'+
     statSeg+tagChips+catChips+body, true);
 }
+function _devIssue(x){
+  // 기기 "문제"가 확실한 표현만 (단순 설치완료·발송·체크 제외)
+  var nt=String(x.note||'')+' '+String(x.kind||'');
+  return /미구매|안\s?옴|미도착|늦게\s?도착|늦|지연|연기|고장|오류|안\s?됨|안\s?보|불가|반품|재구매|수리|교체|파손|먹통|미개통|개통\s?안|초기\s?세팅\s?x|세팅\s?안|로그인\s?문제|프로그램\s?문제|캠.*문제|노트북.*(구매|문제|없|오면)/i.test(nt);
+}
 function devBox(){
-  var L=(D.device||[]).filter(inBr);
+  var L=(D.device||[]).filter(inBr).filter(_devIssue);
   if(!L.length) return '';
   var F=window.__df||'all';
   var by={};L.forEach(function(x){(by[x.side]=by[x.side]||[]).push(x);});
@@ -1908,7 +1913,7 @@ function todoBox(){
   var urgent=counts.golden+counts.recent;
   // 최우선(골든+최근)은 펼침, 나머지는 접기
   var body=
-    todoList('⚡','골든타임 — 가입 14일내 취소요청',(TD.golden||[]),'golden','환불·위약금 없이 나감. 빠른 응대',false,'todo-gold')+
+    todoList('⚡','가입 14일내 취소 문의',(TD.golden||[]),'golden','',false,'todo-gold')+
     todoList('🔴','최근 민원 — 접수 14일내',(TD.recent||[]),'recent','',false,'todo-rec')+
     todoList('🟡','1달내 민원 — 접수 15~30일',(TD.mid||[]),'mid','',true,'todo-mid')+
     todoList('📅','만료 임박 — 이번주 관리만료',exp,'expiring','연장 안내 대상',true,'todo-exp')+
@@ -1981,6 +1986,11 @@ function alertData(){
   (D.device||[]).slice().sort(function(a,b){return a.d<b.d?-1:1;}).forEach(function(x){
     if(!inBr(x)||seen[x.n]||x.d>TODAY||CAN[x.n]) return;
     if(EV.some(function(e){return e.name===x.n&&e.kind==='첫수업'&&e.st==='done';})) return;
+    // 기기 "문제"가 확실한 표현이 있을 때만 남김 (화이트리스트).
+    //   설치완료·시간표발송·연결체크 등 문제 아닌 건 자동 제외.
+    var _nt=String(x.note||'')+' '+String(x.kind||'');
+    var _hasIssue=/미구매|안\s?옴|미도착|늦게\s?도착|늦|지연|연기|고장|오류|안\s?됨|안\s?보|불가|반품|재구매|수리|교체|파손|먹통|미개통|개통\s?안|프로그램\s?문제|캠.*문제|노트북.*(구매|문제|없)/i.test(_nt);
+    if(!_hasIssue) return;
     var dd=diff(x.d,TODAY); if(dd<7) return; seen[x.n]=1;
     A.dev.push({dt:x.d,n:x.n,d:dd,br:x.br,sang:x.sang,saup:x.saup,sub:x.side,st:x.kind+' '+md(x.d),bad:dd>=21,note:x.note||''});
   });
@@ -2040,7 +2050,7 @@ function churnBar(){
   }
   var blocks='';
   if(C.risk.length) blocks+='<div class="cbblk cbblk-risk"><div class="cb-h">⚡ 청약철회 위험 <b>'+C.risk.length+'</b>'+
-    '<span class="cb-d">가입 14일내 · 지금 응대하면 환불·위약금 없이 막을 시간</span></div>'+
+    '<span class="cb-d">가입 14일내 취소 문의</span></div>'+
     '<div class="cb-list">'+C.risk.map(function(x){return chip(x,'risk');}).join('')+'</div></div>';
   if(C.fresh.length) blocks+='<div class="cbblk cbblk-fresh"><div class="cb-h">🔴 갓 들어온 취소문의 <b>'+C.fresh.length+'</b>'+
     '<span class="cb-d">접수 3일내 · 아직 안 식음, 지금이 붙잡을 골든타임</span></div>'+
@@ -2826,7 +2836,7 @@ function render(){
     return '<button class="'+(TAB===t[0]?'on':'')+'" data-tab="'+t[0]+'">'+t[1]+'</button>';}).join('');
   var el=document.getElementById('app');
   if(TAB==='all'){
-    var SEC=[['지금 할 일',[['journey','신규 회원 여정',journeyBox],['week','이번 주 · 다음 주',weekBox],['alert','확인 필요',alertBox]]],
+    var SEC=[['지금 할 일',[['journey','신규 회원 여정',journeyBox],['week','이번 주 · 다음 주',weekBox]]],
              ['관리 현황',[['exp','관리기간 만료 예정',expBox],['can','취소',canBox],['guard','민원 방어',guardBox]]],
              ['분석',[['flow','월별 흐름',flowBox],['funnel','월별 진단',funnelBox],['fill','채워야 할 칸',fillBox],['dev','기기 · 설치 트러블',devBox],['data','데이터 상태',dataBox]]]];
     var anchor='<div class="anch sticky">'+SEC.map(function(g){
