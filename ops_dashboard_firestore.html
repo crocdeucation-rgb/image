@@ -2818,7 +2818,7 @@ function render(){
   var BL=(D.branchList||[]);
   document.getElementById('brsel').innerHTML=(TAB==='teach')?'':('<button class="chip'+(BR===''?' on':'')+'" data-br="">전체 지점</button>'+
     BL.map(function(b){return '<button class="chip'+(BR===b?' on':'')+'" data-br="'+esc(b)+'">'+esc(b)+'</button>';}).join(''));
-  document.getElementById('brsel').style.display=(TAB==='teach')?'none':'';
+  document.getElementById('brsel').style.display=(TAB==='teach'||(TAB==='coach'&&window.__cOpen))?'none':'';
   document.getElementById('qres').innerHTML=searchBox();
   document.getElementById('sub').textContent='시트 '+md(DATA)+' 수집분 기준';
   var T=[['all','전체 현황'],['coach','코칭 현황'],['teach','강사 현황']];
