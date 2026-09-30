@@ -620,6 +620,7 @@ body.gate-hasbar{padding-top:calc(34px + var(--sat))}
   body.md-teach-open .md-detail, body.md-coach-open .md-detail{min-width:0}
   body.md-teach-open .md-master .tbl.tfix.tc th:nth-child(2),body.md-teach-open .md-master .tbl.tfix.tc td:nth-child(2),body.md-teach-open .md-master .tbl.tfix.tc col:nth-child(2),body.md-teach-open .md-master .tbl.tfix.tc th:nth-child(5),body.md-teach-open .md-master .tbl.tfix.tc td:nth-child(5),body.md-teach-open .md-master .tbl.tfix.tc col:nth-child(5),body.md-teach-open .md-master .tbl.tfix.tc th:nth-child(6),body.md-teach-open .md-master .tbl.tfix.tc td:nth-child(6),body.md-teach-open .md-master .tbl.tfix.tc col:nth-child(6),body.md-teach-open .md-master .tbl.tfix.tc th:nth-child(8),body.md-teach-open .md-master .tbl.tfix.tc td:nth-child(8),body.md-teach-open .md-master .tbl.tfix.tc col:nth-child(8){display:none}
   body.md-coach-open #app > .zone:not(.md-master):not(.md-detail){display:none}
+  body.md-coach-open .md-master .zone#z-csum th:nth-child(2),body.md-coach-open .md-master .zone#z-csum td:nth-child(2),body.md-coach-open .md-master .zone#z-csum th:nth-child(9),body.md-coach-open .md-master .zone#z-csum td:nth-child(9),body.md-coach-open .md-master .zone#z-csum th:nth-child(10),body.md-coach-open .md-master .zone#z-csum td:nth-child(10),body.md-coach-open .md-master .zone#z-csum th:nth-child(11),body.md-coach-open .md-master .zone#z-csum td:nth-child(11),body.md-coach-open .md-master .zone#z-csum th:nth-child(12),body.md-coach-open .md-master .zone#z-csum td:nth-child(12),body.md-coach-open .md-master .zone#z-csum th:nth-child(13),body.md-coach-open .md-master .zone#z-csum td:nth-child(13),body.md-coach-open .md-master .zone#z-csum th:nth-child(14),body.md-coach-open .md-master .zone#z-csum td:nth-child(14),body.md-coach-open .md-master .zone#z-csum th:nth-child(15),body.md-coach-open .md-master .zone#z-csum td:nth-child(15){display:none}
   body.md-teach-open .md-detail .mdbar, body.md-coach-open .md-detail .mdbar{display:flex;align-items:center;gap:10px;margin-bottom:10px}
   body.md-teach-open .md-detail .mdbar button, body.md-coach-open .md-detail .mdbar button{border:0;background:var(--v1);color:#fff;font:inherit;font-weight:800;font-size:13px;border-radius:20px;padding:7px 14px;display:inline-flex;align-items:center;gap:4px;cursor:pointer}
   body.md-teach-open .md-detail .mdbar b, body.md-coach-open .md-detail .mdbar b{font-size:15px}
@@ -2411,8 +2412,10 @@ function coachDist(M){
 
 function coachTab(){
   var names=Object.keys(CO).sort(function(a,b){return CO[b].live.length-CO[a].live.length;});
-  if(!window.__c||!CO[window.__c]) window.__c=names[0];
-  var cur=window.__c, V=CO[cur], M=V.live, E=V.exp;
+  if(window.__c&&!CO[window.__c]) window.__c=null;   // 없는 담당이면 해제(자동선택 안함)
+  var cur=window.__c;                                  // 진짜 선택(null=명단만)
+  var _cc=cur||names[0];                               // 계산용 폴백(에러방지)
+  var V=CO[_cc], M=V.live, E=V.exp;
   var wkcnt=function(w){return M.filter(function(m){return m.wk===w;}).length;};
   var mwN=M.filter(function(m){return m.mw;}).length;
   var mwC=function(L,k){return L.filter(function(m){return m.mw&&mwRes(m)===k;}).length;};
@@ -2528,9 +2531,10 @@ function coachTab(){
    '<td class="c" style="color:var(--pur)">'+T.mo+'</td><td class="c" style="color:var(--pos)">'+T.mk+'</td><td class="c" style="color:var(--red)">'+T.md2+'</td>'+
    '<td class="c">'+(T.live?Math.round(T.mw/T.live*1000)/10+'%':'')+'</td><td class="c">'+T.can+'</td><td></td><td class="c">'+T.noexp+'</td><td class="c">'+T.end+'</td></tr>'+
    '</tbody></table></div>',true);
-  return '<div class="md-master"><div class="chips stickysel" style="margin-bottom:10px">'+chips.replace('<div class="chips stickysel">','').replace('<div class="chips">','').replace('</div>','')+'</div>'+
-   '<details style="margin-bottom:12px"'+(cur?'':' open')+'><summary class="jmoreb" style="list-style:none">담당 전체표 '+names.length+'명 보기 ▾</summary><div style="margin-top:8px">'+summary+'</div></details>'+
-   '</details></div>'+  /* 마스터 끝 */
+  // 담당 미선택 = 전체표(명단)만. 이름 클릭하면 좌우분할로.
+  if(!cur) return summary;
+  // 담당 선택 = 좌우분할: 왼쪽 전체표(마스터) + 오른쪽 상세(디테일)
+  return '<div class="md-master">'+summary+'</div>'+  /* 마스터 = 전체표 */
    '<div class="md-detail"><div class="mdbar"><button data-mdback>‹ 담당 목록</button><b>'+esc(cur)+'</b></div>'+
    '<div class="kpi">'+kpi.map(function(x){return '<div class="'+x[2]+'"><div class="l">'+x[0]+'</div><b>'+x[1]+'</b></div>';}).join('')+'</div>'+
    (function(){
