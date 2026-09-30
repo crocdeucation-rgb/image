@@ -1037,7 +1037,7 @@ function inBr(x){return !BR||x.br===BR;}
 function evOf(day){return EV.filter(function(e){return e.day===day&&inBr(e);});}
 function orgline(e){
   return '<b class="brg">'+esc(e.br||'지점 미확인')+'</b>'+
-   '<br>상담 '+esc(e.sang||'—')+' · 방문 '+esc(e.saup||'—');
+   '<br>상담 '+esc(e.sang||'—')+' · 사업 '+esc(e.saup||'—');
 }
 function org(e){ return '<div class="org">'+orgline(e)+'</div>'; }
 /* ── 사건 한 줄 ── */
@@ -1192,7 +1192,7 @@ function weekBox(){
   var xTbl=X.length?'<div class="grp">'+md(sel)+' 만료 '+X.length+'명 — 사전 안내 대상</div><table class="tbl mrow xd"><thead><tr><th>회원</th><th>소속</th><th>코칭</th><th>사전 안내</th><th>민원</th><th>특이사항</th></tr></thead><tbody>'+
     X.map(function(o){var m=o.m,rr=m.mw?mwRes(m):'';
       return '<tr><td><button class="nmbtn" data-name="'+esc(m.n)+'">'+esc(m.n)+'</button><div class="org">'+esc(m.g||'')+'</div></td>'+
-       '<td><b>'+esc(m.br||'지점 미확인')+'</b><div class="org">상담 '+esc(m.sang||'—')+' · 방문 '+esc(m.saup||'—')+'</div></td>'+
+       '<td><b>'+esc(m.br||'지점 미확인')+'</b><div class="org">상담 '+esc(m.sang||'—')+' · 사업 '+esc(m.saup||'—')+'</div></td>'+
        '<td style="white-space:nowrap">'+esc(o.c)+'<div class="org">'+(m.dw?esc(m.dw)+' '+esc(m.t||''):'요일 칸 비어 있음')+'</div></td>'+
        '<td><span class="tag empty2">칸 없음</span></td>'+
        '<td>'+(m.mw?'<span class="tag '+(rr==='유지'?'ok':(rr==='해지'?'ng':'wait'))+'">'+rr+' '+md(m.mw.d)+'</span>':'<span class="z">—</span>')+'</td>'+
@@ -1337,7 +1337,7 @@ function missBox(){
         return '<tr'+(r.d>=14?' class="hot"':'')+'><td><button data-name="'+esc(r.n)+'" style="border:0;background:none;font:inherit;font-weight:800;cursor:pointer;padding:0">'+esc(r.n)+'</button> <span class="z">'+esc(r.g)+'</span></td>'+
         '<td style="white-space:nowrap">'+(r.join?md(r.join):'<span class="z">—</span>')+'</td>'+
         '<td style="white-space:nowrap;font-weight:800'+(r.d>=14?';color:var(--red)':'')+'">'+(r.d<999?'D+'+r.d:'—')+'</td>'+
-        '<td><b>'+esc(r.br||'—')+'</b><div class="org">상담 '+esc(r.sang||'—')+' · 방문 '+esc(r.saup||'—')+'</div></td></tr>';}).join('')+
+        '<td><b>'+esc(r.br||'—')+'</b><div class="org">상담 '+esc(r.sang||'—')+' · 사업 '+esc(r.saup||'—')+'</div></td></tr>';}).join('')+
       '</tbody></table>'+(rows.length>40?'<div class="empty">외 '+(rows.length-40)+'명</div>':''):'<div class="empty">없습니다.</div>';
   } else if(sel==='코칭 칸 비어 있음'){
     var GL=gapList();
@@ -1347,14 +1347,14 @@ function missBox(){
         '<td style="white-space:nowrap">'+esc(m.coach)+'</td>'+
         '<td style="white-space:nowrap">'+(m.log.last?md(m.log.last):'<span class="z">—</span>')+'</td>'+
         '<td style="white-space:nowrap;font-weight:800'+(m.log.gap>=30?';color:var(--red)':'')+'">'+m.log.gap+'일</td>'+
-        '<td><b>'+esc(m.br||'—')+'</b><div class="org">상담 '+esc(m.sang||'—')+' · 방문 '+esc(m.saup||'—')+'</div></td>'+
+        '<td><b>'+esc(m.br||'—')+'</b><div class="org">상담 '+esc(m.sang||'—')+' · 사업 '+esc(m.saup||'—')+'</div></td>'+
         '<td class="note'+(m.note?'':' none')+'" style="max-width:300px">'+(m.note?hi(m.note):'칸 비어 있음')+'</td></tr>';}).join('')+
       '</tbody></table>'+(GL.length>40?'<div class="empty">외 '+(GL.length-40)+'명</div>':''):'<div class="empty">없습니다.</div>';
   } else if(sel==='민원 결과 미기재'){
     list=openMw.length?'<table class="tbl"><thead><tr><th>회원</th><th>가입</th><th>접수</th><th>경과</th><th>담당</th><th>사유</th></tr></thead><tbody>'+
      openMw.slice(0,40).map(function(i){
       return '<tr'+(diff(i.day,TODAY)>=21?' class="hot"':'')+'><td><button data-name="'+esc(i.name)+'" style="border:0;background:none;font:inherit;font-weight:800;cursor:pointer;padding:0">'+esc(i.name)+'</button>'+
-       '<div class="org"><b>'+esc(i.br||'지점 미확인')+'</b><br>상담 '+esc(i.sang||'—')+' · 방문 '+esc(i.saup||'—')+'</div></td>'+
+       '<div class="org"><b>'+esc(i.br||'지점 미확인')+'</b><br>상담 '+esc(i.sang||'—')+' · 사업 '+esc(i.saup||'—')+'</div></td>'+
        '<td style="white-space:nowrap">'+(i.join?md(i.join):'<span class="z">—</span>')+'</td><td style="white-space:nowrap">'+md(i.day)+'</td><td style="white-space:nowrap;font-weight:800">'+diff(i.day,TODAY)+'일째</td>'+
        '<td class="z" style="white-space:nowrap">'+esc(i.sub||'')+'</td>'+
        '<td class="note'+(i.note?'':' none')+'">'+(i.note?hi(i.note):'사유 칸 비어 있음')+'</td></tr>';}).join('')+
@@ -1589,7 +1589,7 @@ function devBox(){
       var fin=EV.filter(function(e){return e.name===x.n&&e.kind==='첫수업'&&e.st==='done';})[0];
       return '<tr'+(false?' class="hot"':'')+'><td style="white-space:nowrap"><b>'+md(x.d)+'</b><div class="org">'+esc(x.side)+'</div></td>'+
        '<td><button data-name="'+esc(x.n)+'" style="border:0;background:none;font:inherit;font-weight:800;cursor:pointer;padding:0">'+esc(x.n)+'</button></td>'+
-       '<td><b>'+esc(x.br||'—')+'</b><div class="org">상담 '+esc(x.sang||'—')+' · 방문 '+esc(x.saup||'—')+'</div></td>'+
+       '<td><b>'+esc(x.br||'—')+'</b><div class="org">상담 '+esc(x.sang||'—')+' · 사업 '+esc(x.saup||'—')+'</div></td>'+
        '<td class="z" style="white-space:nowrap">'+esc(x.kind)+'</td>'+
        '<td class="note">'+hi(x.note)+
        (fin?'<br><span class="tag ok">해결 — '+md(fin.day)+' 첫수업</span>':'<span class="tag wait" style="margin-left:6px">해결 기록 없음'+(x.d<=TODAY?' · '+diff(x.d,TODAY)+'일':' · 예정 '+md(x.d))+'</span>')+
@@ -1742,7 +1742,7 @@ function byBox(){
       return '<div class="ccard'+(c.resp==='재이탈'?' hot':'')+'">'+
         '<div class="cc1"><button class="nmbtn" data-name="'+esc(m.n)+'">'+esc(m.n)+'</button>'+(m.g?'<span class="gr">'+esc(m.g)+'</span>':'')+
         '<b class="camt">'+(c.amt?won(c.amt):'—')+'</b></div>'+
-        '<div class="org cc2">상담 '+esc(m.sang||'—')+' · 방문 '+esc(m.saup||'—')+' · 담임 '+esc(c.teach||_COACHOF[m.n]||'미기재')+(m.ten>=0?' · 학습기간 '+m.ten+'일':'')+'</div>'+
+        '<div class="org cc2">상담 '+esc(m.sang||'—')+' · 사업 '+esc(m.saup||'—')+' · 담임 '+esc(c.teach||_COACHOF[m.n]||'미기재')+(m.ten>=0?' · 학습기간 '+m.ten+'일':'')+'</div>'+
         '<div class="cbs">'+respTag+'<span class="cb '+cc2+'">'+esc(c.cat||'미분류')+'</span></div>'+
         '<div class="cflow"><span class="cf j">가입 '+(m.join?md(m.join):'—')+'</span><span class="cf r">'+md(c.d)+' '+(c.kind==='당일취소'?'당일취소':'해지')+'</span></div>'+
         '<div class="cwhy">'+(c.why?hi(c.why):'<span class="z">사유 칸 비어 있음</span>')+'</div></div>';
@@ -1813,10 +1813,12 @@ function todoCard(x, mode){
   var g = x.grade || L.g || '';
   var br = L.br || x.br || '';
   var sang = x.sang || L.sang || '';
+  var saup = x.saup || L.saup || '';
   var coach = x.teach || L.coach || '';
   var meta=[];
   if(br) meta.push(esc(br));
   if(sang) meta.push('상담 '+esc(sang));
+  if(saup) meta.push('사업 '+esc(saup));
   if(coach) meta.push('담임 '+esc(coach));
   // 시간 표기: 골든타임=D-day, 만료임박=만료일, 나머지=접수 경과
   var timeHtml='';
@@ -2082,7 +2084,7 @@ function journeyBox(){
     return '<div class="jrow" data-name="'+esc(j.n)+'">'+
       '<div class="jr-l">'+
         '<div class="jr-nm"><b>'+esc(j.n)+'</b>'+(j.g?'<span class="jr-g">'+esc(j.g)+'</span>':'')+'</div>'+
-        '<div class="jr-meta">'+esc(j.br||'지점 미확인')+' · 가입 '+(j.join?md(j.join):'—')+(j.saup?' · 방문 '+esc(j.saup):'')+'</div>'+
+        '<div class="jr-meta">'+esc(j.br||'지점 미확인')+(j.sang?' · 상담 '+esc(j.sang):'')+(j.saup?' · 사업 '+esc(j.saup):'')+' · 가입 '+(j.join?md(j.join):'—')+'</div>'+
       '</div>'+
       '<div class="jr-c">'+stepDot(j)+'</div>'+
       '<div class="jr-r">'+
@@ -2136,7 +2138,7 @@ function alertBox(){
   var row=function(x){
     return '<tr'+(x.bad?' class="hot"':'')+'><td style="white-space:nowrap"><b style="font-size:15px;'+(x.bad?'color:var(--red)':'')+'">'+x.d+'</b><span class="org" style="display:inline">'+(cur[3]==='회'?'회':'일')+'</span></td>'+
      '<td><button data-name="'+esc(x.n)+'" class="nmbtn">'+esc(x.n)+'</button><div class="org">'+esc(x.sub)+'</div></td>'+
-     '<td><b>'+esc(x.br||'지점 미확인')+'</b><div class="org">상담 '+esc(x.sang||'—')+' · 방문 '+esc(x.saup||'—')+'</div></td>'+
+     '<td><b>'+esc(x.br||'지점 미확인')+'</b><div class="org">상담 '+esc(x.sang||'—')+' · 사업 '+esc(x.saup||'—')+'</div></td>'+
      '<td style="white-space:nowrap">'+esc(x.st)+'</td><td class="note" style="margin:0">'+(x.note?hi(x.note):'<span class="z">—</span>')+'</td></tr>';};
   var head='<table class="tbl mrow al"><thead><tr><th>경과</th><th>회원</th><th>소속</th><th>마지막 기록</th><th>원문</th></tr></thead><tbody>';
   var body=L.length?head+L.slice(0,20).map(row).join('')+'</tbody></table>'+
@@ -2455,7 +2457,7 @@ function coachTab(){
        var stt=m.can?'<span class="tag ng">취소</span>':(m.mw?'<button class="tag '+(rr==='유지'?'ok':(rr==='해지'?'ng':'wait'))+'" data-name="'+esc(m.n)+'" style="border:0;cursor:pointer">민원 '+rr+' '+md(m.mw.d)+'</button>':'<span class="z">—</span>');
        return '<tr><td style="white-space:nowrap;font-weight:800">'+md(m.exp)+' <span class="dpn">D-'+dd+'</span></td>'+
         '<td><button data-name="'+esc(m.n)+'" style="border:0;background:none;font:inherit;font-weight:800;cursor:pointer;padding:0">'+esc(m.n)+'</button>'+
-        '<div class="org">'+esc(m.g||'')+' · <b>'+esc(m.br||'지점 미확인')+'</b><br>상담 '+esc(m.sang||'—')+' · 방문 '+esc(m.saup||'—')+'</div></td>'+
+        '<div class="org">'+esc(m.g||'')+' · <b>'+esc(m.br||'지점 미확인')+'</b><br>상담 '+esc(m.sang||'—')+' · 사업 '+esc(m.saup||'—')+'</div></td>'+
         '<td style="white-space:nowrap">'+(m.dw?'<b>'+esc(m.dw)+'</b> '+esc(m.t||''):'<span class="z">—</span>')+'</td>'+
         '<td><span class="tag empty2">칸 없음</span></td><td>'+stt+'</td>'+
         '<td class="note'+(m.note?'':' none')+'" style="max-width:320px">'+(m.note?hi(m.note):'칸 비어 있음')+'</td></tr>';}).join('')+
@@ -2748,7 +2750,7 @@ function card(name){
   return '<div class="ov" data-close="1"><div class="card"><button class="cls" data-close="1">✕</button>'+
    '<h3>'+esc(name)+'</h3>'+
    '<div class="org" style="margin-top:4px"><b>'+esc(o.br||(cm&&cm.br)||'지점 미확인')+'</b> · 상담 '+esc(o.sang||(cm&&cm.sang)||'—')+
-   ' · 방문 '+esc(o.saup||(cm&&cm.saup)||'—')+(coach?' · 코칭 '+esc(coach):'')+
+   ' · 사업 '+esc(o.saup||(cm&&cm.saup)||'—')+(coach?' · 코칭 '+esc(coach):'')+
    (o.join?' · 가입 '+md(o.join)+' (D+'+diff(o.join,CUR)+')':'')+
    (cm&&cm.exp?' · 관리만료 '+md(cm.exp):'')+(cm&&cm.ten>=0?' · 학습기간 '+cm.ten+'일':'')+((cm&&cm.ten>=0&&cm.ten<=30&&!cm.can)?' <span class="tag" style="background:#E7F0FF;color:#1C57C4">신규</span>':'')+'</div>'+
    (cm&&cm.log?'<div class="lead" style="margin:10px 0 0">최근 주차 입력(완료 표기 아님) &nbsp;'+
