@@ -2403,6 +2403,19 @@ _fauth.onAuthStateChanged(function(u){
   if(window.__curBday) renderBdwCard();   // [2026-09] 생일 모달 열려있으면 로그인 상태 즉시 반영
   if(typeof notifStart==='function') notifStart();   // [2026-09] 알림 로드/재시작
   if(typeof profilesStart==='function') profilesStart();   // [2026-09] 프로필 구독(미로그인 실패 대비)
+  // [2026-10-02] 상단 스위처 탭바(opsnav)는 경영진 전용 메뉴 — 상담원에겐 눌러도 막히는 불필요 기능이라 숨김.
+  //   total만 자체 authGate(상담 54명)라 다른 페이지와 달리 이 탭이 상담원에게도 노출됐던 것.
+  (function(){
+    var _on=document.getElementById('opsnav');
+    if(!_on) return;
+    // 경영진(파운더·대표이사·이사)만 탭 노출 — 지점장·부지점장·상담원은 숨김(isBoss보다 좁은 기준)
+    var _R=(window._me&&window._me.rank)||'';
+    var _exec=['파운더','대표이사','이사'].indexOf(_R)>=0;
+    _on.style.display=_exec?'':'none';
+    // opsnav를 숨기면 그 아래로 피해있던 topnav(내카드·알림)가 붕 뜨므로, 상담원일 땐 상단으로 올림.
+    var _tn=document.getElementById('topnav');
+    if(_tn && !_exec){ _tn.style.setProperty('top','14px','important'); }
+  })();
 });
 /* [2026-09] 로그인 게이트 — 33명 통과해야 대시보드 오픈 */
 function gateCheck(u){
@@ -2502,6 +2515,11 @@ function notifRankCheck(myName){
 // 내 소속 지점 찾기 (persons/divpersons의 team)
 function notifMyBranch(name){
   var D=window.__liveD||window.__D||{};
+  // [2026-10-02] 1순위: personCards(과거월 매출만 있어도 team 보유) → 이번달 매출0 소속원도 지점 찾음
+  var pc=D.personCards||{};
+  var pcLists=[pc.sang||[], pc.saup||[]];
+  for(var P=0;P<pcLists.length;P++){ for(var i=0;i<pcLists[P].length;i++){ if(pcLists[P][i].name===name && pcLists[P][i].team) return pcLists[P][i].team; } }
+  // 2순위: persons/divpersons(이번달 실적자)
   var lists=[D.persons||[], D.divpersons||[]];
   for(var L=0;L<lists.length;L++){ for(var i=0;i<lists[L].length;i++){ if(lists[L][i].name===name && lists[L][i].team) return lists[L][i].team; } }
   return '';
