@@ -650,10 +650,11 @@ var webCxaThisMonth = null;   // total JSON의 이번달 웹마 취소(web.cxa).
 var totalDataDate = null;     // total JSON 기준일 (예: 2026-09-15) — "N일까지 반영" 표시용
 async function loadCancel() {
   try {
-    const text = await _fsCsv('execData','dash-cancel');
+    // [2026-10-02] 취소 소스 교체: dash-cancel(4~8월만, 9월 누락) → ledger-2026(원장 전체, total과 동일 소스).
+    //   ledger-2026 컬럼: date(0)|sang(1)|student(2)|sales(3)|saup(4)|gubun(5)|team(6)|grade(7)|cancelAmt(8)|state(9)|nopo(10)
+    //   취소액은 둘 다 index 8로 동일 → 집계 그대로. 상태는 dash-cancel=4 였으나 ledger=9 라 기준일 계산만 r[9]로 변경.
+    const text = await _fsCsv('dashData','ledger-2026');
     const rows = parseCSV(text);
-    // 원장(리드요약_원장) 컬럼: 날짜(0)|시간(1)|이름(2)|학년(3)|타입(4)|매출(5)|담당자(6)|pageId(7)|취소액(8)
-    // 원장 취소액(8)엔 4~8월만 있음(과거월). 이번달 취소는 total JSON(web.cxa)에서 별도 로드.
     cancelData.rows = rows.filter(r => /^\d{4}-\d{2}-\d{2}/.test(String(r[0]||'').trim()) && (parseFloat(r[8])||0) > 0);
     // [2026-09-22] ★ 기준일 = 원장에서 order+매출>0인 최신 날짜를 자체 계산 (total의 __ledgerMax와 동일).
     //   D.date(buildTotalData가 오늘 날짜로 저장 → 하루 밀림 버그)를 믿지 않고 원장 실제 최신일 사용.
@@ -664,7 +665,7 @@ async function loadCancel() {
       rows.forEach(function(r){
         var _ds = String(r[0]||'').trim();
         if (!/^\d{4}-\d{2}-\d{2}/.test(_ds)) return;
-        var _state = String(r[4]||'').trim();
+        var _state = String(r[9]||'').trim();   // [2026-10-02] ledger-2026은 상태(state)가 index 9 (dash-cancel은 4였음)
         // [2026-09 수정] order 매출뿐 아니라 결보·취소 등 상태 찍힌 행도 그날 반영된 것.
         //   (결보만 있는 9/27이 24로 후퇴하던 버그) 상태값 있고 미래 아닌 행이면 후보.
         if (_state === '') return;
