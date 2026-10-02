@@ -169,6 +169,11 @@
   .tname{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:16px;font-weight:800;margin-bottom:3px}
   .tnew{background:#E6F7EE;color:var(--green);font-size:10px;font-weight:800;padding:1px 6px;border-radius:6px}
   .tin{font-size:11px;color:#9AA6B8;font-weight:600;margin-left:auto}
+
+  .tbig{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:2px 0 8px}
+  .tbig-subj{font-size:17px;font-weight:900;color:var(--navy);letter-spacing:-.5px}
+  .tbig-g{font-size:12px;font-weight:800;padding:3px 11px;border-radius:8px;color:#fff}
+  .tbig-g.g초{background:#3B82C4}.tbig-g.g중{background:#2AA37B}.tbig-g.g고{background:#C0662E}
   .tschool{font-size:12px;color:var(--blue);font-weight:700;margin-bottom:6px}
   .tline{font-size:12px;line-height:1.5;color:#4A5568;margin-bottom:3px}
   .tline b{color:#2B4C8C;font-weight:800;margin-right:4px}
@@ -201,6 +206,8 @@
   .tavail .avn{font-size:10px;color:#9AA6B8;font-weight:600}
   .tavail .avv{margin-left:auto;font-weight:900;color:#4C6EF5}
   .tavail .avr.sg .avv{color:#1FA37A}
+  .tavail .avnote{margin-top:9px;padding-top:9px;border-top:1px dashed #D5DDE8;font-size:10.5px;line-height:1.7;color:#8A94A6}
+  .tavail .avnote b{color:#5c6b8a;font-weight:800}
   .tloading{text-align:center;padding:50px 20px;color:var(--gray)}
 
 #opsnav{display:none}
@@ -470,7 +477,8 @@ function tSchedHtml(name){
   var avail='<div class="tavail"><div class="avh">💡 가능 타임 <span class="avs">평일 16시~·주말 10시~ 기준 · 빈 '+(freeH%1?freeH.toFixed(1):freeH)+'시간</span></div>'+
     '<div class="avr"><span class="avk">정규 60분</span><span class="avn">(쉬는 15분 포함)</span><span class="avv">주 '+t60+'타임</span></div>'+
     '<div class="avr"><span class="avk">정규 90분</span><span class="avn">(쉬는 15분 포함)</span><span class="avv">주 '+t90+'타임</span></div>'+
-    '<div class="avr sg"><span class="avk">시강 30분</span><span class="avn">(쉬는 10분 포함)</span><span class="avv">최대 '+tsg+'회</span></div></div>';
+    '<div class="avr sg"><span class="avk">시강 30분</span><span class="avn">(쉬는 10분 포함)</span><span class="avv">최대 '+tsg+'회</span></div>'+
+    '<div class="avnote">※ <b>평일 16시~</b>: 학생이 학교 끝나고 오는 시간 기준 (초·중등 하교 후). 고등은 보통 더 늦음. &nbsp;<b>주말 10시~</b>: 종일 가능. &nbsp;상한은 <b>새벽 1시</b>까지(과외 특성).<br>※ <b>정규 1타임 = 주2회</b>(월·수 등). 아라 수업은 고정이라 찬 시간으로 계산. 수업 없는 평일은 근무일 아님으로 제외.<br>※ 빈 시간 ÷ (수업+쉬는시간)으로 환산한 <b>참고 여력</b> — 실제 배정은 시간대 조정 필요.</div></div>';
 
   return '<div class="tcal-lb">주간 시간표 <span class="tcal-cnt">주 '+evts.length+'교시</span><span class="tcal-leg"><i class="la"></i>아라<i class="ls"></i>쌤이다</span></div>'+
     '<div class="tcal-wrap"><div class="tcal-days">'+dayHead+'</div><div class="tcal-body"><div class="tcal-axis" style="height:'+totalH+'px">'+hourLines+'</div><div class="tcal-grid">'+cols+'</div></div></div>'+avail;
@@ -487,6 +495,9 @@ function tCardHtml(e){
     var tags=[];if(/고/.test(rangeTxt))tags=['초','중','고'];else if(/중/.test(rangeTxt))tags=['초','중'];else if(/초/.test(rangeTxt))tags=['초'];
     var tagHtml=tags.length?('<div class="tsubj-tags">'+tags.map(function(t){return '<span class="tsubj-tag g'+t+'">'+t+'등</span>';}).join('')+'</div>'):'';
     subjHtml='<div class="tsubj"><div class="tsubj-nm">'+subjName+'</div>'+tagHtml+'</div>';
+    // 본문 큰 딱지
+    var bigTags=tags.map(function(t){return '<span class="tbig-g g'+t+'">'+t+'등</span>';}).join('');
+    e._bigSubj='<div class="tbig"><span class="tbig-subj">'+subjName+'</span>'+bigTags+'</div>';
   }
   var photo=purl?'<div class="tphoto"><img src="'+purl+'" onerror="this.parentNode.classList.add(\'noimg\');this.remove();"><span class="tinit">'+e.name.charAt(0)+'</span>'+subjHtml+'</div>'
                 :'<div class="tphoto noimg"><span class="tinit">'+e.name.charAt(0)+'</span>'+subjHtml+'</div>';
@@ -500,7 +511,7 @@ function tCardHtml(e){
     }).join('');
   }
   var isNew=e.isNew?'<span class="tnew">NEW</span>':'';
-  return '<div class="tcard">'+photo+'<div class="tbody"><div class="tname">'+e.name+isNew+'<span class="tin">'+(e.inD||'')+'</span></div>'+school+note+tSchedHtml(e.name)+'</div></div>';
+  return '<div class="tcard">'+photo+'<div class="tbody"><div class="tname">'+e.name+isNew+'<span class="tin">'+(e.inD||'')+'</span></div>'+(e._bigSubj||'')+school+note+tSchedHtml(e.name)+'</div></div>';
 }
 
 async function loadTeachers(){
