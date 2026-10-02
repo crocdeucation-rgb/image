@@ -141,6 +141,63 @@
   .okitem{font-size:12.5px;color:var(--gray);padding:4px 0;display:flex;gap:7px;line-height:1.5}
   .okitem::before{content:'·';color:var(--gray2);font-weight:900}
 
+  /* 쌤이다 탭 */
+  .stab{display:flex;gap:8px;margin:16px 0 4px}
+  .stab button{background:#E7ECF4;border:none;color:var(--gray);font-family:inherit;font-weight:800;font-size:14px;padding:10px 22px;border-radius:30px;cursor:pointer}
+  .stab button.on{background:var(--navy);color:#fff}
+  .tabpane{display:none}
+  .tabpane.on{display:block}
+  /* 강사 카드 */
+  .tgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+  @media(max-width:860px){.tgrid{grid-template-columns:1fr}}
+  .tcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;display:flex;gap:16px}
+  .tphoto{position:relative;width:96px;height:128px;border-radius:14px;overflow:hidden;flex:none;background:linear-gradient(135deg,#E8ECF3,#D5DCE8)}
+  .tphoto img{width:100%;height:100%;object-fit:cover;display:block;position:relative;z-index:1}
+  .tphoto .tinit{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800;color:#9AA6B8;z-index:0}
+  .tphoto.noimg img{display:none}
+  .tsubj{position:absolute;left:0;right:0;bottom:0;z-index:2;background:linear-gradient(to top,rgba(20,28,45,.9),rgba(20,28,45,.5),transparent);color:#fff;padding:14px 5px 6px;text-align:center}
+  .tsubj-nm{font-size:10.5px;font-weight:800;margin-bottom:3px;word-break:keep-all}
+  .tsubj-tags{display:flex;gap:3px;justify-content:center;flex-wrap:wrap}
+  .tsubj-tag{font-size:8px;font-weight:800;padding:1px 5px;border-radius:5px;color:#fff}
+  .tsubj-tag.g초{background:#3B82C4}.tsubj-tag.g중{background:#2AA37B}.tsubj-tag.g고{background:#C0662E}
+  .tbody{flex:1;min-width:0}
+  .tname{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:16px;font-weight:800;margin-bottom:3px}
+  .tnew{background:#E6F7EE;color:var(--green);font-size:10px;font-weight:800;padding:1px 6px;border-radius:6px}
+  .tin{font-size:11px;color:#9AA6B8;font-weight:600;margin-left:auto}
+  .tschool{font-size:12px;color:var(--blue);font-weight:700;margin-bottom:6px}
+  .tline{font-size:12px;line-height:1.5;color:#4A5568;margin-bottom:3px}
+  .tline b{color:#2B4C8C;font-weight:800;margin-right:4px}
+  .tcal-lb{font-size:11px;font-weight:800;color:var(--gray);margin:8px 0 5px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .tcal-cnt{font-size:10px;font-weight:700;color:#4C6EF5;background:#EEF2FF;padding:1px 7px;border-radius:5px}
+  .tcal-leg{font-size:9px;color:#9AA6B8}
+  .tcal-leg i{display:inline-block;width:8px;height:8px;border-radius:2px;margin:0 2px 0 6px;vertical-align:-1px}
+  .tcal-leg i.la{background:#4C6EF5}.tcal-leg i.ls{background:#1FA37A}
+  .tcal-wrap{border:1px solid #E3E8F0;border-radius:10px;overflow:hidden;background:#fff}
+  .tcal-days{display:grid;grid-template-columns:repeat(7,1fr);margin-left:40px;border-bottom:1px solid #E3E8F0}
+  .tcal-dh{text-align:center;font-size:10px;font-weight:700;color:#4A5568;padding:4px 0;background:#F4F6FA;border-left:1px solid #EEF1F6}
+  .tcal-dh.we{color:#B6BECB}
+  .tcal-body{position:relative;display:flex;padding:5px 0 8px}
+  .tcal-axis{position:relative;width:40px;flex:none;background:#FAFBFD}
+  .tcal-hr{position:absolute;left:0;right:0;border-top:1px solid #EEF1F6}
+  .tcal-hl{position:absolute;top:-6px;right:4px;font-size:8.5px;color:#9AA6B8;font-weight:600;background:#FAFBFD;padding:0 2px}
+  .tcal-grid{position:relative;flex:1;display:grid;grid-template-columns:repeat(7,1fr)}
+  .tcal-col{position:relative;border-left:1px solid #EEF1F6}
+  .tcal-col.we{background:#FAFBFD}
+  .tcal-ev{position:absolute;left:1px;right:1px;border-radius:4px;padding:1px 3px;overflow:hidden;z-index:1;box-shadow:0 1px 2px rgba(0,0,0,.12)}
+  .tcal-ev.ea{background:#4C6EF5}.tcal-ev.es{background:#1FA37A}
+  .tcal-ev-t{display:block;font-size:7.5px;font-weight:700;color:rgba(255,255,255,.9);line-height:1.1}
+  .tcal-ev-l{display:block;font-size:9px;font-weight:800;color:#fff;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* 가능 타임 */
+  .tavail{margin-top:10px;background:#F4F6FA;border:1px solid #E3E8F0;border-radius:10px;padding:11px 14px}
+  .tavail .avh{font-size:12px;font-weight:800;color:#2B4C8C;margin-bottom:8px;display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
+  .tavail .avs{font-size:10px;font-weight:600;color:#9AA6B8}
+  .tavail .avr{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:3px 0}
+  .tavail .avk{font-weight:800;color:#4A5568;min-width:62px}
+  .tavail .avn{font-size:10px;color:#9AA6B8;font-weight:600}
+  .tavail .avv{margin-left:auto;font-weight:900;color:#4C6EF5}
+  .tavail .avr.sg .avv{color:#1FA37A}
+  .tloading{text-align:center;padding:50px 20px;color:var(--gray)}
+
 #opsnav{display:none}
 body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sgate.hidden) #opsnav{display:flex}
 #opsnav{position:sticky;top:0;z-index:200;background:#fff;border-bottom:1px solid #E3E8F0;display:flex;align-items:center;gap:14px;padding:9px 16px;flex-wrap:wrap}#opsnav .onav-logo{font-size:14px;font-weight:800;letter-spacing:-.3px;white-space:nowrap}#opsnav .onav-logo b{color:#4C6EF5}#opsnav .onav-tabs{display:flex;gap:5px;overflow-x:auto;-webkit-overflow-scrolling:touch}#opsnav .onav-tabs a{text-decoration:none;background:#EEF1F6;color:#6B7688;font-size:13px;font-weight:700;padding:8px 16px;border-radius:22px;white-space:nowrap}#opsnav .onav-tabs a:hover{color:#1B2436}#opsnav .onav-tabs a.on{background:#4C6EF5;color:#fff}body.gate-hasbar #opsnav{top:34px}@media(max-width:768px){#opsnav{padding:7px 10px;gap:8px}#opsnav .onav-logo{font-size:12.5px}#opsnav .onav-tabs a{padding:7px 13px;font-size:12.5px}}
@@ -172,6 +229,12 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
     <div class="meta">파운더님 지시 · 전 영역 10/10~12 오픈 목표로 총력 대응</div>
   </div>
 
+  <div class="stab">
+    <button class="on" onclick="sTab(0,this)">📋 오픈 준비 현황</button>
+    <button onclick="sTab(1,this)">👩‍🏫 강사 현황</button>
+  </div>
+
+  <div class="tabpane on" id="pane0">
   <div class="kpi" id="kpi">
     <div class="kd"><div class="l">완료</div><div class="n" id="kDone">-<span>건</span></div></div>
     <div class="kp"><div class="l">진행중</div><div class="n" id="kDoing">-<span>건</span></div></div>
@@ -295,6 +358,12 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
         <div class="okitem" style="color:var(--gray2)">영역별 담당자·완료기한은 확정 후 기입</div><div class="okitem" style="color:var(--gray2)">상태 추적은 상단 현황판과 연동 예정</div></div>
     </div>
   </div>
+
+  </div><!-- /pane0 -->
+
+  <div class="tabpane" id="pane1">
+    <div class="tgrid" id="tgrid"><div class="tloading">강사 데이터 불러오는 중…</div></div>
+  </div><!-- /pane1 -->
 
   <div class="docsec">
     <div class="docsec-hd">📎 설계 · 기획 문서 <span class="docsec-lock">🔒 경영진 전용</span></div>
@@ -431,5 +500,134 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
   }
   load();
 })();
+
+// ========== 강사 현황 탭 ==========
+var SSAM_PHOTO_BASE='https://crocdeucation-rgb.github.io/image/report/ssam/';
+var SSAM_ROMAJA={'안중현':'anjunghyeon','최정민':'choejeongmin','최광백':'choegwangbaek'};
+function tPhotoUrl(name){return SSAM_ROMAJA[name]?(SSAM_PHOTO_BASE+SSAM_ROMAJA[name]+'.jpg'):'';}
+function tParseCSV(text){var rows=[],row=[],cur='',q=false;for(var i=0;i<text.length;i++){var c=text[i];if(q){if(c==='"'){if(text[i+1]==='"'){cur+='"';i++;}else q=false;}else cur+=c;}else{if(c==='"')q=true;else if(c===','){row.push(cur);cur='';}else if(c==='\n'){row.push(cur);rows.push(row);row=[];cur='';}else if(c==='\r'){}else cur+=c;}}if(cur!==''||row.length){row.push(cur);rows.push(row);}return rows;}
+function tRowsToCsv(rows){return (rows||[]).map(function(r){return (r||[]).map(function(c){var s=String(c==null?'':c);return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}).join(',');}).join('\n');}
+async function tFsGet(coll,docId){var db=firebase.firestore();var doc=await db.collection(coll).doc(docId).get();if(!doc.exists)throw new Error(coll+'/'+docId);var d=doc.data();return d.json?JSON.parse(d.json):d;}
+
+var T_SCHED={};
+function tParseSched(csvText){
+  T_SCHED={};if(!csvText)return;
+  var rows=tParseCSV(csvText),cur=null,DOW=['월','화','수','목','금','토','일'];
+  rows.forEach(function(r){
+    var name=String(r[1]||'').trim(),c2=String(r[2]||'').trim();
+    if(DOW.indexOf(c2)>=0&&name){cur=name;var hd=[];for(var i=2;i<r.length;i++){var d=String(r[i]||'').trim();if(DOW.indexOf(d)>=0)hd.push({day:d,col:i});}T_SCHED[cur]={days:hd.map(function(x){return x.day;}),cols:hd.map(function(x){return x.col;}),rows:[]};return;}
+    var time=name;
+    if(cur&&time&&/[:~시]/.test(time)){var cells=T_SCHED[cur].cols.map(function(ci){return String(r[ci]||'').trim();});T_SCHED[cur].rows.push({time:time,cells:cells});}
+  });
+}
+function tToMin(t){var m=String(t).match(/(\d{1,2})\s*:\s*(\d{2})/);if(!m)return null;var h=+m[1];if(h>=1&&h<=11)h+=12;return h*60+ +m[2];}
+
+// 시간표 + 가능타임 HTML
+function tSchedHtml(name){
+  var s=T_SCHED[name];if(!s||!s.rows.length)return '';
+  var HH=44,WEEK=['월','화','수','목','금','토','일'],sheetDays=s.days;
+  var evts=[],minS=1e9,maxE=-1;
+  s.rows.forEach(function(r){
+    var mm=String(r.time).match(/(\d{1,2}:\d{2})\s*[~\-]\s*(\d{1,2}:\d{2})/);
+    var st=mm?tToMin(mm[1]):tToMin(r.time),en=mm?tToMin(mm[2]):(st!=null?st+40:null);
+    if(st==null)return;
+    r.cells.forEach(function(c,di){
+      if(c){var wd=WEEK.indexOf(sheetDays[di]);if(wd<0)return;
+        var org='ara',label=c;var mk=c.match(/^\s*(?:S|s|쌤\)?|쌤이다\)?)\s*[:\-)]?\s*/);
+        if(mk&&/^(?:S|s|쌤)/.test(c.trim())){org='ssam';label=c.replace(mk,'').trim()||c;}
+        evts.push({wd:wd,s:st,e:en,label:label,org:org});if(st<minS)minS=st;if(en>maxE)maxE=en;}
+    });
+  });
+  if(!evts.length)return '';
+  var axS=Math.floor(minS/60)*60,axE=Math.ceil(maxE/30)*30,totalH=(axE-axS)/60*HH;
+  var hourLines='';for(var t=axS;t<=axE;t+=60){var y=(t-axS)/60*HH;hourLines+='<div class="tcal-hr" style="top:'+y+'px"><span class="tcal-hl">'+(t/60)+':00</span></div>';}
+  var dayHead=WEEK.map(function(d,i){return '<div class="tcal-dh'+(i>=5?' we':'')+'">'+d+'</div>';}).join('');
+  var cols=WEEK.map(function(d,wi){
+    var blocks=evts.filter(function(e){return e.wd===wi;}).map(function(e){
+      var top=(e.s-axS)/60*HH,hh=Math.max((e.e-e.s)/60*HH,15),tm=(Math.floor(e.s/60))+':'+('0'+(e.s%60)).slice(-2);
+      return '<div class="tcal-ev '+(e.org==='ssam'?'es':'ea')+'" style="top:'+top+'px;height:'+(hh-2)+'px" title="'+tm+' '+e.label+'"><span class="tcal-ev-t">'+tm+'</span><span class="tcal-ev-l">'+e.label+'</span></div>';
+    }).join('');
+    return '<div class="tcal-col'+(wi>=5?' we':'')+'" style="height:'+totalH+'px">'+blocks+'</div>';
+  }).join('');
+
+  // ===== 가능 타임 (평일 16~25시 / 주말 10~25시, 아라+쌤이다=찬시간) =====
+  var OPEN_WD=[16*60,25*60],OPEN_WE=[10*60,25*60];
+  var busyByDay={};evts.forEach(function(e){(busyByDay[e.wd]=busyByDay[e.wd]||[]).push([e.s,e.e]);});
+  var freeMin=0;
+  for(var wd=0;wd<7;wd++){
+    var isWe=(wd>=5),op=isWe?OPEN_WE:OPEN_WD,hasAny=busyByDay[wd]&&busyByDay[wd].length;
+    if(!isWe&&!hasAny)continue;
+    var busy=(busyByDay[wd]||[]).slice().sort(function(a,b){return a[0]-b[0];}),cursor=op[0],dayFree=0;
+    busy.forEach(function(b){var st=Math.max(b[0],op[0]),en=Math.min(b[1],op[1]);if(st>cursor)dayFree+=(st-cursor);if(en>cursor)cursor=en;});
+    if(op[1]>cursor)dayFree+=(op[1]-cursor);
+    freeMin+=Math.max(0,dayFree);
+  }
+  var t60=Math.floor(freeMin/150),t90=Math.floor(freeMin/210),tsg=Math.floor(freeMin/40),freeH=(freeMin/60);
+  var avail='<div class="tavail"><div class="avh">💡 가능 타임 <span class="avs">평일 16시~·주말 10시~ 기준 · 빈 '+(freeH%1?freeH.toFixed(1):freeH)+'시간</span></div>'+
+    '<div class="avr"><span class="avk">정규 60분</span><span class="avn">(쉬는 15분 포함)</span><span class="avv">주 '+t60+'타임</span></div>'+
+    '<div class="avr"><span class="avk">정규 90분</span><span class="avn">(쉬는 15분 포함)</span><span class="avv">주 '+t90+'타임</span></div>'+
+    '<div class="avr sg"><span class="avk">시강 30분</span><span class="avn">(쉬는 10분 포함)</span><span class="avv">최대 '+tsg+'회</span></div></div>';
+
+  return '<div class="tcal-lb">주간 시간표 <span class="tcal-cnt">주 '+evts.length+'교시</span><span class="tcal-leg"><i class="la"></i>아라<i class="ls"></i>쌤이다</span></div>'+
+    '<div class="tcal-wrap"><div class="tcal-days">'+dayHead+'</div><div class="tcal-body"><div class="tcal-axis" style="height:'+totalH+'px">'+hourLines+'</div><div class="tcal-grid">'+cols+'</div></div></div>'+avail;
+}
+
+// 강사 카드
+function tCardHtml(e){
+  var purl=tPhotoUrl(e.name);
+  var rawSub=(e.sub&&e.sub!=='전체'&&e.sub!=='미구분')?e.sub:'';
+  var subjHtml='';
+  if(rawSub){
+    var mm=rawSub.match(/^([^(]+?)\s*\(([^)]*)\)/);
+    var subjName=(mm?mm[1]:rawSub).trim().replace(/,/g,'·'),rangeTxt=mm?mm[2]:'';
+    var tags=[];if(/고/.test(rangeTxt))tags=['초','중','고'];else if(/중/.test(rangeTxt))tags=['초','중'];else if(/초/.test(rangeTxt))tags=['초'];
+    var tagHtml=tags.length?('<div class="tsubj-tags">'+tags.map(function(t){return '<span class="tsubj-tag g'+t+'">'+t+'등</span>';}).join('')+'</div>'):'';
+    subjHtml='<div class="tsubj"><div class="tsubj-nm">'+subjName+'</div>'+tagHtml+'</div>';
+  }
+  var photo=purl?'<div class="tphoto"><img src="'+purl+'" onerror="this.parentNode.classList.add(\'noimg\');this.remove();"><span class="tinit">'+e.name.charAt(0)+'</span>'+subjHtml+'</div>'
+                :'<div class="tphoto noimg"><span class="tinit">'+e.name.charAt(0)+'</span>'+subjHtml+'</div>';
+  var school=e.school?'<div class="tschool">'+e.school+'</div>':'';
+  var note='';
+  if(e.note){
+    var norm=e.note.replace(/\r/g,'').replace(/[\n|]+/g,' ').replace(/\s*\*\s*/g,'\n*').trim();
+    note=norm.split('\n').map(function(s){return s.trim();}).filter(Boolean).map(function(p){
+      p=p.replace(/^\*/,'').trim();
+      return '<div class="tline">'+p.replace(/^업무내용\s*:\s*/,'<b>업무</b> ').replace(/^경력\s*:\s*/,'<b>경력</b> ').replace(/^자격증\s*:\s*/,'<b>자격</b> ')+'</div>';
+    }).join('');
+  }
+  var isNew=e.isNew?'<span class="tnew">NEW</span>':'';
+  return '<div class="tcard">'+photo+'<div class="tbody"><div class="tname">'+e.name+isNew+'<span class="tin">'+(e.inD||'')+'</span></div>'+school+note+tSchedHtml(e.name)+'</div></div>';
+}
+
+async function loadTeachers(){
+  try{
+    var ssamCsv=await tFsGet('execData','hr-ssam').then(function(o){return tRowsToCsv(o.rows);});
+    var schedCsv=await tFsGet('execData','hr-ssam-sched').then(function(o){return tRowsToCsv(o.rows);}).catch(function(){return '';});
+    tParseSched(schedCsv);
+    // hr-ssam 파싱 (loadDept 간소화: 이름·과목·학교·특이사항·입사일·재직)
+    var rows=tParseCSV(ssamCsv),H=rows[1]||[],idx={};
+    H.forEach(function(hh,i){hh=String(hh||'').trim();if(hh)idx[hh]=i;});
+    var list=[];
+    for(var r=2;r<rows.length;r++){
+      var row=rows[r],nm=String(row[idx['이름']]||'').trim();if(!nm)continue;
+      var jae=('재직' in idx)?String(row[idx['재직']]||'').trim():'';
+      if(jae&&jae!=='재직')continue;
+      var inRaw=row[idx['입사일']]||'';var im=String(inRaw).match(/(\d{4})[-.\/]\s*(\d{1,2})[-.\/]\s*(\d{1,2})/);
+      list.push({name:nm,sub:('과목' in idx)?String(row[idx['과목']]||'').trim():'',school:('학교' in idx)?String(row[idx['학교']]||'').trim():'',note:('특이사항' in idx)?String(row[idx['특이사항']]||'').trim():'',inD:im?(im[1]+'-'+('0'+im[2]).slice(-2)+'-'+('0'+im[3]).slice(-2)):'',isNew:false});
+    }
+    var el=document.getElementById('tgrid');
+    el.innerHTML=list.length?list.map(tCardHtml).join(''):'<div class="tloading">강사 데이터가 없습니다.</div>';
+  }catch(e){console.error(e);document.getElementById('tgrid').innerHTML='<div class="tloading">강사 데이터를 불러오지 못했습니다.</div>';}
+}
+
+var _tLoaded=false;
+function sTab(i,btn){
+  document.querySelectorAll('.stab button').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  document.getElementById('pane0').classList.toggle('on',i===0);
+  document.getElementById('pane1').classList.toggle('on',i===1);
+  if(i===1&&!_tLoaded){_tLoaded=true;loadTeachers();}
+}
+
 </script>
 </body></html>
