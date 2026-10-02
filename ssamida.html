@@ -21,7 +21,7 @@
   :root[data-theme="dark"]{--navy:#060d1e;--ink:#dde5f5;--gray:#8c9bb8;--gray2:#68789a;--line:#1f2a42;--bg:#0a0f1c;--card:#131a2b;--soft:#0f1626}
   *{margin:0;padding:0;box-sizing:border-box}
   body{font-family:'Pretendard',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;letter-spacing:-.2px}
-  .wrap{max-width:1280px;margin:0 auto;padding:22px 16px 70px}
+  .wrap{max-width:1560px;margin:0 auto;padding:22px 16px 70px}
   .hero{position:relative;background:linear-gradient(120deg,#4C6EF5,#7048E8);border-radius:18px;padding:26px 30px;overflow:hidden;box-shadow:0 16px 40px rgba(76,110,245,.28)}
   .hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:40px 40px}
   .hero .tag{position:relative;font-size:11px;font-weight:800;letter-spacing:3px;color:#d6dcff}
@@ -56,6 +56,13 @@
   .task .ds{font-size:12px;color:var(--gray);margin:3px 0 0 0;padding-left:0;line-height:1.5}
   .task .lg{font-size:11px;color:var(--teal);margin-top:4px;font-weight:600}
   .task .cm{font-size:11px;color:var(--purple);margin-top:3px;background:var(--soft);padding:4px 8px;border-radius:6px}
+
+  .ministeps{display:flex;flex-wrap:wrap;align-items:center;gap:3px;margin:6px 0 2px}
+  .ministeps .ms{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:6px;white-space:nowrap}
+  .ministeps .ms.ok{background:#E5F6EF;color:var(--green)}
+  .ministeps .ms.cur{background:#EAF0FF;color:var(--blue);box-shadow:0 0 0 1.5px var(--blue) inset}
+  .ministeps .ms.wait{background:var(--soft);color:var(--gray2)}
+  .ministeps .msar{font-size:9px;color:var(--gray2)}
   .pbar{height:5px;background:var(--soft);border-radius:100px;overflow:hidden;margin-top:5px}
   .pfill{height:100%;border-radius:100px}
   .f-done{background:var(--green)}.f-doing{background:var(--blue)}.f-plan{background:var(--gray2)}.f-talk{background:var(--orange)}.f-check{background:var(--purple)}
@@ -75,6 +82,64 @@
   .docsec-card:hover .dc-arrow{color:#3B5BDB;transform:translateX(2px)}
   .foot{text-align:center;font-size:12.5px;color:var(--gray2);margin-top:24px;padding-top:16px;border-top:1px solid var(--line)}
   .updated{font-size:11px;color:var(--gray2);text-align:right;margin-top:8px}
+
+  /* ── 그로스 콘텐츠 현황 / 오픈 체크리스트 섹션 ── */
+  .gsec{margin-top:30px}
+  .gsec-hd{display:flex;align-items:baseline;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+  .gsec-hd .gt{font-size:19px;font-weight:900;color:var(--navy);letter-spacing:-.6px}
+  .gsec-hd .gsub{font-size:12.5px;color:var(--gray);font-weight:600}
+  .gnote{background:var(--soft);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:10px;padding:13px 16px;font-size:13px;color:var(--gray);line-height:1.65;margin-bottom:16px}
+  .gnote b{color:var(--ink)}
+  /* 랜딩 수렴 배너 */
+  .converge{background:linear-gradient(120deg,#0E9C8A,#2E5BFF);border-radius:15px;padding:20px 24px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden}
+  .converge::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:34px 34px}
+  .converge .cvt{position:relative;font-size:16px;font-weight:900;letter-spacing:-.4px;margin-bottom:4px}
+  .converge .cvd{position:relative;font-size:13px;color:#eaf3ff;line-height:1.6}
+  .converge .cvtags{position:relative;display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+  .converge .cvtags span{font-size:11.5px;font-weight:700;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);padding:4px 11px;border-radius:100px}
+  /* 그로스 카드 그리드 */
+  .gcards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:860px){.gcards{grid-template-columns:1fr}}
+  .gcard{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:18px 20px;box-shadow:0 3px 14px rgba(20,40,80,.05)}
+  .gcard.span2{grid-column:1/-1}
+  .gc-hd{display:flex;align-items:center;gap:11px;margin-bottom:4px}
+  .gc-ic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex:none;background:var(--soft)}
+  .gc-tt{font-size:16px;font-weight:900;color:var(--navy);letter-spacing:-.4px}
+  .gc-badge{margin-left:auto;font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:7px}
+  .gc-badge.prod{background:#FDF1E2;color:var(--orange)}
+  .gc-badge.setup{background:#E5F6EF;color:var(--green)}
+  .gc-badge.plan{background:#F0F2F7;color:#8a97ad}
+  .gc-lead{font-size:12.5px;color:var(--gray);margin:2px 0 12px;line-height:1.55}
+  /* 진행 단계 (스텝) */
+  .steps{display:flex;flex-direction:column;gap:0;margin:10px 0}
+  .step{display:flex;align-items:flex-start;gap:10px;padding:7px 0;position:relative}
+  .step .dot{width:16px;height:16px;border-radius:50%;flex:none;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#fff}
+  .step.done .dot{background:var(--green)}.step.doing .dot{background:var(--blue)}.step.plan .dot{background:var(--gray2)}.step.talk .dot{background:var(--orange)}
+  .step .sbody{flex:1;min-width:0}
+  .step .sname{font-size:13.5px;font-weight:800;color:var(--ink)}
+  .step .smeta{font-size:11.5px;color:var(--gray);margin-top:1px}
+  .step .stag{font-size:10px;font-weight:800;padding:1px 7px;border-radius:5px;margin-left:6px;vertical-align:middle}
+  .step.done .stag{background:#E5F6EF;color:var(--green)}.step.doing .stag{background:#EAF0FF;color:var(--blue)}.step.plan .stag{background:#F0F2F7;color:#8a97ad}.step.talk .stag{background:#FDF1E2;color:var(--orange)}
+  /* 두 경로 선택 */
+  .twoway{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 6px}
+  @media(max-width:520px){.twoway{grid-template-columns:1fr}}
+  .way{border:1px solid var(--line);border-radius:11px;padding:13px 14px;background:var(--soft)}
+  .way .wh{font-size:12.5px;font-weight:900;color:var(--navy);display:flex;align-items:center;gap:6px}
+  .way .wt{font-size:18px;font-weight:900;letter-spacing:-.5px;margin:4px 0 2px}
+  .way.fast .wt{color:var(--teal)} .way.prod .wt{color:var(--orange)}
+  .way .wd{font-size:11.5px;color:var(--gray);line-height:1.5}
+  .way .wtag{display:inline-block;font-size:10px;font-weight:800;padding:2px 8px;border-radius:5px;margin-top:7px}
+  .way.fast .wtag{background:#E5F6EF;color:var(--teal)} .way.prod .wtag{background:#FDF1E2;color:var(--orange)}
+  .eta{font-size:12px;font-weight:800;color:var(--purple);background:#EDEAFC;border-radius:8px;padding:7px 12px;margin-top:10px;display:inline-block}
+  .glink{font-size:11.5px;color:var(--blue);font-weight:700;margin-top:9px;display:inline-block;text-decoration:none}
+  /* 오픈 체크리스트 간단표 */
+  .okgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:860px){.okgrid{grid-template-columns:1fr}}
+  .okcard{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:15px 17px}
+  .okcard .okh{font-size:13.5px;font-weight:900;color:var(--navy);margin-bottom:8px;display:flex;align-items:center;gap:7px}
+  .okcard .okh .oknum{width:21px;height:21px;border-radius:6px;background:var(--soft);color:var(--gray);font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;flex:none}
+  .okitem{font-size:12.5px;color:var(--gray);padding:4px 0;display:flex;gap:7px;line-height:1.5}
+  .okitem::before{content:'·';color:var(--gray2);font-weight:900}
 
 #opsnav{display:none}
 body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sgate.hidden) #opsnav{display:flex}
@@ -118,6 +183,119 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
     <div class="loading">데이터 불러오는 중…</div>
   </div>
   <div class="updated" id="updated"></div>
+  <!-- ══ 그로스 콘텐츠 현황 (B) ══ -->
+  <div class="gsec">
+    <div class="gsec-hd">
+      <span class="gt">🚀 그로스 콘텐츠 현황</span>
+      <span class="gsub">쌤이다 론칭 — 영상·소재·채널</span>
+    </div>
+    <div class="gnote">
+      콘텐츠는 <b>세팅형</b>(채널 개설 등 — 세팅 끝나면 바로 가동)과 <b>제작형</b>(기획·촬영·편집 — 단계별 소요)으로 나뉩니다.
+      아래는 각 항목의 <b>실제 진행 단계와 소요 기간</b>입니다.
+    </div>
+
+    <!-- 랜딩 수렴 배너 -->
+    <div class="converge">
+      <div class="cvt">🎯 모든 콘텐츠는 랜딩페이지로 수렴합니다</div>
+      <div class="cvd">영상·소재는 그 자체가 목적이 아니라, 쌤이다 랜딩페이지를 채우는 자산입니다. 한 번의 촬영이 여러 산출물로 분화됩니다.</div>
+      <div class="cvtags"><span>유튜브 브랜드 필름</span><span>릴스 (재편집)</span><span>단일 이미지 소재</span><span>랜딩 삽입 영상</span></div>
+    </div>
+
+    <div class="gcards">
+
+      <!-- 유튜브 / 영상 -->
+      <div class="gcard span2">
+        <div class="gc-hd"><div class="gc-ic">📹</div><div class="gc-tt">영상 · 쌤이다 브랜드 필름</div><span class="gc-badge prod">제작형</span></div>
+        <div class="gc-lead">과목별 선생님 1인칭 브랜드 필름. 영어·국어 스토리보드 완료, 강사 협의 후 촬영 예정.</div>
+
+        <div class="steps">
+          <div class="step done"><div class="dot">✓</div><div class="sbody"><div class="sname">기획 · 스토리보드 <span class="stag done">완료</span></div><div class="smeta">영어편 · 국어편 콘티 완성 (AI 콘티 포함)</div></div></div>
+          <div class="step talk"><div class="dot">·</div><div class="sbody"><div class="sname">강사 미팅 · 협의 <span class="stag talk">다음주 수 예정</span></div><div class="smeta">출연·대본 톤·촬영 일정 협의 (촬영 시점 미정)</div></div></div>
+          <div class="step plan"><div class="dot">·</div><div class="sbody"><div class="sname">촬영 <span class="stag plan">대기</span></div><div class="smeta">협의 후 일정 확정</div></div></div>
+          <div class="step plan"><div class="dot">·</div><div class="sbody"><div class="sname">편집 · 산출 <span class="stag plan">대기</span></div><div class="smeta">촬영본 → 유튜브 + 릴스 + 단일이미지 + 랜딩영상</div></div></div>
+        </div>
+
+        <!-- 두 트랙 -->
+        <div class="twoway">
+          <div class="way fast">
+            <div class="wh">⚡ 속도 트랙</div>
+            <div class="wt">1~2일</div>
+            <div class="wd">퀄 집착 없이 폰으로 찍고 숏폼(릴스) 편집. SNS·릴스용 — <b>랜딩 메인엔 퀄 부적합.</b></div>
+            <div class="wtag">SNS · 숏폼용</div>
+          </div>
+          <div class="way prod">
+            <div class="wh">🎬 제작 트랙</div>
+            <div class="wt">합쳐서 2~3주</div>
+            <div class="wd">쌤캐스트 + 브랜드 필름 제대로 제작. 1촬영 → 유튜브·릴스·단일이미지·랜딩 멀티산출.</div>
+            <div class="wtag">브랜드 자산화</div>
+          </div>
+        </div>
+        <div class="eta">▶ 제작 트랙은 동시 진행 불가 — 무엇부터 할지 우선순위 결정 필요 / 급하면 속도 트랙 병행</div><br>
+        <a class="glink" href="#" onclick="return false">📎 영어편·국어편 스토리보드 (별도 공유)</a>
+      </div>
+
+      <!-- 쌤캐스트 -->
+      <div class="gcard">
+        <div class="gc-hd"><div class="gc-ic">🎙️</div><div class="gc-tt">쌤캐스트</div><span class="gc-badge prod">제작형</span></div>
+        <div class="gc-lead">팟캐스트형 콘텐츠. 여러 편 동시 촬영 → 베스트 1편 편집 집중.</div>
+        <div class="steps">
+          <div class="step talk"><div class="dot">·</div><div class="sbody"><div class="sname">컨설턴트 섭외·미팅 <span class="stag talk">다음주 화 예정</span></div><div class="smeta">출연 협의</div></div></div>
+          <div class="step plan"><div class="dot">·</div><div class="sbody"><div class="sname">포맷·꼭지 기획 <span class="stag plan">미팅 후</span></div></div></div>
+          <div class="step plan"><div class="dot">·</div><div class="sbody"><div class="sname">촬영·녹음 → 편집·업로드 <span class="stag plan">미정</span></div></div></div>
+        </div>
+        <div class="eta">▶ 촬영 후 1차 편집본 약 1주 (동시 촬영 → 베스트 1편 집중)</div>
+      </div>
+
+      <!-- SNS / 블로그 -->
+      <div class="gcard">
+        <div class="gc-hd"><div class="gc-ic">📱</div><div class="gc-tt">SNS · 블로그</div><span class="gc-badge setup">세팅형</span></div>
+        <div class="gc-lead">채널 인프라 준비 완료. 콘텐츠 발행 예정.</div>
+        <div class="steps">
+          <div class="step done"><div class="dot">✓</div><div class="sbody"><div class="sname">인스타그램 채널 <span class="stag done">개설 완료</span></div><div class="smeta">콘텐츠 발행 예정</div></div></div>
+          <div class="step done"><div class="dot">✓</div><div class="sbody"><div class="sname">네이버 블로그 <span class="stag done">개설 + AI 스킬 연결</span></div><div class="smeta">업로드 체계 준비, 발행 예정</div></div></div>
+          <div class="step plan"><div class="dot">·</div><div class="sbody"><div class="sname">언론 · PR <span class="stag plan">기획 예정</span></div></div></div>
+        </div>
+      </div>
+
+      <!-- 랜딩페이지 -->
+      <div class="gcard span2">
+        <div class="gc-hd"><div class="gc-ic">🎯</div><div class="gc-tt">랜딩 · 상세페이지</div><span class="gc-badge plan">조립 대기</span></div>
+        <div class="gc-lead">위 영상·소재가 확보되면 조립. 기획 구조는 아라온 랜딩 방법론과 동일(목적별 세계관 설계).</div>
+        <div class="steps">
+          <div class="step doing"><div class="dot">·</div><div class="sbody"><div class="sname">기획 · 서사 설계 <span class="stag doing">진행</span></div><div class="smeta">메시지 축·서사 구조</div></div></div>
+          <div class="step plan"><div class="dot">·</div><div class="sbody"><div class="sname">소재 삽입 · 제작 <span class="stag plan">소재 확보 후</span></div><div class="smeta">영상·릴스·단일이미지·후기 조립 → 발행</div></div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ 서비스 오픈 체크리스트 (A · 파운더 관리표 7영역) ══ -->
+  <div class="gsec">
+    <div class="gsec-hd">
+      <span class="gt">📋 서비스 오픈 체크리스트</span>
+      <span class="gsub">파운더님 업무 관리표 · 7개 영역</span>
+    </div>
+    <div class="okgrid">
+      <div class="okcard"><div class="okh"><span class="oknum">1</span> 고객 접점 · 채널</div>
+        <div class="okitem">통신사 선정 · 대표번호 개통</div><div class="okitem">통화연결음 / ARS 설정</div><div class="okitem">카카오톡 비즈니스 채널</div><div class="okitem">네이버·인스타·유튜브 채널 개설</div></div>
+      <div class="okcard"><div class="okh"><span class="oknum">2</span> 운영 정책 · 계약</div>
+        <div class="okitem">이용약관 · 개인정보처리방침</div><div class="okitem">교습비 · 상품/가격표 확정</div><div class="okitem">강사용 계약서</div><div class="okitem">환불·해지·중도취소 규정</div></div>
+      <div class="okcard"><div class="okh"><span class="oknum">3</span> 교육 운영 · 자료</div>
+        <div class="okitem">원격 프로그램 · 교재</div><div class="okitem">보다라이브 이용 매뉴얼</div><div class="okitem">강사·학생·학부모 매뉴얼</div><div class="okitem">캠·태블릿 발주 시스템</div></div>
+      <div class="okcard"><div class="okh"><span class="oknum">4</span> 서비스 페이지 · 시스템</div>
+        <div class="okitem">관리자·학생·강사 페이지</div><div class="okitem">메인·랜딩페이지</div><div class="okitem">DB 유입 시스템</div><div class="okitem">모바일 테스트</div></div>
+      <div class="okcard"><div class="okh"><span class="oknum">5</span> 결제 · 정산</div>
+        <div class="okitem">PG 결제 시스템 결정</div><div class="okitem">현금영수증 처리 기준</div></div>
+      <div class="okcard"><div class="okh"><span class="oknum">6</span> 고객 지원 · 보고</div>
+        <div class="okitem">일일·주간 리포트</div><div class="okitem">민원 처리 프로세스</div><div class="okitem">학부모 상담 매뉴얼</div></div>
+      <div class="okcard"><div class="okh"><span class="oknum">7</span> 오픈 프로모션</div>
+        <div class="okitem">오픈 이벤트 기획</div><div class="okitem">상품소개서 제작</div></div>
+      <div class="okcard" style="border-style:dashed"><div class="okh"><span class="oknum">✓</span> 담당·기한</div>
+        <div class="okitem" style="color:var(--gray2)">영역별 담당자·완료기한은 확정 후 기입</div><div class="okitem" style="color:var(--gray2)">상태 추적은 상단 현황판과 연동 예정</div></div>
+    </div>
+  </div>
+
   <div class="docsec">
     <div class="docsec-hd">📎 설계 · 기획 문서 <span class="docsec-lock">🔒 경영진 전용</span></div>
     <a class="docsec-card" href="https://drive.google.com/drive/folders/1KpFnQUkVEuOAVYaTitwStNJ-evLeSkhv?usp=drive_link" target="_blank" rel="noopener">
@@ -135,15 +313,14 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
 
 <script>
 (function(){
-  // 팀별 아이콘·색
   var TEAM_META={
     '브랜딩':{ic:'🎨',name:'브랜딩 · 프론트엔드'},
     '시스템':{ic:'⚙️',name:'시스템 · 백엔드'},
     '강사플랫폼':{ic:'👨‍🏫',name:'강사 플랫폼'},
-    '콘텐츠':{ic:'🚀',name:'콘텐츠 · 마케팅 · 그로스'}
+    '그로스':{ic:'🚀',name:'그로스 · 콘텐츠 · 마케팅'},
+    '콘텐츠':{ic:'🚀',name:'그로스 · 콘텐츠 · 마케팅'}
   };
-  var TEAM_ORDER=['브랜딩','시스템','강사플랫폼','콘텐츠'];
-  // 상태 → 배지 클래스 + 그룹
+  var TEAM_ORDER=['브랜딩','시스템','강사플랫폼','그로스','콘텐츠'];
   function stClass(s){
     if(/완료/.test(s)) return 'done';
     if(/진행/.test(s)) return 'doing';
@@ -157,21 +334,39 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
     return '예정·논의';
   }
   var GROUP_ORDER=['완료','진행중','예정·논의'];
-
   function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  // 단계 문자열 파싱 → 미니 스텝 UI.  형식: "a>b*>c" (완료=✓/현재단계앞 / 현재=* / 이후=대기)
+  function renderSteps(str){
+    if(!str) return '';
+    var parts=String(str).split('>');
+    var curIdx=-1;
+    parts.forEach(function(p,i){ if(p.indexOf('*')>=0) curIdx=i; });
+    var html='<div class="ministeps">';
+    parts.forEach(function(p,i){
+      var cur=p.indexOf('*')>=0;
+      var doneMark=p.indexOf('✓')>=0 || p.indexOf('✔')>=0;
+      var name=p.replace(/[\*✓✔]/g,'').trim();
+      var cls;
+      if(cur) cls='cur';
+      else if(doneMark) cls='ok';
+      else if(curIdx>=0 && i<curIdx) cls='ok';
+      else cls='wait';
+      html+='<span class="ms '+cls+'">'+esc(name)+'</span>';
+      if(i<parts.length-1) html+='<span class="msar">→</span>';
+    });
+    html+='</div>';
+    return html;
+  }
 
   function render(rows){
     if(!rows||!rows.length){ document.getElementById('teams').innerHTML='<div class="loading">데이터가 없습니다.</div>'; return; }
-    // 헤더 파싱 — 컬럼명으로 인덱스 찾기 (순서 바뀌어도 대응)
     var H=rows[0].map(function(x){return String(x||'').trim();});
     function ci(names){ for(var n=0;n<names.length;n++){ for(var i=0;i<H.length;i++){ if(H[i].replace(/\s/g,'').indexOf(names[n])>=0) return i; } } return -1; }
     var iTeam=ci(['팀']), iOwner=ci(['담당자']), iCollab=ci(['협업자','협업']), iTask=ci(['과제']),
         iStat=ci(['상태']), iProg=ci(['진행률','진행']), iDesc=ci(['설명']),
-        iLog=ci(['진척로그','진척']), iCmt=ci(['코멘트']), iDue=ci(['마감']), iPri=ci(['우선']);
-
+        iLog=ci(['진척로그','진척']), iCmt=ci(['코멘트']), iDue=ci(['마감']), iPri=ci(['우선']), iStep=ci(['단계']);
     var data=rows.slice(1).filter(function(r){ return (r[iTeam]||'').trim() && (r[iTask]||'').trim(); });
-
-    // KPI 집계
     var done=0,doing=0,plan=0, ppl={};
     data.forEach(function(r){
       var g=stGroup((r[iStat]||''));
@@ -182,21 +377,16 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
     document.getElementById('kDoing').innerHTML=doing+'<span>건</span>';
     document.getElementById('kPlan').innerHTML=plan+'<span>건</span>';
     document.getElementById('kPpl').innerHTML=Object.keys(ppl).length+'<span>명</span>';
-
-    // 팀별 그룹핑
     var byTeam={};
     data.forEach(function(r){ var t=(r[iTeam]||'').trim(); if(!byTeam[t])byTeam[t]=[]; byTeam[t].push(r); });
-
     var html='';
     TEAM_ORDER.forEach(function(tk){
       var list=byTeam[tk]; if(!list||!list.length) return;
       var meta=TEAM_META[tk]||{ic:'📁',name:tk};
       var owner=(list[0][iOwner]||'').trim();
-      // 상태 카운트
       var c={done:0,doing:0,plan:0};
       list.forEach(function(r){ var g=stGroup(r[iStat]||''); if(g==='완료')c.done++; else if(g==='진행중')c.doing++; else c.plan++; });
       html+='<div class="team"><div class="thd"><div class="ic">'+meta.ic+'</div><div><div class="tn">'+esc(meta.name)+'</div><div class="to">'+esc(owner)+'</div></div><div class="cnt">'+c.done+' 완료 · '+c.doing+' 진행 · '+c.plan+' 예정</div></div>';
-      // 그룹별
       GROUP_ORDER.forEach(function(grp){
         var items=list.filter(function(r){ return stGroup(r[iStat]||'')===grp; });
         if(!items.length) return;
@@ -213,6 +403,7 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
             +(collab?'<span class="co">+'+esc(collab)+'</span>':'')+(due?' <span style="font-size:11px;color:#E5533D">~'+esc(due)+'</span>':'')+'</div>'
             +(!isNaN(prog)?'<span class="pv">'+prog+'%</span>':'')+'</div>';
           if(desc) html+='<div class="ds">'+esc(desc)+'</div>';
+          if(iStep>=0 && (r[iStep]||'').trim()) html+=renderSteps((r[iStep]||'').trim());
           if(!isNaN(prog)&&prog>0) html+='<div class="pbar"><div class="pfill f-'+cls+'" style="width:'+prog+'%"></div></div>';
           if(log) html+='<div class="lg">📌 '+esc(log)+'</div>';
           if(cmt) html+='<div class="cm">💬 '+esc(cmt)+'</div>';
@@ -224,7 +415,6 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
     });
     document.getElementById('teams').innerHTML=html||'<div class="loading">표시할 과제가 없습니다.</div>';
   }
-
   function load(){
     try{
       if(typeof firebase==='undefined'||!firebase.firestore){ setTimeout(load,400); return; }
