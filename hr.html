@@ -560,7 +560,7 @@ function spanBadge(sp){if(sp==null)return '';let c=sp<=30?'sp-o':sp<=90?'sp-r':'
 function orderedGroups(dept){let keys=Object.keys(DATA[dept].trend),ord=ORDER[dept]||[];let head=ord.filter(g=>keys.includes(g));let rest=keys.filter(g=>!head.includes(g)).sort();return head.concat(rest).filter(g=>!DATA[dept].trend[g].every(v=>v===0));}
 function sumOf(dept,mo){let m=DATA[dept].months[mo]||DATA[dept].months[String(mo)];return m.sum;}
 
-function renderTabs(){document.getElementById('tabs').innerHTML=['쌤이다','수업강사','코칭코치','사업부','상담부'].map(d=>`<button class="tabbtn ${d===curDept?'on':''}" onclick="selDept('${d}')">${d}</button>`).join('');}
+function renderTabs(){document.getElementById('tabs').innerHTML=['수업강사','코칭코치','사업부','상담부'].map(d=>`<button class="tabbtn ${d===curDept?'on':''}" onclick="selDept('${d}')">${d}</button>`).join('');}
 function selDept(d){curDept=d;curMonth=9;renderAll();window.scrollTo({top:0,behavior:'smooth'});}
 
 function renderKpi(){
