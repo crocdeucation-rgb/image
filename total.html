@@ -2497,17 +2497,32 @@ function notifRankCheck(myName){
       var by=(arr[idx-1]||{}).name||'';
       window.__notifItems.push({type:'rank', seg:seg, from:by, text:LB[seg]+' '+me.prevRank+'위 → '+me.rank+'위 하락', ms:ms, down:true});
     } else if(me.move>0){
-      window.__notifItems.push({type:'rank', seg:seg, from:'', text:LB[seg]+' '+me.prevRank+'위 → '+me.rank+'위 상승', ms:ms, up:true, rank1:(me.rank===1)});
+      // [2026-10-02] 역전한 쪽 — 지금 내 바로 아래(idx+1)가 내가 제친 사람. 이름 있으면 "제치고" 문구.
+      var _over=(arr[idx+1]||{}).name||'';
+      var _txt=_over ? (LB[seg]+' '+_over+' 제치고 '+me.rank+'위로! ('+me.prevRank+'위 → '+me.rank+'위)')
+                     : (LB[seg]+' '+me.prevRank+'위 → '+me.rank+'위 상승');
+      window.__notifItems.push({type:'rank', seg:seg, from:_over, text:_txt, ms:ms, up:true, rank1:(me.rank===1)});
     }
   });
   // [2026-09] 지점 — 내 소속 지점 순위 변동 시 소속 전원에게 (소속감)
   var myBr=notifMyBranch(myName);
   if(myBr){
-    var barr=rm.branch||[]; var b=null;
-    for(var j=0;j<barr.length;j++){ if(barr[j].name===myBr){ b=barr[j]; break; } }
+    var barr=rm.branch||[]; var b=null, bidx=-1;
+    for(var j=0;j<barr.length;j++){ if(barr[j].name===myBr){ b=barr[j]; bidx=j; break; } }
     if(b && b.prevRank!=null && b.move!==0){
-      if(b.move>0) window.__notifItems.push({type:'rank', seg:'branch', from:'', text:'우리 '+myBr+' '+b.prevRank+'위 → '+b.rank+'위 상승!', ms:ms, up:true, rank1:(b.rank===1), team:true});
-      else window.__notifItems.push({type:'rank', seg:'branch', from:'', text:'우리 '+myBr+' '+b.prevRank+'위 → '+b.rank+'위', ms:ms, down:true, team:true});
+      if(b.move>0){
+        // [2026-10-02] 역전한 지점 — 바로 아래(bidx+1)가 제친 지점. 소속감 + 상대 명시.
+        var _overBr=(barr[bidx+1]||{}).name||'';
+        var _bt=_overBr ? ('우리 '+myBr+' '+_overBr+' 제치고 '+b.rank+'위로! ('+b.prevRank+'위 → '+b.rank+'위)')
+                        : ('우리 '+myBr+' '+b.prevRank+'위 → '+b.rank+'위 상승!');
+        window.__notifItems.push({type:'rank', seg:'branch', from:_overBr, text:_bt, ms:ms, up:true, rank1:(b.rank===1), team:true});
+      } else {
+        // 역전당한 지점 — 나를 제친 지점(bidx-1)
+        var _byBr=(barr[bidx-1]||{}).name||'';
+        var _bt2=_byBr ? ('우리 '+myBr+' '+_byBr+'에게 밀려 '+b.rank+'위 ('+b.prevRank+'위 → '+b.rank+'위)')
+                       : ('우리 '+myBr+' '+b.prevRank+'위 → '+b.rank+'위');
+        window.__notifItems.push({type:'rank', seg:'branch', from:_byBr, text:_bt2, ms:ms, down:true, team:true});
+      }
     }
   }
   notifRender();
