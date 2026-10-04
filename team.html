@@ -20,7 +20,6 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 .top .rf{margin-left:auto;font-size:12px;padding:6px 13px;border:1px solid var(--line);border-radius:9px;background:var(--card);cursor:pointer;color:#5a6272;font-weight:600}
 .top .rf:hover{border-color:#cdd2db}
 
-/* 모바일 전용 섹션 탭 (PC에서는 숨김 · 3단 그리드 유지) */
 .sec-nav{display:none;justify-content:center;gap:6px;margin-bottom:12px}
 .sec-nav-btn{font-size:12px;font-weight:700;padding:6px 16px;border-radius:16px;border:1px solid var(--line);background:var(--card);color:#7a828f;cursor:pointer;letter-spacing:-.01em}
 .sec-nav-btn.on{background:var(--blue);color:#fff;border-color:var(--blue)}
@@ -62,6 +61,7 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 .pf .db{color:var(--blue);font-weight:700} .pf .vs{color:var(--amber);font-weight:700} .pf .se{color:#2563eb;font-weight:700}
 .pf .ca{color:var(--red);font-weight:700} .pf .od{color:var(--green);font-weight:700} .pf .sl{color:var(--purple);font-weight:800}
 .pf .rt{color:#9aa1ad;font-size:10.5px} .pf .ro{color:var(--green);font-weight:800} .pf .ef{color:var(--purple);font-weight:700}
+.pf .fee{color:#d4380d;font-weight:800}
 
 .heat{width:100%;border-collapse:collapse;font-size:10.5px}
 .heat th{color:#8b93a2;font-weight:700;font-size:9px;padding:4px 2px;text-align:center;white-space:nowrap}
@@ -103,60 +103,43 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 .as.hye{background:var(--green)} .as.kim{background:var(--blue)} .as.jang{background:#f97316} .as.park{background:var(--purple)} .as.ahn{background:#4338ca}
 .as.woo{background:var(--red)} .as.tae{background:var(--cyan)} .as.sung{background:#7c3aed} .as.noh{background:#0d9488} .as.won{background:#b45309}
 
-/* 근무 스테이터스 (홀딩 자리 대체) */
 .wk{width:100%;border-collapse:collapse;font-size:12px}
 .wk th{background:#f7f8fb;color:#6b7280;font-weight:700;font-size:9.5px;padding:6px 3px;text-align:center}
 .wk th.l{text-align:left;padding-left:14px}
 .wk td{padding:5px 3px;text-align:center;border-bottom:1px solid #f4f5f8}
 .wk td.nm{text-align:left;padding-left:14px;white-space:nowrap;font-weight:800}
 .wk tr:last-child td{border-bottom:none}
-.sw{position:relative;display:inline-block;width:42px;height:23px;cursor:pointer;vertical-align:middle}
-.sw input{opacity:0;width:0;height:0}
-.sw .sl2{position:absolute;inset:0;background:#cfd4dd;border-radius:23px;transition:.18s}
-.sw .sl2:before{content:"";position:absolute;height:17px;width:17px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.18s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
-.sw input:checked + .sl2{background:var(--green)}
-.sw input:checked + .sl2:before{transform:translateX(19px)}
-.sw.busy .sl2{background:#e11d48}
-.dchip{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;border:1.5px solid #dfe3ea;background:#fff;color:#aeb4bf;font-size:10.5px;font-weight:800;cursor:pointer;transition:.12s;user-select:none}
-.dchip.off{background:#fdecef;border-color:#f3b6c1;color:#d11846}
-.dchip.past{opacity:.32;cursor:default}
-.wk-note{font-size:10px;color:#9aa1ad;padding:7px 14px 2px}
-.wk-note b{color:#e11d48}
-/* [2026-08-21] 모바일 오버라이드 — 원본 뒤로 이동(소스순서 우선 확보) */
+
+/* 10월 공지 박스 */
+.notice-oct{font-size:12px;line-height:1.75;opacity:.96;word-break:keep-all;overflow-wrap:break-word}
+.notice-oct b.y{color:#ffd966}
+.fee-mini{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.fee-mini span{font-size:11px;font-weight:700;background:rgba(255,255,255,.12);border-radius:6px;padding:2px 8px}
+
 @media (max-width:1240px){
   .board{grid-template-columns:minmax(0,1fr);height:auto}
   .colwrap,.mid{min-height:0}
-  /* 모바일: 카드가 빈 공간 늘리지 않게 (하단 여백 제거) */
   .board .card.colwrap,.board .card[style*="flex:1"]{flex:0 1 auto!important}
   .scroll{max-height:none!important;overflow:visible}
   #situation.scroll{max-height:420px;overflow-y:auto}
   .sec-nav{display:flex}
-  /* 순위 헤더: 모바일에서 제목 아래로 토글 (좁아서 깨지는 것 방지) */
   .ch{flex-wrap:wrap;gap:6px}
   .ch .tabs{flex-wrap:nowrap;width:100%;justify-content:flex-start}
-  /* 방문/챙길리드 섹션 짧을 때 하단 여백 제거 */
   .mid.sec .card{flex:0 1 auto}
   .mid.sec .scroll{max-height:none}
   .sec{display:none}
-  .colwrap.sec.on{display:flex}   /* .colwrap은 flex 컨테이너 */
-  .mid.sec.on{display:grid}       /* .mid는 grid 컨테이너 */
-
-  /* 성과 탭: 소재 히트맵 폰트/여백 축소 */
+  .colwrap.sec.on{display:flex}
+  .mid.sec.on{display:grid}
   .heat{font-size:9.5px}
   .heat th{font-size:8.5px;padding:3px 1px}
   .heat td{padding:1px}
   .heat th.l,.heat td.l{padding-left:8px}
   .heat .cell{min-width:17px;padding:4px 1px}
-
-  /* [2026-08-21] 모바일 개선 — PC 영향 없음 (1240px 이하만) */
-  /* ① 제목·새로고침 한 줄 유지 (쪼개짐 방지) */
   .top{flex-wrap:nowrap;gap:8px}
   .top h1{font-size:15px;white-space:nowrap;flex-shrink:0}
   .top .upd{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
   .top .rf{font-size:11px;padding:5px 10px;white-space:nowrap;flex-shrink:0}
-  /* ② [2026-08-21 개정] 담당자 성과표 → 카드 2열 (가로스크롤 폐지, 핵심 7지표만) */
   .pfwrap{min-width:0;overflow-x:hidden}
-  /* [2026-09] 순위판 = 모바일도 표 그대로 (dashboard 방식·촘촘). 카드 변환 폐지 */
   .pf{display:table;width:100%;min-width:0;font-size:11px;white-space:nowrap}
   .pf thead{display:table-header-group}
   .pf tbody{display:table-row-group}
@@ -166,25 +149,18 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
   .pf th{font-size:9.5px;color:#8b93a2;font-weight:700;background:#f7f8fb;position:sticky;top:0}
   .pf td.rk{white-space:nowrap;font-size:10.5px;text-align:center}
   .pf td.nm{text-align:left;font-weight:800;font-size:12px;padding-left:6px;white-space:nowrap}
-  .pf td.sc{font-weight:800;color:#5b5fe0}
-  .pf td.sl{color:var(--purple);font-weight:700;font-size:10px}
-  .pf td.ca,.pf td.rt{display:none}   /* 방취·방취율·오더율만 숨김 */
-  .pf td::before{display:none!important} /* 라벨 접두사 제거 (헤더 있음) */
-  /* 순위판만 가로 스크롤 (열 많아 넘칠 때) */
+  .pf td.sl{color:var(--purple);font-weight:800}
+  .pf td.ca,.pf td.rt,.pf td.ro,.pf td.ef{display:none}
+  .pf td::before{display:none!important}
   .card .scroll:has(.pf), #situation{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  /* 매출 요약 카드도 2열 (우측 잘림 방지) */
   .sales{grid-template-columns:repeat(2,1fr)}
   .sales .sc .v{font-size:12.5px;letter-spacing:-.03em;line-height:1.25}
-  /* 소재 히트맵만 가로 스크롤 유지 (매트릭스라 카드화 부적합) */
   #heat-wrap{min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
   .heat{min-width:600px}
-  /* 스크롤 힌트 — 오른쪽 그라데이션으로 "더 있음" 표시 */
   .pfwrap, #heat-wrap{position:relative}
-  /* ③ 결번왕 등 이름 쪼개짐 방지 */
   .hlrow .nm{white-space:nowrap;flex-shrink:0}
   .hlrow .no{font-size:8.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 }
-
 </style>
 </head>
 <body>
@@ -195,7 +171,6 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
   <button class="rf" onclick="loadAll()">새로고침</button>
 </div>
 
-<!-- 모바일 전용 섹션 탭 (1240px 이하에서만 표시) -->
 <div class="sec-nav">
   <button class="sec-nav-btn on" onclick="showSec(0)">성과</button>
   <button class="sec-nav-btn" onclick="showSec(1)">팀현황</button>
@@ -217,7 +192,7 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 
     <div class="card colwrap" style="flex:1;min-height:0;gap:0">
       <div class="ch">
-        <span class="t">🏆 GROWTH CUP 순위 <span style="font-size:10px;font-weight:600;color:#8b93a2">점수=매출×ROAS · 매일 ▲▼</span></span>
+        <span class="t">🏆 10월 그로스팀 순위 <span style="font-size:10px;font-weight:600;color:#8b93a2">순위=매출순 · 건당 수수료</span></span>
         <span class="tabs sp" id="pf-tabs">
           <span class="tab on" onclick="setPerfTab(0)">이번달</span>
           <span class="tab" onclick="setPerfTab(1)">지난달</span>
@@ -226,57 +201,53 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
       </div>
       <div class="pfwrap scroll" style="flex:1">
         <table class="pf">
-          <thead><tr><th>순위</th><th>담당자</th><th>점수</th><th>DB</th><th>방문</th><th>세팅</th><th>오더</th><th>매출</th><th>ROAS</th><th>효율</th></tr></thead>
-          <tbody id="pf-body"><tr><td colspan="11" class="empty">불러오는 중...</td></tr></tbody>
+          <thead><tr><th>순위</th><th>담당자</th><th>매출</th><th>오더</th><th>건당</th><th>수수료</th><th>DB</th><th>방문</th><th>세팅</th><th>ROAS</th></tr></thead>
+          <tbody id="pf-body"><tr><td colspan="10" class="empty">불러오는 중...</td></tr></tbody>
         </table>
       </div>
     </div>
-    <!-- 덕질 스탯 (순위는 위 표에서, 여긴 재미 요소) -->
     <div class="card">
       <div class="ch"><span class="t">🔥 덕질 스탯</span><span class="badge sp">이번주</span></div>
       <div class="hl" id="hl"></div>
     </div>
   </div>
 
-  <!-- 가운데: 지금 챙길 리드 (크게) + 9월 규칙 전문 -->
+  <!-- 가운데: 지금 챙길 리드 + 10월 공지 -->
   <div class="mid sec">
     <div class="card colwrap" style="flex:1;min-height:0;gap:0">
       <div class="ch"><span class="t">📋 지금 챙길 리드</span><span class="badge sp">실시간</span></div>
       <div class="scroll" id="situation" style="flex:1"><div class="empty">불러오는 중...</div></div>
     </div>
-    <!-- 9월 업무 시스템 변경 (오디세이 배경 은은하게) -->
-    <div class="card" style="position:relative;overflow:hidden;background:linear-gradient(135deg,#1a2a4a,#2d3f5f);color:#fff;padding:20px 22px">
-      <!-- 오디세이 배경 이미지 (은은하게) — GitHub에 올린 오디세이 포스터 URL로 교체 가능 -->
-      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 70% 30%, rgba(90,120,160,.25), transparent 60%),radial-gradient(ellipse at 20% 80%, rgba(40,60,90,.3), transparent 55%);opacity:.6;pointer-events:none"></div>
+    <div class="card" style="position:relative;overflow:hidden;background:linear-gradient(135deg,#0f1830,#1e2d4f);color:#fff;padding:20px 22px">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 75% 25%, rgba(70,110,200,.28), transparent 58%),radial-gradient(ellipse at 15% 85%, rgba(30,50,90,.3), transparent 55%);opacity:.7;pointer-events:none"></div>
       <div style="position:relative;z-index:1">
-      <div style="font-weight:800;font-size:15px;margin-bottom:10px;letter-spacing:-.3px">⚔️ 9월 한 달 업무 시스템 변경 <span style="opacity:.65;font-weight:600;font-size:12px">· 춘추전국시대</span></div>
-      <div style="font-size:12px;line-height:1.75;opacity:.96;word-break:keep-all;overflow-wrap:break-word">
-        <b style="color:#ffd966">1. 신규DB 담당자 자동지정 폐지</b><br>
-        · 먼저 콜한 사람이 담당자가 본인이름으로 입력<br><br>
-        <b style="color:#ffd966">2. 부재관리 변경</b><br>
-        · 1콜만 진행한 모든 부재콜은 <b>2일 뒤까지 재콜 없으면</b> 다른 사람이 마음껏 업무 (담당자 본인이름으로 변경해서 콜 가능)<br>
-        · <b>2콜 이상 부재</b>였던 건은 무조건 부재 알림톡 진행 원칙. 안 되어있는 모든 콜은 담당자 변경하고 다른 사람이 부재 알림톡으로 진행<br>
-        · <b>2주 이상 지난 모든 부재</b>는 이유불문 다른 사람이 콜 가능<br><br>
-        <b style="color:#ffd966">3. 홀딩관리 변경</b><br>
-        · 약속콜 메모 안 되어있는 홀딩, 약속콜 시간 이후 관리 안 되어있는 홀딩은 <b>1일 이상 관리 안 할 시</b> 다른 사람이 담당자 변경 업무 가능<br>
-        · <span style="opacity:.85">(눈치 보지 말 것. 변경이 안 되면 신이사나 내가 강제 변경하겠음)</span>
+      <div style="font-weight:800;font-size:15px;margin-bottom:12px;letter-spacing:-.3px">🎯 10월 업무 시스템 <span style="opacity:.65;font-weight:600;font-size:12px">· 숫자가 전부다</span></div>
+      <div class="notice-oct">
+        <b class="y">1. 신규 DB 자동배정 복귀</b><br>
+        · 유입 즉시 순차로 담당 자동 지정<br><br>
+        <b class="y">2. 오후 2시 미접촉 재분배</b><br>
+        · 배정받고 <b>오후 2시까지 코멘트(접촉 기록) 없으면</b> = 미접촉<br>
+        · 미접촉·부재 DB 전면 재분배 (다른 담당에게 넘어감)<br>
+        · <b>콜했으면 반드시 코멘트</b> — 그게 내 DB 지키는 법<br><br>
+        <b class="y">3. 순위 = 매출순 · 건당 수수료</b>
+        <div class="fee-mini">
+          <span>1등 15만</span><span>2등 12만</span><span>3등 10만</span><span>4등 7만</span><span>5등 5만</span>
+        </div>
       </div>
       <div style="font-size:12px;line-height:1.7;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.2);opacity:.9">
-        지금 DB 배정된 거 다 무시하시면 되고요. 신규인데 전화 안 들어간 건 그냥 각자 알아서 하시면 됩니다. 혼란스러워하지 마세요.
+        전국 3억 달성 시 <b style="color:#5dd39e">전원 건당 15만</b> · 2억 미달 시 <b style="color:#f59e9e">전원 건당 5만</b> (순위 무관)
       </div>
       </div>
     </div>
   </div>
 
-  <!-- 우: 시상 포스터 (풀샷) + 바로가기 -->
+  <!-- 우: 시상 포스터 + 바로가기 -->
   <div class="colwrap sec">
-    <!-- 시상 이미지 풀샷 -->
-    <a href="https://github.com/crocdeucation-rgb/image/blob/main/KakaoTalk_20260901_181646086.png?raw=true" target="_blank"
+    <a href="https://github.com/crocdeucation-rgb/image/blob/main/KakaoTalk_20261003_135501433.png?raw=true" target="_blank"
        style="display:block;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.12);border:1px solid var(--border,#e2e6ef);margin-bottom:14px">
-      <img src="https://github.com/crocdeucation-rgb/image/blob/main/KakaoTalk_20260901_181646086.png?raw=true"
-           alt="GROWTH CUP 9월" style="width:100%;height:auto;display:block" />
+      <img src="https://github.com/crocdeucation-rgb/image/blob/main/KakaoTalk_20261003_135501433.png?raw=true"
+           alt="그로스팀 10월" style="width:100%;height:auto;display:block" />
     </a>
-    <!-- 바로가기 -->
     <div style="display:flex;flex-direction:column;gap:10px">
       <a href="https://drive.google.com/drive/folders/1QpRfhW4EbVv62nPqspYWfZd-ZyIl0qcT?usp=sharing" target="_blank"
          style="display:block;background:var(--card2,#f0f2f8);border:0.5px solid var(--border,#e2e6ef);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--text,#333)">
@@ -301,7 +272,6 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 const SITUATION_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=669050300&single=true&output=csv';
 const SUMMARY_CSV_URL   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1438610573&single=true&output=csv';
 const SCHEDULE_CSV_URL  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1384080283&single=true&output=csv';
-// ★ WORK_CSV_URL: '아라위키 자동화' 스프레드시트 → '근무상태' 탭 웹게시 CSV (2026-08-11 연결)
 const WORK_CSV_URL      = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRp14Bg9QZsfrfO9bv63ZjHnM4OL5A-7-eiQX-J4hVku0W-qwKmTQT6vlVRp-vBGBM87wajO7Qe6Xs_/pub?gid=1370179906&single=true&output=csv';
 const WEBAPP_URL        = 'https://script.google.com/macros/s/AKfycbxu_6qC9WKTtVcAJJtoh_EfmvUbyzbkZFlTRC7uUr_dFmUYehON0Vhb3HdAwrTnF37w/exec';
 
@@ -314,7 +284,9 @@ const dayN=['일','월','화','수','목','금','토'];
 const WDAYS=['월','화','수','목','금','토'];
 let summaryRows=[], perfTab=0, workState={};
 
-/* ── 모바일 섹션 탭 (1240px 이하에서만 동작 · PC는 CSS로 3단 유지) ── */
+// [2026-10] 매출순 등수별 건당 수수료 (만원)
+function feeRate(rank){ return ({1:15,2:12,3:10,4:7,5:5})[rank] || 5; }
+
 let currentSec=0;
 function showSec(i){
   currentSec=i;
@@ -336,7 +308,6 @@ async function loadAll(){
   document.getElementById('upd').textContent='업데이트 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
 }
 
-/* ── 지금 챙길 리드 (중간관리·우선 / 홀딩 제거) + 근무 스테이터스 ── */
 async function loadSit(){
   let rows;
   try{ rows=await csv(SITUATION_CSV_URL); rows.shift(); }
@@ -347,11 +318,9 @@ async function loadSit(){
     if(v.diff!==null&&v.diff>=MID_DAYS) mid.push({l,v});
   });
   mid.sort((a,b)=>a.v.diff-b.v.diff);
-
   const midRow=({l,v})=>'<div class="item '+(l.mid?'done':'')+'"><input type="checkbox" class="chk" '+(l.mid?'checked':'')+' onchange="tglMid(this,\''+l.pageId+'\')"><span class="when">'+v.lab+'</span>'+nmL(l.name,l.pageId)+' <span class="gr">'+esc(l.grade)+'</span><span class="mn">+'+v.diff+'일</span>'+asB(l.as)+'</div>';
   const grp=(icon,label,color,arr,fn)=>'<div class="grp"><div class="glabel">'+icon+' '+label+'<span class="gc" style="background:'+color+'">'+arr.length+'</span></div>'+(arr.length?arr.map(fn).join(''):'<div class="empty">없음</div>')+'</div>';
-  document.getElementById('situation').innerHTML =
-    grp('🔔','중간관리','var(--purple)',mid,midRow);
+  document.getElementById('situation').innerHTML = grp('🔔','중간관리','var(--purple)',mid,midRow);
 }
 function tglMid(el,pid){
   el.closest('.item').classList.toggle('done',el.checked);
@@ -359,87 +328,13 @@ function tglMid(el,pid){
   fetch(WEBAPP_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'midmanage',pageId:pid,checked:el.checked})}).catch(function(){});
 }
 
-/* ── 근무 스테이터스 (독립 카드 / 하이브리드: 요일=근무일 positive) ── */
-const cHex={hye:'#0f9d58',kim:'#1a73e8',jang:'#f97316',park:'#9333ea',woo:'#e11d48',tae:'#0891b2',sung:'#7c3aed',noh:'#0d9488',won:'#b45309',ahn:'#4338ca'};
-async function loadWork(){
-  let ok=false;
-  if(WORK_CSV_URL.indexOf('WORK_GID')<0 && WORK_CSV_URL.indexOf('PASTE_')<0){
-    try{
-      const rows=await csv(WORK_CSV_URL); rows.shift();
-      rows.forEach(function(r){ if(!r[0])return;
-        var off={}; WDAYS.forEach(function(d,i){off[d]=(r[2+i]==='1'||r[2+i]==='TRUE'||r[2+i]==='O')});
-        workState[r[0]]={active:!(r[1]==='0'||r[1]==='FALSE'), off:off};
-      }); ok=true;
-    }catch(e){}
-  }
-  if(!ok){ ASSIGNEES.forEach(function(n){ if(!workState[n]) workState[n]={active:true,off:{월:false,화:false,수:false,목:false,금:false,토:false}}; }); }
-  renderWorkRows();
-}
-function renderWorkRows(){
-  if(!document.getElementById('wk-body'))return;
-  var todayIdx=new Date().getDay();           // 0=일 .. 6=토
-  var todayN=dayN[todayIdx];
-  var html=ASSIGNEES.map(function(n){
-    var s=workState[n]||{active:true,off:{}};
-    var days=WDAYS.map(function(d){
-      var dIdx=dayN.indexOf(d);               // 월=1 .. 토=6
-      var isOff=!!(s.off&&s.off[d]);
-      var isPast=(todayIdx!==0 && dIdx<todayIdx);   // 오늘보다 앞선 요일 = 지나감(배정 무시)
-      var mark=(d===todayN)?'outline:2px solid #c4b5fd;outline-offset:1px':'';
-      var cls='dchip'+(isOff?' off':'')+(isPast?' past':'');
-      var click=isPast?'':' onclick="tglDay(\''+n+'\',\''+d+'\',this)"';
-      return '<td><span class="'+cls+'" style="'+mark+'"'+click+'>'+d+'</span></td>';
-    }).join('');
-    var sw='<label class="sw '+(s.active?'':'busy')+'"><input type="checkbox" '+(s.active?'checked':'')+' onchange="tglActive(\''+n+'\',this)"><span class="sl2"></span></label>';
-    var color=cHex[cmap[n]]||'#3c434f';
-    return '<tr><td class="nm" style="color:'+color+'">'+esc(n)+'</td><td>'+sw+'</td>'+days+'</tr>';
-  }).join('');
-  document.getElementById('wk-body').innerHTML=html;
-}
-function tglActive(name,el){
-  el.closest('.sw').classList.toggle('busy',!el.checked);
-  if(!workState[name])workState[name]={active:true,off:{}};
-  workState[name].active=el.checked;
-  postWork({action:'setActive',name:name,active:el.checked});
-}
-function tglDay(name,day,el){
-  if(!workState[name])workState[name]={active:true,off:{}};
-  if(!workState[name].off)workState[name].off={};
-  var next=!workState[name].off[day];
-  workState[name].off[day]=next; el.classList.toggle('off',next);
-  // 요일 체크 = 그 요일 안 됨(오프) → 노션 체크박스 true=오프
-  postWork({action:'setDayoff',name:name,day:day,off:next});
-}
-function postWork(p){
-  if(!WEBAPP_URL||WEBAPP_URL.indexOf('PASTE_')===0) return;
-  fetch(WEBAPP_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)}).catch(function(){});
-}
-
-/* ── 방문 목록 ── */
-async function loadVisit(){
-  let rows;
-  try{ rows=await csv(SCHEDULE_CSV_URL); rows.shift(); }
-  catch(e){ document.getElementById('visit').innerHTML='<div class="empty">데이터를 불러오지 못했어요.</div>'; return; }
-  const today=tMid();
-  const tStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
-  const vs=rows.filter(r=>r[0]&&r[4]==='visit'&&new Date(r[0])>=today).sort((a,b)=>new Date(a[0])-new Date(b[0]));
-  document.getElementById('c-visit').textContent=vs.length;
-  document.getElementById('visit').innerHTML = vs.length ? vs.map(r=>{
-    const d=new Date(r[0]); const ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    const isT=ds===tStr; const lab=(d.getMonth()+1)+'/'+d.getDate()+' ('+dayN[d.getDay()]+')';
-    return '<div class="item '+(isT?'today':'')+'"><span class="when">'+(isT?'오늘':lab)+'</span><span class="tm">'+(r[1]||'미정')+'</span>'+nmL(r[2],r[7])+' <span class="gr">'+esc(sg(r[3]))+'</span>'+asB(r[6])+'</div>';
-  }).join('') : '<div class="empty">방문 예정 없음</div>';
-}
 function sg(g){if(!g)return'';if(g.indexOf('초')>=0){var m=g.match(/\d+/);return m?'초'+m[0]:'초'}if(g.indexOf('중')>=0){var m=g.match(/\d+/);return m?'중'+m[0]:'중'}if(g.indexOf('고')>=0){var m=g.match(/\d+/);return m?'고'+m[0]:'고'}return g}
 
-/* ── 요약 ── */
-// [2026-09] 순위이력 시트 (대쉬보드 1bkK, gid=690549750). G~K블록=매출×ROAS(팀용) 어제순위.
 const RANK_CSV_URL = 'https://docs.google.com/spreadsheets/d/1bkKxvdFlEgP8EoNjMmLzemFfRjJIfhc3EyIJI5v3Eo8/gviz/tq?tqx=out:csv&headers=0&gid=690549750';
-var YRANK_MAP = {};   // {이름: 어제순위}
+var YRANK_MAP = {};
 async function loadYRank(){
   try{
     var rows = await csv(RANK_CSV_URL);
-    // G~K = 인덱스 6~10 (G:이름 6 / H:어제순위 7). gviz 큰따옴표 제거 필수.
     function unq(s){ return String(s||'').replace(/^"|"$/g,'').trim(); }
     rows.forEach(function(r){
       var nm = unq(r[6]);
@@ -461,16 +356,14 @@ async function loadSum(){
   renderHL(); renderPerf();
 }
 function renderHL(){
-  // [2026-09] 덕질 스탯 — 순위는 GROWTH CUP 표에서, 여긴 재미요소만
   var hl={};
   for(var i=0;i<summaryRows.length;i++){ if(summaryRows[i]&&summaryRows[i][0]==='주간하이라이트'){ for(var j=i+1;j<Math.min(i+9,summaryRows.length);j++){var r=summaryRows[j];if(!r||!r[0])break;hl[r[0]]={name:r[1]||'-',val:r[2]||'',extra:r[3]||''}} break; } }
-  // 급상승왕 = 이번달 점수 순위가 지난달 대비 제일 오른 사람
-  function rankOf(tab){var o=tab*6+1,c=19+tab*3,a=[];ASSIGNEES.forEach(function(nm,i){var r=summaryRows[ASSIGNEE_START_IDX+i]||[];var sn=parseFloat(((r[o+5]||'0')+'').replace(/[^0-9.]/g,''))||0;a.push({name:r[0]||nm,score:Math.round(sn*(+(r[c+1]||0)))});});a.sort(function(x,y){return y.score-x.score;});var rk={};a.forEach(function(x,idx){rk[x.name]=idx+1;});return rk;}
+  // [2026-10] 급상승왕 = 매출순 순위 상승폭 (매출 기준)
+  function rankOf(tab){var o=tab*6+1,a=[];ASSIGNEES.forEach(function(nm,i){var r=summaryRows[ASSIGNEE_START_IDX+i]||[];var sn=parseFloat(((r[o+5]||'0')+'').replace(/[^0-9.]/g,''))||0;a.push({name:r[0]||nm,sales:sn});});a.sort(function(x,y){return y.sales-x.sales;});var rk={};a.forEach(function(x,idx){rk[x.name]=idx+1;});return rk;}
   var curR=rankOf(0), prvR=rankOf(1), topRise=null, mx=0;
   ASSIGNEES.forEach(function(nm){var d=(prvR[nm]||99)-(curR[nm]||99);if(d>mx){mx=d;topRise=nm;}});
   var row=function(ic,lb,nm,vl){return '<div class="hlrow"><span class="ic">'+ic+'</span><span class="lb">'+lb+'</span><span class="nm">'+esc(nm||'-')+'</span><span class="vl">'+esc(vl||'')+'</span></div>';};
-  // 담당자 데이터에서 DB왕·오더왕·매출왕 계산 (이달)
-  var _o=1;  // 이번달 offset
+  var _o=1;
   var _stat={db:{n:'-',v:0},od:{n:'-',v:0},sl:{n:'-',v:0}};
   ASSIGNEES.forEach(function(nm,i){
     var r=summaryRows[ASSIGNEE_START_IDX+i]||[];
@@ -493,60 +386,59 @@ function setPerfTab(i){perfTab=i;var ts=document.querySelectorAll('#pf-tabs .tab
 function renderPerf(){
   if(!summaryRows.length)return;
   var off=perfTab*6+1, co=19+perfTab*3;
-  // [2026-09 GROWTH CUP] 담당자별 점수(매출×ROAS) 계산 → 순위 + 전월 대비 변동
-  function calcScores(tab){
-    var o=tab*6+1, c=19+tab*3, a=[];
+  // [2026-10] 매출순 순위 (전월 대비는 매출순위로)
+  function calcSalesRank(tab){
+    var o=tab*6+1, a=[];
     ASSIGNEES.forEach(function(name,i){
       var r=summaryRows[ASSIGNEE_START_IDX+i]||[];
       var sn=parseFloat(((r[o+5]||'0')+'').replace(/[^0-9.]/g,''))||0;
-      var rn=+(r[c+1]||0);
-      a.push({name:r[0]||name, score:Math.round(sn*rn)});
+      a.push({name:r[0]||name, sales:sn});
     });
-    a.sort(function(x,y){return y.score-x.score;});
+    a.sort(function(x,y){return y.sales-x.sales;});
     var rk={}; a.forEach(function(x,idx){rk[x.name]=idx+1;});
     return rk;
   }
-  var prevRank = calcScores(1);   // 지난달 순위 (전월변동용)
-  var tDb=0,tVs=0,tSe=0,tCa=0,tOd=0,tSales=0,tSpend=0;
-  // 담당자 데이터 수집 (점수 포함)
+  var tDb=0,tVs=0,tSe=0,tCa=0,tOd=0,tSales=0,tSpend=0,tFee=0;
   var data=ASSIGNEES.map(function(name,i){
     var r=summaryRows[ASSIGNEE_START_IDX+i]||[];
     var db=+(r[off]||0),vs=+(r[off+1]||0),se=+(r[off+2]||0),ca=+(r[off+3]||0),od=+(r[off+4]||0);
     var sales=r[off+5]||'0원';
-    var salesNum=parseFloat((sales+'').replace(/[^0-9.]/g,''))||0;   // [2026-09-06] 소수점 유지(만원 소수1자리). '.'제거 시 10배 뻥튀기 버그
+    var salesNum=parseFloat((sales+'').replace(/[^0-9.]/g,''))||0;
     var roasNum=+(r[co+1]||0);
     return {name:r[0]||name, db:db,vs:vs,se:se,ca:ca,od:od, sales:sales, salesNum:salesNum, roas:roasNum,
-            ef:(r[co+2]?r[co+2]+'만':'-'), score:Math.round(salesNum*roasNum),
-            yRank:(YRANK_MAP[r[0]||name]||0)};   // [2026-09] 어제순위 = 순위이력 G~K(매출×ROAS)
+            ef:(r[co+2]?r[co+2]+'만':'-'),
+            yRank:(YRANK_MAP[r[0]||name]||0)};
   });
-  // 점수순 정렬
-  data.sort(function(a,b){return b.score-a.score;});
+  // [2026-10] 매출로만 정렬
+  data.sort(function(a,b){return b.salesNum-a.salesNum;});
   var rows=data.map(function(d,idx){
     tDb+=d.db;tVs+=d.vs;tSe+=d.se;tCa+=d.ca;tOd+=d.od;tSales+=d.salesNum;
     if(d.roas>0&&d.salesNum>0) tSpend+=d.salesNum/d.roas;
-    var hasRank = d.score>0;                // [2026-09] 오늘 순위 자격 = 매출×ROAS>0
-    var rank = hasRank ? idx+1 : 0;         // 매출0 = 순위 없음(0)
+    var hasRank = d.salesNum>0;            // [2026-10] 순위 자격 = 매출>0
+    var rank = hasRank ? idx+1 : 0;
+    var rate = hasRank ? feeRate(rank) : 0;
+    var fee = hasRank ? d.od*rate : 0;     // 수수료 = 오더 × 등수별 건당
+    tFee += fee;
     var dDelta = (hasRank && d.yRank>0) ? (d.yRank-rank) : 0;
-    // [2026-09] op.gg 스타일 순위 변동 — 어제→오늘 (전월 제거)
     var dv;
-    if(!hasRank)                   dv='';   // 오늘 순위 없음 → 아무 표시 안 함
+    if(!hasRank)                   dv='';
     else if(d.yRank>0 && dDelta>0) dv='<span style="color:#0f9d58;font-weight:800;font-size:10px">▲'+dDelta+'</span><span style="color:#9aa3b0;font-size:9px"> 어제'+d.yRank+'위</span>';
     else if(d.yRank>0 && dDelta<0) dv='<span style="color:#e11d48;font-weight:800;font-size:10px">▼'+(-dDelta)+'</span><span style="color:#9aa3b0;font-size:9px"> 어제'+d.yRank+'위</span>';
     else if(d.yRank>0)             dv='<span style="color:#9aa3b0;font-size:10px">—</span>';
-    else                          dv='<span style="color:#5b5fe0;font-weight:800;font-size:9px">NEW</span>';   // 오늘 순위O + 어제 순위X
-    var mv='';
+    else                          dv='<span style="color:#5b5fe0;font-weight:800;font-size:9px">NEW</span>';
     var medal = !hasRank ? '<b style="color:#c2c8d2">'+(idx+1)+'</b>' : rank===1?'👑':rank===2?'🥈':rank===3?'🥉':'<b style="color:#8b93a2">'+rank+'</b>';
-    var cr=d.vs?Math.round(d.ca/d.vs*100):0, or=d.se?Math.round(d.od/d.se*100):0;
-    return '<tr'+(rank<=3?' style="background:rgba(91,95,224,.04)"':'')+'>'
+    return '<tr'+(rank&&rank<=3?' style="background:rgba(91,95,224,.04)"':'')+'>'
       +'<td class="rk" style="text-align:center;white-space:nowrap;line-height:1.5">'+medal+'<br>'+dv+'</td>'
       +'<td class="nm">'+esc(d.name)+'</td>'
-      +'<td class="sc" style="font-weight:800;color:#5b5fe0">'+(d.score?d.score.toLocaleString():'-')+'</td>'
-      +'<td class="db">'+d.db+'</td><td class="vs">'+d.vs+'</td><td class="se">'+d.se+'</td><td class="od">'+d.od+'</td>'
-      +'<td class="sl">'+esc(d.sales)+'</td><td class="ro">'+(d.roas?d.roas.toFixed(2):'-')+'</td><td class="ef">'+d.ef+'</td></tr>';
+      +'<td class="sl">'+esc(d.sales)+'</td>'
+      +'<td class="od">'+d.od+'</td>'
+      +'<td class="rt">'+(hasRank?rate+'만':'-')+'</td>'
+      +'<td class="fee">'+(fee?fee.toLocaleString()+'만':'-')+'</td>'
+      +'<td class="db">'+d.db+'</td><td class="vs">'+d.vs+'</td><td class="se">'+d.se+'</td>'
+      +'<td class="ro">'+(d.roas?d.roas.toFixed(2):'-')+'</td></tr>';
   });
-  var tEf=tDb?Math.round(tSales/tDb*10)/10:0;
   var tRoas=tSpend>0?(tSales/tSpend).toFixed(2):'-';
-  rows.push('<tr class="tot"><td class="rk"></td><td class="nm">합계</td><td class="sc"></td><td class="db">'+tDb+'</td><td class="vs">'+tVs+'</td><td class="se">'+tSe+'</td><td class="od">'+tOd+'</td><td class="sl">'+tSales.toLocaleString()+'만원</td><td class="ro">'+tRoas+'</td><td class="ef">'+tEf+'만</td></tr>');
+  rows.push('<tr class="tot"><td class="rk"></td><td class="nm">합계</td><td class="sl">'+tSales.toLocaleString()+'만원</td><td class="od">'+tOd+'</td><td class="rt"></td><td class="fee">'+tFee.toLocaleString()+'만</td><td class="db">'+tDb+'</td><td class="vs">'+tVs+'</td><td class="se">'+tSe+'</td><td class="ro">'+tRoas+'</td></tr>');
   document.getElementById('pf-body').innerHTML=rows.join('');
 
   var sojCol=perfTab===1?29:(perfTab===2?30:28);
@@ -557,7 +449,7 @@ function renderPerf(){
   var ht;
   if(!keys.length){ht='<div class="empty">이 기간 소재 배정 없음</div>'}
   else{ht='<table class="heat"><thead><tr><th class="l">담당자</th>'+keys.map(function(k){return'<th>'+esc(k)+'</th>'}).join('')+'</tr></thead><tbody>'+hd.map(function(d){return'<tr><td class="l">'+esc(d.name)+'</td>'+keys.map(function(k){var v=d.soj[k]||0;var fg=v>mx*0.55?'#fff':'#5b4a6b';return'<td><span class="cell" style="background:'+col(v)+';color:'+fg+'">'+(v||'')+'</span></td>'}).join('')+'</tr>'}).join('')+'</tbody></table>'}
-  var _hw=document.getElementById('heat-wrap'); if(_hw) _hw.innerHTML=ht;   // 소재배정 폐기 시 null 안전
+  var _hw=document.getElementById('heat-wrap'); if(_hw) _hw.innerHTML=ht;
 }
 
 loadAll();
