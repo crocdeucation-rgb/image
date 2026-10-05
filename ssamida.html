@@ -59,15 +59,33 @@
   .task .lg{font-size:11px;color:var(--teal);margin-top:4px;font-weight:600}
   .task .cm{font-size:11px;color:var(--purple);margin-top:3px;background:var(--soft);padding:4px 8px;border-radius:6px}
 
-  /* ── [추가] 완료 강조 ── */
-  .task.done-hl{background:linear-gradient(90deg,rgba(15,157,110,.08),rgba(15,157,110,.01));border-left:3px solid var(--green);border-radius:0 8px 8px 0;padding-left:11px;margin-left:-14px;padding-top:11px;padding-bottom:11px}
-  .st.done-big{font-size:12px;font-weight:900;padding:4px 11px;background:var(--green);color:#fff;border-radius:7px;box-shadow:0 2px 6px rgba(15,157,110,.3)}
-  .task.done-hl .tt{color:var(--green)}
-  /* ── [추가] 완료예정일 D-day 뱃지 ── */
-  .due{display:inline-block;font-size:10.5px;font-weight:800;padding:2px 9px;border-radius:6px;margin-left:7px;white-space:nowrap;vertical-align:middle;background:#EAF0FF;color:var(--blue);border:1px solid #cfdcff}
-  .due.soon{background:#FDF1E2;color:var(--orange);border-color:#f3d9ae}
-  .due.over{background:#FDECEA;color:var(--red);border-color:#f3c6be}
-  .due .dd{font-weight:900;margin-left:3px}
+  /* ── 제목줄: 제목은 왼쪽, 상태/완료예정/완료딱지는 모두 오른쪽 ── */
+  .task .tr{align-items:center;gap:10px}
+  .task .tt{flex:1;min-width:0}
+  .task .rhs{flex:none;margin-left:auto;display:flex;align-items:center;gap:7px;white-space:nowrap}
+
+  /* 우측 상태 뱃지(미완) */
+  .rst{font-size:11px;font-weight:800;padding:3px 10px;border-radius:7px;white-space:nowrap}
+  .rst.doing{background:#EAF0FF;color:var(--blue)}
+  .rst.plan{background:#F0F2F7;color:#8a97ad}
+  .rst.talk{background:#FDF1E2;color:var(--orange)}
+  .rst.check{background:#EDEAFC;color:var(--purple)}
+
+  /* [완료] 우측 빨간 딱지 + 본문 가라앉힘(흐림/빗금/취소선) */
+  .done-stamp{font-size:11px;font-weight:900;letter-spacing:-.3px;color:#fff;background:var(--red);padding:3px 12px;border-radius:7px;white-space:nowrap;box-shadow:0 2px 6px rgba(229,83,61,.3)}
+  .task.done-hl{opacity:.6;background-image:repeating-linear-gradient(135deg,rgba(100,116,139,.05) 0 6px,transparent 6px 12px);border-radius:7px;padding-left:8px;margin-left:-8px}
+  .task.done-hl .tt{color:var(--gray);text-decoration:line-through;text-decoration-color:rgba(100,116,139,.45);text-decoration-thickness:1px}
+  .task.done-hl .ds,.task.done-hl .lg,.task.done-hl .ministeps,.task.done-hl .owner{opacity:.8}
+
+  /* [완료예정일] 우측, 눈에 확 띄게 */
+  .due{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:900;padding:4px 11px;border-radius:8px;white-space:nowrap;
+       background:#FFF3C4;color:#8A6D0F;border:1.5px solid #F2D98C;box-shadow:0 1px 4px rgba(224,133,12,.12)}
+  .due::before{content:'📅';font-size:11px}
+  .due .dd{font-weight:900;font-size:12.5px}
+  .due.soon{background:#FDE7CF;color:#B5590A;border-color:#F3B873}
+  .due.soon::before{content:'⏰'}
+  .due.over{background:var(--red);color:#fff;border-color:var(--red);box-shadow:0 2px 7px rgba(229,83,61,.35)}
+  .due.over::before{content:'🚨'}
 
   .ministeps{display:flex;flex-wrap:wrap;align-items:center;gap:3px;margin:6px 0 2px}
   .ministeps .ms{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:6px;white-space:nowrap}
@@ -347,8 +365,8 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
       var meta=AREA_META[ak]||{ic:'📁',name:ak,col:'#64748b'};
       var c={done:0,doing:0,plan:0};
       list.forEach(function(r){ var g=stGroup(r[iStat]||''); if(g==='완료')c.done++; else if(g==='진행중')c.doing++; else c.plan++; });
-      // [추가] 완료 항목은 영역 안에서 위로
-      list.sort(function(a,b){ var ga=stGroup(a[iStat]||'')==='완료'?0:1, gb=stGroup(b[iStat]||'')==='완료'?0:1; return ga-gb; });
+      // [변경] 완료 항목은 끝난 일이므로 영역 안에서 아래로 가라앉힘
+      list.sort(function(a,b){ var ga=/완료/.test(a[iStat]||'')?1:0, gb=/완료/.test(b[iStat]||'')?1:0; return ga-gb; });
       html+='<div class="team areacard" style="border-top:3px solid '+meta.col+'">';
       html+='<div class="thd"><div class="ic">'+meta.ic+'</div><div><div class="tn">'+esc(meta.name)+'</div></div><div class="cnt">'+c.done+' 완료 · '+c.doing+' 진행 · '+c.plan+' 예정</div></div>';
       html+='<div class="grp">';
@@ -361,14 +379,17 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
         var log=iLog>=0?(r[iLog]||'').trim():'';
         var due=iDue>=0?(r[iDue]||'').trim():'';
         var isDone=/완료/.test(st);
-        // [추가] 완료면 큰 뱃지+강조, 아니면 기존 뱃지 + 완료예정일 D-day
-        var stTag = isDone
-          ? '<span class="st done-big">✅ 완료</span>'
-          : '<span class="st '+cls+'">'+esc(st)+'</span>';
-        var dueTag = (!isDone && due) ? dueBadge(due) : '';
+        // [변경] 좌측 뱃지 없음. 우측(rhs)에 전부 — 완료=빨간딱지 / 미완=완료예정일 + 상태
+        var rhs='';
+        if(isDone){
+          rhs='<span class="done-stamp">✔ 완료</span>';
+        } else {
+          if(due) rhs+=dueBadge(due);
+          rhs+='<span class="rst '+cls+'">'+esc(st)+'</span>';
+        }
         html+='<div class="task'+(isDone?' done-hl':'')+'"><div class="tr">'
-          +stTag
-          +'<div class="tt">'+esc(task)+(owner&&owner!=='—'?'<span class="owner">'+esc(owner)+'</span>':'')+dueTag+'</div>'
+          +'<div class="tt">'+esc(task)+(owner&&owner!=='—'?'<span class="owner">'+esc(owner)+'</span>':'')+'</div>'
+          +'<div class="rhs">'+rhs+'</div>'
           +'</div>';
         if(desc) html+='<div class="ds">'+esc(desc)+'</div>';
         if(step) html+=renderSteps(step);
