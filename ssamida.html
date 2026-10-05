@@ -35,6 +35,8 @@
   .kpi .n{font-size:26px;font-weight:900;letter-spacing:-1px;margin-top:3px}
   .kpi .n span{font-size:14px;font-weight:700;color:var(--gray)}
   .kd .n{color:var(--green)}.kp .n{color:var(--blue)}.kw .n{color:var(--orange)}.kh .n{color:var(--purple)}
+  .kd{position:relative}
+  .kd::after{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:14px 0 0 14px;background:var(--green)}
   .teams{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
   @media(max-width:900px){.teams{grid-template-columns:1fr}}
   .team{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;box-shadow:0 3px 14px rgba(20,40,80,.05)}
@@ -56,6 +58,16 @@
   .task .ds{font-size:12px;color:var(--gray);margin:3px 0 0 0;padding-left:0;line-height:1.5}
   .task .lg{font-size:11px;color:var(--teal);margin-top:4px;font-weight:600}
   .task .cm{font-size:11px;color:var(--purple);margin-top:3px;background:var(--soft);padding:4px 8px;border-radius:6px}
+
+  /* ── [추가] 완료 강조 ── */
+  .task.done-hl{background:linear-gradient(90deg,rgba(15,157,110,.08),rgba(15,157,110,.01));border-left:3px solid var(--green);border-radius:0 8px 8px 0;padding-left:11px;margin-left:-14px;padding-top:11px;padding-bottom:11px}
+  .st.done-big{font-size:12px;font-weight:900;padding:4px 11px;background:var(--green);color:#fff;border-radius:7px;box-shadow:0 2px 6px rgba(15,157,110,.3)}
+  .task.done-hl .tt{color:var(--green)}
+  /* ── [추가] 완료예정일 D-day 뱃지 ── */
+  .due{display:inline-block;font-size:10.5px;font-weight:800;padding:2px 9px;border-radius:6px;margin-left:7px;white-space:nowrap;vertical-align:middle;background:#EAF0FF;color:var(--blue);border:1px solid #cfdcff}
+  .due.soon{background:#FDF1E2;color:var(--orange);border-color:#f3d9ae}
+  .due.over{background:#FDECEA;color:var(--red);border-color:#f3c6be}
+  .due .dd{font-weight:900;margin-left:3px}
 
   .ministeps{display:flex;flex-wrap:wrap;align-items:center;gap:3px;margin:6px 0 2px}
   .ministeps .ms{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:6px;white-space:nowrap}
@@ -87,64 +99,6 @@
   .docsec-card:hover .dc-arrow{color:#3B5BDB;transform:translateX(2px)}
   .foot{text-align:center;font-size:12.5px;color:var(--gray2);margin-top:24px;padding-top:16px;border-top:1px solid var(--line)}
   .updated{font-size:11px;color:var(--gray2);text-align:right;margin-top:8px}
-
-  /* ── 그로스 콘텐츠 현황 / 오픈 체크리스트 섹션 ── */
-  .gsec{margin-top:30px}
-  .gsec-hd{display:flex;align-items:baseline;gap:10px;margin-bottom:14px;flex-wrap:wrap}
-  .gsec-hd .gt{font-size:19px;font-weight:900;color:var(--navy);letter-spacing:-.6px}
-  .gsec-hd .gsub{font-size:12.5px;color:var(--gray);font-weight:600}
-  .gnote{background:var(--soft);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:10px;padding:13px 16px;font-size:13px;color:var(--gray);line-height:1.65;margin-bottom:16px}
-  .gnote b{color:var(--ink)}
-  /* 랜딩 수렴 배너 */
-  .converge{background:linear-gradient(120deg,#0E9C8A,#2E5BFF);border-radius:15px;padding:20px 24px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden}
-  .converge::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:34px 34px}
-  .converge .cvt{position:relative;font-size:16px;font-weight:900;letter-spacing:-.4px;margin-bottom:4px}
-  .converge .cvd{position:relative;font-size:13px;color:#eaf3ff;line-height:1.6}
-  .converge .cvtags{position:relative;display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
-  .converge .cvtags span{font-size:11.5px;font-weight:700;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);padding:4px 11px;border-radius:100px}
-  /* 그로스 카드 그리드 */
-  .gcards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  @media(max-width:860px){.gcards{grid-template-columns:1fr}}
-  .gcard{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:18px 20px;box-shadow:0 3px 14px rgba(20,40,80,.05)}
-  .gcard.span2{grid-column:1/-1}
-  .gc-hd{display:flex;align-items:center;gap:11px;margin-bottom:4px}
-  .gc-ic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex:none;background:var(--soft)}
-  .gc-tt{font-size:16px;font-weight:900;color:var(--navy);letter-spacing:-.4px}
-  .gc-badge{margin-left:auto;font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:7px}
-  .gc-badge.prod{background:#FDF1E2;color:var(--orange)}
-  .gc-badge.setup{background:#E5F6EF;color:var(--green)}
-  .gc-badge.plan{background:#F0F2F7;color:#8a97ad}
-  .gc-lead{font-size:12.5px;color:var(--gray);margin:2px 0 12px;line-height:1.55}
-  /* 진행 단계 (스텝) */
-  .steps{display:flex;flex-direction:column;gap:0;margin:10px 0}
-  .step{display:flex;align-items:flex-start;gap:10px;padding:7px 0;position:relative}
-  .step .dot{width:16px;height:16px;border-radius:50%;flex:none;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#fff}
-  .step.done .dot{background:var(--green)}.step.doing .dot{background:var(--blue)}.step.plan .dot{background:var(--gray2)}.step.talk .dot{background:var(--orange)}
-  .step .sbody{flex:1;min-width:0}
-  .step .sname{font-size:13.5px;font-weight:800;color:var(--ink)}
-  .step .smeta{font-size:11.5px;color:var(--gray);margin-top:1px}
-  .step .stag{font-size:10px;font-weight:800;padding:1px 7px;border-radius:5px;margin-left:6px;vertical-align:middle}
-  .step.done .stag{background:#E5F6EF;color:var(--green)}.step.doing .stag{background:#EAF0FF;color:var(--blue)}.step.plan .stag{background:#F0F2F7;color:#8a97ad}.step.talk .stag{background:#FDF1E2;color:var(--orange)}
-  /* 두 경로 선택 */
-  .twoway{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 6px}
-  @media(max-width:520px){.twoway{grid-template-columns:1fr}}
-  .way{border:1px solid var(--line);border-radius:11px;padding:13px 14px;background:var(--soft)}
-  .way .wh{font-size:12.5px;font-weight:900;color:var(--navy);display:flex;align-items:center;gap:6px}
-  .way .wt{font-size:18px;font-weight:900;letter-spacing:-.5px;margin:4px 0 2px}
-  .way.fast .wt{color:var(--teal)} .way.prod .wt{color:var(--orange)}
-  .way .wd{font-size:11.5px;color:var(--gray);line-height:1.5}
-  .way .wtag{display:inline-block;font-size:10px;font-weight:800;padding:2px 8px;border-radius:5px;margin-top:7px}
-  .way.fast .wtag{background:#E5F6EF;color:var(--teal)} .way.prod .wtag{background:#FDF1E2;color:var(--orange)}
-  .eta{font-size:12px;font-weight:800;color:var(--purple);background:#EDEAFC;border-radius:8px;padding:7px 12px;margin-top:10px;display:inline-block}
-  .glink{font-size:11.5px;color:var(--blue);font-weight:700;margin-top:9px;display:inline-block;text-decoration:none}
-  /* 오픈 체크리스트 간단표 */
-  .okgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  @media(max-width:860px){.okgrid{grid-template-columns:1fr}}
-  .okcard{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:15px 17px}
-  .okcard .okh{font-size:13.5px;font-weight:900;color:var(--navy);margin-bottom:8px;display:flex;align-items:center;gap:7px}
-  .okcard .okh .oknum{width:21px;height:21px;border-radius:6px;background:var(--soft);color:var(--gray);font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;flex:none}
-  .okitem{font-size:12.5px;color:var(--gray);padding:4px 0;display:flex;gap:7px;line-height:1.5}
-  .okitem::before{content:'·';color:var(--gray2);font-weight:900}
 
   /* 쌤이다 탭 */
   .stab{display:flex;gap:8px;margin:16px 0 4px}
@@ -281,14 +235,6 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
 
 <script>
 (function(){
-  var TEAM_META={
-    '브랜딩':{ic:'🎨',name:'브랜딩 · 프론트엔드'},
-    '시스템':{ic:'⚙️',name:'시스템 · 백엔드'},
-    '강사플랫폼':{ic:'👨‍🏫',name:'강사 플랫폼'},
-    '그로스':{ic:'🚀',name:'그로스 · 콘텐츠 · 마케팅'},
-    '콘텐츠':{ic:'🚀',name:'그로스 · 콘텐츠 · 마케팅'}
-  };
-  var TEAM_ORDER=['브랜딩','시스템','강사플랫폼','그로스','콘텐츠'];
   function stClass(s){
     if(/완료/.test(s)) return 'done';
     if(/진행/.test(s)) return 'doing';
@@ -301,10 +247,37 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
     if(/진행/.test(s)) return '진행중';
     return '예정·논의';
   }
-  var GROUP_ORDER=['완료','진행중','예정·논의'];
   function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-  // 단계 문자열 파싱 → 미니 스텝 UI.  형식: "a>b*>c" (완료=✓/현재단계앞 / 현재=* / 이후=대기)
+  // ── [추가] 완료예정일 파싱 + D-day 계산 ──
+  // "10/7", "10/7(수)", "10/10~11", "10월 7일" 등 → 가장 이른 날짜의 Date
+  function parseDue(str){
+    var s=String(str||'').trim();
+    if(!s || s==='—' || s==='-') return null;
+    var now=new Date(); var y=now.getFullYear();
+    var m;
+    // 10월 7일
+    m=s.match(/(\d{1,2})월\s*(\d{1,2})일/);
+    if(m) return new Date(y, +m[1]-1, +m[2]);
+    // 10/7  또는 10/10~11 (앞 날짜)
+    m=s.match(/(\d{1,2})\s*\/\s*(\d{1,2})/);
+    if(m) return new Date(y, +m[1]-1, +m[2]);
+    return null;
+  }
+  function dueBadge(dueStr){
+    var d=parseDue(dueStr);
+    if(!d) return '';
+    var now=new Date(); now.setHours(0,0,0,0); d.setHours(0,0,0,0);
+    var diff=Math.round((d-now)/864e5);
+    var mmdd=(d.getMonth()+1)+'/'+d.getDate();
+    var cls='due', dd;
+    if(diff<0){ cls='due over'; dd='지연 D+'+(-diff); }
+    else if(diff===0){ cls='due soon'; dd='오늘'; }
+    else if(diff<=3){ cls='due soon'; dd='D-'+diff; }
+    else { cls='due'; dd='D-'+diff; }
+    return '<span class="'+cls+'">'+mmdd+'<span class="dd">'+dd+'</span></span>';
+  }
+
   function renderSteps(str){
     if(!str) return '';
     var parts=String(str).split('>');
@@ -327,7 +300,6 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
     return html;
   }
 
-  // 영역 메타 (7영역 + B 브랜딩 + G 그로스)
   var AREA_META={
     '1':{ic:'📞',name:'1. 고객 접점·채널',col:'#2E5BFF'},
     '2':{ic:'📋',name:'2. 운영 정책·계약',col:'#0F9D6E'},
@@ -346,8 +318,12 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
     if(!rows||!rows.length){ document.getElementById('teams').innerHTML='<div class="loading">데이터가 없습니다.</div>'; return; }
     var H=rows[0].map(function(x){return String(x||'').trim();});
     function ci(names){ for(var n=0;n<names.length;n++){ for(var i=0;i<H.length;i++){ if(H[i].replace(/\s/g,'').indexOf(names[n])>=0) return i; } } return -1; }
+    // ── [추가] '완료예정일' 먼저 찾고, '완료'는 그 열 제외하고 정확매칭 ──
+    function ciExact(name, excludeIdx){ for(var i=0;i<H.length;i++){ if(i===excludeIdx) continue; if(H[i].replace(/\s/g,'')===name) return i; } return -1; }
     var iArea=ci(['영역']), iTask=ci(['업무','과제']), iOwner=ci(['담당']),
         iStat=ci(['상태']), iStep=ci(['단계']), iDesc=ci(['설명']), iLog=ci(['진척','로그']);
+    var iDue=ci(['완료예정일','예정일']);
+    var iDoneCol=ciExact('완료', iDue);   // '완료' 정확매칭(완료예정일 제외)
     var data=rows.slice(1).filter(function(r){ return (r[iArea]||'').trim() && (r[iTask]||'').trim(); });
 
     // KPI
@@ -362,7 +338,6 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
     document.getElementById('kPlan').innerHTML=plan+'<span>건</span>';
     document.getElementById('kPpl').innerHTML=Object.keys(ppl).length+'<span>명</span>';
 
-    // 영역별 그룹
     var byArea={};
     data.forEach(function(r){ var k=areaKey(r[iArea]); if(!byArea[k])byArea[k]=[]; byArea[k].push(r); });
 
@@ -372,6 +347,8 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
       var meta=AREA_META[ak]||{ic:'📁',name:ak,col:'#64748b'};
       var c={done:0,doing:0,plan:0};
       list.forEach(function(r){ var g=stGroup(r[iStat]||''); if(g==='완료')c.done++; else if(g==='진행중')c.doing++; else c.plan++; });
+      // [추가] 완료 항목은 영역 안에서 위로
+      list.sort(function(a,b){ var ga=stGroup(a[iStat]||'')==='완료'?0:1, gb=stGroup(b[iStat]||'')==='완료'?0:1; return ga-gb; });
       html+='<div class="team areacard" style="border-top:3px solid '+meta.col+'">';
       html+='<div class="thd"><div class="ic">'+meta.ic+'</div><div><div class="tn">'+esc(meta.name)+'</div></div><div class="cnt">'+c.done+' 완료 · '+c.doing+' 진행 · '+c.plan+' 예정</div></div>';
       html+='<div class="grp">';
@@ -382,9 +359,16 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
         var step=iStep>=0?(r[iStep]||'').trim():'';
         var desc=iDesc>=0?(r[iDesc]||'').trim():'';
         var log=iLog>=0?(r[iLog]||'').trim():'';
-        html+='<div class="task"><div class="tr">'
-          +'<span class="st '+cls+'">'+esc(st)+'</span>'
-          +'<div class="tt">'+esc(task)+(owner&&owner!=='—'?'<span class="owner">'+esc(owner)+'</span>':'')+'</div>'
+        var due=iDue>=0?(r[iDue]||'').trim():'';
+        var isDone=/완료/.test(st);
+        // [추가] 완료면 큰 뱃지+강조, 아니면 기존 뱃지 + 완료예정일 D-day
+        var stTag = isDone
+          ? '<span class="st done-big">✅ 완료</span>'
+          : '<span class="st '+cls+'">'+esc(st)+'</span>';
+        var dueTag = (!isDone && due) ? dueBadge(due) : '';
+        html+='<div class="task'+(isDone?' done-hl':'')+'"><div class="tr">'
+          +stTag
+          +'<div class="tt">'+esc(task)+(owner&&owner!=='—'?'<span class="owner">'+esc(owner)+'</span>':'')+dueTag+'</div>'
           +'</div>';
         if(desc) html+='<div class="ds">'+esc(desc)+'</div>';
         if(step) html+=renderSteps(step);
@@ -433,7 +417,6 @@ function tParseSched(csvText){
 }
 function tToMin(t){var m=String(t).match(/(\d{1,2})\s*:\s*(\d{2})/);if(!m)return null;var h=+m[1];if(h>=1&&h<=11)h+=12;return h*60+ +m[2];}
 
-// 시간표 + 가능타임 HTML
 function tSchedHtml(name){
   var s=T_SCHED[name];if(!s||!s.rows.length)return '';
   var HH=44,WEEK=['월','화','수','목','금','토','일'],sheetDays=s.days;
@@ -461,7 +444,6 @@ function tSchedHtml(name){
     return '<div class="tcal-col'+(wi>=5?' we':'')+'" style="height:'+totalH+'px">'+blocks+'</div>';
   }).join('');
 
-  // ===== 가능 타임 (평일 16~25시 / 주말 10~25시, 아라+쌤이다=찬시간) =====
   var OPEN_WD=[16*60,25*60],OPEN_WE=[10*60,25*60];
   var busyByDay={};evts.forEach(function(e){(busyByDay[e.wd]=busyByDay[e.wd]||[]).push([e.s,e.e]);});
   var freeMin=0;
@@ -484,7 +466,6 @@ function tSchedHtml(name){
     '<div class="tcal-wrap"><div class="tcal-days">'+dayHead+'</div><div class="tcal-body"><div class="tcal-axis" style="height:'+totalH+'px">'+hourLines+'</div><div class="tcal-grid">'+cols+'</div></div></div>'+avail;
 }
 
-// 강사 카드
 function tCardHtml(e){
   var purl=tPhotoUrl(e.name);
   var rawSub=(e.sub&&e.sub!=='전체'&&e.sub!=='미구분')?e.sub:'';
@@ -495,7 +476,6 @@ function tCardHtml(e){
     var tags=[];if(/고/.test(rangeTxt))tags=['초','중','고'];else if(/중/.test(rangeTxt))tags=['초','중'];else if(/초/.test(rangeTxt))tags=['초'];
     var tagHtml=tags.length?('<div class="tsubj-tags">'+tags.map(function(t){return '<span class="tsubj-tag g'+t+'">'+t+'등</span>';}).join('')+'</div>'):'';
     subjHtml='<div class="tsubj"><div class="tsubj-nm">'+subjName+'</div>'+tagHtml+'</div>';
-    // 본문 큰 딱지
     var bigTags=tags.map(function(t){return '<span class="tbig-g g'+t+'">'+t+'등</span>';}).join('');
     e._bigSubj='<div class="tbig"><span class="tbig-subj">'+subjName+'</span>'+bigTags+'</div>';
   }
@@ -519,7 +499,6 @@ async function loadTeachers(){
     var ssamCsv=await tFsGet('execData','hr-ssam').then(function(o){return tRowsToCsv(o.rows);});
     var schedCsv=await tFsGet('execData','hr-ssam-sched').then(function(o){return tRowsToCsv(o.rows);}).catch(function(){return '';});
     tParseSched(schedCsv);
-    // hr-ssam 파싱 (loadDept 간소화: 이름·과목·학교·특이사항·입사일·재직)
     var rows=tParseCSV(ssamCsv),H=rows[1]||[],idx={};
     H.forEach(function(hh,i){hh=String(hh||'').trim();if(hh)idx[hh]=i;});
     var list=[];
