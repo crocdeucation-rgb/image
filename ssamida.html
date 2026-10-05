@@ -342,6 +342,8 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
         iStat=ci(['상태']), iStep=ci(['단계']), iDesc=ci(['설명']), iLog=ci(['진척','로그']);
     var iDue=ci(['완료예정일','예정일']);
     var iDoneCol=ciExact('완료', iDue);   // '완료' 정확매칭(완료예정일 제외)
+    // [폴백] 완료예정일 헤더가 비어 있으면(시트 H1 누락), '완료' 열 바로 왼쪽을 완료예정일로 간주
+    if(iDue<0 && iDoneCol>0) iDue=iDoneCol-1;
     var data=rows.slice(1).filter(function(r){ return (r[iArea]||'').trim() && (r[iTask]||'').trim(); });
 
     // KPI
