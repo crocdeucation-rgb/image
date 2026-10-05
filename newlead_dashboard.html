@@ -44,7 +44,8 @@
   .num{font-variant-numeric:tabular-nums}
   .db{color:var(--blue);font-weight:700} .visit{color:var(--teal)} .setting{color:var(--blue)}
   .order{color:var(--green);font-weight:700} .cancel{color:var(--red)}
-  .sales{color:var(--purple);font-weight:700} .spend{color:#6b7280}
+  .sales{color:var(--purple);font-weight:700} .spend{color:#6b7280} .cpl{color:var(--amber);font-weight:600}
+  .rate{font-size:10px;color:#9aa3b0;font-weight:600;margin-left:2px}
   .roas{font-weight:800} .roas.good{color:var(--green)} .roas.bad{color:var(--red)} .roas.none{color:#c2c8d2}
   .who{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:middle}
   .who.woo{background:var(--green)} .who.jang{background:var(--amber)} .who.kim{background:var(--blue)}
@@ -68,8 +69,8 @@
 
   <div class="sec">담당자별</div>
   <table id="assignee-tbl">
-    <thead><tr><th>담당자</th><th>DB</th><th>방문</th><th>세팅</th><th>방취</th><th>오더</th><th>매출</th><th>광고비</th><th>ROAS</th></tr></thead>
-    <tbody><tr><td colspan="9" class="loading">불러오는 중…</td></tr></tbody>
+    <thead><tr><th>담당자</th><th>DB</th><th>방문</th><th>세팅</th><th>방취</th><th>오더</th><th>매출</th><th>광고비</th><th>CPL</th><th>ROAS</th></tr></thead>
+    <tbody><tr><td colspan="10" class="loading">불러오는 중…</td></tr></tbody>
   </table>
 
   <div class="sec camp">캠페인별</div>
@@ -98,6 +99,13 @@ function parseCSV(text){
 function won(n){ n=Number(n)||0; if(n<=0)return '0'; if(n>=10000)return (Math.round(n/1000)/10).toLocaleString()+'만'; return n.toLocaleString(); }
 function whoClass(name){ return name.indexOf('우혜림')>=0?'woo':name.indexOf('장윤호')>=0?'jang':name.indexOf('김윤호')>=0?'kim':''; }
 function roasCell(v){ if(v===''||v==null)return '<span class="roas none">-</span>'; var n=parseFloat(v); var cls=n>=1?'good':'bad'; return '<span class="roas '+cls+'">'+v+'</span>'; }
+// "0 (0%)" → 숫자 크게 + % 작게. %가 없으면 숫자만.
+function fnl(cell){
+  var s=String(cell==null?'':cell);
+  var m=s.match(/^(\d+)\s*\(([^)]+)\)$/);
+  if(m) return m[1]+'<span class="rate">('+m[2]+')</span>';
+  return s||'0';
+}
 
 async function load(){
   try{
@@ -127,24 +135,26 @@ async function load(){
         var x=rows[r]; if(!x[0])continue;
         ahtml += '<tr><td><span class="who '+whoClass(x[0])+'"></span>'+x[0]+'</td>'
           +'<td class="num db">'+(x[1]||0)+'</td>'
-          +'<td class="num visit">'+(x[2]||0)+'</td>'
-          +'<td class="num setting">'+(x[3]||0)+'</td>'
+          +'<td class="num visit">'+fnl(x[2])+'</td>'
+          +'<td class="num setting">'+fnl(x[3])+'</td>'
           +'<td class="num cancel">'+(x[4]||0)+'</td>'
-          +'<td class="num order">'+(x[5]||0)+'</td>'
+          +'<td class="num order">'+fnl(x[5])+'</td>'
           +'<td class="num sales">'+won(x[6])+'</td>'
           +'<td class="num spend">'+won(x[7])+'</td>'
-          +'<td class="num">'+roasCell(x[8])+'</td></tr>';
+          +'<td class="num cpl">'+(x[8]?won(x[8]):'-')+'</td>'
+          +'<td class="num">'+roasCell(x[9])+'</td></tr>';
       }
       // 합계행
       var t=rows[aEnd];
-      sumDb=t[1]; sumOrder=t[5]; sumSales=t[6]; sumSpend=t[7];
+      sumDb=t[1]; sumOrder=parseInt(t[5])||0; sumSales=t[6]; sumSpend=t[7];
       ahtml += '<tr class="total"><td>합계</td>'
-        +'<td class="num db">'+(t[1]||0)+'</td><td class="num visit">'+(t[2]||0)+'</td>'
-        +'<td class="num setting">'+(t[3]||0)+'</td><td class="num cancel">'+(t[4]||0)+'</td>'
-        +'<td class="num order">'+(t[5]||0)+'</td><td class="num sales">'+won(t[6])+'</td>'
-        +'<td class="num spend">'+won(t[7])+'</td><td class="num">'+roasCell(t[8])+'</td></tr>';
+        +'<td class="num db">'+(t[1]||0)+'</td><td class="num visit">'+fnl(t[2])+'</td>'
+        +'<td class="num setting">'+fnl(t[3])+'</td><td class="num cancel">'+(t[4]||0)+'</td>'
+        +'<td class="num order">'+fnl(t[5])+'</td><td class="num sales">'+won(t[6])+'</td>'
+        +'<td class="num spend">'+won(t[7])+'</td><td class="num cpl">'+(t[8]?won(t[8]):'-')+'</td>'
+        +'<td class="num">'+roasCell(t[9])+'</td></tr>';
     }
-    atb.innerHTML = ahtml || '<tr><td colspan="9" class="loading">데이터 없음</td></tr>';
+    atb.innerHTML = ahtml || '<tr><td colspan="10" class="loading">데이터 없음</td></tr>';
 
     // 요약 카드
     var totRoas = (Number(sumSpend)>0) ? (Number(sumSales)/Number(sumSpend)).toFixed(2) : '-';
@@ -162,10 +172,10 @@ async function load(){
         var y=rows[r2]; if(!y[0])continue;
         chtml += '<tr><td>'+y[0]+'</td>'
           +'<td class="num db">'+(y[1]||0)+'</td>'
-          +'<td class="num visit">'+(y[2]||0)+'</td>'
-          +'<td class="num setting">'+(y[3]||0)+'</td>'
+          +'<td class="num visit">'+fnl(y[2])+'</td>'
+          +'<td class="num setting">'+fnl(y[3])+'</td>'
           +'<td class="num cancel">'+(y[4]||0)+'</td>'
-          +'<td class="num order">'+(y[5]||0)+'</td>'
+          +'<td class="num order">'+fnl(y[5])+'</td>'
           +'<td class="num sales">'+won(y[6])+'</td></tr>';
       }
     }
