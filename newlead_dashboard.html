@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>신규 리드 현황 — 분리 캠페인</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  :root{
+    --ink:#1a2332; --sub:#6b7688; --line:#e8edf4; --bg:#f6f8fb; --card:#fff;
+    --blue:#2563eb; --teal:#0891b2; --amber:#d97706; --green:#0f9d58; --red:#e11d48; --purple:#7c3aed;
+    box-sizing:border-box; padding-top:env(safe-area-inset-top,0); padding-bottom:env(safe-area-inset-bottom,0);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Pretendard',system-ui,sans-serif}
+  body{background:var(--bg);color:var(--ink);padding:20px 14px 60px;letter-spacing:-.2px}
+  .wrap{max-width:1100px;margin:0 auto}
+
+  .head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+  .head h1{font-size:20px;font-weight:800;letter-spacing:-.5px}
+  .head .tag{font-size:11px;font-weight:700;color:var(--blue);background:#eaf1fe;padding:3px 10px;border-radius:20px}
+  .updated{font-size:11.5px;color:var(--sub);margin-bottom:18px}
+  .updated .asof{color:var(--blue);font-weight:700;background:#eaf1fe;padding:1px 7px;border-radius:5px}
+
+  /* 요약 카드 */
+  .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+  @media(max-width:620px){.summary{grid-template-columns:1fr 1fr}}
+  .scard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .scard .l{font-size:12px;color:var(--sub);font-weight:600;margin-bottom:5px}
+  .scard .v{font-size:24px;font-weight:800;letter-spacing:-1px}
+  .scard.db .v{color:var(--blue)} .scard.order .v{color:var(--green)}
+  .scard.sales .v{color:var(--purple)} .scard.roas .v{color:var(--amber)}
+  .scard .v span{font-size:14px;font-weight:700;color:var(--sub)}
+
+  .sec{font-size:14px;font-weight:800;color:var(--ink);margin:0 0 10px;padding-left:9px;border-left:3px solid var(--blue)}
+  .sec.camp{border-left-color:var(--amber)}
+
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:12.5px;margin-bottom:24px}
+  thead th{background:#f0f4fa;color:var(--sub);font-weight:700;padding:9px 8px;text-align:center;white-space:nowrap;font-size:11.5px}
+  thead th:first-child{text-align:left;padding-left:14px}
+  tbody td{padding:10px 8px;text-align:center;border-top:1px solid var(--line);white-space:nowrap}
+  tbody td:first-child{text-align:left;padding-left:14px;font-weight:700}
+  tbody tr.total{background:#fafbff;font-weight:800}
+  tbody tr.total td{border-top:2px solid #dde6f5}
+  .num{font-variant-numeric:tabular-nums}
+  .db{color:var(--blue);font-weight:700} .visit{color:var(--teal)} .setting{color:var(--blue)}
+  .order{color:var(--green);font-weight:700} .cancel{color:var(--red)}
+  .sales{color:var(--purple);font-weight:700} .spend{color:#6b7280}
+  .roas{font-weight:800} .roas.good{color:var(--green)} .roas.bad{color:var(--red)} .roas.none{color:#c2c8d2}
+  .who{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:middle}
+  .who.woo{background:var(--green)} .who.jang{background:var(--amber)} .who.kim{background:var(--blue)}
+
+  .note{font-size:11.5px;color:var(--sub);line-height:1.6;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .note b{color:var(--ink)}
+  .loading{text-align:center;color:var(--sub);padding:40px;font-size:13px}
+  .refresh{font-size:11.5px;color:var(--blue);background:none;border:1px solid var(--line);border-radius:6px;padding:3px 10px;cursor:pointer;margin-left:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <h1>신규 리드 현황</h1>
+    <span class="tag">분리 캠페인 · 공부방법·필기방법</span>
+    <button class="refresh" onclick="load()">새로고침</button>
+  </div>
+  <div class="updated" id="updated">불러오는 중…</div>
+
+  <div class="summary" id="summary"></div>
+
+  <div class="sec">담당자별</div>
+  <table id="assignee-tbl">
+    <thead><tr><th>담당자</th><th>DB</th><th>방문</th><th>세팅</th><th>방취</th><th>오더</th><th>매출</th><th>광고비</th><th>ROAS</th></tr></thead>
+    <tbody><tr><td colspan="9" class="loading">불러오는 중…</td></tr></tbody>
+  </table>
+
+  <div class="sec camp">캠페인별</div>
+  <table id="campaign-tbl">
+    <thead><tr><th>캠페인</th><th>DB</th><th>방문</th><th>세팅</th><th>방취</th><th>오더</th><th>매출</th></tr></thead>
+    <tbody><tr><td colspan="7" class="loading">불러오는 중…</td></tr></tbody>
+  </table>
+
+  <div class="note">
+    <b>광고비 기준:</b> 메타는 전날 자정까지 데이터가 다음날 오후 7시에 확정됩니다. 당일 리드는 광고비 미반영이라 ROAS는 참고용입니다 · <b>매출:</b> 오더 확정 기준 (취소 제외)
+  </div>
+</div>
+
+<script>
+// 우혜림 DB 시트의 '대시보드' 탭 (whBuildDashData가 저장) — gviz 공개 읽기
+var GVIZ = 'https://docs.google.com/spreadsheets/d/1l0H8mY0SHiENr9Mlvnha7WVNAxA-iPQh0AB55eXhFaA/gviz/tq?tqx=out:csv&headers=0&sheet=' + encodeURIComponent('대시보드');
+
+function parseCSV(text){
+  return text.trim().split('\n').map(function(line){
+    var out=[],cur='',q=false;
+    for(var i=0;i<line.length;i++){var c=line[i];
+      if(c==='"'){q=!q;} else if(c===','&&!q){out.push(cur.trim());cur='';} else cur+=c;}
+    out.push(cur.trim());return out;
+  });
+}
+function won(n){ n=Number(n)||0; if(n<=0)return '0'; if(n>=10000)return (Math.round(n/1000)/10).toLocaleString()+'만'; return n.toLocaleString(); }
+function whoClass(name){ return name.indexOf('우혜림')>=0?'woo':name.indexOf('장윤호')>=0?'jang':name.indexOf('김윤호')>=0?'kim':''; }
+function roasCell(v){ if(v===''||v==null)return '<span class="roas none">-</span>'; var n=parseFloat(v); var cls=n>=1?'good':'bad'; return '<span class="roas '+cls+'">'+v+'</span>'; }
+
+async function load(){
+  try{
+    var text = await fetch(GVIZ, {cache:'no-store'}).then(function(r){return r.text();});
+    var rows = parseCSV(text);
+
+    // 1행: 갱신 / 시각 / 기준월 / yymm
+    var updated='', yymm='';
+    if(rows[0] && rows[0][0]==='갱신'){ updated=rows[0][1]||''; yymm=rows[0][3]||''; }
+    var moLabel = yymm ? (parseInt(yymm.substring(2,4),10)+'월') : '';
+    document.getElementById('updated').innerHTML = '업데이트 ' + updated + (moLabel? ' · <span class="asof">'+moLabel+' 기준</span>':'');
+
+    // 담당자 블록: '담당자' 헤더행 다음 ~ '합계'까지
+    var aStart=-1, aEnd=-1, cStart=-1;
+    for(var i=0;i<rows.length;i++){
+      if(rows[i][0]==='담당자') aStart=i+1;
+      if(rows[i][0]==='합계' && aEnd<0) aEnd=i;
+      if(rows[i][0]==='캠페인') cStart=i+1;
+    }
+
+    // 담당자 테이블
+    var atb = document.querySelector('#assignee-tbl tbody');
+    var ahtml='';
+    var sumDb=0,sumOrder=0,sumSales=0,sumSpend=0;
+    if(aStart>=0 && aEnd>aStart){
+      for(var r=aStart;r<aEnd;r++){
+        var x=rows[r]; if(!x[0])continue;
+        ahtml += '<tr><td><span class="who '+whoClass(x[0])+'"></span>'+x[0]+'</td>'
+          +'<td class="num db">'+(x[1]||0)+'</td>'
+          +'<td class="num visit">'+(x[2]||0)+'</td>'
+          +'<td class="num setting">'+(x[3]||0)+'</td>'
+          +'<td class="num cancel">'+(x[4]||0)+'</td>'
+          +'<td class="num order">'+(x[5]||0)+'</td>'
+          +'<td class="num sales">'+won(x[6])+'</td>'
+          +'<td class="num spend">'+won(x[7])+'</td>'
+          +'<td class="num">'+roasCell(x[8])+'</td></tr>';
+      }
+      // 합계행
+      var t=rows[aEnd];
+      sumDb=t[1]; sumOrder=t[5]; sumSales=t[6]; sumSpend=t[7];
+      ahtml += '<tr class="total"><td>합계</td>'
+        +'<td class="num db">'+(t[1]||0)+'</td><td class="num visit">'+(t[2]||0)+'</td>'
+        +'<td class="num setting">'+(t[3]||0)+'</td><td class="num cancel">'+(t[4]||0)+'</td>'
+        +'<td class="num order">'+(t[5]||0)+'</td><td class="num sales">'+won(t[6])+'</td>'
+        +'<td class="num spend">'+won(t[7])+'</td><td class="num">'+roasCell(t[8])+'</td></tr>';
+    }
+    atb.innerHTML = ahtml || '<tr><td colspan="9" class="loading">데이터 없음</td></tr>';
+
+    // 요약 카드
+    var totRoas = (Number(sumSpend)>0) ? (Number(sumSales)/Number(sumSpend)).toFixed(2) : '-';
+    document.getElementById('summary').innerHTML =
+      '<div class="scard db"><div class="l">총 리드</div><div class="v">'+(sumDb||0)+'<span>건</span></div></div>'
+     +'<div class="scard order"><div class="l">오더</div><div class="v">'+(sumOrder||0)+'<span>건</span></div></div>'
+     +'<div class="scard sales"><div class="l">매출</div><div class="v">'+won(sumSales)+'<span>원</span></div></div>'
+     +'<div class="scard roas"><div class="l">광고비 '+won(sumSpend)+'원 · ROAS</div><div class="v">'+totRoas+'</div></div>';
+
+    // 캠페인 테이블
+    var ctb = document.querySelector('#campaign-tbl tbody');
+    var chtml='';
+    if(cStart>=0){
+      for(var r2=cStart;r2<rows.length;r2++){
+        var y=rows[r2]; if(!y[0])continue;
+        chtml += '<tr><td>'+y[0]+'</td>'
+          +'<td class="num db">'+(y[1]||0)+'</td>'
+          +'<td class="num visit">'+(y[2]||0)+'</td>'
+          +'<td class="num setting">'+(y[3]||0)+'</td>'
+          +'<td class="num cancel">'+(y[4]||0)+'</td>'
+          +'<td class="num order">'+(y[5]||0)+'</td>'
+          +'<td class="num sales">'+won(y[6])+'</td></tr>';
+      }
+    }
+    ctb.innerHTML = chtml || '<tr><td colspan="7" class="loading">데이터 없음</td></tr>';
+
+  }catch(e){
+    document.getElementById('updated').textContent = '불러오기 실패 — 대시보드 탭이 생성됐는지 확인하세요';
+    document.querySelector('#assignee-tbl tbody').innerHTML = '<tr><td colspan="9" class="loading">로드 실패</td></tr>';
+  }
+}
+load();
+</script>
+</body>
+</html>
