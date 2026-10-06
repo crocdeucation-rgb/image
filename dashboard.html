@@ -437,6 +437,14 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
   <div class="card"><div class="clabel">오늘 유입</div><div class="cval amber sm" id="v-today">-</div></div>
   <div class="card"><div class="clabel">어제 유입</div><div class="cval orange sm" id="v-yesterday">-</div></div>
 </div>
+<div class="section-label">그로스별 유입 <span class="badge today">오늘·어제·월간</span></div>
+<div class="tbl-scroll"><table class="funnel-table" id="growth-inflow-tbl">
+  <thead><tr><th>구분</th><th>오늘</th><th>어제</th><th>월간</th></tr></thead>
+  <tbody id="growth-inflow-tbody">
+    <tr><td colspan="4" style="color:#aaa;text-align:center;padding:12px;">불러오는 중...</td></tr>
+  </tbody>
+</table></div>
+  
 
 <div class="section-label">학년별 <span class="badge today" id="grade-tab-label">이번달</span></div>
 <div class="grid-3">
@@ -627,6 +635,46 @@ function renderWebmaDukji(){
 async function loadAll() {
   await loadYRank();
   await Promise.all([loadData(), loadSchedule(), loadCancel()]);
+  loadGrowthInflow();   // ← 추가
+}
+// [그로스별 유입] 우혜림 DB 시트(대시보드 탭) gviz 로드
+var GROWTH_GVIZ = 'https://docs.google.com/spreadsheets/d/1l0H8mY0SHiENr9Mlvnha7WVNAxA-iPQh0AB55eXhFaA/gviz/tq?tqx=out:csv&headers=0&sheet=' + encodeURIComponent('대시보드');
+var _growthInflow = null;
+async function loadGrowthInflow(){
+  try{
+    var text = await fetch(GROWTH_GVIZ, {cache:'no-store'}).then(function(r){return r.text();});
+    var rows = parseCSV(text);
+    var start=-1;
+    for(var i=0;i<rows.length;i++){ if(rows[i][0]==='기간유입'){ start=i+1; break; } }
+    var out={};
+    if(start>=0){
+      for(var r=start;r<rows.length;r++){
+        var nm=(rows[r][0]||'').trim();
+        if(!nm || nm==='신규합계') break;
+        out[nm]={ t:parseInt(rows[r][1])||0, y:parseInt(rows[r][2])||0, m:parseInt(rows[r][4])||0 };
+      }
+    }
+    _growthInflow = out;
+  }catch(e){ _growthInflow = {}; }
+  renderGrowthInflow();
+}
+function renderGrowthInflow(){
+  var tb = document.getElementById('growth-inflow-tbody');
+  if(!tb) return;
+  var chongToday = parseInt((allRows[1] && allRows[1][1]) || 0) || 0;
+  var chongYday  = parseInt((allRows[2] && allRows[2][1]) || 0) || 0;
+  var chongMonth = parseInt((allRows[1] && allRows[1][2]) || 0) || 0;
+  var members = ['우혜림','장윤호','김윤호'];
+  var gi = _growthInflow || {};
+  var h = '<tr><td class="name">그로스 총괄</td><td class="num db">'+chongToday+'</td><td class="num" style="color:#f97316">'+chongYday+'</td><td class="num" style="color:#9333ea">'+chongMonth+'</td></tr>';
+  var sumT=chongToday, sumY=chongYday, sumM=chongMonth;
+  members.forEach(function(m){
+    var d = gi[m] || {t:0,y:0,m:0};
+    sumT+=d.t; sumY+=d.y; sumM+=d.m;
+    h += '<tr><td class="name">그로스 '+m+'</td><td class="num db">'+d.t+'</td><td class="num" style="color:#f97316">'+d.y+'</td><td class="num" style="color:#9333ea">'+d.m+'</td></tr>';
+  });
+  h += '<tr class="total"><td class="name">총 유입</td><td class="num db">'+sumT+'</td><td class="num" style="color:#f97316">'+sumY+'</td><td class="num" style="color:#9333ea">'+sumM+'</td></tr>';
+  tb.innerHTML = h;
 }
 
 // [2026-09] 순위이력 시트 (대쉬보드 1bkK, gid=690549750). A~E블록=7:3 가중합(대쉬보드용) 어제순위.
