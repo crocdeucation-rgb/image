@@ -245,8 +245,8 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
 </div>
 <div class="wrap">
 <div class="hd"><div><div class="k">HR 인사 리포트 · 경영진용</div><h1 id="pageTitle">인사 현황 — 인력 추이</h1>
-<div class="m" id="pageSub">2026년 1~9월 · 월말 재직 기준</div></div>
-<div class="asof">기준<b>2026년 9월</b></div></div>
+<div class="m" id="pageSub">2026년 1~10월 · 월말 재직 기준</div></div>
+<div class="asof">기준<b id="asofMo">2026년 10월</b></div></div>
 <div class="tabs" id="tabs"></div>
 <div class="kpis" id="kpis"></div>
 <div class="card" id="comboCard"><h2 id="comboTitle"></h2><div class="sub">선 = 월말 전체 재직 인원 (재직 기준·정확) · 막대 = 월별 입사/퇴사 흐름 (참고) · 클릭하면 그 달 상세</div>
@@ -254,7 +254,7 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
   <div class="clgd"><span><i style="background:#5DCAA5"></i>입사</span><span><i style="background:#F09595"></i>퇴사</span><span><i style="background:#161C2B"></i>월말 재직 인원</span></div></div>
 <div class="card" id="tenureCard"><h2 id="tenTitle"></h2><div class="sub">2026년 퇴사자를 근속 기간별로 분류 · 얼마나 빨리 나가는지가 채용 효율의 핵심 지표</div>
   <div id="tenure"></div></div>
-<div class="card" id="brCard"><h2 id="brTitle"></h2><div class="sub">각 카드 = 현재 인원 · 1~9월 미니 추이 · 연초 대비 순증감</div>
+<div class="card" id="brCard"><h2 id="brTitle"></h2><div class="sub">각 카드 = 현재 인원 · 1~10월 미니 추이 · 연초 대비 순증감</div>
   <div class="brgrid" id="brgrid"></div>
   
   <div class="swipehint">← 좌우로 밀어 지점을 넘겨보세요 · 탭하면 상세로</div></div>
@@ -346,7 +346,7 @@ function activeAt(e,end){
 
 // 부서 데이터 빌드 (매출 salesFn optional)
 function buildDept(dept,emps,salesFn){
-  var months=[1,2,3,4,5,6,7,8,9];
+  var months=[1,2,3,4,5,6,7,8,9,10];
   var grps=[]; emps.forEach(function(e){if(grps.indexOf(e.grp)<0)grps.push(e.grp);}); grps.sort();
   var trend={}, totalT=[];
   grps.forEach(function(g){trend[g]=[];});
@@ -391,7 +391,7 @@ function buildDept(dept,emps,salesFn){
   // 근속분포
   var ten={d0:0,d1_6:0,d7_13:0,d14_29:0,d30_89:0,d90:0}, tvals=[];
   emps.forEach(function(e){
-    if(e.outD&&e.outD.getFullYear()===2026&&e.outD.getMonth()<=8&&e.inD){
+    if(e.outD&&e.outD.getFullYear()===2026&&e.outD.getMonth()<=9&&e.inD){
       var d=daysBetween(e.inD,e.outD); if(d<0)return; tvals.push(d);
       if(d===0)ten.d0++; else if(d<7)ten.d1_6++; else if(d<14)ten.d7_13++; else if(d<30)ten.d14_29++; else if(d<90)ten.d30_89++; else ten.d90++;
     }
@@ -553,22 +553,28 @@ async function loadHR(){
     return true;
   }catch(e){console.error('HR load fail',e);return false;}
 }
-const MONTHS=[1,2,3,4,5,6,7,8,9];
-let curDept='상담부', curMonth=9;
+const MONTHS=[1,2,3,4,5,6,7,8,9,10];
+// 데이터 있는 마지막 달의 인덱스 (0-base). 10월이 아직 안 채워진 부서는 자동으로 9월을 현재로 유지.
+function lastIdx(dept){let t=(DATA[dept]&&DATA[dept].totalTrend)||[];for(let i=t.length-1;i>=0;i--){if(t[i]>0)return i;}return t.length-1;}
+function curMo(dept){return MONTHS[lastIdx(dept)];}
+let curDept='상담부', curMonth=10;
 function man(n){n=n||0;if(n>=1e8)return (n/1e8).toFixed(2).replace(/\.?0+$/,'')+'억';if(n>=1e4)return Math.round(n/1e4)+'만';return ''+Math.round(n);}
 function spanBadge(sp){if(sp==null)return '';let c=sp<=30?'sp-o':sp<=90?'sp-r':'sp-g';return `<span class="bg-span ${c}">${sp}일 만에</span>`;}
 function orderedGroups(dept){let keys=Object.keys(DATA[dept].trend),ord=ORDER[dept]||[];let head=ord.filter(g=>keys.includes(g));let rest=keys.filter(g=>!head.includes(g)).sort();return head.concat(rest).filter(g=>!DATA[dept].trend[g].every(v=>v===0));}
 function sumOf(dept,mo){let m=DATA[dept].months[mo]||DATA[dept].months[String(mo)];return m.sum;}
 
 function renderTabs(){document.getElementById('tabs').innerHTML=['수업강사','코칭코치','사업부','상담부'].map(d=>`<button class="tabbtn ${d===curDept?'on':''}" onclick="selDept('${d}')">${d}</button>`).join('');}
-function selDept(d){curDept=d;curMonth=9;renderAll();window.scrollTo({top:0,behavior:'smooth'});}
+function selDept(d){curDept=d;curMonth=curMo(d);renderAll();window.scrollTo({top:0,behavior:'smooth'});}
 
 function renderKpi(){
-  let tot=DATA[curDept].totalTrend;let now=tot[8],jan=tot[0],prev=tot[7];
+  let tot=DATA[curDept].totalTrend;let li=lastIdx(curDept);
+  let now=tot[li],jan=tot[0],prev=li>0?tot[li-1]:tot[0];
+  let prevMo=MONTHS[li>0?li-1:0];
   let ytd=now-jan, mom=now-prev;
   // 쌤이다: 출범 준비 단계 전용 KPI (인력추이·이탈 지표 대신)
   if(curDept==='쌤이다'){
-    var md=DATA['쌤이다'].months[9]||DATA['쌤이다'].months['9'];
+    var li2=lastIdx('쌤이다'), curM=MONTHS[li2];
+    var md=DATA['쌤이다'].months[curM]||DATA['쌤이다'].months[String(curM)];
     var sepIn=md?md.sum.in:0;
     // 과목 수 = 재직 강사의 과목(sub) 종류
     var subs={};
@@ -580,17 +586,18 @@ function renderKpi(){
     var dday=Math.round((launch-today)/86400000);
     var ddayStr=dday>0?('D-'+dday):(dday===0?'D-DAY':'출범');
     document.getElementById('kpis').innerHTML=`
-     <div class="kpi"><div class="lb">현재 강사 수</div><div class="vv">${now}<small>명</small></div><div class="sub2 up">전월 대비 ${mom>=0?'+'+mom:mom}명 (8월 ${prev}명)</div></div>
-     <div class="kpi"><div class="lb">이번 달 증원</div><div class="vv up">+${sepIn}<small>명</small></div><div class="sub2 flat">9월 신규 합류</div></div>
+     <div class="kpi"><div class="lb">현재 강사 수</div><div class="vv">${now}<small>명</small></div><div class="sub2 up">전월 대비 ${mom>=0?'+'+mom:mom}명 (${prevMo}월 ${prev}명)</div></div>
+     <div class="kpi"><div class="lb">이번 달 증원</div><div class="vv up">+${sepIn}<small>명</small></div><div class="sub2 flat">${curM}월 신규 합류</div></div>
      <div class="kpi"><div class="lb">담당 과목</div><div class="vv">${subCnt}<small>과목</small></div><div class="sub2 flat">${Object.keys(subs).join(' · ')||'-'}</div></div>
-     <div class="kpi"><div class="lb">10월 출범까지</div><div class="vv up" style="font-size:26px">${ddayStr}</div><div class="sub2 flat">정식 출범 · 증원 진행 중</div></div>`;
+     <div class="kpi"><div class="lb">${dday>0?'10월 출범까지':'출범 상태'}</div><div class="vv up" style="font-size:26px">${ddayStr}</div><div class="sub2 flat">정식 출범 · 증원 진행 중</div></div>`;
     return;
   }
-  let mn=Math.min(...tot),mnMo=MONTHS[tot.indexOf(mn)];
-  let mx=Math.max(...tot),mxMo=MONTHS[tot.indexOf(mx)];
+  let totD=tot.slice(0,li+1);  // 데이터 있는 달까지만 (빈 10월이 최저로 잡히는 것 방지)
+  let mn=Math.min(...totD),mnMo=MONTHS[tot.indexOf(mn)];
+  let mx=Math.max(...totD),mxMo=MONTHS[tot.indexOf(mx)];
   let T=DATA[curDept].tenure; let e30r=T.total?T.e30/T.total*100:0;
   document.getElementById('kpis').innerHTML=`
-   <div class="kpi"><div class="lb">현재 재직 인원</div><div class="vv">${now}<small>명</small></div><div class="sub2 ${mom>=0?'up':'dn'}">전월 대비 ${mom>=0?'+'+mom:mom}명 (8월 ${prev}명)</div></div>
+   <div class="kpi"><div class="lb">현재 재직 인원</div><div class="vv">${now}<small>명</small></div><div class="sub2 ${mom>=0?'up':'dn'}">전월 대비 ${mom>=0?'+'+mom:mom}명 (${prevMo}월 ${prev}명)</div></div>
    <div class="kpi"><div class="lb">연초 대비</div><div class="vv ${ytd>=0?'up':'dn'}">${ytd>=0?'+':''}${ytd}<small>명</small></div><div class="sub2 flat">1월 ${jan}명 → 현재 ${now}명</div></div>
    <div class="kpi"><div class="lb">올해 최고 / 최저</div><div class="vv" style="font-size:22px">${mx} <span style="color:#C3CDDD">/</span> ${mn}<small>명</small></div><div class="sub2 flat">최고 ${mxMo}월 · 최저 ${mnMo}월</div></div>
    <div class="kpi"><div class="lb">30일내 조기이탈률</div><div class="vv ${e30r>=50?'dn':''}">${e30r.toFixed(0)}<small>%</small></div><div class="sub2 flat">퇴사 ${T.total}명 중 ${T.e30}명 · 중앙 근속 ${T.median}일</div></div>`;
@@ -644,10 +651,11 @@ function renderBranches(){
   if(brCard) brCard.style.display='';
   document.getElementById('brTitle').textContent=`${curDept} — 지점별 현황`;
   let gs=orderedGroups(curDept);
+  let li=lastIdx(curDept);
   // 현재 인원 큰 순
-  gs=gs.slice().sort((a,b)=>DATA[curDept].trend[b][8]-DATA[curDept].trend[a][8]);
+  gs=gs.slice().sort((a,b)=>DATA[curDept].trend[b][li]-DATA[curDept].trend[a][li]);
   document.getElementById('brgrid').innerHTML=gs.map(g=>{
-    let arr=DATA[curDept].trend[g],now=arr[8],net=now-arr[0];
+    let arr=DATA[curDept].trend[g],now=arr[li],net=now-arr[0];
     // 스파크라인
     const w=200,h=34,mx=Math.max(...arr,1),mn=Math.min(...arr);
     const rng=Math.max(mx-mn,1);
@@ -852,18 +860,19 @@ function renderTenure(){
 }
 function renderAll(){
   renderTabs();
+  var am=document.getElementById('asofMo'); if(am){var li0=lastIdx(curDept);am.textContent='2026년 '+MONTHS[li0]+'월';}
   var isSsam=(curDept==='쌤이다');
   document.body.classList.toggle('ssam-mode',isSsam);
   var pt=document.getElementById('pageTitle'), ps=document.getElementById('pageSub');
   if(pt) pt.textContent=isSsam?'쌤이다 — 강사 현황':'인사 현황 — 인력 추이';
-  if(ps) ps.textContent=isSsam?'10월 정식 출범 · 9월부터 증원 중':'2026년 1~9월 · 월말 재직 기준';
+  if(ps) ps.textContent=isSsam?'10월 정식 출범 · 증원 진행 중':'2026년 1~10월 · 월말 재직 기준';
   // 쌤이다: 지점/근속/월추이/월별탭 전부 숨김 → 강사 인사상세만
   var hide=['comboCard','tenureCard','brCard','mbar'];
   hide.forEach(function(id){var el=document.getElementById(id);if(el)el.style.display=isSsam?'none':'';});
   var mt=document.querySelector('.mtitle');if(mt)mt.style.display=isSsam?'none':'';
   renderKpi();
   if(!isSsam){renderCombo();renderTenure();renderBranches();renderMbar();renderMonth();}
-  else{curMonth=9;renderMonth();}   // 쌤이다도 9월 상세는 grid에 렌더
+  else{curMonth=curMo('쌤이다');renderMonth();}   // 쌤이다 상세는 마지막 데이터달
 }
 (function(){
   var ld=document.createElement('div');
@@ -873,7 +882,7 @@ function renderAll(){
   document.body.appendChild(ld);
   loadHR().then(function(ok){
     if(!ok||!Object.keys(DATA).length){ ld.innerHTML='<div style="text-align:center;color:#E23A22"><div style="font-size:18px;font-weight:900">데이터를 불러오지 못했어요</div><div style="font-size:13px;color:#6B7688;margin-top:8px">시트 공유(링크 있는 사람=뷰어) 확인 필요</div></div>'; return; }
-    renderAll(); ld.remove();
+    curMonth=curMo(curDept); renderAll(); ld.remove();
   });
 })();
 </script></body></html>
