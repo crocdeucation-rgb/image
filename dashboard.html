@@ -25,23 +25,28 @@ body { background: #f8f9fa; padding: 20px 0 0; overflow-x: hidden; }
   .sec-nav-btn.active { background: #1a73e8; color: white; border-color: #1a73e8; }
   .funnel-table th, .funnel-table td, .campaign-table th, .campaign-table td { font-size: 10px !important; padding: 5px 4px !important; }
 
-  /* ★ [2026-10-07] 담당자 성과표 — 모바일 카드 리스트형 (가로스크롤 → 세로 카드) */
+  /* ★ [2026-10-07] 담당자 성과표 — 모바일 컴팩트 리스트 (매출 메인, 2줄 밀집) */
   .funnel-table thead { display: none; }
   #funnel-tbody { display: block; }
   #funnel-tbody tr { display: grid;
-      grid-template-columns: 26px 1fr auto;
-      grid-template-areas: "rank name sales" "meta meta meta";
-      column-gap: 8px; row-gap: 4px; align-items: baseline;
-      padding: 10px 12px; margin-bottom: 6px; background:#fff; border:1px solid #eee;
-      border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+      grid-template-columns: 22px 1fr auto;
+      grid-template-areas: "rank name sales" ". meta sales";
+      column-gap: 7px; row-gap: 1px; align-items: baseline;
+      padding: 7px 10px; margin-bottom: 4px; background:#fff; border:1px solid #eee;
+      border-radius: 8px; }
   #funnel-tbody tr.total { background:#fafbff; border-color:#d9e2ff; }
   #funnel-tbody td { border: none !important; padding: 0 !important; text-align: left !important; }
-  #funnel-tbody td:nth-child(1){ grid-area: rank; font-size: 13px !important; text-align:center !important; }
-  #funnel-tbody td:nth-child(2){ grid-area: name; font-size: 14px !important; font-weight: 800; color:#1a1a1a; }
-  #funnel-tbody td.sales{ grid-area: sales; font-size: 14px !important; font-weight: 800; text-align:right !important; }
-  #funnel-tbody td.mob-meta{ grid-area: meta; display: block !important; font-size: 11px !important;
-      color:#64748b; margin-top: 2px; padding-top: 5px; border-top: 1px solid #f2f4f7; line-height:1.4; }
-  /* 나머지 전부 숨김 (요약은 mob-meta가 대신) */
+  /* 순위 — 작게, 메달 한 줄 */
+  #funnel-tbody td:nth-child(1){ grid-area: rank; font-size: 12px !important; text-align:center !important; line-height:1.2 }
+  #funnel-tbody td:nth-child(1) br, #funnel-tbody td:nth-child(1) span{ display:none !important }  /* 순위변동 숨김(공간절약) */
+  /* 이름 — 크게 */
+  #funnel-tbody td:nth-child(2){ grid-area: name; font-size: 13.5px !important; font-weight: 800; color:#1a1a1a; }
+  /* 매출 — 우측, 제일 크게 (메인 지표) */
+  #funnel-tbody td.sales{ grid-area: sales; font-size: 15px !important; font-weight: 800; text-align:right !important; align-self:center; color:#9333ea !important }
+  /* 지표줄 — 이름 아래 작게 */
+  #funnel-tbody td.mob-meta{ grid-area: meta; display: block !important; font-size: 10px !important;
+      color:#8b93a2; line-height:1.3; }
+  /* 나머지 숨김 */
   #funnel-tbody td:nth-child(3),#funnel-tbody td:nth-child(4),#funnel-tbody td:nth-child(5),
   #funnel-tbody td:nth-child(6),#funnel-tbody td:nth-child(7),#funnel-tbody td:nth-child(9),
   #funnel-tbody td:nth-child(10),#funnel-tbody td:nth-child(11),#funnel-tbody td:nth-child(12),
@@ -49,6 +54,10 @@ body { background: #f8f9fa; padding: 20px 0 0; overflow-x: hidden; }
   /* 폭 넘침 방지 */
   .layout, .section { max-width: 100% !important; overflow-x: hidden; }
   .tbl-scroll { overflow-x: visible !important; }
+  /* ★ 모바일 기간탭 중복 제거 — 유입경로 섹션 탭 숨김(퍼널 탭이 전체 동기화) */
+  #route-tabs { display: none !important; }
+  /* 유입경로 섹션 상단에 현재 기간 안내만 (조작은 퍼널 탭에서) */
+  #sec2 .sec-title::after { content: ' · ' attr(data-period); font-size:10px; color:#94a3b8; font-weight:600 }
   .cval { font-size: 16px !important; }
   .cval.sm { font-size: 13px !important; }
   .cval.xs { font-size: 11px !important; }
@@ -485,10 +494,11 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
 </div>
 
 <div class="section-label" style="margin-top:0;">유입 현황 <span class="badge today">전체 · 그로스 분해</span></div>
-<div class="grid-3">
+<div class="grid-4">
   <div class="card"><div class="clabel">총 유입<span style="font-size:8px;color:#bbb;margin-left:2px" id="inflow-tab-label">이번달</span></div><div class="cval blue sm" id="v-total">-</div></div>
   <div class="card"><div class="clabel">오늘 유입</div><div class="cval amber sm" id="v-today">-</div></div>
   <div class="card"><div class="clabel">어제 유입</div><div class="cval orange sm" id="v-yesterday">-</div></div>
+  <div class="card"><div class="clabel">광고비<span style="font-size:8px;color:#bbb;margin-left:2px">어제까지</span></div><div class="cval sm" id="v-spend" style="color:#ea580c">-</div></div>
 </div>
 <div class="tbl-scroll" style="margin-top:6px"><table class="funnel-table" id="growth-inflow-tbl">
   <thead><tr><th>구분</th><th>오늘</th><th>어제</th><th>월간</th><th>광고비<br><span style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th></tr></thead>
@@ -749,16 +759,19 @@ function renderGrowthInflow(){
   var gi = _growthInflow || {};
   var sp = _growthSpend || {};
   var spFmt = function(won){ won=won||0; if(won<=0) return '-'; return Math.round(won/10000).toLocaleString()+'만'; };
-  var h = '<tr><td class="name">그로스 총괄</td><td class="num db">'+chongToday+'</td><td class="num" style="color:#f97316">'+chongYday+'</td><td class="num" style="color:#9333ea">'+chongMonth+'</td><td class="num" style="color:#e65100">'+spFmt(sp['총괄'])+'</td></tr>';
-  var sumT=chongToday, sumY=chongYday, sumM=chongMonth;
+  // 상단 카드 = 전체(총괄). 표는 그 분해: 그로스 총괄 + 3명. 합계 행은 카드와 중복이라 제거.
+  // 총괄 = 전체 - 3명 기여를 보여주면 분해가 명확 (총괄 + 3명 = 카드 전체).
+  var spFmtCell = function(won){ return (isThisMonth && won>0) ? spFmt(won) : (isThisMonth?'-':'-'); };
+  // 총괄 행 (3명 제외 나머지) — 카드 전체에서 3명 뺀 값
+  var g3Today = isThisMonth ? members.reduce(function(s,m){return s+((gi[m]&&gi[m].t)||0);},0) : 0;
+  var g3Yday  = isThisMonth ? members.reduce(function(s,m){return s+((gi[m]&&gi[m].y)||0);},0) : 0;
+  var g3Month = isThisMonth ? members.reduce(function(s,m){return s+((gi[m]&&gi[m].m)||0);},0) : 0;
+  var h = '<tr><td class="name">그로스 총괄</td><td class="num db">'+chongToday+'</td><td class="num" style="color:#f97316">'+chongYday+'</td><td class="num" style="color:#9333ea">'+chongMonth+'</td><td class="num" style="color:#e65100">'+spFmtCell(sp['총괄']||0)+'</td></tr>';
   members.forEach(function(m){
-    var d = isThisMonth ? (gi[m] || {t:0,y:0,m:0}) : {t:0,y:0,m:0};   // 이번달 탭만 값, 나머진 0
-    sumT+=d.t; sumY+=d.y; sumM+=d.m;
-    var spCell = isThisMonth ? spFmt(sp[m]) : '-';                     // 광고비도 이번달만
+    var d = isThisMonth ? (gi[m] || {t:0,y:0,m:0}) : {t:0,y:0,m:0};
+    var spCell = isThisMonth ? spFmt(sp[m]) : '-';
     h += '<tr><td class="name">그로스 '+m+'</td><td class="num db">'+d.t+'</td><td class="num" style="color:#f97316">'+d.y+'</td><td class="num" style="color:#9333ea">'+d.m+'</td><td class="num" style="color:#e65100">'+spCell+'</td></tr>';
   });
-  var spTot = isThisMonth ? ((sp['총괄']||0)+(sp['우혜림']||0)+(sp['장윤호']||0)+(sp['김윤호']||0)) : 0;
-  h += '<tr class="total"><td class="name">총 유입</td><td class="num db">'+sumT+'</td><td class="num" style="color:#f97316">'+sumY+'</td><td class="num" style="color:#9333ea">'+sumM+'</td><td class="num" style="color:#e65100">'+(isThisMonth?spFmt(spTot):'-')+'</td></tr>';
   tb.innerHTML = h;
 }
 
@@ -1055,6 +1068,12 @@ function render() {
     document.getElementById('v-total').textContent     = (_tm ? _mTotal + _gMonth : _mTotal).toLocaleString();
     document.getElementById('v-today').textContent     = (_tm ? _mToday + _gToday : _mToday).toLocaleString();
     document.getElementById('v-yesterday').textContent = (_tm ? _mYday + _gYday : _mYday).toLocaleString();
+    // 광고비 카드 = 전체(총괄+3명). 이번달 탭만(그로스 광고비는 이번달 데이터).
+    { const _sp = _growthSpend || {};
+      const _spAll = (_sp['총괄']||0)+(_sp['우혜림']||0)+(_sp['장윤호']||0)+(_sp['김윤호']||0);
+      const _ve = document.getElementById('v-spend');
+      if(_ve) _ve.textContent = (_tm && _spAll>0) ? Math.round(_spAll/10000).toLocaleString()+'만' : '-';
+    }
   }
   { const itl = document.getElementById('inflow-tab-label'); if (itl) itl.textContent = ['이번달','지난달','전체'][routeTab]; }
 
@@ -1132,7 +1151,7 @@ function render() {
       <td class="cost adm-only">${costV}</td>
       <td class="iroas adm-only">${iroasV}</td>
       <td class="eff2">${effV}</td>
-      <td class="mob-meta"><b style="color:#1a73e8">DB ${db}</b> · 방문 ${visit} · 세팅 ${setting} · 오더 ${order}${iroasN?' · <b style="color:#0f9d58">ROAS '+iroasN+'</b>':''}</td>
+      <td class="mob-meta">DB ${db} · 방문 ${visit} · 세팅 ${setting} · 오더 ${order}${iroasN?' · ROAS '+iroasN:''}</td>
     </tr>`;
   });
   // [정합] 미배정/이관 DB는 합계에만 포함(행은 숨김) — 대시보드 합계 DB = 총유입 유지
