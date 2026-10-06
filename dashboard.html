@@ -35,8 +35,10 @@ body { background: #f8f9fa; padding: 20px 0 0; overflow-x: hidden; }
   .funnel-table th, .funnel-table td, .campaign-table th, .campaign-table td { font-size: 10px !important; padding: 5px 4px !important; }
 
   /* ★ [2026-10-07] 담당자 성과표 — 모바일 컴팩트 리스트 (매출 메인, 2줄 밀집) */
+  .funnel-table { display: block !important; width: 100% !important; min-width: 0 !important; table-layout: fixed; }
+  #funnel-tbody.funnel-table, .tbl-scroll .funnel-table { min-width: 0 !important; }
   .funnel-table thead { display: none; }
-  #funnel-tbody { display: block; }
+  #funnel-tbody { display: block; width: 100%; }
   #funnel-tbody tr { display: grid;
       grid-template-columns: 22px 1fr auto;
       grid-template-areas: "rank name sales" ". meta sales";
@@ -312,59 +314,32 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
    2줄: 오더 · ROAS · 광고비   (DB/방문/세팅은 PC에서. 모바일은 성과만) */
 @media (max-width: 700px) {
   .campaign-table thead { display: none; }
-  .campaign-table { display: block; width: 100%; border: none; background: transparent; }
+  .campaign-table { display: block !important; width: 100% !important; min-width:0 !important; border: none; background: transparent; }
   .campaign-table tbody { display: block; width: 100%; }
-  .campaign-table tr:not(.camp-sep) {
+  .campaign-table tr:not(.camp-sep):not(.camp-kill-head) {
     display: grid; grid-template-columns: 1fr auto;
-    grid-template-areas: "name sales" "sub sub";
+    grid-template-areas: "name sales" "meta meta";
     column-gap: 8px; row-gap: 3px; align-items: baseline;
     background: #fff; border: 1px solid #eee; border-radius: 8px;
     padding: 9px 11px; margin-bottom: 5px; }
   .campaign-table tr.camp-sep { display: block; }
   .campaign-table td { border: none !important; padding: 0 !important; }
-  /* 1줄 왼쪽: 캠페인명 */
-  .campaign-table td.name { grid-area: name; font-size: 12.5px !important; font-weight: 700;
+  /* 1줄 왼쪽: 캠페인명 (ON/메타 뱃지) */
+  .campaign-table td.name, .campaign-table td.kname { grid-area: name; font-size: 12.5px !important; font-weight: 700;
     color: #1a1a1a !important; word-break: keep-all; overflow-wrap: anywhere; line-height: 1.3; }
   .campaign-table td.name .cname { font-size: 12.5px !important; white-space: normal; }
   /* 1줄 오른쪽: 매출 (메인) */
-  .campaign-table td.metric[data-label="매출"] { grid-area: sales; font-size: 14px !important;
-    font-weight: 800; color:#7c3aed !important; text-align: right !important; align-self:center; white-space:nowrap }
-  /* 2줄: 오더·ROAS·광고비만 (나머지 숨김) */
-  .campaign-table td.metric[data-label="오더"] { grid-area: sub; grid-row:2; display:inline-block !important;
-    font-size: 10.5px !important; color:#0f9d58 !important; margin-right:8px; }
-  .campaign-table td.metric[data-label="오더"] b { display:none !important }  /* (xx%) 숨김, 숫자만 */
-  .campaign-table td.metric[data-label="오더"]::before { content:'오더 '; color:#c0c6d0; font-weight:600; font-size:9px }
-  .campaign-table td.metric[data-label="ROAS"] { grid-row:2; display:inline-block !important;
-    font-size:10.5px !important; margin-right:8px; grid-column:auto; }
-  .campaign-table td.metric[data-label="ROAS"]::before { content:'ROAS '; color:#c0c6d0; font-weight:600; font-size:9px }
-  .campaign-table td.spend { grid-row:2; display:inline-block !important; font-size:10.5px !important;
-    color:#8b93a2 !important; grid-column:auto; }
-  .campaign-table td.spend::before { content:'광고비 '; color:#c0c6d0; font-weight:600; font-size:9px }
-  /* 숨김: DB·방문·세팅 (모바일은 성과 중심) */
-  .campaign-table td.num[data-label="DB"],
-  .campaign-table td.metric[data-label="방문"],
-  .campaign-table td.metric[data-label="세팅"] { display:none !important; }
-  /* 2줄을 한 줄로 묶기 (오더·ROAS·광고비가 같은 줄에 흐름) */
-  .campaign-table tr:not(.camp-sep) { grid-template-areas: "name sales" "sub sub"; }
-  .campaign-table td.metric[data-label="오더"],
-  .campaign-table td.metric[data-label="ROAS"],
-  .campaign-table td.spend { grid-column: 1 / -1; }
-  .campaign-table td.metric[data-label="ROAS"] { margin-left:0 }
-  /* 최근 종료 행 — 동일 2줄 */
+  .campaign-table td.metric[data-label="매출"], .campaign-table td.knum[data-label="매출"] {
+    grid-area: sales; font-size: 14px !important; font-weight: 800; color:#7c3aed !important;
+    text-align: right !important; align-self:center; white-space:nowrap }
+  /* 2줄: mob-meta 한 줄 (오더·ROAS·광고비) */
+  .campaign-table td.mob-meta { grid-area: meta; display: block !important; font-size: 10.5px !important;
+    color:#8b93a2; line-height:1.4; }
+  /* 나머지 td 전부 숨김 (mob-meta가 요약) — 단 매출·이름·mob-meta는 제외 */
+  .campaign-table td:not(.name):not(.kname):not(.mob-meta):not([data-label="매출"]) { display: none !important; }
+  /* 최근 종료 행도 동일 */
   .campaign-table tr.camp-kill-head { display: none !important; }
-  .campaign-table tr.camp-killed-row { display:grid; grid-template-columns:1fr auto;
-    grid-template-areas:"name sales" "sub sub"; column-gap:8px; row-gap:3px;
-    background:#fff; border:1px solid #fecaca; border-radius:8px; padding:9px 11px; margin-bottom:5px; }
-  .campaign-table tr.camp-killed-row td { border:none !important; padding:0 !important; }
-  .campaign-table tr.camp-killed-row td.kname { grid-area:name; font-size:12.5px !important;
-    font-weight:700; color:#1a1a1a !important; word-break:keep-all; line-height:1.3; }
-  .campaign-table tr.camp-killed-row td.knum[data-label="매출"]{ grid-area:sales; font-size:13px !important;
-    font-weight:800; text-align:right !important; }
-  .campaign-table tr.camp-killed-row td.knum[data-label="DB"],
-  .campaign-table tr.camp-killed-row td.knum[data-label="방문"],
-  .campaign-table tr.camp-killed-row td.knum[data-label="세팅"] { display: none !important; }
-  .campaign-table tr.camp-killed-row td.knum { grid-column:1/-1; grid-row:2; display:inline-block;
-    font-size:10.5px !important; margin-right:8px; }
+  .campaign-table tr.camp-killed-row { border-color:#fecaca !important; }
   .campaign-table tr.camp-killed-row td.knum::before { content: attr(data-label) ' '; font-size:9px; color:#c0c6d0; font-weight:600; }
   .campaign-table tr.camp-sep td { display: block; width: 100%; text-align: center; }
   .campaign-table tr.camp-off { opacity: .7; }
@@ -1448,6 +1423,7 @@ function render() {
         <td class="num spend" data-label="광고비" style="color:#6b7280;font-size:11px">${c.spend > 0 ? '₩'+c.spend.toLocaleString() : '-'}</td>
         <td class="num metric" data-label="매출" style="color:#7c3aed;font-size:11px">${manWon(c.sales)}</td>
         <td class="num metric" data-label="ROAS" style="color:${roasColor};font-weight:700">${c.roas || '-'}</td>
+        <td class="mob-meta">오더 ${c.order} · ROAS ${c.roas||'-'} · 광고비 ${c.spend>0?'₩'+c.spend.toLocaleString():'-'}</td>
       </tr>`;
       };
   // ── 최근 종료 캠페인: 위 퍼널표와 다른 "종료 근거" 형식 (종료직전 CPL·ROAS·매출) ─────────
@@ -1471,6 +1447,7 @@ function render() {
       <td class="knum" data-label="종료직전 CPL/사유" style="color:#e11d48;font-weight:800">${reason ? reason : '₩'+cpl.toLocaleString()}</td>
       <td class="knum" data-label="ROAS" style="color:${roasBad ? '#e11d48' : '#b45309'};font-weight:800">${c.roas || '0'}</td>
       <td class="knum" data-label="매출" style="color:#6b7280;font-weight:700">${manWon(c.sales)}</td>
+      <td class="mob-meta" style="color:#991b1b">종료: ${reason?reason:'CPL ₩'+(cpl||0).toLocaleString()} · ROAS ${c.roas||'0'}</td>
     </tr>`;
   };
   const sepRow = killedList.length
