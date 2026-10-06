@@ -468,18 +468,6 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
   </tbody>
 </table></div>
 
-<div class="section-label">날짜별 유입 <span class="badge today">전체 통합(기존+그로스)</span></div>
-<div class="cal-wrap">
-  <div class="cal-head">
-    <div class="cal-title" id="cal-title">-</div>
-    <div class="cal-toggle">
-      <button id="cal-btn-month" class="on" onclick="setCalView('month')">월간</button>
-      <button id="cal-btn-week" onclick="setCalView('week')">주간</button>
-    </div>
-  </div>
-  <div id="cal-body"><div style="color:#aaa;text-align:center;padding:16px;font-size:11px">불러오는 중...</div></div>
-</div>
-
 <div class="section-label">학년별 <span class="badge today" id="grade-tab-label">이번달</span></div>
 <div class="grid-3">
   <div class="card"><div class="clabel">초등</div><div class="cval blue xs" id="grade-elem">-</div><div class="route-eff" id="ge-elem"></div></div>
@@ -521,6 +509,18 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
 
 <!-- 섹션3: 방문 스케줄 -->
 <div class="section" id="sec3">
+<div class="section-label" style="margin-top:0">날짜별 유입 <span class="badge today">전체 통합</span></div>
+<div class="cal-wrap">
+  <div class="cal-head">
+    <div class="cal-title" id="cal-title">-</div>
+    <div class="cal-toggle">
+      <button id="cal-btn-week" class="on" onclick="setCalView('week')">주간</button>
+      <button id="cal-btn-month" onclick="setCalView('month')">월간</button>
+    </div>
+  </div>
+  <div id="cal-body"><div style="color:#aaa;text-align:center;padding:16px;font-size:11px">불러오는 중...</div></div>
+</div>
+
 <div class="sec-title amber">방문 스케줄</div>
 <div class="visit-panel">
   <div id="visit-list"><div class="visit-empty">불러오는 중...</div></div>
@@ -713,7 +713,7 @@ function renderGrowthInflow(){
 }
 
 // ══ [2026-10-06] 캘린더(잔디밭) 뷰 — 두 소스 일자별유입 합산 ══
-var _calView = 'month';
+var _calView = 'week';
 var _calDaily = null;
 async function loadCalendar(){
   try{
@@ -768,20 +768,24 @@ function renderCalendar(){
     h+='</div><div class="cal-legend">적음 <span class="lg" style="background:'+color(1)+'"></span><span class="lg" style="background:'+color(Math.round(mx*0.5))+'"></span><span class="lg" style="background:'+color(mx)+'"></span> 많음</div>';
     body.innerHTML=h;
   } else {
-    title.textContent='최근 8주 유입';
+    // 주간 = 이번 주 월~일 7일, 각 날짜별 유입 (하루에 몇 건)
+    title.textContent='이번 주 일별 유입';
     function startOfWeek(dt){var x=new Date(dt.getFullYear(),dt.getMonth(),dt.getDate());var dow=x.getDay();x.setDate(x.getDate()-(dow===0?6:dow-1));return x;}
-    var weeks=[];
     var ws=startOfWeek(now);
-    for(var w=0;w<8;w++){
-      var wStart=new Date(ws); wStart.setDate(ws.getDate()-7*w);
-      var sum=0;
-      for(var k=0;k<7;k++){ var dk=new Date(wStart); dk.setDate(wStart.getDate()+k); sum+=(d[_ymd(dk)]||0); }
-      weeks.push({label:(wStart.getMonth()+1)+'/'+wStart.getDate()+' 주', val:sum});
+    var dowNames=['월','화','수','목','금','토','일'];
+    var days=[];
+    for(var k=0;k<7;k++){
+      var dk=new Date(ws); dk.setDate(ws.getDate()+k);
+      var key=_ymd(dk);
+      days.push({ dow:dowNames[k], md:(dk.getMonth()+1)+'/'+dk.getDate(), val:(d[key]||0), today:(key===todayKey) });
     }
-    var wmx=1; weeks.forEach(function(x){if(x.val>wmx)wmx=x.val;});
+    var wmx=1; days.forEach(function(x){if(x.val>wmx)wmx=x.val;});
     var h='';
-    weeks.forEach(function(x,i){
-      h+='<div class="cal-week-row"><span class="wlabel">'+(i===0?'이번주 ':'')+x.label+'</span><span class="wbar"><span style="width:'+Math.round(x.val/wmx*100)+'%"></span></span><span class="wval">'+x.val+'</span></div>';
+    days.forEach(function(x){
+      h+='<div class="cal-week-row"'+(x.today?' style="background:#eef7f1;border-radius:7px"':'')+'>'
+        +'<span class="wlabel">'+x.dow+' '+x.md+(x.today?' ·오늘':'')+'</span>'
+        +'<span class="wbar"><span style="width:'+Math.round(x.val/wmx*100)+'%"></span></span>'
+        +'<span class="wval">'+x.val+'</span></div>';
     });
     body.innerHTML=h;
   }
