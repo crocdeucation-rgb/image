@@ -24,9 +24,31 @@ body { background: #f8f9fa; padding: 20px 0 0; overflow-x: hidden; }
   .sec-nav-btn { padding: 4px 12px; font-size: 11px; border-radius: 16px; border: 1px solid #ddd; background: white; color: #666; cursor: pointer; }
   .sec-nav-btn.active { background: #1a73e8; color: white; border-color: #1a73e8; }
   .funnel-table th, .funnel-table td, .campaign-table th, .campaign-table td { font-size: 10px !important; padding: 5px 4px !important; }
-  /* 담당자 성과: 모바일에선 방취율·오더율 숨김 (개인 ROAS만 보이면 됨) */
-  .funnel-table th:nth-child(8), .funnel-table td:nth-child(8),
-  .funnel-table th:nth-child(9), .funnel-table td:nth-child(9) { display: none !important; }
+
+  /* ★ [2026-10-07] 담당자 성과표 — 모바일 카드 리스트형 (가로스크롤 → 세로 카드) */
+  .funnel-table thead { display: none; }
+  #funnel-tbody { display: block; }
+  #funnel-tbody tr { display: grid;
+      grid-template-columns: 26px 1fr auto;
+      grid-template-areas: "rank name sales" "meta meta meta";
+      column-gap: 8px; row-gap: 4px; align-items: baseline;
+      padding: 10px 12px; margin-bottom: 6px; background:#fff; border:1px solid #eee;
+      border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+  #funnel-tbody tr.total { background:#fafbff; border-color:#d9e2ff; }
+  #funnel-tbody td { border: none !important; padding: 0 !important; text-align: left !important; }
+  #funnel-tbody td:nth-child(1){ grid-area: rank; font-size: 13px !important; text-align:center !important; }
+  #funnel-tbody td:nth-child(2){ grid-area: name; font-size: 14px !important; font-weight: 800; color:#1a1a1a; }
+  #funnel-tbody td.sales{ grid-area: sales; font-size: 14px !important; font-weight: 800; text-align:right !important; }
+  #funnel-tbody td.mob-meta{ grid-area: meta; display: block !important; font-size: 11px !important;
+      color:#64748b; margin-top: 2px; padding-top: 5px; border-top: 1px solid #f2f4f7; line-height:1.4; }
+  /* 나머지 전부 숨김 (요약은 mob-meta가 대신) */
+  #funnel-tbody td:nth-child(3),#funnel-tbody td:nth-child(4),#funnel-tbody td:nth-child(5),
+  #funnel-tbody td:nth-child(6),#funnel-tbody td:nth-child(7),#funnel-tbody td:nth-child(9),
+  #funnel-tbody td:nth-child(10),#funnel-tbody td:nth-child(11),#funnel-tbody td:nth-child(12),
+  #funnel-tbody td:nth-child(13){ display: none !important; }
+  /* 폭 넘침 방지 */
+  .layout, .section { max-width: 100% !important; overflow-x: hidden; }
+  .tbl-scroll { overflow-x: visible !important; }
   .cval { font-size: 16px !important; }
   .cval.sm { font-size: 13px !important; }
   .cval.xs { font-size: 11px !important; }
@@ -54,7 +76,10 @@ body { background: #f8f9fa; padding: 20px 0 0; overflow-x: hidden; }
 @media (min-width: 701px) {
   .sec-nav { display: none; }
   .section { display: block !important; }
+  .mob-meta { display: none !important; }   /* 모바일 요약 셀 — PC 숨김 */
 }
+/* 기본(미디어쿼리 밖)에서도 PC 폭이면 숨김 보장 */
+.mob-meta { display: none; }
 
 .sec-title { font-size: 13px; font-weight: 700; color: #1a1a1a; margin-bottom: 10px; padding-bottom: 8px; }
 .sec-title.blue  { border-bottom: 2px solid #1a73e8; }
@@ -72,6 +97,10 @@ body { background: #f8f9fa; padding: 20px 0 0; overflow-x: hidden; }
 .section-label { font-size: 13px; color: #0f172a; margin: 15px 0 8px; font-weight: 700; display: flex; align-items: center; gap: 6px; padding-left: 9px; border-left: 4px solid #4338ca; line-height: 1.3; letter-spacing: -0.01em; }
 .section-label .badge { font-size: 9px; padding: 2px 7px; border-radius: 8px; background: #eef2f7; color: #475569; font-weight: 600; }
 .section-label .badge.pay { background: #f3e8ff; color: #7c3aed; }
+.asof-badge { font-size: 10px; font-weight: 800; color: #fff; background: #ea580c; border-radius: 8px; padding: 2px 9px; margin-left: 4px; letter-spacing: -.2px; box-shadow: 0 1px 4px rgba(234,88,12,.3); }
+.asof-note { font-size: 10.5px; color: #94a3b8; font-weight: 600; margin: 3px 0 7px; padding-left: 9px; }
+.asof-note b { color: #ea580c; font-weight: 800; }
+@media (max-width: 700px){ .asof-badge{ font-size:9px; padding:1px 6px } .asof-note{ font-size:9.5px } }
 .section-label .badge.today { background: #fff3e0; color: #e65100; font-weight: 700; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
@@ -407,7 +436,8 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
   <button class="refresh" onclick="loadAll()">새로고침</button>
 </div>
 
-<div class="section-label" style="margin-top:0;">매출 <span class="badge pay">결제일 기준</span></div>
+<div class="section-label" style="margin-top:0;">매출 <span class="badge pay">결제일 기준</span><span class="asof-badge" id="asof-badge" style="display:none"></span></div>
+<div class="asof-note" id="asof-note">DB·방문은 실시간 · 매출은 <b id="asof-note-date">—</b></div>
 <div class="grid-4">
   <div class="card"><div class="clabel"><span id="sm-label">이번 달</span><span class="dayno" id="dn-month"></span></div><div class="cval purple sm" id="sales-month">-</div></div>
   <div class="card" id="card-week"><div class="clabel">이번 주<span class="dayno" id="dn-week"></span></div><div class="cval purple sm" id="sales-week">-</div></div>
@@ -448,20 +478,19 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
 <div class="section" id="sec2">
 <div class="sec-title green">유입경로 분석</div>
 
-<div class="tabs" id="route-tabs">
+<div class="tabs" id="route-tabs" title="전체 화면 기간과 연동됩니다">
   <button class="tab active" onclick="setRouteTab(0)">이번달</button>
   <button class="tab" onclick="setRouteTab(1)">지난달</button>
   <button class="tab" onclick="setRouteTab(2)">전체</button>
 </div>
 
-<div class="section-label" style="margin-top:0;">유입 현황 <span class="badge" id="inflow-tab-label">이번달</span></div>
+<div class="section-label" style="margin-top:0;">유입 현황 <span class="badge today">전체 · 그로스 분해</span></div>
 <div class="grid-3">
-  <div class="card"><div class="clabel">총 유입</div><div class="cval blue sm" id="v-total">-</div></div>
+  <div class="card"><div class="clabel">총 유입<span style="font-size:8px;color:#bbb;margin-left:2px" id="inflow-tab-label">이번달</span></div><div class="cval blue sm" id="v-total">-</div></div>
   <div class="card"><div class="clabel">오늘 유입</div><div class="cval amber sm" id="v-today">-</div></div>
   <div class="card"><div class="clabel">어제 유입</div><div class="cval orange sm" id="v-yesterday">-</div></div>
 </div>
-<div class="section-label">그로스별 유입 <span class="badge today">오늘·어제·월간</span></div>
-<div class="tbl-scroll"><table class="funnel-table" id="growth-inflow-tbl">
+<div class="tbl-scroll" style="margin-top:6px"><table class="funnel-table" id="growth-inflow-tbl">
   <thead><tr><th>구분</th><th>오늘</th><th>어제</th><th>월간</th><th>광고비<br><span style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th></tr></thead>
   <tbody id="growth-inflow-tbody">
     <tr><td colspan="5" style="color:#aaa;text-align:center;padding:12px;">불러오는 중...</td></tr>
@@ -710,24 +739,26 @@ async function loadGrowthSpend(){
 function renderGrowthInflow(){
   var tb = document.getElementById('growth-inflow-tbody');
   if(!tb) return;
-  var chongToday = parseInt((allRows[1] && allRows[1][1]) || 0) || 0;
-  var chongYday  = parseInt((allRows[2] && allRows[2][1]) || 0) || 0;
-  var chongMonth = parseInt((allRows[1] && allRows[1][2]) || 0) || 0;
+  // ★ 탭 연동 — 총괄 월간은 routeTab(이번달[2]/지난달[3]/전체[4]) 따라감.
+  //   그로스 3명은 "이번달" 데이터만 존재 → 지난달/전체 탭이면 0으로.
+  var isThisMonth = (routeTab === 0);
+  var chongToday = parseInt((allRows[1] && allRows[1][1]) || 0) || 0;       // 노션 오늘(토글 무관)
+  var chongYday  = parseInt((allRows[2] && allRows[2][1]) || 0) || 0;       // 노션 어제(토글 무관)
+  var chongMonth = parseInt((allRows[1] && allRows[1][routeTab+2]) || 0) || 0;  // 총유입(탭 따라감)
   var members = ['우혜림','장윤호','김윤호'];
   var gi = _growthInflow || {};
   var sp = _growthSpend || {};
-  // 광고비 포맷: 원 → 만원
   var spFmt = function(won){ won=won||0; if(won<=0) return '-'; return Math.round(won/10000).toLocaleString()+'만'; };
   var h = '<tr><td class="name">그로스 총괄</td><td class="num db">'+chongToday+'</td><td class="num" style="color:#f97316">'+chongYday+'</td><td class="num" style="color:#9333ea">'+chongMonth+'</td><td class="num" style="color:#e65100">'+spFmt(sp['총괄'])+'</td></tr>';
   var sumT=chongToday, sumY=chongYday, sumM=chongMonth;
   members.forEach(function(m){
-    var d = gi[m] || {t:0,y:0,m:0};
+    var d = isThisMonth ? (gi[m] || {t:0,y:0,m:0}) : {t:0,y:0,m:0};   // 이번달 탭만 값, 나머진 0
     sumT+=d.t; sumY+=d.y; sumM+=d.m;
-    h += '<tr><td class="name">그로스 '+m+'</td><td class="num db">'+d.t+'</td><td class="num" style="color:#f97316">'+d.y+'</td><td class="num" style="color:#9333ea">'+d.m+'</td><td class="num" style="color:#e65100">'+spFmt(sp[m])+'</td></tr>';
+    var spCell = isThisMonth ? spFmt(sp[m]) : '-';                     // 광고비도 이번달만
+    h += '<tr><td class="name">그로스 '+m+'</td><td class="num db">'+d.t+'</td><td class="num" style="color:#f97316">'+d.y+'</td><td class="num" style="color:#9333ea">'+d.m+'</td><td class="num" style="color:#e65100">'+spCell+'</td></tr>';
   });
-  // 광고비 합계 = 총괄 + 3명 (총괄이 이미 3명 제외 전체라 = 전체 메타)
-  var spTot = (sp['총괄']||0)+(sp['우혜림']||0)+(sp['장윤호']||0)+(sp['김윤호']||0);
-  h += '<tr class="total"><td class="name">총 유입</td><td class="num db">'+sumT+'</td><td class="num" style="color:#f97316">'+sumY+'</td><td class="num" style="color:#9333ea">'+sumM+'</td><td class="num" style="color:#e65100">'+spFmt(spTot)+'</td></tr>';
+  var spTot = isThisMonth ? ((sp['총괄']||0)+(sp['우혜림']||0)+(sp['장윤호']||0)+(sp['김윤호']||0)) : 0;
+  h += '<tr class="total"><td class="name">총 유입</td><td class="num db">'+sumT+'</td><td class="num" style="color:#f97316">'+sumY+'</td><td class="num" style="color:#9333ea">'+sumM+'</td><td class="num" style="color:#e65100">'+(isThisMonth?spFmt(spTot):'-')+'</td></tr>';
   tb.innerHTML = h;
 }
 
@@ -874,6 +905,7 @@ async function loadCancel() {
         _u.innerHTML += ' · <b class="asof">' + parseInt(_m[1],10) + '월 ' + parseInt(_m[2],10) + '일까지 반영</b>';
       }
     }
+    updateAsofBadge();   // ★ 매출 기준일 뱃지 (늦게 와도 갱신)
   } catch(e) {
     const el = document.getElementById('cancel-amt');
     if (el) el.textContent = '-';
@@ -942,6 +974,7 @@ async function loadData() {
       _upd += ' · <b class="asof">' + parseInt(_md[1],10) + '월 ' + parseInt(_md[2],10) + '일까지 반영</b>';
     }
     document.getElementById('updated').innerHTML = _upd;
+    updateAsofBadge();   // ★ 매출 기준일 뱃지
   } catch(e) {
     document.getElementById('updated').textContent = '로드 실패';
   }
@@ -954,20 +987,21 @@ function setFunnelTab(idx) {
 }
 
 // [2026-08-27] 퍼널 통합 토글 — 취소현황+성과분석+히트맵 한 토글로 연동
-function setFunnelAll(idx) {
-  funnelTab = idx;
-  cancelTab = idx;
-  document.querySelectorAll('#funnel-all-tabs .tab').forEach((t,i) => t.classList.toggle('active', i===idx));
-  const cl = document.getElementById('cancel-tab-label'); if (cl) cl.textContent = ['이번달','지난달','전체'][idx];
+// ★ [2026-10-07] 전 화면 기간 토글 통합 — 퍼널·취소·유입경로·그로스별 한 번에.
+//   어느 탭을 눌러도 funnelTab=cancelTab=routeTab 동일 → 화면 기간 엇갈림 제거.
+function setPeriodAll(idx){
+  funnelTab = idx; cancelTab = idx; routeTab = idx;
+  // 두 탭 UI 동기화 (퍼널 상단 + 유입경로)
+  document.querySelectorAll('#funnel-all-tabs .tab').forEach((t,i)=>t.classList.toggle('active', i===idx));
+  document.querySelectorAll('#route-tabs .tab').forEach((t,i)=>t.classList.toggle('active', i===idx));
+  const cl=document.getElementById('cancel-tab-label'); if(cl) cl.textContent=['이번달','지난달','전체'][idx];
   render();
   renderCancel();
+  renderGrowthInflow();
 }
-
-function setRouteTab(idx) {
-  routeTab = idx;
-  document.querySelectorAll('#route-tabs .tab').forEach((t,i) => t.classList.toggle('active', i===idx));
-  render();
-}
+// 기존 호출부 호환 (HTML onclick 둘 다 setPeriodAll로 통일)
+function setFunnelAll(idx){ setPeriodAll(idx); }
+function setRouteTab(idx){ setPeriodAll(idx); }
 
 function pickDayNo(s) {
   const m = String(s || '').match(/\((\d+일차)\)/);
@@ -1019,10 +1053,22 @@ function render() {
   document.getElementById('sales-lastweek').textContent = r13[3] || '-';
   document.getElementById('dn-week').textContent  = pickDayNo(r12[2]);
 
-  document.getElementById('v-total').textContent     = allRows[1]?.[routeTab + 2] || '0';  // [수정 2026-08-13] 토글 연동: 이번달[2]/지난달[3]/전체[4]
+  // ★ 그로스 3명(별도 노션)도 포함한 전체 유입 — 상단 서머리 = 아래 그로스별 표 합계와 일치
+  { const _gi = _growthInflow || {};
+    const _gMembers = ['우혜림','장윤호','김윤호'];
+    const _gSum = (k) => _gMembers.reduce((s,m)=> s + ((_gi[m]&&_gi[m][k])||0), 0);
+    const _gToday = _gSum('t'), _gYday = _gSum('y'), _gMonth = _gSum('m');
+    // 메인 노션값
+    const _mTotal = parseInt(allRows[1]?.[routeTab + 2] || '0') || 0;
+    const _mToday = parseInt(allRows[1]?.[1] || '0') || 0;
+    const _mYday  = parseInt(allRows[2]?.[1] || '0') || 0;
+    // 그로스 3명은 "이번달" 데이터만 → 이번달 탭에서만 합산. 지난달/전체는 노션값만.
+    const _tm = (routeTab===0);
+    document.getElementById('v-total').textContent     = (_tm ? _mTotal + _gMonth : _mTotal).toLocaleString();
+    document.getElementById('v-today').textContent     = (_tm ? _mToday + _gToday : _mToday).toLocaleString();
+    document.getElementById('v-yesterday').textContent = (_tm ? _mYday + _gYday : _mYday).toLocaleString();
+  }
   { const itl = document.getElementById('inflow-tab-label'); if (itl) itl.textContent = ['이번달','지난달','전체'][routeTab]; }
-  document.getElementById('v-today').textContent     = allRows[1]?.[1] || '0';
-  document.getElementById('v-yesterday').textContent = allRows[2]?.[1] || '0';
 
   const offset = funnelTab * 6 + 1;
   const tbody = document.getElementById('funnel-tbody');
@@ -1098,6 +1144,7 @@ function render() {
       <td class="cost adm-only">${costV}</td>
       <td class="iroas adm-only">${iroasV}</td>
       <td class="eff2">${effV}</td>
+      <td class="mob-meta"><b style="color:#1a73e8">DB ${db}</b> · 방문 ${visit} · 세팅 ${setting} · 오더 ${order}${iroasN?' · <b style="color:#0f9d58">ROAS '+iroasN+'</b>':''}</td>
     </tr>`;
   });
   // [정합] 미배정/이관 DB는 합계에만 포함(행은 숨김) — 대시보드 합계 DB = 총유입 유지
@@ -1138,6 +1185,7 @@ function render() {
     <td class="cost adm-only">${_totalCostView?Number(_totalCostView.toFixed(1)).toLocaleString()+'만':'-'}</td>
     <td class="iroas adm-only">${_totalCostView?(totalSalesNum/(_totalCostView*10000)).toFixed(2):'-'}</td>
     <td class="eff2">${totalDb?(totalSalesNum/totalDb/10000).toFixed(1)+'만':'-'}</td>
+    <td class="mob-meta"><b style="color:#1a73e8">DB ${totalDb}</b> · 방문 ${totalVisit} · 세팅 ${totalSetting} · 오더 ${totalOrder}</td>
   </tr>`);
   tbody.innerHTML = rows.join('');
 
@@ -1469,6 +1517,17 @@ function nameWithBreaks(s) {
 
 // 원 단위 매출 → 만원 표기. 만원 단위는 유지하되(원 단위로 쓰면 열이 넓어진다)
 // 반올림으로 뭉개지 않게 소수점 1자리까지 살린다. 3,468,000 → 346.8만 / 52,020,000 → 5,202만
+// ★ 매출 기준일 뱃지·안내 갱신 (DB 실시간 / 매출 N월 X일까지 반영)
+function updateAsofBadge(){
+  var b = document.getElementById('asof-badge');
+  var n = document.getElementById('asof-note');
+  var nd = document.getElementById('asof-note-date');
+  if(!totalDataDate){ if(b) b.style.display='none'; if(nd) nd.textContent='집계 중'; return; }
+  var m = totalDataDate.split('-');
+  var label = parseInt(m[1],10)+'월 '+parseInt(m[2],10)+'일까지 반영';
+  if(b){ b.textContent='💰 '+label; b.style.display=''; }
+  if(nd){ nd.textContent=label; }
+}
 function manWon(won) {
   const n = Number(won) || 0;
   if (n <= 0) return '-';
