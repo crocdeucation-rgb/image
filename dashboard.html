@@ -338,6 +338,29 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 #opsnav{display:none}
 body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sgate.hidden) #opsnav{display:flex}
 #opsnav{position:sticky;top:0;z-index:200;background:#fff;border-bottom:1px solid #E3E8F0;display:flex;align-items:center;gap:14px;padding:9px 16px;flex-wrap:wrap}#opsnav .onav-logo{font-size:14px;font-weight:800;letter-spacing:-.3px;white-space:nowrap}#opsnav .onav-logo b{color:#4C6EF5}#opsnav .onav-tabs{display:flex;gap:5px;overflow-x:auto;-webkit-overflow-scrolling:touch}#opsnav .onav-tabs a{text-decoration:none;background:#EEF1F6;color:#6B7688;font-size:13px;font-weight:700;padding:8px 16px;border-radius:22px;white-space:nowrap}#opsnav .onav-tabs a:hover{color:#1B2436}#opsnav .onav-tabs a.on{background:#4C6EF5;color:#fff}body.gate-hasbar #opsnav{top:34px}@media(max-width:768px){#opsnav{padding:7px 10px;gap:8px}#opsnav .onav-logo{font-size:12.5px}#opsnav .onav-tabs a{padding:7px 13px;font-size:12.5px}}
+/* ══ [2026-10-06] 캘린더(잔디밭) 뷰 ══ */
+.cal-wrap{background:#fff;border:1px solid #eee;border-radius:10px;padding:14px;margin:4px 0 14px}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-title{font-size:13px;font-weight:700;color:#1a1a1a}
+.cal-toggle{display:inline-flex;gap:4px}
+.cal-toggle button{font-size:11px;padding:3px 11px;border-radius:14px;border:1px solid #ddd;background:#fff;cursor:pointer;color:#888;font-weight:600}
+.cal-toggle button.on{background:#0f9d58;color:#fff;border-color:#0f9d58}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-dow{font-size:9px;color:#aaa;text-align:center;font-weight:700;padding-bottom:2px}
+.cal-cell{aspect-ratio:1;border-radius:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;position:relative;background:#f3f4f6}
+.cal-cell .cd{font-size:8px;color:#9aa3b0;position:absolute;top:2px;left:4px;font-weight:600}
+.cal-cell .cv{font-size:13px;font-weight:800}
+.cal-cell.empty{background:transparent}
+.cal-cell.today{outline:2px solid #1a73e8;outline-offset:-2px}
+.cal-legend{display:flex;align-items:center;gap:4px;justify-content:flex-end;margin-top:8px;font-size:9px;color:#aaa}
+.cal-legend .lg{width:13px;height:13px;border-radius:3px}
+.cal-week-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid #f5f5f5}
+.cal-week-row:last-child{border-bottom:none}
+.cal-week-row .wlabel{font-size:11px;color:#666;font-weight:600;min-width:90px}
+.cal-week-row .wbar{flex:1;height:14px;background:#f3f4f6;border-radius:7px;overflow:hidden}
+.cal-week-row .wbar>span{display:block;height:100%;background:linear-gradient(90deg,#34d399,#0f9d58)}
+.cal-week-row .wval{font-size:12px;font-weight:800;color:#0f9d58;min-width:40px;text-align:right}
+@media(max-width:700px){.cal-cell .cv{font-size:11px}.cal-cell .cd{font-size:7px}}
 </style>
 </head>
 <body>
@@ -444,7 +467,18 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
     <tr><td colspan="4" style="color:#aaa;text-align:center;padding:12px;">불러오는 중...</td></tr>
   </tbody>
 </table></div>
-  
+
+<div class="section-label">날짜별 유입 <span class="badge today">전체 통합(기존+그로스)</span></div>
+<div class="cal-wrap">
+  <div class="cal-head">
+    <div class="cal-title" id="cal-title">-</div>
+    <div class="cal-toggle">
+      <button id="cal-btn-month" class="on" onclick="setCalView('month')">월간</button>
+      <button id="cal-btn-week" onclick="setCalView('week')">주간</button>
+    </div>
+  </div>
+  <div id="cal-body"><div style="color:#aaa;text-align:center;padding:16px;font-size:11px">불러오는 중...</div></div>
+</div>
 
 <div class="section-label">학년별 <span class="badge today" id="grade-tab-label">이번달</span></div>
 <div class="grid-3">
@@ -636,6 +670,7 @@ async function loadAll() {
   await loadYRank();
   await Promise.all([loadData(), loadSchedule(), loadCancel()]);
   loadGrowthInflow();   // ← 추가
+  loadCalendar();       // ← [2026-10-06] 캘린더뷰
 }
 // [그로스별 유입] 우혜림 DB 시트(대시보드 탭) gviz 로드
 var GROWTH_GVIZ = 'https://docs.google.com/spreadsheets/d/1l0H8mY0SHiENr9Mlvnha7WVNAxA-iPQh0AB55eXhFaA/gviz/tq?tqx=out:csv&headers=0&sheet=' + encodeURIComponent('대시보드');
@@ -675,6 +710,81 @@ function renderGrowthInflow(){
   });
   h += '<tr class="total"><td class="name">총 유입</td><td class="num db">'+sumT+'</td><td class="num" style="color:#f97316">'+sumY+'</td><td class="num" style="color:#9333ea">'+sumM+'</td></tr>';
   tb.innerHTML = h;
+}
+
+// ══ [2026-10-06] 캘린더(잔디밭) 뷰 — 두 소스 일자별유입 합산 ══
+var _calView = 'month';
+var _calDaily = null;
+async function loadCalendar(){
+  try{
+    var merged = {};
+    try{ _mergeDaily(merged, parseCSV(await _fsCsv('execData','dash-summary'))); }catch(e){}
+    try{ var t2 = await fetch(GROWTH_GVIZ, {cache:'no-store'}).then(function(r){return r.text();}); _mergeDaily(merged, parseCSV(t2)); }catch(e){}
+    _calDaily = merged;
+  }catch(e){ _calDaily = {}; }
+  renderCalendar();
+}
+function _mergeDaily(merged, rows){
+  var start=-1;
+  for(var i=0;i<rows.length;i++){ if((rows[i][0]||'').trim()==='일자별유입'){ start=i+1; break; } }
+  if(start<0) return;
+  for(var r=start;r<rows.length;r++){
+    var k=(rows[r][0]||'').trim();
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(k)) break;
+    merged[k]=(merged[k]||0)+(parseInt(rows[r][1])||0);
+  }
+}
+function setCalView(v){
+  _calView=v;
+  document.getElementById('cal-btn-month').classList.toggle('on', v==='month');
+  document.getElementById('cal-btn-week').classList.toggle('on', v==='week');
+  renderCalendar();
+}
+function renderCalendar(){
+  var body=document.getElementById('cal-body');
+  var title=document.getElementById('cal-title');
+  if(!body) return;
+  var d=_calDaily||{};
+  var now=new Date();
+  var _ymd=function(dt){return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');};
+  var todayKey=_ymd(now);
+  var vals=Object.values(d); var mx=1; vals.forEach(function(v){if(v>mx)mx=v;});
+  var color=function(v){ if(!v) return '#f3f4f6'; var t=Math.min(v/mx,1); return 'rgba(15,157,88,'+(0.15+t*0.8).toFixed(2)+')'; };
+  var fg=function(v){ return v>mx*0.55?'#fff':'#333'; };
+
+  if(_calView==='month'){
+    title.textContent=(now.getMonth()+1)+'월 유입';
+    var y=now.getFullYear(), m=now.getMonth();
+    var first=new Date(y,m,1), startDow=(first.getDay()+6)%7;
+    var days=new Date(y,m+1,0).getDate();
+    var dows=['월','화','수','목','금','토','일'];
+    var h='<div class="cal-grid">'+dows.map(function(x){return '<div class="cal-dow">'+x+'</div>';}).join('');
+    for(var i=0;i<startDow;i++) h+='<div class="cal-cell empty"></div>';
+    for(var dd=1;dd<=days;dd++){
+      var key=y+'-'+String(m+1).padStart(2,'0')+'-'+String(dd).padStart(2,'0');
+      var v=d[key]||0;
+      h+='<div class="cal-cell'+(key===todayKey?' today':'')+'" style="background:'+color(v)+'"><span class="cd">'+dd+'</span><span class="cv" style="color:'+fg(v)+'">'+(v||'')+'</span></div>';
+    }
+    h+='</div><div class="cal-legend">적음 <span class="lg" style="background:'+color(1)+'"></span><span class="lg" style="background:'+color(Math.round(mx*0.5))+'"></span><span class="lg" style="background:'+color(mx)+'"></span> 많음</div>';
+    body.innerHTML=h;
+  } else {
+    title.textContent='최근 8주 유입';
+    function startOfWeek(dt){var x=new Date(dt.getFullYear(),dt.getMonth(),dt.getDate());var dow=x.getDay();x.setDate(x.getDate()-(dow===0?6:dow-1));return x;}
+    var weeks=[];
+    var ws=startOfWeek(now);
+    for(var w=0;w<8;w++){
+      var wStart=new Date(ws); wStart.setDate(ws.getDate()-7*w);
+      var sum=0;
+      for(var k=0;k<7;k++){ var dk=new Date(wStart); dk.setDate(wStart.getDate()+k); sum+=(d[_ymd(dk)]||0); }
+      weeks.push({label:(wStart.getMonth()+1)+'/'+wStart.getDate()+' 주', val:sum});
+    }
+    var wmx=1; weeks.forEach(function(x){if(x.val>wmx)wmx=x.val;});
+    var h='';
+    weeks.forEach(function(x,i){
+      h+='<div class="cal-week-row"><span class="wlabel">'+(i===0?'이번주 ':'')+x.label+'</span><span class="wbar"><span style="width:'+Math.round(x.val/wmx*100)+'%"></span></span><span class="wval">'+x.val+'</span></div>';
+    });
+    body.innerHTML=h;
+  }
 }
 
 // [2026-09] 순위이력 시트 (대쉬보드 1bkK, gid=690549750). A~E블록=7:3 가중합(대쉬보드용) 어제순위.
