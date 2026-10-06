@@ -26,12 +26,12 @@ body { background: #f8f9fa; padding: 20px 0 0; overflow-x: hidden; }
   .sec-nav-btn { flex: 1; padding: 8px 0; font-size: 12.5px; font-weight: 700; border-radius: 8px;
       border: none; background: transparent; color: #6b7688; cursor: pointer; letter-spacing:-.3px; transition: all .15s; }
   .sec-nav-btn.active { background: #fff; color: #1a73e8; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
-  /* 기간탭 — 섹션 제목 줄 오른쪽으로 끌어올림 (제목과 한 줄) */
-  #sec1 .sec-title, #sec2 .sec-title { margin-bottom: 0 !important; }
-  #funnel-all-tabs, #route-tabs { justify-content: flex-end; gap: 4px;
-      margin-top: -30px !important; margin-bottom: 14px !important; }
-  #funnel-all-tabs .tab, #route-tabs .tab { padding: 4px 11px; font-size: 11px; }
-  /* route-tabs는 모바일에서 숨겨둔 상태(아래 규칙) — 유입경로 섹션엔 퍼널 기간 적용 */
+  /* 기간탭 — 섹션 제목과 같은 줄, flex 양끝 정렬 (겹침 없이) */
+  #sec1 .sec-title, #sec2 .sec-title {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: nowrap; gap: 8px; margin-bottom: 10px !important; padding-bottom: 8px; }
+  #funnel-all-tabs, #route-tabs { margin: 0 !important; gap: 4px; flex: 0 0 auto; }
+  #funnel-all-tabs .tab, #route-tabs .tab { padding: 4px 10px; font-size: 10.5px; white-space: nowrap; }
   .funnel-table th, .funnel-table td, .campaign-table th, .campaign-table td { font-size: 10px !important; padding: 5px 4px !important; }
 
   /* ★ [2026-10-07] 담당자 성과표 — 모바일 컴팩트 리스트 (매출 메인, 2줄 밀집) */
@@ -64,6 +64,17 @@ body { background: #f8f9fa; padding: 20px 0 0; overflow-x: hidden; }
   .layout, .section { max-width: 100% !important; overflow-x: hidden; }
   .tbl-scroll { overflow-x: visible !important; }
   /* 모바일: 각 섹션에 기간탭 유지 (setPeriodAll로 전부 동기화되니 어느쪽 눌러도 OK) */
+
+  /* ★ 유입경로별·학년별 — 모바일 세로 리스트 (grid-3 칸반 폐기) */
+  #route-grid, #grade-grid { display: block !important; }
+  #route-grid .card, #grade-grid .card { display: grid; grid-template-columns: auto 1fr; grid-template-areas: "label val" "sub sub";
+      column-gap: 10px; row-gap: 2px; align-items: baseline; text-align: left !important;
+      padding: 9px 12px !important; margin-bottom: 5px; border-radius: 8px; }
+  #route-grid .clabel, #grade-grid .clabel { grid-area: label; font-size: 12.5px !important; font-weight: 700; color:#1a1a1a; margin:0 !important; align-self:center }
+  #route-grid .cval, #grade-grid .cval { grid-area: val; text-align: right !important; font-size: 15px !important; }
+  #route-grid .crate, #grade-grid .route-eff { grid-area: sub; grid-row:2; font-size: 10px !important; color:#8b93a2; line-height:1.4; margin:0 !important; text-align:left }
+  #route-grid .crate .fnl, #grade-grid .route-eff .fnl { font-size:10px !important; margin-right:5px }
+  #route-grid .route-eff { font-size:9px !important; margin-top:1px }
   .cval { font-size: 16px !important; }
   .cval.sm { font-size: 13px !important; }
   .cval.xs { font-size: 11px !important; }
@@ -88,10 +99,21 @@ body { background: #f8f9fa; padding: 20px 0 0; overflow-x: hidden; }
   .visit-assignee { font-size: 9px; }
   .dayno { font-size: 8px !important; }
 }
+/* ★ 전역 기간 토글 — PC만 표시 (opsnav 아래 우측 바). 섹션별 탭은 PC에서 숨김. */
+#global-period { display: none; }
 @media (min-width: 701px) {
   .sec-nav { display: none; }
   .section { display: block !important; }
-  .mob-meta { display: none !important; }   /* 모바일 요약 셀 — PC 숨김 */
+  .mob-meta { display: none !important; }
+  /* 전역 기간 바 */
+  #global-period { display: flex; align-items: center; justify-content: flex-end; gap: 5px;
+      max-width: 1700px; margin: 8px auto 0; padding: 6px 14px 0; }
+  #global-period .gp-label { font-size: 11px; color: #94a3b8; font-weight: 700; margin-right: 3px; }
+  #global-period .gp-btn { padding: 5px 15px; font-size: 12px; font-weight: 700; border-radius: 16px;
+      border: 1px solid #ddd; background: #fff; color: #6b7688; cursor: pointer; transition: all .15s; }
+  #global-period .gp-btn.active { background: #1a73e8; color: #fff; border-color: #1a73e8; }
+  /* 섹션별 기간탭 PC 숨김 (전역 토글로 통합) */
+  #funnel-all-tabs, #route-tabs { display: none !important; }
 }
 /* 기본(미디어쿼리 밖)에서도 PC 폭이면 숨김 보장 */
 .mob-meta { display: none; }
@@ -285,65 +307,67 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 .fnl-o { color:#0f9d58; }
 @media (max-width:640px){ .fnl { display:block; margin-right:0; } }
 
-/* ══ [2026-08-21] 모바일 캠페인 카드형 — 700px 이하 ══
-   표를 억지로 좁히는 대신, 각 캠페인 행을 카드로 재배치.
-   캠페인명은 위에 크게, 지표(DB/방문/세팅/오더/광고비/매출/ROAS)는 아래 그리드로. */
+/* ══ [2026-10-07] 모바일 캠페인 2줄 요약 리스트 — 700px 이하 ══
+   1줄: 캠페인명(ON) ········ 매출
+   2줄: 오더 · ROAS · 광고비   (DB/방문/세팅은 PC에서. 모바일은 성과만) */
 @media (max-width: 700px) {
-  .campaign-table thead { display: none; }               /* 헤더행 숨김 (data-label로 대체) */
+  .campaign-table thead { display: none; }
   .campaign-table { display: block; width: 100%; border: none; background: transparent; }
-  .campaign-table tbody { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; align-items: start; width: 100%; }
+  .campaign-table tbody { display: block; width: 100%; }
   .campaign-table tr:not(.camp-sep) {
-    display: block; background: #fff; border: 1px solid #eee;
-    border-radius: 10px; margin-bottom: 0; padding: 10px 11px;
-    box-shadow: 0 1px 3px rgba(0,0,0,.04);
-  }
-  .campaign-table tr.camp-sep { grid-column: 1 / -1; }
-  /* 캠페인명 — 카드 상단, 크게, 줄바꿈 자연스럽게 */
-  .campaign-table td.name {
-    display: block; width: 100%; max-width: 100%;
-    font-size: 13px !important; font-weight: 700; color: #1a1a1a !important;
-    padding: 0 0 8px 0 !important; margin-bottom: 8px;
-    border-bottom: 1px solid #f0f0f0; word-break: keep-all; overflow-wrap: anywhere;
-    line-height: 1.35;
-  }
-  .campaign-table td.name .cname { font-size: 13px !important; white-space: normal; }
-  /* 지표들 — 3열 그리드 카드 */
-  .campaign-table td.num, .campaign-table td.metric, .campaign-table td.spend {
-    display: inline-block; width: 48%; text-align: left !important;
-    padding: 3px 1px !important; vertical-align: top; font-size: 12px !important;
-    border: none !important;
-  }
-  .campaign-table td.spend { width: 100% !important; font-size: 11px !important; }
-  /* 각 지표 위에 라벨 (data-label) */
-  .campaign-table td.num::before, .campaign-table td.spend::before {
-    content: attr(data-label); display: block;
-    font-size: 9px; color: #999; font-weight: 600; margin-bottom: 1px;
-  }
-  .campaign-table td.metric b { font-size: 10px !important; }
-  /* [모바일 전용] 최근 종료 카드 간결화 — CPL·ROAS·매출만, DB/방문/세팅/오더 숨김 (PC는 8칸 표 유지) */
-  .campaign-table tr.camp-kill-head { display: none !important; }  /* 모바일은 헤더행 숨기고 카드 라벨로 대체 */
-  .campaign-table tr.camp-killed-row td.kname {
-    display: block; width: 100%; font-size: 13px !important; font-weight: 700; color: #1a1a1a !important;
-    padding: 0 0 8px 0 !important; margin-bottom: 8px; border-bottom: 1px solid #f0f0f0;
-    word-break: keep-all; overflow-wrap: anywhere; line-height: 1.35;
-  }
+    display: grid; grid-template-columns: 1fr auto;
+    grid-template-areas: "name sales" "sub sub";
+    column-gap: 8px; row-gap: 3px; align-items: baseline;
+    background: #fff; border: 1px solid #eee; border-radius: 8px;
+    padding: 9px 11px; margin-bottom: 5px; }
+  .campaign-table tr.camp-sep { display: block; }
+  .campaign-table td { border: none !important; padding: 0 !important; }
+  /* 1줄 왼쪽: 캠페인명 */
+  .campaign-table td.name { grid-area: name; font-size: 12.5px !important; font-weight: 700;
+    color: #1a1a1a !important; word-break: keep-all; overflow-wrap: anywhere; line-height: 1.3; }
+  .campaign-table td.name .cname { font-size: 12.5px !important; white-space: normal; }
+  /* 1줄 오른쪽: 매출 (메인) */
+  .campaign-table td.metric[data-label="매출"] { grid-area: sales; font-size: 14px !important;
+    font-weight: 800; color:#7c3aed !important; text-align: right !important; align-self:center; white-space:nowrap }
+  /* 2줄: 오더·ROAS·광고비만 (나머지 숨김) */
+  .campaign-table td.metric[data-label="오더"] { grid-area: sub; grid-row:2; display:inline-block !important;
+    font-size: 10.5px !important; color:#0f9d58 !important; margin-right:8px; }
+  .campaign-table td.metric[data-label="오더"] b { display:none !important }  /* (xx%) 숨김, 숫자만 */
+  .campaign-table td.metric[data-label="오더"]::before { content:'오더 '; color:#c0c6d0; font-weight:600; font-size:9px }
+  .campaign-table td.metric[data-label="ROAS"] { grid-row:2; display:inline-block !important;
+    font-size:10.5px !important; margin-right:8px; grid-column:auto; }
+  .campaign-table td.metric[data-label="ROAS"]::before { content:'ROAS '; color:#c0c6d0; font-weight:600; font-size:9px }
+  .campaign-table td.spend { grid-row:2; display:inline-block !important; font-size:10.5px !important;
+    color:#8b93a2 !important; grid-column:auto; }
+  .campaign-table td.spend::before { content:'광고비 '; color:#c0c6d0; font-weight:600; font-size:9px }
+  /* 숨김: DB·방문·세팅 (모바일은 성과 중심) */
+  .campaign-table td.num[data-label="DB"],
+  .campaign-table td.metric[data-label="방문"],
+  .campaign-table td.metric[data-label="세팅"] { display:none !important; }
+  /* 2줄을 한 줄로 묶기 (오더·ROAS·광고비가 같은 줄에 흐름) */
+  .campaign-table tr:not(.camp-sep) { grid-template-areas: "name sales" "sub sub"; }
+  .campaign-table td.metric[data-label="오더"],
+  .campaign-table td.metric[data-label="ROAS"],
+  .campaign-table td.spend { grid-column: 1 / -1; }
+  .campaign-table td.metric[data-label="ROAS"] { margin-left:0 }
+  /* 최근 종료 행 — 동일 2줄 */
+  .campaign-table tr.camp-kill-head { display: none !important; }
+  .campaign-table tr.camp-killed-row { display:grid; grid-template-columns:1fr auto;
+    grid-template-areas:"name sales" "sub sub"; column-gap:8px; row-gap:3px;
+    background:#fff; border:1px solid #fecaca; border-radius:8px; padding:9px 11px; margin-bottom:5px; }
+  .campaign-table tr.camp-killed-row td { border:none !important; padding:0 !important; }
+  .campaign-table tr.camp-killed-row td.kname { grid-area:name; font-size:12.5px !important;
+    font-weight:700; color:#1a1a1a !important; word-break:keep-all; line-height:1.3; }
+  .campaign-table tr.camp-killed-row td.knum[data-label="매출"]{ grid-area:sales; font-size:13px !important;
+    font-weight:800; text-align:right !important; }
   .campaign-table tr.camp-killed-row td.knum[data-label="DB"],
   .campaign-table tr.camp-killed-row td.knum[data-label="방문"],
-  .campaign-table tr.camp-killed-row td.knum[data-label="세팅"],
-  .campaign-table tr.camp-killed-row td.knum[data-label="오더"] { display: none !important; }
-  .campaign-table tr.camp-killed-row td.knum {
-    display: inline-block; width: 48%; text-align: left !important;
-    padding: 3px 1px !important; vertical-align: top; font-size: 13px !important; border: none !important;
-  }
-  .campaign-table tr.camp-killed-row td.knum[data-label="종료직전 CPL"] { width: 100% !important; }
-  .campaign-table tr.camp-killed-row td.knum::before {
-    content: attr(data-label); display: block; font-size: 9px; color: #999; font-weight: 600; margin-bottom: 1px;
-  }
-  /* 종료소재 구분선 카드형 */
-  .campaign-table tr.camp-sep td { display: block; width: 100%; text-align: center; border-radius: 8px; }
-  .campaign-table tr.camp-off { opacity: .75; padding: 8px 12px; }
-  .campaign-table tr.camp-off td.name { font-size: 11px !important; padding-bottom: 6px !important; }
-  .campaign-table tr.camp-off td.num, .campaign-table tr.camp-off td.metric, .campaign-table tr.camp-off td.spend { font-size: 11px !important; }
+  .campaign-table tr.camp-killed-row td.knum[data-label="세팅"] { display: none !important; }
+  .campaign-table tr.camp-killed-row td.knum { grid-column:1/-1; grid-row:2; display:inline-block;
+    font-size:10.5px !important; margin-right:8px; }
+  .campaign-table tr.camp-killed-row td.knum::before { content: attr(data-label) ' '; font-size:9px; color:#c0c6d0; font-weight:600; }
+  .campaign-table tr.camp-sep td { display: block; width: 100%; text-align: center; }
+  .campaign-table tr.camp-off { opacity: .7; }
 }
 
 
@@ -426,6 +450,13 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
     <a href="dashboard.html" class="on">웹마케팅</a>
     <a href="ssamida.html">쌤이다</a>
   </nav>
+</div>
+<!-- ★ 전역 기간 토글 — 퍼널·유입경로·그로스 전부 한 번에 (PC 통합) -->
+<div id="global-period">
+  <span class="gp-label">기간</span>
+  <button class="gp-btn active" onclick="setPeriodAll(0)">이번달</button>
+  <button class="gp-btn" onclick="setPeriodAll(1)">지난달</button>
+  <button class="gp-btn" onclick="setPeriodAll(2)">전체</button>
 </div>
 <div class="sec-nav">
   <button class="sec-nav-btn active" onclick="showSec(0)">퍼널</button>
@@ -514,14 +545,14 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
 </table></div>
 
 <div class="section-label">학년별 <span class="badge today" id="grade-tab-label">이번달</span></div>
-<div class="grid-3">
+<div class="grid-3" id="grade-grid">
   <div class="card"><div class="clabel">초등</div><div class="cval blue xs" id="grade-elem">-</div><div class="route-eff" id="ge-elem"></div></div>
   <div class="card"><div class="clabel">중등</div><div class="cval green xs" id="grade-mid">-</div><div class="route-eff" id="ge-mid"></div></div>
   <div class="card"><div class="clabel">고등</div><div class="cval amber xs" id="grade-high">-</div><div class="route-eff" id="ge-high"></div></div>
 </div>
 
 <div class="section-label">유입경로별 <span class="badge pay" id="route-eff-label">CPL·ROAS</span></div>
-<div class="grid-3">
+<div class="grid-3" id="route-grid">
   <div class="card"><div class="clabel">메타광고</div><div class="cval purple xs" id="route-meta">-</div><div class="crate" id="rr-meta"></div></div>
   <div class="card"><div class="clabel">무료유입</div><div class="cval blue xs" id="route-insta">-</div><div class="crate" id="rr-insta"></div></div>
   <div class="card"><div class="clabel">카카오</div><div class="cval amber xs" id="route-kakao">-</div><div class="crate" id="rr-kakao"></div></div>
@@ -1003,7 +1034,8 @@ function setFunnelTab(idx) {
 //   어느 탭을 눌러도 funnelTab=cancelTab=routeTab 동일 → 화면 기간 엇갈림 제거.
 function setPeriodAll(idx){
   funnelTab = idx; cancelTab = idx; routeTab = idx;
-  // 두 탭 UI 동기화 (퍼널 상단 + 유입경로)
+  // 탭 UI 동기화 (전역 바 + 퍼널 + 유입경로)
+  document.querySelectorAll('#global-period .gp-btn').forEach((t,i)=>t.classList.toggle('active', i===idx));
   document.querySelectorAll('#funnel-all-tabs .tab').forEach((t,i)=>t.classList.toggle('active', i===idx));
   document.querySelectorAll('#route-tabs .tab').forEach((t,i)=>t.classList.toggle('active', i===idx));
   const cl=document.getElementById('cancel-tab-label'); if(cl) cl.textContent=['이번달','지난달','전체'][idx];
