@@ -18,6 +18,9 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',-apple-syste
 .top{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:12px}
 .brand{font-size:20px;font-weight:800}
 .brand span{font-size:12.5px;font-weight:600;color:var(--soft);margin-left:8px}
+.archbtn{display:inline-flex;align-items:center;gap:5px;text-decoration:none;font-size:12.5px;font-weight:700;color:var(--v1);background:var(--v1s);border:1px solid #C5D0FA;border-radius:9px;padding:7px 14px;white-space:nowrap;transition:.1s}
+.archbtn:hover{background:var(--v1);color:#fff;border-color:var(--v1)}
+@media(max-width:768px){.archbtn{font-size:12px;padding:6px 11px}}
 .tabs{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding-bottom:2px}
 .tabs button{border:1px solid var(--line);background:#fff;font:inherit;font-size:14px;font-weight:800;color:var(--soft);padding:9px 18px;cursor:pointer;border-radius:22px;white-space:nowrap}
 .tabs button:hover{border-color:#C5D0FA;color:var(--ink)}
@@ -1017,6 +1020,7 @@ body.gate-hasbar .tabbar{top:calc(34px + var(--navH,53px))}
 <div class="wrap">
  <div class="top">
    <div class="brand">운영본부<span id="sub"></span></div>
+   <a class="archbtn" href="https://drive.google.com/drive/folders/1ksR5E2zwnj7xDDoDS5Hmx6F3quyqAHZA?usp=sharing" target="_blank" rel="noopener">🔒 소재 아카이브</a>
  </div>
  <div class="tabbar" id="tabbar">
    <div class="tabs" id="tabs"></div>
@@ -1441,7 +1445,7 @@ function guardBox(){
     return '<div'+(cls?' class="'+cls+'"':'')+'><div class="l">'+l+'</div><b>'+(v==null?'—':v+(unit||''))+'</b>'+
       (d?'<div class="org" style="font-weight:700">전월 '+(pvv+(unit||''))+' · '+(d>0?'▲':'▼')+Math.abs(d)+'</div>':(pvv!=null?'<div class="org">전월 '+pvv+(unit||'')+'</div>':''))+'</div>';};
   var dr=function(x){return pc(x.keep,x.keep+x.drop);};
-  var head=kpi('관리중',cur.active,pv&&pv.active)+kpi('접수',cur.mw,pv&&pv.mw)+kpi('유지',cur.keep,pv&&pv.keep,'g')+kpi('해지',cur.drop,pv&&pv.drop,'r')+
+  var head=kpi('접수',cur.mw,pv&&pv.mw)+kpi('유지',cur.keep,pv&&pv.keep,'g')+kpi('해지',cur.drop,pv&&pv.drop,'r')+
     kpi('진행·부재',cur.ing,pv&&pv.ing)+kpi('방어율',dr(cur),pv&&dr(pv),'g','%');
   var mseg='<div class="seg" style="margin-bottom:10px">'+ms.map(function(m){
     return '<button class="'+(m===G?'on':'')+'" data-gm="'+m+'">'+(+m.slice(5))+'월'+(m===DATA.slice(0,7)?' (진행 중)':'')+'</button>';}).join('')+'</div>';
@@ -1459,13 +1463,12 @@ function guardBox(){
       var h=Math.max(2,Math.round(t.n/mx*26)), on=t.m===G;
       return '<span title="'+(+t.m.slice(5))+'월 접수 '+t.n+(t.r!=null?' · 방어율 '+t.r+'%':'')+'"><i style="height:'+h+'px;background:'+(on?'var(--v1)':'#C9D3E6')+'"></i><em>'+(t.r!=null?Math.round(t.r):'·')+'</em></span>';}).join('')+'</div>';};
   var sortSeg='<div class="seg" style="margin-bottom:10px"><button class="'+(SORT==='rate'?'on':'')+'" data-gsort="rate">방어율 순</button><button class="'+(SORT==='recv'?'on':'')+'" data-gsort="recv">접수율 순</button></div>';
-  var tbl='<div class="scrollx"><table class="tbl"><thead><tr><th>담당</th><th class="c">관리중</th><th class="c">접수</th><th>접수율</th><th class="c">유지</th><th class="c">해지</th><th class="c">당일취소</th><th class="c">진행·미기재</th><th>방어율</th><th class="c">전월</th><th>5~9월 접수 · 방어율</th></tr></thead><tbody>'+
+  var tbl='<div class="scrollx"><table class="tbl"><thead><tr><th>담당</th><th class="c">접수</th><th class="c">유지</th><th class="c">해지</th><th class="c">당일취소</th><th class="c">진행·미기재</th><th>방어율</th><th class="c">전월</th><th>5~9월 접수 · 방어율</th></tr></thead><tbody>'+
    rows.map(function(x){
      var d=(x.r!=null&&x.pr!=null)?Math.round((x.r-x.pr)*10)/10:null;
      var cv=(D.joinCov||{})[x.k];
-     return '<tr><td><b>'+esc(x.k)+'</b></td><td class="c">'+(x.n==null?'<span class="z" title="관리중 회원 가입일 기재 '+cv+'% — 역산 불가">가입일 미기재</span>':x.n)+'</td>'+
+     return '<tr><td><b>'+esc(x.k)+'</b></td>'+
       '<td class="c"><b>'+x.recv+'</b></td>'+
-      '<td>'+(x.rr==null?'<span class="z">—</span>':bar(x.rr*2,'var(--amber)')+'<b>'+x.rr+'%</b>')+'</td>'+
       '<td class="c" style="color:var(--pos);font-weight:700">'+(x.keep||'<span class="z">·</span>')+'</td>'+
       '<td class="c" style="color:var(--red);font-weight:700">'+(x.drop||'<span class="z">·</span>')+'</td>'+
       '<td class="c">'+(x.dang||'<span class="z">·</span>')+'</td><td class="c z">'+(x.ing||'·')+'</td>'+
@@ -1473,7 +1476,7 @@ function guardBox(){
       '<td class="c" style="white-space:nowrap">'+(x.pr==null?'<span class="z">—</span>':x.pr+'%'+(d?'<div style="font-size:10.5px;font-weight:700;color:'+(d>0?'var(--pos)':'var(--red)')+'">'+(d>0?'▲':'▼')+Math.abs(d)+'</div>':''))+'</td>'+
       '<td>'+spark(x.tr)+'</td></tr>';}).join('')+'</tbody></table></div>';
   return zone('guard','var(--pos)','민원 방어',(+G.slice(5))+'월 '+(dr(cur)==null?'—':dr(cur)+'%'),'달을 골라 그 달 관리·접수·결과를 전월과 같이',
-   '<div class="lead">민원 시트 월 탭 기준. <b>방어율</b>=유지÷(유지+해지), <b>접수율</b>=접수÷그 달 관리중. 당일취소는 방어 기회가 없던 건이라 방어율에서 뺍니다. 담당은 민원 시트 "관리교사" 칸 그대로 — 현 코칭 명단에 없는 교사로 적힌 접수는 이 표에 안 잡힙니다.</div>'+
+   '<div class="lead">민원 시트 월 탭 기준. <b>방어율</b>=유지÷(유지+해지). 당일취소는 방어 기회가 없던 건이라 방어율에서 뺍니다. 담당은 민원 시트 "관리교사" 칸 그대로 — 현 코칭 명단에 없는 교사로 적힌 접수는 이 표에 안 잡힙니다.</div>'+
    mseg+'<div class="kpi">'+head+'</div>'+sortSeg+tbl,true);
 }
 function planBox(){
@@ -1667,8 +1670,7 @@ function funnelBox(){
   var seg='<div class="seg" style="margin-bottom:10px">'+ms.map(function(m){
     return '<button class="'+(m===F?'on':'')+'" data-fm="'+m+'">'+lab(m)+(m===DATA.slice(0,7)?' (진행 중)':'')+'</button>';}).join('')+'</div>';
   var funnel='<div class="fflow">'+
-    step('관리중',cur.active==null?'—':cur.active.toLocaleString('ko-KR')+'명',pv&&pv.active!=null&&cur.active!=null?'전월 '+pv.active.toLocaleString('ko-KR')+' · '+(cur.active-pv.active>0?'+':'')+(cur.active-pv.active):'그 달 시점 역산')+arrow+
-    step('민원 접수',cur.mw+'건','접수율 '+(cur.active?pc(cur.mw,cur.active)+'%':'—')+(pv?' · 전월 '+pv.mw+d_(cur.mw,pv.mw,'dn'):''),'var(--pur)')+arrow+
+    step('민원 접수',cur.mw+'건',(pv?'전월 '+pv.mw+d_(cur.mw,pv.mw,'dn'):''),'var(--pur)')+arrow+
     step('민원 방어',(dr(cur)==null?'—':dr(cur)+'%'),'유지 '+cur.keep+' · 해지 '+cur.drop+(pv&&dr(pv)!=null?' · 전월 '+dr(pv)+'%'+d_(dr(cur),dr(pv),'up'):''),dr(cur)>=55?'var(--pos)':'var(--red)')+arrow+
     step('취소',cur.can+'명','해지 '+cur.drop+' · 당일 '+cur.dang+(pv?' · 전월 '+pv.can+d_(cur.can,pv.can,'dn'):''),'var(--red)')+'</div>';
   /* 월 × 항목 매트릭스 */
@@ -2325,12 +2327,10 @@ function flowBox(){
   var sec=function(t){return '<tr><td colspan="'+(col.length+1)+'" style="background:#F6F8FB;font-size:11.5px;font-weight:800;color:var(--soft);letter-spacing:.5px"><span class="secl">'+t+'</span></td></tr>';};
   var tbl='<div class="scrollx"><table class="tbl mtbl"><thead><tr>'+th+'</tr></thead><tbody>'+
     sec('회원')+
-    row('관리중','active',{tip:'각 달 시점 역산 (5~9월)',delta:'n'})+
-    row('신규 가입','join',{sub:1,tip:'코칭 시트 가입일 기준'})+
+    row('신규 가입','join',{tip:'코칭 시트 가입일 기준'})+
     row('관리 만료 도래','exp',{sub:1,tip:'코칭 시트 만료일 기준'})+
     sec('민원 (민원 시트 월 탭)')+
     row('민원 접수','mw',{mw:1,delta:'dn'})+
-    row('접수율','mwR',{mw:1,pct:1,sub:1,tip:'접수 ÷ 관리중'})+
     row('유지','keep',{mw:1,sub:1,col:'var(--pos)'})+
     row('해지','drop',{mw:1,sub:1,col:'var(--red)'})+
     row('당일취소','dang',{mw:1,sub:1})+
@@ -2339,14 +2339,13 @@ function flowBox(){
     row('방어율','defR',{mw:1,pct:1,tip:'유지 ÷ (유지+해지)',delta:'up',col:'var(--ink)'})+
     sec('취소 (해지 + 당일취소, 회원 기준)')+
     row('취소','can',{mw:1,delta:'dn',col:'var(--red)'})+
-    row('취소율','canR',{mw:1,pct:1,sub:1,tip:'취소 ÷ 관리중'})+
     row('재이탈','re',{mw:1,sub:1,tip:'앞서 유지됐던 회원'})+
     row('점검 필요 분류','chk',{mw:1,sub:1,tip:'고객 오해·관리·수업'})+
     row('취소 금액','canAmt',{mw:1,sub:1,money:1,tip:'민원 순취소액 · 없으면 취소입력'})+row('금액 없는 건','noAmt',{mw:1,sub:1,col:'var(--mute)'})+
     '</tbody></table></div>';
   return zone('flow','var(--pos)','월별 흐름','','관리 → 민원 → 결과 → 취소를 달마다',
     '<div class="lead">총합은 시점이 섞여 흐름이 안 보여서 <b>달마다</b> 나눕니다. ▲▼는 전월 대비. 민원·취소는 민원 시트 월 탭 기준 — 2~4월은 탭이 없고 1월 탭은 30건만 적혀 있습니다. '+
-    '관리중은 가입·만료일로 역산(5~9월), 가입·만료 도래는 코칭 시트에 날짜가 적힌 회원만 셉니다 — 정예영 담당 회원은 가입일이 대부분 비어 있어 관리중에서 약 90명이 빠져 있습니다.</div>'+tbl,true);
+    '신규 가입·만료 도래는 코칭 시트에 날짜가 적힌 회원만 셉니다. 월별 관리중 인원은 과거 담임 이력이 시트에 남지 않아 집계하지 않습니다.</div>'+tbl,true);
 }
 /* ── 코칭 탭 ── */
 function mwRes(m){var r=(m.mw&&m.mw.res)||'';return r==='유지'?'유지':((r==='해지'||r==='당취')?'해지':'진행');}
@@ -2376,14 +2375,13 @@ function coachTrend(name){
   var arrow=function(cur,prev){if(prev==null||cur==null)return '';var d=cur-prev;return d>0?'<span style="color:var(--red)">▲'+d+'</span>':(d<0?'<span style="color:var(--pos)">▼'+(-d)+'</span>':'<span class="z">–</span>');};
   var rows=CM.map(function(x,i){var p=i>0?CM[i-1]:null;
     return '<tr><td><b>'+(+x.m.slice(5))+'월</b></td>'+
-      '<td class="c">'+x.active+' '+(p?arrow(x.active,p.active):'')+'</td>'+
       '<td class="c">'+x.mw+'</td>'+
       '<td class="c">'+(x.defR!=null?'<b style="color:'+(x.defR>=60?'var(--pos)':(x.defR<=52?'var(--red)':'var(--amber)'))+'">'+x.defR+'%</b>':'<span class="z">—</span>')+'</td>'+
       '<td class="c">'+(x.can||'<span class="z">·</span>')+'</td>'+
       '<td class="c">'+(x.canR?x.canR+'%':'<span class="z">—</span>')+'</td></tr>';}).join('');
-  return '<div class="grp" style="margin-top:14px">'+esc(name)+' 월별 추이 — 관리중·민원·방어율·취소가 달마다 어떻게 움직였나</div>'+
-    '<table class="tbl" style="max-width:520px"><thead><tr><th>월</th><th class="c">관리중</th><th class="c">민원</th><th class="c">방어율</th><th class="c">취소</th><th class="c">취소율</th></tr></thead><tbody>'+rows+'</tbody></table>'+
-    '<div class="lead" style="margin-top:4px">관리중 <span style="color:var(--red)">▲</span>=늘어남 <span style="color:var(--pos)">▼</span>=줄어듦. 취소는 7~9월만(5·6월 원본 미반영).</div>';
+  return '<div class="grp" style="margin-top:14px">'+esc(name)+' 월별 추이 — 민원·방어율·취소가 달마다 어떻게 움직였나</div>'+
+    '<table class="tbl" style="max-width:460px"><thead><tr><th>월</th><th class="c">민원</th><th class="c">방어율</th><th class="c">취소</th><th class="c">취소율</th></tr></thead><tbody>'+rows+'</tbody></table>'+
+    '<div class="lead" style="margin-top:4px">민원 시트 월 탭 기준. 취소는 7~9월만(5·6월 원본 미반영).</div>';
 }
 
 function coachDist(M){
@@ -2580,7 +2578,6 @@ function coachTab(){
            return '<td class="c"'+(o.col?' style="color:'+o.col+'"':'')+'>'+(v==null?'<span class="z">—</span>':(o.pct?v+'%':v))+dh+'</td>';}).join('')+'</tr>';};
      var dr=function(x){return pc(x.keep,(x.keep||0)+(x.drop||0));};
      var tbl='<div class="scrollx"><table class="tbl mtbl"><thead><tr><th>항목</th>'+th+'</tr></thead><tbody>'+
-       row('관리중',function(x){return x.active;},{delta:'up'})+
        row('민원 접수',function(x){return x.mw||0;},{delta:'dn',col:'var(--pur)'})+
        row('유지',function(x){return x.keep||0;},{sub:1,col:'var(--pos)'})+
        row('해지',function(x){return x.drop||0;},{sub:1,col:'var(--red)'})+
@@ -2588,7 +2585,7 @@ function coachTab(){
        row('방어율',function(x){return dr(x);},{pct:1,delta:'up',col:'var(--ink)'})+
        '</tbody></table></div>';
      return zone('cmon','var(--pos)',esc(cur)+' 월별 추이','','이 담당의 5~9월 관리·민원·방어 흐름',
-       '<div class="lead">민원 시트 월 탭 기준. 관리중은 각 월 시점 역산. 방어율=유지÷(유지+해지).</div>'+tbl,true);
+       '<div class="lead">민원 시트 월 탭 기준. 방어율=유지÷(유지+해지).</div>'+tbl,true);
    })()+
    zone('cdist',"var(--v1)",esc(cur)+' 회원 구성',M.length+'명','학년·가입·만료·지점 분포',coachDist(M)+coachTrend(cur),true)+
    zone('ctt','var(--pos)',esc(cur)+' 주간 코칭표',V.team+' · '+M.length+'명','만료·민원은 칸 안에 표시',
