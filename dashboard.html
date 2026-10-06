@@ -462,9 +462,9 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
 </div>
 <div class="section-label">그로스별 유입 <span class="badge today">오늘·어제·월간</span></div>
 <div class="tbl-scroll"><table class="funnel-table" id="growth-inflow-tbl">
-  <thead><tr><th>구분</th><th>오늘</th><th>어제</th><th>월간</th></tr></thead>
+  <thead><tr><th>구분</th><th>오늘</th><th>어제</th><th>월간</th><th>광고비<br><span style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th></tr></thead>
   <tbody id="growth-inflow-tbody">
-    <tr><td colspan="4" style="color:#aaa;text-align:center;padding:12px;">불러오는 중...</td></tr>
+    <tr><td colspan="5" style="color:#aaa;text-align:center;padding:12px;">불러오는 중...</td></tr>
   </tbody>
 </table></div>
 
@@ -691,7 +691,21 @@ async function loadGrowthInflow(){
     }
     _growthInflow = out;
   }catch(e){ _growthInflow = {}; }
+  await loadGrowthSpend();   // ★ 그로스별 광고비(메타광고비 시트)도 로드
   renderGrowthInflow();
+}
+// ★ [그로스별 광고비] 메타광고비 시트(execData/dash-metaspend)의 _그로스_* 행 → {총괄,우혜림,장윤호,김윤호}
+var _growthSpend = null;
+async function loadGrowthSpend(){
+  try{
+    var rows = parseCSV(await _fsCsv('execData','dash-metaspend'));
+    var sp = {};
+    rows.forEach(function(r){
+      var k=(r[0]||'').trim();
+      if(k.indexOf('_그로스_')===0) sp[k.replace('_그로스_','')] = parseInt(r[1])||0;
+    });
+    _growthSpend = sp;
+  }catch(e){ _growthSpend = {}; }
 }
 function renderGrowthInflow(){
   var tb = document.getElementById('growth-inflow-tbody');
@@ -701,14 +715,19 @@ function renderGrowthInflow(){
   var chongMonth = parseInt((allRows[1] && allRows[1][2]) || 0) || 0;
   var members = ['우혜림','장윤호','김윤호'];
   var gi = _growthInflow || {};
-  var h = '<tr><td class="name">그로스 총괄</td><td class="num db">'+chongToday+'</td><td class="num" style="color:#f97316">'+chongYday+'</td><td class="num" style="color:#9333ea">'+chongMonth+'</td></tr>';
+  var sp = _growthSpend || {};
+  // 광고비 포맷: 원 → 만원
+  var spFmt = function(won){ won=won||0; if(won<=0) return '-'; return Math.round(won/10000).toLocaleString()+'만'; };
+  var h = '<tr><td class="name">그로스 총괄</td><td class="num db">'+chongToday+'</td><td class="num" style="color:#f97316">'+chongYday+'</td><td class="num" style="color:#9333ea">'+chongMonth+'</td><td class="num" style="color:#e65100">'+spFmt(sp['총괄'])+'</td></tr>';
   var sumT=chongToday, sumY=chongYday, sumM=chongMonth;
   members.forEach(function(m){
     var d = gi[m] || {t:0,y:0,m:0};
     sumT+=d.t; sumY+=d.y; sumM+=d.m;
-    h += '<tr><td class="name">그로스 '+m+'</td><td class="num db">'+d.t+'</td><td class="num" style="color:#f97316">'+d.y+'</td><td class="num" style="color:#9333ea">'+d.m+'</td></tr>';
+    h += '<tr><td class="name">그로스 '+m+'</td><td class="num db">'+d.t+'</td><td class="num" style="color:#f97316">'+d.y+'</td><td class="num" style="color:#9333ea">'+d.m+'</td><td class="num" style="color:#e65100">'+spFmt(sp[m])+'</td></tr>';
   });
-  h += '<tr class="total"><td class="name">총 유입</td><td class="num db">'+sumT+'</td><td class="num" style="color:#f97316">'+sumY+'</td><td class="num" style="color:#9333ea">'+sumM+'</td></tr>';
+  // 광고비 합계 = 총괄 + 3명 (총괄이 이미 3명 제외 전체라 = 전체 메타)
+  var spTot = (sp['총괄']||0)+(sp['우혜림']||0)+(sp['장윤호']||0)+(sp['김윤호']||0);
+  h += '<tr class="total"><td class="name">총 유입</td><td class="num db">'+sumT+'</td><td class="num" style="color:#f97316">'+sumY+'</td><td class="num" style="color:#9333ea">'+sumM+'</td><td class="num" style="color:#e65100">'+spFmt(spTot)+'</td></tr>';
   tb.innerHTML = h;
 }
 
