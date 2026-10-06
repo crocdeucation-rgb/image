@@ -20,9 +20,18 @@ body { background: #f8f9fa; padding: 20px 0 0; overflow-x: hidden; }
   .layout { display: block; padding: 4px 8px; }
   .section { display: none; }
   .section.active { display: block; }
-  .sec-nav { display: flex; justify-content: center; gap: 6px; margin-bottom: 8px; }
-  .sec-nav-btn { padding: 4px 12px; font-size: 11px; border-radius: 16px; border: 1px solid #ddd; background: white; color: #666; cursor: pointer; }
-  .sec-nav-btn.active { background: #1a73e8; color: white; border-color: #1a73e8; }
+  /* ★ 모바일 상단 세그먼트 바 (퍼널/분석/방문) — sticky, 여백, iOS식 세그먼트 */
+  .sec-nav { display: flex; gap: 0; margin: 10px 8px 10px; padding: 3px; background: #eef1f6;
+      border-radius: 10px; position: sticky; top: 46px; z-index: 50; box-shadow: 0 1px 4px rgba(0,0,0,.05); }
+  .sec-nav-btn { flex: 1; padding: 8px 0; font-size: 12.5px; font-weight: 700; border-radius: 8px;
+      border: none; background: transparent; color: #6b7688; cursor: pointer; letter-spacing:-.3px; transition: all .15s; }
+  .sec-nav-btn.active { background: #fff; color: #1a73e8; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+  /* 기간탭 — 섹션 제목 줄 오른쪽으로 끌어올림 (제목과 한 줄) */
+  #sec1 .sec-title, #sec2 .sec-title { margin-bottom: 0 !important; }
+  #funnel-all-tabs, #route-tabs { justify-content: flex-end; gap: 4px;
+      margin-top: -30px !important; margin-bottom: 14px !important; }
+  #funnel-all-tabs .tab, #route-tabs .tab { padding: 4px 11px; font-size: 11px; }
+  /* route-tabs는 모바일에서 숨겨둔 상태(아래 규칙) — 유입경로 섹션엔 퍼널 기간 적용 */
   .funnel-table th, .funnel-table td, .campaign-table th, .campaign-table td { font-size: 10px !important; padding: 5px 4px !important; }
 
   /* ★ [2026-10-07] 담당자 성과표 — 모바일 컴팩트 리스트 (매출 메인, 2줄 밀집) */
@@ -54,10 +63,7 @@ body { background: #f8f9fa; padding: 20px 0 0; overflow-x: hidden; }
   /* 폭 넘침 방지 */
   .layout, .section { max-width: 100% !important; overflow-x: hidden; }
   .tbl-scroll { overflow-x: visible !important; }
-  /* ★ 모바일 기간탭 중복 제거 — 유입경로 섹션 탭 숨김(퍼널 탭이 전체 동기화) */
-  #route-tabs { display: none !important; }
-  /* 유입경로 섹션 상단에 현재 기간 안내만 (조작은 퍼널 탭에서) */
-  #sec2 .sec-title::after { content: ' · ' attr(data-period); font-size:10px; color:#94a3b8; font-weight:600 }
+  /* 모바일: 각 섹션에 기간탭 유지 (setPeriodAll로 전부 동기화되니 어느쪽 눌러도 OK) */
   .cval { font-size: 16px !important; }
   .cval.sm { font-size: 13px !important; }
   .cval.xs { font-size: 11px !important; }
@@ -773,6 +779,11 @@ function renderGrowthInflow(){
     h += '<tr><td class="name">그로스 '+m+'</td><td class="num db">'+d.t+'</td><td class="num" style="color:#f97316">'+d.y+'</td><td class="num" style="color:#9333ea">'+d.m+'</td><td class="num" style="color:#e65100">'+spCell+'</td></tr>';
   });
   tb.innerHTML = h;
+  // ★ 광고비 카드(v-spend)도 여기서 세팅 — _growthSpend 로드 후라 값이 있음(render는 로드 전이라 '-')
+  { var _spAll = (sp['총괄']||0)+(sp['우혜림']||0)+(sp['장윤호']||0)+(sp['김윤호']||0);
+    var _ve = document.getElementById('v-spend');
+    if(_ve) _ve.textContent = (isThisMonth && _spAll>0) ? Math.round(_spAll/10000).toLocaleString()+'만' : '-';
+  }
 }
 
 // ══ [2026-10-06] 캘린더(잔디밭) 뷰 — 두 소스 일자별유입 합산 ══
