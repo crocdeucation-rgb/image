@@ -392,8 +392,8 @@ async function load(){
           +'<td class="num setting">'+fnl(a.setCell)+'</td>'
           +'<td class="num order">'+fnl(a.orderCell)+'</td>'
           +'<td class="num sales">'+won(a.sales)+'</td>'
-          +'<td class="num spend">'+wonSp(sumSpend)+'</td>'
-          +'<td class="num cpl">'+_tcpl+'</td>'
+          +'<td class="num spend">'+wonSp(a.sp)+'</td>'
+          +'<td class="num cpl">'+_cpl+'</td>'
           +'<td class="num">'+roasCell(a.roasV)+'</td></tr>';
       });
       _savePrevRank(key, curRank);  // 이번 순위 저장(다음 비교용)
