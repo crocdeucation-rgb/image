@@ -505,7 +505,8 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
   <button class="tab" onclick="setRouteTab(2)">전체</button>
 </div>
 
-<div class="section-label" style="margin-top:0;">유입 현황 <span class="badge today">전체 · 그로스 분해</span><span class="asof-badge spend-asof-badge" id="spend-asof-badge" style="display:none;background:#0891b2"></span></div>
+<div class="section-label" style="margin-top:0;">유입 현황 <span class="badge today">전체 · 그로스 분해</span></div>
+<div class="asof-note" style="color:#94a3b8">유입은 실시간 · <b style="color:#0891b2">광고비만</b> 태평양시간 오후 7시반 전날까지 집계 (<b class="spend-asof" style="color:#0891b2">어제까지</b>)</div>
 <div class="grid-3" style="margin-bottom:6px">
   <div class="card"><div class="clabel">총 유입<span style="font-size:8px;color:#bbb;margin-left:2px" id="inflow-tab-label">이번달</span></div><div class="cval blue sm" id="v-total">-</div></div>
   <div class="card"><div class="clabel">오늘 유입</div><div class="cval amber sm" id="v-today">-</div></div>
@@ -531,7 +532,6 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
 </div>
 
 <div class="section-label">유입경로별 <span class="badge pay" id="route-eff-label">CPL·ROAS</span></div>
-<div class="asof-note" id="route-asof-note" style="color:#94a3b8">소스는 실시간 · 광고비는 태평양시간 오후 7시반 전날까지 수동집계 (현재 10/6까지)</div>
 <div class="grid-3" id="route-grid">
   <div class="card"><div class="clabel">메타광고</div><div class="cval purple xs" id="route-meta">-</div><div class="crate" id="rr-meta"></div></div>
   <div class="card"><div class="clabel">무료유입</div><div class="cval blue xs" id="route-insta">-</div><div class="crate" id="rr-insta"></div></div>
@@ -764,13 +764,10 @@ async function loadGrowthSpend(){
       if(k==='_갱신'){ var m=String(r[3]||'').match(/~(\d{4}-\d{2}-\d{2})/); if(m) _spendUntil=m[1]; }
     });
     _growthSpend = sp;
-    // 광고비 기준일 → 유입현황 뱃지 + 유입경로별 설명문 + 카드 라벨
+    // 광고비 기준일 → 안내문·카드 라벨의 날짜 반영
     if(_spendUntil){
       var _p=_spendUntil.split('-'), _md=parseInt(_p[1],10)+'/'+parseInt(_p[2],10);
-      document.querySelectorAll('.spend-asof-badge').forEach(function(e){ e.textContent='📊 광고비 '+_md+'까지'; e.style.display=''; });
       document.querySelectorAll('.spend-asof').forEach(function(e){ e.textContent=_md+'까지'; });
-      var _rn=document.getElementById('route-asof-note');
-      if(_rn) _rn.innerHTML='소스는 실시간 · 광고비는 태평양시간 오후 7시반 전날까지 수동집계 (현재 <b style="color:#0891b2">'+_md+'까지</b>)';
     }
   }catch(e){ _growthSpend = {}; }
 }
