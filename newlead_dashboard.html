@@ -212,6 +212,63 @@ function fnl(cell){
   return s||'0';
 }
 function numOf(cell){ var m=String(cell||'').match(/^(\d+)/); return m?parseInt(m[1],10):0; }
+// ── 날짜별 유입 (주간/월간 토글) ──
+var _calDaily={}, _calView='week';
+function setCalView(v){
+  _calView=v;
+  var bw=document.getElementById('cal-btn-week'), bm=document.getElementById('cal-btn-month');
+  if(bw) bw.classList.toggle('on', v==='week');
+  if(bm) bm.classList.toggle('on', v==='month');
+  renderCalendar();
+}
+function renderCalendar(){
+  var body=document.getElementById('daybars'), title=document.getElementById('cal-title');
+  if(!body) return;
+  var d=_calDaily||{};
+  var now=new Date();
+  var _ymd=function(dt){return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');};
+  var todayKey=_ymd(now);
+  var vals=Object.keys(d).map(function(k){return d[k];}); var mx=1; vals.forEach(function(v){if(v>mx)mx=v;});
+  var color=function(v){ if(!v) return '#f3f4f6'; var t=Math.min(v/mx,1); return 'rgba(15,157,88,'+(0.15+t*0.8).toFixed(2)+')'; };
+  var fg=function(v){ return v>mx*0.55?'#fff':'#333'; };
+
+  if(_calView==='month'){
+    if(title) title.textContent=(now.getMonth()+1)+'월';
+    var y=now.getFullYear(), m=now.getMonth();
+    var first=new Date(y,m,1), startDow=(first.getDay()+6)%7;
+    var days=new Date(y,m+1,0).getDate();
+    var dows=['월','화','수','목','금','토','일'];
+    var h='<div class="cal-grid">'+dows.map(function(x){return '<div class="cal-dow">'+x+'</div>';}).join('');
+    for(var i=0;i<startDow;i++) h+='<div class="cal-cell empty"></div>';
+    for(var dd=1;dd<=days;dd++){
+      var key=y+'-'+String(m+1).padStart(2,'0')+'-'+String(dd).padStart(2,'0');
+      var v=d[key]||0;
+      h+='<div class="cal-cell'+(key===todayKey?' today':'')+'" style="background:'+color(v)+'"><span class="cd">'+dd+'</span><span class="cv" style="color:'+fg(v)+'">'+(v||'')+'</span></div>';
+    }
+    h+='</div><div class="cal-legend">적음 <span class="lg" style="background:'+color(1)+'"></span><span class="lg" style="background:'+color(Math.round(mx*0.5))+'"></span><span class="lg" style="background:'+color(mx)+'"></span> 많음</div>';
+    body.innerHTML=h;
+  } else {
+    if(title) title.textContent='이번 주';
+    function startOfWeek(dt){var x=new Date(dt.getFullYear(),dt.getMonth(),dt.getDate());var dow=x.getDay();x.setDate(x.getDate()-(dow===0?6:dow-1));return x;}
+    var ws=startOfWeek(now);
+    var dowNames=['월','화','수','목','금','토','일'];
+    var days=[];
+    for(var k=0;k<7;k++){
+      var dk=new Date(ws); dk.setDate(ws.getDate()+k);
+      var key=_ymd(dk);
+      days.push({ dow:dowNames[k], md:(dk.getMonth()+1)+'/'+dk.getDate(), val:(d[key]||0), today:(key===todayKey) });
+    }
+    var wmx=1; days.forEach(function(x){if(x.val>wmx)wmx=x.val;});
+    var h='';
+    days.forEach(function(x){
+      h+='<div class="db-row'+(x.today?' today':'')+'"><span class="dl">'+x.dow+' '+x.md+(x.today?' ·오늘':'')+'</span>'
+        +'<span class="dbar"><span style="width:'+Math.round(x.val/wmx*100)+'%"></span></span>'
+        +'<span class="dv">'+x.val+'</span></div>';
+    });
+    body.innerHTML=h;
+  }
+}
+
 // ── 순위 정렬 ──
 var RANK_SORT = 'db';   // 'db' | 'visit' | 'order'
 function setRankSort(k){
@@ -418,36 +475,15 @@ async function load(){
     }
     ctb.innerHTML = chtml || '<tr><td colspan="6" class="loading">데이터 없음</td></tr>';
 
-    // ── 일자별 유입 막대 (최근 14일) ──
-    var days=[];
+    // ── 날짜별 유입 — 맵 저장 후 주간/월간 렌더 ──
+    _calDaily={};
     if(dStart>=0){
       for(var r3=dStart;r3<rows.length;r3++){
         var z=rows[r3]; if(!/^\d{4}-\d{2}-\d{2}$/.test(z[0]))continue;
-        days.push({d:z[0], v:parseInt(z[1])||0});
+        _calDaily[z[0]]=parseInt(z[1])||0;
       }
     }
-    days=days.slice(-14);
-    var todayKey=new Date().toISOString().slice(0,10);
-    var dmax=1; days.forEach(function(x){if(x.v>dmax)dmax=x.v;});
-    var dhtml='';
-    days.forEach(function(x){
-      var p=x.d.split('-'), md=parseInt(p[1],10)+'/'+parseInt(p[2],10);
-      var isT=x.d===todayKey;
-      dhtml+='<div class="db-row'+(isT?' today':'')+'"><span class="dl">'+md+(isT?' ·오늘':'')+'</span>'
-        +'<span class="dbar"><span style="width:'+Math.round(x.v/dmax*100)+'%"></span></span>'
-        +'<span class="dv">'+x.v+'</span></div>';
-    });
-    document.getElementById('daybars').innerHTML = dhtml || '<div class="loading">데이터 없음</div>';
-
-    // ── 일자별 요약 미니카드 (오늘/어제/주간/월간) ──
-    var _ds=document.getElementById('day-sum');
-    if(_ds){
-      _ds.innerHTML =
-         '<div class="ds t"><div class="dl">오늘</div><div class="dvn">'+sumToday+'</div></div>'
-        +'<div class="ds"><div class="dl">어제</div><div class="dvn">'+sumYday+'</div></div>'
-        +'<div class="ds"><div class="dl">주간</div><div class="dvn">'+sumWeek+'</div></div>'
-        +'<div class="ds"><div class="dl">월간</div><div class="dvn">'+sumMonth+'</div></div>';
-    }
+    renderCalendar();
 
   }catch(e){
     document.getElementById('updated').textContent = '불러오기 실패 — 대시보드 탭이 생성됐는지 확인하세요';
