@@ -801,7 +801,7 @@ function renderGrowthInflow(){
   var members = ['우혜림','장윤호','김윤호'];
   var gi = _growthInflow || {};
   var sp = _growthSpend || {};
-  var spFmt = function(won){ won=won||0; if(won<=0) return '-'; return Math.round(won/10000).toLocaleString()+'만'; };
+  var spFmt = function(won){ won=won||0; if(won<=0) return '-'; return (won/10000).toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:1})+'만'; };
   // 상단 카드 = 전체(총괄). 표는 그 분해: 그로스 총괄 + 3명. 합계 행은 카드와 중복이라 제거.
   // 총괄 = 전체 - 3명 기여를 보여주면 분해가 명확 (총괄 + 3명 = 카드 전체).
   var spFmtCell = function(won){ return (isThisMonth && won>0) ? spFmt(won) : (isThisMonth?'-':'-'); };
