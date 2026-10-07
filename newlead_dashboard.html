@@ -202,6 +202,7 @@ function parseCSV(text){
   });
 }
 function won(n){ n=Number(n)||0; if(n<=0)return '0'; if(n>=10000)return (Math.round(n/1000)/10).toLocaleString()+'만'; return n.toLocaleString(); }
+function wonSp(n){ n=Number(n)||0; if(n<=0)return '0'; return (n/10000).toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:1})+'만'; }
 function whoClass(name){ return name.indexOf('우혜림')>=0?'woo':name.indexOf('장윤호')>=0?'jang':name.indexOf('김윤호')>=0?'kim':''; }
 function roasCell(v){ if(v===''||v==null||v==='-')return '<span class="roas none">-</span>'; var n=parseFloat(v); if(!n) return '<span class="roas none">-</span>'; var cls=n>=1?'good':'bad'; return '<span class="roas '+cls+'">'+v+'</span>'; }
 // "0 (0%)" → 숫자 + % 작게
@@ -391,7 +392,7 @@ async function load(){
           +'<td class="num setting">'+fnl(a.setCell)+'</td>'
           +'<td class="num order">'+fnl(a.orderCell)+'</td>'
           +'<td class="num sales">'+won(a.sales)+'</td>'
-          +'<td class="num spend">'+won(a.sp)+'</td>'
+          +'<td class="num spend">'+wonSp(a.sp)+'</td>'
           +'<td class="num cpl">'+_cpl+'</td>'
           +'<td class="num">'+roasCell(a.roasV)+'</td></tr>';
       });
@@ -405,7 +406,7 @@ async function load(){
         +'<td class="num db">'+sumDb+'</td><td class="num visit">'+fnl(t[2])+'</td>'
         +'<td class="num setting">'+fnl(t[3])+'</td>'
         +'<td class="num order">'+fnl(t[5])+'</td><td class="num sales">'+won(t[6])+'</td>'
-        +'<td class="num spend">'+won(sumSpend)+'</td>'
+        +'<td class="num spend">'+wonSp(a.sp)+'</td>'
         +'<td class="num cpl">'+_tcpl+'</td>'
         +'<td class="num">'+roasCell(t[9])+'</td></tr>';
     }
@@ -430,7 +431,7 @@ async function load(){
         var _tod=parseInt(px[1])||0, _wk=parseInt(px[3])||0, _sp2=spendByName[px[0]]||0;
         var _wkU=_wk-_tod;  // 주간 유입 중 오늘 제외
         var _cpl2=(_sp2>0&&_wkU>0)?won(Math.round(_sp2/_wkU)):'-';
-        phtml+='<tr><td><span class="who '+whoClass(px[0])+'"></span>'+px[0]+'</td><td class="num db">'+_tod+'</td><td class="num">'+(px[2]||0)+'</td><td class="num">'+_wk+'</td><td class="num">'+(px[4]||0)+'</td><td class="num spend">'+won(_sp2)+'</td><td class="num cpl">'+_cpl2+'</td></tr>';
+        phtml+='<tr><td><span class="who '+whoClass(px[0])+'"></span>'+px[0]+'</td><td class="num db">'+_tod+'</td><td class="num">'+(px[2]||0)+'</td><td class="num">'+_wk+'</td><td class="num">'+(px[4]||0)+'</td><td class="num spend">'+wonSp(_sp2)+'</td><td class="num cpl">'+_cpl2+'</td></tr>';
         pT+=_tod; pSp+=_sp2;
       }
     }
@@ -445,7 +446,7 @@ async function load(){
      +'<div class="scard today"><div class="l">오늘 유입</div><div class="v">'+sumToday+'<span>건</span></div></div>'
      +'<div class="scard yday"><div class="l">어제 유입</div><div class="v">'+sumYday+'<span>건</span></div></div>'
      +'<div class="scard week"><div class="l">주간 유입</div><div class="v">'+sumWeek+'<span>건</span></div></div>'
-     +'<div class="scard cpl"><div class="l">CPL <span style="font-size:8px;color:#bbb">오늘제외</span></div><div class="v">'+totCpl+'</div><div class="sub">광고비 '+won(sumSpend)+' · ROAS '+totRoas+'</div></div>';
+     +'<div class="scard cpl"><div class="l">CPL <span style="font-size:8px;color:#bbb">오늘제외</span></div><div class="v">'+totCpl+'</div><div class="sub">광고비 '+wonSp(sumSpend)+' · ROAS '+totRoas+'</div></div>';
 
     // ── 퍼널 전환 깔때기 ──
     var fnlSteps=[['DB',sumDb,'s0'],['방문',sumVisit,'s1'],['세팅',sumSet,'s2'],['오더',sumOrder,'s3']];
