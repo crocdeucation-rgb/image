@@ -9,51 +9,99 @@
   :root{
     --ink:#1a2332; --sub:#6b7688; --line:#e8edf4; --bg:#f6f8fb; --card:#fff;
     --blue:#2563eb; --teal:#0891b2; --amber:#d97706; --green:#0f9d58; --red:#e11d48; --purple:#7c3aed;
-    box-sizing:border-box; padding-top:env(safe-area-inset-top,0); padding-bottom:env(safe-area-inset-bottom,0);
+    box-sizing:border-box;
   }
   *{margin:0;padding:0;box-sizing:border-box;font-family:'Pretendard',system-ui,sans-serif}
-  body{background:var(--bg);color:var(--ink);padding:20px 14px 60px;letter-spacing:-.2px}
-  .wrap{max-width:1100px;margin:0 auto}
+  body{background:var(--bg);color:var(--ink);padding:18px 14px 60px;letter-spacing:-.2px}
+  .wrap{max-width:1500px;margin:0 auto}
 
-  .head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:4px}
-  .head h1{font-size:20px;font-weight:800;letter-spacing:-.5px}
+  .head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:3px}
+  .head h1{font-size:19px;font-weight:800;letter-spacing:-.5px}
   .head .tag{font-size:11px;font-weight:700;color:var(--blue);background:#eaf1fe;padding:3px 10px;border-radius:20px}
-  .updated{font-size:11.5px;color:var(--sub);margin-bottom:18px}
+  .updated{font-size:11.5px;color:var(--sub);margin-bottom:14px}
   .updated .asof{color:var(--blue);font-weight:700;background:#eaf1fe;padding:1px 7px;border-radius:5px}
+  .refresh{font-size:11.5px;color:var(--blue);background:none;border:1px solid var(--line);border-radius:6px;padding:3px 10px;cursor:pointer;margin-left:auto}
 
   /* 요약 카드 */
-  .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
-  @media(max-width:620px){.summary{grid-template-columns:1fr 1fr}}
-  .scard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-  .scard .l{font-size:12px;color:var(--sub);font-weight:600;margin-bottom:5px}
-  .scard .v{font-size:24px;font-weight:800;letter-spacing:-1px}
-  .scard.db .v{color:var(--blue)} .scard.order .v{color:var(--green)}
-  .scard.sales .v{color:var(--purple)} .scard.roas .v{color:var(--amber)}
-  .scard .v span{font-size:14px;font-weight:700;color:var(--sub)}
+  .summary{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-bottom:16px}
+  @media(max-width:760px){.summary{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:460px){.summary{grid-template-columns:repeat(2,1fr)}}
+  .scard{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:12px 14px;text-align:center}
+  .scard .l{font-size:11px;color:var(--sub);font-weight:600;margin-bottom:4px}
+  .scard .v{font-size:21px;font-weight:800;letter-spacing:-.8px}
+  .scard.db .v{color:var(--blue)} .scard.visit .v{color:var(--teal)} .scard.order .v{color:var(--green)}
+  .scard.sales .v{color:var(--purple)} .scard.cpl .v{color:var(--amber)}
+  .scard .v span{font-size:12px;font-weight:700;color:var(--sub)}
+  .scard .sub{font-size:10px;color:#9aa3b0;font-weight:600;margin-top:2px}
 
-  .sec{font-size:14px;font-weight:800;color:var(--ink);margin:0 0 10px;padding-left:9px;border-left:3px solid var(--blue)}
-  .sec.camp{border-left-color:var(--amber)}
+  /* 2열 레이아웃 */
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+  @media(max-width:900px){.cols{grid-template-columns:1fr}}
+  .block{min-width:0}
 
-  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:12.5px;margin-bottom:24px}
-  thead th{background:#f0f4fa;color:var(--sub);font-weight:700;padding:9px 8px;text-align:center;white-space:nowrap;font-size:11.5px}
-  thead th:first-child{text-align:left;padding-left:14px}
-  tbody td{padding:10px 8px;text-align:center;border-top:1px solid var(--line);white-space:nowrap}
-  tbody td:first-child{text-align:left;padding-left:14px;font-weight:700}
+  .sec{font-size:13.5px;font-weight:800;color:var(--ink);margin:0 0 9px;padding-left:9px;border-left:3px solid var(--blue);display:flex;align-items:center;gap:7px}
+  .sec.camp{border-left-color:var(--amber)} .sec.fnl{border-left-color:var(--teal)} .sec.day{border-left-color:var(--green)}
+  .sec .badge{font-size:9px;font-weight:700;color:var(--sub);background:#eef2f7;padding:2px 7px;border-radius:7px}
+
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:11px;overflow:hidden;font-size:12px;margin-bottom:18px}
+  thead th{background:#f0f4fa;color:var(--sub);font-weight:700;padding:8px 6px;text-align:center;white-space:nowrap;font-size:11px}
+  thead th:first-child{text-align:left;padding-left:12px}
+  tbody td{padding:9px 6px;text-align:center;border-top:1px solid var(--line);white-space:nowrap}
+  tbody td:first-child{text-align:left;padding-left:12px;font-weight:700}
   tbody tr.total{background:#fafbff;font-weight:800}
   tbody tr.total td{border-top:2px solid #dde6f5}
   .num{font-variant-numeric:tabular-nums}
   .db{color:var(--blue);font-weight:700} .visit{color:var(--teal)} .setting{color:var(--blue)}
   .order{color:var(--green);font-weight:700} .cancel{color:var(--red)}
   .sales{color:var(--purple);font-weight:700} .spend{color:#6b7280} .cpl{color:var(--amber);font-weight:600}
-  .rate{font-size:10px;color:#9aa3b0;font-weight:600;margin-left:2px}
+  .rate{font-size:9px;color:#9aa3b0;font-weight:600;margin-left:1px}
   .roas{font-weight:800} .roas.good{color:var(--green)} .roas.bad{color:var(--red)} .roas.none{color:#c2c8d2}
-  .who{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:middle}
+  .who{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
   .who.woo{background:var(--green)} .who.jang{background:var(--amber)} .who.kim{background:var(--blue)}
+
+  /* 기준일 뱃지 + 안내문 */
+  .asof-badge{display:inline-block;font-size:10px;font-weight:800;color:#fff;background:var(--teal);border-radius:8px;padding:2px 9px;margin-left:4px;letter-spacing:-.2px}
+  .asof-note{font-size:11px;color:var(--sub);font-weight:600;margin:-6px 0 16px;line-height:1.5}
+  .asof-note b{color:var(--teal);font-weight:800}
+
+  /* 모바일 담당자/캠페인 탭 전환 (PC는 2열 그대로) */
+  .block-tabs{display:none;gap:6px;margin-bottom:10px}
+  .block-tabs button{flex:1;padding:8px 0;font-size:12.5px;font-weight:700;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--sub);cursor:pointer}
+  .block-tabs button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+  @media(max-width:900px){
+    .block-tabs{display:flex}
+    .cols{display:block}
+    .block.bk-camp{display:none}
+    .cols.show-camp .block.bk-assignee{display:none}
+    .cols.show-camp .block.bk-camp{display:block}
+    .block .sec{display:none}   /* 탭이 제목 역할 */
+  }
+
+  /* 퍼널 깔때기 */
+  .funnel{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:14px;margin-bottom:18px}
+  .fn-row{display:flex;align-items:center;gap:10px;padding:6px 0}
+  .fn-row .fl{font-size:11.5px;font-weight:700;color:var(--sub);min-width:46px}
+  .fn-row .fbar{flex:1;height:22px;background:#f0f4fa;border-radius:6px;overflow:hidden;position:relative}
+  .fn-row .fbar>span{display:block;height:100%;border-radius:6px}
+  .fn-row.s0 .fbar>span{background:linear-gradient(90deg,#60a5fa,#2563eb)}
+  .fn-row.s1 .fbar>span{background:linear-gradient(90deg,#22d3ee,#0891b2)}
+  .fn-row.s2 .fbar>span{background:linear-gradient(90deg,#4ade80,#0f9d58)}
+  .fn-row.s3 .fbar>span{background:linear-gradient(90deg,#34d399,#059669)}
+  .fn-row .fv{font-size:13px;font-weight:800;min-width:66px;text-align:right}
+  .fn-row .fp{font-size:10px;color:#9aa3b0;font-weight:600;min-width:42px;text-align:right}
+
+  /* 일자별 유입 막대 */
+  .daybars{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:14px;margin-bottom:18px}
+  .db-row{display:flex;align-items:center;gap:9px;padding:4px 0}
+  .db-row .dl{font-size:11px;color:var(--sub);font-weight:600;min-width:52px}
+  .db-row .dbar{flex:1;height:16px;background:#f0f4fa;border-radius:5px;overflow:hidden}
+  .db-row .dbar>span{display:block;height:100%;background:linear-gradient(90deg,#86efac,#0f9d58);border-radius:5px}
+  .db-row.today .dl{color:var(--green);font-weight:800}
+  .db-row .dv{font-size:12px;font-weight:800;color:var(--green);min-width:28px;text-align:right}
 
   .note{font-size:11.5px;color:var(--sub);line-height:1.6;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
   .note b{color:var(--ink)}
-  .loading{text-align:center;color:var(--sub);padding:40px;font-size:13px}
-  .refresh{font-size:11.5px;color:var(--blue);background:none;border:1px solid var(--line);border-radius:6px;padding:3px 10px;cursor:pointer;margin-left:auto}
+  .loading{text-align:center;color:var(--sub);padding:30px;font-size:12.5px}
 </style>
 </head>
 <body>
@@ -66,26 +114,45 @@
   <div class="updated" id="updated">불러오는 중…</div>
 
   <div class="summary" id="summary"></div>
+  <div class="asof-note">유입·방문은 실시간 집계 · <b>광고비만</b> 태평양시간 오후 7시반에 전날까지 반영 · 매출은 오더 확정 기준(취소 제외)</div>
 
-  <div class="sec">담당자별</div>
-  <table id="assignee-tbl">
-    <thead><tr><th>담당자</th><th>DB</th><th>방문</th><th>세팅</th><th>방취</th><th>오더</th><th>매출</th><th>광고비</th><th>CPL</th><th>ROAS</th></tr></thead>
-    <tbody><tr><td colspan="10" class="loading">불러오는 중…</td></tr></tbody>
-  </table>
+  <!-- 퍼널 전환 -->
+  <div class="sec fnl">퍼널 전환 <span class="badge" id="fnl-label">이번달 전체</span></div>
+  <div class="funnel" id="funnel"><div class="loading">불러오는 중…</div></div>
 
-  <div class="sec camp">캠페인별</div>
-  <table id="campaign-tbl">
-    <thead><tr><th>캠페인</th><th>DB</th><th>방문</th><th>세팅</th><th>방취</th><th>오더</th><th>매출</th></tr></thead>
-    <tbody><tr><td colspan="7" class="loading">불러오는 중…</td></tr></tbody>
-  </table>
+  <!-- 모바일 탭 (PC는 2열) -->
+  <div class="block-tabs" id="block-tabs">
+    <button class="on" onclick="showBlock('assignee')">담당자별</button>
+    <button onclick="showBlock('camp')">캠페인별</button>
+  </div>
+  <!-- 2열: 담당자별 | 캠페인별 -->
+  <div class="cols" id="cols">
+    <div class="block bk-assignee">
+      <div class="sec">담당자별</div>
+      <table id="assignee-tbl">
+        <thead><tr><th>담당자</th><th>DB</th><th>방문</th><th>세팅</th><th>오더</th><th>매출</th><th>CPL</th><th>ROAS</th></tr></thead>
+        <tbody><tr><td colspan="8" class="loading">불러오는 중…</td></tr></tbody>
+      </table>
+    </div>
+    <div class="block bk-camp">
+      <div class="sec camp">캠페인별 <span class="badge">소재 성과</span></div>
+      <table id="campaign-tbl">
+        <thead><tr><th>캠페인</th><th>DB</th><th>방문</th><th>세팅</th><th>오더</th><th>매출</th></tr></thead>
+        <tbody><tr><td colspan="6" class="loading">불러오는 중…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 일자별 유입 -->
+  <div class="sec day">일자별 유입 <span class="badge">최근 14일</span></div>
+  <div class="daybars" id="daybars"><div class="loading">불러오는 중…</div></div>
 
   <div class="note">
-    <b>광고비 기준:</b> 메타는 전날 자정까지 데이터가 다음날 오후 7시에 확정됩니다. 당일 리드는 광고비 미반영이라 ROAS는 참고용입니다 · <b>매출:</b> 오더 확정 기준 (취소 제외)
+    <b>광고비 기준:</b> 메타는 전날 자정까지 데이터가 다음날 오후 7시에 확정됩니다. 당일 리드는 광고비 미반영이라 ROAS는 참고용입니다 · <b>매출:</b> 오더 확정 기준 (취소 제외) · <b>소재=담당자</b> 1:1 고정 배정
   </div>
 </div>
 
 <script>
-// 우혜림 DB 시트의 '대시보드' 탭 (whBuildDashData가 저장) — gviz 공개 읽기
 var GVIZ = 'https://docs.google.com/spreadsheets/d/1l0H8mY0SHiENr9Mlvnha7WVNAxA-iPQh0AB55eXhFaA/gviz/tq?tqx=out:csv&headers=0&sheet=' + encodeURIComponent('대시보드');
 
 function parseCSV(text){
@@ -98,13 +165,22 @@ function parseCSV(text){
 }
 function won(n){ n=Number(n)||0; if(n<=0)return '0'; if(n>=10000)return (Math.round(n/1000)/10).toLocaleString()+'만'; return n.toLocaleString(); }
 function whoClass(name){ return name.indexOf('우혜림')>=0?'woo':name.indexOf('장윤호')>=0?'jang':name.indexOf('김윤호')>=0?'kim':''; }
-function roasCell(v){ if(v===''||v==null)return '<span class="roas none">-</span>'; var n=parseFloat(v); var cls=n>=1?'good':'bad'; return '<span class="roas '+cls+'">'+v+'</span>'; }
-// "0 (0%)" → 숫자 크게 + % 작게. %가 없으면 숫자만.
+function roasCell(v){ if(v===''||v==null||v==='-')return '<span class="roas none">-</span>'; var n=parseFloat(v); if(!n) return '<span class="roas none">-</span>'; var cls=n>=1?'good':'bad'; return '<span class="roas '+cls+'">'+v+'</span>'; }
+// "0 (0%)" → 숫자 + % 작게
 function fnl(cell){
   var s=String(cell==null?'':cell);
   var m=s.match(/^(\d+)\s*\(([^)]+)\)$/);
   if(m) return m[1]+'<span class="rate">('+m[2]+')</span>';
   return s||'0';
+}
+function numOf(cell){ var m=String(cell||'').match(/^(\d+)/); return m?parseInt(m[1],10):0; }
+// 모바일 담당자/캠페인 탭 전환
+function showBlock(which){
+  var cols=document.getElementById('cols');
+  cols.classList.toggle('show-camp', which==='camp');
+  var btns=document.querySelectorAll('#block-tabs button');
+  btns[0].classList.toggle('on', which==='assignee');
+  btns[1].classList.toggle('on', which==='camp');
 }
 
 async function load(){
@@ -112,78 +188,113 @@ async function load(){
     var text = await fetch(GVIZ, {cache:'no-store'}).then(function(r){return r.text();});
     var rows = parseCSV(text);
 
-    // 1행: 갱신 / 시각 / 기준월 / yymm
     var updated='', yymm='';
     if(rows[0] && rows[0][0]==='갱신'){ updated=rows[0][1]||''; yymm=rows[0][3]||''; }
     var moLabel = yymm ? (parseInt(yymm.substring(2,4),10)+'월') : '';
-    document.getElementById('updated').innerHTML = '업데이트 ' + updated + (moLabel? ' · <span class="asof">'+moLabel+' 기준</span>':'');
+    document.getElementById('updated').innerHTML = '업데이트 ' + updated + (moLabel? ' · <span class="asof">'+moLabel+' 기준</span>':'') + ' <span class="asof-badge">📊 유입 실시간 · 광고비 전날까지</span>';
+    var fl=document.getElementById('fnl-label'); if(fl) fl.textContent=moLabel+' 전체';
 
-    // 담당자 블록: '담당자' 헤더행 다음 ~ '합계'까지
-    var aStart=-1, aEnd=-1, cStart=-1;
+    // 블록 위치
+    var aStart=-1, aEnd=-1, cStart=-1, dStart=-1;
     for(var i=0;i<rows.length;i++){
       if(rows[i][0]==='담당자') aStart=i+1;
       if(rows[i][0]==='합계' && aEnd<0) aEnd=i;
       if(rows[i][0]==='캠페인') cStart=i+1;
+      if(rows[i][0]==='일자별유입') dStart=i+1;
     }
 
-    // 담당자 테이블
+    // ── 담당자 테이블 ──
     var atb = document.querySelector('#assignee-tbl tbody');
     var ahtml='';
-    var sumDb=0,sumOrder=0,sumSales=0,sumSpend=0;
+    var sumDb=0,sumVisit=0,sumSet=0,sumOrder=0,sumSales=0,sumSpend=0;
     if(aStart>=0 && aEnd>aStart){
       for(var r=aStart;r<aEnd;r++){
         var x=rows[r]; if(!x[0])continue;
+        var _sp=Number(x[7])||0, _db=Number(x[1])||0;
+        var _cpl = (_sp>0&&_db>0)? won(Math.round(_sp/_db)) : '-';
         ahtml += '<tr><td><span class="who '+whoClass(x[0])+'"></span>'+x[0]+'</td>'
           +'<td class="num db">'+(x[1]||0)+'</td>'
           +'<td class="num visit">'+fnl(x[2])+'</td>'
           +'<td class="num setting">'+fnl(x[3])+'</td>'
-          +'<td class="num cancel">'+(x[4]||0)+'</td>'
           +'<td class="num order">'+fnl(x[5])+'</td>'
           +'<td class="num sales">'+won(x[6])+'</td>'
-          +'<td class="num spend">'+won(x[7])+'</td>'
-          +'<td class="num cpl">'+(x[8]?won(x[8]):'-')+'</td>'
+          +'<td class="num cpl">'+_cpl+'</td>'
           +'<td class="num">'+roasCell(x[9])+'</td></tr>';
       }
-      // 합계행
       var t=rows[aEnd];
-      sumDb=t[1]; sumOrder=parseInt(t[5])||0; sumSales=t[6]; sumSpend=t[7];
+      sumDb=Number(t[1])||0; sumVisit=numOf(t[2]); sumSet=numOf(t[3]); sumOrder=numOf(t[5]); sumSales=Number(t[6])||0; sumSpend=Number(t[7])||0;
+      var _tcpl=(sumSpend>0&&sumDb>0)?won(Math.round(sumSpend/sumDb)):'-';
       ahtml += '<tr class="total"><td>합계</td>'
-        +'<td class="num db">'+(t[1]||0)+'</td><td class="num visit">'+fnl(t[2])+'</td>'
-        +'<td class="num setting">'+fnl(t[3])+'</td><td class="num cancel">'+(t[4]||0)+'</td>'
+        +'<td class="num db">'+sumDb+'</td><td class="num visit">'+fnl(t[2])+'</td>'
+        +'<td class="num setting">'+fnl(t[3])+'</td>'
         +'<td class="num order">'+fnl(t[5])+'</td><td class="num sales">'+won(t[6])+'</td>'
-        +'<td class="num spend">'+won(t[7])+'</td><td class="num cpl">'+(t[8]?won(t[8]):'-')+'</td>'
+        +'<td class="num cpl">'+_tcpl+'</td>'
         +'<td class="num">'+roasCell(t[9])+'</td></tr>';
     }
-    atb.innerHTML = ahtml || '<tr><td colspan="10" class="loading">데이터 없음</td></tr>';
+    atb.innerHTML = ahtml || '<tr><td colspan="8" class="loading">데이터 없음</td></tr>';
 
-    // 요약 카드
-    var totRoas = (Number(sumSpend)>0) ? (Number(sumSales)/Number(sumSpend)).toFixed(2) : '-';
+    // ── 요약 카드 (5개) ──
+    var totRoas = (sumSpend>0) ? (sumSales/sumSpend).toFixed(2) : '-';
+    var totCpl = (sumSpend>0&&sumDb>0) ? won(Math.round(sumSpend/sumDb)) : '-';
     document.getElementById('summary').innerHTML =
-      '<div class="scard db"><div class="l">총 리드</div><div class="v">'+(sumDb||0)+'<span>건</span></div></div>'
-     +'<div class="scard order"><div class="l">오더</div><div class="v">'+(sumOrder||0)+'<span>건</span></div></div>'
+      '<div class="scard db"><div class="l">총 리드</div><div class="v">'+sumDb+'<span>건</span></div></div>'
+     +'<div class="scard visit"><div class="l">방문</div><div class="v">'+sumVisit+'<span>건</span></div></div>'
+     +'<div class="scard order"><div class="l">오더</div><div class="v">'+sumOrder+'<span>건</span></div></div>'
      +'<div class="scard sales"><div class="l">매출</div><div class="v">'+won(sumSales)+'<span>원</span></div></div>'
-     +'<div class="scard roas"><div class="l">광고비 '+won(sumSpend)+'원 · ROAS</div><div class="v">'+totRoas+'</div></div>';
+     +'<div class="scard cpl"><div class="l">CPL</div><div class="v">'+totCpl+'</div><div class="sub">광고비 '+won(sumSpend)+' · ROAS '+totRoas+'</div></div>';
 
-    // 캠페인 테이블
+    // ── 퍼널 전환 깔때기 ──
+    var fnlSteps=[['DB',sumDb,'s0'],['방문',sumVisit,'s1'],['세팅',sumSet,'s2'],['오더',sumOrder,'s3']];
+    var fnMax=sumDb||1, fhtml='';
+    fnlSteps.forEach(function(s,idx){
+      var pct=Math.round(s[1]/fnMax*100);
+      var conv = idx>0 ? (fnlSteps[idx-1][1]>0?Math.round(s[1]/fnlSteps[idx-1][1]*100):0)+'%' : '';
+      fhtml += '<div class="fn-row '+s[2]+'"><span class="fl">'+s[0]+'</span>'
+        +'<span class="fbar"><span style="width:'+Math.max(pct,2)+'%"></span></span>'
+        +'<span class="fv">'+s[1]+'건</span><span class="fp">'+conv+'</span></div>';
+    });
+    document.getElementById('funnel').innerHTML = fhtml;
+
+    // ── 캠페인 테이블 ──
     var ctb = document.querySelector('#campaign-tbl tbody');
     var chtml='';
     if(cStart>=0){
       for(var r2=cStart;r2<rows.length;r2++){
-        var y=rows[r2]; if(!y[0])continue;
+        var y=rows[r2]; if(!y[0]||y[0]==='일자별유입')break;
         chtml += '<tr><td>'+y[0]+'</td>'
           +'<td class="num db">'+(y[1]||0)+'</td>'
           +'<td class="num visit">'+fnl(y[2])+'</td>'
           +'<td class="num setting">'+fnl(y[3])+'</td>'
-          +'<td class="num cancel">'+(y[4]||0)+'</td>'
           +'<td class="num order">'+fnl(y[5])+'</td>'
           +'<td class="num sales">'+won(y[6])+'</td></tr>';
       }
     }
-    ctb.innerHTML = chtml || '<tr><td colspan="7" class="loading">데이터 없음</td></tr>';
+    ctb.innerHTML = chtml || '<tr><td colspan="6" class="loading">데이터 없음</td></tr>';
+
+    // ── 일자별 유입 막대 (최근 14일) ──
+    var days=[];
+    if(dStart>=0){
+      for(var r3=dStart;r3<rows.length;r3++){
+        var z=rows[r3]; if(!/^\d{4}-\d{2}-\d{2}$/.test(z[0]))continue;
+        days.push({d:z[0], v:parseInt(z[1])||0});
+      }
+    }
+    days=days.slice(-14);
+    var todayKey=new Date().toISOString().slice(0,10);
+    var dmax=1; days.forEach(function(x){if(x.v>dmax)dmax=x.v;});
+    var dhtml='';
+    days.forEach(function(x){
+      var p=x.d.split('-'), md=parseInt(p[1],10)+'/'+parseInt(p[2],10);
+      var isT=x.d===todayKey;
+      dhtml+='<div class="db-row'+(isT?' today':'')+'"><span class="dl">'+md+(isT?' ·오늘':'')+'</span>'
+        +'<span class="dbar"><span style="width:'+Math.round(x.v/dmax*100)+'%"></span></span>'
+        +'<span class="dv">'+x.v+'</span></div>';
+    });
+    document.getElementById('daybars').innerHTML = dhtml || '<div class="loading">데이터 없음</div>';
 
   }catch(e){
     document.getElementById('updated').textContent = '불러오기 실패 — 대시보드 탭이 생성됐는지 확인하세요';
-    document.querySelector('#assignee-tbl tbody').innerHTML = '<tr><td colspan="9" class="loading">로드 실패</td></tr>';
+    document.querySelector('#assignee-tbl tbody').innerHTML = '<tr><td colspan="8" class="loading">로드 실패</td></tr>';
   }
 }
 load();
