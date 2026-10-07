@@ -277,6 +277,8 @@ const WEBAPP_URL        = 'https://script.google.com/macros/s/AKfycbxu_6qC9WKTtV
 
 const MID_DAYS=4;
 const ASSIGNEES=['우혜림','김윤호','장윤호','박창건','김태석','김성윤','노영호','김원득','김우진','안준섭','김주환'];
+// [2026-10-07] 화면에서 숨길 담당자 (시트 인덱스 밀림 방지 위해 배열은 유지, 렌더만 제외)
+const HIDE_ASSIGNEES=['김성윤'];
 const ASSIGNEE_START_IDX=46;
 const SOJ_KEYS=['노트릴스','노필릴스','채리','GT','원톱','5단계루틴','기초부족','MLST공부','MLST캐러셀','노트공부법','너만본다','CPA(텐핑)','카카오','Organic','네이버브랜드','기타'];
 const cmap={'우혜림':'hye','김윤호':'kim','장윤호':'jang','박창건':'park','김우진':'woo','김태석':'tae','김성윤':'sung','노영호':'noh','김원득':'won','안준섭':'ahn'};
@@ -359,7 +361,7 @@ function renderHL(){
   var hl={};
   for(var i=0;i<summaryRows.length;i++){ if(summaryRows[i]&&summaryRows[i][0]==='주간하이라이트'){ for(var j=i+1;j<Math.min(i+9,summaryRows.length);j++){var r=summaryRows[j];if(!r||!r[0])break;hl[r[0]]={name:r[1]||'-',val:r[2]||'',extra:r[3]||''}} break; } }
   // [2026-10] 급상승왕 = 매출순 순위 상승폭 (매출 기준)
-  function rankOf(tab){var o=tab*6+1,a=[];ASSIGNEES.forEach(function(nm,i){var r=summaryRows[ASSIGNEE_START_IDX+i]||[];var sn=parseFloat(((r[o+5]||'0')+'').replace(/[^0-9.]/g,''))||0;a.push({name:r[0]||nm,sales:sn});});a.sort(function(x,y){return y.sales-x.sales;});var rk={};a.forEach(function(x,idx){rk[x.name]=idx+1;});return rk;}
+  function rankOf(tab){var o=tab*6+1,a=[];ASSIGNEES.forEach(function(nm,i){var r=summaryRows[ASSIGNEE_START_IDX+i]||[];if(HIDE_ASSIGNEES.indexOf(r[0]||nm)!==-1)return;var sn=parseFloat(((r[o+5]||'0')+'').replace(/[^0-9.]/g,''))||0;a.push({name:r[0]||nm,sales:sn});});a.sort(function(x,y){return y.sales-x.sales;});var rk={};a.forEach(function(x,idx){rk[x.name]=idx+1;});return rk;}
   var curR=rankOf(0), prvR=rankOf(1), topRise=null, mx=0;
   ASSIGNEES.forEach(function(nm){var d=(prvR[nm]||99)-(curR[nm]||99);if(d>mx){mx=d;topRise=nm;}});
   var row=function(ic,lb,nm,vl){return '<div class="hlrow"><span class="ic">'+ic+'</span><span class="lb">'+lb+'</span><span class="nm">'+esc(nm||'-')+'</span><span class="vl">'+esc(vl||'')+'</span></div>';};
@@ -367,6 +369,7 @@ function renderHL(){
   var _stat={db:{n:'-',v:0},od:{n:'-',v:0},sl:{n:'-',v:0}};
   ASSIGNEES.forEach(function(nm,i){
     var r=summaryRows[ASSIGNEE_START_IDX+i]||[];
+    if(HIDE_ASSIGNEES.indexOf(r[0]||nm)!==-1) return;   // 김성윤 제외
     var db=+(r[_o]||0), od=+(r[_o+4]||0), sl=parseFloat(((r[_o+5]||'0')+'').replace(/[^0-9.]/g,''))||0;
     if(db>_stat.db.v){_stat.db={n:r[0]||nm,v:db};}
     if(od>_stat.od.v){_stat.od={n:r[0]||nm,v:od};}
@@ -408,7 +411,7 @@ function renderPerf(){
     return {name:r[0]||name, db:db,vs:vs,se:se,ca:ca,od:od, sales:sales, salesNum:salesNum, roas:roasNum,
             ef:(r[co+2]?r[co+2]+'만':'-'),
             yRank:(YRANK_MAP[r[0]||name]||0)};
-  });
+  }).filter(function(d){ return HIDE_ASSIGNEES.indexOf(d.name)===-1; });  // 김성윤 제외
   // [2026-10] 매출로만 정렬
   data.sort(function(a,b){return b.salesNum-a.salesNum;});
   var rows=data.map(function(d,idx){
@@ -442,7 +445,7 @@ function renderPerf(){
   document.getElementById('pf-body').innerHTML=rows.join('');
 
   var sojCol=perfTab===1?29:(perfTab===2?30:28);
-  var hd=ASSIGNEES.map(function(name,i){var r=summaryRows[ASSIGNEE_START_IDX+i]||[];var s={};(r[sojCol]||'').split(';').forEach(function(p){var k=p.lastIndexOf(':');if(k>0)s[p.slice(0,k)]=+(p.slice(k+1))||0});return{name:r[0]||name,soj:s}});
+  var hd=ASSIGNEES.map(function(name,i){var r=summaryRows[ASSIGNEE_START_IDX+i]||[];var s={};(r[sojCol]||'').split(';').forEach(function(p){var k=p.lastIndexOf(':');if(k>0)s[p.slice(0,k)]=+(p.slice(k+1))||0});return{name:r[0]||name,soj:s}}).filter(function(d){return HIDE_ASSIGNEES.indexOf(d.name)===-1;});
   var keys=SOJ_KEYS.filter(function(k){return hd.some(function(d){return (d.soj[k]||0)>0})});
   var mx=1; hd.forEach(function(d){keys.forEach(function(k){if((d.soj[k]||0)>mx)mx=d.soj[k]})});
   var col=function(v){if(!v)return'#f6f7f9';var t=Math.min(v/mx,1);return'rgba(147,51,234,'+(0.10+t*0.72).toFixed(2)+')'};
