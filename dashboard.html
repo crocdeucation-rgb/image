@@ -506,16 +506,20 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
 </div>
 
 <div class="section-label" style="margin-top:0;">유입 현황 <span class="badge today">전체 · 그로스 분해</span></div>
-<div class="grid-4">
+<div class="grid-3" style="margin-bottom:6px">
   <div class="card"><div class="clabel">총 유입<span style="font-size:8px;color:#bbb;margin-left:2px" id="inflow-tab-label">이번달</span></div><div class="cval blue sm" id="v-total">-</div></div>
   <div class="card"><div class="clabel">오늘 유입</div><div class="cval amber sm" id="v-today">-</div></div>
   <div class="card"><div class="clabel">어제 유입</div><div class="cval orange sm" id="v-yesterday">-</div></div>
-  <div class="card"><div class="clabel">광고비<span style="font-size:8px;color:#bbb;margin-left:2px">어제까지</span></div><div class="cval sm" id="v-spend" style="color:#ea580c">-</div></div>
+</div>
+<div class="grid-3">
+  <div class="card"><div class="clabel">광고비<span class="spend-asof" style="font-size:8px;color:#bbb;margin-left:2px">어제까지</span></div><div class="cval sm" id="v-spend" style="color:#ea580c">-</div></div>
+  <div class="card"><div class="clabel">통합 CPL</div><div class="cval sm" id="v-cpl" style="color:#0891b2">-</div></div>
+  <div class="card"><div class="clabel">통합 ROAS</div><div class="cval sm" id="v-roas" style="color:#9ca3af;font-size:12px">준비중</div></div>
 </div>
 <div class="tbl-scroll" style="margin-top:6px"><table class="funnel-table" id="growth-inflow-tbl">
-  <thead><tr><th>구분</th><th>오늘</th><th>어제</th><th>월간</th><th>광고비<br><span style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th></tr></thead>
+  <thead><tr><th>구분</th><th>오늘</th><th>어제</th><th>월간</th><th>광고비<br><span class="spend-asof" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL</th><th>ROAS</th></tr></thead>
   <tbody id="growth-inflow-tbody">
-    <tr><td colspan="5" style="color:#aaa;text-align:center;padding:12px;">불러오는 중...</td></tr>
+    <tr><td colspan="6" style="color:#aaa;text-align:center;padding:12px;">불러오는 중...</td></tr>
   </tbody>
 </table></div>
 
@@ -748,6 +752,7 @@ async function loadGrowthInflow(){
 }
 // ★ [그로스별 광고비] 메타광고비 시트(execData/dash-metaspend)의 _그로스_* 행 → {총괄,우혜림,장윤호,김윤호}
 var _growthSpend = null;
+var _spendUntil = null;   // 광고비 집계 종료일 (메타광고비 시트 _기간의 끝날짜, 예: 2026-10-06)
 async function loadGrowthSpend(){
   try{
     var rows = parseCSV(await _fsCsv('execData','dash-metaspend'));
@@ -755,8 +760,17 @@ async function loadGrowthSpend(){
     rows.forEach(function(r){
       var k=(r[0]||'').trim();
       if(k.indexOf('_그로스_')===0) sp[k.replace('_그로스_','')] = parseInt(r[1])||0;
+      // 1행: _갱신|날짜|_기간|2026-10-01~2026-10-06|_월|2610 → 기간 끝날짜 추출
+      if(k==='_갱신'){ var m=String(r[3]||'').match(/~(\d{4}-\d{2}-\d{2})/); if(m) _spendUntil=m[1]; }
     });
     _growthSpend = sp;
+    // 광고비 기준일을 안내문·카드 라벨에 반영
+    if(_spendUntil){
+      var _p=_spendUntil.split('-'), _md=parseInt(_p[1],10)+'/'+parseInt(_p[2],10);
+      var _rn=document.getElementById('route-asof-note');
+      if(_rn) _rn.innerHTML='소스는 실시간 · 광고비는 태평양시간 기준 매일 오후 7시반 전날까지 수동집계 (현재 <b style="color:#ea580c">'+_md+'까지</b>)';
+      document.querySelectorAll('.spend-asof').forEach(function(e){ e.textContent=_md+'까지'; });
+    }
   }catch(e){ _growthSpend = {}; }
 }
 function renderGrowthInflow(){
@@ -779,11 +793,15 @@ function renderGrowthInflow(){
   var g3Today = isThisMonth ? members.reduce(function(s,m){return s+((gi[m]&&gi[m].t)||0);},0) : 0;
   var g3Yday  = isThisMonth ? members.reduce(function(s,m){return s+((gi[m]&&gi[m].y)||0);},0) : 0;
   var g3Month = isThisMonth ? members.reduce(function(s,m){return s+((gi[m]&&gi[m].m)||0);},0) : 0;
-  var h = '<tr><td class="name">그로스 총괄</td><td class="num db">'+chongToday+'</td><td class="num" style="color:#f97316">'+chongYday+'</td><td class="num" style="color:#9333ea">'+chongMonth+'</td><td class="num" style="color:#e65100">'+spFmtCell(sp['총괄']||0)+'</td></tr>';
+  // CPL = 광고비 ÷ 월간유입 (만원). 유입 0이면 '-'
+  var cplCell = function(won, cnt){ if(!isThisMonth||!won||!cnt) return '-'; return (Math.round(won/cnt/1000)/10).toLocaleString()+'만'; };
+  // ROAS = 매출 ÷ 광고비 — 그로스 3명 매출 아직 없음(이제 시작). 칸만 만들고 '-' (매출 쌓이면 자동)
+  var roasCell = function(sales, won){ if(!isThisMonth||!sales||!won) return '-'; return (sales/won).toFixed(2); };
+  var h = '<tr><td class="name">그로스 총괄</td><td class="num db">'+chongToday+'</td><td class="num" style="color:#f97316">'+chongYday+'</td><td class="num" style="color:#9333ea">'+chongMonth+'</td><td class="num" style="color:#e65100">'+spFmtCell(sp['총괄']||0)+'</td><td class="num" style="color:#0891b2">'+cplCell(sp['총괄']||0, chongMonth)+'</td><td class="num" style="color:#0f9d58">'+roasCell(0, sp['총괄']||0)+'</td></tr>';
   members.forEach(function(m){
     var d = isThisMonth ? (gi[m] || {t:0,y:0,m:0}) : {t:0,y:0,m:0};
     var spCell = isThisMonth ? spFmt(sp[m]) : '-';
-    h += '<tr><td class="name">그로스 '+m+'</td><td class="num db">'+d.t+'</td><td class="num" style="color:#f97316">'+d.y+'</td><td class="num" style="color:#9333ea">'+d.m+'</td><td class="num" style="color:#e65100">'+spCell+'</td></tr>';
+    h += '<tr><td class="name">그로스 '+m+'</td><td class="num db">'+d.t+'</td><td class="num" style="color:#f97316">'+d.y+'</td><td class="num" style="color:#9333ea">'+d.m+'</td><td class="num" style="color:#e65100">'+spCell+'</td><td class="num" style="color:#0891b2">'+cplCell(sp[m]||0, d.m)+'</td><td class="num" style="color:#0f9d58">'+roasCell(0, sp[m]||0)+'</td></tr>';
   });
   tb.innerHTML = h;
   // ★ 상단 유입 카드 = 전체(총괄+3명). _growthInflow 로드 후라 여기서 세팅해야 3명 반영됨
