@@ -458,7 +458,7 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
 </div>
 
 <div class="section-label" style="margin-top:0;">매출 <span class="badge pay">결제일 기준</span><span class="asof-badge" id="asof-badge" style="display:none"></span></div>
-<div class="asof-note" id="asof-note">DB·방문은 실시간, 매출은 결제 반영분 기준</div>
+<div class="asof-note" id="asof-note">DB·방문은 실시간 · 매출은 매일 오후 3시경 전날까지 반영(김사라 차장 데이터 수동 매칭)</div>
 <div class="grid-4">
   <div class="card"><div class="clabel"><span id="sm-label">이번 달</span><span class="dayno" id="dn-month"></span></div><div class="cval purple sm" id="sales-month">-</div></div>
   <div class="card" id="card-week"><div class="clabel">이번 주<span class="dayno" id="dn-week"></span></div><div class="cval purple sm" id="sales-week">-</div></div>
@@ -527,6 +527,7 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
 </div>
 
 <div class="section-label">유입경로별 <span class="badge pay" id="route-eff-label">CPL·ROAS</span></div>
+<div class="asof-note" id="route-asof-note" style="color:#94a3b8">소스는 실시간 · 광고비는 태평양시간 기준 매일 오후 7시반 전날까지 수동집계</div>
 <div class="grid-3" id="route-grid">
   <div class="card"><div class="clabel">메타광고</div><div class="cval purple xs" id="route-meta">-</div><div class="crate" id="rr-meta"></div></div>
   <div class="card"><div class="clabel">무료유입</div><div class="cval blue xs" id="route-insta">-</div><div class="crate" id="rr-insta"></div></div>
@@ -785,6 +786,13 @@ function renderGrowthInflow(){
     h += '<tr><td class="name">그로스 '+m+'</td><td class="num db">'+d.t+'</td><td class="num" style="color:#f97316">'+d.y+'</td><td class="num" style="color:#9333ea">'+d.m+'</td><td class="num" style="color:#e65100">'+spCell+'</td></tr>';
   });
   tb.innerHTML = h;
+  // ★ 상단 유입 카드 = 전체(총괄+3명). _growthInflow 로드 후라 여기서 세팅해야 3명 반영됨
+  //   (render()는 _growthInflow 로드 전에 돌아 3명이 0으로 빠지던 버그 → 날짜별유입 33 vs 카드 20 불일치 해결)
+  { var _vt=document.getElementById('v-total'), _vd=document.getElementById('v-today'), _vy=document.getElementById('v-yesterday');
+    if(_vt) _vt.textContent = (chongMonth + g3Month).toLocaleString();   // 총유입 = 총괄월간 + 3명월간
+    if(_vd) _vd.textContent = (chongToday + g3Today).toLocaleString();   // 오늘 = 총괄오늘 + 3명오늘
+    if(_vy) _vy.textContent = (chongYday + g3Yday).toLocaleString();     // 어제 = 총괄어제 + 3명어제
+  }
   // ★ 광고비 카드(v-spend)도 여기서 세팅 — _growthSpend 로드 후라 값이 있음(render는 로드 전이라 '-')
   { var _spAll = (sp['총괄']||0)+(sp['우혜림']||0)+(sp['장윤호']||0)+(sp['김윤호']||0);
     var _ve = document.getElementById('v-spend');
