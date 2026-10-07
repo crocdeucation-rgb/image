@@ -31,6 +31,13 @@
   .scard .v{font-size:21px;font-weight:800;letter-spacing:-.8px}
   .scard.db .v{color:var(--blue)} .scard.visit .v{color:var(--teal)} .scard.order .v{color:var(--green)}
   .scard.sales .v{color:var(--purple)} .scard.cpl .v{color:var(--amber)}
+  .scard.today .v{color:var(--green)} .scard.yday .v{color:#ea580c} .scard.week .v{color:var(--teal)}
+  /* 일자별 요약 미니카드 */
+  .day-sum{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:10px}
+  .day-sum .ds{background:#fafbfc;border:1px solid var(--line);border-radius:9px;padding:7px 8px;text-align:center}
+  .day-sum .ds .dl{font-size:9.5px;color:var(--sub);font-weight:600;margin-bottom:2px}
+  .day-sum .ds .dvn{font-size:15px;font-weight:800;color:var(--green)}
+  .day-sum .ds.t .dvn{color:#ea580c}
   .scard .v span{font-size:12px;font-weight:700;color:var(--sub)}
   .scard .sub{font-size:10px;color:#9aa3b0;font-weight:600;margin-top:2px}
 
@@ -106,6 +113,11 @@
   .db-row.today .dl{color:var(--green);font-weight:800}
   .db-row .dv{font-size:12px;font-weight:800;color:var(--green);min-width:28px;text-align:right}
 
+  /* PC 2단 가로 배치 — 데이터 적어 3열 대신 2열 */
+  .dash2{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+  @media(max-width:900px){.dash2{grid-template-columns:1fr;gap:0}}
+  .dash2 .colL,.dash2 .colR{min-width:0}
+
   .note{font-size:11.5px;color:var(--sub);line-height:1.6;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
   .note b{color:var(--ink)}
   .loading{text-align:center;color:var(--sub);padding:30px;font-size:12.5px}
@@ -123,18 +135,13 @@
   <div class="summary" id="summary"></div>
   <div class="asof-note">유입·방문은 실시간 집계 · <b>광고비만</b> 태평양시간 오후 7시반에 전날까지 반영 · CPL은 광고비와 기간 맞춰 <b>오늘 유입 제외</b>(오늘 DB는 내일 광고비 확정 후 반영) · 매출은 오더 확정 기준(취소 제외)</div>
 
-  <!-- 퍼널 전환 -->
-  <div class="sec fnl">퍼널 전환 <span class="badge" id="fnl-label">이번달 전체</span></div>
-  <div class="funnel" id="funnel"><div class="loading">불러오는 중…</div></div>
+  <!-- PC 2단 가로 배치 -->
+  <div class="dash2">
+    <!-- 왼쪽: 퍼널 + 담당자별 -->
+    <div class="colL">
+      <div class="sec fnl">퍼널 전환 <span class="badge" id="fnl-label">이번달 전체</span></div>
+      <div class="funnel" id="funnel"><div class="loading">불러오는 중…</div></div>
 
-  <!-- 모바일 탭 (PC는 2열) -->
-  <div class="block-tabs" id="block-tabs">
-    <button class="on" onclick="showBlock('assignee')">담당자별</button>
-    <button onclick="showBlock('camp')">캠페인별</button>
-  </div>
-  <!-- 2열: 담당자별 | 캠페인별 -->
-  <div class="cols" id="cols">
-    <div class="block bk-assignee">
       <div class="sec">담당자별 <span class="badge">순위</span></div>
       <div class="rank-tabs" id="rank-tabs">
         <button class="on" data-sort="db" onclick="setRankSort('db')">DB순</button>
@@ -146,25 +153,26 @@
         <tbody><tr><td colspan="10" class="loading">불러오는 중…</td></tr></tbody>
       </table>
     </div>
-    <div class="block bk-camp">
+
+    <!-- 오른쪽: 캠페인별 + 기간유입 + 일자별 -->
+    <div class="colR">
       <div class="sec camp">캠페인별 <span class="badge">소재 성과</span></div>
       <table id="campaign-tbl">
         <thead><tr><th>캠페인</th><th>DB</th><th>방문</th><th>세팅</th><th>오더</th><th>매출</th></tr></thead>
         <tbody><tr><td colspan="6" class="loading">불러오는 중…</td></tr></tbody>
       </table>
+
+      <div class="sec period">기간유입 <span class="badge">담당자별 · CPL 오늘제외</span></div>
+      <table id="period-tbl">
+        <thead><tr><th>담당자</th><th>오늘</th><th>어제</th><th>주간</th><th>월간</th><th>광고비<br><span style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span style="font-size:8px;color:#aaa;font-weight:400">오늘제외</span></th></tr></thead>
+        <tbody><tr><td colspan="7" class="loading">불러오는 중…</td></tr></tbody>
+      </table>
+
+      <div class="sec day">일자별 유입 <span class="badge">최근 14일</span></div>
+      <div class="day-sum" id="day-sum"></div>
+      <div class="daybars" id="daybars"><div class="loading">불러오는 중…</div></div>
     </div>
   </div>
-
-  <!-- 기간유입 (담당자별 오늘/어제/주간/월간 + 광고비/CPL) -->
-  <div class="sec period">기간유입 <span class="badge">담당자별 · CPL 오늘제외</span></div>
-  <table id="period-tbl">
-    <thead><tr><th>담당자</th><th>오늘</th><th>어제</th><th>주간</th><th>월간</th><th>광고비<br><span style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span style="font-size:8px;color:#aaa;font-weight:400">오늘제외</span></th></tr></thead>
-    <tbody><tr><td colspan="7" class="loading">불러오는 중…</td></tr></tbody>
-  </table>
-
-  <!-- 일자별 유입 -->
-  <div class="sec day">일자별 유입 <span class="badge">최근 14일</span></div>
-  <div class="daybars" id="daybars"><div class="loading">불러오는 중…</div></div>
 
   <div class="note">
     <b>광고비 기준:</b> 메타는 전날 자정까지 데이터가 다음날 오후 7시에 확정됩니다. 당일 리드는 광고비 미반영이라 ROAS는 참고용입니다 · <b>매출:</b> 오더 확정 기준 (취소 제외) · <b>소재=담당자</b> 1:1 고정 배정
@@ -260,9 +268,15 @@ async function load(){
     }
     // 담당자별 '오늘 유입' 맵 (CPL 분모에서 뺌 — 광고비 기간과 맞춤)
     var todayByName={}, todayTotal=0;
+    var sumToday=0, sumYday=0, sumWeek=0, sumMonth=0;   // 전체 기간 합계 (요약카드용)
     if(pStart>=0){
       for(var pi=pStart;pi<rows.length;pi++){
-        var pr=rows[pi]; if(!pr[0]||pr[0]==='신규합계')break;
+        var pr=rows[pi]; if(!pr[0])break;
+        if(pr[0]==='신규합계'){  // [신규합계, 오늘, 어제, 주간, 월간]
+          sumToday=parseInt(pr[1])||0; sumYday=parseInt(pr[2])||0;
+          sumWeek=parseInt(pr[3])||0;  sumMonth=parseInt(pr[4])||0;
+          break;
+        }
         var tv=parseInt(pr[1])||0; todayByName[pr[0]]=tv; todayTotal+=tv;
       }
     }
@@ -359,10 +373,10 @@ async function load(){
     var _dbUntilS=sumDb-todayTotal;
     var totCpl = (sumSpend>0&&_dbUntilS>0) ? won(Math.round(sumSpend/_dbUntilS)) : '-';
     document.getElementById('summary').innerHTML =
-      '<div class="scard db"><div class="l">총 리드</div><div class="v">'+sumDb+'<span>건</span></div></div>'
-     +'<div class="scard visit"><div class="l">방문</div><div class="v">'+sumVisit+'<span>건</span></div></div>'
-     +'<div class="scard order"><div class="l">오더</div><div class="v">'+sumOrder+'<span>건</span></div></div>'
-     +'<div class="scard sales"><div class="l">매출</div><div class="v">'+won(sumSales)+'<span>원</span></div></div>'
+      '<div class="scard db"><div class="l">총 리드 <span style="font-size:8px;color:#bbb">월간</span></div><div class="v">'+sumDb+'<span>건</span></div></div>'
+     +'<div class="scard today"><div class="l">오늘 유입</div><div class="v">'+sumToday+'<span>건</span></div></div>'
+     +'<div class="scard yday"><div class="l">어제 유입</div><div class="v">'+sumYday+'<span>건</span></div></div>'
+     +'<div class="scard week"><div class="l">주간 유입</div><div class="v">'+sumWeek+'<span>건</span></div></div>'
      +'<div class="scard cpl"><div class="l">CPL <span style="font-size:8px;color:#bbb">오늘제외</span></div><div class="v">'+totCpl+'</div><div class="sub">광고비 '+won(sumSpend)+' · ROAS '+totRoas+'</div></div>';
 
     // ── 퍼널 전환 깔때기 ──
@@ -413,6 +427,16 @@ async function load(){
         +'<span class="dv">'+x.v+'</span></div>';
     });
     document.getElementById('daybars').innerHTML = dhtml || '<div class="loading">데이터 없음</div>';
+
+    // ── 일자별 요약 미니카드 (오늘/어제/주간/월간) ──
+    var _ds=document.getElementById('day-sum');
+    if(_ds){
+      _ds.innerHTML =
+         '<div class="ds t"><div class="dl">오늘</div><div class="dvn">'+sumToday+'</div></div>'
+        +'<div class="ds"><div class="dl">어제</div><div class="dvn">'+sumYday+'</div></div>'
+        +'<div class="ds"><div class="dl">주간</div><div class="dvn">'+sumWeek+'</div></div>'
+        +'<div class="ds"><div class="dl">월간</div><div class="dvn">'+sumMonth+'</div></div>';
+    }
 
   }catch(e){
     document.getElementById('updated').textContent = '불러오기 실패 — 대시보드 탭이 생성됐는지 확인하세요';
