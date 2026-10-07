@@ -107,10 +107,13 @@ body { background: #f8f9fa; padding: 20px 0 0; overflow-x: hidden; }
   .sec-nav { display: none; }
   .section { display: block !important; }
   .mob-meta { display: none !important; }
-  /* 전역 기간 바 */
+  /* 전역 기간 바 — 퍼널+유입경로(앞 2열, 전체폭의 4/5)까지만. 날짜별·방문 영역 위엔 안 감 */
   #global-period { display: flex; align-items: center; justify-content: flex-end; gap: 5px;
-      max-width: 1700px; margin: 8px auto 0; padding: 6px 14px 0; }
+      max-width: 1700px; margin: 8px auto 0; padding: 6px 14px 0; box-sizing: border-box; }
+  /* layout은 2fr 2fr 1fr(gap 14px×2). 앞 2열 = (전체 - gap×2)×4/5 + gap. 오른쪽 1fr+gap 만큼 비움 */
+  #global-period { padding-right: calc(14px + (100% - 28px) / 5 + 14px); }
   #global-period .gp-label { font-size: 11px; color: #94a3b8; font-weight: 700; margin-right: 3px; }
+  #global-period .gp-scope { font-size:10px; color:#b4bdc9; font-weight:600; margin-left:8px; white-space:nowrap }
   #global-period .gp-btn { padding: 5px 15px; font-size: 12px; font-weight: 700; border-radius: 16px;
       border: 1px solid #ddd; background: #fff; color: #6b7688; cursor: pointer; transition: all .15s; }
   #global-period .gp-btn.active { background: #1a73e8; color: #fff; border-color: #1a73e8; }
@@ -432,6 +435,7 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
   <button class="gp-btn active" onclick="setPeriodAll(0)">이번달</button>
   <button class="gp-btn" onclick="setPeriodAll(1)">지난달</button>
   <button class="gp-btn" onclick="setPeriodAll(2)">전체</button>
+  <span class="gp-scope">· 퍼널·유입경로 적용</span>
 </div>
 <div class="sec-nav">
   <button class="sec-nav-btn active" onclick="showSec(0)">퍼널</button>
@@ -506,6 +510,7 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
 </div>
 
 <div class="section-label" style="margin-top:0;">유입 현황 <span class="badge today">전체 · 그로스 분해</span><span class="asof-badge" style="background:#0891b2">📊 유입 실시간 · 광고비 <span class="spend-asof">어제까지</span></span></div>
+<div class="asof-note" style="color:#94a3b8">유입 수는 실시간 집계 · <b style="color:#0891b2">광고비만</b> 태평양시간 오후 7시반에 전날까지 반영 (현재 <b class="spend-asof" style="color:#0891b2">어제까지</b>)</div>
 <div class="grid-3" style="margin-bottom:6px">
   <div class="card"><div class="clabel">총 유입<span style="font-size:8px;color:#bbb;margin-left:2px" id="inflow-tab-label">이번달</span></div><div class="cval blue sm" id="v-total">-</div></div>
   <div class="card"><div class="clabel">오늘 유입</div><div class="cval amber sm" id="v-today">-</div></div>
