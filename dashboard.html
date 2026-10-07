@@ -458,7 +458,7 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
 </div>
 
 <div class="section-label" style="margin-top:0;">매출 <span class="badge pay">결제일 기준</span><span class="asof-badge" id="asof-badge" style="display:none"></span></div>
-<div class="asof-note" id="asof-note">DB·방문은 실시간 · 매출은 매일 오후 3시경 전날까지 반영(김사라 차장 데이터 수동 매칭)</div>
+<div class="asof-note" id="asof-note">매일 오후 3시경 전날 매출 반영 (김사라 차장 데이터 수동 매칭)</div>
 <div class="grid-4">
   <div class="card"><div class="clabel"><span id="sm-label">이번 달</span><span class="dayno" id="dn-month"></span></div><div class="cval purple sm" id="sales-month">-</div></div>
   <div class="card" id="card-week"><div class="clabel">이번 주<span class="dayno" id="dn-week"></span></div><div class="cval purple sm" id="sales-week">-</div></div>
@@ -505,8 +505,7 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
   <button class="tab" onclick="setRouteTab(2)">전체</button>
 </div>
 
-<div class="section-label" style="margin-top:0;">유입 현황 <span class="badge today">전체 · 그로스 분해</span></div>
-<div class="asof-note" style="color:#94a3b8">유입은 실시간 · <b style="color:#0891b2">광고비만</b> 태평양시간 오후 7시반 전날까지 집계 (<b class="spend-asof" style="color:#0891b2">어제까지</b>)</div>
+<div class="section-label" style="margin-top:0;">유입 현황 <span class="badge today">전체 · 그로스 분해</span><span class="asof-badge" style="background:#0891b2">📊 유입 실시간 · 광고비 <span class="spend-asof">어제까지</span></span></div>
 <div class="grid-3" style="margin-bottom:6px">
   <div class="card"><div class="clabel">총 유입<span style="font-size:8px;color:#bbb;margin-left:2px" id="inflow-tab-label">이번달</span></div><div class="cval blue sm" id="v-total">-</div></div>
   <div class="card"><div class="clabel">오늘 유입</div><div class="cval amber sm" id="v-today">-</div></div>
