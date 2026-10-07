@@ -1436,14 +1436,7 @@ function dayBox(dd,inner){
   var cards='<div class="lead">진행 중 <b>'+ing.length+'</b>명 · 온보딩 완료 <b>'+don.length+'</b>명 — 오늘 <b>할 단계별</b>로 묶었습니다.</div>'+
     (ing.length?grpHtml:'<div class="empty" style="padding:14px">진행 중(다음 단계 남은) 회원이 없습니다.</div>')+
     (don.length?'<details style="margin-top:10px"><summary class="jmoreb" style="list-style:none">온보딩 완료 '+don.length+'명 보기 ▾</summary><div class="jlist" style="margin-top:6px">'+don.map(jrowHtml).join('')+'</div></details>':'');
-  var y=add(d,-1), nj=[],seen={};
-  EV.forEach(function(e){if(e.join===y&&!seen[e.name]){seen[e.name]=1;nj.push(e);}});
-  var njb=nj.length?'<div class="grp">전날('+md(y)+') 가입 '+nj.length+'명 — 해피콜 대상</div>'+
-    '<div class="dcol" style="min-width:auto">'+nj.map(function(e){
-      var stn=STAT[e.name], note=(stn&&stn.note)||e.note||'';
-      return '<div class="dcard"><div class="dtop"><button data-name="'+esc(e.name)+'" class="dnm">'+esc(e.name)+'</button></div>'+
-       '<div class="org">'+esc(e.grade||'')+' · '+orgline(e)+'</div>'+
-       '<div class="note'+(note?'':' none')+'">'+(note?hi(note):'상담 특이사항 칸 비어 있음')+'</div></div>';}).join('')+'</div>':'';
+  var njb='';   // [2026-10-08] 전날 가입 해피콜 대상 블록 제거 — 위 '신규 회원 여정'과 중복
   if(inner) return (cards?'<div class="lead">온보딩 '+names.length+'명 · '+E.length+'건 — 오늘 잡힌 일정입니다. 회원별 여정은 위 <b>신규 회원 여정</b>에서.</div><div class="drow">'+cards+'</div>':'<div class="empty">이 날짜에 잡힌 온보딩 일정이 없습니다.</div>')+njb;
   return zone('day','var(--v1)',(d===TODAY?'오늘 하는 일':md(d)+'('+dw(d)+') 일정'),names.length+'명 · '+E.length+'건',
    '단계별 · 사람 단위',
