@@ -1416,7 +1416,7 @@ function dayBox(dd,inner){
     var memo=note&&/(월|예정|시작|형제|병행|이사|재조율|변경)/.test(note)?'<span class="jmemo" title="'+esc(note)+'">✎ '+esc(note.length>22?note.slice(0,22)+'…':note)+'</span>':'';
     return '<div class="jrow today" data-name="'+esc(o.n)+'">'+
       '<div class="jr-l"><div class="jr-nm"><b>'+esc(o.n)+'</b>'+(e0.grade?'<span class="jr-g">'+esc(e0.grade)+'</span>':'')+'</div>'+
-      '<div class="jr-meta">'+esc(e0.br||'')+(nx?' · 다음 '+esc(nx):'')+'</div></div>'+
+      '<div class="jr-meta">'+esc((j&&j.br)||e0.br||'지점 미확인')+(((j&&j.sang)||e0.sang)?' · 상담 '+esc((j&&j.sang)||e0.sang):'')+(((j&&j.saup)||e0.saup)?' · 사업 '+esc((j&&j.saup)||e0.saup):'')+(nx?' · 다음 '+esc(nx):'')+'</div></div>'+
       '<div class="jr-c todo">'+todo+'</div>'+
       '<div class="jr-r">'+memo+'</div></div>';
   };
