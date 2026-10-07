@@ -1078,7 +1078,7 @@ body.gate-hasbar{padding-top:34px}
    프리뷰(window.OPS 주입)면 이 로더는 통째로 스킵. */
 (function(){
   if(window.OPS){ return; }               // 로컬 프리뷰: 데이터 이미 있음
-  var DOCS=['summary','event','teach','coachA','coachB','cancel'];
+  var DOCS=['summary','event','event2','teach','coachA','coachB','cancel'];
   var loaded=false;
   function showMsg(t,err){
     var w=document.querySelector('.wrap'); if(!w) return;
@@ -1103,6 +1103,7 @@ body.gate-hasbar{padding-top:34px}
       parts.forEach(function(p){
         Object.keys(p).forEach(function(k){
           if(k==='coach'){ O.coach=O.coach||{}; for(var n in p.coach) O.coach[n]=p.coach[n]; }
+          else if(k==='events'){ O.events=(O.events||[]).concat(p.events||[]); }
           else O[k]=p[k];
         });
       });
