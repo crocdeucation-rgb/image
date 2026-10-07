@@ -505,7 +505,7 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
   <button class="tab" onclick="setRouteTab(2)">전체</button>
 </div>
 
-<div class="section-label" style="margin-top:0;">유입 현황 <span class="badge today">전체 · 그로스 분해</span></div>
+<div class="section-label" style="margin-top:0;">유입 현황 <span class="badge today">전체 · 그로스 분해</span><span class="asof-badge spend-asof-badge" id="spend-asof-badge" style="display:none;background:#0891b2"></span></div>
 <div class="grid-3" style="margin-bottom:6px">
   <div class="card"><div class="clabel">총 유입<span style="font-size:8px;color:#bbb;margin-left:2px" id="inflow-tab-label">이번달</span></div><div class="cval blue sm" id="v-total">-</div></div>
   <div class="card"><div class="clabel">오늘 유입</div><div class="cval amber sm" id="v-today">-</div></div>
@@ -530,8 +530,7 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
   <div class="card"><div class="clabel">고등</div><div class="cval amber xs" id="grade-high">-</div><div class="route-eff" id="ge-high"></div></div>
 </div>
 
-<div class="section-label">유입경로별 <span class="badge pay" id="route-eff-label">CPL·ROAS</span></div>
-<div class="asof-note" id="route-asof-note" style="color:#94a3b8">소스는 실시간 · 광고비는 태평양시간 기준 매일 오후 7시반 전날까지 수동집계</div>
+<div class="section-label">유입경로별 <span class="badge pay" id="route-eff-label">CPL·ROAS</span><span class="asof-badge spend-asof-badge" style="display:none;background:#0891b2"></span></div>
 <div class="grid-3" id="route-grid">
   <div class="card"><div class="clabel">메타광고</div><div class="cval purple xs" id="route-meta">-</div><div class="crate" id="rr-meta"></div></div>
   <div class="card"><div class="clabel">무료유입</div><div class="cval blue xs" id="route-insta">-</div><div class="crate" id="rr-insta"></div></div>
@@ -764,11 +763,10 @@ async function loadGrowthSpend(){
       if(k==='_갱신'){ var m=String(r[3]||'').match(/~(\d{4}-\d{2}-\d{2})/); if(m) _spendUntil=m[1]; }
     });
     _growthSpend = sp;
-    // 광고비 기준일을 안내문·카드 라벨에 반영
+    // 광고비 기준일 → 뱃지 + 카드 라벨에 반영
     if(_spendUntil){
       var _p=_spendUntil.split('-'), _md=parseInt(_p[1],10)+'/'+parseInt(_p[2],10);
-      var _rn=document.getElementById('route-asof-note');
-      if(_rn) _rn.innerHTML='소스는 실시간 · 광고비는 태평양시간 기준 매일 오후 7시반 전날까지 수동집계 (현재 <b style="color:#ea580c">'+_md+'까지</b>)';
+      document.querySelectorAll('.spend-asof-badge').forEach(function(e){ e.textContent='📊 광고비 '+_md+'까지'; e.style.display=''; });
       document.querySelectorAll('.spend-asof').forEach(function(e){ e.textContent=_md+'까지'; });
     }
   }catch(e){ _growthSpend = {}; }
@@ -795,9 +793,11 @@ function renderGrowthInflow(){
   var g3Month = isThisMonth ? members.reduce(function(s,m){return s+((gi[m]&&gi[m].m)||0);},0) : 0;
   // CPL = 광고비 ÷ 월간유입 (만원). 유입 0이면 '-'
   var cplCell = function(won, cnt){ if(!isThisMonth||!won||!cnt) return '-'; return (Math.round(won/cnt/1000)/10).toLocaleString()+'만'; };
-  // ROAS = 매출 ÷ 광고비 — 그로스 3명 매출 아직 없음(이제 시작). 칸만 만들고 '-' (매출 쌓이면 자동)
-  var roasCell = function(sales, won){ if(!isThisMonth||!sales||!won) return '-'; return (sales/won).toFixed(2); };
-  var h = '<tr><td class="name">그로스 총괄</td><td class="num db">'+chongToday+'</td><td class="num" style="color:#f97316">'+chongYday+'</td><td class="num" style="color:#9333ea">'+chongMonth+'</td><td class="num" style="color:#e65100">'+spFmtCell(sp['총괄']||0)+'</td><td class="num" style="color:#0891b2">'+cplCell(sp['총괄']||0, chongMonth)+'</td><td class="num" style="color:#0f9d58">'+roasCell(0, sp['총괄']||0)+'</td></tr>';
+  // ROAS = 매출 ÷ 광고비. 총괄은 메인 노션 매출 있음(원장). 3명은 매출 아직 없음(이제 시작) → '-'
+  var roasCell = function(salesWon, won){ if(!isThisMonth||!salesWon||!won) return '-'; return (salesWon/won).toFixed(2); };
+  // 총괄 이번달 매출(원) = 요약시트 r12[1] "2658.6만원" 파싱 → 원
+  var _chongSalesWon = (function(){ var s=String((allRows[11]&&allRows[11][1])||''); var n=parseFloat(s.replace(/[^0-9.]/g,''))||0; return s.indexOf('만')>=0 ? n*10000 : n; })();
+  var h = '<tr><td class="name">그로스 총괄</td><td class="num db">'+chongToday+'</td><td class="num" style="color:#f97316">'+chongYday+'</td><td class="num" style="color:#9333ea">'+chongMonth+'</td><td class="num" style="color:#e65100">'+spFmtCell(sp['총괄']||0)+'</td><td class="num" style="color:#0891b2">'+cplCell(sp['총괄']||0, chongMonth)+'</td><td class="num" style="color:#0f9d58">'+roasCell(_chongSalesWon, sp['총괄']||0)+'</td></tr>';
   members.forEach(function(m){
     var d = isThisMonth ? (gi[m] || {t:0,y:0,m:0}) : {t:0,y:0,m:0};
     var spCell = isThisMonth ? spFmt(sp[m]) : '-';
@@ -819,6 +819,13 @@ function renderGrowthInflow(){
     var _totalIn = chongMonth + g3Month;
     var _vc = document.getElementById('v-cpl');
     if(_vc) _vc.textContent = (isThisMonth && _spAll>0 && _totalIn>0) ? (Math.round(_spAll/_totalIn/1000)/10).toLocaleString()+'만' : '-';
+    // 통합 ROAS = 총괄매출(원장) ÷ 전체광고비. 3명 매출은 아직 없어 총괄 매출로 계산(참고).
+    var _vr = document.getElementById('v-roas');
+    if(_vr){
+      var _sw = (function(){ var s=String((allRows[11]&&allRows[11][1])||''); var n=parseFloat(s.replace(/[^0-9.]/g,''))||0; return s.indexOf('만')>=0?n*10000:n; })();
+      if(isThisMonth && _sw>0 && _spAll>0){ _vr.textContent=(_sw/_spAll).toFixed(2); _vr.style.color='#0f9d58'; _vr.style.fontSize=''; }
+      else { _vr.textContent='준비중'; _vr.style.color='#9ca3af'; _vr.style.fontSize='12px'; }
+    }
   }
 }
 
