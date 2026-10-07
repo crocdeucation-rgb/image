@@ -519,7 +519,7 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
 <div class="tbl-scroll" style="margin-top:6px"><table class="funnel-table" id="growth-inflow-tbl">
   <thead><tr><th>구분</th><th>오늘</th><th>어제</th><th>월간</th><th>광고비<br><span class="spend-asof" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL</th><th>ROAS</th></tr></thead>
   <tbody id="growth-inflow-tbody">
-    <tr><td colspan="6" style="color:#aaa;text-align:center;padding:12px;">불러오는 중...</td></tr>
+    <tr><td colspan="7" style="color:#aaa;text-align:center;padding:12px;">불러오는 중...</td></tr>
   </tbody>
 </table></div>
 
@@ -811,10 +811,14 @@ function renderGrowthInflow(){
     if(_vd) _vd.textContent = (chongToday + g3Today).toLocaleString();   // 오늘 = 총괄오늘 + 3명오늘
     if(_vy) _vy.textContent = (chongYday + g3Yday).toLocaleString();     // 어제 = 총괄어제 + 3명어제
   }
-  // ★ 광고비 카드(v-spend)도 여기서 세팅 — _growthSpend 로드 후라 값이 있음(render는 로드 전이라 '-')
+  // ★ 광고비 + 통합 CPL 카드 세팅 — _growthSpend 로드 후
   { var _spAll = (sp['총괄']||0)+(sp['우혜림']||0)+(sp['장윤호']||0)+(sp['김윤호']||0);
     var _ve = document.getElementById('v-spend');
     if(_ve) _ve.textContent = (isThisMonth && _spAll>0) ? Math.round(_spAll/10000).toLocaleString()+'만' : '-';
+    // 통합 CPL = 전체광고비 ÷ 전체유입(총괄월간+3명)
+    var _totalIn = chongMonth + g3Month;
+    var _vc = document.getElementById('v-cpl');
+    if(_vc) _vc.textContent = (isThisMonth && _spAll>0 && _totalIn>0) ? (Math.round(_spAll/_totalIn/1000)/10).toLocaleString()+'만' : '-';
   }
 }
 
