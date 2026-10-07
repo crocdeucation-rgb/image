@@ -32,12 +32,20 @@
   .scard.db .v{color:var(--blue)} .scard.visit .v{color:var(--teal)} .scard.order .v{color:var(--green)}
   .scard.sales .v{color:var(--purple)} .scard.cpl .v{color:var(--amber)}
   .scard.today .v{color:var(--green)} .scard.yday .v{color:#ea580c} .scard.week .v{color:var(--teal)}
-  /* 일자별 요약 미니카드 */
-  .day-sum{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:10px}
-  .day-sum .ds{background:#fafbfc;border:1px solid var(--line);border-radius:9px;padding:7px 8px;text-align:center}
-  .day-sum .ds .dl{font-size:9.5px;color:var(--sub);font-weight:600;margin-bottom:2px}
-  .day-sum .ds .dvn{font-size:15px;font-weight:800;color:var(--green)}
-  .day-sum .ds.t .dvn{color:#ea580c}
+  /* 날짜별 유입 주간/월간 토글 */
+  .cal-tabs{display:flex;gap:5px;margin-bottom:8px}
+  .cal-tabs button{padding:4px 13px;font-size:11px;font-weight:700;border-radius:7px;border:1px solid var(--line);background:#fff;color:var(--sub);cursor:pointer}
+  .cal-tabs button.on{background:var(--green);color:#fff;border-color:var(--green)}
+  /* 월간 달력 히트맵 */
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+  .cal-dow{font-size:9px;color:var(--sub);font-weight:700;text-align:center;padding:2px 0}
+  .cal-cell{aspect-ratio:1;border-radius:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+  .cal-cell.empty{background:transparent}
+  .cal-cell.today{outline:2px solid var(--green);outline-offset:-2px}
+  .cal-cell .cd{font-size:8px;color:#94a3b8;position:absolute;top:2px;left:3px}
+  .cal-cell .cv{font-size:12px;font-weight:800}
+  .cal-legend{display:flex;align-items:center;gap:3px;justify-content:flex-end;font-size:9px;color:var(--sub);margin-top:7px}
+  .cal-legend .lg{display:inline-block;width:11px;height:11px;border-radius:3px}
   .scard .v span{font-size:12px;font-weight:700;color:var(--sub)}
   .scard .sub{font-size:10px;color:#9aa3b0;font-weight:600;margin-top:2px}
 
@@ -168,8 +176,11 @@
         <tbody><tr><td colspan="7" class="loading">불러오는 중…</td></tr></tbody>
       </table>
 
-      <div class="sec day">일자별 유입 <span class="badge">최근 14일</span></div>
-      <div class="day-sum" id="day-sum"></div>
+      <div class="sec day">날짜별 유입 <span class="badge" id="cal-title">이번 주</span></div>
+      <div class="cal-tabs">
+        <button class="on" id="cal-btn-week" onclick="setCalView('week')">주간</button>
+        <button id="cal-btn-month" onclick="setCalView('month')">월간</button>
+      </div>
       <div class="daybars" id="daybars"><div class="loading">불러오는 중…</div></div>
     </div>
   </div>
