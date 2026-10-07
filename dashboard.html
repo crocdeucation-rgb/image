@@ -510,7 +510,7 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
 </div>
 
 <div class="section-label" style="margin-top:0;">유입 현황 <span class="badge today">전체 · 그로스 분해</span><span class="asof-badge" style="background:#0891b2">📊 유입 실시간 · 광고비 <span class="spend-asof">어제까지</span></span></div>
-<div class="asof-note" style="color:#94a3b8">유입 수는 실시간 집계 · <b style="color:#0891b2">광고비만</b> 태평양시간 오후 7시반에 전날까지 반영 (현재 <b class="spend-asof" style="color:#0891b2">어제까지</b>)</div>
+<div class="asof-note" style="color:#94a3b8">유입 수는 실시간 집계 · <b style="color:#0891b2">광고비만</b> 태평양시간 오후 7시반에 전날까지 반영 (현재 <b class="spend-asof" style="color:#0891b2">어제까지</b>) · CPL은 광고비와 기간 맞춰 <b>오늘 유입 제외</b> (오늘 DB는 내일 광고비 확정 후 CPL 반영)</div>
 <div class="grid-3" style="margin-bottom:6px">
   <div class="card"><div class="clabel">총 유입<span style="font-size:8px;color:#bbb;margin-left:2px" id="inflow-tab-label">이번달</span></div><div class="cval blue sm" id="v-total">-</div></div>
   <div class="card"><div class="clabel">오늘 유입</div><div class="cval amber sm" id="v-today">-</div></div>
@@ -518,11 +518,11 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
 </div>
 <div class="grid-3">
   <div class="card"><div class="clabel">광고비<span class="spend-asof" style="font-size:8px;color:#bbb;margin-left:2px">어제까지</span></div><div class="cval sm" id="v-spend" style="color:#ea580c">-</div></div>
-  <div class="card"><div class="clabel">통합 CPL</div><div class="cval sm" id="v-cpl" style="color:#0891b2">-</div></div>
+  <div class="card"><div class="clabel">통합 CPL<span class="spend-asof" style="font-size:8px;color:#bbb;margin-left:2px">어제까지</span></div><div class="cval sm" id="v-cpl" style="color:#0891b2">-</div></div>
   <div class="card"><div class="clabel">통합 ROAS</div><div class="cval sm" id="v-roas" style="color:#9ca3af;font-size:12px">준비중</div></div>
 </div>
 <div class="tbl-scroll" style="margin-top:6px"><table class="funnel-table" id="growth-inflow-tbl">
-  <thead><tr><th>구분</th><th>오늘</th><th>어제</th><th>월간</th><th>광고비<br><span class="spend-asof" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL</th><th>ROAS</th></tr></thead>
+  <thead><tr><th>구분</th><th>오늘</th><th>어제</th><th>월간</th><th>광고비<br><span class="spend-asof" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span style="font-size:8px;color:#aaa;font-weight:400">오늘제외</span></th><th>ROAS</th></tr></thead>
   <tbody id="growth-inflow-tbody">
     <tr><td colspan="7" style="color:#aaa;text-align:center;padding:12px;">불러오는 중...</td></tr>
   </tbody>
@@ -796,16 +796,17 @@ function renderGrowthInflow(){
   var g3Yday  = isThisMonth ? members.reduce(function(s,m){return s+((gi[m]&&gi[m].y)||0);},0) : 0;
   var g3Month = isThisMonth ? members.reduce(function(s,m){return s+((gi[m]&&gi[m].m)||0);},0) : 0;
   // CPL = 광고비 ÷ 월간유입 (만원). 유입 0이면 '-'
-  var cplCell = function(won, cnt){ if(!isThisMonth||!won||!cnt) return '-'; return (Math.round(won/cnt/1000)/10).toLocaleString()+'만'; };
+  // CPL = 광고비(어제까지) ÷ 유입(어제까지 = 월간-오늘). 분모·분자 기간 정합.
+  var cplCell = function(won, monthCnt, todayCnt){ var cnt=(monthCnt||0)-(todayCnt||0); if(!isThisMonth||!won||cnt<=0) return '-'; return (Math.round(won/cnt/1000)/10).toLocaleString()+'만'; };
   // ROAS = 매출 ÷ 광고비. 총괄은 메인 노션 매출 있음(원장). 3명은 매출 아직 없음(이제 시작) → '-'
   var roasCell = function(salesWon, won){ if(!isThisMonth||!salesWon||!won) return '-'; return (salesWon/won).toFixed(2); };
   // 총괄 이번달 매출(원) = 요약시트 r12[1] "2658.6만원" 파싱 → 원
   var _chongSalesWon = (function(){ var s=String((allRows[11]&&allRows[11][1])||''); var n=parseFloat(s.replace(/[^0-9.]/g,''))||0; return s.indexOf('만')>=0 ? n*10000 : n; })();
-  var h = '<tr><td class="name">그로스 총괄</td><td class="num db">'+chongToday+'</td><td class="num" style="color:#f97316">'+chongYday+'</td><td class="num" style="color:#9333ea">'+chongMonth+'</td><td class="num" style="color:#e65100">'+spFmtCell(sp['총괄']||0)+'</td><td class="num" style="color:#0891b2">'+cplCell(sp['총괄']||0, chongMonth)+'</td><td class="num" style="color:#0f9d58">'+roasCell(_chongSalesWon, sp['총괄']||0)+'</td></tr>';
+  var h = '<tr><td class="name">그로스 총괄</td><td class="num db">'+chongToday+'</td><td class="num" style="color:#f97316">'+chongYday+'</td><td class="num" style="color:#9333ea">'+chongMonth+'</td><td class="num" style="color:#e65100">'+spFmtCell(sp['총괄']||0)+'</td><td class="num" style="color:#0891b2">'+cplCell(sp['총괄']||0, chongMonth, chongToday)+'</td><td class="num" style="color:#0f9d58">'+roasCell(_chongSalesWon, sp['총괄']||0)+'</td></tr>';
   members.forEach(function(m){
     var d = isThisMonth ? (gi[m] || {t:0,y:0,m:0}) : {t:0,y:0,m:0};
     var spCell = isThisMonth ? spFmt(sp[m]) : '-';
-    h += '<tr><td class="name">그로스 '+m+'</td><td class="num db">'+d.t+'</td><td class="num" style="color:#f97316">'+d.y+'</td><td class="num" style="color:#9333ea">'+d.m+'</td><td class="num" style="color:#e65100">'+spCell+'</td><td class="num" style="color:#0891b2">'+cplCell(sp[m]||0, d.m)+'</td><td class="num" style="color:#0f9d58">'+roasCell(0, sp[m]||0)+'</td></tr>';
+    h += '<tr><td class="name">그로스 '+m+'</td><td class="num db">'+d.t+'</td><td class="num" style="color:#f97316">'+d.y+'</td><td class="num" style="color:#9333ea">'+d.m+'</td><td class="num" style="color:#e65100">'+spCell+'</td><td class="num" style="color:#0891b2">'+cplCell(sp[m]||0, d.m, d.t)+'</td><td class="num" style="color:#0f9d58">'+roasCell(0, sp[m]||0)+'</td></tr>';
   });
   tb.innerHTML = h;
   // ★ 상단 유입 카드 = 전체(총괄+3명). _growthInflow 로드 후라 여기서 세팅해야 3명 반영됨
@@ -819,10 +820,10 @@ function renderGrowthInflow(){
   { var _spAll = (sp['총괄']||0)+(sp['우혜림']||0)+(sp['장윤호']||0)+(sp['김윤호']||0);
     var _ve = document.getElementById('v-spend');
     if(_ve) _ve.textContent = (isThisMonth && _spAll>0) ? Math.round(_spAll/10000).toLocaleString()+'만' : '-';
-    // 통합 CPL = 전체광고비 ÷ 전체유입(총괄월간+3명)
-    var _totalIn = chongMonth + g3Month;
+    // 통합 CPL = 광고비(어제까지) ÷ 유입(어제까지 = 전체월간 - 전체오늘). 분모·분자 정합.
+    var _totalInUntil = (chongMonth + g3Month) - (chongToday + g3Today);
     var _vc = document.getElementById('v-cpl');
-    if(_vc) _vc.textContent = (isThisMonth && _spAll>0 && _totalIn>0) ? (Math.round(_spAll/_totalIn/1000)/10).toLocaleString()+'만' : '-';
+    if(_vc) _vc.textContent = (isThisMonth && _spAll>0 && _totalInUntil>0) ? (Math.round(_spAll/_totalInUntil/1000)/10).toLocaleString()+'만' : '-';
     // 통합 ROAS = 총괄매출(원장) ÷ 전체광고비. 3명 매출은 아직 없어 총괄 매출로 계산(참고).
     var _vr = document.getElementById('v-roas');
     if(_vr){
