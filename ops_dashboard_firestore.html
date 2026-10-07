@@ -4,9 +4,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>window.GATE_CFG={title:'운영본부',sub:'운영본부 현황판입니다.<br>경영진 계정으로 로그인해 주세요.',foot:'문의: 신상준 이사'};</script>
-<style id="__pregate">body{visibility:hidden!important}#agate{visibility:visible!important}</style>
+<style id="__pregate">body{visibility:hidden!important}#authGate{visibility:visible!important}</style>
 
-<script src="gate.js"></script>
+<!-- gate.js 제거 → 자체 게이트로 대체 (2026-10-07) -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <style>
 :root{--bg:#F1F4F9;--pan:#fff;--ink:#161C2B;--soft:#6B7688;--mute:#9AA6B8;--line:#E3E8F0;
@@ -952,6 +952,127 @@ body.gate-hasbar .tabbar{top:calc(34px + var(--navH,53px))}
 }
 .mdswitch{display:none!important}   /* 하단 플로팅 뒤로가기 전역 제거(PC 포함) — 상단 sticky 뒤로가기로 통일 */
 </style></head><body>
+<!-- ★ [2026-10-07] ops 자체 게이트 (total식) — gate.js 대체. 경영진+운영실무자 명단 인증 + 경영진만 상단 탭바 노출 -->
+<div id="authGate">
+  <div class="gate-card">
+    <div class="gate-logo">🔒</div>
+    <div class="gate-ttl">운영본부</div>
+    <div class="gate-sub">운영본부 대시보드입니다.<br>등록된 계정으로 로그인해 주세요.</div>
+    <button class="gate-btn" onclick="gateLogin()">
+      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1Z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23Z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84Z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38Z"/></svg>
+      Google로 로그인
+    </button>
+    <div class="gate-msg" id="gateMsg"></div>
+    <div class="gate-foot">문의: 신상준 이사</div>
+  </div>
+</div>
+<style>
+#authGate{position:fixed;inset:0;z-index:99999;background:linear-gradient(160deg,#0F1626,#1E2C48);display:flex;align-items:center;justify-content:center;padding:24px}
+#authGate.hidden{display:none}
+#authGate .gate-card{opacity:0;transition:opacity .25s ease}
+#authGate.ready .gate-card{opacity:1}
+.gate-card{background:#fff;border-radius:22px;padding:38px 32px;max-width:380px;width:100%;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.4)}
+.gate-logo{font-size:34px;margin-bottom:6px}
+.gate-ttl{font-size:20px;font-weight:900;color:#1B2436;letter-spacing:-.5px}
+.gate-sub{font-size:13px;color:#8A97AC;font-weight:600;margin-top:8px;line-height:1.5}
+.gate-btn{margin-top:24px;width:100%;height:48px;border:1px solid #DCE3EE;border-radius:12px;background:#fff;font-size:14px;font-weight:800;font-family:inherit;color:#3A4356;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:.15s}
+.gate-btn:hover{background:#F7F9FC;box-shadow:0 3px 12px rgba(27,36,54,.1)}
+.gate-btn svg{width:19px;height:19px}
+.gate-msg{margin-top:16px;font-size:12.5px;font-weight:700;min-height:18px}
+.gate-msg.err{color:#E23A22}
+.gate-msg.wait{color:#8A97AC}
+.gate-foot{margin-top:20px;font-size:11px;color:#B6C2DC;font-weight:600}
+/* 보안 세션 배너 (gate.js 방식 재사용) */
+#gSessBar{position:fixed;top:0;left:0;right:0;z-index:99997;background:#0F1626;color:#dfe6f2;font-family:Pretendard,sans-serif;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:12px;padding:6px 14px;padding-top:calc(6px + env(safe-area-inset-top,0px));box-shadow:0 1px 6px rgba(0,0,0,.15)}
+#gSessBar .gs-dot{width:6px;height:6px;border-radius:50%;background:#12b886;box-shadow:0 0 0 0 rgba(18,184,134,.5);animation:gsPulse 2s infinite}
+@keyframes gsPulse{0%{box-shadow:0 0 0 0 rgba(18,184,134,.5)}70%{box-shadow:0 0 0 6px rgba(18,184,134,0)}100%{box-shadow:0 0 0 0 rgba(18,184,134,0)}}
+#gSessBar b{color:#00e5c8;font-weight:700}
+#gSessBar .gs-out{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:3px 11px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit}
+#gSessBar .gs-out:hover{background:rgba(255,255,255,.22)}
+body.gate-hasbar{padding-top:34px}
+</style>
+<script>
+(function(){
+  // ★ ops 접근 명단 (경영진 7 + 운영실무자 2). 나중에 추가 가능.
+  var OPS_ALLOW={
+    '032100jesus@gmail.com':{name:'오동근',rank:'파운더'},
+    'christuhm@gmail.com':{name:'엄현호',rank:'대표이사'},
+    'crocdeucation@gmail.com':{name:'신상준',rank:'이사'},
+    'kanghansara@gmail.com':{name:'김사라',rank:'경영총괄'},
+    'thestudydesign@gmail.com':{name:'김상현',rank:'이사'},
+    'loityr123@gmail.com':{name:'이경훈',rank:'이사'},
+    'kit27314320@gmail.com':{name:'김인태',rank:'이사'},
+    // ─ 운영실무자 (운영본부만, 상단 탭바 안 보임) ─
+    'jny1048@gmail.com':{name:'정나영',rank:'본부장'},
+    'careitjoy@gmail.com':{name:'장영주',rank:'팀장'}
+  };
+  // 경영진 = 상단 탭바(opsnav) 노출 대상
+  var EXEC_RANKS=['파운더','대표이사','이사','경영총괄'];
+  window._opsMe=null;
+
+  var CFG={apiKey:"AIzaSyCBDimk0MyGAHf762mvInS_H4K9HkW6Ol0",authDomain:"dashboard-88ba4.firebaseapp.com",projectId:"dashboard-88ba4",storageBucket:"dashboard-88ba4.firebasestorage.app",messagingSenderId:"857535538974",appId:"1:857535538974:web:999d190f28e14964eb4b0f"};
+  function initFb(){ if(window.firebase && firebase.auth){ if(!firebase.apps.length) firebase.initializeApp(CFG); return true; } return false; }
+  function ready(fn){ if(document.readyState!=='loading') fn(); else document.addEventListener('DOMContentLoaded',fn); }
+
+  window.gateLogin=function(){
+    var msg=document.getElementById('gateMsg');
+    if(msg){ msg.className='gate-msg wait'; msg.textContent='로그인 창을 여는 중...'; }
+    try{ var p=new firebase.auth.GoogleAuthProvider(); firebase.auth().signInWithPopup(p).catch(function(e){ if(msg){ msg.className='gate-msg err'; msg.textContent='로그인 실패: '+(e.message||e.code); } }); }
+    catch(e){ if(msg){ msg.className='gate-msg err'; msg.textContent='로그인 오류: '+e.message; } }
+  };
+
+  function gateShow(g){ g.classList.remove('hidden'); g.classList.add('ready'); document.body.style.overflow='hidden'; }
+
+  function sessBar(me){
+    if(document.getElementById('gSessBar')) return;
+    var isF=(me.rank==='파운더');
+    var bar=document.createElement('div'); bar.id='gSessBar';
+    bar.innerHTML='<span class="gs-dot"></span><span>'+(isF?'👑':'🔒')+' <b>'+me.name+(me.rank?(' '+me.rank):'')+'</b> · 보안 세션 활성</span>'
+      +'<button class="gs-out" onclick="try{firebase.auth().signOut();location.reload();}catch(e){}">로그아웃</button>';
+    document.body.appendChild(bar); document.body.classList.add('gate-hasbar');
+  }
+
+  function onPass(me){
+    var g=document.getElementById('authGate'); if(g){ g.classList.add('hidden'); }
+    document.body.style.overflow='';
+    var pg=document.getElementById('__pregate'); if(pg) pg.parentNode.removeChild(pg);
+    try{ sessBar(me); }catch(e){}
+    // ★ 경영진만 상단 탭바(opsnav) 노출
+    var exec=EXEC_RANKS.indexOf(me.rank)>=0;
+    var on=document.getElementById('opsnav');
+    if(on) on.style.display=exec?'':'none';
+    // ★ Firestore 로더 깨우기 (명단 통과 확정 후)
+    try{ document.dispatchEvent(new CustomEvent('opsAuthPassed')); }catch(e){}
+  }
+
+  function check(u){
+    var g=document.getElementById('authGate'), msg=document.getElementById('gateMsg');
+    if(!g){ ready(function(){ check(u); }); return; }
+    if(u && OPS_ALLOW[(u.email||'').toLowerCase()]){
+      window._opsMe=OPS_ALLOW[(u.email||'').toLowerCase()];
+      onPass(window._opsMe);
+    } else if(u){
+      window._opsMe=null;
+      if(msg){ msg.className='gate-msg err'; msg.textContent='접근 권한이 없는 계정입니다 ('+u.email+')'; }
+      gateShow(g);
+      setTimeout(function(){ try{firebase.auth().signOut();}catch(e){} },2500);
+    } else {
+      window._opsMe=null;
+      if(msg){ msg.className='gate-msg'; msg.textContent=''; }
+      gateShow(g);
+    }
+  }
+
+  function boot(){
+    if(!initFb()){ setTimeout(boot,120); return; }
+    firebase.auth().onAuthStateChanged(function(u){ ready(function(){ check(u); }); });
+  }
+  // ★ firebase 로드와 무관하게 게이트 카드 먼저 표시 (로그인 버튼 안 뜨는 것 방지)
+  ready(function(){ var g=document.getElementById('authGate'); if(g && !g.classList.contains('hidden')) g.classList.add('ready'); });
+  boot();
+})();
+</script>
+
 <script>
 /* 운영본부 — Firestore 로더 (gate.js 인증 후 opsData 6문서 읽어 조립)
    프리뷰(window.OPS 주입)면 이 로더는 통째로 스킵. */
@@ -996,9 +1117,11 @@ body.gate-hasbar .tabbar{top:calc(34px + var(--navH,53px))}
   // gate.js가 firebase 초기화·로그인 처리 → 인증(권한통과) 시점에 읽는다.
   function wait(){
     if(window.firebase && firebase.auth){
-      firebase.auth().onAuthStateChanged(function(u){ if(u) load(); });
-      // 이미 세션 복원돼 있으면 즉시 시도
-      if(firebase.auth().currentUser) load();
+      firebase.auth().onAuthStateChanged(function(u){ if(u && window._opsMe) load(); });
+      // ★ 게이트 통과 이벤트로도 깨움 (타이밍 안전장치)
+      document.addEventListener('opsAuthPassed', function(){ load(); });
+      // 이미 세션 복원 + 명단 통과면 즉시 시도
+      if(firebase.auth().currentUser && window._opsMe) load();
     } else { setTimeout(wait,120); }
   }
   wait();
