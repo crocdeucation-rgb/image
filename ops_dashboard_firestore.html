@@ -387,6 +387,23 @@ details[open]>.more::before{content:'▾ '}
 .jd.d em{background:var(--pos)}
 .jd.nx i{background:#fff;border-color:var(--v1);box-shadow:0 0 0 3px var(--v1s)}
 .jd.pl i{background:var(--amber);border-color:var(--amber)}
+.jd.miss i{background:#fff;border:2px dashed #C3CBD9}
+.jd.miss em{background:repeating-linear-gradient(90deg,#DDE3EC 0 3px,transparent 3px 6px)}
+/* 회원카드 여정 타임라인 */
+.jtl{margin:12px 0 2px}
+.ov .card .jtl .stp{display:inline-flex!important;align-items:center;gap:4px;width:auto!important;flex:0 0 auto;max-width:100%}
+.stp.cur{box-shadow:0 0 0 2px var(--v1) inset;font-weight:900}
+.stp.miss{background:#fff;border:1px dashed #C3CBD9;color:var(--mute);font-weight:700;white-space:nowrap}
+.jmiss{font-size:9px;font-weight:800;color:var(--mute);margin-left:4px}
+.jmissln{font-size:11.5px;color:var(--soft);margin:2px 0 0}
+.jmissln b{color:#9A5B06;background:var(--ambers);padding:1px 6px;border-radius:5px;font-weight:800}
+.jonb{font-size:11.5px;color:#3D4759;background:#F6F8FB;border:1px solid var(--line);border-radius:8px;padding:7px 10px;margin-top:8px;line-height:1.6}
+.jonb b{color:var(--soft);font-weight:800;font-size:10.5px}
+.jrbadge{display:inline-block;font-size:11px;font-weight:800;padding:1px 8px;border-radius:6px;margin-left:6px}
+.jrbadge.can{background:var(--reds);color:var(--red)}
+.jrbadge.hold{background:#EEF1F6;color:var(--soft)}
+.jrbadge.absent{background:var(--ambers);color:#9A5B06}
+.jr-miss{display:inline-block;font-size:10px;font-weight:800;color:var(--mute);border:1px dashed #C3CBD9;border-radius:5px;padding:1px 6px;margin-top:3px}
 .jr-r{text-align:right}
 .jr-next{font-size:12px;color:var(--soft);font-weight:700}
 .jr-next b{color:var(--v1);font-weight:800}
@@ -1171,6 +1188,7 @@ body.gate-hasbar{padding-top:34px}
 window.__bootOps=function(){
 (function(){
 var D=window.OPS, EV=D.events||[], IN=D.inbox||[], CO=D.coach||{}, TC=D.teach||{}, STAT=D.stat||{};
+var JBYN={}; (D.journey||[]).forEach(function(j){ JBYN[String(j.n).replace(/\(.*?\)/g,'').replace(/\s/g,'')]=j; }); // 여정 이름맵(클라생성, Firestore 중복 방지)
 var HOL=D.holidays||{}; var TODAY=D.today, DATA=D.dataTo, CUR=TODAY, SEL=null, TAB='all', CARD=null, OPENZ={}, MISS=null, CTAB='live', BR='', Q='';
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function P(s){var a=s.split('-');return new Date(+a[0],+a[1]-1,+a[2]);}
@@ -2202,8 +2220,10 @@ function journeyBox(){
   if(!J.length) return '';
   var STEPS=['해피콜','개통','입학식','첫만남','첫수업'];
   var STEPDESC={'해피콜':'가입 후 첫 통화','개통':'기기·계정 개통','입학식':'OT 시작','첫만남':'담임 첫 대면','첫수업':'정규수업 시작 (여기부터 코칭)'};
-  var onb=J.filter(function(j){return !j.grad && !j.can;});   // 온보딩 진행 중
+  var onb=J.filter(function(j){return !j.grad && !j.can && !j.hold && !j.absent;});   // 온보딩 진행 중(정상 흐름)
   var grad=J.filter(function(j){return j.grad && !j.can;});    // 졸업(코칭 단계)
+  var held=J.filter(function(j){return (j.hold||j.absent) && !j.can;});   // 보류·장기부재(흐름서 분리)
+  var missN=onb.filter(function(j){return j.miss && j.miss.length;}).length; // 수기누락 회원
   var view=window.__jv||'onb';
   // 단계별 대기 집계 (다음 단계 기준)
   var byNext={};onb.forEach(function(j){var k=j.nextStep||'완료';(byNext[k]=byNext[k]||[]).push(j);});
@@ -2230,7 +2250,7 @@ function journeyBox(){
   list.sort(function(a,b){return (b.join||'').localeCompare(a.join||'');});
   var stepDot=function(j){
     return '<div class="jbar">'+STEPS.map(function(s,i){
-      var st=j.steps[i], cls=st.st==='done'?'d':(i===j.topIdx+1?'nx':(st.st==='plan'?'pl':'')); 
+      var st=j.steps[i], cls=st.st==='done'?'d':(st.st==='miss'?'miss':(i===j.topIdx+1?'nx':(st.st==='plan'?'pl':'')));
       return '<span class="jd '+cls+'" title="'+esc(s)+(st.day?' '+md(st.day):'')+'">'+
         '<i></i>'+(i<STEPS.length-1?'<em></em>':'')+'</span>';
     }).join('')+'</div>';
@@ -2253,6 +2273,7 @@ function journeyBox(){
       '<div class="jr-r">'+
         (nx?'<div class="jr-next">다음 <b>'+esc(nx)+'</b></div>':'<div class="jr-next done">온보딩 완료</div>')+
         (stuckTxt?'<div class="jr-stuck">'+stuckTxt+'</div>':'')+
+        (j.miss&&j.miss.length?'<span class="jr-miss" title="뒷단계 기록은 있는데 이 칸이 비어 있음">✎ '+esc(j.miss.join('·'))+' 칸 빔</span>':'')+
         memoTag(j)+
       '</div></div>';
   };
@@ -2264,9 +2285,12 @@ function journeyBox(){
     '<button class="chip'+(NF===''?' on':'')+'" data-jnext="">전체 '+onb.length+'</button>'+
     STEPS.map(function(s){var n=(byNext[s]||[]).length;return n?'<button class="chip'+(NF===s?' on':'')+'" data-jnext="'+esc(s)+'">'+esc(s)+' 대기<span>'+n+'</span></button>':'';}).join('')+
     '</div>' : '';
+  var statusLn=(held.length||missN)?'<div class="jmissln" style="margin:0 0 10px">'+
+    (missN?'<b>✎ 칸 비어있음 '+missN+'명</b> (뒷단계 기록은 있는데 앞 단계 칸이 빔 — 기록 보충 대상) ':'')+
+    (held.length?'<span style="color:var(--soft)">· 보류·장기부재 '+held.length+'명 (흐름서 분리)</span>':'')+'</div>':'';
   return zone('journey','var(--v1)','신규 회원 여정','가입 '+J.length+'명','가입 → 해피콜 → 개통 → 입학식 → 첫만남 → 첫수업 → 코칭',
     '<div class="lead">배달 추적처럼 <b>회원 한 명이 지금 어디까지 왔는지</b>를 봅니다. 색으로 문제를 단정하지 않고 <b>진행 상태와 다음 단계</b>만 보여줍니다 — 가입 시 "다음 달 시작" 같은 약속은 메모로 병기됩니다.</div>'+
-    funnelHtml+churnBar()+tog+nextFilter+listHtml,true);
+    funnelHtml+statusLn+churnBar()+tog+nextFilter+listHtml,true);
 }
 function alertBox(){
   var A=alertData();
@@ -2916,6 +2940,32 @@ function card(name){
     if(!f) return '<span class="stp">'+k+'<em>—</em></span>';
     return '<span class="stp '+k+(f.st==='done'?' done':'')+'">'+k+'<em>'+md(f.day)+(f.time?' '+f.time:'')+'</em>'+(f.st==='miss'?' ✗':'')+'</span>';
   }).join('<span class="arw">›</span>');
+  // ★ 고객여정 통합: 신아라오티+온보딩 실생성 레코드 (있으면 이벤트 flow 대신 풀 타임라인)
+  var JR=JBYN[String(name).replace(/\(.*?\)/g,'').replace(/\s/g,'')];
+  var jtlHtml='', jonbHtml='', jmissHtml='', jrBadge='';
+  if(JR){
+    if(JR.can)       jrBadge='<span class="jrbadge can">당일취소</span>';
+    else if(JR.hold) jrBadge='<span class="jrbadge hold">보류</span>';
+    else if(JR.absent)jrBadge='<span class="jrbadge absent">장기부재</span>';
+    var cells=[{s:'가입',st:'done',day:JR.join}].concat(JR.steps||[]);
+    jtlHtml='<div class="flow jtl">'+cells.map(function(c,idx){
+      var stageCls=(c.s!=='가입'&&c.st!=='miss')?' '+c.s:'';
+      var stCls=c.st==='done'?' done':(c.st==='miss'?' miss':'');
+      var isCur=(idx>0&&(idx-1)===JR.topIdx)?' cur':'';
+      return (idx?'<span class="arw">›</span>':'')+
+        '<span class="stp'+stageCls+stCls+isCur+'">'+c.s+
+        (c.day&&c.st==='done'?'<em>'+md(c.day)+'</em>':'')+
+        (c.st==='miss'?'<span class="jmiss">칸 빔</span>':'')+'</span>';
+    }).join('')+'</div>';
+    if(JR.miss&&JR.miss.length)
+      jmissHtml='<div class="jmissln">기록 안 된 단계 <b>'+esc(JR.miss.join(' · '))+'</b> — 뒷단계 기록은 있는데 이 칸이 비어 있습니다(일이 안 된 게 아니라 기록이 안 된 것).</div>';
+    var mg=JR.mgmt||{}, mgb=[mg.att&&'출석',mg.hw&&'숙제',mg.wr&&'필기/오답',mg.sch&&'스쿨강의'].filter(Boolean);
+    var ob=[];
+    if(JR.rete) ob.push('<b>레테</b> '+esc(JR.rete));
+    if(JR.realDone) ob.push('<b>리얼 완료</b> '+esc(JR.realDone));
+    if(mgb.length) ob.push('<b>관리 기록</b> '+esc(mgb.join(' · ')));
+    if(ob.length) jonbHtml='<div class="jonb">온보딩 &nbsp;'+ob.join(' &nbsp;·&nbsp; ')+'</div>';
+  }
   var his=[];
   if(o.join) his.push([o.join,'가입']);
   E.forEach(function(e){his.push([e.day,e.kind+(e.time?' '+e.time:'')+(e.who?' · '+e.who:'')+(e.st==='miss'?' — 기록 없음':'')]);});
@@ -2926,8 +2976,9 @@ function card(name){
   var stn=STAT[name]; if(stn&&stn.note) notes.push(['어드민',stn.note]);
   var sn=E.map(function(e){return e.note;}).filter(Boolean)[0]; if(sn) notes.push(['오티리스트',sn]);
   if(cm&&cm.note) notes.push(['코칭('+coach+')',cm.note]);
+  if(JR&&JR.noteCoach&&JR.noteCoach!==(cm&&cm.note)) notes.push(['온보딩 코칭',JR.noteCoach]);
   return '<div class="ov" data-close="1"><div class="card"><button class="cls" data-close="1">✕</button>'+
-   '<h3>'+esc(name)+'</h3>'+
+   '<h3>'+esc(name)+jrBadge+'</h3>'+
    '<div class="org" style="margin-top:4px"><b>'+esc(o.br||(cm&&cm.br)||'지점 미확인')+'</b> · 상담 '+esc(o.sang||(cm&&cm.sang)||'—')+
    ' · 사업 '+esc(o.saup||(cm&&cm.saup)||'—')+(coach?' · 코칭 '+esc(coach):'')+
    (o.join?' · 가입 '+md(o.join)+' (D+'+diff(o.join,CUR)+')':'')+
@@ -2935,8 +2986,8 @@ function card(name){
    (cm&&cm.log?'<div class="lead" style="margin:10px 0 0">최근 주차 입력(완료 표기 아님) &nbsp;'+
      (cm.log.tail||[]).map(function(x){return '<span class="mini2'+(x[0]==='done'?' 첫수업':'')+'">'+(x[0]==='done'?(x[1]?md(x[1]):'완료'):esc(x[1]))+'</span>';}).join(' ')+
      ''+'</div>':'')+
-   '<div class="flow" style="margin:14px 0">'+steps+'</div>'+
-   (notes.length?'<div style="border-top:1px solid var(--line);padding-top:10px"><div class="grp" style="margin-top:0">특이사항</div>'+
+   (JR?jtlHtml:'<div class="flow" style="margin:14px 0">'+steps+'</div>')+jmissHtml+jonbHtml+
+   (notes.length?'<div style="border-top:1px solid var(--line);padding-top:10px;margin-top:12px"><div class="grp" style="margin-top:0">특이사항 <span style="font-weight:600;color:var(--mute);font-size:11px">상담·코칭 관점이 다르면 병기</span></div>'+
      notes.map(function(n){return '<div class="hi"><span class="d">'+esc(n[0])+'</span><div class="note">'+hi(n[1])+'</div></div>';}).join('')+'</div>':'')+
    '<div style="border-top:1px solid var(--line);margin-top:12px;padding-top:10px"><div class="grp" style="margin-top:0">이력</div>'+
    his.map(function(h){return '<div class="hi"><span class="d">'+md(h[0])+'</span><div class="note">'+hi(h[1])+'</div></div>';}).join('')+'</div>'+
