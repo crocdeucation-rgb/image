@@ -1607,26 +1607,29 @@ function guardBox(){
   var rows=Object.keys(TM).map(function(k){
     var c=TM[k][G]||{}, p=prev?(TM[k][prev]||{}):{};
     var cl=(c.keep||0)+(c.drop||0);
-    return {k:k,n:c.active,recv:c.mw||0,rr:c.active?pc(c.mw||0,c.active):null,keep:c.keep||0,drop:c.drop||0,dang:c.dang||0,ing:(c.ing||0)+(c.blank||0),
+    var act=CO[k]?CO[k].live.length:null;   // 관리중 = 현재 코칭명단 실파싱 (tm엔 active 없음)
+    return {k:k,n:act,recv:c.mw||0,rr:act?pc(c.mw||0,act):null,keep:c.keep||0,drop:c.drop||0,dang:c.dang||0,ing:(c.ing||0)+(c.blank||0),
       r:cl?pc(c.keep,cl):null,pr:((p.keep||0)+(p.drop||0))?pc(p.keep,(p.keep||0)+(p.drop||0)):null,precv:p.mw||0,
       tr:ms.map(function(m){var z=TM[k][m]||{};var q=(z.keep||0)+(z.drop||0);return {m:m,n:z.mw||0,r:q?pc(z.keep,q):null};})};
   }).filter(function(x){return x.recv||x.precv;});
   rows.sort(SORT==='recv'?function(a,b){return (b.rr||0)-(a.rr||0);}:function(a,b){return (b.r==null?-1:b.r)-(a.r==null?-1:a.r);});
   var bar=function(r,col){return '<div style="display:inline-block;width:44px;height:6px;background:#EEF1F6;border-radius:3px;overflow:hidden;vertical-align:middle;margin-right:6px"><i style="display:block;height:100%;width:'+Math.min(r||0,100)+'%;background:'+col+'"></i></div>';};
-  var mx=Math.max.apply(null,rows.map(function(x){return Math.max.apply(null,x.tr.map(function(t){return t.n;}));}).concat([1]));
+  // 막대·숫자 둘 다 방어율(%)로 통일 — 접수수는 툴팁에만 (이중 인코딩 제거)
   var spark=function(tr){return '<div class="spk">'+tr.map(function(t){
-      var h=Math.max(2,Math.round(t.n/mx*26)), on=t.m===G;
-      return '<span title="'+(+t.m.slice(5))+'월 접수 '+t.n+(t.r!=null?' · 방어율 '+t.r+'%':'')+'"><i style="height:'+h+'px;background:'+(on?'var(--v1)':'#C9D3E6')+'"></i><em>'+(t.r!=null?Math.round(t.r):'·')+'</em></span>';}).join('')+'</div>';};
+      var h=t.r!=null?Math.max(3,Math.round(t.r/100*26)):2, on=t.m===G;
+      var col=t.r==null?'#E3E8F0':(on?'var(--v1)':(t.r>=55?'#9DB8EE':'#C9D3E6'));
+      return '<span title="'+(+t.m.slice(5))+'월 · 접수 '+t.n+(t.r!=null?' · 방어율 '+t.r+'%':' · 결론 없음')+'"><i style="height:'+h+'px;background:'+col+'"></i><em>'+(t.r!=null?Math.round(t.r):'·')+'</em></span>';}).join('')+'</div>';};
+  var spLab=ms.length?((+ms[0].slice(5))+'~'+(+ms[ms.length-1].slice(5))+'월 방어율'):'방어율 추이';
   var sortSeg='<div class="seg" style="margin-bottom:10px"><button class="'+(SORT==='rate'?'on':'')+'" data-gsort="rate">방어율 순</button><button class="'+(SORT==='recv'?'on':'')+'" data-gsort="recv">접수율 순</button></div>';
-  var tbl='<div class="scrollx"><table class="tbl"><thead><tr><th>담당</th><th class="c">접수</th><th class="c">유지</th><th class="c">해지</th><th class="c">당일취소</th><th class="c">진행·미기재</th><th>방어율</th><th class="c">전월</th><th>5~9월 접수 · 방어율</th></tr></thead><tbody>'+
+  var tbl='<div class="scrollx"><table class="tbl"><thead><tr><th>담당</th><th class="c">관리중</th><th class="c">접수</th><th class="c">유지</th><th class="c">해지</th><th>방어율</th><th class="c">전월</th><th>'+spLab+'</th></tr></thead><tbody>'+
    rows.map(function(x){
      var d=(x.r!=null&&x.pr!=null)?Math.round((x.r-x.pr)*10)/10:null;
      var cv=(D.joinCov||{})[x.k];
      return '<tr><td><b>'+esc(x.k)+'</b></td>'+
+      '<td class="c">'+(x.n!=null?x.n:'<span class="z">·</span>')+(x.n&&x.rr!=null?'<div class="org" style="font-weight:600">접수율 '+x.rr+'%</div>':'')+'</td>'+
       '<td class="c"><b>'+x.recv+'</b></td>'+
       '<td class="c" style="color:var(--pos);font-weight:700">'+(x.keep||'<span class="z">·</span>')+'</td>'+
       '<td class="c" style="color:var(--red);font-weight:700">'+(x.drop||'<span class="z">·</span>')+'</td>'+
-      '<td class="c">'+(x.dang||'<span class="z">·</span>')+'</td><td class="c z">'+(x.ing||'·')+'</td>'+
       '<td>'+(x.r==null?'<span class="z">결론 없음</span>':bar(x.r,'var(--pos)')+'<b>'+x.r+'%</b>')+'</td>'+
       '<td class="c" style="white-space:nowrap">'+(x.pr==null?'<span class="z">—</span>':x.pr+'%'+(d?'<div style="font-size:10.5px;font-weight:700;color:'+(d>0?'var(--pos)':'var(--red)')+'">'+(d>0?'▲':'▼')+Math.abs(d)+'</div>':''))+'</td>'+
       '<td>'+spark(x.tr)+'</td></tr>';}).join('')+'</tbody></table></div>';
