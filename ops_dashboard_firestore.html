@@ -874,6 +874,8 @@ details.cgrp[open]{padding-bottom:4px}
 .cb-age{font-size:11px;font-weight:800;color:var(--red);background:#fff;border-radius:5px;padding:1px 7px}
 .cb-bd{font-size:10px;font-weight:800;color:var(--amber);background:#fff;border-radius:4px;padding:1px 6px}
 .cb-bd.cb-red{color:var(--red)}
+.cb-bd.cb-bef{color:#7c3aed;background:#f3e8ff}
+.cb-bd.cb-aft{color:#0369a1;background:#e0f2fe}
 .cb-meta{font-size:11px;font-weight:600;color:var(--soft);line-height:1.35}
 .cb-g{font-size:11px;font-weight:700;color:var(--mute);white-space:nowrap}
 .cb-why{font-size:11.5px;color:var(--ink);margin-top:3px;line-height:1.35;word-break:keep-all}
@@ -2172,12 +2174,21 @@ function _churnLook(name){
 }
 function churnData(){
   var IB=D.inbox||[], risk=[], fresh=[], seenR={}, seenF={};
+  // ★ 회원별 최종(최신 접수) 상태 — 당취 접수 후 재기록으로 '유지'된 케이스(김민우E 등) 정리.
+  //   같은 회원이 당취(진행중)행 + 유지행 둘 다 있으면 최신 결과가 유지 → 철회위험/취소에서 빼야 맞음.
+  var FINAL={};
+  IB.forEach(function(x){ var k=x.name; if(!FINAL[k]||((x.recv||'')>(FINAL[k].recv||''))) FINAL[k]=x; });
+  function jNorm(n){ return String(n==null?'':n).replace(/\(.*?\)/g,'').replace(/\s/g,''); }
   IB.forEach(function(x){
     if(x.status!=='진행중') return;              // 진행중만 (완결·유지=취소섹션)
+    if((FINAL[x.name]||{}).status!=='진행중') return;   // ★ 최종 결과가 유지/완결이면 제외
     var L=_churnLook(x.name), br=L.br||x.br||'';
     if(BR && br!==BR) return;                    // 지점필터
+    var jr=JBYN[jNorm(x.name)]||{};              // 여정(온보딩) 매칭 — 첫수업 전/후 판별
+    var firstDone=(jr.topIdx>=4)||jr.grad===true;
     var base={name:x.name, join:x.join, recv:x.recv, why:x.why, res:x.res,
-              sang:x.sang||L.sang||'', saup:x.saup||L.saup||'', coach:x.teach||L.coach||'', br:br, g:x.grade||L.g||'', absent:x.absent};
+              sang:x.sang||L.sang||'', saup:x.saup||L.saup||'', coach:x.teach||L.coach||'', br:br, g:x.grade||L.g||'', absent:x.absent,
+              firstDone:firstDone, inJourney:!!jr.n};
     // ⚡청약철회: 오늘-가입 ≤14 (법적 데드라인)
     if(x.join){ var sj=diff(x.join,TODAY);
       if(sj>=0&&sj<=14 && !seenR[x.name]){ seenR[x.name]=1; risk.push(Object.assign({dleft:14-sj},base)); } }
@@ -2201,6 +2212,10 @@ function churnBar(){
     var badges='';
     if(mode==='fresh'&&x.isChurn) badges+='<span class="cb-bd">⚡철회</span>';
     if(x.absent) badges+='<span class="cb-bd cb-red">📞부재</span>';
+    // 첫수업 전/후 — 책임 흐름 구분용. 여정에 있는데 첫수업 전이면 '온보딩 단계'(코칭 책임 전)
+    if(x.inJourney){ badges+= x.firstDone
+      ? '<span class="cb-bd cb-aft">▶수업후</span>'
+      : '<span class="cb-bd cb-bef">📘첫수업 전</span>'; }
     var meta=[x.br||'지점 미확인', x.sang?'상담 '+x.sang:'', x.saup?'사업 '+x.saup:'', x.coach?'담임 '+x.coach:''].filter(Boolean).join(' · ');
     return '<button class="cbrow" data-name="'+esc(x.name)+'">'+
       '<div class="cb-top">'+tag+'<b>'+esc(x.name)+'</b>'+(x.g?'<span class="cb-g">'+esc(x.g)+'</span>':'')+badges+'</div>'+
