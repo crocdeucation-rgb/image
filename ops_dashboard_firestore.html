@@ -3039,7 +3039,7 @@ function render(){
   if(TAB==='all'){
     var SEC=[['지금 할 일',[['journey','신규 회원 여정',journeyBox],['week','이번 주 · 다음 주',weekBox]]],
              ['관리 현황',[['exp','관리기간 만료 예정',expBox],['can','취소',canBox],['guard','민원 방어',guardBox]]],
-             ['분석',[['flow','월별 흐름',flowBox],['funnel','월별 진단',funnelBox],['fill','채워야 할 칸',fillBox],['dev','기기 · 설치 트러블',devBox],['data','데이터 상태',dataBox]]]];
+             ['분석',[['flow','월별 흐름',flowBox],['funnel','월별 진단',funnelBox],['fill','채워야 할 칸',fillBox],['dev','기기 · 설치 트러블',devBox]]]];
     var anchor='<div class="anch sticky">'+SEC.map(function(g){
         return '<span class="anch-g">'+g[0]+'</span>'+g[1].map(function(z){return '<button data-anch="'+z[0]+'">'+esc(z[1])+'</button>';}).join('');}).join('<span class="anch-sep"></span>')+'</div>';
     el.innerHTML=anchor+SEC.map(function(g,gi){
