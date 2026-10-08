@@ -2391,10 +2391,6 @@ function trendCharts(){
   var w=(D.mwTrend||[]).filter(function(x){return x.n>5&&x.m<=dm;});
   var P=function(m){return m===dm?part:'';};
   return '<div class="charts">'+
-   combo({title:'기록 누락',barName:'누락 건수',lineName:'누락 비율',barCol:'#F0A23B',lineCol:'#C2410C',
-     fmt:function(v){return (Math.round(v*10)/10)+'%';},
-     data:g.map(function(x){return {lab:(+x.m.slice(5))+'월',bar:x.miss,line:x.miss/x.n*100,part:P(x.m)};}),
-     foot:'첫수업 회원 중 앞 단계 칸 빈 건 · 분모 '+g.map(function(x){return (+x.m.slice(5))+'월 '+x.n;}).join(' · ')})+
    combo({title:'취소',barName:'건수',lineName:'금액(만)',barCol:'#F28B7D',lineCol:'#B42318',
      fmt:function(v){return Math.round(v).toLocaleString('ko-KR')+'만';},
      data:c.map(function(x){return {lab:(+x.m.slice(5))+'월',bar:x.n,line:x.amt/10000,part:P(x.m)};}),
@@ -2506,7 +2502,7 @@ function flowBox(){
   var sec=function(t){return '<tr><td colspan="'+(col.length+1)+'" style="background:#F6F8FB;font-size:11.5px;font-weight:800;color:var(--soft);letter-spacing:.5px"><span class="secl">'+t+'</span></td></tr>';};
   var tbl='<div class="scrollx"><table class="tbl mtbl"><thead><tr>'+th+'</tr></thead><tbody>'+
     sec('회원')+
-    row('신규 가입','join',{tip:'코칭 시트 가입일 기준'})+
+    row('신규 가입','join',{tip:'데일리실적 가입일 기준'})+
     row('관리 만료 도래','exp',{sub:1,tip:'코칭 시트 만료일 기준'})+
     sec('민원 (민원 시트 월 탭)')+
     row('민원 접수','mw',{mw:1,delta:'dn'})+
@@ -2524,7 +2520,7 @@ function flowBox(){
     '</tbody></table></div>';
   return zone('flow','var(--pos)','월별 흐름','','관리 → 민원 → 결과 → 취소를 달마다',
     '<div class="lead">총합은 시점이 섞여 흐름이 안 보여서 <b>달마다</b> 나눕니다. ▲▼는 전월 대비. 민원·취소는 민원 시트 월 탭 기준 — 2~4월은 탭이 없고 1월 탭은 30건만 적혀 있습니다. '+
-    '신규 가입·만료 도래는 코칭 시트에 날짜가 적힌 회원만 셉니다. 월별 관리중 인원은 과거 담임 이력이 시트에 남지 않아 집계하지 않습니다.</div>'+tbl,true);
+    '신규 가입은 데일리실적(총매출·월종결)의 계약(order) 건수, 관리 만료 도래는 코칭 시트 만료일 기준입니다. 월별 관리중 인원은 과거 담임 이력이 시트에 남지 않아 집계하지 않습니다.</div>'+tbl,true);
 }
 /* ── 코칭 탭 ── */
 function mwRes(m){var r=(m.mw&&m.mw.res)||'';return r==='유지'?'유지':((r==='해지'||r==='당취')?'해지':'진행');}
