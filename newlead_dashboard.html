@@ -123,9 +123,10 @@
   .db-row .dv{font-size:12px;font-weight:800;color:var(--green);min-width:28px;text-align:right}
 
   /* PC 2단 가로 배치 — 데이터 적어 3열 대신 2열 */
-  .dash2{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
-  @media(max-width:900px){.dash2{grid-template-columns:1fr;gap:0}}
-  .dash2 .colL,.dash2 .colR{min-width:0}
+  .dash3{display:grid;grid-template-columns:1.4fr 1.4fr 1fr;gap:18px;align-items:start}
+  @media(max-width:1100px){.dash3{grid-template-columns:1fr 1fr;gap:16px}}
+  @media(max-width:900px){.dash3{grid-template-columns:1fr;gap:0}}
+  .dash3 .col{min-width:0}
 
   .note{font-size:11.5px;color:var(--sub);line-height:1.6;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
   .note b{color:var(--ink)}
@@ -161,10 +162,10 @@
   <div class="summary" id="summary"></div>
   <div class="asof-note">유입·방문은 실시간 집계 · <b>광고비만</b> 태평양시간 오후 7시반에 전날까지 반영 (현재 <b class="asof-spend">어제까지</b>) · CPL은 광고비와 기간 맞춰 <b>광고비 집계일 이후 유입 제외</b>(그 유입은 광고비 확정 후 CPL 반영) · 매출은 오더 확정 기준(취소 제외)</div>
 
-  <!-- PC 2단 가로 배치 -->
-  <div class="dash2">
-    <!-- 왼쪽: 퍼널 + 담당자별 -->
-    <div class="colL">
+  <!-- PC 3단 가로 배치 -->
+  <div class="dash3">
+    <!-- 1열: 퍼널 + 담당자별 -->
+    <div class="col">
       <div class="sec fnl">퍼널 전환 <span class="badge" id="fnl-label">이번달 전체</span></div>
       <div class="funnel" id="funnel"><div class="loading">불러오는 중…</div></div>
 
@@ -180,26 +181,29 @@
       </table></div>
     </div>
 
-    <!-- 오른쪽: 캠페인별 + 날짜별유입 + 기간유입 -->
-    <div class="colR">
+    <!-- 2열: 캠페인별 + 기간유입 -->
+    <div class="col">
       <div class="sec camp">캠페인별 <span class="badge">소재 성과 · 광고비</span></div>
       <div class="tbl-wrap"><table id="campaign-tbl">
         <thead><tr><th>캠페인</th><th>DB</th><th>방문</th><th>세팅</th><th>오더</th><th>광고비<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>매출</th></tr></thead>
         <tbody><tr><td colspan="8" class="loading">불러오는 중…</td></tr></tbody>
       </table></div>
 
+      <div class="sec period">기간유입 <span class="badge">담당자별 · 주간 CPL</span></div>
+      <div class="tbl-wrap"><table id="period-tbl">
+        <thead><tr><th>담당자</th><th>오늘</th><th>어제</th><th>주간</th><th>월간</th><th>광고비<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th></tr></thead>
+        <tbody><tr><td colspan="7" class="loading">불러오는 중…</td></tr></tbody>
+      </table></div>
+    </div>
+
+    <!-- 3열: 날짜별 유입 -->
+    <div class="col">
       <div class="sec day">날짜별 유입 <span class="badge" id="cal-title">이번 주</span></div>
       <div class="cal-tabs">
         <button class="on" id="cal-btn-week" onclick="setCalView('week')">주간</button>
         <button id="cal-btn-month" onclick="setCalView('month')">월간</button>
       </div>
       <div class="daybars" id="daybars"><div class="loading">불러오는 중…</div></div>
-
-      <div class="sec period">기간유입 <span class="badge">담당자별 · 주간 CPL</span></div>
-      <div class="tbl-wrap"><table id="period-tbl">
-        <thead><tr><th>담당자</th><th>오늘</th><th>어제</th><th>주간</th><th>월간</th><th>광고비<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th></tr></thead>
-        <tbody><tr><td colspan="7" class="loading">불러오는 중…</td></tr></tbody>
-      </table></div>
     </div>
   </div>
 
