@@ -1,771 +1,557 @@
-// [산출물 ②] "분리캠페인 DB" 독립 스크립트 — 3시트 통합 + 날짜별유입
-//   위치: "아라위키 자동화" 프로젝트 안 파일로 존재 (트리거도 여기서).
-//   ⚠️ 파일 복제 금지 — 같은 프로젝트에 복제하면 var 중복선언으로 전체 죽음.
-//      이 파일 하나가 시트 3개(우혜림/김윤호/장윤호)를 전부 처리.
-//
-//   역할: 메타 네이티브 연동이 각 시트에 꽂는 신규행을
-//         → 통합_NEW 노션(WH_DATABASE_ID)에 저장
-//         → 담당자_P = 시트별 고정 배정 (우혜림/김윤호/장윤호)
-//         → 슬랙 알림 / P열 done 마킹
-//
-//   [2026-10-06] 3시트화 — campaign_name 기반 배정 폐기(시트=담당자 고정).
-//   [2026-10-06] 날짜별유입 추가 — whBuildDashData가 대시보드탭에 '일자별유입' 블록 기록.
-//
-//   ── 시트 컬럼 구조 (0-base, 3개 시트 공통) ──
-//   A(0)id B(1)created_time C(2)ad_id D(3)ad_name E(4)adset_id F(5)adset_name
-//   G(6)campaign_id H(7)campaign_name I(8)form_id J(9)form_name K(10)is_organic
-//   L(11)platform M(12)자녀_학년 N(13)자녀_이름 O(14)phone P(15)lead_status
-// ════════════════════════════════════════════════════════════
-
-var WH_NOTION_TOKEN  = PropertiesService.getScriptProperties().getProperty('NOTION_TOKEN');
-var WH_DATABASE_ID   = PropertiesService.getScriptProperties().getProperty('WH_DATABASE_ID');
-var WH_SLACK_URL     = PropertiesService.getScriptProperties().getProperty('WH_SLACK_WEBHOOK_URL');
-
-// ★ [교차 중복감지 2026-10-07] 기존 통합 노션(1번 DB)도 조회해서 이미 상담했던 번호면 '중복' 표시 + 이전 기록 메모.
-var WH_MASTER_DB_ID  = PropertiesService.getScriptProperties().getProperty('DATABASE_ID'); // 통합 1번 노션
-var WH_CROSS_DEDUPE  = true;   // 교차 중복감지 on/off
-
-// ★ 소스 정의 — 시트 하나 = 담당자 하나 (고정 배정)
-var WH_SOURCES = [
-  { ssId: '1l0H8mY0SHiENr9Mlvnha7WVNAxA-iPQh0AB55eXhFaA', sheet: '공부방법 필기방법 상담신청',  assignee: '우혜림' },
-  { ssId: '10kohj9t_SjUf9sb2COnrrNyl0kEFVOJI1vzbeqRKxak', sheet: '무료 학습컨설팅 신청-copy', assignee: '김윤호' },
-  { ssId: '1dClwuzOJtYm_ULXgbkqNM880aNc42DThn0hzUbJTSL4', sheet: '장윤호 무료학습컨설팅',       assignee: '장윤호' }
-];
-
-var WH_STATUS_DB_ID  = '3b152211-5108-804f-a4a7-c87116b690ce'; // 상태표
-var WH_DONE_COL      = 16;       // P열 = lead_status (1-base)
-
-var _whAssigneeCache = {};
-
-// People 표시이름 → 실제 담당자명 (집계용)
-var WH_PNAME_MAP = { 'sunrim': '우혜림' };
-function whResolvePName_(pname){
-  var n = String(pname || '').trim();
-  return WH_PNAME_MAP[n] || n;
-}
-
-// ════════════════════════════════════════════════════════════
-// 메인 — 1분 트리거. 3개 시트 전부 신규행만 처리.
-// ════════════════════════════════════════════════════════════
-var _whMasterPhones = null;   // ★ 교차중복: 통합 1번 DB 번호셋 (whProcessNewLeads 실행 1회 로드)
-
-function whProcessNewLeads() {
-  // ① 동시 실행 차단 — 트리거가 겹쳐 돌면 즉시 종료 (중복 생성 원천 차단)
-  var lock = LockService.getScriptLock();
-  if (!lock.tryLock(1000)) { Logger.log('whProcessNewLeads: 이미 실행 중 — 이번 호출 스킵'); return; }
-  try {
-    _whAssigneeCache = {};
-    _whMasterPhones = null;
-    var existingPhones = null, existingLeadIds = null;
-    var grand = { success: 0, skip: 0, err: 0, dup: 0 };
-
-    WH_SOURCES.forEach(function(src){
-      try {
-        var ss = SpreadsheetApp.openById(src.ssId);
-        var sheet = ss.getSheetByName(src.sheet);
-        if (!sheet) { Logger.log('[' + src.assignee + '] 시트 없음: ' + src.sheet); return; }
-        var lastRow = sheet.getLastRow();
-        if (lastRow < 2) return;
-
-        var numRows = lastRow - 1;
-        var rows = sheet.getRange(2, 1, numRows, 16).getValues();
-        var assignee = whGetAssignee_(src.assignee);
-
-        for (var i = 0; i < rows.length; i++) {
-          var rowNum = i + 2;
-          var row = rows[i];
-          var doneFlag = String(row[WH_DONE_COL - 1] || '').trim();
-          if (doneFlag === 'done' || doneFlag === 'DONE' || doneFlag === 'SKIP_TEST') { grand.skip++; continue; }
-
-          var data = whParseRow_(row);
-          if (!data.fullName && !data.phone) { sheet.getRange(rowNum, WH_DONE_COL).setValue('SKIP_TEST'); grand.skip++; continue; }
-          if (whIsTestData_(data)) { sheet.getRange(rowNum, WH_DONE_COL).setValue('SKIP_TEST'); grand.skip++; continue; }
-
-          try {
-            if (!existingPhones)  existingPhones  = whBuildPhoneSet_();
-            if (!existingLeadIds) existingLeadIds = whBuildLeadIdSet_();
-
-            // ② lead_id 이미 노션에 있으면 = 이미 생성됨 → done만 찍고 생성 skip (겹친 실행 2번째 차단)
-            var lid = whStripPrefix_(data.leadId);
-            if (lid && existingLeadIds[lid]) {
-              sheet.getRange(rowNum, WH_DONE_COL).setValue('done');
-              grand.dup++;
-              continue;
-            }
-
-            whSendToNotion_(data, existingPhones, assignee);
-            if (lid) existingLeadIds[lid] = 1;                 // 같은 실행 내 재중복 방지
-            sheet.getRange(rowNum, WH_DONE_COL).setValue('done');
-            grand.success++;
-            try { whSendSlack_(data, assignee, src.assignee); } catch (e1) { Logger.log('슬랙 실패(무시): ' + e1); }
-            Utilities.sleep(400);
-          } catch (e) {
-            Logger.log('[' + src.assignee + '] 행 ' + rowNum + ' 에러: ' + e.toString());
-            sheet.getRange(rowNum, WH_DONE_COL).setValue('ERROR: ' + e.toString().substring(0, 80));
-            grand.err++;
-            Utilities.sleep(500);
-          }
-        }
-      } catch (err) {
-        Logger.log('[' + src.assignee + '] 시트 처리 에러: ' + err.toString());
-      }
-    });
-
-    Logger.log('whProcessNewLeads 완료 — 성공:' + grand.success + ' 중복skip:' + grand.dup + ' 스킵:' + grand.skip + ' 에러:' + grand.err);
-  } finally {
-    lock.releaseLock();
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>신규 리드 현황 — 분리 캠페인</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  :root{
+    --ink:#1a2332; --sub:#6b7688; --line:#e8edf4; --bg:#f6f8fb; --card:#fff;
+    --blue:#2563eb; --teal:#0891b2; --amber:#d97706; --green:#0f9d58; --red:#e11d48; --purple:#7c3aed;
+    box-sizing:border-box;
   }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Pretendard',system-ui,sans-serif}
+  body{background:var(--bg);color:var(--ink);padding:18px 14px 60px;letter-spacing:-.2px}
+  .wrap{max-width:1500px;margin:0 auto}
+
+  .head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:3px}
+  .head h1{font-size:19px;font-weight:800;letter-spacing:-.5px}
+  .head .tag{font-size:11px;font-weight:700;color:var(--blue);background:#eaf1fe;padding:3px 10px;border-radius:20px}
+  .updated{font-size:11.5px;color:var(--sub);margin-bottom:14px}
+  .updated .asof{color:var(--blue);font-weight:700;background:#eaf1fe;padding:1px 7px;border-radius:5px}
+  .refresh{font-size:11.5px;color:var(--blue);background:none;border:1px solid var(--line);border-radius:6px;padding:3px 10px;cursor:pointer;margin-left:auto}
+
+  /* 요약 카드 */
+  .summary{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-bottom:16px}
+  @media(max-width:760px){.summary{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:460px){.summary{grid-template-columns:repeat(2,1fr)}}
+  .scard{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:12px 14px;text-align:center}
+  .scard .l{font-size:11px;color:var(--sub);font-weight:600;margin-bottom:4px}
+  .scard .v{font-size:21px;font-weight:800;letter-spacing:-.8px}
+  .scard.db .v{color:var(--blue)} .scard.visit .v{color:var(--teal)} .scard.order .v{color:var(--green)}
+  .scard.sales .v{color:var(--purple)} .scard.cpl .v{color:var(--amber)}
+  .scard.today .v{color:var(--green)} .scard.yday .v{color:#ea580c} .scard.week .v{color:var(--teal)}
+  /* 날짜별 유입 주간/월간 토글 */
+  .cal-tabs{display:flex;gap:5px;margin-bottom:8px}
+  .cal-tabs button{padding:4px 13px;font-size:11px;font-weight:700;border-radius:7px;border:1px solid var(--line);background:#fff;color:var(--sub);cursor:pointer}
+  .cal-tabs button.on{background:var(--green);color:#fff;border-color:var(--green)}
+  /* 월간 달력 히트맵 */
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+  .cal-dow{font-size:9px;color:var(--sub);font-weight:700;text-align:center;padding:2px 0}
+  .cal-cell{aspect-ratio:1;border-radius:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+  .cal-cell.empty{background:transparent}
+  .cal-cell.today{outline:2px solid var(--green);outline-offset:-2px}
+  .cal-cell .cd{font-size:8px;color:#94a3b8;position:absolute;top:2px;left:3px}
+  .cal-cell .cv{font-size:12px;font-weight:800}
+  .cal-legend{display:flex;align-items:center;gap:3px;justify-content:flex-end;font-size:9px;color:var(--sub);margin-top:7px}
+  .cal-legend .lg{display:inline-block;width:11px;height:11px;border-radius:3px}
+  .scard .v span{font-size:12px;font-weight:700;color:var(--sub)}
+  .scard .sub{font-size:10px;color:#9aa3b0;font-weight:600;margin-top:2px}
+
+  /* 2열 레이아웃 */
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+  @media(max-width:900px){.cols{grid-template-columns:1fr}}
+  .block{min-width:0}
+
+  .sec{font-size:13.5px;font-weight:800;color:var(--ink);margin:0 0 9px;padding-left:9px;border-left:3px solid var(--blue);display:flex;align-items:center;gap:7px}
+  .sec.camp{border-left-color:var(--amber)} .sec.fnl{border-left-color:var(--teal)} .sec.day{border-left-color:var(--green)} .sec.period{border-left-color:var(--purple)}
+  .sec .badge{font-size:9px;font-weight:700;color:var(--sub);background:#eef2f7;padding:2px 7px;border-radius:7px}
+
+  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:11px;margin-bottom:18px;background:var(--card)}
+  table{width:100%;border-collapse:collapse;background:var(--card);font-size:12px}
+  thead th{background:#f0f4fa;color:var(--sub);font-weight:700;padding:8px 6px;text-align:center;white-space:nowrap;font-size:11px}
+  thead th:first-child{text-align:left;padding-left:12px}
+  tbody td{padding:9px 6px;text-align:center;border-top:1px solid var(--line);white-space:nowrap}
+  tbody td:first-child{text-align:left;padding-left:12px;font-weight:700}
+  tbody tr.total{background:#fafbff;font-weight:800}
+  tbody tr.total td{border-top:2px solid #dde6f5}
+  .num{font-variant-numeric:tabular-nums}
+  .db{color:var(--blue);font-weight:700} .visit{color:var(--teal)} .setting{color:var(--blue)}
+  .order{color:var(--green);font-weight:700} .cancel{color:var(--red)}
+  .sales{color:var(--purple);font-weight:700} .spend{color:#6b7280} .cpl{color:var(--amber);font-weight:600}
+  .rate{font-size:9px;color:#9aa3b0;font-weight:600;margin-left:1px}
+  .roas{font-weight:800} .roas.good{color:var(--green)} .roas.bad{color:var(--red)} .roas.none{color:#c2c8d2}
+  .who{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+  .who.woo{background:var(--green)} .who.jang{background:var(--amber)} .who.kim{background:var(--blue)}
+
+  /* 기준일 뱃지 + 안내문 */
+  .asof-badge{display:inline-block;font-size:10px;font-weight:800;color:#fff;background:var(--teal);border-radius:8px;padding:2px 9px;margin-left:4px;letter-spacing:-.2px}
+  .asof-note{font-size:11px;color:var(--sub);font-weight:600;margin:-6px 0 16px;line-height:1.5}
+  .asof-note b{color:var(--teal);font-weight:800}
+
+  /* 순위 정렬 탭 */
+  .rank-tabs{display:flex;gap:5px;margin-bottom:8px}
+  .rank-tabs button{padding:4px 11px;font-size:11px;font-weight:700;border-radius:7px;border:1px solid var(--line);background:#fff;color:var(--sub);cursor:pointer}
+  .rank-tabs button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+  .rk{font-weight:800;font-size:13px} .rk .mv{font-size:9px;font-weight:700;margin-left:2px}
+  .rk .up{color:var(--green)} .rk .down{color:var(--red)} .rk .same{color:#c2c8d2}
+
+  /* 모바일 담당자/캠페인 탭 전환 (PC는 2열 그대로) */
+  .block-tabs{display:none;gap:6px;margin-bottom:10px}
+  .block-tabs button{flex:1;padding:8px 0;font-size:12.5px;font-weight:700;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--sub);cursor:pointer}
+  .block-tabs button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+  @media(max-width:900px){
+    .block-tabs{display:flex}
+    .cols{display:block}
+    .block.bk-camp{display:none}
+    .cols.show-camp .block.bk-assignee{display:none}
+    .cols.show-camp .block.bk-camp{display:block}
+    .block .sec{display:none}   /* 탭이 제목 역할 */
+  }
+
+  /* 퍼널 깔때기 */
+  .funnel{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:14px;margin-bottom:18px}
+  .fn-row{display:flex;align-items:center;gap:10px;padding:6px 0}
+  .fn-row .fl{font-size:11.5px;font-weight:700;color:var(--sub);min-width:46px}
+  .fn-row .fbar{flex:1;height:22px;background:#f0f4fa;border-radius:6px;overflow:hidden;position:relative}
+  .fn-row .fbar>span{display:block;height:100%;border-radius:6px}
+  .fn-row.s0 .fbar>span{background:linear-gradient(90deg,#60a5fa,#2563eb)}
+  .fn-row.s1 .fbar>span{background:linear-gradient(90deg,#22d3ee,#0891b2)}
+  .fn-row.s2 .fbar>span{background:linear-gradient(90deg,#4ade80,#0f9d58)}
+  .fn-row.s3 .fbar>span{background:linear-gradient(90deg,#34d399,#059669)}
+  .fn-row .fv{font-size:13px;font-weight:800;min-width:66px;text-align:right}
+  .fn-row .fp{font-size:10px;color:#9aa3b0;font-weight:600;min-width:42px;text-align:right}
+
+  /* 일자별 유입 막대 */
+  .daybars{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:14px;margin-bottom:18px}
+  .db-row{display:flex;align-items:center;gap:9px;padding:4px 0}
+  .db-row .dl{font-size:11px;color:var(--sub);font-weight:600;min-width:52px}
+  .db-row .dbar{flex:1;height:16px;background:#f0f4fa;border-radius:5px;overflow:hidden}
+  .db-row .dbar>span{display:block;height:100%;background:linear-gradient(90deg,#86efac,#0f9d58);border-radius:5px}
+  .db-row.today .dl{color:var(--green);font-weight:800}
+  .db-row .dv{font-size:12px;font-weight:800;color:var(--green);min-width:28px;text-align:right}
+
+  /* PC 2단 가로 배치 — 데이터 적어 3열 대신 2열 */
+  .dash3{display:grid;grid-template-columns:1.4fr 1.4fr 1fr;gap:18px;align-items:start}
+  @media(max-width:1100px){.dash3{grid-template-columns:1fr 1fr;gap:16px}}
+  @media(max-width:900px){.dash3{grid-template-columns:1fr;gap:0}}
+  .dash3 .col{min-width:0}
+
+  .note{font-size:11.5px;color:var(--sub);line-height:1.6;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .note b{color:var(--ink)}
+  .loading{text-align:center;color:var(--sub);padding:30px;font-size:12.5px}
+
+  /* ── 모바일: 표 가로 스크롤 + 축소 (대시보드 모바일 방식) ── */
+  @media(max-width:620px){
+    body{padding:12px 10px 48px}
+    .head h1{font-size:17px}
+    .sec{font-size:12.5px}
+    thead th{font-size:10px;padding:7px 4px}
+    tbody td{padding:8px 5px;font-size:11px}
+    tbody td:first-child{padding-left:9px}
+    #assignee-tbl{min-width:560px}   /* 10컬럼 — 가로 스크롤 */
+    #campaign-tbl{min-width:470px}   /* 8컬럼 */
+    #period-tbl{min-width:430px}     /* 7컬럼 */
+    .summary{gap:7px}
+    .scard{padding:10px 8px}
+    .scard .v{font-size:18px}
+    .funnel,.daybars{padding:12px 10px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <h1>신규 리드 현황</h1>
+    <span class="tag">분리 캠페인 · 공부방법·필기방법</span>
+    <button class="refresh" onclick="load()">새로고침</button>
+  </div>
+  <div class="updated" id="updated">불러오는 중…</div>
+
+  <div class="summary" id="summary"></div>
+  <div class="asof-note">유입·방문은 실시간 집계 · <b>광고비만</b> 태평양시간 오후 7시반에 전날까지 반영 (현재 <b class="asof-spend">어제까지</b>) · CPL은 광고비와 기간 맞춰 <b>광고비 집계일 이후 유입 제외</b>(그 유입은 광고비 확정 후 CPL 반영) · 매출은 오더 확정 기준(취소 제외)</div>
+
+  <!-- PC 3단 가로 배치 -->
+  <div class="dash3">
+    <!-- 1열: 퍼널 + 담당자별 -->
+    <div class="col">
+      <div class="sec fnl">퍼널 전환 <span class="badge" id="fnl-label">이번달 전체</span></div>
+      <div class="funnel" id="funnel"><div class="loading">불러오는 중…</div></div>
+
+      <div class="sec">담당자별 <span class="badge">순위</span></div>
+      <div class="rank-tabs" id="rank-tabs">
+        <button class="on" data-sort="db" onclick="setRankSort('db')">DB순</button>
+        <button data-sort="visit" onclick="setRankSort('visit')">방문순</button>
+        <button data-sort="order" onclick="setRankSort('order')">오더순</button>
+      </div>
+      <div class="tbl-wrap"><table id="assignee-tbl">
+        <thead><tr><th>순위</th><th>담당자</th><th>DB</th><th>방문</th><th>세팅</th><th>오더</th><th>매출</th><th>광고비<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>ROAS</th></tr></thead>
+        <tbody><tr><td colspan="10" class="loading">불러오는 중…</td></tr></tbody>
+      </table></div>
+    </div>
+
+    <!-- 2열: 캠페인별 + 기간유입 -->
+    <div class="col">
+      <div class="sec camp">캠페인별 <span class="badge">소재 성과 · 광고비</span></div>
+      <div class="tbl-wrap"><table id="campaign-tbl">
+        <thead><tr><th>캠페인</th><th>DB</th><th>방문</th><th>세팅</th><th>오더</th><th>광고비<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>매출</th></tr></thead>
+        <tbody><tr><td colspan="8" class="loading">불러오는 중…</td></tr></tbody>
+      </table></div>
+
+      <div class="sec period">기간유입 <span class="badge">담당자별 · 주간 CPL</span></div>
+      <div class="tbl-wrap"><table id="period-tbl">
+        <thead><tr><th>담당자</th><th>오늘</th><th>어제</th><th>주간</th><th>월간</th><th>광고비<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th></tr></thead>
+        <tbody><tr><td colspan="7" class="loading">불러오는 중…</td></tr></tbody>
+      </table></div>
+    </div>
+
+    <!-- 3열: 날짜별 유입 -->
+    <div class="col">
+      <div class="sec day">날짜별 유입 <span class="badge" id="cal-title">이번 주</span></div>
+      <div class="cal-tabs">
+        <button class="on" id="cal-btn-week" onclick="setCalView('week')">주간</button>
+        <button id="cal-btn-month" onclick="setCalView('month')">월간</button>
+      </div>
+      <div class="daybars" id="daybars"><div class="loading">불러오는 중…</div></div>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>광고비 기준:</b> 메타는 전날 자정까지 데이터가 다음날 오후 7시에 확정됩니다. 당일 리드는 광고비 미반영이라 ROAS는 참고용입니다 · <b>캠페인별 광고비</b>는 메타 소재(ad)별 실집행을 캠페인명으로 매칭 · <b>매출:</b> 오더 확정 기준 (취소 제외) · <b>소재=담당자</b> 1:1 고정 배정
+  </div>
+</div>
+
+<script>
+var GVIZ = 'https://docs.google.com/spreadsheets/d/1l0H8mY0SHiENr9Mlvnha7WVNAxA-iPQh0AB55eXhFaA/gviz/tq?tqx=out:csv&headers=0&sheet=' + encodeURIComponent('대시보드');
+
+function parseCSV(text){
+  return text.trim().split('\n').map(function(line){
+    var out=[],cur='',q=false;
+    for(var i=0;i<line.length;i++){var c=line[i];
+      if(c==='"'){q=!q;} else if(c===','&&!q){out.push(cur.trim());cur='';} else cur+=c;}
+    out.push(cur.trim());return out;
+  });
 }
-
-function whParseRow_(row) {
-  return {
-    leadId:       whStripPrefix_(row[0]),
-    createdTime:  String(row[1] || '').trim(),
-    adName:       String(row[3] || '').trim(),
-    adsetName:    String(row[5] || '').trim(),
-    campaignName: String(row[7] || '').trim(),
-    formId:       whStripPrefix_(row[8]),
-    platform:     String(row[11] || '').trim(),
-    grade:        String(row[12] || '').trim(),
-    fullName:     String(row[13] || '').trim(),
-    phone:        String(row[14] || '').trim()
-  };
+function won(n){ n=Number(n)||0; if(n<=0)return '0'; if(n>=10000)return (Math.round(n/1000)/10).toLocaleString()+'만'; return n.toLocaleString(); }
+function wonSp(n){ n=Number(n)||0; if(n<=0)return '0'; return (n/10000).toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:1})+'만'; }
+function whoClass(name){ return name.indexOf('우혜림')>=0?'woo':name.indexOf('장윤호')>=0?'jang':name.indexOf('김윤호')>=0?'kim':''; }
+function roasCell(v){ if(v===''||v==null||v==='-')return '<span class="roas none">-</span>'; var n=parseFloat(v); if(!n) return '<span class="roas none">-</span>'; var cls=n>=1?'good':'bad'; return '<span class="roas '+cls+'">'+v+'</span>'; }
+// "0 (0%)" → 숫자 + % 작게
+function fnl(cell){
+  var s=String(cell==null?'':cell);
+  var m=s.match(/^(\d+)\s*\(([^)]+)\)$/);
+  if(m) return m[1]+'<span class="rate">('+m[2]+')</span>';
+  return s||'0';
 }
-
-function whIsTestData_(data) {
-  var name = String(data.fullName || '').toLowerCase();
-  var phone = String(data.phone || '').toLowerCase();
-  return name.indexOf('test') !== -1 || name.indexOf('dummy') !== -1 ||
-         name.indexOf('<test') !== -1 || phone.indexOf('test') !== -1 ||
-         phone.indexOf('dummy') !== -1;
+function numOf(cell){ var m=String(cell||'').match(/^(\d+)/); return m?parseInt(m[1],10):0; }
+// ── 날짜별 유입 (주간/월간 토글) ──
+var _calDaily={}, _calView='week';
+function setCalView(v){
+  _calView=v;
+  var bw=document.getElementById('cal-btn-week'), bm=document.getElementById('cal-btn-month');
+  if(bw) bw.classList.toggle('on', v==='week');
+  if(bm) bm.classList.toggle('on', v==='month');
+  renderCalendar();
 }
+function renderCalendar(){
+  var body=document.getElementById('daybars'), title=document.getElementById('cal-title');
+  if(!body) return;
+  var d=_calDaily||{};
+  var now=new Date();
+  var _ymd=function(dt){return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');};
+  var todayKey=_ymd(now);
+  var vals=Object.keys(d).map(function(k){return d[k];}); var mx=1; vals.forEach(function(v){if(v>mx)mx=v;});
+  var color=function(v){ if(!v) return '#f3f4f6'; var t=Math.min(v/mx,1); return 'rgba(15,157,88,'+(0.15+t*0.8).toFixed(2)+')'; };
+  var fg=function(v){ return v>mx*0.55?'#fff':'#333'; };
 
-function whSendToNotion_(data, existingPhones, assignee) {
-  var isoDate;
-  try {
-    var d = (data.createdTime instanceof Date) ? data.createdTime : new Date(data.createdTime);
-    isoDate = isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
-  } catch (e) { isoDate = new Date().toISOString(); }
-
-  var cleanPhone = whFormatPhone_(data.phone).replace(/-/g, '').trim();
-  var existing = existingPhones[cleanPhone];
-
-  // ★ [교차 중복감지] 통합 1번 DB도 조회 — 거기 있던 번호면 중복 + 이전 상담 메모
-  if (_whMasterPhones === null) _whMasterPhones = whBuildMasterPhoneSet_();
-  var crossHit = (_whMasterPhones && _whMasterPhones[cleanPhone]) ? _whMasterPhones[cleanPhone] : null;
-
-  var isDup = (existing && existing.count > 0) || !!crossHit;
-  var status = isDup ? '중복' : '신규';
-  var memoText = crossHit ? whBuildCrossMemo_(crossHit) : '';
-
-  var payload = {
-    parent: { database_id: WH_DATABASE_ID },
-    properties: {
-      '이름':     { title: [{ text: { content: data.fullName || '미입력' } }] },
-      '신청일':   { date: { start: isoDate } },
-      '연락처':   { rich_text: [{ text: { content: whFormatPhone_(data.phone) } }] },
-      '리드출처': { select: { name: '아라위키' } },
-      '상태':     { select: { name: status } },
-      '캠페인':   { rich_text: [{ text: { content: data.adName || '' } }] },
-      '소스':     { rich_text: [{ text: { content: 'meta_ad' } }] },
-      '유입경로': { select: { name: whConvertPlatform_(data.platform) } },
-      '리드ID':   { rich_text: [{ text: { content: data.leadId || '' } }] }
+  if(_calView==='month'){
+    if(title) title.textContent=(now.getMonth()+1)+'월';
+    var y=now.getFullYear(), m=now.getMonth();
+    var first=new Date(y,m,1), startDow=(first.getDay()+6)%7;
+    var days=new Date(y,m+1,0).getDate();
+    var dows=['월','화','수','목','금','토','일'];
+    var h='<div class="cal-grid">'+dows.map(function(x){return '<div class="cal-dow">'+x+'</div>';}).join('');
+    for(var i=0;i<startDow;i++) h+='<div class="cal-cell empty"></div>';
+    for(var dd=1;dd<=days;dd++){
+      var key=y+'-'+String(m+1).padStart(2,'0')+'-'+String(dd).padStart(2,'0');
+      var v=d[key]||0;
+      h+='<div class="cal-cell'+(key===todayKey?' today':'')+'" style="background:'+color(v)+'"><span class="cd">'+dd+'</span><span class="cv" style="color:'+fg(v)+'">'+(v||'')+'</span></div>';
     }
-  };
-  if (memoText) payload.properties['내용'] = { rich_text: [{ text: { content: memoText } }] };
-  var mappedGrade = whMapGrade_(data.grade);
-  if (mappedGrade) payload.properties['학년'] = { select: { name: mappedGrade } };
-  if (assignee && assignee.id) {
-    payload.properties['담당자_P'] = { people: [{ id: assignee.id }] };
-  }
-
-  var response = UrlFetchApp.fetch('https://api.notion.com/v1/pages', {
-    method: 'post', contentType: 'application/json',
-    headers: { 'Authorization': 'Bearer ' + WH_NOTION_TOKEN, 'Notion-Version': '2022-06-28' },
-    payload: JSON.stringify(payload), muteHttpExceptions: true
-  });
-  if (response.getResponseCode() !== 200) {
-    throw new Error('노션 응답 오류: ' + response.getContentText().substring(0, 200));
-  }
-  whTouchPhone_(existingPhones, cleanPhone);
-}
-
-function whGetAssignee_(name) {
-  if (!name) return null;
-  if (_whAssigneeCache[name]) return _whAssigneeCache[name];
-  try {
-    var r = UrlFetchApp.fetch('https://api.notion.com/v1/databases/' + WH_STATUS_DB_ID + '/query', {
-      method: 'post', contentType: 'application/json',
-      headers: { 'Authorization': 'Bearer ' + WH_NOTION_TOKEN, 'Notion-Version': '2022-06-28' },
-      payload: JSON.stringify({ page_size: 50, filter: { property: '이름', title: { equals: name } } }),
-      muteHttpExceptions: true
-    });
-    var res = JSON.parse(r.getContentText()).results || [];
-    if (!res.length) { Logger.log('상태표에 ' + name + ' 없음'); return null; }
-    var p = res[0].properties;
-    var ppl = (p['사람'] && p['사람'].people) ? p['사람'].people : [];
-    var slack = '';
-    if (p['슬랙ID'] && p['슬랙ID'].rich_text) p['슬랙ID'].rich_text.forEach(function(t){ slack += t.plain_text; });
-    var obj = { id: ppl.length ? ppl[0].id : null, slack: slack.trim(), name: name };
-    _whAssigneeCache[name] = obj;
-    return obj;
-  } catch (e) { Logger.log('whGetAssignee_ 에러: ' + e.toString()); return null; }
-}
-
-function whSendSlack_(data, assignee, assigneeNameFallback) {
-  if (!WH_SLACK_URL) return;
-  var name  = data.fullName || '-';
-  var phone = whFormatPhone_(data.phone) || '-';
-  var grade = whMapGrade_(data.grade) || data.grade || '-';
-  var adName = data.adName || '-';
-  var assigneeName = (assignee && assignee.name) ? assignee.name : (assigneeNameFallback || '미배정');
-  var mention = (assignee && assignee.slack) ? ' <@' + assignee.slack + '>' : '';
-  var timeStr = '';
-  try { var d = new Date(data.createdTime); if (!isNaN(d.getTime())) timeStr = Utilities.formatDate(d, 'Asia/Seoul', 'MM/dd HH:mm'); } catch(e) {}
-
-  var message = {
-    text: '📝 분리캠페인 신규 리드! (담당 ' + assigneeName + ')',
-    blocks: [
-      { type: 'header', text: { type: 'plain_text', text: '📝 신규 리드 — ' + assigneeName + ' 담당', emoji: true } },
-      { type: 'section', fields: [
-        { type: 'mrkdwn', text: '*👤 이름:*\n' + name },
-        { type: 'mrkdwn', text: '*📱 전화:*\n' + phone },
-        { type: 'mrkdwn', text: '*🎓 학년:*\n' + grade },
-        { type: 'mrkdwn', text: '*🎨 소재:*\n' + adName }
-      ]},
-      { type: 'section', text: { type: 'mrkdwn', text: '담당 →' + mention + ' · 즉시 콜백 부탁드립니다!' } },
-      { type: 'context', elements: [{ type: 'mrkdwn', text: '⏰ ' + timeStr }] }
-    ]
-  };
-  UrlFetchApp.fetch(WH_SLACK_URL, { method: 'post', contentType: 'application/json', payload: JSON.stringify(message), muteHttpExceptions: true });
-}
-
-// 중복체크 (통합_NEW 내에서만). ※A안(1번 노션 교차조회)은 다음 세션.
-function whBuildPhoneSet_() {
-  var map = {};
-  var hasMore = true, startCursor = null;
-  while (hasMore) {
-    var body = { page_size: 100, sorts: [{ property: '신청일', direction: 'ascending' }] };
-    if (startCursor) body.start_cursor = startCursor;
-    var response = UrlFetchApp.fetch('https://api.notion.com/v1/databases/' + WH_DATABASE_ID + '/query', {
-      method: 'post', contentType: 'application/json',
-      headers: { 'Authorization': 'Bearer ' + WH_NOTION_TOKEN, 'Notion-Version': '2022-06-28' },
-      payload: JSON.stringify(body), muteHttpExceptions: true
-    });
-    var data = JSON.parse(response.getContentText());
-    if (data.results) {
-      for (var i = 0; i < data.results.length; i++) {
-        var props = data.results[i].properties;
-        var phoneProp = props['연락처'];
-        if (!phoneProp || !phoneProp.rich_text || !phoneProp.rich_text.length) continue;
-        var phone = phoneProp.rich_text[0].plain_text.replace(/[^0-9]/g, '').trim();
-        if (!phone) continue;
-        if (!map[phone]) map[phone] = { count: 0 };
-        map[phone].count++;
-      }
+    h+='</div><div class="cal-legend">적음 <span class="lg" style="background:'+color(1)+'"></span><span class="lg" style="background:'+color(Math.round(mx*0.5))+'"></span><span class="lg" style="background:'+color(mx)+'"></span> 많음</div>';
+    body.innerHTML=h;
+  } else {
+    if(title) title.textContent='이번 주';
+    function startOfWeek(dt){var x=new Date(dt.getFullYear(),dt.getMonth(),dt.getDate());var dow=x.getDay();x.setDate(x.getDate()-(dow===0?6:dow-1));return x;}
+    var ws=startOfWeek(now);
+    var dowNames=['월','화','수','목','금','토','일'];
+    var days=[];
+    for(var k=0;k<7;k++){
+      var dk=new Date(ws); dk.setDate(ws.getDate()+k);
+      var key=_ymd(dk);
+      days.push({ dow:dowNames[k], md:(dk.getMonth()+1)+'/'+dk.getDate(), val:(d[key]||0), today:(key===todayKey) });
     }
-    hasMore = data.has_more;
-    startCursor = data.next_cursor;
-    Utilities.sleep(300);
-  }
-  return map;
-}
-
-/** ★ 신규 퍼널 DB 의 리드ID 셋 (중복 생성 차단용). 리드ID 속성 전수 로드 */
-function whBuildLeadIdSet_() {
-  var set = {};
-  var hasMore = true, startCursor = null;
-  while (hasMore) {
-    var body = { page_size: 100 };
-    if (startCursor) body.start_cursor = startCursor;
-    var res = UrlFetchApp.fetch('https://api.notion.com/v1/databases/' + WH_DATABASE_ID + '/query', {
-      method: 'post', contentType: 'application/json',
-      headers: { 'Authorization': 'Bearer ' + WH_NOTION_TOKEN, 'Notion-Version': '2022-06-28' },
-      payload: JSON.stringify(body), muteHttpExceptions: true
+    var wmx=1; days.forEach(function(x){if(x.val>wmx)wmx=x.val;});
+    var h='';
+    days.forEach(function(x){
+      h+='<div class="db-row'+(x.today?' today':'')+'"><span class="dl">'+x.dow+' '+x.md+(x.today?' ·오늘':'')+'</span>'
+        +'<span class="dbar"><span style="width:'+Math.round(x.val/wmx*100)+'%"></span></span>'
+        +'<span class="dv">'+x.val+'</span></div>';
     });
-    var data = JSON.parse(res.getContentText());
-    (data.results || []).forEach(function(pg){
-      var p = pg.properties['리드ID'];
-      if (p && p.rich_text && p.rich_text[0]) {
-        var lid = p.rich_text[0].plain_text.replace(/^[a-z]+:/i, '').trim();
-        if (lid) set[lid] = 1;
-      }
-    });
-    hasMore = data.has_more;
-    startCursor = data.next_cursor;
-    Utilities.sleep(300);
+    body.innerHTML=h;
   }
-  return set;
-}
-// ★ [교차 중복감지] 통합 1번 노션 번호셋 — 번호→{상담날짜·내용·담당·상태}. whProcessNewLeads 1회 로드.
-function whBuildMasterPhoneSet_() {
-  var map = {};
-  if (!WH_CROSS_DEDUPE || !WH_MASTER_DB_ID) return map;
-  try {
-    var hasMore = true, cursor = null, loops = 0;
-    while (hasMore && loops < 60) {
-      loops++;
-      var body = { page_size: 100, sorts: [{ property: '신청일', direction: 'ascending' }] };
-      if (cursor) body.start_cursor = cursor;
-      var res = UrlFetchApp.fetch('https://api.notion.com/v1/databases/' + WH_MASTER_DB_ID + '/query', {
-        method: 'post', contentType: 'application/json',
-        headers: { 'Authorization': 'Bearer ' + WH_NOTION_TOKEN, 'Notion-Version': '2022-06-28' },
-        payload: JSON.stringify(body), muteHttpExceptions: true
-      });
-      if (res.getResponseCode() !== 200) { Logger.log('[교차중복] 통합DB 조회 실패 ' + res.getResponseCode()); break; }
-      var data = JSON.parse(res.getContentText());
-      (data.results || []).forEach(function(page){
-        var props = page.properties;
-        var pp = props['연락처'];
-        if (!pp || !pp.rich_text || !pp.rich_text.length) return;
-        var phone = pp.rich_text[0].plain_text.replace(/[^0-9]/g, '').trim();
-        if (!phone) return;
-        var signupDate = '';
-        if (props['신청일'] && props['신청일'].date && props['신청일'].date.start) {
-          try { signupDate = Utilities.formatDate(new Date(props['신청일'].date.start), 'Asia/Seoul', 'M/d'); } catch(e){}
-        }
-        var content = '';
-        if (props['내용'] && props['내용'].rich_text) content = props['내용'].rich_text.map(function(t){return t.plain_text;}).join('');
-        var assignee = (props['담당자'] && props['담당자'].select && props['담당자'].select.name) ? props['담당자'].select.name : '';
-        var status = (props['상태'] && props['상태'].select && props['상태'].select.name) ? props['상태'].select.name : '';
-        // 최신 레코드 기준으로 덮어씀(정렬 asc라 마지막이 최신)
-        map[phone] = { count: (map[phone]?map[phone].count:0)+1, signupDate: signupDate, content: content, assignee: assignee, status: status };
-      });
-      hasMore = data.has_more; cursor = data.next_cursor;
-      Utilities.sleep(300);
-    }
-    Logger.log('[교차중복] 통합DB 번호 ' + Object.keys(map).length + '건 로드');
-  } catch(e){ Logger.log('[교차중복] 예외: ' + e); }
-  return map;
 }
 
-// ★ [진단] 교차중복이 통합DB를 제대로 읽는지 + 특정 번호 매칭 테스트.
-function whDebugCrossDedupe() {
-  Logger.log('WH_MASTER_DB_ID = ' + (WH_MASTER_DB_ID || '(없음!)'));
-  Logger.log('WH_CROSS_DEDUPE = ' + WH_CROSS_DEDUPE);
-  if (!WH_MASTER_DB_ID) { Logger.log('❌ DATABASE_ID 프로퍼티 없음 → 교차중복 작동 불가'); return; }
-  var m = whBuildMasterPhoneSet_();
-  Logger.log('통합DB 번호셋 ' + Object.keys(m).length + '건 로드됨');
-  // 분리캠페인 DB의 최근 리드 번호가 통합DB에 있는지 샘플 체크
-  var r = UrlFetchApp.fetch('https://api.notion.com/v1/databases/' + WH_DATABASE_ID + '/query', {
-    method: 'post', contentType: 'application/json',
-    headers: { 'Authorization': 'Bearer ' + WH_NOTION_TOKEN, 'Notion-Version': '2022-06-28' },
-    payload: JSON.stringify({ page_size: 10, sorts: [{ property: '신청일', direction: 'descending' }] }),
-    muteHttpExceptions: true
-  });
-  var leads = JSON.parse(r.getContentText()).results || [];
-  Logger.log('--- 분리캠페인 최근 10건 vs 통합DB 교차체크 ---');
-  leads.forEach(function(pg){
-    var pr = pg.properties;
-    var nm = (pr['이름'] && pr['이름'].title[0]) ? pr['이름'].title[0].plain_text : '?';
-    var pp = pr['연락처'];
-    var phone = (pp && pp.rich_text && pp.rich_text[0]) ? pp.rich_text[0].plain_text.replace(/[^0-9]/g,'') : '';
-    var st = (pr['상태'] && pr['상태'].select) ? pr['상태'].select.name : '';
-    var hit = m[phone];
-    Logger.log((hit?'🔁중복':'🆕신규') + ' [' + nm + '] ' + phone + ' / 현재상태:' + st + (hit?(' ← 통합DB에 있음('+hit.signupDate+' '+hit.status+')'):''));
-  });
+// ── 순위 정렬 ──
+var RANK_SORT = 'db';   // 'db' | 'visit' | 'order'
+function setRankSort(k){
+  RANK_SORT = k;
+  var btns=document.querySelectorAll('#rank-tabs button');
+  btns.forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-sort')===k); });
+  load();   // 재렌더
 }
-
-// ★ [소급 교차중복 2026-10-07] 이미 들어간 분리캠페인 '신규' 리드를 통합DB와 대조.
-//   v2 적용 전 들어와서 '신규'로 남은 것 중, 통합DB에 있던 번호면 → '중복'으로 업데이트 + 이전 기록 메모.
-//   (1회 실행용. 앞으로 새 리드는 whSendToNotion_이 자동 처리)
-function whBackfillCrossDedupe() {
-  var master = whBuildMasterPhoneSet_();
-  if (!master || !Object.keys(master).length) { Logger.log('통합DB 번호셋 비어있음 — 중단'); return; }
-
-  var total = 0, updated = 0;
-  var hasMore = true, cursor = null, loops = 0;
-  while (hasMore && loops < 80) {
-    loops++;
-    // 분리캠페인 DB에서 상태 '신규'인 것만
-    var body = { page_size: 100, filter: { property: '상태', select: { equals: '신규' } } };
-    if (cursor) body.start_cursor = cursor;
-    var r = UrlFetchApp.fetch('https://api.notion.com/v1/databases/' + WH_DATABASE_ID + '/query', {
-      method: 'post', contentType: 'application/json',
-      headers: { 'Authorization': 'Bearer ' + WH_NOTION_TOKEN, 'Notion-Version': '2022-06-28' },
-      payload: JSON.stringify(body), muteHttpExceptions: true
-    });
-    if (r.getResponseCode() !== 200) { Logger.log('소급 조회 실패: ' + r.getResponseCode()); break; }
-    var data = JSON.parse(r.getContentText());
-    (data.results || []).forEach(function(pg){
-      total++;
-      var pr = pg.properties;
-      var pp = pr['연락처'];
-      var phone = (pp && pp.rich_text && pp.rich_text[0]) ? pp.rich_text[0].plain_text.replace(/[^0-9]/g,'') : '';
-      if (!phone) return;
-      var hit = master[phone];
-      if (!hit) return;   // 통합DB에 없음 → 진짜 신규, 그대로
-      // 중복으로 업데이트 + 이전 기록 메모
-      var memo = whBuildCrossMemo_(hit);
-      // 기존 내용 보존 (앞에 붙임)
-      var oldContent = '';
-      if (pr['내용'] && pr['내용'].rich_text) oldContent = pr['내용'].rich_text.map(function(t){return t.plain_text;}).join('');
-      var newContent = memo + (oldContent ? ('\n' + oldContent) : '');
-      if (newContent.length > 1990) newContent = newContent.slice(0, 1990);
-      try {
-        var up = UrlFetchApp.fetch('https://api.notion.com/v1/pages/' + pg.id, {
-          method: 'patch', contentType: 'application/json',
-          headers: { 'Authorization': 'Bearer ' + WH_NOTION_TOKEN, 'Notion-Version': '2022-06-28' },
-          payload: JSON.stringify({ properties: {
-            '상태': { select: { name: '중복' } },
-            '내용': { rich_text: [{ text: { content: newContent } }] }
-          }}),
-          muteHttpExceptions: true
-        });
-        if (up.getResponseCode() === 200) { updated++; Logger.log('소급중복: ' + phone + ' (통합 ' + hit.signupDate + ' ' + hit.status + ')'); }
-        else Logger.log('소급 패치 실패 ' + pg.id.substring(0,8) + ': ' + up.getResponseCode());
-        Utilities.sleep(350);
-      } catch(e){ Logger.log('소급 개별 에러: ' + e); }
-    });
-    hasMore = data.has_more; cursor = data.next_cursor;
-    Utilities.sleep(300);
-  }
-  Logger.log('whBackfillCrossDedupe 완료 — 신규 ' + total + '건 중 ' + updated + '건 중복 소급');
-}
-
-// ★ [교차 중복감지] 이전 기록 메모 생성
-function whBuildCrossMemo_(hit) {
-  var m = '--- 이전 상담 기록 (' + (hit.signupDate || '날짜미상') + ' 통합DB) ---\n';
-  m += (hit.content || '내용 없음') + '\n';
-  if (hit.assignee) m += '담당: ' + hit.assignee + '\n';
-  if (hit.status)   m += '상태: ' + hit.status + '\n';
-  m += '--- 이전 기록 끝 ---';
-  return m;
-}
-
-function whTouchPhone_(map, cleanPhone) {
-  if (!cleanPhone) return;
-  if (map[cleanPhone]) map[cleanPhone].count++;
-  else map[cleanPhone] = { count: 1 };
-}
-
-function whStripPrefix_(raw) { return String(raw || '').replace(/^[a-z]+:/i, '').trim(); }
-function whFormatPhone_(raw) {
-  if (!raw) return '';
-  var phone = String(raw).replace('p:', '').replace(/[^0-9]/g, '');
-  if (phone.indexOf('0082') === 0) phone = '0' + phone.substring(4);
-  else if (phone.indexOf('001') === 0) phone = '0' + phone.substring(3);
-  else if (phone.indexOf('820') === 0) phone = '0' + phone.substring(2);
-  else if (phone.indexOf('82') === 0 && phone.length >= 11) phone = '0' + phone.substring(2);
-  if (phone.indexOf('0') !== 0) phone = '0' + phone;
-  if (phone.length === 11) return phone.substr(0,3) + '-' + phone.substr(3,4) + '-' + phone.substr(7,4);
-  if (phone.length === 10) return phone.substr(0,3) + '-' + phone.substr(3,3) + '-' + phone.substr(6,4);
-  return phone;
-}
-function whConvertPlatform_(platform) {
-  var p = String(platform || '').toLowerCase();
-  if (p === 'fb') return '페이스북';
-  if (p === 'ig') return '인스타그램';
-  return '기타';
-}
-function whMapGrade_(grade) {
-  if (!grade) return null;
-  var g = grade.toString().trim();
-  if (g.indexOf(',') !== -1) g = g.split(',')[0].trim();
-  return g || null;
-}
-
-function whInstallTrigger() {
-  var triggers = ScriptApp.getProjectTriggers();
-  for (var i = 0; i < triggers.length; i++) {
-    if (triggers[i].getHandlerFunction() === 'whProcessNewLeads') ScriptApp.deleteTrigger(triggers[i]);
-  }
-  ScriptApp.newTrigger('whProcessNewLeads').timeBased().everyMinutes(1).create();
-  Logger.log('분리캠페인 리드 처리 1분 트리거 설치 완료');
-}
-
-function whTestAssignee() {
-  _whAssigneeCache = {};
-  WH_SOURCES.forEach(function(src){
-    var a = whGetAssignee_(src.assignee);
-    Logger.log(src.assignee + ' → People ID: ' + (a && a.id ? a.id : '❌없음') + ' / 슬랙: ' + (a && a.slack ? a.slack : '❌없음'));
-  });
-}
-
-// ════════════════════════════════════════════════════════════
-// [대시보드 집계] whBuildDashData — 통합_NEW 집계 → '대시보드' 탭
-//   [2026-10-06] 담당자 판정 = 담당자_P(People)의 .name 기준.
-//   [2026-10-06] 날짜별유입(일자별유입) 블록 추가 — 캘린더 뷰용.
-// ════════════════════════════════════════════════════════════
-var WH_DASH_SS_ID = '1l0H8mY0SHiENr9Mlvnha7WVNAxA-iPQh0AB55eXhFaA';
-var WH_DASH_SHEET = '대시보드';
-
-function _whAssigneeList(){ return WH_SOURCES.map(function(s){ return s.assignee; }); }
-
-// 광고비 (수동 입력, 월별 YYMM) — MCP 실측으로 갱신
-var WH_CAMPAIGN_SPEND = {
-  '우혜림': { '2610': 0 },
-  '장윤호': { '2610': 0 },
-  '김윤호': { '2610': 0 }
-};
-
-// ════════════════════════════════════════════════════════════
-// [신규 퍼널 광고비 자동집계] whBuildDashData 패치
-//   ⚠️ "아라위키 자동화" 프로젝트의 whBuildDashData 함수 수정 (대쉬보드 아님!)
-//
-//   원리: 메타광고비 시트(대쉬보드 리드요약 시트)에 saveMetaSpendToSheet가
-//         _그로스_우혜림/장윤호/김윤호 광고비를 이미 저장함.
-//         → 그걸 gviz로 읽어서 신규퍼널 대시보드 담당자 광고비로 사용.
-// ════════════════════════════════════════════════════════════
-
-// ── [추가] 메타광고비 시트에서 그로스 3명 광고비 읽기 (gviz) ──
-//   대쉬보드 리드요약 시트 ID = 1bkKxvdFlEgP8EoNjMmLzemFfRjJIfhc3EyIJI5v3Eo8
-//   '메타광고비' 탭의 _그로스_* 행 → {우혜림:원, 장윤호:원, 김윤호:원}
-function whLoadGrowthSpend_(expectYYMM){
+// 순위변동 = 어제 대비. localStorage에 {date, ranks} 지표별 보관.
+//   오늘 첫 렌더 때 저장된 날짜가 오늘이 아니면 → 그게 '어제(직전영업일)' 순위 → 비교대상.
+//   오늘 저장본이 이미 있으면 어제분을 별도 슬롯(_prev)에 보존해 계속 비교.
+function _ymd(){ var d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+function _loadPrevRank(k){
   try{
-    var url='https://docs.google.com/spreadsheets/d/1bkKxvdFlEgP8EoNjMmLzemFfRjJIfhc3EyIJI5v3Eo8'
-          +'/gviz/tq?tqx=out:csv&headers=0&sheet='+encodeURIComponent('메타광고비');
-    var res=UrlFetchApp.fetch(url,{muteHttpExceptions:true});
-    if(res.getResponseCode()!==200){ Logger.log('[신규퍼널 광고비] 시트 fetch 실패 '+res.getResponseCode()); return {}; }
-    var rows=res.getContentText().trim().split('\n').map(function(r){
-      return r.split(',').map(function(c){ return c.trim().replace(/^"|"$/g,''); });
-    });
-    // 1행 F열(_월) 확인
-    var sheetYYMM=(rows[0]&&rows[0][5])?String(rows[0][5]).trim():'';
-    if(expectYYMM && sheetYYMM && sheetYYMM!==expectYYMM){ Logger.log('[신규퍼널 광고비] 월 불일치 '+sheetYYMM+'≠'+expectYYMM); return {}; }
-    var sp={}; sp._camp={};   // ★ _camp = 캠페인(소재)별 광고비 맵
-    rows.forEach(function(r){
-      var k=(r[0]||'').trim();
-      if(k.indexOf('_그로스_')===0){
-        var who=k.replace('_그로스_','');
-        if(who==='우혜림'||who==='장윤호'||who==='김윤호') sp[who]=parseInt(r[1])||0;
-      }
-      // ★ [캠페인별 광고비] _소재_<ad_name> 행 → ad_name 그대로 맵에 담음.
-      //   노션 '캠페인' 필드 = 메타 ad_name 이라 whBuildDashData 캠페인 블록에서 정확 매칭.
-      else if(k.indexOf('_소재_')===0){
-        var adn=k.replace('_소재_','').trim();
-        if(adn) sp._camp[adn]=parseInt(r[1])||0;
-      }
-      // ★ 광고비 집계 끝날짜 = cutoff.
-      //   우선순위 1: _기간 칸에 '~2026-10-06' 있으면 그 날짜.
-      //   우선순위 2(폴백): _갱신 시각(예 '2026-10-07 19:25')의 전날 = 10-06.
-      //     메타는 태평양 오후 7시반에 '전날까지' 확정 → 갱신날 - 1일이 광고비 반영 끝날.
-      if(k==='_갱신'){
-        var mm=String(r[3]||'').match(/~(\d{4}-\d{2}-\d{2})/);
-        if(mm){ sp._spendUntil=mm[1]; }
-        else {
-          var md=String(r[1]||'').match(/(\d{4})-(\d{2})-(\d{2})/);
-          if(md){
-            var _d=new Date(parseInt(md[1]),parseInt(md[2])-1,parseInt(md[3]));
-            _d.setDate(_d.getDate()-1);  // 갱신날 전날
-            sp._spendUntil=Utilities.formatDate(_d,'GMT+9','yyyy-MM-dd');
-          }
-        }
-      }
-    });
-    Logger.log('[신규퍼널 광고비] 우혜림 '+(sp['우혜림']||0)+' / 장윤호 '+(sp['장윤호']||0)+' / 김윤호 '+(sp['김윤호']||0)+' / cutoff '+(sp._spendUntil||'?'));
-    return sp;
-  }catch(e){ Logger.log('[신규퍼널 광고비] 예외: '+e); return {}; }
+    var cur=JSON.parse(localStorage.getItem('shinkyu_rank_'+k)||'null');
+    var prev=JSON.parse(localStorage.getItem('shinkyu_rankPrev_'+k)||'null');
+    // cur이 과거 날짜면 그게 비교대상, cur이 오늘이면 prev(어제분)가 비교대상
+    if(cur && cur.date!==_ymd()) return cur.ranks;
+    if(prev) return prev.ranks;
+    return null;
+  }catch(e){ return null; }
+}
+function _savePrevRank(k, map){
+  try{
+    var cur=JSON.parse(localStorage.getItem('shinkyu_rank_'+k)||'null');
+    // 날짜 넘어갔으면 기존 cur을 prev로 밀고 오늘 걸 cur에 저장
+    if(!cur || cur.date!==_ymd()){
+      if(cur) localStorage.setItem('shinkyu_rankPrev_'+k, JSON.stringify(cur));
+      localStorage.setItem('shinkyu_rank_'+k, JSON.stringify({date:_ymd(), ranks:map}));
+    } else {
+      // 같은 날 재렌더 — cur 갱신(순위 자체는 최신 유지), prev는 건드리지 않음
+      localStorage.setItem('shinkyu_rank_'+k, JSON.stringify({date:_ymd(), ranks:map}));
+    }
+  }catch(e){}
 }
 
-function whBuildDashData() {
-  try {
-    var now = new Date();
-    var yymm = Utilities.formatDate(now, 'GMT+9', 'yyMM');
-    var _growthSpend = whLoadGrowthSpend_(yymm);   // ★ 메타광고비 시트에서 3명 광고비 자동 로드
-    var monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    var todayStr = _whYmd(now);
+// 모바일 담당자/캠페인 탭 전환
+function showBlock(which){
+  var cols=document.getElementById('cols');
+  cols.classList.toggle('show-camp', which==='camp');
+  var btns=document.querySelectorAll('#block-tabs button');
+  btns[0].classList.toggle('on', which==='assignee');
+  btns[1].classList.toggle('on', which==='camp');
+}
 
-    var yday = new Date(now.getFullYear(), now.getMonth(), now.getDate()-1);
-    var ydayStr = _whYmd(yday);
-    var week7 = new Date(now.getFullYear(), now.getMonth(), now.getDate()-6);
-    var week7Str = _whYmd(week7);
-    var monthStartStr = _whYmd(monthStart);
-    // ★ 광고비 집계 끝날짜 (예 '2026-10-06'). 이 날짜 이후 유입은 CPL 분모에서 제외 (광고비 미반영).
-    var spendUntilStr = (_growthSpend && _growthSpend._spendUntil) || '';
+async function load(){
+  try{
+    var text = await fetch(GVIZ, {cache:'no-store'}).then(function(r){return r.text();});
+    var rows = parseCSV(text);
 
-    var pages = _whQueryAll();
+    var updated='', yymm='', spendUntil='';
+    if(rows[0] && rows[0][0]==='갱신'){ updated=rows[0][1]||''; yymm=rows[0][3]||''; spendUntil=rows[0][4]||''; }
+    var moLabel = yymm ? (parseInt(yymm.substring(2,4),10)+'월') : '';
+    // ★ 광고비 집계 끝날짜(10/6 등) — "어제까지" 하드코딩 대신 동적. 기존 그로스 대시보드와 동일 기준.
+    var spendMd = '';
+    if(/^\d{4}-\d{2}-\d{2}$/.test(spendUntil)){ var _sp=spendUntil.split('-'); spendMd=parseInt(_sp[1],10)+'/'+parseInt(_sp[2],10); }
+    var asofLabel = spendMd ? (spendMd+'까지') : '어제까지';
+    document.getElementById('updated').innerHTML = '업데이트 ' + updated + (moLabel? ' · <span class="asof">'+moLabel+' 기준</span>':'') + ' <span class="asof-badge">📊 유입 실시간 · 광고비 '+asofLabel+'</span>';
+    var fl=document.getElementById('fnl-label'); if(fl) fl.textContent=moLabel+' 전체';
+    // 표·안내문에 박힌 "어제까지" 라벨 전부 cutoff 날짜로 교체
+    document.querySelectorAll('.asof-spend').forEach(function(e){ e.textContent=asofLabel; });
 
-    var ASSIGNEES = _whAssigneeList();
-    var byAssignee = {};
-    var byCampaign = {};
-    var _dailyInflow = {};   // ★ 'yyyy-MM-dd' → 건수 (신청일 기준, 캘린더뷰)
-    ASSIGNEES.forEach(function(a){ byAssignee[a] = _whEmptyAgg(); });
-
-    pages.forEach(function(p){
-      var props = p.properties;
-      var name = (props['이름'] && props['이름'].title && props['이름'].title[0]) ? props['이름'].title[0].plain_text : '';
-      if (!name) return;
-
-      var status = (props['상태'] && props['상태'].select) ? props['상태'].select.name : '';
-      var campaign = '';
-      if (props['캠페인'] && props['캠페인'].rich_text) campaign = props['캠페인'].rich_text.map(function(t){return t.plain_text;}).join('');
-      campaign = campaign.trim();
-      // ★ 메타 ad_name 유실분(연동 권한 에러 문자열) → '(소재미상)'으로 묶음
-      if (/권한이 부족|facebook\.com\/business\/help/.test(campaign)) campaign = '(소재미상)';
-
-      var salesRaw = (props['매출'] && typeof props['매출'].number === 'number') ? props['매출'].number : 0;
-      var sales = salesRaw > 0 ? salesRaw * 1000 : 0;
-
-      var visitStr = (props['방문 일정'] && props['방문 일정'].date) ? props['방문 일정'].date.start : null;
-      var visitDate = visitStr ? new Date(visitStr) : null;
-      var visitKST = visitDate ? _whYmd(visitDate) : '';
-
-      var isKulbo = status === '결보';
-      var isOrder = status === '오더';
-      var isVisitStatus = status === '방문';
-      var isCancel = status === '방문취소';
-      var isVisit = isVisitStatus || isCancel || isKulbo || isOrder;
-      var isSetting = isKulbo || isOrder;
-
-      var who = '';
-      var pplProp = props['담당자_P'];
-      if (pplProp && pplProp.people && pplProp.people.length) {
-        who = whResolvePName_(pplProp.people[0].name || '');
-      }
-
-      var signStr = (props['신청일'] && props['신청일'].date) ? props['신청일'].date.start : '';
-      var signKST = signStr ? _whYmd(new Date(signStr)) : '';
-
-      // ★ 날짜별 유입 (담당자 무관, 전체)
-      if (signKST) _dailyInflow[signKST] = (_dailyInflow[signKST] || 0) + 1;
-
-      if (byAssignee[who]) {
-        var a = byAssignee[who];
-        a.db++;
-        if (isVisit) a.visit++;
-        if (isSetting) a.setting++;
-        if (isCancel) a.cancel++;
-        if (isOrder) { a.order++; a.sales += sales; }
-        if (signKST) {
-          if (signKST === todayStr) a.dToday++;
-          if (signKST === ydayStr)  a.dYday++;
-          if (signKST >= week7Str)  a.dWeek++;
-          if (signKST >= monthStartStr) a.dMonth++;
-          if (spendUntilStr && signKST > spendUntilStr) a.afterCut++;   // ★ 광고비 미반영분 (cutoff 이후 유입)
+    // 블록 위치
+    var aStart=-1, aEnd=-1, cStart=-1, dStart=-1, pStart=-1;
+    for(var i=0;i<rows.length;i++){
+      if(rows[i][0]==='담당자') aStart=i+1;
+      if(rows[i][0]==='합계' && aEnd<0) aEnd=i;
+      if(rows[i][0]==='캠페인') cStart=i+1;
+      if(rows[i][0]==='일자별유입') dStart=i+1;
+      if(rows[i][0]==='기간유입') pStart=i+1;   // [담당자,오늘,어제,주간,월간]
+    }
+    // 담당자별 '오늘 유입' 맵 (CPL 분모에서 뺌 — 광고비 기간과 맞춤)
+    var todayByName={}, todayTotal=0;
+    var sumToday=0, sumYday=0, sumWeek=0, sumMonth=0;   // 전체 기간 합계 (요약카드용)
+    if(pStart>=0){
+      for(var pi=pStart;pi<rows.length;pi++){
+        var pr=rows[pi]; if(!pr[0])break;
+        if(pr[0]==='신규합계'){  // [신규합계, 오늘, 어제, 주간, 월간]
+          sumToday=parseInt(pr[1])||0; sumYday=parseInt(pr[2])||0;
+          sumWeek=parseInt(pr[3])||0;  sumMonth=parseInt(pr[4])||0;
+          break;
         }
+        var tv=parseInt(pr[1])||0; todayByName[pr[0]]=tv; todayTotal+=tv;
       }
-
-      var ck = campaign || '(미표기)';
-      if (!byCampaign[ck]) byCampaign[ck] = _whEmptyAgg();
-      var c = byCampaign[ck];
-      c.db++;
-      if (isVisit) c.visit++;
-      if (isSetting) c.setting++;
-      if (isCancel) c.cancel++;
-      if (isOrder) { c.order++; c.sales += sales; }
-      // ★ 캠페인 CPL 분모용 — cutoff 이후 유입(광고비 미반영) 카운트
-      if (spendUntilStr && signKST && signKST > spendUntilStr) c.afterCut++;
-    });
-
-    function spendOf(assignee){
-      // 메타광고비 시트값(_그로스_*) 우선, 없으면 WH_CAMPAIGN_SPEND 폴백
-      if(_growthSpend && _growthSpend[assignee]!=null) return _growthSpend[assignee];
-      var s = WH_CAMPAIGN_SPEND[assignee];
-      return (s && s[yymm]) ? s[yymm] : 0;
     }
 
-    var ss = SpreadsheetApp.openById(WH_DASH_SS_ID);
-    var sh = ss.getSheetByName(WH_DASH_SHEET);
-    if (!sh) sh = ss.insertSheet(WH_DASH_SHEET);
-    sh.clearContents();
+    // ★ 날짜별유입 선파싱 + "광고비 미반영분" 계산 (cutoff 다음날 ~ 오늘 사이 유입)
+    //   CPL 분모를 광고비 집계일(cutoff)까지로 자르기 위함. 기존 그로스 대시보드와 동일 원리.
+    var dailyMap={};
+    if(dStart>=0){
+      for(var dr=dStart;dr<rows.length;dr++){
+        var dz=rows[dr]; if(!/^\d{4}-\d{2}-\d{2}$/.test(dz[0]))continue;
+        dailyMap[dz[0]]=parseInt(dz[1])||0;
+      }
+    }
+    // cutoff(spendUntil) 이후 유입 합 = 분모에서 빼야 할 "광고비 미반영 유입"
+    //   cutoff 없으면(날짜 못읽음) 폴백: todayTotal(오늘)만 뺌 = 기존 동작 유지
+    var afterCutoff = 0;
+    if(/^\d{4}-\d{2}-\d{2}$/.test(spendUntil)){
+      Object.keys(dailyMap).forEach(function(k){ if(k > spendUntil) afterCutoff += dailyMap[k]; });
+    } else {
+      afterCutoff = todayTotal;
+    }
 
-    var rows = [];
-    rows.push(['갱신', Utilities.formatDate(now,'GMT+9','yyyy-MM-dd HH:mm'), '기준월', yymm, (_growthSpend && _growthSpend._spendUntil) || '', '', '', '']);
-
-    function pct(a, b){ return b > 0 ? Math.round(a / b * 100) + '%' : ''; }
-    function cplOf(spend, db){ return (spend > 0 && db > 0) ? Math.round(spend / db) : ''; }
-
-    rows.push(['담당자', 'DB', '방문', '세팅', '방취', '오더', '매출', '광고비', 'CPL', 'ROAS', '']);
-    var totDb=0, totVisit=0, totSet=0, totCancel=0, totOrder=0, totSales=0, totSpend=0;
-    ASSIGNEES.forEach(function(nm){
-      var a = byAssignee[nm];
-      var sp = spendOf(nm);
-      var roas = sp > 0 ? (a.sales / sp).toFixed(2) : '';
-      var visitStr = a.visit + (a.db ? ' (' + pct(a.visit, a.db) + ')' : '');
-      var setStr   = a.setting + (a.visit ? ' (' + pct(a.setting, a.visit) + ')' : '');
-      var orderStr = a.order + (a.setting ? ' (' + pct(a.order, a.setting) + ')' : '');
-      rows.push([nm, a.db, visitStr, setStr, a.cancel, orderStr, a.sales, sp, cplOf(sp, a.db), roas, a.afterCut]);  // [10]=afterCut(광고비 미반영 유입)
-      totDb+=a.db; totVisit+=a.visit; totSet+=a.setting; totCancel+=a.cancel; totOrder+=a.order; totSales+=a.sales; totSpend+=sp;
-    });
-    var totRoas = totSpend > 0 ? (totSales/totSpend).toFixed(2) : '';
-    var tVisitStr = totVisit + (totDb ? ' (' + pct(totVisit, totDb) + ')' : '');
-    var tSetStr   = totSet + (totVisit ? ' (' + pct(totSet, totVisit) + ')' : '');
-    var tOrderStr = totOrder + (totSet ? ' (' + pct(totOrder, totSet) + ')' : '');
-    var totAfterCut = ASSIGNEES.reduce(function(s,nm){ return s + (byAssignee[nm].afterCut||0); }, 0);
-    rows.push(['합계', totDb, tVisitStr, tSetStr, totCancel, tOrderStr, totSales, totSpend, cplOf(totSpend, totDb), totRoas, totAfterCut]);  // [10]=afterCut 합계
-
-    rows.push(['', '', '', '', '', '', '', '', '', '', '']);
-
-    rows.push(['기간유입', '오늘', '어제', '주간', '월간', '', '', '', '', '', '']);
-    var tT=0, tY=0, tW=0, tM=0;
-    ASSIGNEES.forEach(function(nm){
-      var a = byAssignee[nm];
-      rows.push([nm, a.dToday, a.dYday, a.dWeek, a.dMonth, '', '', '', '', '', '']);
-      tT+=a.dToday; tY+=a.dYday; tW+=a.dWeek; tM+=a.dMonth;
-    });
-    rows.push(['신규합계', tT, tY, tW, tM, '', '', '', '', '', '']);
-
-    rows.push(['', '', '', '', '', '', '', '', '', '', '']);
-
-    // ★ 캠페인별 광고비 — _소재_<ad_name> 맵에서 캠페인명으로 매칭.
-    var _campSpend = (_growthSpend && _growthSpend._camp) || {};
-    rows.push(['캠페인', 'DB', '방문', '세팅', '방취', '오더', '매출', '광고비', 'CPL', 'ROAS', 'afterCut']);
-    Object.keys(byCampaign).sort(function(x,y){ return byCampaign[y].order - byCampaign[x].order || byCampaign[y].db - byCampaign[x].db; })
-      .forEach(function(ck){
-        var c = byCampaign[ck];
-        var cv = c.visit + (c.db ? ' (' + pct(c.visit, c.db) + ')' : '');
-        var cs = c.setting + (c.visit ? ' (' + pct(c.setting, c.visit) + ')' : '');
-        var co = c.order + (c.setting ? ' (' + pct(c.order, c.setting) + ')' : '');
-        var csp = _campSpend[ck] || 0;                    // ad_name 매칭 광고비
-        var cDbU = c.db - (c.afterCut || 0);              // 광고비 집계일까지 DB
-        var ccpl = (csp > 0 && cDbU > 0) ? Math.round(csp / cDbU) : '';
-        var croas = (csp > 0) ? (c.sales / csp).toFixed(2) : '';
-        rows.push([ck, c.db, cv, cs, c.cancel, co, c.sales, csp, ccpl, croas, c.afterCut || 0]);  // [7]광고비 [8]CPL [10]afterCut
+    // ── 담당자 테이블 ──
+    var atb = document.querySelector('#assignee-tbl tbody');
+    var ahtml='';
+    var sumDb=0,sumVisit=0,sumSet=0,sumOrder=0,sumSales=0,sumSpend=0;
+    if(aStart>=0 && aEnd>aStart){
+      // 1) 담당자 행 수집
+      var arr=[];
+      for(var r=aStart;r<aEnd;r++){
+        var x=rows[r]; if(!x[0])continue;
+        arr.push({
+          name:x[0], db:Number(x[1])||0, visitCell:x[2], visit:numOf(x[2]),
+          setCell:x[3], order:numOf(x[5]), orderCell:x[5], sales:Number(x[6])||0,
+          sp:Number(x[7])||0, roasV:x[9], afterCut:Number(x[10])||0   // [10]=광고비 미반영 유입
+        });
+      }
+      // 2) 선택 지표로 정렬 (내림차순)
+      var key = RANK_SORT;   // 'db' | 'visit' | 'order'
+      arr.sort(function(a,b){ return (b[key]||0)-(a[key]||0) || b.db-a.db; });
+      // 3) 순위변동 — 직전 순위(localStorage) 비교
+      var prevRank = _loadPrevRank(key);
+      var curRank = {};
+      arr.forEach(function(a,i){ curRank[a.name]=i+1; });
+      // 4) 렌더
+      arr.forEach(function(a,i){
+        var rankN=i+1;
+        var medal = rankN===1?'🥇':rankN===2?'🥈':rankN===3?'🥉':rankN;
+        var mv='';
+        if(prevRank && prevRank[a.name]){
+          var diff=prevRank[a.name]-rankN;
+          if(diff>0) mv='<span class="mv up">▲'+diff+'</span>';
+          else if(diff<0) mv='<span class="mv down">▼'+(-diff)+'</span>';
+          else mv='<span class="mv same">–</span>';
+        }
+        // CPL 분모 = 광고비 집계일까지 DB. afterCut(cutoff 이후 유입) 제외. GAS가 cutoff 못읽으면 0 → 오늘만 제외 폴백.
+        var _cut = a.afterCut || (todayByName[a.name]||0);
+        var _db=a.db-_cut;
+        var _cpl=(a.sp>0&&_db>0)?won(Math.round(a.sp/_db)):'-';
+        ahtml += '<tr><td class="rk">'+medal+mv+'</td>'
+          +'<td><span class="who '+whoClass(a.name)+'"></span>'+a.name+'</td>'
+          +'<td class="num db">'+a.db+'</td>'
+          +'<td class="num visit">'+fnl(a.visitCell)+'</td>'
+          +'<td class="num setting">'+fnl(a.setCell)+'</td>'
+          +'<td class="num order">'+fnl(a.orderCell)+'</td>'
+          +'<td class="num sales">'+won(a.sales)+'</td>'
+          +'<td class="num spend">'+wonSp(a.sp)+'</td>'
+          +'<td class="num cpl">'+_cpl+'</td>'
+          +'<td class="num">'+roasCell(a.roasV)+'</td></tr>';
       });
+      _savePrevRank(key, curRank);  // 이번 순위 저장(다음 비교용)
 
-    // ★ 날짜별 유입 블록 (캘린더뷰)
-    rows.push(['', '', '', '', '', '', '', '', '', '', '']);
-    rows.push(['일자별유입', '건수', '', '', '', '', '', '', '', '', '']);
-    Object.keys(_dailyInflow).sort().forEach(function(k){
-      rows.push([k, _dailyInflow[k], '', '', '', '', '', '', '', '', '']);
-    });
+      var t=rows[aEnd];
+      sumDb=Number(t[1])||0; sumVisit=numOf(t[2]); sumSet=numOf(t[3]); sumOrder=numOf(t[5]); sumSales=Number(t[6])||0; sumSpend=Number(t[7])||0;
+      var _totCut = Number(t[10]) || afterCutoff;   // GAS 합계 afterCut 우선, 없으면 날짜별유입 합산 폴백
+      var _dbUntil=sumDb-_totCut;   // ★ 광고비 집계일까지 DB (cutoff 이후 유입 제외)
+      var _tcpl=(sumSpend>0&&_dbUntil>0)?won(Math.round(sumSpend/_dbUntil)):'-';
+      ahtml += '<tr class="total"><td></td><td>합계</td>'
+        +'<td class="num db">'+sumDb+'</td><td class="num visit">'+fnl(t[2])+'</td>'
+        +'<td class="num setting">'+fnl(t[3])+'</td>'
+        +'<td class="num order">'+fnl(t[5])+'</td><td class="num sales">'+won(t[6])+'</td>'
+        +'<td class="num spend">'+wonSp(sumSpend)+'</td>'
+        +'<td class="num cpl">'+_tcpl+'</td>'
+        +'<td class="num">'+roasCell(t[9])+'</td></tr>';
+    }
+    atb.innerHTML = ahtml || '<tr><td colspan="10" class="loading">데이터 없음</td></tr>';
 
-    var W = 11;
-    var padded = rows.map(function(r){
-      var out = r.slice(0, W);
-      while (out.length < W) out.push('');
-      return out;
+    // ── 기간유입 표 (담당자별 오늘/어제/주간/월간 + 광고비/CPL) ──
+    var spendByName={};
+    if(aStart>=0 && aEnd>aStart){
+      for(var sr=aStart;sr<aEnd;sr++){ var sx=rows[sr]; if(sx[0]) spendByName[sx[0]]=Number(sx[7])||0; }
+    }
+    var ptb=document.querySelector('#period-tbl tbody'), phtml='';
+    if(pStart>=0){
+      var pT=0,pY=0,pW=0,pM=0,pSp=0;
+      for(var pr2=pStart;pr2<rows.length;pr2++){
+        var px=rows[pr2]; if(!px[0])break;
+        if(px[0]==='신규합계'){
+          var _wkUntil=(parseInt(px[3])||0)-(parseInt(px[1])||0); // 주간-오늘
+          var _pcpl=(pSp>0&&_wkUntil>0)?won(Math.round(pSp/_wkUntil)):'-';
+          phtml+='<tr class="total"><td>합계</td><td class="num db">'+(px[1]||0)+'</td><td class="num">'+(px[2]||0)+'</td><td class="num">'+(px[3]||0)+'</td><td class="num">'+(px[4]||0)+'</td><td class="num spend">'+won(pSp)+'</td><td class="num cpl">'+_pcpl+'</td></tr>';
+          break;
+        }
+        var _tod=parseInt(px[1])||0, _wk=parseInt(px[3])||0, _sp2=spendByName[px[0]]||0;
+        var _wkU=_wk-_tod;  // 주간 유입 중 오늘 제외
+        var _cpl2=(_sp2>0&&_wkU>0)?won(Math.round(_sp2/_wkU)):'-';
+        phtml+='<tr><td><span class="who '+whoClass(px[0])+'"></span>'+px[0]+'</td><td class="num db">'+_tod+'</td><td class="num">'+(px[2]||0)+'</td><td class="num">'+_wk+'</td><td class="num">'+(px[4]||0)+'</td><td class="num spend">'+wonSp(_sp2)+'</td><td class="num cpl">'+_cpl2+'</td></tr>';
+        pT+=_tod; pSp+=_sp2;
+      }
+    }
+    if(ptb) ptb.innerHTML = phtml || '<tr><td colspan="7" class="loading">데이터 없음</td></tr>';
+
+    // ── 요약 카드 (5개) ──
+    var totRoas = (sumSpend>0) ? (sumSales/sumSpend).toFixed(2) : '-';
+    var _totCutS = (aEnd>=0 && rows[aEnd] && Number(rows[aEnd][10])) || afterCutoff;   // 합계 afterCut 우선
+    var _dbUntilS=sumDb-_totCutS;   // ★ 광고비 집계일까지 DB
+    var totCpl = (sumSpend>0&&_dbUntilS>0) ? won(Math.round(sumSpend/_dbUntilS)) : '-';
+    document.getElementById('summary').innerHTML =
+      '<div class="scard db"><div class="l">총 리드 <span style="font-size:8px;color:#bbb">월간</span></div><div class="v">'+sumDb+'<span>건</span></div></div>'
+     +'<div class="scard today"><div class="l">오늘 유입</div><div class="v">'+sumToday+'<span>건</span></div></div>'
+     +'<div class="scard yday"><div class="l">어제 유입</div><div class="v">'+sumYday+'<span>건</span></div></div>'
+     +'<div class="scard week"><div class="l">주간 유입</div><div class="v">'+sumWeek+'<span>건</span></div></div>'
+     +'<div class="scard cpl"><div class="l">CPL <span style="font-size:8px;color:#bbb">'+asofLabel+'</span></div><div class="v">'+totCpl+'</div><div class="sub">광고비 '+wonSp(sumSpend)+' · ROAS '+totRoas+'</div></div>';
+
+    // ── 퍼널 전환 깔때기 ──
+    var fnlSteps=[['DB',sumDb,'s0'],['방문',sumVisit,'s1'],['세팅',sumSet,'s2'],['오더',sumOrder,'s3']];
+    var fnMax=sumDb||1, fhtml='';
+    fnlSteps.forEach(function(s,idx){
+      var pct=Math.round(s[1]/fnMax*100);
+      var conv = idx>0 ? (fnlSteps[idx-1][1]>0?Math.round(s[1]/fnlSteps[idx-1][1]*100):0)+'%' : '';
+      fhtml += '<div class="fn-row '+s[2]+'"><span class="fl">'+s[0]+'</span>'
+        +'<span class="fbar"><span style="width:'+Math.max(pct,2)+'%"></span></span>'
+        +'<span class="fv">'+s[1]+'건</span><span class="fp">'+conv+'</span></div>';
     });
-    sh.getRange(1, 1, padded.length, W).setValues(padded);
-    Logger.log('whBuildDashData 완료 — 리드 ' + pages.length + '건 / 담당자 ' + ASSIGNEES.length + '명 / 캠페인 ' + Object.keys(byCampaign).length + '개 / 일자 ' + Object.keys(_dailyInflow).length);
-  } catch (e) {
-    Logger.log('whBuildDashData 에러: ' + e.toString());
+    document.getElementById('funnel').innerHTML = fhtml;
+
+    // ── 캠페인 테이블 (광고비 컬럼 추가) ──
+    //   컬럼: [캠페인(0), DB(1), 방문(2), 세팅(3), 방취(4), 오더(5), 매출(6), 광고비(7), CPL(8)]
+    //   광고비·CPL은 GAS whBuildDashData가 캠페인 블록에 추가(ad_name 매칭). 없으면 '-'.
+    var ctb = document.querySelector('#campaign-tbl tbody');
+    var chtml='';
+    if(cStart>=0){
+      for(var r2=cStart;r2<rows.length;r2++){
+        var y=rows[r2]; if(!y[0]||y[0]==='일자별유입'||y[0]==='기간유입')break;
+        var _csp=Number(y[7])||0;              // 광고비 (GAS가 넣음, cutoff까지)
+        var _cdb=Number(y[1])||0;
+        var _caf=Number(y[10])||0;             // 캠페인 afterCut (cutoff 이후 유입) — GAS가 넣음
+        // CPL 분모 = 광고비 집계일까지 DB (cutoff 이후 유입 제외). 담당자표와 동일 기준.
+        var _cdbU=_cdb-_caf;
+        var _ccpl=(_csp>0&&_cdbU>0)?won(Math.round(_csp/_cdbU)):'-';
+        chtml += '<tr><td>'+y[0]+'</td>'
+          +'<td class="num db">'+_cdb+'</td>'
+          +'<td class="num visit">'+fnl(y[2])+'</td>'
+          +'<td class="num setting">'+fnl(y[3])+'</td>'
+          +'<td class="num order">'+fnl(y[5])+'</td>'
+          +'<td class="num spend">'+(_csp>0?wonSp(_csp):'-')+'</td>'
+          +'<td class="num cpl">'+_ccpl+'</td>'
+          +'<td class="num sales">'+won(y[6])+'</td></tr>';
+      }
+    }
+    ctb.innerHTML = chtml || '<tr><td colspan="8" class="loading">데이터 없음</td></tr>';
+
+    // ── 날짜별 유입 — 맵 저장 후 주간/월간 렌더 ──
+    _calDaily={};
+    if(dStart>=0){
+      for(var r3=dStart;r3<rows.length;r3++){
+        var z=rows[r3]; if(!/^\d{4}-\d{2}-\d{2}$/.test(z[0]))continue;
+        _calDaily[z[0]]=parseInt(z[1])||0;
+      }
+    }
+    renderCalendar();
+
+  }catch(e){
+    document.getElementById('updated').textContent = '불러오기 실패 — 대시보드 탭이 생성됐는지 확인하세요';
+    document.querySelector('#assignee-tbl tbody').innerHTML = '<tr><td colspan="10" class="loading">로드 실패</td></tr>';
   }
 }
-
-function _whEmptyAgg(){ return { db:0, visit:0, setting:0, cancel:0, order:0, sales:0, dToday:0, dYday:0, dWeek:0, dMonth:0, afterCut:0 }; }
-function _whYmd(d){
-  if (!d || isNaN(d.getTime())) return '';
-  return Utilities.formatDate(d, 'GMT+9', 'yyyy-MM-dd');
-}
-function _whQueryAll(){
-  var all = [];
-  var cursor = null;
-  var sevenMonthsAgo = new Date();
-  sevenMonthsAgo.setMonth(sevenMonthsAgo.getMonth() - 7);
-  do {
-    var body = { page_size: 100, filter: { property: '신청일', date: { on_or_after: sevenMonthsAgo.toISOString() } } };
-    if (cursor) body.start_cursor = cursor;
-    var res = UrlFetchApp.fetch('https://api.notion.com/v1/databases/' + WH_DATABASE_ID + '/query', {
-      method: 'post', contentType: 'application/json',
-      headers: { 'Authorization': 'Bearer ' + WH_NOTION_TOKEN, 'Notion-Version': '2022-06-28' },
-      payload: JSON.stringify(body), muteHttpExceptions: true
-    });
-    if (res.getResponseCode() !== 200) { Logger.log('노션 조회 실패: ' + res.getResponseCode()); break; }
-    var data = JSON.parse(res.getContentText());
-    all = all.concat(data.results || []);
-    cursor = data.has_more ? data.next_cursor : null;
-    Utilities.sleep(350);
-  } while (cursor);
-  return all;
-}
-
-function whInstallDashTrigger() {
-  var triggers = ScriptApp.getProjectTriggers();
-  for (var i = 0; i < triggers.length; i++) {
-    if (triggers[i].getHandlerFunction() === 'whBuildDashData') ScriptApp.deleteTrigger(triggers[i]);
-  }
-  ScriptApp.newTrigger('whBuildDashData').timeBased().everyMinutes(10).create();
-  Logger.log('whBuildDashData 10분 트리거 설치 완료');
-}
+load();
+</script>
+</body>
+</html>
