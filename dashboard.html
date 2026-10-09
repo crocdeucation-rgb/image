@@ -542,6 +542,13 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
   </tbody>
 </table></div>
 
+<div class="section-label">분리캠페인 캠페인별 <span class="badge">소재 성과 · 광고비</span><span class="asof-badge" style="background:#d97706">📊 광고비 <span class="spend-asof">어제까지</span></span></div>
+<div class="asof-note" style="color:#94a3b8">메타 소재(ad)별 실집행을 캠페인명으로 매칭 · 소재=담당자 1:1 · CPL은 광고비 집계일까지 유입 기준 (이번달 탭)</div>
+<div class="tbl-scroll" style="margin-top:6px"><table class="funnel-table" id="bunri-camp-tbl">
+  <thead><tr><th>캠페인</th><th>DB</th><th>방문</th><th>세팅</th><th>오더</th><th>광고비<br><span class="spend-asof" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span class="spend-asof" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>매출</th></tr></thead>
+  <tbody id="bunri-camp-tbody"><tr><td colspan="8" style="color:#aaa;text-align:center;padding:12px;">불러오는 중...</td></tr></tbody>
+</table></div>
+
 <div class="section-label">학년별 <span class="badge today" id="grade-tab-label">이번달</span></div>
 <div class="grid-3" id="grade-grid">
   <div class="card"><div class="clabel">초등</div><div class="cval blue xs" id="grade-elem">-</div><div class="route-eff" id="ge-elem"></div></div>
@@ -749,6 +756,7 @@ async function loadAll() {
 // [그로스별 유입] 우혜림 DB 시트(대시보드 탭) gviz 로드
 var GROWTH_GVIZ = 'https://docs.google.com/spreadsheets/d/1l0H8mY0SHiENr9Mlvnha7WVNAxA-iPQh0AB55eXhFaA/gviz/tq?tqx=out:csv&headers=0&sheet=' + encodeURIComponent('대시보드');
 var _growthInflow = null;
+var _bunriCamps = null;   // ★ [분리캠페인] 캠페인별 집계 (대시보드 탭 캠페인 블록)
 async function loadGrowthInflow(){
   try{
     var text = await fetch(GROWTH_GVIZ, {cache:'no-store'}).then(function(r){return r.text();});
@@ -779,10 +787,24 @@ async function loadGrowthInflow(){
         out[anm].afterCut=parseInt(ax[10])||0;
       }
     }
+    // ★ [분리캠페인] 캠페인 블록 파싱 — [캠페인,DB,방문,세팅,방취,오더,매출,광고비,CPL,ROAS,afterCut]
+    var cS=-1;
+    for(var ci=0;ci<rows.length;ci++){ if((rows[ci][0]||'').trim()==='캠페인'){ cS=ci+1; break; } }
+    var camps=[];
+    if(cS>=0){
+      for(var cr=cS;cr<rows.length;cr++){
+        var cx=rows[cr]; var cnm=(cx[0]||'').trim();
+        if(!cnm || cnm==='일자별유입' || cnm==='기간유입' || cnm==='담당자') break;
+        camps.push({ name:cnm, db:parseInt(cx[1])||0, visit:_numOf(cx[2]), setting:_numOf(cx[3]),
+                     order:_numOf(cx[5]), sales:parseInt(cx[6])||0, spend:parseInt(cx[7])||0, afterCut:parseInt(cx[10])||0 });
+      }
+    }
+    _bunriCamps = camps;
     _growthInflow = out;
   }catch(e){ _growthInflow = {}; }
   await loadGrowthSpend();   // ★ 그로스별 광고비(메타광고비 시트)도 로드
   renderGrowthInflow();
+  try{ renderBunriCamps(); }catch(e){}   // ★ [분리캠페인] 캠페인별 표
 }
 // ★ [그로스별 광고비] 메타광고비 시트(execData/dash-metaspend)의 _그로스_* 행 → {총괄,우혜림,장윤호,김윤호}
 var _growthSpend = null;
@@ -884,6 +906,32 @@ function renderGrowthInflow(){
       else { _vr.textContent='준비중'; _vr.style.color='#9ca3af'; _vr.style.fontSize='12px'; }
     }
   }
+}
+
+// ★ [분리캠페인] 캠페인별 표 렌더 — 대시보드 탭 캠페인 블록. 이번달 탭에서만(신규 퍼널은 이번달 데이터).
+function renderBunriCamps(){
+  var tb=document.getElementById('bunri-camp-tbody'); if(!tb) return;
+  var camps=_bunriCamps||[];
+  var isThisMonth=(routeTab===0);
+  if(!isThisMonth){ tb.innerHTML='<tr><td colspan="8" style="color:#aaa;text-align:center;padding:12px;">이번달 탭에서 표시</td></tr>'; return; }
+  if(!camps.length){ tb.innerHTML='<tr><td colspan="8" style="color:#aaa;text-align:center;padding:12px;">데이터 없음</td></tr>'; return; }
+  var won=function(n){ n=Number(n)||0; if(n<=0)return '-'; if(n>=10000)return (Math.round(n/1000)/10).toLocaleString()+'만'; return n.toLocaleString(); };
+  var spFmt=function(n){ n=Number(n)||0; if(n<=0)return '-'; return (n/10000).toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:1})+'만'; };
+  var pct=function(a,b){ return b>0?'<span class="rate"> ('+Math.round(a/b*100)+'%)</span>':''; };
+  var h='';
+  camps.forEach(function(c){
+    var cDbU=c.db-(c.afterCut||0);                               // 광고비 집계일까지 DB
+    var cpl=(c.spend>0&&cDbU>0)?won(Math.round(c.spend/cDbU)):'-';
+    h+='<tr><td class="name">'+c.name+'</td>'
+      +'<td class="num db">'+c.db+'</td>'
+      +'<td class="num" style="color:#0891b2">'+c.visit+pct(c.visit,c.db)+'</td>'
+      +'<td class="num" style="color:#2563eb">'+c.setting+'</td>'
+      +'<td class="num order">'+c.order+'</td>'
+      +'<td class="num" style="color:#e65100">'+spFmt(c.spend)+'</td>'
+      +'<td class="num" style="color:#0891b2">'+cpl+'</td>'
+      +'<td class="sales">'+won(c.sales)+'</td></tr>';
+  });
+  tb.innerHTML=h;
 }
 
 // ══ [2026-10-06] 캘린더(잔디밭) 뷰 — 두 소스 일자별유입 합산 ══
