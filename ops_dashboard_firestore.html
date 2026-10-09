@@ -403,6 +403,9 @@ details[open]>.more::before{content:'▾ '}
 .jrbadge.can{background:var(--reds);color:var(--red)}
 .jrbadge.hold{background:#EEF1F6;color:var(--soft)}
 .jrbadge.absent{background:var(--ambers);color:#9A5B06}
+.jrbadge.asgn{background:#e0f2fe;color:#0369a1}
+.jrbadge.rete{background:#e7f8ec;color:#1a7f37}
+.jrbadge.retex{background:#f3e8ff;color:#7c3aed}
 .jr-miss{display:inline-block;font-size:10px;font-weight:800;color:var(--mute);border:1px dashed #C3CBD9;border-radius:5px;padding:1px 6px;margin-top:3px}
 .jr-r{text-align:right}
 .jr-next{font-size:12px;color:var(--soft);font-weight:700}
@@ -1212,7 +1215,7 @@ function inBr(x){return !BR||x.br===BR;}
 function evOf(day){return EV.filter(function(e){return e.day===day&&inBr(e);});}
 function orgline(e){
   return '<b class="brg">'+esc(e.br||'지점 미확인')+'</b>'+
-   '<br>상담 '+esc(e.sang||'—')+' · 사업 '+esc(e.saup||'—');
+   '<br>상담 '+esc(e.sang||'—')+' · 사업 <b>'+esc(e.saup||'—')+'</b>';
 }
 function org(e){ return '<div class="org">'+orgline(e)+'</div>'; }
 /* ── 사건 한 줄 ── */
@@ -1367,7 +1370,7 @@ function weekBox(){
   var xTbl=X.length?'<div class="grp">'+md(sel)+' 만료 '+X.length+'명 — 사전 안내 대상</div><table class="tbl mrow xd"><thead><tr><th>회원</th><th>소속</th><th>코칭</th><th>사전 안내</th><th>민원</th><th>특이사항</th></tr></thead><tbody>'+
     X.map(function(o){var m=o.m,rr=m.mw?mwRes(m):'';
       return '<tr><td><button class="nmbtn" data-name="'+esc(m.n)+'">'+esc(m.n)+'</button><div class="org">'+esc(m.g||'')+'</div></td>'+
-       '<td><b>'+esc(m.br||'지점 미확인')+'</b><div class="org">상담 '+esc(m.sang||'—')+' · 사업 '+esc(m.saup||'—')+'</div></td>'+
+       '<td><b>'+esc(m.br||'지점 미확인')+'</b><div class="org">상담 '+esc(m.sang||'—')+' · 사업 <b>'+esc(m.saup||'—')+'</b>'+'</div></td>'+
        '<td style="white-space:nowrap">'+esc(o.c)+'<div class="org">'+(m.dw?esc(m.dw)+' '+esc(m.t||''):'요일 칸 비어 있음')+'</div></td>'+
        '<td><span class="tag empty2">칸 없음</span></td>'+
        '<td>'+(m.mw?'<span class="tag '+(rr==='유지'?'ok':(rr==='해지'?'ng':'wait'))+'">'+rr+' '+md(m.mw.d)+'</span>':'<span class="z">—</span>')+'</td>'+
@@ -1436,7 +1439,7 @@ function dayBox(dd,inner){
     var memo=note&&/(월|예정|시작|형제|병행|이사|재조율|변경)/.test(note)?'<span class="jmemo" title="'+esc(note)+'">✎ '+esc(note.length>22?note.slice(0,22)+'…':note)+'</span>':'';
     return '<div class="jrow today" data-name="'+esc(o.n)+'">'+
       '<div class="jr-l"><div class="jr-nm"><b>'+esc(o.n)+'</b>'+(e0.grade?'<span class="jr-g">'+esc(e0.grade)+'</span>':'')+'</div>'+
-      '<div class="jr-meta">'+esc((j&&j.br)||e0.br||'지점 미확인')+(((j&&j.sang)||e0.sang)?' · 상담 '+esc((j&&j.sang)||e0.sang):'')+(((j&&j.saup)||e0.saup)?' · 사업 '+esc((j&&j.saup)||e0.saup):'')+(nx?' · 다음 '+esc(nx):'')+'</div></div>'+
+      '<div class="jr-meta">'+esc((j&&j.br)||e0.br||'지점 미확인')+(((j&&j.sang)||e0.sang)?' · 상담 '+esc((j&&j.sang)||e0.sang):'')+(((j&&j.saup)||e0.saup)?' · 사업 <b>'+esc((j&&j.saup)||e0.saup)+'</b>':'')+(nx?' · 다음 '+esc(nx):'')+'</div></div>'+
       '<div class="jr-c todo">'+todo+'</div>'+
       '<div class="jr-r">'+memo+'</div></div>';
   };
@@ -1505,7 +1508,7 @@ function missBox(){
         return '<tr'+(r.d>=14?' class="hot"':'')+'><td><button data-name="'+esc(r.n)+'" style="border:0;background:none;font:inherit;font-weight:800;cursor:pointer;padding:0">'+esc(r.n)+'</button> <span class="z">'+esc(r.g)+'</span></td>'+
         '<td style="white-space:nowrap">'+(r.join?md(r.join):'<span class="z">—</span>')+'</td>'+
         '<td style="white-space:nowrap;font-weight:800'+(r.d>=14?';color:var(--red)':'')+'">'+(r.d<999?'D+'+r.d:'—')+'</td>'+
-        '<td><b>'+esc(r.br||'—')+'</b><div class="org">상담 '+esc(r.sang||'—')+' · 사업 '+esc(r.saup||'—')+'</div></td></tr>';}).join('')+
+        '<td><b>'+esc(r.br||'—')+'</b><div class="org">상담 '+esc(r.sang||'—')+' · 사업 <b>'+esc(r.saup||'—')+'</b>'+'</div></td></tr>';}).join('')+
       '</tbody></table>'+(rows.length>40?'<div class="empty">외 '+(rows.length-40)+'명</div>':''):'<div class="empty">없습니다.</div>';
   } else if(sel==='코칭 칸 비어 있음'){
     var GL=gapList();
@@ -1515,14 +1518,14 @@ function missBox(){
         '<td style="white-space:nowrap">'+esc(m.coach)+'</td>'+
         '<td style="white-space:nowrap">'+(m.log.last?md(m.log.last):'<span class="z">—</span>')+'</td>'+
         '<td style="white-space:nowrap;font-weight:800'+(m.log.gap>=30?';color:var(--red)':'')+'">'+m.log.gap+'일</td>'+
-        '<td><b>'+esc(m.br||'—')+'</b><div class="org">상담 '+esc(m.sang||'—')+' · 사업 '+esc(m.saup||'—')+'</div></td>'+
+        '<td><b>'+esc(m.br||'—')+'</b><div class="org">상담 '+esc(m.sang||'—')+' · 사업 <b>'+esc(m.saup||'—')+'</b>'+'</div></td>'+
         '<td class="note'+(m.note?'':' none')+'" style="max-width:300px">'+(m.note?hi(m.note):'칸 비어 있음')+'</td></tr>';}).join('')+
       '</tbody></table>'+(GL.length>40?'<div class="empty">외 '+(GL.length-40)+'명</div>':''):'<div class="empty">없습니다.</div>';
   } else if(sel==='민원 결과 미기재'){
     list=openMw.length?'<table class="tbl"><thead><tr><th>회원</th><th>가입</th><th>접수</th><th>경과</th><th>담당</th><th>사유</th></tr></thead><tbody>'+
      openMw.slice(0,40).map(function(i){
       return '<tr'+(diff(i.day,TODAY)>=21?' class="hot"':'')+'><td><button data-name="'+esc(i.name)+'" style="border:0;background:none;font:inherit;font-weight:800;cursor:pointer;padding:0">'+esc(i.name)+'</button>'+
-       '<div class="org"><b>'+esc(i.br||'지점 미확인')+'</b><br>상담 '+esc(i.sang||'—')+' · 사업 '+esc(i.saup||'—')+'</div></td>'+
+       '<div class="org"><b>'+esc(i.br||'지점 미확인')+'</b><br>상담 '+esc(i.sang||'—')+' · 사업 <b>'+esc(i.saup||'—')+'</b>'+'</div></td>'+
        '<td style="white-space:nowrap">'+(i.join?md(i.join):'<span class="z">—</span>')+'</td><td style="white-space:nowrap">'+md(i.day)+'</td><td style="white-space:nowrap;font-weight:800">'+diff(i.day,TODAY)+'일째</td>'+
        '<td class="z" style="white-space:nowrap">'+esc(i.sub||'')+'</td>'+
        '<td class="note'+(i.note?'':' none')+'">'+(i.note?hi(i.note):'사유 칸 비어 있음')+'</td></tr>';}).join('')+
@@ -1557,8 +1560,8 @@ function expBox(){
       var stt=m.can?'<span class="tag ng">'+(m.can.is_calc?'계약변경':'취소')+'</span>':(m.mw?'<span class="tag wait">민원</span>':'<span class="z">—</span>');
       return '<tr'+(sel==='w0'?' class="hot"':'')+'><td style="white-space:nowrap;font-weight:800">'+md(m.exp)+' <span class="dpn">D-'+dd+'</span></td>'+
        '<td><button data-name="'+esc(m.n)+'" style="border:0;background:none;font:inherit;font-weight:800;cursor:pointer;padding:0">'+esc(m.n)+'</button>'+
-       '<div class="org">'+esc(m.g||'')+' · '+esc(m.br||'지점 미확인')+(m.sang?' · 상담 '+esc(m.sang):'')+(m.saup?' · 사업 '+esc(m.saup):'')+'</div></td>'+
-       '<td style="white-space:nowrap">'+esc(m.coach)+' <span class="z">'+m.team+'</span></td>'+
+       '<div class="org">'+esc(m.g||'')+' · '+esc(m.br||'지점 미확인')+(m.sang?' · 상담 '+esc(m.sang):'')+(m.saup?' · 사업 <b>'+esc(m.saup)+'</b>':'')+'</div></td>'+
+       '<td style="white-space:nowrap">'+esc(m.coach)+' <span class="z">'+tLbl(m.team)+'</span></td>'+
        '<td style="white-space:nowrap">'+(m.dw?esc(m.dw)+' '+esc(m.t||''):'<span class="z">—</span>')+'</td>'+
        '<td><span class="tag empty2">칸 없음</span></td><td>'+stt+'</td>'+
        '<td class="note'+(m.note?'':' none')+'" style="max-width:300px">'+(m.note?hi(m.note):'칸 비어 있음')+'</td></tr>';};
@@ -1582,6 +1585,7 @@ function expBox(){
    cards+(cs?'<div class="grp">담당별 — '+cs+'</div>':'')+'<div class="grp">'+(({w0:'이번 주',w1:'다음 주',w2:'2주 뒤',m0:'이달 안'})[sel]||'')+' 만료 '+L.length+'명</div>'+etoggle+list+
    (noexp?'<div class="lead" style="margin-top:10px">관리만료일이 시트에 없는 회원이 <b>'+noexp+'명</b> 있습니다. 이 회원들은 만료가 와도 미리 보이지 않습니다.</div>':''),true);
 }
+function tLbl(t){return t==='1팀'?'A팀':t==='2팀'?'B팀':(t||'');}   // 1팀/2팀 → 실제 A팀/B팀
 function guardBox(){
   var TM=D.tm||{};
   // 월 목록·월별 전사합을 tm(실집계)에서 직접 — mon2(golden, 9월까지) 의존 제거
@@ -1606,6 +1610,8 @@ function guardBox(){
     kpi('진행·부재',cur.ing,pv&&pv.ing)+kpi('방어율',dr(cur),pv&&dr(pv),'g','%');
   var mseg='<div class="seg" style="margin-bottom:10px">'+ms.map(function(m){
     return '<button class="'+(m===G?'on':'')+'" data-gm="'+m+'">'+(+m.slice(5))+'월'+(m===DATA.slice(0,7)?' (진행 중)':'')+'</button>';}).join('')+'</div>';
+  var RETIRED={'이용우':1,'정기상':1};   // 퇴사자 — 당시 접수건은 전사 합계엔 포함, 담당 표에서는 제외
+  var retRecv=Object.keys(TM).filter(function(k){return RETIRED[k];}).reduce(function(s,k){return s+((TM[k][G]||{}).mw||0);},0);
   var rows=Object.keys(TM).map(function(k){
     var c=TM[k][G]||{}, p=prev?(TM[k][prev]||{}):{};
     var cl=(c.keep||0)+(c.drop||0);
@@ -1613,7 +1619,7 @@ function guardBox(){
     return {k:k,n:act,recv:c.mw||0,rr:act?pc(c.mw||0,act):null,keep:c.keep||0,drop:c.drop||0,dang:c.dang||0,ing:(c.ing||0)+(c.blank||0),
       r:cl?pc(c.keep,cl):null,pr:((p.keep||0)+(p.drop||0))?pc(p.keep,(p.keep||0)+(p.drop||0)):null,precv:p.mw||0,
       tr:ms.map(function(m){var z=TM[k][m]||{};var q=(z.keep||0)+(z.drop||0);return {m:m,n:z.mw||0,r:q?pc(z.keep,q):null};})};
-  }).filter(function(x){return x.recv||x.precv;});
+  }).filter(function(x){return (x.recv||x.precv) && !RETIRED[x.k];});
   rows.sort(SORT==='recv'?function(a,b){return (b.rr||0)-(a.rr||0);}:function(a,b){return (b.r==null?-1:b.r)-(a.r==null?-1:a.r);});
   var bar=function(r,col){return '<div style="display:inline-block;width:44px;height:6px;background:#EEF1F6;border-radius:3px;overflow:hidden;vertical-align:middle;margin-right:6px"><i style="display:block;height:100%;width:'+Math.min(r||0,100)+'%;background:'+col+'"></i></div>';};
   // 막대·숫자 둘 다 방어율(%)로 통일 — 접수수는 툴팁에만 (이중 인코딩 제거)
@@ -1634,7 +1640,8 @@ function guardBox(){
       '<td class="c" style="color:var(--red);font-weight:700">'+(x.drop||'<span class="z">·</span>')+'</td>'+
       '<td>'+(x.r==null?'<span class="z">결론 없음</span>':bar(x.r,'var(--pos)')+'<b>'+x.r+'%</b>')+'</td>'+
       '<td class="c" style="white-space:nowrap">'+(x.pr==null?'<span class="z">—</span>':x.pr+'%'+(d?'<div style="font-size:10.5px;font-weight:700;color:'+(d>0?'var(--pos)':'var(--red)')+'">'+(d>0?'▲':'▼')+Math.abs(d)+'</div>':''))+'</td>'+
-      '<td>'+spark(x.tr)+'</td></tr>';}).join('')+'</tbody></table></div>';
+      '<td>'+spark(x.tr)+'</td></tr>';}).join('')+'</tbody></table></div>'+
+   (retRecv?'<div class="org" style="margin-top:8px">※ 퇴사자(이용우·정기상) '+(+G.slice(5))+'월 접수 '+retRecv+'건은 전사 합계에만 포함하고 담당 표에서는 제외했습니다 — 해당 회원은 현재 다른 담당이 관리합니다.</div>':'');
   return zone('guard','var(--pos)','민원 방어',(+G.slice(5))+'월 '+(dr(cur)==null?'—':dr(cur)+'%'),'달을 골라 그 달 관리·접수·결과를 전월과 같이',
    '<div class="lead">민원 시트 월 탭 기준. <b>방어율</b>=유지÷(유지+해지). 당일취소는 방어 기회가 없던 건이라 방어율에서 뺍니다. 담당은 민원 시트 "관리교사" 칸 그대로 — 현 코칭 명단에 없는 교사로 적힌 접수는 이 표에 안 잡힙니다.</div>'+
    mseg+'<div class="kpi">'+head+'</div>'+sortSeg+tbl,true);
@@ -1697,8 +1704,28 @@ function canBox(){
   var CHK=['고객 오해','관리·코칭 품질','수업·효과 불만'];
   var catCnt={}; order.forEach(function(c){catCnt[c]=P.filter(function(m){return (m.cat||'미분류')===c;}).length;});
 
+  // ── 사업부별 취소현황 요약 (진행중/유지/완결, IB 전체 기준) ──
+  var SAUPF=window.__csaup||'';
+  var bySaup={}; IB.forEach(function(m){ var s=m.saup||'미기재'; var o=bySaup[s]=bySaup[s]||{ing:0,keep:0,done:0};
+    if(m.status==='진행중')o.ing++; else if(m.status==='유지')o.keep++; else if(m.status==='완결')o.done++; });
+  var sk=Object.keys(bySaup).sort(function(a,b){var A=bySaup[a],B=bySaup[b];return (B.ing+B.keep+B.done)-(A.ing+A.keep+A.done);});
+  var smx=1; sk.forEach(function(k){var t=bySaup[k],v=t.ing+t.keep+t.done; if(v>smx)smx=v;});
+  var saupRow=function(lab,key,ing,keep,done,on){ var tot=ing+keep+done;
+    return '<tr'+(on?' class="hot"':'')+'><td><button class="nmbtn" data-csaup="'+esc(key)+'">'+(key?'<b>'+esc(lab)+'</b>':lab)+'</button></td>'+
+      '<td class="c">'+(ing||'<span class="z">·</span>')+'</td>'+
+      '<td class="c" style="color:var(--pos);font-weight:700">'+(keep||'<span class="z">·</span>')+'</td>'+
+      '<td class="c" style="color:var(--red);font-weight:800">'+(done||'<span class="z">·</span>')+'</td>'+
+      '<td class="c"><b>'+tot+'</b></td>'+
+      '<td style="width:110px"><div style="display:inline-block;width:88px;height:6px;background:#EEF1F6;border-radius:3px;overflow:hidden;vertical-align:middle"><i style="display:block;height:100%;width:'+Math.round(tot/smx*100)+'%;background:#F28B7D"></i></div></td></tr>';};
+  var saupSum='<div class="grp">사업부별 취소현황 <span class="org" style="font-weight:600">· 사업부를 누르면 아래 목록이 그 사업부로 좁혀집니다</span></div>'+
+    '<div class="scrollx"><table class="tbl mtbl"><thead><tr><th style="min-width:120px">사업부</th><th class="c">진행중</th><th class="c">유지</th><th class="c">완결</th><th class="c">합</th><th></th></tr></thead><tbody>'+
+    saupRow('전체','',byStatus.진행중.length,byStatus.유지.length,byStatus.완결.length,SAUPF==='')+
+    sk.map(function(k){var t=bySaup[k];return saupRow(k,k,t.ing,t.keep,t.done,SAUPF===k);}).join('')+
+    '</tbody></table></div>';
+
   // 필터 적용
   var S=P.slice();
+  if(SAUPF) S=S.filter(function(m){return (m.saup||'미기재')===SAUPF;});
   if(TF) S=S.filter(function(m){return (m.tags||[]).indexOf(TF)>=0;});
   if(CF) S=S.filter(function(m){return (m.cat||'미분류')===CF;});
 
@@ -1750,8 +1777,8 @@ function canBox(){
 
   return zone('can','var(--red)','취소 문의',byStatus.진행중.length+'진행 · '+byStatus.유지.length+'유지 · '+byStatus.완결.length+'완결',
     '민원 시트 = 취소하겠다고 온 것 전부. 결과 상태로 나눠 분석',
-    '<div class="lead">민원 시트에 올라온 건 모두 <b>취소 문의</b>입니다. 막아냈으면 유지, 못 막았으면 완결, 아직이면 진행중. 성격·원인으로 좁혀 보세요.</div>'+
-    statSeg+tagChips+catChips+body, true);
+    '<div class="lead">민원 시트에 올라온 건 모두 <b>취소 문의</b>입니다. 막아냈으면 유지, 못 막았으면 완결, 아직이면 진행중. 사업부·성격·원인으로 좁혀 보세요.</div>'+
+    saupSum+'<div class="grp" style="margin-top:14px">'+(SAUPF?'<b>'+esc(SAUPF)+'</b> · ':'')+'결과 상태로 보기</div>'+statSeg+tagChips+catChips+body, true);
 }
 function _devIssue(x){
   // 기기 "문제"가 확실한 표현만 (단순 설치완료·발송·체크 제외)
@@ -1771,7 +1798,7 @@ function devBox(){
       var fin=EV.filter(function(e){return e.name===x.n&&e.kind==='첫수업'&&e.st==='done';})[0];
       return '<tr'+(false?' class="hot"':'')+'><td style="white-space:nowrap"><b>'+md(x.d)+'</b><div class="org">'+esc(x.side)+'</div></td>'+
        '<td><button data-name="'+esc(x.n)+'" style="border:0;background:none;font:inherit;font-weight:800;cursor:pointer;padding:0">'+esc(x.n)+'</button></td>'+
-       '<td><b>'+esc(x.br||'—')+'</b><div class="org">상담 '+esc(x.sang||'—')+' · 사업 '+esc(x.saup||'—')+'</div></td>'+
+       '<td><b>'+esc(x.br||'—')+'</b><div class="org">상담 '+esc(x.sang||'—')+' · 사업 <b>'+esc(x.saup||'—')+'</b>'+'</div></td>'+
        '<td class="z" style="white-space:nowrap">'+esc(x.kind)+'</td>'+
        '<td class="note">'+hi(x.note)+
        (fin?'<br><span class="tag ok">해결 — '+md(fin.day)+' 첫수업</span>':'<span class="tag wait" style="margin-left:6px">해결 기록 없음'+(x.d<=TODAY?' · '+diff(x.d,TODAY)+'일':' · 예정 '+md(x.d))+'</span>')+
@@ -1923,7 +1950,7 @@ function byBox(){
       return '<div class="ccard'+(c.resp==='재이탈'?' hot':'')+'">'+
         '<div class="cc1"><button class="nmbtn" data-name="'+esc(m.n)+'">'+esc(m.n)+'</button>'+(m.g?'<span class="gr">'+esc(m.g)+'</span>':'')+
         '<b class="camt">'+(c.amt?won(c.amt):'—')+'</b></div>'+
-        '<div class="org cc2">상담 '+esc(m.sang||'—')+' · 사업 '+esc(m.saup||'—')+' · 담임 '+esc(c.teach||_COACHOF[m.n]||'미기재')+(m.ten>=0?' · 학습기간 '+m.ten+'일':'')+'</div>'+
+        '<div class="org cc2">상담 '+esc(m.sang||'—')+' · 사업 <b>'+esc(m.saup||'—')+'</b>'+' · 담임 '+esc(c.teach||_COACHOF[m.n]||'미기재')+(m.ten>=0?' · 학습기간 '+m.ten+'일':'')+'</div>'+
         '<div class="cbs">'+respTag+'<span class="cb '+cc2+'">'+esc(c.cat||'미분류')+'</span></div>'+
         '<div class="cflow"><span class="cf j">가입 '+(m.join?md(m.join):'—')+'</span><span class="cf r">'+md(c.d)+' '+(c.kind==='당일취소'?'당일취소':'해지')+'</span></div>'+
         '<div class="cwhy">'+(c.why?hi(c.why):'<span class="z">사유 칸 비어 있음</span>')+'</div></div>';
@@ -1999,7 +2026,7 @@ function todoCard(x, mode){
   var meta=[];
   if(br) meta.push(esc(br));
   if(sang) meta.push('상담 '+esc(sang));
-  if(saup) meta.push('사업 '+esc(saup));
+  if(saup) meta.push('사업 <b>'+esc(saup)+'</b>');
   if(coach) meta.push('담임 '+esc(coach));
   // 시간 표기: 골든타임=D-day, 만료임박=만료일, 나머지=접수 경과
   var timeHtml='';
@@ -2216,7 +2243,7 @@ function churnBar(){
     if(x.inJourney){ badges+= x.firstDone
       ? '<span class="cb-bd cb-aft">▶수업후</span>'
       : '<span class="cb-bd cb-bef">📘첫수업 전</span>'; }
-    var meta=[x.br||'지점 미확인', x.sang?'상담 '+x.sang:'', x.saup?'사업 '+x.saup:'', x.coach?'담임 '+x.coach:''].filter(Boolean).join(' · ');
+    var meta=[x.br||'지점 미확인', x.sang?'상담 '+x.sang:'', x.saup?'사업 <b>'+x.saup+'</b>':'', x.coach?'담임 '+x.coach:''].filter(Boolean).join(' · ');
     return '<button class="cbrow" data-name="'+esc(x.name)+'">'+
       '<div class="cb-top">'+tag+'<b>'+esc(x.name)+'</b>'+(x.g?'<span class="cb-g">'+esc(x.g)+'</span>':'')+badges+'</div>'+
       '<div class="cb-meta">'+esc(meta)+'</div>'+
@@ -2285,7 +2312,7 @@ function journeyBox(){
     return '<div class="jrow" data-name="'+esc(j.n)+'">'+
       '<div class="jr-l">'+
         '<div class="jr-nm"><b>'+esc(j.n)+'</b>'+(j.g?'<span class="jr-g">'+esc(j.g)+'</span>':'')+'</div>'+
-        '<div class="jr-meta">'+esc(j.br||'지점 미확인')+(j.sang?' · 상담 '+esc(j.sang):'')+(j.saup?' · 사업 '+esc(j.saup):'')+' · 가입 '+(j.join?md(j.join):'—')+'</div>'+
+        '<div class="jr-meta">'+esc(j.br||'지점 미확인')+(j.sang?' · 상담 '+esc(j.sang):'')+(j.saup?' · 사업 <b>'+esc(j.saup)+'</b>':'')+' · 가입 '+(j.join?md(j.join):'—')+'</div>'+
       '</div>'+
       '<div class="jr-c">'+stepDot(j)+'</div>'+
       '<div class="jr-r">'+
@@ -2343,7 +2370,7 @@ function alertBox(){
   var row=function(x){
     return '<tr'+(x.bad?' class="hot"':'')+'><td style="white-space:nowrap"><b style="font-size:15px;'+(x.bad?'color:var(--red)':'')+'">'+x.d+'</b><span class="org" style="display:inline">'+(cur[3]==='회'?'회':'일')+'</span></td>'+
      '<td><button data-name="'+esc(x.n)+'" class="nmbtn">'+esc(x.n)+'</button><div class="org">'+esc(x.sub)+'</div></td>'+
-     '<td><b>'+esc(x.br||'지점 미확인')+'</b><div class="org">상담 '+esc(x.sang||'—')+' · 사업 '+esc(x.saup||'—')+'</div></td>'+
+     '<td><b>'+esc(x.br||'지점 미확인')+'</b><div class="org">상담 '+esc(x.sang||'—')+' · 사업 <b>'+esc(x.saup||'—')+'</b>'+'</div></td>'+
      '<td style="white-space:nowrap">'+esc(x.st)+'</td><td class="note" style="margin:0">'+(x.note?hi(x.note):'<span class="z">—</span>')+'</td></tr>';};
   var head='<table class="tbl mrow al"><thead><tr><th>경과</th><th>회원</th><th>소속</th><th>마지막 기록</th><th>원문</th></tr></thead><tbody>';
   var body=L.length?head+L.slice(0,20).map(row).join('')+'</tbody></table>'+
@@ -2408,7 +2435,7 @@ function trendBox(){
 }
 function nobrList(){
   var L=[],cnt={};
-  Object.keys(CO).forEach(function(c){CO[c].live.forEach(function(m){var k=cleanNm(m.n);cnt[k]=(cnt[k]||0)+1;if(!m.br)L.push({c:c,t:CO[c].team,m:m});});});
+  Object.keys(CO).forEach(function(c){CO[c].live.forEach(function(m){var k=cleanNm(m.n);cnt[k]=(cnt[k]||0)+1;if(!m.br)L.push({c:c,t:tLbl(CO[c].team),m:m});});});
   if(!L.length) return '';
   return '<div class="lead">이 회원들은 원장에서 학생은 찾았으나 <b>원장에 지점 칸이 비어 있어</b> 소속을 못 넣은 경우입니다. 원장 쪽 지점을 채워야 반영됩니다.</div><details'+(window.innerWidth<=768?'':' open')+'><summary class="more">해당 회원 '+L.length+'명</summary><table class="tbl mrow nb"><thead><tr><th>명단 표기(원문)</th><th>학년</th><th>담당</th><th>만료일</th><th>특이사항 원문</th></tr></thead><tbody>'+
    L.map(function(x){var m=x.m,dup=cnt[cleanNm(m.n)]>1;
@@ -2616,7 +2643,7 @@ function coachTab(){
     var s2=CO[n].live.filter(function(m){return m.wk==='w0'||m.wk==='w1';}).length;
     var w2=mwC(CO[n].live,'진행');
     return '<button class="chip'+(n===cur?' on':'')+'" data-coach="'+esc(n)+'">'+esc(n)+
-      '<span>'+CO[n].team+' · '+CO[n].live.length+(s2?' · <b class="exb">만료 안내 '+s2+'</b>':'')+(w2?' · <b class="hot">민원 진행 '+w2+'</b>':'')+'</span></button>';}).join('')+'</div>';
+      '<span>'+tLbl(CO[n].team)+' · '+CO[n].live.length+(s2?' · <b class="exb">만료 안내 '+s2+'</b>':'')+(w2?' · <b class="hot">민원 진행 '+w2+'</b>':'')+'</span></button>';}).join('')+'</div>';
   var kpi=[['관리중',M.length,''],[md(WK)+' 주 코칭',didW+(hasLog?' / '+hasLog:''),didW?'g':''],
            ['이번 주 만료',wkcnt('w0'),wkcnt('w0')?'b':''],['다음 주 만료',wkcnt('w1'),wkcnt('w1')?'b':''],
            ['민원 진행',mwC(M,'진행'),mwC(M,'진행')?'r':''],['민원 유지(주시)',mwC(M,'유지'),mwC(M,'유지')?'b':''],['민원 해지',mwC(M,'해지'),mwC(M,'해지')?'r':''],
@@ -2662,7 +2689,7 @@ function coachTab(){
        var stt=m.can?'<span class="tag ng">취소</span>':(m.mw?'<button class="tag '+(rr==='유지'?'ok':(rr==='해지'?'ng':'wait'))+'" data-name="'+esc(m.n)+'" style="border:0;cursor:pointer">민원 '+rr+' '+md(m.mw.d)+'</button>':'<span class="z">—</span>');
        return '<tr><td style="white-space:nowrap;font-weight:800">'+md(m.exp)+' <span class="dpn">D-'+dd+'</span></td>'+
         '<td><button data-name="'+esc(m.n)+'" style="border:0;background:none;font:inherit;font-weight:800;cursor:pointer;padding:0">'+esc(m.n)+'</button>'+
-        '<div class="org">'+esc(m.g||'')+' · <b>'+esc(m.br||'지점 미확인')+'</b><br>상담 '+esc(m.sang||'—')+' · 사업 '+esc(m.saup||'—')+'</div></td>'+
+        '<div class="org">'+esc(m.g||'')+' · <b>'+esc(m.br||'지점 미확인')+'</b><br>상담 '+esc(m.sang||'—')+' · 사업 <b>'+esc(m.saup||'—')+'</b>'+'</div></td>'+
         '<td style="white-space:nowrap">'+(m.dw?'<b>'+esc(m.dw)+'</b> '+esc(m.t||''):'<span class="z">—</span>')+'</td>'+
         '<td><span class="tag empty2">칸 없음</span></td><td>'+stt+'</td>'+
         '<td class="note'+(m.note?'':' none')+'" style="max-width:320px">'+(m.note?hi(m.note):'칸 비어 있음')+'</td></tr>';}).join('')+
@@ -2676,7 +2703,7 @@ function coachTab(){
       return '<tr'+(r==='해지'?' class="hot"':'')+'><td style="white-space:nowrap;font-weight:800">'+md(m.mw.d)+'</td>'+
        '<td><button data-name="'+esc(m.n)+'" style="border:0;background:none;font:inherit;font-weight:800;cursor:pointer;padding:0">'+esc(m.n)+'</button>'+
        '<div class="org">'+esc(m.g||'')+' · <b>'+esc(m.br||'지점 미확인')+'</b>'+(m.exp?' · 만료 '+md(m.exp):'')+
-       '<br>코칭 '+esc(cur)+' · 상담 '+esc(m.sang||'—')+(m.saup?' · 사업 '+esc(m.saup):'')+
+       '<br>코칭 '+esc(cur)+' · 상담 '+esc(m.sang||'—')+(m.saup?' · 사업 <b>'+esc(m.saup)+'</b>':'')+
        (m.mw.t&&m.mw.t!==cur?' · 관리교사 '+esc(m.mw.t):'')+'</div></td>'+
        '<td style="white-space:nowrap">'+(m.dw?'<b>'+esc(m.dw)+'</b> '+esc(m.t||''):'<span class="z">—</span>')+'</td>'+
        '<td>'+tg+'</td>'+
@@ -2704,7 +2731,7 @@ function coachTab(){
    '<div class="scrollx"><table class="tbl"><thead><tr><th>담당</th><th>팀</th><th class="c">관리중</th><th class="c">이번 주 만료</th><th class="c">다음 주 만료</th><th class="c">민원 진행</th><th class="c">민원 유지</th><th class="c">민원 해지</th><th class="c">민원율</th><th class="c">취소</th><th class="c">방어율</th><th class="c">만료일 미기재</th><th class="c">특이 신호</th><th class="c">기록률</th><th class="c">관리 종료</th></tr></thead><tbody>'+
    sum.map(function(x){
      return '<tr'+(x.n===cur?' style="background:#F3F6FD"':'')+'><td><button data-coach="'+esc(x.n)+'" style="border:0;background:none;font:inherit;font-weight:800;cursor:pointer;padding:0'+(x.n===cur?';color:var(--v1)':'')+'">'+esc(x.n)+'</button></td>'+
-      '<td class="z">'+x.team+'</td><td class="c"><b>'+x.live+'</b></td>'+
+      '<td class="z">'+tLbl(x.team)+'</td><td class="c"><b>'+x.live+'</b></td>'+
       '<td class="c"'+(x.w0?' style="color:var(--v1);font-weight:800"':'')+'>'+(x.w0||'<span class="z">·</span>')+'</td>'+
       '<td class="c"'+(x.w1?' style="color:#5C7CFA;font-weight:700"':'')+'>'+(x.w1||'<span class="z">·</span>')+'</td>'+
       '<td class="c"'+(x.mo?' style="color:var(--pur);font-weight:800"':'')+'>'+(x.mo||'<span class="z">·</span>')+'</td>'+
@@ -2769,7 +2796,7 @@ function coachTab(){
        '<div class="lead">민원 시트 월 탭 기준. 방어율=유지÷(유지+해지).</div>'+tbl,true);
    })()+
    zone('cdist',"var(--v1)",esc(cur)+' 회원 구성',M.length+'명','학년·가입·만료·지점 분포',coachDist(M)+coachTrend(cur),true)+
-   zone('ctt','var(--pos)',esc(cur)+' 주간 코칭표',V.team+' · '+M.length+'명','만료·민원은 칸 안에 표시',
+   zone('ctt','var(--pos)',esc(cur)+' 주간 코칭표',tLbl(V.team)+' · '+M.length+'명','만료·민원은 칸 안에 표시',
      '<div class="lead"><b style="color:var(--pos)">주차칸●</b> '+md(WK)+' 주차 칸 입력됨(완료 표기 아님) · <b style="color:var(--v1)">진파랑</b> 이번 주 만료(사전 안내 대상) · <b style="color:#5C7CFA">연파랑</b> 다음 주 만료 · <b style="color:var(--red)">민원 진행</b>(결론 전·위험) · <b style="color:#F0A23B">민원 유지</b>(막았지만 주시) · <b style="color:#ADB5BD">민원 해지</b>(이탈) · <b>취소선</b> 취소</div>'+
      '<div class="scrollx"><table class="tt">'+head+rows+'</table></div>'+
      (noslot.length?'<div class="lead" style="margin-top:10px">요일·시간 미기재 '+noslot.length+'명 — '+noslot.slice(0,12).map(function(m){return esc(m.n);}).join(' · ')+(noslot.length>12?' 외':'')+'</div>':''),true)+
@@ -2967,6 +2994,10 @@ function card(name){
     if(JR.can)       jrBadge='<span class="jrbadge can">당일취소</span>';
     else if(JR.hold) jrBadge='<span class="jrbadge hold">보류</span>';
     else if(JR.absent)jrBadge='<span class="jrbadge absent">장기부재</span>';
+    // 첫수업명단 머지: 배정(팀 A/B)·레테 완료·첫수업 실제일
+    if(JR.assign)        jrBadge+='<span class="jrbadge asgn">'+esc(JR.assign)+'팀 배정완</span>';
+    else if(JR.reteDone==='완') jrBadge+='<span class="jrbadge rete">레테 완료</span>';
+    else if(JR.reteDone==='미완') jrBadge+='<span class="jrbadge retex">레테 전</span>';
     var cells=[{s:'가입',st:'done',day:JR.join}].concat(JR.steps||[]);
     jtlHtml='<div class="flow jtl">'+cells.map(function(c,idx){
       var stageCls=(c.s!=='가입'&&c.st!=='miss')?' '+c.s:'';
@@ -2982,6 +3013,9 @@ function card(name){
     var mg=JR.mgmt||{}, mgb=[mg.att&&'출석',mg.hw&&'숙제',mg.wr&&'필기/오답',mg.sch&&'스쿨강의'].filter(Boolean);
     var ob=[];
     if(JR.rete) ob.push('<b>레테</b> '+esc(JR.rete));
+    if(JR.reteDone) ob.push('<b>레테</b> '+(JR.reteDone==='완'?'통과':'미완'));
+    if(JR.assign) ob.push('<b>담임배정</b> '+esc(JR.assign)+'팀');
+    if(JR.firstReal) ob.push('<b>첫수업</b> '+md(JR.firstReal));
     if(JR.realDone) ob.push('<b>리얼 완료</b> '+esc(JR.realDone));
     if(mgb.length) ob.push('<b>관리 기록</b> '+esc(mgb.join(' · ')));
     if(ob.length) jonbHtml='<div class="jonb">온보딩 &nbsp;'+ob.join(' &nbsp;·&nbsp; ')+'</div>';
@@ -3000,7 +3034,7 @@ function card(name){
   return '<div class="ov" data-close="1"><div class="card"><button class="cls" data-close="1">✕</button>'+
    '<h3>'+esc(name)+jrBadge+'</h3>'+
    '<div class="org" style="margin-top:4px"><b>'+esc(o.br||(cm&&cm.br)||'지점 미확인')+'</b> · 상담 '+esc(o.sang||(cm&&cm.sang)||'—')+
-   ' · 사업 '+esc(o.saup||(cm&&cm.saup)||'—')+(coach?' · 코칭 '+esc(coach):'')+
+   ' · 사업 <b>'+esc(o.saup||(cm&&cm.saup)||'—')+'</b>'+(coach?' · 코칭 '+esc(coach):'')+
    (o.join?' · 가입 '+md(o.join)+' (D+'+diff(o.join,CUR)+')':'')+
    (cm&&cm.exp?' · 관리만료 '+md(cm.exp):'')+(cm&&cm.ten>=0?' · 학습기간 '+cm.ten+'일':'')+((cm&&cm.ten>=0&&cm.ten<=30&&!cm.can)?' <span class="tag" style="background:#E7F0FF;color:#1C57C4">신규</span>':'')+'</div>'+
    (cm&&cm.log?'<div class="lead" style="margin:10px 0 0">최근 주차 입력(완료 표기 아님) &nbsp;'+
@@ -3019,7 +3053,7 @@ function searchBox(){
   Object.keys(CO).forEach(function(k){CO[k].live.concat(CO[k].exp).forEach(function(m){
     if(m.n.indexOf(Q)>=0&&!seen['m'+m.n]){seen['m'+m.n]=1;
       out.push({t:'회원',n:m.n,d:(m.g||'')+' · '+(m.br||'')+' · 코칭 '+k,act:'name'});}});});
-  Object.keys(CO).forEach(function(k){if(k.indexOf(Q)>=0) out.push({t:'코칭 담당',n:k,d:CO[k].team+' · 관리중 '+CO[k].live.length,act:'coach'});});
+  Object.keys(CO).forEach(function(k){if(k.indexOf(Q)>=0) out.push({t:'코칭 담당',n:k,d:tLbl(CO[k].team)+' · 관리중 '+CO[k].live.length,act:'coach'});});
   Object.keys(TC.tt||{}).forEach(function(k){if(k.indexOf(Q)>=0) out.push({t:'강사',n:k,d:((TC.prof||{})[k]||{}).subj||'',act:'teach'});});
   if(!out.length) return '<div class="qcard"><div class="empty" style="padding:8px">일치하는 이름이 없습니다.</div></div>';
   return '<div class="qcard">'+out.slice(0,12).map(function(o){
@@ -3042,8 +3076,8 @@ function render(){
     return '<button class="'+(TAB===t[0]?'on':'')+'" data-tab="'+t[0]+'">'+t[1]+'</button>';}).join('');
   var el=document.getElementById('app');
   if(TAB==='all'){
-    var SEC=[['지금 할 일',[['journey','신규 회원 여정',journeyBox],['week','이번 주 · 다음 주',weekBox]]],
-             ['관리 현황',[['exp','관리기간 만료 예정',expBox],['can','취소',canBox],['guard','민원 방어',guardBox]]],
+    var SEC=[['이번 주 할 일',[['week','이번 주 · 다음 주',weekBox],['journey','신규 회원 여정',journeyBox],['exp','관리기간 만료 예정',expBox]]],
+             ['관리 현황',[['can','취소',canBox],['guard','민원 방어',guardBox]]],
              ['분석',[['flow','월별 흐름',flowBox],['funnel','월별 진단',funnelBox],['trend','월별 추이',trendBox],['dev','기기 · 설치 트러블',devBox]]]];
     var anchor='<div class="anch sticky">'+SEC.map(function(g){
         return '<span class="anch-g">'+g[0]+'</span>'+g[1].map(function(z){return '<button data-anch="'+z[0]+'">'+esc(z[1])+'</button>';}).join('');}).join('<span class="anch-sep"></span>')+'</div>';
@@ -3076,6 +3110,7 @@ document.addEventListener('click',function(e){
   else if(b.dataset.cst){window.__cst=b.dataset.cst;window.__ctag="";window.__ccat="";window.__canmore=false;render();}
   else if(b.dataset.ctag!==undefined){window.__ctag=b.dataset.ctag;render();}
   else if(b.dataset.ccat!==undefined){window.__ccat=b.dataset.ccat;render();}
+  else if(b.dataset.csaup!==undefined){window.__csaup=b.dataset.csaup;window.__canmore=false;render();}
   else if(b.dataset.gm){window.__gm=b.dataset.gm;render();}
   else if(b.dataset.fm){window.__fm=b.dataset.fm;render();}
   else if(b.dataset.cg){window.__cg=b.dataset.cg;render();}
