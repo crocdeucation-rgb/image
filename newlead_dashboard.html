@@ -58,7 +58,8 @@
   .sec.camp{border-left-color:var(--amber)} .sec.fnl{border-left-color:var(--teal)} .sec.day{border-left-color:var(--green)} .sec.period{border-left-color:var(--purple)}
   .sec .badge{font-size:9px;font-weight:700;color:var(--sub);background:#eef2f7;padding:2px 7px;border-radius:7px}
 
-  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:11px;overflow:hidden;font-size:12px;margin-bottom:18px}
+  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:11px;margin-bottom:18px;background:var(--card)}
+  table{width:100%;border-collapse:collapse;background:var(--card);font-size:12px}
   thead th{background:#f0f4fa;color:var(--sub);font-weight:700;padding:8px 6px;text-align:center;white-space:nowrap;font-size:11px}
   thead th:first-child{text-align:left;padding-left:12px}
   tbody td{padding:9px 6px;text-align:center;border-top:1px solid var(--line);white-space:nowrap}
@@ -129,6 +130,23 @@
   .note{font-size:11.5px;color:var(--sub);line-height:1.6;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
   .note b{color:var(--ink)}
   .loading{text-align:center;color:var(--sub);padding:30px;font-size:12.5px}
+
+  /* ── 모바일: 표 가로 스크롤 + 축소 (대시보드 모바일 방식) ── */
+  @media(max-width:620px){
+    body{padding:12px 10px 48px}
+    .head h1{font-size:17px}
+    .sec{font-size:12.5px}
+    thead th{font-size:10px;padding:7px 4px}
+    tbody td{padding:8px 5px;font-size:11px}
+    tbody td:first-child{padding-left:9px}
+    #assignee-tbl{min-width:560px}   /* 10컬럼 — 가로 스크롤 */
+    #campaign-tbl{min-width:470px}   /* 8컬럼 */
+    #period-tbl{min-width:430px}     /* 7컬럼 */
+    .summary{gap:7px}
+    .scard{padding:10px 8px}
+    .scard .v{font-size:18px}
+    .funnel,.daybars{padding:12px 10px}
+  }
 </style>
 </head>
 <body>
@@ -156,25 +174,19 @@
         <button data-sort="visit" onclick="setRankSort('visit')">방문순</button>
         <button data-sort="order" onclick="setRankSort('order')">오더순</button>
       </div>
-      <table id="assignee-tbl">
+      <div class="tbl-wrap"><table id="assignee-tbl">
         <thead><tr><th>순위</th><th>담당자</th><th>DB</th><th>방문</th><th>세팅</th><th>오더</th><th>매출</th><th>광고비<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>ROAS</th></tr></thead>
         <tbody><tr><td colspan="10" class="loading">불러오는 중…</td></tr></tbody>
-      </table>
+      </table></div>
     </div>
 
-    <!-- 오른쪽: 캠페인별 + 기간유입 + 일자별 -->
+    <!-- 오른쪽: 캠페인별 + 날짜별유입 + 기간유입 -->
     <div class="colR">
-      <div class="sec camp">캠페인별 <span class="badge">소재 성과</span></div>
-      <table id="campaign-tbl">
-        <thead><tr><th>캠페인</th><th>DB</th><th>방문</th><th>세팅</th><th>오더</th><th>매출</th></tr></thead>
-        <tbody><tr><td colspan="6" class="loading">불러오는 중…</td></tr></tbody>
-      </table>
-
-      <div class="sec period">기간유입 <span class="badge">담당자별 · 주간 CPL</span></div>
-      <table id="period-tbl">
-        <thead><tr><th>담당자</th><th>오늘</th><th>어제</th><th>주간</th><th>월간</th><th>광고비<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th></tr></thead>
-        <tbody><tr><td colspan="7" class="loading">불러오는 중…</td></tr></tbody>
-      </table>
+      <div class="sec camp">캠페인별 <span class="badge">소재 성과 · 광고비</span></div>
+      <div class="tbl-wrap"><table id="campaign-tbl">
+        <thead><tr><th>캠페인</th><th>DB</th><th>방문</th><th>세팅</th><th>오더</th><th>광고비<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>매출</th></tr></thead>
+        <tbody><tr><td colspan="8" class="loading">불러오는 중…</td></tr></tbody>
+      </table></div>
 
       <div class="sec day">날짜별 유입 <span class="badge" id="cal-title">이번 주</span></div>
       <div class="cal-tabs">
@@ -182,11 +194,17 @@
         <button id="cal-btn-month" onclick="setCalView('month')">월간</button>
       </div>
       <div class="daybars" id="daybars"><div class="loading">불러오는 중…</div></div>
+
+      <div class="sec period">기간유입 <span class="badge">담당자별 · 주간 CPL</span></div>
+      <div class="tbl-wrap"><table id="period-tbl">
+        <thead><tr><th>담당자</th><th>오늘</th><th>어제</th><th>주간</th><th>월간</th><th>광고비<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th></tr></thead>
+        <tbody><tr><td colspan="7" class="loading">불러오는 중…</td></tr></tbody>
+      </table></div>
     </div>
   </div>
 
   <div class="note">
-    <b>광고비 기준:</b> 메타는 전날 자정까지 데이터가 다음날 오후 7시에 확정됩니다. 당일 리드는 광고비 미반영이라 ROAS는 참고용입니다 · <b>매출:</b> 오더 확정 기준 (취소 제외) · <b>소재=담당자</b> 1:1 고정 배정
+    <b>광고비 기준:</b> 메타는 전날 자정까지 데이터가 다음날 오후 7시에 확정됩니다. 당일 리드는 광고비 미반영이라 ROAS는 참고용입니다 · <b>캠페인별 광고비</b>는 메타 소재(ad)별 실집행을 캠페인명으로 매칭 · <b>매출:</b> 오더 확정 기준 (취소 제외) · <b>소재=담당자</b> 1:1 고정 배정
   </div>
 </div>
 
@@ -488,21 +506,31 @@ async function load(){
     });
     document.getElementById('funnel').innerHTML = fhtml;
 
-    // ── 캠페인 테이블 ──
+    // ── 캠페인 테이블 (광고비 컬럼 추가) ──
+    //   컬럼: [캠페인(0), DB(1), 방문(2), 세팅(3), 방취(4), 오더(5), 매출(6), 광고비(7), CPL(8)]
+    //   광고비·CPL은 GAS whBuildDashData가 캠페인 블록에 추가(ad_name 매칭). 없으면 '-'.
     var ctb = document.querySelector('#campaign-tbl tbody');
     var chtml='';
     if(cStart>=0){
       for(var r2=cStart;r2<rows.length;r2++){
-        var y=rows[r2]; if(!y[0]||y[0]==='일자별유입')break;
+        var y=rows[r2]; if(!y[0]||y[0]==='일자별유입'||y[0]==='기간유입')break;
+        var _csp=Number(y[7])||0;              // 광고비 (GAS가 넣음, cutoff까지)
+        var _cdb=Number(y[1])||0;
+        var _caf=Number(y[10])||0;             // 캠페인 afterCut (cutoff 이후 유입) — GAS가 넣음
+        // CPL 분모 = 광고비 집계일까지 DB (cutoff 이후 유입 제외). 담당자표와 동일 기준.
+        var _cdbU=_cdb-_caf;
+        var _ccpl=(_csp>0&&_cdbU>0)?won(Math.round(_csp/_cdbU)):'-';
         chtml += '<tr><td>'+y[0]+'</td>'
-          +'<td class="num db">'+(y[1]||0)+'</td>'
+          +'<td class="num db">'+_cdb+'</td>'
           +'<td class="num visit">'+fnl(y[2])+'</td>'
           +'<td class="num setting">'+fnl(y[3])+'</td>'
           +'<td class="num order">'+fnl(y[5])+'</td>'
+          +'<td class="num spend">'+(_csp>0?wonSp(_csp):'-')+'</td>'
+          +'<td class="num cpl">'+_ccpl+'</td>'
           +'<td class="num sales">'+won(y[6])+'</td></tr>';
       }
     }
-    ctb.innerHTML = chtml || '<tr><td colspan="6" class="loading">데이터 없음</td></tr>';
+    ctb.innerHTML = chtml || '<tr><td colspan="8" class="loading">데이터 없음</td></tr>';
 
     // ── 날짜별 유입 — 맵 저장 후 주간/월간 렌더 ──
     _calDaily={};
@@ -516,7 +544,7 @@ async function load(){
 
   }catch(e){
     document.getElementById('updated').textContent = '불러오기 실패 — 대시보드 탭이 생성됐는지 확인하세요';
-    document.querySelector('#assignee-tbl tbody').innerHTML = '<tr><td colspan="8" class="loading">로드 실패</td></tr>';
+    document.querySelector('#assignee-tbl tbody').innerHTML = '<tr><td colspan="10" class="loading">로드 실패</td></tr>';
   }
 }
 load();
