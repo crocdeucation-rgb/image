@@ -4,5 +4,14 @@ const IMGS = {"노트릴스_영상": "https://raw.githubusercontent.com/crocdeuc
 "MLST_학습유형_2609": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/mlst_type_2609.png",
 "MLST_어디서막힐까_2609": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/mlst_found_2609.png",
 "MLST_공부습관_2609": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/mlst_habit_2609.jpg",
-"MLST_성향테스트_2609": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/mlst_academy_2609.png"
+"MLST_성향테스트_2609": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/mlst_academy_2609.png",
+
+"신규_MLST_캐러셀": ["https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_mlst_1.png", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_mlst_2.png", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_mlst_3.png", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_mlst_4.png"],
+"신규_노트컨설팅_캐러셀": ["https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_note_consult_1.png", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_note_consult_2.png", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_note_consult_3.png", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_note_consult_4.png", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_note_consult_5.png"],
+"신규_노트컨설팅_커버": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_note_consult.png",
+"신규_코넬필기_캐러셀": ["https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_cornell_1.jpg", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_cornell_2.jpg", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_cornell_3.jpg"],
+"신규_필기습관": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_habit.jpg",
+"신규_오답노트릴스": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_wrongnote_reels.jpg",
+"신규_초등공부습관": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_habit_elem.jpg",
+"신규_중등기말대비": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_final_mid.jpg"
 };
