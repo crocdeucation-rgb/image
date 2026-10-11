@@ -5,6 +5,7 @@ const IMGS = {"노트릴스_영상": "https://raw.githubusercontent.com/crocdeuc
 "MLST_어디서막힐까_2609": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/mlst_found_2609.png",
 "MLST_공부습관_2609": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/mlst_habit_2609.jpg",
 "MLST_성향테스트_2609": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/mlst_academy_2609.png",
+"캐러셀_국세청첨삭_2609": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/carousel_taxedit_2609.png",
 
 "신규_MLST_캐러셀": ["https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_mlst_1.png", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_mlst_2.png", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_mlst_3.png", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_mlst_4.png"],
 "신규_노트컨설팅_캐러셀": ["https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_note_consult_1.png", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_note_consult_2.png", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_note_consult_3.png", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_note_consult_4.png", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_note_consult_5.png"],
