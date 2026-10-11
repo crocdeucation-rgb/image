@@ -356,6 +356,13 @@ details[open]>.more::before{content:'▾ '}
 .scard .sseg b{font-size:13.5px}
 .scard .sseg.sa{border-color:#B9C7F5;color:#2A42A8;background:#F4F6FF}.scard .sseg.sb{border-color:#9FD8C6;color:#117A55;background:#F1FBF7}.scard .sseg.sx{color:#8C8378}
 .scard .ssub{font-size:11px;color:#A08A5E;font-weight:600;margin-top:7px}
+.tsmgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.tsmt{border:1px solid var(--line);border-radius:12px;padding:11px 13px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font:inherit;text-align:left}
+.tsmt .tsmt-l{font-size:12.5px;font-weight:700;color:var(--soft)}
+.tsmt b{font-size:19px;font-weight:800;color:var(--ink)}
+.tsmt.hot{border-color:#F3C6C0;background:#FFF6F4}.tsmt.hot b{color:#D64534}
+.tsmt.zero b{color:#C2C8D2}
+@media(max-width:560px){.tsmgrid{gap:6px}.tsmt{padding:9px 10px}.tsmt .tsmt-l{font-size:11px}.tsmt b{font-size:16px}}
 .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:800px){.pgrid{grid-template-columns:1fr}}
 .pcard{border:1px solid var(--line);border-radius:14px;padding:14px 16px;background:#fff}.pcard.now{border-color:#C5D0FA;background:#F7F9FF}
 .pch{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}.pch b{font-size:17px}.pch span{font-size:12px;color:var(--soft);font-weight:700}
@@ -1737,6 +1744,23 @@ function salesCard(){
     '<div class="srow">'+seg('A팀',t.A,'sa')+seg('B팀',t.B,'sb')+seg('팀 확인',t.미상,'sx')+'</div>'+
     (gb?'<div class="ssub">'+gb+'</div>':'')+'</div>';
 }
+/* ── 이번 주 처리·실적 요약: 매출(A/B) + 만료·민원·철회 (온보딩 여정과 분리) ── */
+function todoSummaryBox(){
+  // 매출 lazy load — load() 타이밍과 무관하게 요약 렌더 시점에 확실히 가져옴
+  if(window.SALESMTD===null && !window.__salesTried){ window.__salesTried=1; try{ loadSalesMTD().then(function(){ try{render();}catch(e){} }); }catch(e){} }
+  var mon=monday(CUR), e0=add(mon,6);
+  var inW0=function(d){return d&&d>=mon&&d<=e0;};
+  var exN=0; Object.keys(CO).forEach(function(k){(CO[k].live||[]).forEach(function(m){ if(inW0(m.exp)&&!m.can&&inBr(m)) exN++; });});
+  var mwN=IN.filter(function(i){return i.type==='민원'&&i.state==='open'&&inBr(i);}).length;
+  var riskN=0; try{ riskN=churnData().risk.length; }catch(e){}
+  var tile=function(ic,lab,n,anch){return '<button class="tsmt'+(n?' hot':' zero')+'" data-anch="'+anch+'"><span class="tsmt-l">'+ic+' '+lab+'</span><b>'+n+'</b></button>';};
+  return zone('todosum','var(--amber)','이번 주 처리 · 실적','','매출·만료·민원·철회 — 카드를 누르면 상세로',
+    salesCard()+'<div class="tsmgrid">'+
+      tile('📅','관리만료',exN,'exp')+
+      tile('📮','민원 접수',mwN,'can')+
+      tile('⚡','철회위험',riskN,'can')+
+    '</div>',true);
+}
 function planBox(){
   var mon=monday(CUR), w=[[mon,add(mon,6)],[add(mon,7),add(mon,13)]];
   var inW=function(d,i){return d&&d>=w[i][0]&&d<=w[i][1];};
@@ -1755,12 +1779,10 @@ function planBox(){
   var line=function(lab,n,sub,anch){return '<div class="pl"><button class="pll" data-anch="'+anch+'"><span>'+lab+'</span><b'+(n?'':' class="zero"')+'>'+n+'</b></button>'+(sub?'<div class="pls">'+sub+'</div>':'')+'</div>';};
   var card=function(i,title){var r=R[i];
     return '<div class="pcard'+(i?'':' now')+'"><div class="pch"><b>'+title+'</b><span>'+md(w[i][0])+' ~ '+md(w[i][1])+'</span></div>'+
-      line('해피콜',(r.ob['해피콜']||0),'가입 후 첫 통화','week')+
-      line('온보딩 일정',r.obn,top(r.ob),'week')+
-      line('관리 만료 도래',r.ex,r.ex?'담당 '+top(r.exBy):'','exp')+
-      (i?'' : line('민원 접수',openMw,'결과(유지/해지) 전인 접수','miss'))+
+      line('해피콜',(r.ob['해피콜']||0),'가입 후 첫 통화','onbhub')+
+      line('온보딩 일정',r.obn,top(r.ob),'onbhub')+
     '</div>';};
-  return salesCard()+'<div class="pgrid">'+card(0,monday(TODAY)===mon?'이번 주':md(mon)+' 주')+card(1,monday(TODAY)===mon?'다음 주':md(add(mon,7))+' 주')+'</div>';
+  return '<div class="pgrid">'+card(0,monday(TODAY)===mon?'이번 주':md(mon)+' 주')+card(1,monday(TODAY)===mon?'다음 주':md(add(mon,7))+' 주')+'</div>';
 }
 
 function canBox(){
@@ -2405,7 +2427,7 @@ function journeyBox(){
     (held.length?'<span style="color:var(--soft)">· 보류·장기부재 '+held.length+'명 (흐름서 분리)</span>':'')+'</div>':'';
   return zone('journey','var(--v1)','신규 회원 여정','가입 '+J.length+'명','가입 → 해피콜 → 개통 → 입학식 → 첫만남 → 첫수업 → 코칭',
     '<div class="lead">배달 추적처럼 <b>회원 한 명이 지금 어디까지 왔는지</b>를 봅니다. 색으로 문제를 단정하지 않고 <b>진행 상태와 다음 단계</b>만 보여줍니다 — 가입 시 "다음 달 시작" 같은 약속은 메모로 병기됩니다.</div>'+
-    funnelHtml+statusLn+churnBar()+tog+nextFilter+listHtml,true);
+    funnelHtml+statusLn+tog+nextFilter+listHtml,true);
 }
 /* ── 온보딩 허브: 주간 일정 ↔ 단계별 대기 한 위젯·두 탭 ── */
 function onbHubBox(){
@@ -3155,7 +3177,7 @@ function render(){
     return '<button class="'+(TAB===t[0]?'on':'')+'" data-tab="'+t[0]+'">'+t[1]+'</button>';}).join('');
   var el=document.getElementById('app');
   if(TAB==='all'){
-    var SEC=[['이번 주 할 일',[['onbhub','온보딩 허브',onbHubBox],['exp','관리기간 만료 예정',expBox]]],
+    var SEC=[['이번 주 할 일',[['todosum','이번 주 처리·실적',todoSummaryBox],['onbhub','온보딩 허브',onbHubBox],['exp','관리기간 만료 예정',expBox]]],
              ['관리 현황',[['guard','분해 (담당·지점별)',guardBox],['can','취소 문의',canBox]]],
              ['분석',[['flow','월별 흐름',flowBox],['funnel','월별 진단',funnelBox],['trend','월별 추이',trendBox],['dev','기기 · 설치 트러블',devBox]]]];
     var anchor='<div class="anch sticky">'+SEC.map(function(g){
