@@ -347,6 +347,15 @@ details[open]>.more::before{content:'▾ '}
 .mtbl td,.mtbl th{padding:7px 8px}
 .spk{display:flex;gap:5px;align-items:flex-end}.spk span{display:flex;flex-direction:column;align-items:center;gap:2px}.spk i{display:block;width:14px;border-radius:2px}.spk em{font-style:normal;font-size:10px;color:var(--soft);font-weight:700}
 .wknav{display:flex;align-items:center;gap:10px;margin-bottom:12px}.wknav button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 12px;font:inherit;font-weight:700;cursor:pointer;color:var(--ink)}.wknav button:hover{background:#F4F7FF;border-color:#C5D0FA}.wknav b{font-size:15px}.wknow{font-size:11px;font-weight:800;color:var(--v1);background:#EEF2FF;padding:3px 9px;border-radius:20px}
+.scard{border:1px solid #E3D9C8;border-radius:14px;padding:12px 16px;background:linear-gradient(90deg,#FFFBF2,#FFF7E8);margin-bottom:14px}
+.scard .sch{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;margin-bottom:9px}
+.scard .sch b{font-size:16px;color:#1B2436}.scard .sct{font-size:11px;font-weight:700;color:#B4883B;background:#FBEFD6;padding:1px 8px;border-radius:9px}
+.scard .stot{font-size:13px;font-weight:800;color:#9A6B16;margin-left:auto}
+.scard .srow{display:flex;gap:8px;flex-wrap:wrap}
+.scard .sseg{font-size:12.5px;font-weight:700;color:#5B4B2E;background:#fff;border:1px solid #EADFC9;border-radius:9px;padding:4px 11px}
+.scard .sseg b{font-size:13.5px}
+.scard .sseg.sa{border-color:#B9C7F5;color:#2A42A8;background:#F4F6FF}.scard .sseg.sb{border-color:#9FD8C6;color:#117A55;background:#F1FBF7}.scard .sseg.sx{color:#8C8378}
+.scard .ssub{font-size:11px;color:#A08A5E;font-weight:600;margin-top:7px}
 .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:800px){.pgrid{grid-template-columns:1fr}}
 .pcard{border:1px solid var(--line);border-radius:14px;padding:14px 16px;background:#fff}.pcard.now{border-color:#C5D0FA;background:#F7F9FF}
 .pch{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}.pch b{font-size:17px}.pch span{font-size:12px;color:var(--soft);font-weight:700}
@@ -1130,6 +1139,7 @@ body.gate-hasbar{padding-top:34px}
         });
       });
       window.OPS=O;
+      try{ if(typeof loadSalesMTD==='function') await loadSalesMTD(); }catch(e){}   // ★ 매출입력 이번달 자체매출(A/B) 직접 로드
       var el=document.getElementById('ops-load'); if(el) el.remove();
       if(window.__bootOps) window.__bootOps();
     }catch(e){
@@ -1672,6 +1682,61 @@ function guardBox(){
    dimSeg+mseg+'<div class="kpi">'+head+'</div>'+sortSeg+tbl,true);
 }
 function tLbl2(k){return k;}   // (코칭담당 이름은 그대로 — 팀 라벨 아님)
+
+// ★ 매출입력시트(운영센터) 이번달 자체매출(추가계약) 직접 로드 — 팀 컬럼(A/B) 집계
+window.SALESMTD=null;
+async function loadSalesMTD(){
+  try{
+    var now=new Date();
+    var ym=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+    var url='https://docs.google.com/spreadsheets/d/1KuBnGVIxo_1oJO4vbZyYtFnGWAZlIgdimM-mm8wuLUE/gviz/tq?tqx=out:csv&headers=0&gid=1847238453';
+    var txt=await fetch(url,{cache:'no-store'}).then(function(r){return r.text();});
+    var rows=txt.trim().split('\n').map(function(line){
+      var o=[],c='',q=false;
+      for(var i=0;i<line.length;i++){var ch=line[i];
+        if(ch==='"'){q=!q;}else if(ch===','&&!q){o.push(c);c='';}else c+=ch;}
+      o.push(c);return o;
+    });
+    var W=function(s){var n=String(s||'').replace(/[^0-9]/g,'');return n?parseInt(n,10):0;};
+    // ★ 담임시트(코칭 A/B)에서 이름→팀 맵 — 매출 팀칸이 A/B가 아닐 때(오름·기타 오입력) 폴백 판정
+    var CO=(window.OPS&&window.OPS.coach)||{}, n2t={};
+    Object.keys(CO).forEach(function(c){
+      var tm=CO[c].team, t=(tm==='1팀')?'A':(tm==='2팀')?'B':'';
+      if(!t) return;
+      ['live','exp'].forEach(function(k){(CO[c][k]||[]).forEach(function(m){
+        var nm=String(m.n||'').replace(/\(.*?\)/g,'').replace(/\s+/g,'').trim();
+        if(nm&&!n2t[nm]) n2t[nm]=t;
+      });});
+    });
+    // 컬럼: 0기준월 1방문일 2구분 3이름 4학년 5사업 6팀 7계약금액
+    var by={A:{c:0,amt:0},B:{c:0,amt:0},미상:{c:0,amt:0}}, tot={c:0,amt:0}, gubun={};
+    rows.forEach(function(r){
+      if((r[0]||'').trim()!==ym) return;
+      var g=(r[2]||'').trim();
+      if(g.indexOf('자체매출')<0) return;           // 추가계약 = 구분이 자체매출 계열
+      var team=(r[6]||'').trim(), tk;
+      if(team==='A') tk='A';
+      else if(team==='B') tk='B';
+      else { var nm=String(r[3]||'').replace(/\(.*?\)/g,'').replace(/\s+/g,'').trim(); tk=n2t[nm]||'미상'; }  // 팀칸 오입력 → 담임으로 판정
+      var amt=W(r[7]);
+      by[tk].c++; by[tk].amt+=amt; tot.c++; tot.amt+=amt;
+      if(!gubun[g]) gubun[g]={c:0,amt:0}; gubun[g].c++; gubun[g].amt+=amt;
+    });
+    window.SALESMTD={by:by,tot:tot,gubun:gubun,ym:ym};
+  }catch(e){ window.SALESMTD=null; }
+}
+function salesCard(){
+  var S=window.SALESMTD; if(!S||!S.tot.c) return '';
+  var w=function(n){ return n>=10000?(Math.round(n/10000)).toLocaleString()+'만':n.toLocaleString(); };
+  var t=S.by, mo=(+S.ym.slice(5,7));
+  var seg=function(lab,o,cls){ return o.c?'<span class="sseg '+cls+'">'+lab+' <b>'+o.c+'</b>건 · '+w(o.amt)+'</span>':''; };
+  var gb=Object.keys(S.gubun).sort(function(a,b){return S.gubun[b].amt-S.gubun[a].amt;})
+    .map(function(g){return esc(g.replace('자체매출-',''))+' '+S.gubun[g].c;}).join(' · ');
+  return '<div class="scard"><div class="sch"><b>💰 '+mo+'월 자체매출</b><span class="sct">추가계약</span>'+
+    '<span class="stot">'+S.tot.c+'건 · '+w(S.tot.amt)+'원</span></div>'+
+    '<div class="srow">'+seg('A팀',t.A,'sa')+seg('B팀',t.B,'sb')+seg('팀 확인',t.미상,'sx')+'</div>'+
+    (gb?'<div class="ssub">'+gb+'</div>':'')+'</div>';
+}
 function planBox(){
   var mon=monday(CUR), w=[[mon,add(mon,6)],[add(mon,7),add(mon,13)]];
   var inW=function(d,i){return d&&d>=w[i][0]&&d<=w[i][1];};
@@ -1690,13 +1755,12 @@ function planBox(){
   var line=function(lab,n,sub,anch){return '<div class="pl"><button class="pll" data-anch="'+anch+'"><span>'+lab+'</span><b'+(n?'':' class="zero"')+'>'+n+'</b></button>'+(sub?'<div class="pls">'+sub+'</div>':'')+'</div>';};
   var card=function(i,title){var r=R[i];
     return '<div class="pcard'+(i?'':' now')+'"><div class="pch"><b>'+title+'</b><span>'+md(w[i][0])+' ~ '+md(w[i][1])+'</span></div>'+
+      line('해피콜',(r.ob['해피콜']||0),'가입 후 첫 통화','week')+
       line('온보딩 일정',r.obn,top(r.ob),'week')+
       line('관리 만료 도래',r.ex,r.ex?'담당 '+top(r.exBy):'','exp')+
-      (i?'' : line('민원 접수',openMw,'결과(유지/해지) 전인 접수','miss')+
-
-              line('재배정 대기',A.orphan.filter(function(x){return x.bad;}).length,'담임이 현직 명단에 없는 회원','alert'))+
+      (i?'' : line('민원 접수',openMw,'결과(유지/해지) 전인 접수','miss'))+
     '</div>';};
-  return '<div class="pgrid">'+card(0,monday(TODAY)===mon?'이번 주':md(mon)+' 주')+card(1,monday(TODAY)===mon?'다음 주':md(add(mon,7))+' 주')+'</div>';
+  return salesCard()+'<div class="pgrid">'+card(0,monday(TODAY)===mon?'이번 주':md(mon)+' 주')+card(1,monday(TODAY)===mon?'다음 주':md(add(mon,7))+' 주')+'</div>';
 }
 
 function canBox(){
@@ -2249,10 +2313,10 @@ function churnBar(){
     if(x.inJourney){ badges+= x.firstDone
       ? '<span class="cb-bd cb-aft">▶수업후</span>'
       : '<span class="cb-bd cb-bef">📘첫수업 전</span>'; }
-    var meta=[x.br||'지점 미확인', x.sang?'상담 '+x.sang:'', x.saup?'사업 <b>'+x.saup+'</b>':'', x.coach?'담임 '+x.coach:''].filter(Boolean).join(' · ');
+    var meta=[esc(x.br||'지점 미확인'), x.sang?'상담 '+esc(x.sang):'', x.saup?'사업 <b>'+esc(x.saup)+'</b>':'', x.coach?'담임 '+esc(x.coach):''].filter(Boolean).join(' · ');
     return '<button class="cbrow" data-name="'+esc(x.name)+'">'+
       '<div class="cb-top">'+tag+'<b>'+esc(x.name)+'</b>'+(x.g?'<span class="cb-g">'+esc(x.g)+'</span>':'')+badges+'</div>'+
-      '<div class="cb-meta">'+esc(meta)+'</div>'+
+      '<div class="cb-meta">'+meta+'</div>'+
       (x.why?'<div class="cb-why">'+esc(x.why)+'</div>':'')+
     '</button>';
   }
@@ -2342,6 +2406,15 @@ function journeyBox(){
   return zone('journey','var(--v1)','신규 회원 여정','가입 '+J.length+'명','가입 → 해피콜 → 개통 → 입학식 → 첫만남 → 첫수업 → 코칭',
     '<div class="lead">배달 추적처럼 <b>회원 한 명이 지금 어디까지 왔는지</b>를 봅니다. 색으로 문제를 단정하지 않고 <b>진행 상태와 다음 단계</b>만 보여줍니다 — 가입 시 "다음 달 시작" 같은 약속은 메모로 병기됩니다.</div>'+
     funnelHtml+statusLn+churnBar()+tog+nextFilter+listHtml,true);
+}
+/* ── 온보딩 허브: 주간 일정 ↔ 단계별 대기 한 위젯·두 탭 ── */
+function onbHubBox(){
+  var T=window.__onbtab||'week';
+  var seg='<div class="seg onbtab" style="margin-bottom:10px">'+
+    '<button class="'+(T==='week'?'on':'')+'" data-onbtab="week">📅 주간 일정</button>'+
+    '<button class="'+(T==='stage'?'on':'')+'" data-onbtab="stage">🔖 단계별 대기</button></div>';
+  var body=(T==='stage'?journeyBox():weekBox());
+  return '<div id="z-onbhub" class="onbhub">'+seg+body+'</div>';
 }
 function alertBox(){
   var A=alertData();
@@ -3082,7 +3155,7 @@ function render(){
     return '<button class="'+(TAB===t[0]?'on':'')+'" data-tab="'+t[0]+'">'+t[1]+'</button>';}).join('');
   var el=document.getElementById('app');
   if(TAB==='all'){
-    var SEC=[['이번 주 할 일',[['week','이번 주 · 다음 주',weekBox],['journey','신규 회원 여정',journeyBox],['exp','관리기간 만료 예정',expBox]]],
+    var SEC=[['이번 주 할 일',[['onbhub','온보딩 허브',onbHubBox],['exp','관리기간 만료 예정',expBox]]],
              ['관리 현황',[['guard','분해 (담당·지점별)',guardBox],['can','취소 문의',canBox]]],
              ['분석',[['flow','월별 흐름',flowBox],['funnel','월별 진단',funnelBox],['trend','월별 추이',trendBox],['dev','기기 · 설치 트러블',devBox]]]];
     var anchor='<div class="anch sticky">'+SEC.map(function(g){
@@ -3122,6 +3195,7 @@ document.addEventListener('click',function(e){
   else if(b.dataset.cg){window.__cg=b.dataset.cg;render();}
   else if(b.dataset.gsort){window.__gsort=b.dataset.gsort;render();}
   else if(b.dataset.mdim){window.__mdim=b.dataset.mdim;render();}
+  else if(b.dataset.onbtab){window.__onbtab=b.dataset.onbtab;render();}
   else if(b.dataset.expview){window.__expview=b.dataset.expview;render();}
   else if(b.dataset.bsel){window.__bsel=b.dataset.bsel;render();}
   else if(b.dataset.cp){window.__cp=b.dataset.cp;render();}
