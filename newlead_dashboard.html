@@ -185,8 +185,8 @@
     <div class="col">
       <div class="sec camp">캠페인별 <span class="badge">소재 성과 · 광고비</span></div>
       <div class="tbl-wrap"><table id="campaign-tbl">
-        <thead><tr><th>캠페인</th><th>DB</th><th>방문</th><th>세팅</th><th>오더</th><th>광고비<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>매출</th></tr></thead>
-        <tbody><tr><td colspan="8" class="loading">불러오는 중…</td></tr></tbody>
+        <thead><tr><th>캠페인</th><th>DB</th><th>방문</th><th>세팅</th><th>오더</th><th>광고비<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>매출</th><th>적합도<br><span style="font-size:8px;color:#aaa;font-weight:400">핵심35-54</span></th></tr></thead>
+        <tbody><tr><td colspan="9" class="loading">불러오는 중…</td></tr></tbody>
       </table></div>
 
       <div class="sec period">기간유입 <span class="badge">담당자별 · 주간 CPL</span></div>
@@ -524,6 +524,10 @@ async function load(){
         // CPL 분모 = 광고비 집계일까지 DB (cutoff 이후 유입 제외). 담당자표와 동일 기준.
         var _cdbU=_cdb-_caf;
         var _ccpl=(_csp>0&&_cdbU>0)?won(Math.round(_csp/_cdbU)):'-';
+        // 타겟 적합도 [11] = 소재별 핵심(35-54 학부모) 리드% — GAS saveMetaSpendToSheet가 넣음
+        var _cfit=(y[11]===''||y[11]==null)?null:(parseInt(y[11])||0);
+        var _fcol=_cfit==null?'#cbd5e1':(_cfit>=70?'#0f9d58':(_cfit>=45?'#f59e0b':'#ef4444'));
+        var _ftxt=_cfit==null?'<span style="color:#cbd5e1">-</span>':('<b style="color:'+_fcol+'">'+_cfit+'%</b>');
         chtml += '<tr><td>'+y[0]+'</td>'
           +'<td class="num db">'+_cdb+'</td>'
           +'<td class="num visit">'+fnl(y[2])+'</td>'
@@ -531,10 +535,11 @@ async function load(){
           +'<td class="num order">'+fnl(y[5])+'</td>'
           +'<td class="num spend">'+(_csp>0?wonSp(_csp):'-')+'</td>'
           +'<td class="num cpl">'+_ccpl+'</td>'
-          +'<td class="num sales">'+won(y[6])+'</td></tr>';
+          +'<td class="num sales">'+won(y[6])+'</td>'
+          +'<td class="num" style="font-size:11px">'+_ftxt+'</td></tr>';
       }
     }
-    ctb.innerHTML = chtml || '<tr><td colspan="8" class="loading">데이터 없음</td></tr>';
+    ctb.innerHTML = chtml || '<tr><td colspan="9" class="loading">데이터 없음</td></tr>';
 
     // ── 날짜별 유입 — 맵 저장 후 주간/월간 렌더 ──
     _calDaily={};
