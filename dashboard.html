@@ -1184,6 +1184,7 @@ function setPeriodAll(idx){
   render();
   renderCancel();
   renderGrowthInflow();
+  try{ renderBunriCamps(); }catch(e){}   // ★ 탭 전환 시 분리캠페인 섹션 재평가(지난달/전체면 숨김)
 }
 // 기존 호출부 호환 (HTML onclick 둘 다 setPeriodAll로 통일)
 function setFunnelAll(idx){ setPeriodAll(idx); }
