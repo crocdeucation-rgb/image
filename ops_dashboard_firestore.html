@@ -1972,10 +1972,11 @@ function funnelBox(){
   var arrow='<div class="farr">›</div>';
   var seg='<div class="seg" style="margin-bottom:10px">'+ms.map(function(m){
     return '<button class="'+(m===F?'on':'')+'" data-fm="'+m+'">'+lab(m)+(m===DATA.slice(0,7)?' (진행 중)':'')+'</button>';}).join('')+'</div>';
+  var fPart=(F===DATA.slice(0,7));   // 선택 달이 진행 중이면 전월 대비 ▲▼ 생략 (종결 전)
   var funnel='<div class="fflow">'+
-    step('민원 접수',cur.mw+'건',(pv?'전월 '+pv.mw+d_(cur.mw,pv.mw,'dn'):''),'var(--pur)')+arrow+
-    step('민원 방어',(dr(cur)==null?'—':dr(cur)+'%'),'유지 '+cur.keep+' · 해지 '+cur.drop+(pv&&dr(pv)!=null?' · 전월 '+dr(pv)+'%'+d_(dr(cur),dr(pv),'up'):''),dr(cur)>=55?'var(--pos)':'var(--red)')+arrow+
-    step('취소',(cur.can==null?'—':cur.can+'명'),'일반 '+(cur.canGen||0)+' · 당일 '+(cur.canDang||0)+(pv&&pv.can!=null&&cur.can!=null?' · 전월 '+pv.can+d_(cur.can,pv.can,'dn'):'')+' · 취소입력시트','var(--red)')+'</div>';
+    step('민원 접수',cur.mw+'건',(pv?'전월 '+pv.mw+(fPart?'':d_(cur.mw,pv.mw,'dn')):''),'var(--pur)')+arrow+
+    step('민원 방어',(dr(cur)==null?'—':dr(cur)+'%'),'유지 '+cur.keep+' · 해지 '+cur.drop+(pv&&dr(pv)!=null?' · 전월 '+dr(pv)+'%'+(fPart?'':d_(dr(cur),dr(pv),'up')):''),dr(cur)>=55?'var(--pos)':'var(--red)')+arrow+
+    step('취소',(cur.can==null?'—':cur.can+'명'),'일반 '+(cur.canGen||0)+' · 당일 '+(cur.canDang||0)+(pv&&pv.can!=null&&cur.can!=null?' · 전월 '+pv.can+(fPart?'':d_(cur.can,pv.can,'dn')):'')+' · 취소입력시트','var(--red)')+'</div>';
   /* 월 × 항목 매트릭스 */
   var th='<th style="min-width:170px">'+'</th>'+ms.map(function(m){return '<th class="c'+(m===F?' fsel':'')+'" style="min-width:80px">'+lab(m)+'<div class="org" style="font-weight:600">취소 '+byM[m].length+'</div></th>';}).join('');
   var cell=function(m,n,mx,col){var tot=byM[m].length, p=tot?Math.round(n/tot*100):0;
@@ -2567,11 +2568,12 @@ function combo(o){
   var pts=[];
   o.data.forEach(function(d,i){
     var cx=pl+cw*i+cw/2, bw=Math.min(cw*0.5,34);
-    if(d.barA!=null||d.barB!=null){   // A/B 스택 (총계=A+B)
-      var ha=Math.max((d.barA||0)/bm*bH,0), hb=Math.max((d.barB||0)/bm*bH,0), ya=base-ha, yb=ya-hb, op=d.part?' fill-opacity=".45"':'';
+    if(d.barA!=null||d.barB!=null||d.barX!=null){   // A/B/미상 스택 (총계=A+B+미상)
+      var ha=Math.max((d.barA||0)/bm*bH,0), hb=Math.max((d.barB||0)/bm*bH,0), hx=Math.max((d.barX||0)/bm*bH,0), ya=base-ha, yb=ya-hb, yx=yb-hx, op=d.part?' fill-opacity=".45"':'';
       s+='<rect x="'+(cx-bw/2)+'" y="'+ya+'" width="'+bw+'" height="'+ha+'" fill="#3B5BDB"'+op+'/>';
-      s+='<rect x="'+(cx-bw/2)+'" y="'+yb+'" width="'+bw+'" height="'+hb+'" rx="3" fill="#12B886"'+op+'/>';
-      s+='<text x="'+cx+'" y="'+(yb-5)+'" text-anchor="middle" font-size="12" font-weight="800" fill="#161C2B">'+d.bar+'</text>';
+      s+='<rect x="'+(cx-bw/2)+'" y="'+yb+'" width="'+bw+'" height="'+hb+'" fill="#12B886"'+op+'/>';
+      if(hx>0.5) s+='<rect x="'+(cx-bw/2)+'" y="'+yx+'" width="'+bw+'" height="'+hx+'" rx="3" fill="#C6CDD8"'+op+'/>';
+      s+='<text x="'+cx+'" y="'+((hx>0.5?yx:yb)-5)+'" text-anchor="middle" font-size="12" font-weight="800" fill="#161C2B">'+d.bar+'</text>';
     } else {
       var h=Math.max(d.bar/bm*bH,2), y=base-h;
       s+='<rect x="'+(cx-bw/2)+'" y="'+y+'" width="'+bw+'" height="'+h+'" rx="3" fill="'+o.barCol+'"'+(d.part?' fill-opacity=".4" stroke="'+o.barCol+'" stroke-dasharray="3 2"':'')+'/>';
@@ -2588,8 +2590,8 @@ function combo(o){
     s+='<text x="'+p[0]+'" y="'+(p[1]-8)+'" text-anchor="middle" font-size="11.5" font-weight="800" fill="'+o.lineCol+'">'+o.fmt(p[2].line)+'</text>';
   });
   s+='</svg>';
-  var leg=(o.data.some(function(d){return d.barA!=null||d.barB!=null;}))
-    ? '<i style="background:#3B5BDB"></i>A팀<i style="background:#12B886"></i>B팀<i style="background:'+o.lineCol+';height:3px;margin-top:5px"></i>'+o.lineName
+  var leg=(o.data.some(function(d){return d.barA!=null||d.barB!=null||d.barX!=null;}))
+    ? '<i style="background:#3B5BDB"></i>A팀<i style="background:#12B886"></i>B팀<i style="background:#C6CDD8"></i>미상<i style="background:'+o.lineCol+';height:3px;margin-top:5px"></i>'+o.lineName
     : '<i style="background:'+o.barCol+'"></i>'+o.barName+'<i style="background:'+o.lineCol+';height:3px;margin-top:5px"></i>'+o.lineName;
   return '<div class="chart"><div class="chh"><b>'+o.title+'</b><span>'+leg+'</span></div>'+s+
     (o.foot?'<div class="chf">'+o.foot+'</div>':'')+'</div>';
@@ -2608,11 +2610,11 @@ function trendCharts(){
   return '<div class="charts">'+
    combo({title:'취소',barName:'건수',lineName:'금액(만)',barCol:'#F28B7D',lineCol:'#B42318',
      fmt:function(v){return (Math.round(v*10)/10).toLocaleString('ko-KR')+'만';},
-     data:c.map(function(x){var o=canMT[x.m]||{A:0,B:0};return {lab:(+x.m.slice(5))+'월',bar:o.A+o.B,barA:o.A,barB:o.B,line:x.amt/10000,part:P(x.m)};}),
+     data:c.map(function(x){var o=canMT[x.m]||{A:0,B:0};return {lab:(+x.m.slice(5))+'월',bar:x.n,barA:o.A,barB:o.B,barX:Math.max(x.n-o.A-o.B,0),line:x.amt/10000,part:P(x.m)};}),
      foot:c.map(function(x){return (+x.m.slice(5))+'월 '+won(x.amt);}).join(' · ')})+
    combo({title:'민원',barName:'접수 건수',lineName:'방어율',barCol:'#8EA4F8',lineCol:'#3B5BDB',
      fmt:function(v){return (Math.round(v*10)/10)+'%';},
-     data:w.map(function(x){var cl=x.keep+x.drop,o=mwMT[x.m]||{A:0,B:0};return {lab:(+x.m.slice(5))+'월',bar:o.A+o.B,barA:o.A,barB:o.B,line:cl?x.keep/cl*100:null,part:P(x.m)};}),
+     data:w.map(function(x){var cl=x.keep+x.drop,o=mwMT[x.m]||{A:0,B:0};return {lab:(+x.m.slice(5))+'월',bar:x.n,barA:o.A,barB:o.B,barX:Math.max(x.n-o.A-o.B,0),line:cl?x.keep/cl*100:null,part:P(x.m)};}),
      foot:w.map(function(x){return (+x.m.slice(5))+'월 유지 '+x.keep+' · 해지 '+x.drop;}).join(' / ')})+
   '</div>';
 }
