@@ -1245,7 +1245,7 @@ var HOL=D.holidays||{}; var TODAY=D.today, DATA=D.dataTo, CUR=TODAY, SEL=null, T
 var _TEAMAB=(function(){var o={};Object.keys(CO).forEach(function(k){var t=CO[k]&&CO[k].team,ab=t==='1팀'?'A팀':t==='2팀'?'B팀':'';if(ab)o[String(k).replace(/\(.*?\)/g,'').replace(/\s+/g,'')]=ab;});return o;})();
 function teamAB(coachName){if(!coachName)return '(미배정)';return _TEAMAB[String(coachName).replace(/\(.*?\)/g,'').replace(/\s+/g,'')]||'팀 미상';}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-function P(s){var a=s.split('-');return new Date(+a[0],+a[1]-1,+a[2]);}
+function P(s){if(!s)return new Date(NaN); var a=String(s).split('-');return new Date(+a[0],+a[1]-1,+a[2]);}
 function F(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function add(s,n){var d=P(s);d.setDate(d.getDate()+n);return F(d);}
 var DW=['일','월','화','수','목','금','토'];
@@ -1389,7 +1389,7 @@ function weekBox(){
     return '<div class="wc'+rel+(d===sel?' sel':'')+'" data-go="'+d+'" style="cursor:pointer"><button class="wh" data-go="'+d+'"><b>'+md(d)+'</b><span>'+dw(d)+(d===TODAY?' · 오늘':(d===add(TODAY,1)?' · 내일':''))+'</span></button><div class="wb">'+
       sec('ev','단계 일정',ppl.length,evItems,d===TODAY?8:5)+sec('xp','만료 · 사전 안내',X.length,xItems,5)+sec('mw','민원 접수',M.length,mItems,3)+'</div></div>';
   }).join('');
-  var callItems=mwOpen.map(function(i){return '<li><button data-name="'+esc(i.name)+'">'+esc(i.name)+'</button><small>접수 '+md(i.day)+' · '+esc((i.sub||'').replace('관리교사 ','').split(' · ')[0])+'</small><b class="'+(diff(i.day,TODAY)>=14?'ng':'mu')+'">'+diff(i.day,TODAY)+'일</b></li>';});
+  var callItems=mwOpen.map(function(i){return '<li><button data-name="'+esc(i.name)+'">'+esc(i.name)+'</button><small>접수 '+(i.recv?md(i.recv):'—')+' · '+esc((i.sub||'').replace('관리교사 ','').split(' · ')[0])+'</small><b class="'+(diff(i.recv,TODAY)>=14?'ng':'mu')+'">'+diff(i.recv,TODAY)+'일</b></li>';});
   var obByN={};EV.forEach(function(e){if(inBr(e)&&/부재/.test(e.note||''))(obByN[e.name]=obByN[e.name]||[]).push(e);});
   var obItems=Object.keys(obByN).filter(function(n){return !EV.some(function(e){return e.name===n&&e.kind==='첫수업'&&e.st==='done';});}).map(function(n){
     var L=obByN[n].sort(function(a,b){return b.day.localeCompare(a.day);});return {n:n,d:L[0].day,k:L[0].kind};}).sort(function(a,b){return b.d.localeCompare(a.d);})
@@ -1572,9 +1572,9 @@ function missBox(){
   } else if(sel==='민원 결과 미기재'){
     list=openMw.length?'<table class="tbl"><thead><tr><th>회원</th><th>가입</th><th>접수</th><th>경과</th><th>담당</th><th>사유</th></tr></thead><tbody>'+
      openMw.slice(0,40).map(function(i){
-      return '<tr'+(diff(i.day,TODAY)>=21?' class="hot"':'')+'><td><button data-name="'+esc(i.name)+'" style="border:0;background:none;font:inherit;font-weight:800;cursor:pointer;padding:0">'+esc(i.name)+'</button>'+
+      return '<tr'+(diff(i.recv,TODAY)>=21?' class="hot"':'')+'><td><button data-name="'+esc(i.name)+'" style="border:0;background:none;font:inherit;font-weight:800;cursor:pointer;padding:0">'+esc(i.name)+'</button>'+
        '<div class="org"><b>'+esc(i.br||'지점 미확인')+'</b><br>상담 '+esc(i.sang||'—')+' · 사업 <b>'+esc(i.saup||'—')+'</b>'+'</div></td>'+
-       '<td style="white-space:nowrap">'+(i.join?md(i.join):'<span class="z">—</span>')+'</td><td style="white-space:nowrap">'+md(i.day)+'</td><td style="white-space:nowrap;font-weight:800">'+diff(i.day,TODAY)+'일째</td>'+
+       '<td style="white-space:nowrap">'+(i.join?md(i.join):'<span class="z">—</span>')+'</td><td style="white-space:nowrap">'+(i.recv?md(i.recv):'—')+'</td><td style="white-space:nowrap;font-weight:800">'+diff(i.recv,TODAY)+'일째</td>'+
        '<td class="z" style="white-space:nowrap">'+esc(i.sub||'')+'</td>'+
        '<td class="note'+(i.note?'':' none')+'">'+(i.note?hi(i.note):'사유 칸 비어 있음')+'</td></tr>';}).join('')+
      '</tbody></table>'+(openMw.length>40?'<div class="empty">외 '+(openMw.length-40)+'건</div>':''):'<div class="empty">없습니다.</div>';
