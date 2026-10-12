@@ -45,6 +45,11 @@ body{overflow-x:hidden}
 .card{background:var(--pan);border-radius:14px;padding:18px 20px;box-shadow:0 2px 8px rgba(27,36,54,.05)}
 .ct{font-size:14px;font-weight:800;display:flex;align-items:center;gap:8px}
 .dot{width:10px;height:10px;border-radius:50%}.card.web .dot{background:var(--web)}.card.sang .dot{background:var(--v1)}
+.wsub{margin-top:11px;border-top:1px solid var(--line);padding-top:9px;display:flex;flex-direction:column;gap:5px}
+.wsr{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;gap:8px}
+.wsn{font-weight:800;color:var(--ink);white-space:nowrap}
+.wsv{color:var(--soft);font-weight:700;text-align:right;white-space:nowrap}
+.wsv b{color:var(--web);font-size:13px}.wsv em{font-style:normal;color:var(--soft);font-weight:600;margin-left:7px;font-size:11px}
 .card .v{font-size:23px;font-weight:900;margin-top:8px}.card .v span{font-size:13px;color:var(--soft)}
 .card .r{display:flex;gap:16px;margin-top:8px;flex-wrap:wrap}.card .r div{font-size:12px;color:var(--soft)}.card .r b{display:block;font-size:16px;color:var(--ink);margin-top:2px}
 .card .r .cx b{color:var(--red)}
@@ -1037,7 +1042,7 @@ body.gate-hasbar .topnav{top:95px!important}
 <div class="yst" id="h_yst"></div>
 <div class="chips"><div>세팅<b id="h_set"></b></div><div>오더<b id="h_ord"></b></div><div>오더율<b id="h_rate"></b></div><div class="cx">당월 취소<b id="h_cx"></b></div></div></div>
 <div class="two">
-<div class="card web"><div class="ct"><span class="dot"></span>웹마케팅</div><div class="v" id="w_s"></div><div class="yst" id="w_yst"></div><div class="r"><div>세팅<b id="w_set"></b></div><div>오더<b id="w_ord"></b></div><div>오더율<b id="w_r"></b></div><div class="cx">취소<b id="w_cx"></b></div></div></div>
+<div class="card web"><div class="ct"><span class="dot"></span>웹마케팅</div><div class="v" id="w_s"></div><div class="yst" id="w_yst"></div><div class="r"><div>세팅<b id="w_set"></b></div><div>오더<b id="w_ord"></b></div><div>오더율<b id="w_r"></b></div><div class="cx">취소<b id="w_cx"></b></div></div><div class="wsub" id="w_sub"></div></div>
 <div class="card sang"><div class="ct"><span class="dot"></span>상담지점</div><div class="v" id="s_s"></div><div class="yst" id="s_yst"></div><div class="r"><div>세팅<b id="s_set"></b></div><div>오더<b id="s_ord"></b></div><div>오더율<b id="s_r"></b></div><div class="cx">취소<b id="s_cx"></b></div></div></div></div>
 </div>
 <!-- [2026-09] MVP 시상식 — 종결달 전용 (트로피 5종) -->
@@ -1456,6 +1461,7 @@ document.getElementById('h_cx').textContent=won(D.cancel.amt)+'원 ('+D.cancel.c
 // [2026-09] 취소 표기 — 부서장·경영진만
 ;['h_cx','w_cx','s_cx'].forEach(function(id){ var _e=document.getElementById(id); if(_e&&_e.parentNode) _e.parentNode.style.display=_BOSS?'':'none'; });
 document.getElementById('w_s').innerHTML=won(D.web.sales)+' <span>원</span>';document.getElementById('w_set').textContent=D.web.set;document.getElementById('w_ord').textContent=D.web.ord;document.getElementById('w_r').textContent=D.web.rate+'%';document.getElementById('w_cx').textContent=won(D.web.cxa)+'원';
+try{var _wsub=(D.web&&D.web.sub)||[],_wse=document.getElementById('w_sub');if(_wse)_wse.innerHTML=_wsub.map(function(s){return '<div class="wsr"><span class="wsn">'+s.name+'</span><span class="wsv"><b>'+won(s.sales)+'</b>원<em>세팅 '+s.set+' · 오더 '+s.ord+' · '+s.rate+'%</em></span></div>';}).join('');}catch(e){}
 document.getElementById('s_s').innerHTML=won(D.sang.sales)+' <span>원</span>';document.getElementById('s_set').textContent=D.sang.set;document.getElementById('s_ord').textContent=D.sang.ord;document.getElementById('s_r').textContent=D.sang.rate+'%';document.getElementById('s_cx').textContent=won(D.sang.cxa)+'원';
 function barsBr(arr,sortKey){ sortKey=sortKey||'sales';
 var BH=(typeof BRANCH_HEAD!=='undefined'?BRANCH_HEAD:{});
