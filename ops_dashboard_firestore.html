@@ -1783,7 +1783,9 @@ function todoSummaryBox(){
   var mon=monday(CUR), e0=add(mon,6);
   var inW0=function(d){return d&&d>=mon&&d<=e0;};
   var exN=0; Object.keys(CO).forEach(function(k){(CO[k].live||[]).forEach(function(m){ if(inW0(m.exp)&&!m.can&&inBr(m)) exN++; });});
-  var mwN=IN.filter(function(i){return i.status==='진행중'&&inBr(i);}).length;
+  // 회원별 최신 민원 결과 — 당취→재기록 유지 같은 케이스에서 옛 진행 행을 진행 집계서 제외
+  var FINALm={}; IN.forEach(function(x){var k=x.name;if(!FINALm[k]||((x.recv||'')>(FINALm[k].recv||'')))FINALm[k]=x;});
+  var mwN=IN.filter(function(i){return i.status==='진행중'&&inBr(i)&&(FINALm[i.name]||{}).status==='진행중';}).length;   // 회원 최신 결과도 진행중인 것만
   var rcvN=IN.filter(function(i){return (i.recv||'').slice(0,7)===TODAY.slice(0,7)&&inBr(i);}).length;   // 이번 달 접수
   var riskN=0; try{ riskN=churnData().risk.length; }catch(e){}
   var moN=(+TODAY.slice(5,7));
