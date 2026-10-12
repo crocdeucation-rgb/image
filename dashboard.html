@@ -844,6 +844,7 @@ function renderGrowthInflow(){
   var chongYday  = parseInt((allRows[2] && allRows[2][1]) || 0) || 0;       // 노션 어제(토글 무관)
   var chongMonth = parseInt((allRows[1] && allRows[1][routeTab+2]) || 0) || 0;  // 총유입(탭 따라감)
   var members = ['우혜림','장윤호','김윤호'];
+  var GLBL = {'우혜림':'부평웹마','장윤호':'메이킷웹마','김윤호':'파인더웹마'};   // 그로스 담당자 → 하위팀 라벨
   var gi = _growthInflow || {};
   var sp = _growthSpend || {};
   var spFmt = function(won){ won=won||0; if(won<=0) return '-'; return (won/10000).toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:1})+'만'; };
@@ -871,14 +872,16 @@ function renderGrowthInflow(){
   // 총괄 이번달 매출(원) = 요약시트 r12[1] "2658.6만원" 파싱 → 원
   var _chongSalesWon = (function(){ var s=String((allRows[11]&&allRows[11][1])||''); var n=parseFloat(s.replace(/[^0-9.]/g,''))||0; return s.indexOf('만')>=0 ? n*10000 : n; })();
   var _ft = window._fnlTot || {visit:0,setting:0,order:0};
-  var h = '<tr><td class="name">그로스 총괄</td><td class="num db">'+chongToday+'</td><td class="num" style="color:#f97316">'+chongYday+'</td><td class="num" style="color:#9333ea">'+chongMonth+'</td>'
+  var _spSum=(sp['총괄']||0)+members.reduce(function(s,m){return s+(sp[m]||0);},0), _inM=chongMonth+g3Month;
+  var totRow='<tr style="font-weight:800;background:#f1f5f9"><td class="name">총합계</td><td class="num db">'+(chongToday+g3Today)+'</td><td class="num" style="color:#f97316">'+(chongYday+g3Yday)+'</td><td class="num" style="color:#9333ea">'+_inM+'</td><td class="num" style="color:#0891b2">'+(_ft.visit||0)+'</td><td class="num" style="color:#2563eb">'+(_ft.setting||0)+'</td><td class="num order">'+(_ft.order||0)+'</td><td class="num" style="color:#e65100">'+spFmtCell(_spSum)+'</td><td class="num" style="color:#0891b2">'+cplCell(_spSum,_inM,_totAfterCut)+'</td><td class="num" style="color:#0f9d58">'+roasCell(_chongSalesWon,_spSum)+'</td></tr>';
+  var h = totRow + '<tr><td class="name">본사웹마</td><td class="num db">'+chongToday+'</td><td class="num" style="color:#f97316">'+chongYday+'</td><td class="num" style="color:#9333ea">'+chongMonth+'</td>'
     +'<td class="num" style="color:#0891b2">'+(_ft.visit||0)+'</td><td class="num" style="color:#2563eb">'+(_ft.setting||0)+'</td><td class="num order">'+(_ft.order||0)+'</td>'
     +'<td class="num" style="color:#e65100">'+spFmtCell(sp['총괄']||0)+'</td><td class="num" style="color:#0891b2">'+cplCell(sp['총괄']||0, chongMonth, _chongAfterCut)+'</td><td class="num" style="color:#0f9d58">'+roasCell(_chongSalesWon, sp['총괄']||0)+'</td></tr>';
   members.forEach(function(m){
     var d = isThisMonth ? (gi[m] || {t:0,y:0,m:0,visit:0,setting:0,order:0,afterCut:0}) : {t:0,y:0,m:0,visit:0,setting:0,order:0,afterCut:0};
     var spCell = isThisMonth ? spFmt(sp[m]) : '-';
     var _mAfterCut = d.afterCut || d.t;   // 담당자 afterCut(광고비 미반영분), 없으면 오늘값 폴백
-    h += '<tr><td class="name">그로스 '+m+'</td><td class="num db">'+d.t+'</td><td class="num" style="color:#f97316">'+d.y+'</td><td class="num" style="color:#9333ea">'+d.m+'</td>'
+    h += '<tr><td class="name">'+(GLBL[m]||m)+'</td><td class="num db">'+d.t+'</td><td class="num" style="color:#f97316">'+d.y+'</td><td class="num" style="color:#9333ea">'+d.m+'</td>'
       +'<td class="num" style="color:#0891b2">'+(isThisMonth?(d.visit||0):'-')+'</td><td class="num" style="color:#2563eb">'+(isThisMonth?(d.setting||0):'-')+'</td><td class="num order">'+(isThisMonth?(d.order||0):'-')+'</td>'
       +'<td class="num" style="color:#e65100">'+spCell+'</td><td class="num" style="color:#0891b2">'+cplCell(sp[m]||0, d.m, _mAfterCut)+'</td><td class="num" style="color:#0f9d58">'+roasCell(0, sp[m]||0)+'</td></tr>';
   });
