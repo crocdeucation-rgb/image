@@ -185,8 +185,8 @@
     <div class="col">
       <div class="sec camp">캠페인별 <span class="badge">소재 성과 · 광고비</span></div>
       <div class="tbl-wrap"><table id="campaign-tbl">
-        <thead><tr><th>캠페인</th><th>DB</th><th>방문</th><th>세팅</th><th>오더</th><th>광고비<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>매출</th><th>온타겟%<br><span style="font-size:8px;color:#aaa;font-weight:400">35-54</span></th></tr></thead>
-        <tbody><tr><td colspan="9" class="loading">불러오는 중…</td></tr></tbody>
+        <thead><tr><th>캠페인</th><th>DB</th><th>방문</th><th>세팅</th><th>오더</th><th>광고비<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>매출</th></tr></thead>
+        <tbody><tr><td colspan="8" class="loading">불러오는 중…</td></tr></tbody>
       </table></div>
 
       <div class="sec period">기간유입 <span class="badge">담당자별 · 주간 CPL</span></div>
@@ -204,6 +204,10 @@
         <button id="cal-btn-month" onclick="setCalView('month')">월간</button>
       </div>
       <div class="daybars" id="daybars"><div class="loading">불러오는 중…</div></div>
+
+      <div class="sec" style="margin-top:18px">🎯 타겟 적합도 <span class="badge" style="background:#eaf1fe;color:#1a73e8">소재별 On-Target%</span></div>
+      <div style="font-size:9.5px;color:#94a3b8;margin:-3px 0 8px">온타겟 = 핵심 학부모(35-54) 리드 비율 · <span style="color:#0f9d58">70%↑</span> <span style="color:#f59e0b">45~69</span> <span style="color:#ef4444">↓45</span></div>
+      <div id="agefit-box"><div class="loading">불러오는 중…</div></div>
     </div>
   </div>
 
@@ -514,20 +518,19 @@ async function load(){
     //   컬럼: [캠페인(0), DB(1), 방문(2), 세팅(3), 방취(4), 오더(5), 매출(6), 광고비(7), CPL(8)]
     //   광고비·CPL은 GAS whBuildDashData가 캠페인 블록에 추가(ad_name 매칭). 없으면 '-'.
     var ctb = document.querySelector('#campaign-tbl tbody');
-    var chtml='';
+    var chtml=''; var _fitArr=[];   // 소재별 온타겟% 수집(별도 섹션용)
     if(cStart>=0){
       for(var r2=cStart;r2<rows.length;r2++){
-        var y=rows[r2]; if(!y[0]||y[0]==='일자별유입'||y[0]==='기간유입')break;
+        var y=rows[r2]; if(!y[0]||y[0]==='일자별유입'||y[0]==='기간유입'||y[0]==='소재적합도')break;
         var _csp=Number(y[7])||0;              // 광고비 (GAS가 넣음, cutoff까지)
         var _cdb=Number(y[1])||0;
         var _caf=Number(y[10])||0;             // 캠페인 afterCut (cutoff 이후 유입) — GAS가 넣음
         // CPL 분모 = 광고비 집계일까지 DB (cutoff 이후 유입 제외). 담당자표와 동일 기준.
         var _cdbU=_cdb-_caf;
         var _ccpl=(_csp>0&&_cdbU>0)?won(Math.round(_csp/_cdbU)):'-';
-        // 타겟 적합도 [11] = 소재별 핵심(35-54 학부모) 리드% — GAS saveMetaSpendToSheet가 넣음
+        // 타겟 적합도 [11] = 소재별 핵심(35-54 학부모) 리드% — 별도 섹션에서 사용
         var _cfit=(y[11]===''||y[11]==null)?null:(parseInt(y[11])||0);
-        var _fcol=_cfit==null?'#cbd5e1':(_cfit>=70?'#0f9d58':(_cfit>=45?'#f59e0b':'#ef4444'));
-        var _ftxt=_cfit==null?'<span style="color:#cbd5e1">-</span>':('<b style="color:'+_fcol+'">'+_cfit+'%</b>');
+        if(_cfit!=null && y[0]!=='(소재미상)') _fitArr.push({name:y[0], fit:_cfit, db:_cdb});
         chtml += '<tr><td>'+y[0]+'</td>'
           +'<td class="num db">'+_cdb+'</td>'
           +'<td class="num visit">'+fnl(y[2])+'</td>'
@@ -535,11 +538,26 @@ async function load(){
           +'<td class="num order">'+fnl(y[5])+'</td>'
           +'<td class="num spend">'+(_csp>0?wonSp(_csp):'-')+'</td>'
           +'<td class="num cpl">'+_ccpl+'</td>'
-          +'<td class="num sales">'+won(y[6])+'</td>'
-          +'<td class="num" style="font-size:11px">'+_ftxt+'</td></tr>';
+          +'<td class="num sales">'+won(y[6])+'</td></tr>';
       }
     }
-    ctb.innerHTML = chtml || '<tr><td colspan="9" class="loading">데이터 없음</td></tr>';
+    ctb.innerHTML = chtml || '<tr><td colspan="8" class="loading">데이터 없음</td></tr>';
+
+    // ── 타겟 적합도 (소재별 온타겟%) — 날짜별 유입 밑 별도 섹션 ──
+    var afBox=document.getElementById('agefit-box');
+    if(afBox){
+      var afh='';
+      _fitArr.sort(function(a,b){ return b.db-a.db; }).forEach(function(x){
+        var c=x.fit>=70?'#0f9d58':(x.fit>=45?'#f59e0b':'#ef4444');
+        afh += '<div style="margin:9px 0">'
+          +'<div style="display:flex;justify-content:space-between;align-items:baseline;gap:6px;margin-bottom:3px">'
+            +'<span style="font-size:11px;font-weight:600;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+x.name+'</span>'
+            +'<b style="font-size:12px;color:'+c+';flex-shrink:0">'+x.fit+'%</b></div>'
+          +'<div style="height:9px;border-radius:5px;background:#eef2f7;overflow:hidden"><span style="display:block;height:100%;width:'+x.fit+'%;background:'+c+'"></span></div>'
+          +'</div>';
+      });
+      afBox.innerHTML = afh || '<div class="loading">데이터 없음</div>';
+    }
 
     // ── 날짜별 유입 — 맵 저장 후 주간/월간 렌더 ──
     _calDaily={};
