@@ -1307,7 +1307,7 @@ function calendar(){
     var c={};E.forEach(function(e){c[e.kind]=(c[e.kind]||{n:0,ok:0,ng:0});c[e.kind].n++;
       if(e.st==='done')c[e.kind].ok++; if(e.st==='miss')c[e.kind].ng++;});
     var nj=0,seen={};EV.forEach(function(e){if(e.join===d&&!seen[e.name]){seen[e.name]=1;nj++;}});
-    var IL=IN.filter(function(i){return i.day===d;});
+    var IL=IN.filter(function(i){return (i.recv||'').slice(0,10)===d;});
     var rel=d<TODAY?' past':(d===TODAY?' today':(d===add(TODAY,1)?' tmr':''));
     var line=function(l,o){
       if(!o) return '<div class="kv"><em>'+l+'</em><span class="z">—</span></div>';
@@ -1359,14 +1359,14 @@ function weekBox(){
   var sel=SEL&&all7.indexOf(SEL)>=0?SEL:(all7.indexOf(TODAY)>=0?TODAY:days[0]);
   var KIND=['해피콜','개통','입학식','첫만남','첫수업'];
   var A=alertData();
-  var mwOpen=IN.filter(function(i){return i.type==='민원'&&i.state==='open'&&inBr(i);})
-    .sort(function(a,b){return a.day<b.day?1:-1;});
+  var mwOpen=IN.filter(function(i){return i.status==='진행중'&&inBr(i);})
+    .sort(function(a,b){return (a.recv||'')<(b.recv||'')?1:-1;});
   var cols=days.map(function(d){
     var rel=d<TODAY?' past':(d===TODAY?' today':(d===add(TODAY,1)?' tmr':''));
     if(HOL[d]) return '<div class="wc hol"><button class="wh" data-go="'+d+'"><b>'+md(d)+'</b><span>'+dw(d)+'</span></button><div class="wb"><div class="holt">'+esc(HOL[d])+'</div></div></div>';
     var E=evOf(d), g={};E.forEach(function(e){(g[e.name]=g[e.name]||[]).push(e);});
     var ppl=Object.keys(g).sort(function(a,b){return (g[a][0].time||'~').localeCompare(g[b][0].time||'~');});
-    var X=expOn(d), M=IN.filter(function(i){return i.type==='민원'&&i.day===d&&inBr(i);});
+    var X=expOn(d), M=IN.filter(function(i){return (i.recv||'').slice(0,10)===d&&inBr(i);});
     var sec=function(cls,t,n,items,max){
       if(!n) return '<div class="ws z"><em>'+t+'</em><span>—</span></div>';
       return '<div class="ws '+cls+'"><em>'+t+'</em><span>'+n+'</span></div><ul class="wl">'+items.slice(0,max).join('')+
@@ -1377,8 +1377,8 @@ function weekBox(){
     var xItems=X.map(function(o){return '<li><button data-name="'+esc(o.m.n)+'">'+esc(o.m.n)+'</button><small>'+esc(o.c)+'</small>'+
       (o.m.mw?'<b class="'+(mwRes(o.m)==='진행'?'ng':'mu')+'">민원 '+mwRes(o.m)+'</b>':'')+'</li>';});
     var mItems=M.map(function(i){return '<li><button data-name="'+esc(i.name)+'">'+esc(i.name)+'</button><small>'+esc((i.sub||'').replace('관리교사 ',''))+'</small>'+
-      (i.state==='open'?'<b class="ng">진행</b>':'<b class="mu">'+esc(i.label||'')+'</b>')+'</li>';});
-    return '<div class="wc'+rel+(d===sel?' sel':'')+'"><button class="wh" data-go="'+d+'"><b>'+md(d)+'</b><span>'+dw(d)+(d===TODAY?' · 오늘':(d===add(TODAY,1)?' · 내일':''))+'</span></button><div class="wb">'+
+      (i.status==='진행중'?'<b class="ng">진행</b>':'<b class="mu">'+esc(i.status||i.label||'')+'</b>')+'</li>';});
+    return '<div class="wc'+rel+(d===sel?' sel':'')+'" data-go="'+d+'" style="cursor:pointer"><button class="wh" data-go="'+d+'"><b>'+md(d)+'</b><span>'+dw(d)+(d===TODAY?' · 오늘':(d===add(TODAY,1)?' · 내일':''))+'</span></button><div class="wb">'+
       sec('ev','단계 일정',ppl.length,evItems,d===TODAY?8:5)+sec('xp','만료 · 사전 안내',X.length,xItems,5)+sec('mw','민원 접수',M.length,mItems,3)+'</div></div>';
   }).join('');
   var callItems=mwOpen.map(function(i){return '<li><button data-name="'+esc(i.name)+'">'+esc(i.name)+'</button><small>접수 '+md(i.day)+' · '+esc((i.sub||'').replace('관리교사 ','').split(' · ')[0])+'</small><b class="'+(diff(i.day,TODAY)>=14?'ng':'mu')+'">'+diff(i.day,TODAY)+'일</b></li>';});
@@ -1529,7 +1529,7 @@ function missBox(){
   var byk={};ms.forEach(function(e){(byk[e.kind]=byk[e.kind]||[]).push(e);});
   var nohc=(D.nohc||[]);
   var MJ=D.mwJoin||{};var jOf=function(n){return MJ[n]||((EV.filter(function(x){return x.name===n;})[0]||{}).join)||'';};
-  var openMw=IN.filter(function(i){return i.type==='민원'&&i.state==='open';}).map(function(i){return Object.assign({join:jOf(i.name)},i);}).sort(function(a,b){return (b.join||'').localeCompare(a.join||'')||(b.day||'').localeCompare(a.day||'');});
+  var openMw=IN.filter(function(i){return i.status==='진행중';}).map(function(i){return Object.assign({join:jOf(i.name)},i);}).sort(function(a,b){return (b.join||'').localeCompare(a.join||'')||(b.recv||'').localeCompare(a.recv||'');});
   var ORDER=[['해피콜',nohc.length,'가입 후 첫 통화 칸이 비어 있음','먼저 할 것'],
              ['개통',(byk['개통']||[]).length,'예정일이 지났는데 다음 칸이 비어 있음',''],
              ['입학식',(byk['입학식']||[]).length,'예정일이 지났는데 다음 칸이 비어 있음',''],
@@ -1739,7 +1739,7 @@ async function loadSalesMTD(){
       });});
     });
     // 컬럼: 0기준월 1방문일 2구분 3이름 4학년 5사업 6팀 7계약금액
-    var by={A:{c:0,amt:0},B:{c:0,amt:0},미상:{c:0,amt:0}}, tot={c:0,amt:0}, gubun={};
+    var by={A:{c:0,amt:0},B:{c:0,amt:0},기타:{c:0,amt:0},미상:{c:0,amt:0}}, tot={c:0,amt:0}, gubun={};
     rows.forEach(function(r){
       if((r[0]||'').trim()!==ym) return;
       var g=(r[2]||'').trim();
@@ -1747,7 +1747,8 @@ async function loadSalesMTD(){
       var team=(r[6]||'').trim(), tk;
       if(team==='A') tk='A';
       else if(team==='B') tk='B';
-      else { var nm=String(r[3]||'').replace(/\(.*?\)/g,'').replace(/\s+/g,'').trim(); tk=n2t[nm]||'미상'; }  // 팀칸 오입력 → 담임으로 판정
+      else if(/기타|GT|link/i.test(team)) tk='기타';   // 팀칸이 '기타'(GT-LINK 등 팀 무관 상품연장) → 그대로 기타
+      else { var nm=String(r[3]||'').replace(/\(.*?\)/g,'').replace(/\s+/g,'').trim(); tk=n2t[nm]||'미상'; }  // 팀칸 비었거나 오입력 → 담임으로 판정
       var amt=W(r[7]);
       by[tk].c++; by[tk].amt+=amt; tot.c++; tot.amt+=amt;
       if(!gubun[g]) gubun[g]={c:0,amt:0}; gubun[g].c++; gubun[g].amt+=amt;
@@ -1764,7 +1765,7 @@ function salesCard(){
     .map(function(g){return esc(g.replace('자체매출-',''))+' '+S.gubun[g].c;}).join(' · ');
   return '<div class="scard"><div class="sch"><b>💰 '+mo+'월 자체매출</b><span class="sct">추가계약</span>'+
     '<span class="stot">'+S.tot.c+'건 · '+w(S.tot.amt)+'원</span></div>'+
-    '<div class="srow">'+seg('A팀',t.A,'sa')+seg('B팀',t.B,'sb')+seg('팀 확인',t.미상,'sx')+'</div>'+
+    '<div class="srow">'+seg('A팀',t.A,'sa')+seg('B팀',t.B,'sb')+seg('기타',t.기타,'sx')+seg('팀 확인',t.미상,'sx')+'</div>'+
     (gb?'<div class="ssub">'+gb+'</div>':'')+'</div>';
 }
 /* ── 이번 주 처리·실적 요약: 매출(A/B) + 만료·민원·철회 (온보딩 여정과 분리) ── */
@@ -1774,7 +1775,7 @@ function todoSummaryBox(){
   var mon=monday(CUR), e0=add(mon,6);
   var inW0=function(d){return d&&d>=mon&&d<=e0;};
   var exN=0; Object.keys(CO).forEach(function(k){(CO[k].live||[]).forEach(function(m){ if(inW0(m.exp)&&!m.can&&inBr(m)) exN++; });});
-  var mwN=IN.filter(function(i){return i.type==='민원'&&i.state==='open'&&inBr(i);}).length;
+  var mwN=IN.filter(function(i){return i.status==='진행중'&&inBr(i);}).length;
   var riskN=0; try{ riskN=churnData().risk.length; }catch(e){}
   var tile=function(ic,lab,n,anch){return '<button class="tsmt'+(n?' hot':' zero')+'" data-anch="'+anch+'"><span class="tsmt-l">'+ic+' '+lab+'</span><b>'+n+'</b></button>';};
   return zone('todosum','var(--amber)','이번 주 처리 · 실적','','매출·만료·민원·철회 — 카드를 누르면 상세로',
@@ -2294,9 +2295,9 @@ function alertData(){
     A.dev.push({dt:x.d,n:x.n,d:dd,br:x.br,sang:x.sang,saup:x.saup,sub:x.side,st:x.kind+' '+md(x.d),bad:dd>=21,note:x.note||''});
   });
   IN.forEach(function(i){
-    if(i.type!=='민원'||i.state!=='open'||!inBr(i)) return;
-    var dd=diff(i.day,TODAY); if(dd<14) return;
-    A.mw.push({dt:i.day,n:i.name,d:dd,br:i.br,sang:i.sang,saup:i.saup,sub:i.sub||'',st:'접수 '+md(i.day),bad:dd>=21,note:i.note||''});
+    if(i.status!=='진행중'||!inBr(i)) return;
+    var dd=diff(i.recv,TODAY); if(dd<14) return;
+    A.mw.push({dt:i.recv,n:i.name,d:dd,br:i.br,sang:i.sang,saup:i.saup,sub:i.sub||'',st:'접수 '+md(i.recv),bad:dd>=21,note:i.note||''});
   });
   Object.keys(CO).forEach(function(c){CO[c].live.forEach(function(m){
     if(m.orphan&&inBr(m)) A.orphan.push({dt:m.join||'',n:m.n,d:(m.orphanState==='방치'?1:0),br:m.br,sang:m.sang,saup:m.saup,sub:'원 담당 '+m.orphan+(m.orphanState==='이관중'?' → '+m.orphanTo:''),st:m.orphanState==='방치'?'재배정 대기':'이관 중 ('+m.orphanTo+')',bad:m.orphanState==='방치',note:m.note||''});
@@ -2629,7 +2630,7 @@ function fillBox(){
     liv++; if(!m.exp)noexp++; if(!m.dw)nodw++; if(!m.br)nobr++;
     if(m.hold){holdTot++; if(!m.holdEnd)holdNoEnd++;}
     if(m.log&&m.log.gap>=15)gap++; if(!m.log)nolog++;});});
-  var openMw=IN.filter(function(i){return i.type==='민원'&&i.state==='open';}).length;
+  var openMw=IN.filter(function(i){return i.status==='진행중';}).length;
   var nohc=(D.nohc||[]).length;
   var rows=[
    ['해피콜',nohc,'9월 가입자','가입 후 첫 통화 칸'],
@@ -2656,7 +2657,7 @@ function dataBox(){
   var noexp=0,liv=0,nodw=0,nobr=0;
   Object.keys(CO).forEach(function(k){CO[k].live.forEach(function(m){
     liv++; if(!m.exp)noexp++; if(!m.dw)nodw++; if(!m.br)nobr++;});});
-  var nomw=IN.filter(function(i){return i.type==='민원'&&!i.sub;}).length;
+  var nomw=IN.filter(function(i){return i.status==='진행중'&&!i.sub;}).length;
   var rows=[
    ['해피콜·개통·입학식 기록 누락',tot.miss+'명 / '+tot.n+'명',
     '첫수업까지 진행된 회원인데 앞 단계 칸이 비어 있음 (해피콜 '+tot.hc+' · 시간표 '+tot.tt+')'],
@@ -3273,7 +3274,7 @@ function render(){
 document.addEventListener('click',function(e){
   var c=e.target.closest('[data-close]');
   if(c&&(e.target.classList.contains('ov')||e.target.closest('.cls'))){CARD=null;render();if(window.__cardScrollY!=null){window.scrollTo(0,window.__cardScrollY);}return;}
-  var b=e.target.closest('button,[data-z],.qrow,[data-bsel2],[data-jnext],[data-jmore],[data-expmore],[data-canmore],[data-mwper],[data-name]');
+  var b=e.target.closest('button,[data-z],.qrow,[data-bsel2],[data-jnext],[data-jmore],[data-expmore],[data-canmore],[data-mwper],[data-name],[data-go]');
   if(!b) return;
   if(b.dataset.tab){TAB=b.dataset.tab;OPENZ={};window.__tOpen=0;window.__cOpen=0;syncMDClass();render();window.scrollTo(0,0);}
   else if(b.dataset.mv){CUR=add(CUR,7*(+b.dataset.mv));SEL=null;render();}
