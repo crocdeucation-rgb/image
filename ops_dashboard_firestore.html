@@ -364,6 +364,8 @@ details[open]>.more::before{content:'▾ '}
 .scard .sseg.sa{border-color:#B9C7F5;color:#2A42A8;background:#F4F6FF}.scard .sseg.sb{border-color:#9FD8C6;color:#117A55;background:#F1FBF7}.scard .sseg.sx{color:#8C8378}
 .scard .ssub{font-size:11px;color:#A08A5E;font-weight:600;margin-top:7px}
 .tsmgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.tsmgrid.tsm4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:560px){.tsmgrid.tsm4{grid-template-columns:repeat(2,1fr)}}
 .tsmt{border:1px solid var(--line);border-radius:12px;padding:11px 13px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font:inherit;text-align:left}
 .tsmt .tsmt-l{font-size:12.5px;font-weight:700;color:var(--soft)}
 .tsmt b{font-size:19px;font-weight:800;color:var(--ink)}
@@ -1411,7 +1413,7 @@ function weekBox(){
     '<div class="g"><div class="l">완료</div><b>'+wdone+'</b></div>'+
     '<div'+(wmiss?' class="r"':'')+'><div class="l">칸 비어 있음</div><b>'+wmiss+'</b></div>'+
     '<div class="b"><div class="l">만료 · 사전 안내</div><b>'+wx+'</b></div>'+
-    '<div'+(mwOpen.length?' class="r"':'')+'><div class="l">민원 접수</div><b>'+mwOpen.length+'</b></div>'+
+    '<div'+(mwOpen.length?' class="r"':'')+'><div class="l">민원 진행</div><b>'+mwOpen.length+'</b></div>'+
     '<div><div class="l">이 주 코칭</div><b>'+coachWeek(mon)+'</b></div>'+
     '<div'+(wi.filter(function(i){return i.status==='완결'&&i.resp!=='당일취소';}).length?' class="r"':'')+'><div class="l">취소</div><b>'+wi.filter(function(i){return i.status==='완결'&&i.resp!=='당일취소';}).length+'</b></div></div>';
   // 선택한 날 상세
@@ -1782,12 +1784,15 @@ function todoSummaryBox(){
   var inW0=function(d){return d&&d>=mon&&d<=e0;};
   var exN=0; Object.keys(CO).forEach(function(k){(CO[k].live||[]).forEach(function(m){ if(inW0(m.exp)&&!m.can&&inBr(m)) exN++; });});
   var mwN=IN.filter(function(i){return i.status==='진행중'&&inBr(i);}).length;
+  var rcvN=IN.filter(function(i){return (i.recv||'').slice(0,7)===TODAY.slice(0,7)&&inBr(i);}).length;   // 이번 달 접수
   var riskN=0; try{ riskN=churnData().risk.length; }catch(e){}
+  var moN=(+TODAY.slice(5,7));
   var tile=function(ic,lab,n,anch){return '<button class="tsmt'+(n?' hot':' zero')+'" data-anch="'+anch+'"><span class="tsmt-l">'+ic+' '+lab+'</span><b>'+n+'</b></button>';};
   return zone('todosum','var(--amber)','이번 주 처리 · 실적','','매출·만료·민원·철회 — 카드를 누르면 상세로',
-    salesCard()+'<div class="tsmgrid">'+
+    salesCard()+'<div class="tsmgrid tsm4">'+
       tile('📅','관리만료',exN,'exp')+
-      tile('📮','민원 접수',mwN,'can')+
+      tile('📮',moN+'월 접수',rcvN,'can')+
+      tile('📬','민원 진행',mwN,'can')+
       tile('⚡','철회위험',riskN,'can')+
     '</div>'+churnBar(),true);
 }
