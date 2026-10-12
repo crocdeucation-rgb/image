@@ -11,6 +11,8 @@
   //   gate.js는 인증 통과 시 그 스타일을 제거만 한다(아래 onAuthStateChanged).
   var CFG={apiKey:"AIzaSyCBDimk0MyGAHf762mvInS_H4K9HkW6Ol0",authDomain:"dashboard-88ba4.firebaseapp.com",projectId:"dashboard-88ba4",storageBucket:"dashboard-88ba4.firebasestorage.app",messagingSenderId:"857535538974",appId:"1:857535538974:web:999d190f28e14964eb4b0f"};
   var ALLOW=['032100jesus@gmail.com','christuhm@gmail.com','crocdeucation@gmail.com','kanghansara@gmail.com','thestudydesign@gmail.com','loityr123@gmail.com','kit27314320@gmail.com'];
+  // [2026-10] 페이지별 추가 허용 — 특정 페이지 <head>에 window.GATE_EXTRA_ALLOW=['x@y'] 넣으면 그 페이지에서만 허용(그로스 리포트 열람권 등). 공유 대시보드엔 영향 없음.
+  try{ if(window.GATE_EXTRA_ALLOW && window.GATE_EXTRA_ALLOW.length){ ALLOW=ALLOW.concat(window.GATE_EXTRA_ALLOW.map(function(e){return (e||'').toLowerCase();})); } }catch(e){}
 
   // [2026-09] firebase SDK가 gate.js보다 늦게 로드되는 경우(카톡·인스타 인앱 웹뷰에서 gstatic 지연)
   //   기존엔 여기서 즉시 return → onAuthStateChanged 미등록 → __pregate가 안 지워져 빈 화면이 됐다.
@@ -68,32 +70,39 @@
     // 노션·인스타·카톡 등 인앱 웹뷰 감지 → 팝업 불가 → 바로 리다이렉트
     var ua=navigator.userAgent||'';
     var inApp=/Notion|FBAN|FBAV|Instagram|Line|KAKAOTALK|NAVER|DaumApps|wv\)/i.test(ua);
-    if(inApp){
-      // [2026-09] 구글은 인앱 웹뷰 OAuth 를 403 으로 막는다 — 로그인 시도 없이 브라우저로 유도
-      var url=location.href;
-      if(m){
-        m.className='m wait';
-        m.innerHTML='앱 안에서는 구글 보안정책상 로그인이 막혀 있어요.<br>아래 버튼으로 <b>브라우저에서 열어</b> 로그인해주세요.'
-          +'<div style="margin-top:10px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap">'
-          +'<button class="b" style="padding:8px 14px;font-size:13px" id="agOpenExt">브라우저에서 열기</button>'
-          +'<button class="b" style="padding:8px 14px;font-size:13px;background:#eee;color:#333" id="agCopy">링크 복사</button>'
-          +'</div>';
-      }
-      // 안드로이드: intent 로 크롬, iOS/기타: 새 창 시도
+    var url=location.href;
+    // 인앱 웹뷰(카톡 등)에서 구글 로그인이 '진짜로' 막혔을 때만 보여줄 브라우저 유도 UI
+    function showBrowserFallback(reason){
+      if(!m) return;
+      m.className='m wait';
+      m.innerHTML='앱(카톡)에서 구글 로그인이 막혀 있어요.<br>아래 <b>브라우저에서 열기</b>를 누르거나, 안 되면 <b>우측 ⋮ → "다른 브라우저로 열기"</b>로 크롬·삼성인터넷에서 여세요.'
+        +(reason?('<div style="margin-top:4px;font-size:11px;color:#B6C2DC">('+reason+')</div>'):'')
+        +'<div style="margin-top:10px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap">'
+        +'<button class="b" style="padding:8px 14px;font-size:13px" id="agOpenExt">브라우저에서 열기</button>'
+        +'<button class="b" style="padding:8px 14px;font-size:13px;background:#eee;color:#333" id="agCopy">링크 복사</button>'
+        +'</div>';
       var _ua=(navigator.userAgent||'');
       var openExt=function(){
         if(/android/i.test(_ua)){
           var noScheme=url.replace(/^https?:\/\//,'');
-          location.href='intent://'+noScheme+'#Intent;scheme=https;package=com.android.chrome;end';
-        } else {
-          window.open(url,'_blank');
-        }
+          var fallback=setTimeout(function(){ location.href='intent://'+noScheme+'#Intent;scheme=https;end'; },600);
+          try{ location.href='intent://'+noScheme+'#Intent;scheme=https;package=com.android.chrome;end'; }
+          catch(e){ clearTimeout(fallback); location.href='intent://'+noScheme+'#Intent;scheme=https;end'; }
+          document.addEventListener('visibilitychange',function(){ if(document.hidden){ clearTimeout(fallback); } });
+        } else { window.open(url,'_blank'); }
       };
       var btnE=document.getElementById('agOpenExt'); if(btnE) btnE.onclick=openExt;
       var btnC=document.getElementById('agCopy'); if(btnC) btnC.onclick=function(){
         try{ navigator.clipboard.writeText(url); if(m)m.innerHTML+='<div style="margin-top:6px;color:#2E9E5B">✔ 복사됨 — 브라우저에 붙여넣어 여세요</div>'; }
         catch(e){ prompt('아래 주소를 복사해 브라우저에서 여세요', url); }
       };
+    }
+    if(inApp){
+      // 인앱에선 팝업은 막히지만 리다이렉트는 통과되는 경우가 많다(카톡 등) → 리다이렉트부터 시도
+      auth.signInWithRedirect(provider).catch(function(e){
+        // 리다이렉트조차 즉시 실패하면(구글 webview 차단 등) 그때 브라우저로 유도
+        showBrowserFallback(e&&(e.code||e.message)||'');
+      });
       return;
     }
     auth.signInWithPopup(provider).catch(function(e){
@@ -130,8 +139,8 @@
     });
   });
   // [2026-09] 보안 세션 UI — 단독 접속 시 상단 배지 + 로그인 직후 인증 토스트
-  var GATE_NAME={'032100jesus@gmail.com':'오동근','christuhm@gmail.com':'엄현호','crocdeucation@gmail.com':'신상준','kanghansara@gmail.com':'김사라','thestudydesign@gmail.com':'김상현','loityr123@gmail.com':'이경훈','kit27314320@gmail.com':'김인태'};
-  var GATE_RANK={'032100jesus@gmail.com':'파운더님','christuhm@gmail.com':'대표이사','crocdeucation@gmail.com':'이사','kanghansara@gmail.com':'경영총괄','thestudydesign@gmail.com':'이사','loityr123@gmail.com':'이사','kit27314320@gmail.com':'이사'};
+  var GATE_NAME={'032100jesus@gmail.com':'오동근','christuhm@gmail.com':'엄현호','crocdeucation@gmail.com':'신상준','kanghansara@gmail.com':'김사라','thestudydesign@gmail.com':'김상현','loityr123@gmail.com':'이경훈','kit27314320@gmail.com':'김인태','jny1048@gmail.com':'정나영','careitjoy@gmail.com':'장영주'};
+  var GATE_RANK={'032100jesus@gmail.com':'파운더님','christuhm@gmail.com':'대표이사','crocdeucation@gmail.com':'이사','kanghansara@gmail.com':'경영총괄','thestudydesign@gmail.com':'이사','loityr123@gmail.com':'이사','kit27314320@gmail.com':'이사','jny1048@gmail.com':'본부장','careitjoy@gmail.com':'팀장'};
   var _gateSecDone=false;
   function gateSecUI(u){
     if(window.self!==window.top) return;      // switcher iframe 안이면 스킵(부모가 이미 표시)
