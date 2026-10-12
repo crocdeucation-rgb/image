@@ -787,6 +787,7 @@ async function loadGrowthInflow(){
         if(!out[anm]) out[anm]={t:0,y:0,m:0};
         out[anm].dbAll=parseInt(ax[1])||0;   // 누적 DB (전체 탭용)
         out[anm].visit=_numOf(ax[2]); out[anm].setting=_numOf(ax[3]); out[anm].order=_numOf(ax[5]);
+        out[anm].salesAll=parseInt(ax[6])||0;   // 누적 매출(원) — 전체 탭 ROAS용
         out[anm].afterCut=parseInt(ax[10])||0;
       }
     }
@@ -800,6 +801,7 @@ async function loadGrowthInflow(){
         if(!out[gnm]) out[gnm]={t:0,y:0,m:0};
         out[gnm].mVisit=parseInt(gx[1])||0; out[gnm].mSetting=parseInt(gx[2])||0; out[gnm].mOrder=parseInt(gx[3])||0;
         out[gnm].lDb=parseInt(gx[4])||0; out[gnm].lVisit=parseInt(gx[5])||0; out[gnm].lSetting=parseInt(gx[6])||0; out[gnm].lOrder=parseInt(gx[7])||0;
+        out[gnm].mSales=parseInt(gx[8])||0; out[gnm].lSales=parseInt(gx[9])||0;   // 월별 매출(원) — 3명 ROAS용
       }
     }
     // ★ [분리캠페인] 캠페인 블록 파싱 — [캠페인,DB,방문,세팅,방취,오더,매출,광고비,CPL,ROAS,afterCut]
@@ -884,14 +886,18 @@ function renderGrowthInflow(){
   // ★ 3명(신규퍼널) 기간별 접근자 — 유입월 기준 세그먼트(이번달 m* / 지난달 l* / 전체 누적)
   function g3(m){
     var g = gi[m] || {};
-    if(isThisMonth) return { t:(g.t||0), y:(g.y||0), db:(g.m||0), visit:(g.mVisit!=null?g.mVisit:(g.visit||0)), setting:(g.mSetting!=null?g.mSetting:(g.setting||0)), order:(g.mOrder!=null?g.mOrder:(g.order||0)), afterCut:(g.afterCut||0) };
-    if(isLastMonth) return { t:0, y:0, db:(g.lDb||0), visit:(g.lVisit||0), setting:(g.lSetting||0), order:(g.lOrder||0), afterCut:0 };
-    return { t:0, y:0, db:(g.dbAll||0), visit:(g.visit||0), setting:(g.setting||0), order:(g.order||0), afterCut:0 };   // 전체=누적
+    if(isThisMonth) return { t:(g.t||0), y:(g.y||0), db:(g.m||0), visit:(g.mVisit!=null?g.mVisit:(g.visit||0)), setting:(g.mSetting!=null?g.mSetting:(g.setting||0)), order:(g.mOrder!=null?g.mOrder:(g.order||0)), sales:(g.mSales||0), afterCut:(g.afterCut||0) };
+    if(isLastMonth) return { t:0, y:0, db:(g.lDb||0), visit:(g.lVisit||0), setting:(g.lSetting||0), order:(g.lOrder||0), sales:(g.lSales||0), afterCut:0 };
+    return { t:0, y:0, db:(g.dbAll||0), visit:(g.visit||0), setting:(g.setting||0), order:(g.order||0), sales:(g.salesAll||0), afterCut:0 };   // 전체=누적
   }
   // 총괄 행 (3명 제외 나머지) — 카드 전체에서 3명 뺀 값
   var g3Today = members.reduce(function(s,m){return s+g3(m).t;},0);
   var g3Yday  = members.reduce(function(s,m){return s+g3(m).y;},0);
   var g3Month = members.reduce(function(s,m){return s+g3(m).db;},0);
+  // 3명 퍼널 합(총합계 방문/세팅/오더에 더함 — _ft는 본사만이라 3명 누락됨)
+  var g3Visit   = members.reduce(function(s,m){return s+g3(m).visit;},0);
+  var g3Setting = members.reduce(function(s,m){return s+g3(m).setting;},0);
+  var g3Order   = members.reduce(function(s,m){return s+g3(m).order;},0);
   // ★ 유입현황 분해표: 이번달이거나 그 기간에 3명 데이터가 있으면 표시 → 다음달 지난달뷰에서 자동 등장.
   var _has3 = members.some(function(m){ var d=g3(m); return (d.db||0)>0 || (d.visit||0)>0; });
   var _giWrap=document.getElementById('growth-inflow-wrap'); if(_giWrap) _giWrap.style.display = (isThisMonth||_has3) ? '' : 'none';
@@ -915,7 +921,7 @@ function renderGrowthInflow(){
   var afterCutChong = isThisMonth ? _chongAfterCut : 0;
   var _ft = window._fnlTot || {visit:0,setting:0,order:0};
   var _spSum = spChong + (isThisMonth ? members.reduce(function(s,m){return s+(sp[m]||0);},0) : 0), _inM=chongMonth+g3Month;
-  var totRow='<tr style="font-weight:800;background:#f1f5f9"><td class="name">총합계</td><td class="num db">'+tdCell(chongToday+g3Today)+'</td><td class="num" style="color:#f97316">'+tdCell(chongYday+g3Yday)+'</td><td class="num" style="color:#9333ea">'+_inM+'</td><td class="num" style="color:#0891b2">'+(_ft.visit||0)+'</td><td class="num" style="color:#2563eb">'+(_ft.setting||0)+'</td><td class="num order">'+(_ft.order||0)+'</td><td class="num" style="color:#e65100">'+spFmtCell(_spSum)+'</td><td class="num" style="color:#0891b2">'+cplCell(_spSum,_inM,afterCutTot)+'</td><td class="num" style="color:#0f9d58">'+roasCell(_chongSalesWon,_spSum)+'</td></tr>';
+  var totRow='<tr style="font-weight:800;background:#f1f5f9"><td class="name">총합계</td><td class="num db">'+tdCell(chongToday+g3Today)+'</td><td class="num" style="color:#f97316">'+tdCell(chongYday+g3Yday)+'</td><td class="num" style="color:#9333ea">'+_inM+'</td><td class="num" style="color:#0891b2">'+((_ft.visit||0)+g3Visit)+'</td><td class="num" style="color:#2563eb">'+((_ft.setting||0)+g3Setting)+'</td><td class="num order">'+((_ft.order||0)+g3Order)+'</td><td class="num" style="color:#e65100">'+spFmtCell(_spSum)+'</td><td class="num" style="color:#0891b2">'+cplCell(_spSum,_inM,afterCutTot)+'</td><td class="num" style="color:#0f9d58">'+roasCell(_chongSalesWon,_spSum)+'</td></tr>';
   var h = totRow + '<tr><td class="name">본사웹마</td><td class="num db">'+tdCell(chongToday)+'</td><td class="num" style="color:#f97316">'+tdCell(chongYday)+'</td><td class="num" style="color:#9333ea">'+chongMonth+'</td>'
     +'<td class="num" style="color:#0891b2">'+(_ft.visit||0)+'</td><td class="num" style="color:#2563eb">'+(_ft.setting||0)+'</td><td class="num order">'+(_ft.order||0)+'</td>'
     +'<td class="num" style="color:#e65100">'+spFmtCell(spChong)+'</td><td class="num" style="color:#0891b2">'+cplCell(spChong, chongMonth, afterCutChong)+'</td><td class="num" style="color:#0f9d58">'+roasCell(_chongSalesWon, spChong)+'</td></tr>';
@@ -925,7 +931,7 @@ function renderGrowthInflow(){
     var _mAfterCut = d.afterCut || d.t;
     h += '<tr><td class="name">'+(GLBL[m]||m)+'</td><td class="num db">'+tdCell(d.t)+'</td><td class="num" style="color:#f97316">'+tdCell(d.y)+'</td><td class="num" style="color:#9333ea">'+d.db+'</td>'
       +'<td class="num" style="color:#0891b2">'+(d.visit||0)+'</td><td class="num" style="color:#2563eb">'+(d.setting||0)+'</td><td class="num order">'+(d.order||0)+'</td>'
-      +'<td class="num" style="color:#e65100">'+spCell+'</td><td class="num" style="color:#0891b2">'+cplCell(sp[m]||0, d.db, _mAfterCut)+'</td><td class="num" style="color:#0f9d58">'+roasCell(0, sp[m]||0)+'</td></tr>';
+      +'<td class="num" style="color:#e65100">'+spCell+'</td><td class="num" style="color:#0891b2">'+cplCell(sp[m]||0, d.db, _mAfterCut)+'</td><td class="num" style="color:#0f9d58">'+roasCell(d.sales||0, sp[m]||0)+'</td></tr>';
   });
   tb.innerHTML = h;
   // ★ 상단 유입 카드 = 전체(총괄+3명). _growthInflow 로드 후라 여기서 세팅해야 3명 반영됨
