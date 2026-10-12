@@ -542,12 +542,14 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
   </tbody>
 </table></div>
 
+<div id="bunri-section">
 <div class="section-label">분리캠페인 캠페인별 <span class="badge">소재 성과 · 광고비</span><span class="asof-badge" style="background:#d97706">📊 광고비 <span class="spend-asof">어제까지</span></span></div>
 <div class="asof-note" style="color:#94a3b8">메타 소재(ad)별 실집행을 캠페인명으로 매칭 · 소재=담당자 1:1 · CPL은 광고비 집계일까지 유입 기준 (이번달 탭)</div>
 <div class="tbl-scroll" style="margin-top:6px"><table class="funnel-table" id="bunri-camp-tbl">
   <thead><tr><th>캠페인</th><th>DB</th><th>방문</th><th>세팅</th><th>오더</th><th>광고비<br><span class="spend-asof" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span class="spend-asof" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>매출</th></tr></thead>
   <tbody id="bunri-camp-tbody"><tr><td colspan="8" style="color:#aaa;text-align:center;padding:12px;">불러오는 중...</td></tr></tbody>
 </table></div>
+</div>
 
 <div class="section-label">학년별 <span class="badge today" id="grade-tab-label">이번달</span></div>
 <div class="grid-3" id="grade-grid">
@@ -841,7 +843,13 @@ function renderGrowthInflow(){
   //   그로스 3명은 "이번달" 데이터만 존재 → 지난달/전체 탭이면 0으로.
   var isThisMonth = (routeTab === 0);
   var isLastMonth = (routeTab === 1);
-  var hasSpend    = isThisMonth || isLastMonth;   // 광고비/CPL/ROAS 표시 가능 기간 (전체 탭은 데이터 없음 → '-')
+  var isAll       = (routeTab === 2);
+  var hasSpend    = isThisMonth || isLastMonth || isAll;   // 이번달·지난달·전체 모두 광고비/CPL/ROAS 표시
+  // 전체(all-time) 광고비·ROAS·매출 — 요약시트 '전체광고비' 블록에서 라벨로 찾음
+  var _findRow = function(lb){ for(var _i=0;_i<allRows.length;_i++){ if(allRows[_i]&&allRows[_i][0]===lb) return allRows[_i]; } return null; };
+  var _allSpendWon = (function(){ var r=_findRow('전체 광고비'); return r?(parseFloat((''+r[1]).replace(/[^0-9.]/g,''))||0):0; })();
+  var _allRoasV    = (function(){ var r=_findRow('전체 ROAS'); return r?(parseFloat((''+r[1]).replace(/[^0-9.]/g,''))||0):0; })();
+  var _allSalesWon = _allSpendWon * _allRoasV;
   var chongToday = parseInt((allRows[1] && allRows[1][1]) || 0) || 0;       // 노션 오늘(토글 무관)
   var chongYday  = parseInt((allRows[2] && allRows[2][1]) || 0) || 0;       // 노션 어제(토글 무관)
   var chongMonth = parseInt((allRows[1] && allRows[1][routeTab+2]) || 0) || 0;  // 총유입(탭 따라감)
@@ -854,7 +862,9 @@ function renderGrowthInflow(){
   // 총괄 = 전체 - 3명 기여를 보여주면 분해가 명확 (총괄 + 3명 = 카드 전체).
   var spFmtCell = function(won){ return (hasSpend && won>0) ? spFmt(won) : '-'; };
   // 총괄(본사) 광고비: 이번달 sp['총괄'] / 지난달 sp['총괄_L'] (getLeadStats가 _그로스_총괄_L로 기록). 전체 탭은 0 → '-'
-  var spChong = isThisMonth ? (sp['총괄']||0) : (isLastMonth ? (sp['총괄_L']||0) : 0);
+  var spChong = isThisMonth ? (sp['총괄']||0) : (isLastMonth ? (sp['총괄_L']||0) : (isAll ? _allSpendWon : 0));
+  // 오늘/어제 유입은 실시간(오늘 기준) 값 → 지난달·전체 탭에선 '-' (월간만 기간 반영)
+  var tdCell = function(v){ return isThisMonth ? v : '-'; };
   // 총괄 매출(원): 이번달 요약 r12(allRows[11]) / 지난달 요약 r13(allRows[12])
   var _parseWon = function(idx){ var s=String((allRows[idx]&&allRows[idx][1])||''); var n=parseFloat(s.replace(/[^0-9.]/g,''))||0; return s.indexOf('만')>=0?n*10000:n; };
   // 총괄 행 (3명 제외 나머지) — 카드 전체에서 3명 뺀 값
@@ -876,20 +886,20 @@ function renderGrowthInflow(){
   // ROAS = 매출 ÷ 광고비. 총괄은 메인 노션 매출 있음(원장). 3명은 매출 아직 없음(이제 시작) → '-'
   var roasCell = function(salesWon, won){ if(!hasSpend||!salesWon||!won) return '-'; return (salesWon/won).toFixed(2); };
   // 총괄 매출(원): 이번달 요약 r12(allRows[11]) / 지난달 요약 r13(allRows[12])
-  var _chongSalesWon = isThisMonth ? _parseWon(11) : (isLastMonth ? _parseWon(12) : 0);
+  var _chongSalesWon = isThisMonth ? _parseWon(11) : (isLastMonth ? _parseWon(12) : (isAll ? _allSalesWon : 0));
   var afterCutTot   = isThisMonth ? _totAfterCut   : 0;   // 지난달·전체는 전액 확정 → 광고비 미반영분 0
   var afterCutChong = isThisMonth ? _chongAfterCut : 0;
   var _ft = window._fnlTot || {visit:0,setting:0,order:0};
   var _spSum = spChong + (isThisMonth ? members.reduce(function(s,m){return s+(sp[m]||0);},0) : 0), _inM=chongMonth+g3Month;
-  var totRow='<tr style="font-weight:800;background:#f1f5f9"><td class="name">총합계</td><td class="num db">'+(chongToday+g3Today)+'</td><td class="num" style="color:#f97316">'+(chongYday+g3Yday)+'</td><td class="num" style="color:#9333ea">'+_inM+'</td><td class="num" style="color:#0891b2">'+(_ft.visit||0)+'</td><td class="num" style="color:#2563eb">'+(_ft.setting||0)+'</td><td class="num order">'+(_ft.order||0)+'</td><td class="num" style="color:#e65100">'+spFmtCell(_spSum)+'</td><td class="num" style="color:#0891b2">'+cplCell(_spSum,_inM,afterCutTot)+'</td><td class="num" style="color:#0f9d58">'+roasCell(_chongSalesWon,_spSum)+'</td></tr>';
-  var h = totRow + '<tr><td class="name">본사웹마</td><td class="num db">'+chongToday+'</td><td class="num" style="color:#f97316">'+chongYday+'</td><td class="num" style="color:#9333ea">'+chongMonth+'</td>'
+  var totRow='<tr style="font-weight:800;background:#f1f5f9"><td class="name">총합계</td><td class="num db">'+tdCell(chongToday+g3Today)+'</td><td class="num" style="color:#f97316">'+tdCell(chongYday+g3Yday)+'</td><td class="num" style="color:#9333ea">'+_inM+'</td><td class="num" style="color:#0891b2">'+(_ft.visit||0)+'</td><td class="num" style="color:#2563eb">'+(_ft.setting||0)+'</td><td class="num order">'+(_ft.order||0)+'</td><td class="num" style="color:#e65100">'+spFmtCell(_spSum)+'</td><td class="num" style="color:#0891b2">'+cplCell(_spSum,_inM,afterCutTot)+'</td><td class="num" style="color:#0f9d58">'+roasCell(_chongSalesWon,_spSum)+'</td></tr>';
+  var h = totRow + '<tr><td class="name">본사웹마</td><td class="num db">'+tdCell(chongToday)+'</td><td class="num" style="color:#f97316">'+tdCell(chongYday)+'</td><td class="num" style="color:#9333ea">'+chongMonth+'</td>'
     +'<td class="num" style="color:#0891b2">'+(_ft.visit||0)+'</td><td class="num" style="color:#2563eb">'+(_ft.setting||0)+'</td><td class="num order">'+(_ft.order||0)+'</td>'
     +'<td class="num" style="color:#e65100">'+spFmtCell(spChong)+'</td><td class="num" style="color:#0891b2">'+cplCell(spChong, chongMonth, afterCutChong)+'</td><td class="num" style="color:#0f9d58">'+roasCell(_chongSalesWon, spChong)+'</td></tr>';
   members.forEach(function(m){
     var d = isThisMonth ? (gi[m] || {t:0,y:0,m:0,visit:0,setting:0,order:0,afterCut:0}) : {t:0,y:0,m:0,visit:0,setting:0,order:0,afterCut:0};
     var spCell = isThisMonth ? spFmt(sp[m]) : '-';
     var _mAfterCut = d.afterCut || d.t;   // 담당자 afterCut(광고비 미반영분), 없으면 오늘값 폴백
-    h += '<tr><td class="name">'+(GLBL[m]||m)+'</td><td class="num db">'+d.t+'</td><td class="num" style="color:#f97316">'+d.y+'</td><td class="num" style="color:#9333ea">'+d.m+'</td>'
+    h += '<tr><td class="name">'+(GLBL[m]||m)+'</td><td class="num db">'+tdCell(d.t)+'</td><td class="num" style="color:#f97316">'+tdCell(d.y)+'</td><td class="num" style="color:#9333ea">'+d.m+'</td>'
       +'<td class="num" style="color:#0891b2">'+(isThisMonth?(d.visit||0):'-')+'</td><td class="num" style="color:#2563eb">'+(isThisMonth?(d.setting||0):'-')+'</td><td class="num order">'+(isThisMonth?(d.order||0):'-')+'</td>'
       +'<td class="num" style="color:#e65100">'+spCell+'</td><td class="num" style="color:#0891b2">'+cplCell(sp[m]||0, d.m, _mAfterCut)+'</td><td class="num" style="color:#0f9d58">'+roasCell(0, sp[m]||0)+'</td></tr>';
   });
@@ -897,9 +907,9 @@ function renderGrowthInflow(){
   // ★ 상단 유입 카드 = 전체(총괄+3명). _growthInflow 로드 후라 여기서 세팅해야 3명 반영됨
   //   (render()는 _growthInflow 로드 전에 돌아 3명이 0으로 빠지던 버그 → 날짜별유입 33 vs 카드 20 불일치 해결)
   { var _vt=document.getElementById('v-total'), _vd=document.getElementById('v-today'), _vy=document.getElementById('v-yesterday');
-    if(_vt) _vt.textContent = (chongMonth + g3Month).toLocaleString();   // 총유입 = 총괄월간 + 3명월간
-    if(_vd) _vd.textContent = (chongToday + g3Today).toLocaleString();   // 오늘 = 총괄오늘 + 3명오늘
-    if(_vy) _vy.textContent = (chongYday + g3Yday).toLocaleString();     // 어제 = 총괄어제 + 3명어제
+    if(_vt) _vt.textContent = (chongMonth + g3Month).toLocaleString();   // 총유입 = 총괄월간 + 3명월간 (기간 반영)
+    if(_vd) _vd.textContent = isThisMonth ? (chongToday + g3Today).toLocaleString() : '-';   // 오늘: 실시간이라 지난달·전체 탭은 '-'
+    if(_vy) _vy.textContent = isThisMonth ? (chongYday + g3Yday).toLocaleString() : '-';     // 어제: 동일
   }
   // ★ 광고비 + 통합 CPL 카드 세팅 — _growthSpend 로드 후
   { var _spAll = _spSum;   // 이번달=총괄+3명 / 지난달=총괄(총괄_L) / 전체=0
@@ -924,7 +934,9 @@ function renderBunriCamps(){
   var tb=document.getElementById('bunri-camp-tbody'); if(!tb) return;
   var camps=_bunriCamps||[];
   var isThisMonth=(routeTab===0);
-  if(!isThisMonth){ tb.innerHTML='<tr><td colspan="8" style="color:#aaa;text-align:center;padding:12px;">이번달 탭에서 표시</td></tr>'; return; }
+  // ★ 분리캠페인(신규퍼널)은 이번달 전용 — 지난달/전체 탭에선 섹션 통째로 숨김
+  var _sec=document.getElementById('bunri-section'); if(_sec) _sec.style.display = isThisMonth ? '' : 'none';
+  if(!isThisMonth){ return; }
   if(!camps.length){ tb.innerHTML='<tr><td colspan="8" style="color:#aaa;text-align:center;padding:12px;">데이터 없음</td></tr>'; return; }
   var won=function(n){ n=Number(n)||0; if(n<=0)return '-'; if(n>=10000)return (Math.round(n/1000)/10).toLocaleString()+'만'; return n.toLocaleString(); };
   var spFmt=function(n){ n=Number(n)||0; if(n<=0)return '-'; return (n/10000).toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:1})+'만'; };
