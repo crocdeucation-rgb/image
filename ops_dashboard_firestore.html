@@ -1668,8 +1668,7 @@ function guardBox(){
   var mseg='<div class="seg" style="margin-bottom:10px">'+ms.map(function(m){
     return '<button class="'+(!ALL&&m===G?'on':'')+'" data-gm="'+m+'">'+(+m.slice(5))+'월'+(m===DATA.slice(0,7)?' (진행 중)':'')+'</button>';}).join('')+
     '<button class="'+(ALL?'on':'')+'" data-gm="all">전체</button></div>';
-  var SORT=window.__gsort||'rate';
-  var sortSeg='<div class="seg" style="margin-bottom:10px"><button class="'+(SORT==='rate'?'on':'')+'" data-gsort="rate">방어율 순</button><button class="'+(SORT==='recv'?'on':'')+'" data-gsort="recv">접수 많은 순</button></div>';
+  // 정렬 토글 제거 — 접수 많은 순 고정 (방어율 컬럼은 유지)
   var bar=function(r,col){return '<div style="display:inline-block;width:44px;height:6px;background:#EEF1F6;border-radius:3px;overflow:hidden;vertical-align:middle;margin-right:6px"><i style="display:block;height:100%;width:'+Math.min(r||0,100)+'%;background:'+col+'"></i></div>';};
   var spark=function(k){return '<div class="spk">'+ms.map(function(mm){var z=(byGM[k]||{})[mm]||{keep:0,drop:0,mw:0};var q=z.keep+z.drop;var r=q?pc(z.keep,q):null;
       var h=r!=null?Math.max(3,Math.round(r/100*26)):2, on=(!ALL&&mm===G);
@@ -1690,8 +1689,7 @@ function guardBox(){
       '<td>'+(r==null?'<span class="z">결론 없음</span>':bar(r,'var(--pos)')+'<b>'+r+'%</b>')+'</td>'+
       '<td class="c" style="white-space:nowrap">'+(pr==null?'<span class="z">—</span>':pr+'%'+(d?'<div style="font-size:10.5px;font-weight:700;color:'+(d>0?'var(--pos)':'var(--red)')+'">'+(d>0?'▲':'▼')+Math.abs(d)+'</div>':''))+'</td>'+
       '<td>'+spark(k)+'</td></tr>';}).join(''); }
-  var sortf=SORT==='recv'?function(a,b){return A.o[b].mw-A.o[a].mw;}
-    :function(a,b){var ra=dr(A.o[a]),rb=dr(A.o[b]);return (rb==null?-1:rb)-(ra==null?-1:ra);};
+  var sortf=function(a,b){return A.o[b].mw-A.o[a].mw;};   // 접수 많은 순 고정
   // 퇴사·외부 판정 = HR 재직 명단(hrCoach/hrSaup)에 없으면. 명단 미배포시 이용우·정기상만(코칭).
   function _nm(n){return String(n==null?'':n).replace(/\(.*?\)/g,'').replace(/\s/g,'');}
   var hrC=D.hrCoach?(function(){var o={};D.hrCoach.forEach(function(n){o[n]=1;});return o;})():null;
@@ -1711,7 +1709,7 @@ function guardBox(){
   var per=ALL?'전체':(+G.slice(5))+'월';
   return zone('guard','var(--pos)','관리 현황',per+' · 방어율 '+(dr(cur)==null?'—':dr(cur)+'%'),'분류축·기간을 바꿔 민원·취소를 분해',
    '<div class="lead">민원 시트에 올라온 취소 문의를 <b>분류축</b>(팀 A/B·사업담당·코칭담당·지점·상담)과 <b>기간</b>으로 쪼갭니다. 방어율=유지÷(유지+해지), 당일취소 제외. (팀=담임 코칭 기준)</div>'+
-   dimSeg+mseg+'<div class="kpi">'+head+'</div>'+sortSeg+tbl,true);
+   dimSeg+mseg+'<div class="kpi">'+head+'</div>'+tbl,true);
 }
 function tLbl2(k){return k;}   // (코칭담당 이름은 그대로 — 팀 라벨 아님)
 
@@ -1789,23 +1787,17 @@ function todoSummaryBox(){
 function planBox(){
   var mon=monday(CUR), w=[[mon,add(mon,6)],[add(mon,7),add(mon,13)]];
   var inW=function(d,i){return d&&d>=w[i][0]&&d<=w[i][1];};
+  var STEPS=['해피콜','개통','입학식','첫만남','첫수업'];
+  // 날짜별 칼럼과 같은 소스(EV events)로 집계 → 숫자 일치
   var R=[0,1].map(function(i){
     var ob={}, obn=0;
-    Object.keys(D.week||{}).forEach(function(st){var S=D.week[st];Object.keys(S).forEach(function(d){
-      if(!inW(d,i)) return; S[d].forEach(function(e){ if(e.done) return; ob[e.k]=(ob[e.k]||0)+1; obn++;});});});
-    var ex=[], exBy={};
-    Object.keys(CO).forEach(function(k){CO[k].live.forEach(function(m){
-      if(inW(m.exp,i)&&!m.can&&inBr(m)){ex.push(m);exBy[k]=(exBy[k]||0)+1;}});});
-    return {ob:ob,obn:obn,ex:ex.length,exBy:exBy};
+    EV.forEach(function(e){ if(!inBr(e)||!inW(e.day,i)) return; ob[e.kind]=(ob[e.kind]||0)+1; obn++; });
+    return {ob:ob,obn:obn};
   });
-  var A=alertData();
-  var openMw=IN.filter(function(i){return i.type==='민원'&&i.state==='open'&&inBr(i);}).length;
-  var top=function(o){return Object.keys(o).sort(function(a,b){return o[b]-o[a];}).slice(0,4).map(function(k){return esc(k)+' '+o[k];}).join(' · ');};
-  var line=function(lab,n,sub,anch){return '<div class="pl"><button class="pll" data-anch="'+anch+'"><span>'+lab+'</span><b'+(n?'':' class="zero"')+'>'+n+'</b></button>'+(sub?'<div class="pls">'+sub+'</div>':'')+'</div>';};
+  var line=function(lab,n,anch){return '<div class="pl"><button class="pll" data-anch="'+anch+'"><span>'+lab+'</span><b'+(n?'':' class="zero"')+'>'+n+'</b></button></div>';};
   var card=function(i,title){var r=R[i];
-    return '<div class="pcard'+(i?'':' now')+'"><div class="pch"><b>'+title+'</b><span>'+md(w[i][0])+' ~ '+md(w[i][1])+'</span></div>'+
-      line('해피콜',(r.ob['해피콜']||0),'가입 후 첫 통화','onbhub')+
-      line('온보딩 일정',r.obn,top(r.ob),'onbhub')+
+    return '<div class="pcard'+(i?'':' now')+'"><div class="pch"><b>'+title+'</b><span>'+md(w[i][0])+' ~ '+md(w[i][1])+' · 단계 '+r.obn+'건</span></div>'+
+      STEPS.map(function(s){return line(s,(r.ob[s]||0),'onbhub');}).join('')+
     '</div>';};
   return '<div class="pgrid">'+card(0,monday(TODAY)===mon?'이번 주':md(mon)+' 주')+card(1,monday(TODAY)===mon?'다음 주':md(add(mon,7))+' 주')+'</div>';
 }
@@ -2509,7 +2501,7 @@ function onbHubBox(){
     '<button class="'+(T==='week'?'on':'')+'" data-onbtab="week">📅 날짜별 보기</button>'+
     '<button class="'+(T==='journey'?'on':'')+'" data-onbtab="journey">🧭 회원별 여정</button></div>';
   var body=(T==='journey'?journeyBox():weekBox());
-  return '<div id="z-onbhub" class="onbhub">'+weekStageFlow()+seg+body+'</div>';
+  return '<div id="z-onbhub" class="onbhub">'+seg+body+'</div>';
 }
 function alertBox(){
   var A=alertData();
