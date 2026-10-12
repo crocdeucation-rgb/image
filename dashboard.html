@@ -604,7 +604,15 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
   <div id="cal-body"><div style="color:#aaa;text-align:center;padding:16px;font-size:11px">불러오는 중...</div></div>
 </div>
 
-<div class="sec-title amber">방문 스케줄</div>
+<div class="sec-title" style="margin-top:16px">🎯 타겟 적합도 <span style="font-size:9px;color:#94a3b8;font-weight:600">On-Target % · 학부모 연령</span></div>
+<div style="font-size:9.5px;color:#94a3b8;margin:2px 0 7px">
+  <span style="color:#0f9d58;font-weight:800">■</span> 핵심35-54
+  <span style="color:#f59e0b;font-weight:800;margin-left:7px">■</span> 약25-34·55-64
+  <span style="color:#ef4444;font-weight:800;margin-left:7px">■</span> 비대상(낭비)
+</div>
+<div id="agefit-box"><div style="color:#aaa;text-align:center;padding:12px;font-size:11px">불러오는 중...</div></div>
+
+<div class="sec-title amber" style="margin-top:16px">방문 스케줄</div>
 <div class="visit-panel">
   <div id="visit-list"><div class="visit-empty">불러오는 중...</div></div>
 </div>
@@ -754,6 +762,7 @@ async function loadAll() {
   await Promise.all([loadData(), loadSchedule(), loadCancel()]);
   loadGrowthInflow();   // ← 추가
   loadCalendar();       // ← [2026-10-06] 캘린더뷰
+  loadAgeFit();         // ← 타겟 적합도 (execData/dash-agefit)
 }
 // [그로스별 유입] 우혜림 DB 시트(대시보드 탭) gviz 로드
 var GROWTH_GVIZ = 'https://docs.google.com/spreadsheets/d/1l0H8mY0SHiENr9Mlvnha7WVNAxA-iPQh0AB55eXhFaA/gviz/tq?tqx=out:csv&headers=0&sheet=' + encodeURIComponent('대시보드');
@@ -990,6 +999,29 @@ function renderBunriCamps(){
 // ══ [2026-10-06] 캘린더(잔디밭) 뷰 — 두 소스 일자별유입 합산 ══
 var _calView = 'week';
 var _calDaily = null;
+// ★ [타겟 적합도] execData/dash-agefit → 세그먼트별 핵심/약/비대상 스택바
+async function loadAgeFit(){
+  var box=document.getElementById('agefit-box'); if(!box) return;
+  try{
+    var rows=parseCSV(await _fsCsv('execData','dash-agefit'));
+    var h='';
+    for(var i=1;i<rows.length;i++){   // rows[0]=헤더
+      var r=rows[i]||[]; var nm=(r[0]||'').trim(); if(!nm) continue;
+      var cL=parseInt(r[1])||0, wL=parseInt(r[3])||0, oL=parseInt(r[5])||0, tot=parseInt(r[7])||0;
+      var col = cL>=70?'#0f9d58':(cL>=45?'#f59e0b':'#ef4444');
+      h+='<div style="display:flex;align-items:center;gap:8px;margin:7px 0">'
+        +'<span style="width:52px;font-size:11.5px;font-weight:700;color:#374151;flex-shrink:0">'+nm+'</span>'
+        +'<span style="flex:1;height:16px;border-radius:5px;overflow:hidden;display:flex;background:#f0f4fa">'
+          +'<span style="height:100%;width:'+cL+'%;background:#0f9d58"></span>'
+          +'<span style="height:100%;width:'+wL+'%;background:#f59e0b"></span>'
+          +'<span style="height:100%;width:'+oL+'%;background:#ef4444"></span>'
+        +'</span>'
+        +'<span style="width:92px;text-align:right;font-size:11px;flex-shrink:0;color:#9ca3af">핵심 <b style="color:'+col+'">'+cL+'%</b> · 낭비 '+oL+'%</span>'
+        +'</div>';
+    }
+    box.innerHTML = h || '<div style="color:#aaa;text-align:center;padding:10px;font-size:11px">데이터 없음 — whMetaAgeBreakdown 실행 필요</div>';
+  }catch(e){ box.innerHTML='<div style="color:#aaa;text-align:center;padding:10px;font-size:11px">불러오기 실패</div>'; }
+}
 async function loadCalendar(){
   try{
     var merged = {};
