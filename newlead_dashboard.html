@@ -208,6 +208,16 @@
         <thead><tr><th>캠페인</th><th>DB</th><th>방문</th><th>세팅</th><th>오더</th><th>광고비<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>매출</th></tr></thead>
         <tbody><tr><td colspan="8" class="loading">불러오는 중…</td></tr></tbody>
       </table></div>
+
+      <div class="sec camp" style="margin-top:18px">날짜별 광고비 <span class="badge">담당자별 · <span class="asof-spend">어제까지</span></span></div>
+      <div class="cal-tabs">
+        <button class="on" id="sp-btn-week" onclick="setSpendView('week')">주간</button>
+        <button id="sp-btn-month" onclick="setSpendView('month')">월간</button>
+      </div>
+      <div class="tbl-wrap"><table id="spend-tbl">
+        <thead><tr><th>날짜</th><th>김윤호</th><th>장윤호</th><th>우혜림</th><th>합계</th></tr></thead>
+        <tbody><tr><td colspan="5" class="loading">불러오는 중…</td></tr></tbody>
+      </table></div>
     </div>
 
     <!-- 3열: 날짜별 유입 -->
@@ -300,6 +310,42 @@ function renderFit(){
       +'<div style="height:9px;border-radius:5px;background:#eef2f7;overflow:hidden"><span style="display:block;height:100%;width:'+v+'%;background:'+c+'"></span></div></div>';
   });
   afBox.innerHTML = afh || '<div class="loading">데이터 없음</div>';
+}
+
+// ── 날짜별 광고비 (담당자별, 주간/월간 토글) ──
+var _spendDaily={}, _spendView='week';
+function setSpendView(v){
+  _spendView=v;
+  var bw=document.getElementById('sp-btn-week'), bm=document.getElementById('sp-btn-month');
+  if(bw) bw.classList.toggle('on', v==='week');
+  if(bm) bm.classList.toggle('on', v==='month');
+  renderSpend();
+}
+function renderSpend(){
+  var tb=document.querySelector('#spend-tbl tbody'); if(!tb) return;
+  var now=new Date(), _p=function(n){return String(n).padStart(2,'0');};
+  var ymd=function(dt){return dt.getFullYear()+'-'+_p(dt.getMonth()+1)+'-'+_p(dt.getDate());};
+  var monthPrefix=now.getFullYear()+'-'+_p(now.getMonth()+1);
+  var wkFrom=ymd(new Date(now.getFullYear(),now.getMonth(),now.getDate()-6));
+  var keys=Object.keys(_spendDaily).filter(function(d){
+    return _spendView==='month' ? d.indexOf(monthPrefix)===0 : d>=wkFrom;
+  }).sort().reverse();   // 최신 날짜 위로
+  if(!keys.length){ tb.innerHTML='<tr><td colspan="5" class="loading">데이터 없음</td></tr>'; return; }
+  var h='', tg=0,tj=0,tw=0;
+  keys.forEach(function(d){
+    var o=_spendDaily[d]; tg+=o.g; tj+=o.j; tw+=o.w;
+    h+='<tr><td>'+d.slice(5)+'</td>'
+      +'<td class="num spend">'+wonSp(o.g)+'</td>'
+      +'<td class="num spend">'+wonSp(o.j)+'</td>'
+      +'<td class="num spend">'+wonSp(o.w)+'</td>'
+      +'<td class="num">'+wonSp(o.g+o.j+o.w)+'</td></tr>';
+  });
+  h+='<tr class="total"><td>합계</td>'
+    +'<td class="num spend">'+wonSp(tg)+'</td>'
+    +'<td class="num spend">'+wonSp(tj)+'</td>'
+    +'<td class="num spend">'+wonSp(tw)+'</td>'
+    +'<td class="num">'+wonSp(tg+tj+tw)+'</td></tr>';
+  tb.innerHTML=h;
 }
 
 // ── 날짜별 유입 (주간/월간 토글) ──
@@ -452,7 +498,8 @@ async function load(){
     var dailyMap={};
     if(dStart>=0){
       for(var dr=dStart;dr<rows.length;dr++){
-        var dz=rows[dr]; if(!/^\d{4}-\d{2}-\d{2}$/.test(dz[0]))continue;
+        var dz=rows[dr]; if(dz[0]==='일별광고비')break;   // 일별광고비 블록 전에서 멈춤
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(dz[0]))continue;
         dailyMap[dz[0]]=parseInt(dz[1])||0;
       }
     }
@@ -605,11 +652,25 @@ async function load(){
     _calDaily={};
     if(dStart>=0){
       for(var r3=dStart;r3<rows.length;r3++){
-        var z=rows[r3]; if(!/^\d{4}-\d{2}-\d{2}$/.test(z[0]))continue;
+        var z=rows[r3]; if(z[0]==='일별광고비')break;   // 일별광고비 블록 전에서 멈춤
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(z[0]))continue;
         _calDaily[z[0]]=parseInt(z[1])||0;
       }
     }
     renderCalendar();
+
+    // ── 날짜별 광고비 파싱 (일별광고비 블록: [0]날짜 [1]우혜림 [2]장윤호 [3]김윤호) ──
+    _spendDaily={};
+    for(var spI=0; spI<rows.length; spI++){
+      if(rows[spI][0]==='일별광고비'){
+        for(var spJ=spI+1; spJ<rows.length; spJ++){
+          var sr=rows[spJ]; if(!/^\d{4}-\d{2}-\d{2}$/.test(sr[0]))break;
+          _spendDaily[sr[0]]={ w:Number(sr[1])||0, j:Number(sr[2])||0, g:Number(sr[3])||0 };
+        }
+        break;
+      }
+    }
+    renderSpend();
 
   }catch(e){
     document.getElementById('updated').textContent = '불러오기 실패 — 대시보드 탭이 생성됐는지 확인하세요';
