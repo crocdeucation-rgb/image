@@ -2295,7 +2295,8 @@ branchProfilesStart();
 
 var _me=null;   // {email,name,rank}
 // [2026-09] 권한 판별 — 부서장·경영진만 사업 실적·취소 표기 열람
-function isBoss(){ var R=(window._me&&window._me.rank)||''; return ['파운더','대표이사','이사','지사장','지점장','부지점장'].indexOf(R)>=0; }
+function isBoss(){ var M=(window._me||{}); var R=M.rank||''; var E=(M.email||'').toLowerCase();
+  return ['파운더','대표이사','이사','지사장','지점장','부지점장'].indexOf(R)>=0 || ['ansuhee1123@gmail.com'].indexOf(E)>=0; }
 window.isBoss=isBoss;
 // allowlist 이메일→이름·직급 (표시용). 규칙은 Firestore가 강제, 여긴 이름 표시만.
 var ALLOW_NAME={
