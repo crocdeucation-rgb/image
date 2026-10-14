@@ -638,6 +638,12 @@ details.collapsible[open]>summary .fold-hint{display:none}
   <span style="color:#f59e0b;font-weight:800;margin-left:7px">■</span> 준타겟25-34·55-64
   <span style="color:#ef4444;font-weight:800;margin-left:7px">■</span> 아웃타겟(낭비)
 </div>
+<div class="cal-toggle" style="margin:0 0 8px">
+  <button id="af-btn-t" onclick="setAgeFitView('t')">오늘</button>
+  <button id="af-btn-w" onclick="setAgeFitView('w')">주간</button>
+  <button id="af-btn-m" class="on" onclick="setAgeFitView('m')">월간</button>
+  <button id="af-btn-a" onclick="setAgeFitView('a')">전체</button>
+</div>
 <div id="agefit-box"><div style="color:#aaa;text-align:center;padding:12px;font-size:11px">불러오는 중...</div></div>
 
 <div class="sec-title amber" style="margin-top:16px">방문 스케줄</div>
@@ -1085,28 +1091,55 @@ function renderGrowthDaily(){
 // ══ [2026-10-06] 캘린더(잔디밭) 뷰 — 두 소스 일자별유입 합산 ══
 var _calView = 'week';
 var _calDaily = null;
-// ★ [타겟 적합도] execData/dash-agefit → 세그먼트별 핵심/약/비대상 스택바
+// ★ [타겟 적합도] execData/dash-agefit → 세그먼트별 핵심/약/비대상 스택바 (기간: 오늘/주간/월간/전체)
+var _ageFit = null;        // {t:rows, w:rows, m:rows, a:rows}
+var _ageFitView = 'm';
 async function loadAgeFit(){
   var box=document.getElementById('agefit-box'); if(!box) return;
   try{
-    var rows=parseCSV(await _fsCsv('execData','dash-agefit'));
-    var h='';
-    for(var i=1;i<rows.length;i++){   // rows[0]=헤더
-      var r=rows[i]||[]; var nm=(r[0]||'').trim(); if(!nm) continue;
-      var cL=parseInt(r[1])||0, wL=parseInt(r[3])||0, oL=parseInt(r[5])||0, tot=parseInt(r[7])||0;
-      var col = cL>=70?'#0f9d58':(cL>=45?'#f59e0b':'#ef4444');
-      h+='<div style="display:flex;align-items:center;gap:8px;margin:7px 0">'
-        +'<span style="width:52px;font-size:11.5px;font-weight:700;color:#374151;flex-shrink:0">'+nm+'</span>'
-        +'<span style="flex:1;height:16px;border-radius:5px;overflow:hidden;display:flex;background:#f0f4fa">'
-          +'<span style="height:100%;width:'+cL+'%;background:#0f9d58"></span>'
-          +'<span style="height:100%;width:'+wL+'%;background:#f59e0b"></span>'
-          +'<span style="height:100%;width:'+oL+'%;background:#ef4444"></span>'
-        +'</span>'
-        +'<span style="width:96px;text-align:right;font-size:11px;flex-shrink:0;color:#9ca3af">온타겟 <b style="color:'+col+'">'+cL+'%</b> · 아웃 '+oL+'%</span>'
-        +'</div>';
+    var o = await _fsGet('execData','dash-agefit');   // {rows, periods?}
+    if(o && o.periods){
+      _ageFit = { t:o.periods.t||o.rows, w:o.periods.w||o.rows, m:o.periods.m||o.rows, a:o.periods.a||o.rows };
+    } else {
+      // 구포맷(기간별 미배포) 호환 — rows(월간) 하나를 전 기간에
+      var rr = (o && o.rows) || [];
+      _ageFit = { t:rr, w:rr, m:rr, a:rr };
     }
-    box.innerHTML = h || '<div style="color:#aaa;text-align:center;padding:10px;font-size:11px">데이터 없음 — whMetaAgeBreakdown 실행 필요</div>';
+    renderAgeFit();
   }catch(e){ box.innerHTML='<div style="color:#aaa;text-align:center;padding:10px;font-size:11px">불러오기 실패</div>'; }
+}
+function setAgeFitView(v){
+  _ageFitView=v;
+  ['t','w','m','a'].forEach(function(k){ var b=document.getElementById('af-btn-'+k); if(b) b.classList.toggle('on', k===v); });
+  renderAgeFit();
+}
+function renderAgeFit(){
+  var box=document.getElementById('agefit-box'); if(!box || !_ageFit) return;
+  var rows = _ageFit[_ageFitView] || [];
+  var h='';
+  for(var i=1;i<rows.length;i++){   // rows[0]=헤더
+    var r=rows[i]||[]; var nm=(r[0]||'').trim(); if(!nm) continue;
+    var cL=parseInt(r[1])||0, wL=parseInt(r[3])||0, oL=parseInt(r[5])||0, tot=parseInt(r[7])||0;
+    if(!tot){   // 해당 기간 리드 없음 → 집계 전
+      h+='<div style="display:flex;align-items:center;gap:8px;margin:7px 0;opacity:.6">'
+        +'<span style="width:52px;font-size:11.5px;font-weight:700;color:#9aa3b0;flex-shrink:0">'+nm+'</span>'
+        +'<span style="flex:1;height:16px;border-radius:5px;background:#f3f4f6"></span>'
+        +'<span style="width:96px;text-align:right;font-size:10px;flex-shrink:0;color:#c2c8d2;font-weight:700">집계 전</span>'
+        +'</div>';
+      continue;
+    }
+    var col = cL>=70?'#0f9d58':(cL>=45?'#f59e0b':'#ef4444');
+    h+='<div style="display:flex;align-items:center;gap:8px;margin:7px 0">'
+      +'<span style="width:52px;font-size:11.5px;font-weight:700;color:#374151;flex-shrink:0">'+nm+'</span>'
+      +'<span style="flex:1;height:16px;border-radius:5px;overflow:hidden;display:flex;background:#f0f4fa">'
+        +'<span style="height:100%;width:'+cL+'%;background:#0f9d58"></span>'
+        +'<span style="height:100%;width:'+wL+'%;background:#f59e0b"></span>'
+        +'<span style="height:100%;width:'+oL+'%;background:#ef4444"></span>'
+      +'</span>'
+      +'<span style="width:96px;text-align:right;font-size:11px;flex-shrink:0;color:#9ca3af">온타겟 <b style="color:'+col+'">'+cL+'%</b> · 아웃 '+oL+'%</span>'
+      +'</div>';
+  }
+  box.innerHTML = h || '<div style="color:#aaa;text-align:center;padding:10px;font-size:11px">데이터 없음 — whMetaAgeBreakdown 실행 필요</div>';
 }
 async function loadCalendar(){
   try{
