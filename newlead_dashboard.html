@@ -46,6 +46,12 @@
   .cal-cell .cv{font-size:12px;font-weight:800}
   .cal-legend{display:flex;align-items:center;gap:3px;justify-content:flex-end;font-size:9px;color:var(--sub);margin-top:7px}
   .cal-legend .lg{display:inline-block;width:11px;height:11px;border-radius:3px}
+  /* 날짜별 광고비 — 월간 캘린더 셀의 3명 누적바 + 범례 */
+  .cal-cell.sp .cv{font-size:10px}
+  .cal-cell .spbar{display:flex;width:84%;height:4px;border-radius:2px;overflow:hidden;margin-top:3px;background:#eef2f7}
+  .cal-cell .spbar i{display:block;height:100%}
+  .sp-legend{display:flex;gap:11px;font-size:10px;color:var(--sub);margin:-2px 0 8px;font-weight:600}
+  .sp-legend i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:3px;vertical-align:middle}
   .scard .v span{font-size:12px;font-weight:700;color:var(--sub)}
   .scard .sub{font-size:10px;color:#9aa3b0;font-weight:600;margin-top:2px}
 
@@ -214,10 +220,8 @@
         <button class="on" id="sp-btn-week" onclick="setSpendView('week')">주간</button>
         <button id="sp-btn-month" onclick="setSpendView('month')">월간</button>
       </div>
-      <div class="tbl-wrap"><table id="spend-tbl">
-        <thead><tr><th>날짜</th><th>김윤호</th><th>장윤호</th><th>우혜림</th><th>합계</th></tr></thead>
-        <tbody><tr><td colspan="5" class="loading">불러오는 중…</td></tr></tbody>
-      </table></div>
+      <div class="sp-legend"><span><i style="background:var(--blue)"></i>김윤호</span><span><i style="background:var(--amber)"></i>장윤호</span><span><i style="background:var(--green)"></i>우혜림</span></div>
+      <div id="spend-body"><div class="loading">불러오는 중…</div></div>
     </div>
 
     <!-- 3열: 날짜별 유입 -->
@@ -321,31 +325,55 @@ function setSpendView(v){
   if(bm) bm.classList.toggle('on', v==='month');
   renderSpend();
 }
+var KC_='#2563eb', JC_='#d97706', WC_='#0f9d58';   // 김/장/우 색
+function manC(n){ n=Number(n)||0; if(n<=0) return ''; var v=n/10000; return (v>=10?Math.round(v):Math.round(v*10)/10)+'만'; }
 function renderSpend(){
-  var tb=document.querySelector('#spend-tbl tbody'); if(!tb) return;
+  var body=document.getElementById('spend-body'); if(!body) return;
   var now=new Date(), _p=function(n){return String(n).padStart(2,'0');};
   var ymd=function(dt){return dt.getFullYear()+'-'+_p(dt.getMonth()+1)+'-'+_p(dt.getDate());};
-  var monthPrefix=now.getFullYear()+'-'+_p(now.getMonth()+1);
-  var wkFrom=ymd(new Date(now.getFullYear(),now.getMonth(),now.getDate()-6));
-  var keys=Object.keys(_spendDaily).filter(function(d){
-    return _spendView==='month' ? d.indexOf(monthPrefix)===0 : d>=wkFrom;
-  }).sort().reverse();   // 최신 날짜 위로
-  if(!keys.length){ tb.innerHTML='<tr><td colspan="5" class="loading">데이터 없음</td></tr>'; return; }
-  var h='', tg=0,tj=0,tw=0;
-  keys.forEach(function(d){
-    var o=_spendDaily[d]; tg+=o.g; tj+=o.j; tw+=o.w;
-    h+='<tr><td>'+d.slice(5)+'</td>'
-      +'<td class="num spend">'+wonSp(o.g)+'</td>'
-      +'<td class="num spend">'+wonSp(o.j)+'</td>'
-      +'<td class="num spend">'+wonSp(o.w)+'</td>'
-      +'<td class="num">'+wonSp(o.g+o.j+o.w)+'</td></tr>';
-  });
-  h+='<tr class="total"><td>합계</td>'
-    +'<td class="num spend">'+wonSp(tg)+'</td>'
-    +'<td class="num spend">'+wonSp(tj)+'</td>'
-    +'<td class="num spend">'+wonSp(tw)+'</td>'
-    +'<td class="num">'+wonSp(tg+tj+tw)+'</td></tr>';
-  tb.innerHTML=h;
+
+  if(_spendView==='month'){
+    // ── 월간: 캘린더형 (날짜별 유입과 동일 구조) + 셀마다 3명 누적바 ──
+    var y=now.getFullYear(), m=now.getMonth(), todayKey=ymd(now);
+    var mp=y+'-'+_p(m+1);
+    var mx=1; Object.keys(_spendDaily).forEach(function(k){ if(k.indexOf(mp)===0){ var o=_spendDaily[k]; var t=o.g+o.j+o.w; if(t>mx)mx=t; } });
+    var first=new Date(y,m,1), startDow=(first.getDay()+6)%7, days=new Date(y,m+1,0).getDate();
+    var dows=['월','화','수','목','금','토','일'];
+    var h='<div class="cal-grid">'+dows.map(function(x){return '<div class="cal-dow">'+x+'</div>';}).join('');
+    for(var i=0;i<startDow;i++) h+='<div class="cal-cell empty"></div>';
+    for(var dd=1;dd<=days;dd++){
+      var key=y+'-'+_p(m+1)+'-'+_p(dd);
+      var o=_spendDaily[key]||{g:0,j:0,w:0}, tot=o.g+o.j+o.w;
+      var bg = tot? 'rgba(37,99,235,'+(0.08+Math.min(tot/mx,1)*0.34).toFixed(2)+')' : '#f8fafc';
+      var seg = tot? ('<i style="width:'+(o.g/tot*100)+'%;background:'+KC_+'"></i><i style="width:'+(o.j/tot*100)+'%;background:'+JC_+'"></i><i style="width:'+(o.w/tot*100)+'%;background:'+WC_+'"></i>') : '';
+      var tip = key.slice(5)+' · 김'+wonSp(o.g)+'·장'+wonSp(o.j)+'·우'+wonSp(o.w)+' (합 '+wonSp(tot)+')';
+      h+='<div class="cal-cell sp'+(key===todayKey?' today':'')+'" style="background:'+bg+'" title="'+tip+'">'
+        +'<span class="cd">'+dd+'</span>'
+        +'<span class="cv">'+manC(tot)+'</span>'
+        +'<span class="spbar">'+seg+'</span></div>';
+    }
+    h+='</div>';
+    body.innerHTML=h;
+  } else {
+    // ── 주간: 표(날짜|김|장|우|합계) — 최근 7일, 최신 위로 ──
+    var wkFrom=ymd(new Date(now.getFullYear(),now.getMonth(),now.getDate()-6));
+    var keys=Object.keys(_spendDaily).filter(function(d){return d>=wkFrom;}).sort().reverse();
+    if(!keys.length){ body.innerHTML='<div class="loading">데이터 없음</div>'; return; }
+    var hh='<div class="tbl-wrap"><table id="spend-tbl"><thead><tr><th>날짜</th><th>김윤호</th><th>장윤호</th><th>우혜림</th><th>합계</th></tr></thead><tbody>';
+    var tg=0,tj=0,tw=0;
+    keys.forEach(function(d){
+      var o=_spendDaily[d]; tg+=o.g; tj+=o.j; tw+=o.w;
+      hh+='<tr><td>'+d.slice(5)+'</td>'
+        +'<td class="num spend">'+wonSp(o.g)+'</td>'
+        +'<td class="num spend">'+wonSp(o.j)+'</td>'
+        +'<td class="num spend">'+wonSp(o.w)+'</td>'
+        +'<td class="num">'+wonSp(o.g+o.j+o.w)+'</td></tr>';
+    });
+    hh+='<tr class="total"><td>합계</td>'
+      +'<td class="num spend">'+wonSp(tg)+'</td><td class="num spend">'+wonSp(tj)+'</td>'
+      +'<td class="num spend">'+wonSp(tw)+'</td><td class="num">'+wonSp(tg+tj+tw)+'</td></tr></tbody></table></div>';
+    body.innerHTML=hh;
+  }
 }
 
 // ── 날짜별 유입 (주간/월간 토글) ──
