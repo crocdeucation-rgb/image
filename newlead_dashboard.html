@@ -142,7 +142,6 @@
     tbody td:first-child{padding-left:9px}
     #assignee-tbl{min-width:560px}   /* 10컬럼 — 가로 스크롤 */
     #campaign-tbl{min-width:470px}   /* 8컬럼 */
-    #period-tbl{min-width:430px}     /* 7컬럼 */
     .summary{gap:7px}
     .scard{padding:10px 8px}
     .scard .v{font-size:18px}
@@ -176,23 +175,17 @@
         <button data-sort="order" onclick="setRankSort('order')">오더순</button>
       </div>
       <div class="tbl-wrap"><table id="assignee-tbl">
-        <thead><tr><th>순위</th><th>담당자</th><th>DB</th><th>방문</th><th>세팅</th><th>오더</th><th>매출</th><th>광고비<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>ROAS</th></tr></thead>
+        <thead><tr><th>순위</th><th>담당자</th><th>DB<br><span style="font-size:8px;color:#aaa;font-weight:400">월간·오늘/어제/주간</span></th><th>방문</th><th>세팅</th><th>오더</th><th>매출</th><th>광고비<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>ROAS</th></tr></thead>
         <tbody><tr><td colspan="10" class="loading">불러오는 중…</td></tr></tbody>
       </table></div>
     </div>
 
-    <!-- 2열: 캠페인별 + 기간유입 -->
+    <!-- 2열: 캠페인별 -->
     <div class="col">
       <div class="sec camp">캠페인별 <span class="badge">소재 성과 · 광고비</span></div>
       <div class="tbl-wrap"><table id="campaign-tbl">
         <thead><tr><th>캠페인</th><th>DB</th><th>방문</th><th>세팅</th><th>오더</th><th>광고비<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>매출</th></tr></thead>
         <tbody><tr><td colspan="8" class="loading">불러오는 중…</td></tr></tbody>
-      </table></div>
-
-      <div class="sec period">기간유입 <span class="badge">담당자별 · 주간 CPL</span></div>
-      <div class="tbl-wrap"><table id="period-tbl">
-        <thead><tr><th>담당자</th><th>오늘</th><th>어제</th><th>주간</th><th>월간</th><th>광고비<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span class="asof-spend" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th></tr></thead>
-        <tbody><tr><td colspan="7" class="loading">불러오는 중…</td></tr></tbody>
       </table></div>
     </div>
 
@@ -368,7 +361,8 @@ async function load(){
       if(rows[i][0]==='기간유입') pStart=i+1;   // [담당자,오늘,어제,주간,월간]
     }
     // 담당자별 '오늘 유입' 맵 (CPL 분모에서 뺌 — 광고비 기간과 맞춤)
-    var todayByName={}, todayTotal=0;
+    //   + periodByName: 담당자별 [오늘,어제,주간] (담당자표 DB칸 서브라인용 — 기간유입 통합)
+    var todayByName={}, todayTotal=0, periodByName={};
     var sumToday=0, sumYday=0, sumWeek=0, sumMonth=0;   // 전체 기간 합계 (요약카드용)
     if(pStart>=0){
       for(var pi=pStart;pi<rows.length;pi++){
@@ -379,6 +373,7 @@ async function load(){
           break;
         }
         var tv=parseInt(pr[1])||0; todayByName[pr[0]]=tv; todayTotal+=tv;
+        periodByName[pr[0]]={t:tv, y:parseInt(pr[2])||0, w:parseInt(pr[3])||0};
       }
     }
 
@@ -437,9 +432,12 @@ async function load(){
         var _cut = a.afterCut || (todayByName[a.name]||0);
         var _db=a.db-_cut;
         var _cpl=(a.sp>0&&_db>0)?won(Math.round(a.sp/_db)):'-';
+        var _pd=periodByName[a.name]||{t:0,y:0,w:0};
+        var _dbCell='<div style="font-weight:800;line-height:1.1">'+a.db+'</div>'
+          +'<div style="font-size:8.5px;color:#9aa3b0;font-weight:600;margin-top:1px;white-space:nowrap">오늘'+_pd.t+'·어제'+_pd.y+'·주간'+_pd.w+'</div>';
         ahtml += '<tr><td class="rk">'+medal+mv+'</td>'
           +'<td><span class="who '+whoClass(a.name)+'"></span>'+a.name+'</td>'
-          +'<td class="num db">'+a.db+'</td>'
+          +'<td class="num db">'+_dbCell+'</td>'
           +'<td class="num visit">'+fnl(a.visitCell)+'</td>'
           +'<td class="num setting">'+fnl(a.setCell)+'</td>'
           +'<td class="num order">'+fnl(a.orderCell)+'</td>'
@@ -455,8 +453,10 @@ async function load(){
       var _totCut = Number(t[10]) || afterCutoff;   // GAS 합계 afterCut 우선, 없으면 날짜별유입 합산 폴백
       var _dbUntil=sumDb-_totCut;   // ★ 광고비 집계일까지 DB (cutoff 이후 유입 제외)
       var _tcpl=(sumSpend>0&&_dbUntil>0)?won(Math.round(sumSpend/_dbUntil)):'-';
+      var _totDbCell='<div style="font-weight:800;line-height:1.1">'+sumDb+'</div>'
+        +'<div style="font-size:8.5px;color:#9aa3b0;font-weight:600;margin-top:1px;white-space:nowrap">오늘'+sumToday+'·어제'+sumYday+'·주간'+sumWeek+'</div>';
       ahtml += '<tr class="total"><td></td><td>합계</td>'
-        +'<td class="num db">'+sumDb+'</td><td class="num visit">'+fnl(t[2])+'</td>'
+        +'<td class="num db">'+_totDbCell+'</td><td class="num visit">'+fnl(t[2])+'</td>'
         +'<td class="num setting">'+fnl(t[3])+'</td>'
         +'<td class="num order">'+fnl(t[5])+'</td><td class="num sales">'+won(t[6])+'</td>'
         +'<td class="num spend">'+wonSp(sumSpend)+'</td>'
@@ -465,30 +465,7 @@ async function load(){
     }
     atb.innerHTML = ahtml || '<tr><td colspan="10" class="loading">데이터 없음</td></tr>';
 
-    // ── 기간유입 표 (담당자별 오늘/어제/주간/월간 + 광고비/CPL) ──
-    var spendByName={};
-    if(aStart>=0 && aEnd>aStart){
-      for(var sr=aStart;sr<aEnd;sr++){ var sx=rows[sr]; if(sx[0]) spendByName[sx[0]]=Number(sx[7])||0; }
-    }
-    var ptb=document.querySelector('#period-tbl tbody'), phtml='';
-    if(pStart>=0){
-      var pT=0,pY=0,pW=0,pM=0,pSp=0;
-      for(var pr2=pStart;pr2<rows.length;pr2++){
-        var px=rows[pr2]; if(!px[0])break;
-        if(px[0]==='신규합계'){
-          var _wkUntil=(parseInt(px[3])||0)-(parseInt(px[1])||0); // 주간-오늘
-          var _pcpl=(pSp>0&&_wkUntil>0)?won(Math.round(pSp/_wkUntil)):'-';
-          phtml+='<tr class="total"><td>합계</td><td class="num db">'+(px[1]||0)+'</td><td class="num">'+(px[2]||0)+'</td><td class="num">'+(px[3]||0)+'</td><td class="num">'+(px[4]||0)+'</td><td class="num spend">'+won(pSp)+'</td><td class="num cpl">'+_pcpl+'</td></tr>';
-          break;
-        }
-        var _tod=parseInt(px[1])||0, _wk=parseInt(px[3])||0, _sp2=spendByName[px[0]]||0;
-        var _wkU=_wk-_tod;  // 주간 유입 중 오늘 제외
-        var _cpl2=(_sp2>0&&_wkU>0)?won(Math.round(_sp2/_wkU)):'-';
-        phtml+='<tr><td><span class="who '+whoClass(px[0])+'"></span>'+px[0]+'</td><td class="num db">'+_tod+'</td><td class="num">'+(px[2]||0)+'</td><td class="num">'+_wk+'</td><td class="num">'+(px[4]||0)+'</td><td class="num spend">'+wonSp(_sp2)+'</td><td class="num cpl">'+_cpl2+'</td></tr>';
-        pT+=_tod; pSp+=_sp2;
-      }
-    }
-    if(ptb) ptb.innerHTML = phtml || '<tr><td colspan="7" class="loading">데이터 없음</td></tr>';
+    // (기간유입 표는 담당자별 DB칸 서브라인으로 통합 — 2025.10 개편)
 
     // ── 요약 카드 (5개) ──
     var totRoas = (sumSpend>0) ? (sumSales/sumSpend).toFixed(2) : '-';
@@ -530,7 +507,8 @@ async function load(){
         var _ccpl=(_csp>0&&_cdbU>0)?won(Math.round(_csp/_cdbU)):'-';
         // 타겟 적합도 [11] = 소재별 핵심(35-54 학부모) 리드% — 별도 섹션에서 사용
         var _cfit=(y[11]===''||y[11]==null)?null:(parseInt(y[11])||0);
-        if(_cfit!=null && y[0]!=='(소재미상)') _fitArr.push({name:y[0], fit:_cfit, db:_cdb});
+        // 전체 소재 수집 — 적합도 없는 신규 소재는 fit=null('집계 전')로 표기
+        if(y[0]!=='(소재미상)') _fitArr.push({name:y[0], fit:_cfit, db:_cdb});
         chtml += '<tr><td>'+y[0]+'</td>'
           +'<td class="num db">'+_cdb+'</td>'
           +'<td class="num visit">'+fnl(y[2])+'</td>'
@@ -547,7 +525,22 @@ async function load(){
     var afBox=document.getElementById('agefit-box');
     if(afBox){
       var afh='';
-      _fitArr.sort(function(a,b){ return b.db-a.db; }).forEach(function(x){
+      // 데이터 있는 소재(db 내림차순) 먼저, '집계 전'(fit=null) 소재는 뒤로
+      _fitArr.sort(function(a,b){
+        var an=(a.fit==null), bn=(b.fit==null);
+        if(an!==bn) return an?1:-1;
+        return b.db-a.db;
+      }).forEach(function(x){
+        if(x.fit==null){
+          // 신규 소재 — 적합도 집계 전 (어제까지 광고비 window에 없음)
+          afh += '<div style="margin:9px 0">'
+            +'<div style="display:flex;justify-content:space-between;align-items:baseline;gap:6px;margin-bottom:3px">'
+              +'<span style="font-size:11px;font-weight:600;color:#9aa3b0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+x.name+'</span>'
+              +'<b style="font-size:10px;color:#c2c8d2;flex-shrink:0;font-weight:700">집계 전</b></div>'
+            +'<div style="height:9px;border-radius:5px;background:#f3f4f6;overflow:hidden"></div>'
+            +'</div>';
+          return;
+        }
         var c=x.fit>=70?'#0f9d58':(x.fit>=45?'#f59e0b':'#ef4444');
         afh += '<div style="margin:9px 0">'
           +'<div style="display:flex;justify-content:space-between;align-items:baseline;gap:6px;margin-bottom:3px">'
