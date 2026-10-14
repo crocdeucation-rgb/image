@@ -3241,6 +3241,7 @@ function card(name){
   }).join('<span class="arw">›</span>');
   // ★ 고객여정 통합: 신아라오티+온보딩 실생성 레코드 (있으면 이벤트 flow 대신 풀 타임라인)
   var JR=JBYN[String(name).replace(/\(.*?\)/g,'').replace(/\s/g,'')];
+  var hj=(JR&&JR.join)||o.join;   // 가입일 = 여정(데일리) 우선, 없으면 inbox 폴백
   var jtlHtml='', jonbHtml='', jmissHtml='', jrBadge='';
   if(JR){
     if(JR.can)       jrBadge='<span class="jrbadge can">당일취소</span>';
@@ -3273,7 +3274,7 @@ function card(name){
     if(ob.length) jonbHtml='<div class="jonb">온보딩 &nbsp;'+ob.join(' &nbsp;·&nbsp; ')+'</div>';
   }
   var his=[];
-  if(o.join) his.push([o.join,'가입']);
+  if(hj) his.push([hj,'가입']);
   E.forEach(function(e){his.push([e.day,e.kind+(e.time?' '+e.time:'')+(e.who?' · '+e.who:'')+(e.st==='miss'?' — 기록 없음':'')]);});
   I.forEach(function(i){his.push([i.recv||i.day, '민원'+(i.res?' · '+i.res:'')+(i.why?' — '+i.why:'')]);});
   if(cm&&cm.can) his.push([cm.can.d,'취소 · '+(cm.can.kind||'')+' — '+(cm.can.why||'')]);
@@ -3287,7 +3288,7 @@ function card(name){
    '<h3>'+esc(name)+jrBadge+'</h3>'+
    '<div class="org" style="margin-top:4px"><b>'+esc(o.br||(cm&&cm.br)||'지점 미확인')+'</b> · 상담 '+esc(o.sang||(cm&&cm.sang)||'—')+
    ' · 사업 <b>'+esc(o.saup||(cm&&cm.saup)||'—')+'</b>'+(coach?' · 코칭 '+esc(coach):'')+
-   (o.join?' · 가입 '+md(o.join)+' (D+'+diff(o.join,CUR)+')':'')+
+   (hj?' · 가입 '+md(hj)+' (D+'+diff(hj,CUR)+')':'')+
    (cm&&cm.exp?' · 관리만료 '+md(cm.exp):'')+(cm&&cm.ten>=0?' · 학습기간 '+cm.ten+'일':'')+((cm&&cm.ten>=0&&cm.ten<=30&&!cm.can)?' <span class="tag" style="background:#E7F0FF;color:#1C57C4">신규</span>':'')+'</div>'+
    (cm&&cm.log?'<div class="lead" style="margin:10px 0 0">최근 주차 입력(완료 표기 아님) &nbsp;'+
      (cm.log.tail||[]).map(function(x){return '<span class="mini2'+(x[0]==='done'?' 첫수업':'')+'">'+(x[0]==='done'?(x[1]?md(x[1]):'완료'):esc(x[1]))+'</span>';}).join(' ')+
