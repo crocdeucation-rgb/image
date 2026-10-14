@@ -10,7 +10,7 @@
   // [2026-09] 콘텐츠 선노출 차단은 각 HTML <head> 인라인(__pregate)이 담당.
   //   gate.js는 인증 통과 시 그 스타일을 제거만 한다(아래 onAuthStateChanged).
   var CFG={apiKey:"AIzaSyCBDimk0MyGAHf762mvInS_H4K9HkW6Ol0",authDomain:"dashboard-88ba4.firebaseapp.com",projectId:"dashboard-88ba4",storageBucket:"dashboard-88ba4.firebasestorage.app",messagingSenderId:"857535538974",appId:"1:857535538974:web:999d190f28e14964eb4b0f"};
-  var ALLOW=['032100jesus@gmail.com','christuhm@gmail.com','crocdeucation@gmail.com','kanghansara@gmail.com','thestudydesign@gmail.com','loityr123@gmail.com','kit27314320@gmail.com'];
+  var ALLOW=['032100jesus@gmail.com','christuhm@gmail.com','crocdeucation@gmail.com','kanghansara@gmail.com','thestudydesign@gmail.com','loityr123@gmail.com','kit27314320@gmail.com','ansuhee1123@gmail.com'];
   // [2026-10] 페이지별 추가 허용 — 특정 페이지 <head>에 window.GATE_EXTRA_ALLOW=['x@y'] 넣으면 그 페이지에서만 허용(그로스 리포트 열람권 등). 공유 대시보드엔 영향 없음.
   try{ if(window.GATE_EXTRA_ALLOW && window.GATE_EXTRA_ALLOW.length){ ALLOW=ALLOW.concat(window.GATE_EXTRA_ALLOW.map(function(e){return (e||'').toLowerCase();})); } }catch(e){}
 
@@ -139,8 +139,8 @@
     });
   });
   // [2026-09] 보안 세션 UI — 단독 접속 시 상단 배지 + 로그인 직후 인증 토스트
-  var GATE_NAME={'032100jesus@gmail.com':'오동근','christuhm@gmail.com':'엄현호','crocdeucation@gmail.com':'신상준','kanghansara@gmail.com':'김사라','thestudydesign@gmail.com':'김상현','loityr123@gmail.com':'이경훈','kit27314320@gmail.com':'김인태','jny1048@gmail.com':'정나영','careitjoy@gmail.com':'장영주'};
-  var GATE_RANK={'032100jesus@gmail.com':'파운더님','christuhm@gmail.com':'대표이사','crocdeucation@gmail.com':'이사','kanghansara@gmail.com':'경영총괄','thestudydesign@gmail.com':'이사','loityr123@gmail.com':'이사','kit27314320@gmail.com':'이사','jny1048@gmail.com':'본부장','careitjoy@gmail.com':'팀장'};
+  var GATE_NAME={'032100jesus@gmail.com':'오동근','christuhm@gmail.com':'엄현호','crocdeucation@gmail.com':'신상준','kanghansara@gmail.com':'김사라','thestudydesign@gmail.com':'김상현','loityr123@gmail.com':'이경훈','kit27314320@gmail.com':'김인태','jny1048@gmail.com':'정나영','careitjoy@gmail.com':'장영주','ansuhee1123@gmail.com':'안수희'};
+  var GATE_RANK={'032100jesus@gmail.com':'파운더님','christuhm@gmail.com':'대표이사','crocdeucation@gmail.com':'이사','kanghansara@gmail.com':'경영총괄','thestudydesign@gmail.com':'이사','loityr123@gmail.com':'이사','kit27314320@gmail.com':'이사','jny1048@gmail.com':'본부장','careitjoy@gmail.com':'팀장','ansuhee1123@gmail.com':'차장'};
   var _gateSecDone=false;
   function gateSecUI(u){
     if(window.self!==window.top) return;      // switcher iframe 안이면 스킵(부모가 이미 표시)
