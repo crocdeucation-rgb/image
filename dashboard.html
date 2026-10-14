@@ -560,13 +560,45 @@ details.collapsible[open]>summary .fold-hint{display:none}
   </tbody>
 </table></div>
 
-<div id="bunri-section">
-<div class="section-label">분리캠페인 — 그로스 소재별 <span class="badge">김·장·우 소재 성과</span><span class="asof-badge" style="background:#d97706">📊 광고비 <span class="spend-asof">어제까지</span></span></div>
-<div class="asof-note" style="color:#94a3b8">메타 소재(ad)별 실집행을 캠페인명으로 매칭 · 소재=담당자 1:1 · CPL은 광고비 집계일까지 유입 기준 (이번달 탭)</div>
-<div class="tbl-scroll" style="margin-top:6px"><table class="funnel-table" id="bunri-camp-tbl">
-  <thead><tr><th>캠페인</th><th>DB</th><th>방문</th><th>세팅</th><th>오더</th><th>광고비<br><span class="spend-asof" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span class="spend-asof" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>매출</th></tr></thead>
-  <tbody id="bunri-camp-tbody"><tr><td colspan="8" style="color:#aaa;text-align:center;padding:12px;">불러오는 중...</td></tr></tbody>
-</table></div>
+<!-- 캠페인 성과 — 분리캠페인(그로스) ↔ 본사·전체 토글 -->
+<div class="section-label">캠페인 성과
+  <span class="cal-toggle" style="margin-left:8px">
+    <button id="camp-btn-bunri" class="on" onclick="setCampView('bunri')">분리캠페인(그로스)</button>
+    <button id="camp-btn-main" onclick="setCampView('main')">본사·전체 채널</button>
+  </span>
+  <span class="asof-badge" style="background:#d97706">📊 광고비 <span class="spend-asof">어제까지</span></span>
+</div>
+
+<div id="camp-view-bunri">
+  <div class="asof-note" style="color:#94a3b8">그로스 3명 소재(ad)별 · 소재=담당자 1:1 · CPL은 광고비 집계일까지 유입 기준 (이번달 전용)</div>
+  <div id="bunri-section">
+  <div class="tbl-scroll" style="margin-top:6px"><table class="funnel-table" id="bunri-camp-tbl">
+    <thead><tr><th>캠페인</th><th>DB</th><th>방문</th><th>세팅</th><th>오더</th><th>광고비<br><span class="spend-asof" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span class="spend-asof" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>매출</th></tr></thead>
+    <tbody id="bunri-camp-tbody"><tr><td colspan="8" style="color:#aaa;text-align:center;padding:12px;">불러오는 중...</td></tr></tbody>
+  </table></div>
+  </div>
+</div>
+
+<div id="camp-view-main" style="display:none">
+  <div class="asof-note" style="color:#94a3b8">본사·전체 채널 캠페인 · 오더순</div>
+  <div class="tbl-scroll"><table class="campaign-table">
+    <thead>
+      <tr>
+        <th>캠페인명</th>
+        <th class="num">DB</th>
+        <th class="num">방문</th>
+        <th class="num">세팅</th>
+        <th class="num">오더</th>
+        <th class="num">광고비</th>
+        <th class="num">매출</th>
+        <th class="num">ROAS</th>
+      </tr>
+    </thead>
+    <tbody id="campaign-tbody">
+      <tr><td colspan="8" style="color:#aaa;text-align:center;padding:14px;">불러오는 중...</td></tr>
+    </tbody>
+  </table></div>
+</div>
 
 <div class="section-label" style="margin-top:14px">일별 담당자 광고비 <span class="badge">김·장·우 · <span class="spend-asof">어제까지</span></span></div>
 <div class="cal-toggle" style="margin:2px 0 7px">
@@ -575,7 +607,6 @@ details.collapsible[open]>summary .fold-hint{display:none}
 </div>
 <div class="sp-legend"><span><i style="background:#2563eb"></i>김윤호</span><span><i style="background:#d97706"></i>장윤호</span><span><i style="background:#0f9d58"></i>우혜림</span></div>
 <div id="gd-body"><div style="color:#aaa;text-align:center;padding:12px;font-size:11px">불러오는 중...</div></div>
-</div>
 
 <details class="collapsible"><summary class="section-label">학년별 <span class="badge today" id="grade-tab-label">이번달</span><span class="fold-hint">▸ 펼치기</span></summary>
 <div class="grid-3" id="grade-grid">
@@ -597,26 +628,6 @@ details.collapsible[open]>summary .fold-hint{display:none}
   <div class="card" id="card-daangn" style="display:none"><div class="clabel">당근</div><div class="cval orange xs" id="route-daangn">-</div><div class="crate" id="rr-daangn"></div></div>
 </div>
 </details>
-
-<div class="section-label">캠페인별 <span class="badge">본사·전체 채널 · 오더순</span></div>
-<div class="tbl-scroll"><table class="campaign-table">
-  <thead>
-    <tr>
-      <th>캠페인명</th>
-      <th class="num">DB</th>
-      <th class="num">방문</th>
-      <th class="num">세팅</th>
-      <th class="num">오더</th>
-      <th class="num">광고비</th>
-      <th class="num">매출</th>
-      <th class="num">ROAS</th>
-    </tr>
-  </thead>
-  <tbody id="campaign-tbody">
-    <tr><td colspan="8" style="color:#aaa;text-align:center;padding:14px;">불러오는 중...</td></tr>
-  </tbody>
-</table></div>
-</div>
 
 <!-- 섹션3: 방문 스케줄 -->
 <div class="section" id="sec3">
@@ -1014,13 +1025,24 @@ function renderGrowthInflow(){
 }
 
 // ★ [분리캠페인] 캠페인별 표 렌더 — 대시보드 탭 캠페인 블록. 이번달 탭에서만(신규 퍼널은 이번달 데이터).
+// ★ 캠페인 성과 뷰 토글 — 분리캠페인(그로스) ↔ 본사·전체
+var _campView='bunri';
+function setCampView(v){
+  _campView=v;
+  var vb=document.getElementById('camp-view-bunri'), vm=document.getElementById('camp-view-main');
+  if(vb) vb.style.display = (v==='bunri') ? '' : 'none';
+  if(vm) vm.style.display = (v==='main')  ? '' : 'none';
+  var bb=document.getElementById('camp-btn-bunri'), bm=document.getElementById('camp-btn-main');
+  if(bb) bb.classList.toggle('on', v==='bunri');
+  if(bm) bm.classList.toggle('on', v==='main');
+}
 function renderBunriCamps(){
   var tb=document.getElementById('bunri-camp-tbody'); if(!tb) return;
   var camps=_bunriCamps||[];
   var isThisMonth=(routeTab===0);
-  // ★ 분리캠페인(신규퍼널)은 이번달 전용 — 지난달/전체 탭에선 섹션 통째로 숨김
-  var _sec=document.getElementById('bunri-section'); if(_sec) _sec.style.display = isThisMonth ? '' : 'none';
-  if(!isThisMonth){ return; }
+  // ★ 분리캠페인은 이번달 전용 — 지난달/전체 탭이면 분리 버튼 숨기고 본사뷰로 전환
+  var bb=document.getElementById('camp-btn-bunri'); if(bb) bb.style.display = isThisMonth ? '' : 'none';
+  if(!isThisMonth){ if(_campView==='bunri') setCampView('main'); return; }
   if(!camps.length){ tb.innerHTML='<tr><td colspan="8" style="color:#aaa;text-align:center;padding:12px;">데이터 없음</td></tr>'; return; }
   var won=function(n){ n=Number(n)||0; if(n<=0)return '-'; if(n>=10000)return (Math.round(n/1000)/10).toLocaleString()+'만'; return n.toLocaleString(); };
   var spFmt=function(n){ n=Number(n)||0; if(n<=0)return '-'; return (n/10000).toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:1})+'만'; };
