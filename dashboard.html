@@ -1616,19 +1616,28 @@ function render() {
     var a = ASSIGNEES.map((nm,i)=>{ var r=allRows[ASSIGNEE_START_IDX+i]||[]; return {name:nm, s:parseInt(((r[18]||'0')+'').replace(/[^0-9]/g,''))||0}; });
     a.sort((x,y)=>y.s-x.s); var rk={}; a.forEach((x,idx)=>rk[x.name]=idx+1); return rk;
   })();
-  let _dataArr = ASSIGNEES.map((name, i) => {
-    const r = allRows[ASSIGNEE_START_IDX + i] || [];
+  // [2026-10-15] 담당자 행을 JS 배열 개수로 읽지 않고, 시트 '담당자'~'캠페인' 구간의
+  //   실제 행을 이름(r[0])으로 읽고 중복 제거 → 행수/순서 불일치로 생기던 유령중복(김주환 2명)·누락 제거.
+  let _assigneeRaw=[]; { const _seen={};
+    for(let _i=ASSIGNEE_START_IDX; _i<allRows.length; _i++){
+      const _rr=allRows[_i]||[]; const _nm=((_rr[0]||'')+'').trim();
+      if(!_nm||_nm==='캠페인'||_nm==='합계'||_nm==='기간유입'||_nm==='일자별유입'||_nm==='유입경로별') break;
+      if(_seen[_nm]) continue; _seen[_nm]=true; _assigneeRaw.push(_rr);
+    } }
+  let _dataArr = _assigneeRaw.map((r) => {
     const db=parseInt(r[offset]||'0')||0, visit=parseInt(r[offset+1]||'0')||0, setting=parseInt(r[offset+2]||'0')||0;
     const cancel=parseInt(r[offset+3]||'0')||0, order=parseInt(r[offset+4]||'0')||0, sales=r[offset+5]||'0원';
     const salesNum=parseFloat((sales+'').replace(/[^0-9.]/g,''))||0;   // [2026-09-04] 소수점 유지(만원 소수1자리) — 기존 parseInt+숫자만은 '.'제거로 10배 뻥튀기 버그
     const _co=19+funnelTab*3;
     const vcoh = (funnelTab===0) ? (r[32]||'') : '';   // 방문코호트M(33열=idx32), 이번달 탭만
-    return {name:r[0]||name, db,visit,setting,cancel,order,sales,salesNum, cost:r[_co], iroas:parseFloat(r[_co+1])||0, eff:r[_co+2], yRank:(YRANK_MAP[r[0]||name]||0), vcoh:vcoh};
+    return {name:r[0], db,visit,setting,cancel,order,sales,salesNum, cost:r[_co], iroas:parseFloat(r[_co+1])||0, eff:r[_co+2], yRank:(YRANK_MAP[r[0]]||0), vcoh:vcoh};
   });
   _dataArr.sort((a,b)=>b.salesNum-a.salesNum);
   // [2026-10-15] 김윤호 — 담당자 행은 숨기되, 방문·DB 등 수치는 합계에 유지(요청: "방문장수 총에서 빼지마").
   //   숨김 멤버 통계를 먼저 합계에 더한 뒤 표시 배열에서 제외 → 행만 사라지고 합계는 그대로.
-  const HIDE_ASSIGNEE = ['김윤호'];
+  const DROP_ASSIGNEE = ['김성윤'];        // 완전 제거(값 0 → 합계 영향 없음)
+  const HIDE_ASSIGNEE = ['김윤호'];         // 행만 숨김, 방문 등은 합계 유지
+  _dataArr = _dataArr.filter(d=>!DROP_ASSIGNEE.includes(d.name));
   _dataArr.forEach(d=>{ if(HIDE_ASSIGNEE.includes(d.name)){
     totalDb+=d.db; totalVisit+=d.visit; totalSetting+=d.setting; totalCancel+=d.cancel; totalOrder+=d.order;
     if((d.sales+'').includes('만원')) totalSalesNum+=d.salesNum*10000; else totalSalesNum+=d.salesNum;
@@ -1680,7 +1689,12 @@ function render() {
   });
   // [정합] 미배정/이관 DB는 합계에만 포함(행은 숨김) — 대시보드 합계 DB = 총유입 유지
   {
-    const _ur = allRows[ASSIGNEE_START_IDX + ASSIGNEES.length] || [];
+    let _ur=[];
+    for(let _i=ASSIGNEE_START_IDX; _i<allRows.length; _i++){
+      const _c0=((allRows[_i]||[])[0]||'').trim();
+      if(_c0==='미배정'||_c0==='이관'){ _ur=allRows[_i]; break; }
+      if(_c0==='캠페인'||_c0==='합계'){ break; }
+    }
     totalDb += parseInt(_ur[offset] || '0') || 0;
   }
   // [2026-09-04] 전체탭 원가 = 시트 '전체 광고비'(getLeadStats가 MONTH_SPEND_TOTAL로 계산·누적).
@@ -1739,10 +1753,11 @@ function render() {
   // ★ 2026-08-04 신규 소재 추가: 원톱·5단계루틴·기초부족 (getLeadStats sojKeyOf와 키 일치시킬 것)
   const SOJ_KEYS=['위너노트릴스','위너노트필기','위너MLST','노트릴스','노필릴스','채리','GT','원톱','맞춤처방','방으로','5단계루틴','기초부족','MLST공부','MLST캐러셀','노트공부법','정지소재단일','너만본다','메타기타','CPA(텐핑)','카카오','Organic','네이버브랜드','기타'];
   const _sojCol = funnelTab===1 ? 29 : (funnelTab===2 ? 30 : 28);
-  const heatData=ASSIGNEES.map((name,i)=>{
-    const r=allRows[ASSIGNEE_START_IDX+i]||[];
+  // [2026-10-15] 담당자 테이블과 동일하게 실제 시트행(_assigneeRaw) 기반 + 김성윤·김윤호 제외(유령중복 방지)
+  const _HEAT_HIDE=['김성윤','김윤호'];
+  const heatData=_assigneeRaw.filter(r=>_HEAT_HIDE.indexOf(((r[0]||'')+'').trim())===-1).map((r)=>{
     const soj={}; (r[_sojCol]||'').split(';').forEach(p=>{const idx=p.lastIndexOf(':'); if(idx>0){soj[p.slice(0,idx)]=parseInt(p.slice(idx+1))||0;}});
-    return {name:r[0]||name, soj};
+    return {name:r[0], soj};
   });
   // ★ [수정] 이 탭에서 1건이라도 배정된 소재만 컬럼으로 (값 0 소재 자동 숨김)
   const activeSojKeys = SOJ_KEYS.filter(k => heatData.some(d => (d.soj[k]||0) > 0));
