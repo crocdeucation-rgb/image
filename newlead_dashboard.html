@@ -640,7 +640,7 @@ async function load(){
     //   컬럼: [캠페인(0), DB(1), 방문(2), 세팅(3), 방취(4), 오더(5), 매출(6), 광고비(7), CPL(8)]
     //   광고비·CPL은 GAS whBuildDashData가 캠페인 블록에 추가(ad_name 매칭). 없으면 '-'.
     var ctb = document.querySelector('#campaign-tbl tbody');
-    var chtml=''; _fitArr=[];   // 소재별 온타겟% 수집(별도 섹션용, 전역)
+    var _camps=[]; _fitArr=[];   // 소재별 온타겟% 수집(별도 섹션용, 전역)
     if(cStart>=0){
       for(var r2=cStart;r2<rows.length;r2++){
         var y=rows[r2]; if(!y[0]||y[0]==='일자별유입'||y[0]==='기간유입'||y[0]==='소재적합도')break;
@@ -659,18 +659,28 @@ async function load(){
         var _off=(String(y[12]||'').toUpperCase()==='OFF');
         // 전체 소재 수집 — 적합도 없는 신규 소재는 각 기간 null('집계 전')
         if(y[0]!=='(소재미상)') _fitArr.push({name:y[0], fit:_fitObj, db:_cdb, off:_off});
-        var _offBadge=_off?'<span style="font-size:9px;color:#9aa3b0;font-weight:800;margin-right:3px">⏸</span>':'';
-        chtml += '<tr'+(_off?' style="opacity:.6"':'')+'><td>'+_offBadge+y[0]+'</td>'
-          +'<td class="num db">'+_cdb+'</td>'
-          +'<td class="num visit">'+fnl(y[2])+'</td>'
-          +'<td class="num setting">'+fnl(y[3])+'</td>'
-          +'<td class="num order">'+fnl(y[5])+'</td>'
-          +'<td class="num spend">'+(_csp>0?wonSp(_csp):'-')+'</td>'
-          +'<td class="num cpl">'+_ccpl+'</td>'
-          +'<td class="num sales">'+won(y[6])+'</td></tr>';
+        _camps.push({ name:y[0], db:_cdb, visit:y[2], setting:y[3], order:Number(y[5])||0, orderRaw:y[5], spend:_csp, cpl:_ccpl, sales:y[6], off:_off });
       }
     }
-    ctb.innerHTML = chtml || '<tr><td colspan="8" class="loading">데이터 없음</td></tr>';
+    // ── 리스트형: ON 먼저(오더순) → 꺼짐 구분선 → OFF(흐림). 전부 노출 ──
+    var _byOrd=function(a,b){ return (b.order-a.order)||(b.db-a.db)||(b.spend-a.spend); };
+    var _on =_camps.filter(function(c){return !c.off;}).sort(_byOrd);
+    var _offC=_camps.filter(function(c){return c.off;}).sort(_byOrd);
+    var _stB=function(off){ return off
+      ? '<span style="display:inline-block;font-size:8.5px;font-weight:800;color:#fff;background:#9aa3b0;border-radius:5px;padding:0 4px;margin-right:4px;vertical-align:middle">OFF</span>'
+      : '<span style="display:inline-block;font-size:8.5px;font-weight:800;color:#fff;background:#0f9d58;border-radius:5px;padding:0 4px;margin-right:4px;vertical-align:middle">ON</span>'; };
+    var _crow=function(c){ return '<tr'+(c.off?' style="opacity:.6"':'')+'><td>'+_stB(c.off)+c.name+'</td>'
+      +'<td class="num db">'+c.db+'</td>'
+      +'<td class="num visit">'+fnl(c.visit)+'</td>'
+      +'<td class="num setting">'+fnl(c.setting)+'</td>'
+      +'<td class="num order">'+fnl(c.orderRaw)+'</td>'
+      +'<td class="num spend">'+(c.spend>0?wonSp(c.spend):'-')+'</td>'
+      +'<td class="num cpl">'+c.cpl+'</td>'
+      +'<td class="num sales">'+won(c.sales)+'</td></tr>'; };
+    var _csep=_offC.length?'<tr><td colspan="8" style="text-align:center;font-size:9px;color:#9aa3b0;font-weight:700;background:#f7f8fa;padding:3px 0">── 꺼짐 '+_offC.length+' ──</td></tr>':'';
+    ctb.innerHTML = (_on.length+_offC.length)>0
+      ? (_on.map(_crow).join('')+_csep+_offC.map(_crow).join(''))
+      : '<tr><td colspan="8" class="loading">데이터 없음</td></tr>';
 
     // ── 타겟 적합도 (소재별 온타겟%, 기간 토글) — 날짜별 유입 밑 별도 섹션 ──
     _fitAfBox=document.getElementById('agefit-box');
