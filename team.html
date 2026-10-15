@@ -151,6 +151,9 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
   .pf td.nm{text-align:left;font-weight:800;font-size:12px;padding-left:6px;white-space:nowrap}
   .pf td.sl{color:var(--purple);font-weight:800}
   .pf td.ca,.pf td.rt,.pf td.ro,.pf td.ef{display:none}
+  /* [2026-10-15] 모바일 컬럼 밀림 수정 — 본문에서 건당(5)·ROAS(10) td를 숨기는데
+     헤더 th는 그대로라 2칸씩 어긋났다. 해당 th도 같이 숨겨 헤더=데이터 정렬 일치. */
+  .pf th:nth-child(5),.pf th:nth-child(10){display:none}
   .pf td::before{display:none!important}
   .card .scroll:has(.pf), #situation{overflow-x:auto;-webkit-overflow-scrolling:touch}
   .sales{grid-template-columns:repeat(2,1fr)}
