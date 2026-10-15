@@ -205,13 +205,15 @@ body.personal-view .adm-only { display: none !important; }
 .funnel-table td.rate { color: #888; font-size: 10px; }
 
 .campaign-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; border: 1px solid #eee; font-size: 11px; }
-.campaign-table th { background: #fff3e0; color: #e65100; font-weight: 700; padding: 7px 8px; text-align: left; border-bottom: 1px solid #ffe0b2; }
+.campaign-table th { background: #fff3e0; color: #e65100; font-weight: 700; padding: 6px 5px; text-align: left; border-bottom: 1px solid #ffe0b2; font-size: 10px; }
 .campaign-table th.num { text-align: center; }
-.campaign-table td { padding: 7px 8px; border-bottom: 1px solid #f5f5f5; color: #1a1a1a; }
+.campaign-table td { padding: 6px 5px; border-bottom: 1px solid #f5f5f5; color: #1a1a1a; }
 .campaign-table tr:last-child td { border-bottom: none; }
-.campaign-table td.name { color: #444; font-size: 10px; white-space: nowrap; }
-.campaign-table td.name .cname { display:inline-block; max-width:230px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle; }
-.campaign-table td.num { text-align: center; font-weight: 600; color: #1a73e8; font-size: 12px; }
+.campaign-table td.name { color: #444; font-size: 9.5px; white-space: nowrap; }
+.campaign-table td.name .cname { display:inline-block; max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle; }
+.campaign-table td.num { text-align: center; font-weight: 600; color: #1a73e8; font-size: 11.5px; }
+/* 퍼센트(%)는 작고 흐리게 — 숫자칸 너비 압축해 명칭 공간 확보 */
+.campaign-table td.metric b { font-size: 8.5px !important; font-weight: 600; color: #9aa3b0; }
 .campaign-table tr.camp-off td { opacity: 0.5; }
 .state-badge { display: inline-block; font-size: 9px; font-weight: 700; color: #fff; border-radius: 6px; padding: 1px 5px; margin-right: 5px; vertical-align: middle; letter-spacing: .3px; }
 .state-badge.on { background: #0f9d58; }
@@ -434,12 +436,12 @@ details.collapsible[open]>summary .fold-hint{display:none}
 .cal-cell.sp .cv{font-size:10px}
 .cal-cell .spbar{display:flex;width:84%;height:4px;border-radius:2px;overflow:hidden;margin-top:3px;background:#eef2f7}
 .cal-cell .spbar i{display:block;height:100%}
-#gd-body table{width:100%;border-collapse:collapse;font-size:11.5px}
-#gd-body th{font-size:10px;color:#94a3b8;font-weight:600;padding:6px 5px;border-bottom:1px solid #eee;text-align:right}
-#gd-body th:first-child{text-align:left}
-#gd-body td{padding:7px 5px;text-align:right;border-bottom:1px solid #f5f5f5}
-#gd-body td:first-child{text-align:left;font-weight:600}
-#gd-body tr.tot td{font-weight:800;border-top:1px solid #e5e7eb}
+#gd-body table,#md-body table{width:100%;border-collapse:collapse;font-size:11.5px}
+#gd-body th,#md-body th{font-size:10px;color:#94a3b8;font-weight:600;padding:6px 5px;border-bottom:1px solid #eee;text-align:right}
+#gd-body th:first-child,#md-body th:first-child{text-align:left}
+#gd-body td,#md-body td{padding:7px 5px;text-align:right;border-bottom:1px solid #f5f5f5}
+#gd-body td:first-child,#md-body td:first-child{text-align:left;font-weight:600}
+#gd-body tr.tot td,#md-body tr.tot td{font-weight:800;border-top:1px solid #e5e7eb}
 </style>
 </head>
 <body>
@@ -609,6 +611,13 @@ details.collapsible[open]>summary .fold-hint{display:none}
 </div>
 <div class="sp-legend"><span><i style="background:#2563eb"></i>김윤호</span><span><i style="background:#d97706"></i>장윤호</span><span><i style="background:#0f9d58"></i>우혜림</span></div>
 <div id="gd-body"><div style="color:#aaa;text-align:center;padding:12px;font-size:11px">불러오는 중...</div></div>
+
+<div class="section-label" style="margin-top:14px">본사 일별 광고비 <span class="badge" style="background:#e65100">메타 · <span class="spend-asof">어제까지</span></span></div>
+<div class="cal-toggle" style="margin:2px 0 7px">
+  <button id="md-btn-week" class="on" onclick="setMdView('week')">주간</button>
+  <button id="md-btn-month" onclick="setMdView('month')">월간</button>
+</div>
+<div id="md-body"><div style="color:#aaa;text-align:center;padding:12px;font-size:11px">불러오는 중...</div></div>
 
 <details class="collapsible"><summary class="section-label">학년별 <span class="badge today" id="grade-tab-label">이번달</span><span class="fold-hint">▸ 펼치기</span></summary>
 <div class="grid-3" id="grade-grid">
@@ -832,6 +841,8 @@ var GROWTH_GVIZ = 'https://docs.google.com/spreadsheets/d/1l0H8mY0SHiENr9Mlvnha7
 var _growthInflow = null;
 var _bunriCamps = null;   // ★ [분리캠페인] 캠페인별 집계 (대시보드 탭 캠페인 블록)
 var _growthDaily = null;  // ★ 일별 담당자 광고비 {날짜:{w우,j장,g김}}
+var _mainDaily = null;    // ★ 본사(메타) 일별 광고비 {날짜:금액} — 기존 대시보드 전용
+var _mdView = 'week';
 var _gdView = 'week';     // 일별 광고비 주간/월간
 async function loadGrowthInflow(){
   try{
@@ -899,12 +910,20 @@ async function loadGrowthInflow(){
       if(!/^\d{4}-\d{2}-\d{2}$/.test(dk)) break;
       _gd[dk]={ w:parseInt(dx[1])||0, j:parseInt(dx[2])||0, g:parseInt(dx[3])||0 }; } }
     _growthDaily = _gd;
+    // ★ 본사(메타) 일별 광고비 블록 — [날짜, 메타] (그로스 제외)
+    var _md={}, mS=-1;
+    for(var mi=0;mi<rows.length;mi++){ if((rows[mi][0]||'').trim()==='본사일별광고비'){ mS=mi+1; break; } }
+    if(mS>=0){ for(var mr=mS;mr<rows.length;mr++){ var mx=rows[mr]; var mk=(mx[0]||'').trim();
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(mk)) break;
+      _md[mk]=parseInt(mx[1])||0; } }
+    _mainDaily = _md;
     _growthInflow = out;
   }catch(e){ _growthInflow = {}; }
   await loadGrowthSpend();   // ★ 그로스별 광고비(메타광고비 시트)도 로드
   renderGrowthInflow();
   try{ renderBunriCamps(); }catch(e){}   // ★ [분리캠페인] 캠페인별 표
   try{ renderGrowthDaily(); }catch(e){}  // ★ 일별 담당자 광고비
+  try{ renderMainDaily(); }catch(e){}    // ★ 본사 일별 광고비
 }
 // ★ [그로스별 광고비] 메타광고비 시트(execData/dash-metaspend)의 _그로스_* 행 → {총괄,우혜림,장윤호,김윤호}
 var _growthSpend = null;
@@ -1132,6 +1151,51 @@ function renderGrowthDaily(){
     keys.forEach(function(d){ var o=D[d]; tg+=o.g;tj+=o.j;tw+=o.w;
       hh+='<tr><td>'+d.slice(5)+'</td><td>'+sp(o.g)+'</td><td>'+sp(o.j)+'</td><td>'+sp(o.w)+'</td><td>'+sp(o.g+o.j+o.w)+'</td></tr>'; });
     hh+='<tr class="tot"><td>합계</td><td>'+sp(tg)+'</td><td>'+sp(tj)+'</td><td>'+sp(tw)+'</td><td>'+sp(tg+tj+tw)+'</td></tr></tbody></table>';
+    body.innerHTML=hh;
+  }
+}
+
+// ★ 본사(메타) 일별 광고비 — 주간=표 / 월간=캘린더(금액 단일). _mainDaily{날짜:금액}
+function setMdView(v){
+  _mdView=v;
+  var bw=document.getElementById('md-btn-week'), bm=document.getElementById('md-btn-month');
+  if(bw) bw.classList.toggle('on', v==='week');
+  if(bm) bm.classList.toggle('on', v==='month');
+  renderMainDaily();
+}
+function renderMainDaily(){
+  var body=document.getElementById('md-body'); if(!body) return;
+  var D=_mainDaily||{};
+  var now=new Date(), _p=function(n){return String(n).padStart(2,'0');};
+  var ymd=function(dt){return dt.getFullYear()+'-'+_p(dt.getMonth()+1)+'-'+_p(dt.getDate());};
+  var sp=function(n){ n=Number(n)||0; if(n<=0)return '0'; return (n/10000).toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:1})+'만'; };
+  var manC=function(n){ n=Number(n)||0; if(n<=0)return ''; var v=n/10000; return (v>=10?Math.round(v):Math.round(v*10)/10)+'만'; };
+  if(!Object.keys(D).length){ body.innerHTML='<div style="color:#aaa;text-align:center;padding:12px;font-size:11px">데이터 없음</div>'; return; }
+  var MC='#e65100';   // 본사(메타) 색
+  if(_mdView==='month'){
+    var y=now.getFullYear(), m=now.getMonth(), todayKey=ymd(now), mp=y+'-'+_p(m+1);
+    var mx=1; Object.keys(D).forEach(function(k){ if(k.indexOf(mp)===0 && D[k]>mx) mx=D[k]; });
+    var first=new Date(y,m,1), startDow=(first.getDay()+6)%7, days=new Date(y,m+1,0).getDate();
+    var dows=['월','화','수','목','금','토','일'];
+    var h='<div class="cal-grid">'+dows.map(function(x){return '<div class="cal-dow">'+x+'</div>';}).join('');
+    for(var i=0;i<startDow;i++) h+='<div class="cal-cell empty"></div>';
+    for(var dd=1;dd<=days;dd++){
+      var key=y+'-'+_p(m+1)+'-'+_p(dd), v=D[key]||0;
+      var bg=v?'rgba(230,81,0,'+(0.08+Math.min(v/mx,1)*0.34).toFixed(2)+')':'#f8fafc';
+      var tip=key.slice(5)+' 메타 '+sp(v);
+      h+='<div class="cal-cell sp'+(key===todayKey?' today':'')+'" style="background:'+bg+'" title="'+tip+'"><span class="cd">'+dd+'</span><span class="cv">'+manC(v)+'</span></div>';
+    }
+    h+='</div>';
+    body.innerHTML=h;
+  } else {
+    var wkFrom=ymd(new Date(now.getFullYear(),now.getMonth(),now.getDate()-6));
+    var keys=Object.keys(D).filter(function(d){return d>=wkFrom;}).sort().reverse();
+    if(!keys.length){ body.innerHTML='<div style="color:#aaa;text-align:center;padding:12px;font-size:11px">이번 주 데이터 없음</div>'; return; }
+    var hh='<table><thead><tr><th>날짜</th><th>본사 광고비(메타)</th></tr></thead><tbody>';
+    var tt=0;
+    keys.forEach(function(d){ var v=D[d]||0; tt+=v;
+      hh+='<tr><td>'+d.slice(5)+'</td><td style="color:'+MC+';font-weight:700">'+sp(v)+'</td></tr>'; });
+    hh+='<tr class="tot"><td>합계</td><td style="color:'+MC+'">'+sp(tt)+'</td></tr></tbody></table>';
     body.innerHTML=hh;
   }
 }
