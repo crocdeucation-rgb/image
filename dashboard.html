@@ -846,7 +846,7 @@ var _mdView = 'week';
 var _gdView = 'week';     // 일별 광고비 주간/월간
 async function loadGrowthInflow(){
   try{
-    var text = await fetch(GROWTH_GVIZ, {cache:'no-store'}).then(function(r){return r.text();});
+    var text = await fetch(GROWTH_GVIZ + '&_cb=' + Date.now(), {cache:'no-store'}).then(function(r){return r.text();});
     var rows = parseCSV(text);
     var start=-1;
     for(var i=0;i<rows.length;i++){ if(rows[i][0]==='기간유입'){ start=i+1; break; } }
@@ -1257,7 +1257,7 @@ async function loadCalendar(){
   try{
     var merged = {};
     try{ _mergeDaily(merged, parseCSV(await _fsCsv('execData','dash-summary'))); }catch(e){}
-    try{ var t2 = await fetch(GROWTH_GVIZ, {cache:'no-store'}).then(function(r){return r.text();}); _mergeDaily(merged, parseCSV(t2)); }catch(e){}
+    try{ var t2 = await fetch(GROWTH_GVIZ + '&_cb=' + Date.now(), {cache:'no-store'}).then(function(r){return r.text();}); _mergeDaily(merged, parseCSV(t2)); }catch(e){}
     _calDaily = merged;
   }catch(e){ _calDaily = {}; }
   renderCalendar();
