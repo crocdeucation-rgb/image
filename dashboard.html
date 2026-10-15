@@ -573,9 +573,9 @@ details.collapsible[open]>summary .fold-hint{display:none}
 <div id="camp-view-bunri">
   <div class="asof-note" style="color:#94a3b8">그로스 3명 소재(ad)별 · 소재=담당자 1:1 · CPL은 광고비 집계일까지 유입 기준 (이번달 전용)</div>
   <div id="bunri-section">
-  <div class="tbl-scroll" style="margin-top:6px"><table class="funnel-table" id="bunri-camp-tbl">
-    <thead><tr><th>캠페인</th><th>DB</th><th>방문</th><th>세팅</th><th>오더</th><th>광고비<br><span class="spend-asof" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>CPL<br><span class="spend-asof" style="font-size:8px;color:#aaa;font-weight:400">어제까지</span></th><th>매출</th></tr></thead>
-    <tbody id="bunri-camp-tbody"><tr><td colspan="8" style="color:#aaa;text-align:center;padding:12px;">불러오는 중...</td></tr></tbody>
+  <div class="tbl-scroll" style="margin-top:6px"><table class="campaign-table" id="bunri-camp-tbl">
+    <thead><tr><th>캠페인명</th><th class="num">DB</th><th class="num">방문</th><th class="num">세팅</th><th class="num">오더</th><th class="num">광고비</th><th class="num">CPL</th><th class="num">매출</th><th class="num">ROAS</th></tr></thead>
+    <tbody id="bunri-camp-tbody"><tr><td colspan="9" style="color:#aaa;text-align:center;padding:12px;">불러오는 중...</td></tr></tbody>
   </table></div>
   </div>
 </div>
@@ -591,12 +591,13 @@ details.collapsible[open]>summary .fold-hint{display:none}
         <th class="num">세팅</th>
         <th class="num">오더</th>
         <th class="num">광고비</th>
+        <th class="num">CPL</th>
         <th class="num">매출</th>
         <th class="num">ROAS</th>
       </tr>
     </thead>
     <tbody id="campaign-tbody">
-      <tr><td colspan="8" style="color:#aaa;text-align:center;padding:14px;">불러오는 중...</td></tr>
+      <tr><td colspan="9" style="color:#aaa;text-align:center;padding:14px;">불러오는 중...</td></tr>
     </tbody>
   </table></div>
 </div>
@@ -886,8 +887,8 @@ async function loadGrowthInflow(){
         var cx=rows[cr]; var cnm=(cx[0]||'').trim();
         if(!cnm || cnm==='일자별유입' || cnm==='기간유입' || cnm==='담당자') break;
         camps.push({ name:cnm, db:parseInt(cx[1])||0, visit:_numOf(cx[2]), setting:_numOf(cx[3]),
-                     order:_numOf(cx[5]), sales:parseInt(cx[6])||0, spend:parseInt(cx[7])||0, afterCut:parseInt(cx[10])||0,
-                     off:(String(cx[12]||'').toUpperCase()==='OFF') });   // [12]=소재 ON/OFF
+                     order:_numOf(cx[5]), sales:parseInt(cx[6])||0, spend:parseInt(cx[7])||0, roas:(cx[9]||''), afterCut:parseInt(cx[10])||0,
+                     off:(String(cx[12]||'').toUpperCase()==='OFF') });   // [9]=ROAS [12]=소재 ON/OFF
       }
     }
     _bunriCamps = camps;
@@ -1060,25 +1061,33 @@ function renderBunriCamps(){
   // ★ 분리캠페인은 이번달 전용 — 지난달/전체 탭이면 분리 버튼 숨기고 본사뷰로 전환
   var bb=document.getElementById('camp-btn-bunri'); if(bb) bb.style.display = isThisMonth ? '' : 'none';
   if(!isThisMonth){ if(_campView==='bunri') setCampView('main'); return; }
-  if(!camps.length){ tb.innerHTML='<tr><td colspan="8" style="color:#aaa;text-align:center;padding:12px;">데이터 없음</td></tr>'; return; }
-  var won=function(n){ n=Number(n)||0; if(n<=0)return '-'; if(n>=10000)return (Math.round(n/1000)/10).toLocaleString()+'만'; return n.toLocaleString(); };
-  var spFmt=function(n){ n=Number(n)||0; if(n<=0)return '-'; return (n/10000).toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:1})+'만'; };
-  var pct=function(a,b){ return b>0?'<span class="rate"> ('+Math.round(a/b*100)+'%)</span>':''; };
-  var h='';
-  camps.forEach(function(c){
-    var cDbU=c.db-(c.afterCut||0);                               // 광고비 집계일까지 DB
-    var cpl=(c.spend>0&&cDbU>0)?won(Math.round(c.spend/cDbU)):'-';
-    var offB=c.off?'<span style="font-size:9px;color:#9aa3b0;font-weight:800;margin-right:3px">⏸꺼짐</span>':'';
-    h+='<tr'+(c.off?' style="opacity:.55"':'')+'><td class="name">'+offB+c.name+'</td>'
-      +'<td class="num db">'+c.db+'</td>'
-      +'<td class="num" style="color:#0891b2">'+c.visit+pct(c.visit,c.db)+'</td>'
-      +'<td class="num" style="color:#2563eb">'+c.setting+'</td>'
-      +'<td class="num order">'+c.order+'</td>'
-      +'<td class="num" style="color:#e65100">'+spFmt(c.spend)+'</td>'
-      +'<td class="num" style="color:#0891b2">'+cpl+'</td>'
-      +'<td class="sales">'+won(c.sales)+'</td></tr>';
-  });
-  tb.innerHTML=h;
+  if(!camps.length){ tb.innerHTML='<tr><td colspan="9" style="color:#aaa;text-align:center;padding:12px;">데이터 없음</td></tr>'; return; }
+  // ── 본사 표와 동일한 리스트 틀(campaign-table) — ON 먼저(오더순) → 꺼짐 구분선 → OFF(흐림) ──
+  var pct=function(a,b){ return b>0?' <b style="font-size:10px">('+Math.round(a/b*100)+'%)</b>':''; };
+  var row=function(c){
+    var cDbU=c.db-(c.afterCut||0);                                 // 광고비 집계일까지 DB
+    var cpl=(c.spend>0&&cDbU>0)?'₩'+Math.round(c.spend/cDbU).toLocaleString():'-';
+    var sp=c.spend>0?'₩'+c.spend.toLocaleString():'-';
+    var _rn=parseFloat(c.roas); var roasC=isNaN(_rn)?'#6b7280':(_rn>=1?'#0f9d58':'#e11d48');
+    var stB='<span class="state-badge '+(c.off?'off':'on')+'">'+(c.off?'OFF':'ON')+'</span>';
+    return '<tr'+(c.off?' class="camp-off"':'')+'>'
+      +'<td class="name">'+stB+'<span class="cname">'+escapeHtml(c.name)+'</span></td>'
+      +'<td class="num metric" data-label="DB">'+c.db+'</td>'
+      +'<td class="num metric" data-label="방문" style="color:#0891b2">'+c.visit+pct(c.visit,c.db)+'</td>'
+      +'<td class="num metric" data-label="세팅" style="color:#d97706">'+c.setting+pct(c.setting,c.visit)+'</td>'
+      +'<td class="num metric" data-label="오더" style="color:#0f9d58">'+c.order+pct(c.order,c.setting)+'</td>'
+      +'<td class="num spend" data-label="광고비" style="color:#6b7280;font-size:11px">'+sp+'</td>'
+      +'<td class="num metric" data-label="CPL" style="color:#0891b2;font-size:11px">'+cpl+'</td>'
+      +'<td class="num metric" data-label="매출" style="color:#7c3aed;font-size:11px">'+manWon(c.sales)+'</td>'
+      +'<td class="num metric" data-label="ROAS" style="color:'+roasC+';font-weight:700">'+(c.roas||'-')+'</td>'
+      +'<td class="mob-meta">오더 '+c.order+' · ROAS '+(c.roas||'-')+' · CPL '+cpl+' · 광고비 '+sp+'</td>'
+      +'</tr>';
+  };
+  var byOrd=function(a,b){ return (b.order-a.order)||(b.db-a.db)||(b.spend-a.spend); };
+  var onL=camps.filter(function(c){return !c.off;}).sort(byOrd);
+  var offL=camps.filter(function(c){return c.off;}).sort(byOrd);
+  var sep=offL.length?'<tr class="camp-sep"><td colspan="9"><span>── 종료·꺼짐 '+offL.length+' ──</span></td></tr>':'';
+  tb.innerHTML=(onL.length+offL.length)>0 ? (onL.map(row).join('')+sep+offL.map(row).join('')) : '<tr><td colspan="9" style="color:#aaa;text-align:center;padding:12px;">데이터 없음</td></tr>';
 }
 
 // ★ 일별 담당자 광고비 — 주간=표 / 월간=캘린더(셀마다 3명 누적바)
@@ -1805,6 +1814,7 @@ function render() {
         const cplBadge = isKilled ? `<span style="display:inline-block;font-size:9px;font-weight:800;color:#fff;background:#e11d48;border-radius:5px;padding:1px 5px;margin-left:5px;vertical-align:middle;">종료직전 CPL ₩${lastCpl.toLocaleString()}</span>` : '';
         const _roasNum = parseFloat(c.roas);
         const roasColor = isKilled ? '#e11d48' : (isNaN(_roasNum) ? '#6b7280' : (_roasNum >= 1 ? '#0f9d58' : '#e11d48'));
+        const _cpl = (c.spend > 0 && c.db > 0) ? '₩'+Math.round(c.spend / c.db).toLocaleString() : '-';
         return `<tr class="${off ? 'camp-off' : ''}${isKilled ? ' camp-killed' : ''}">
         <td class="name">${badge}${stateBadge}<span class="cname">${escapeHtml(c.name)}</span>${cplBadge}</td>
         <td class="num metric" data-label="DB">${c.db}</td>
@@ -1812,9 +1822,10 @@ function render() {
         <td class="num metric" data-label="세팅" style="color:#d97706">${c.setting} <b style="font-size:10px">(${sr}%)</b></td>
         <td class="num metric" data-label="오더" style="color:#0f9d58">${c.order} <b style="font-size:10px">(${or_}%)</b></td>
         <td class="num spend" data-label="광고비" style="color:#6b7280;font-size:11px">${c.spend > 0 ? '₩'+c.spend.toLocaleString() : '-'}</td>
+        <td class="num metric" data-label="CPL" style="color:#0891b2;font-size:11px">${_cpl}</td>
         <td class="num metric" data-label="매출" style="color:#7c3aed;font-size:11px">${manWon(c.sales)}</td>
         <td class="num metric" data-label="ROAS" style="color:${roasColor};font-weight:700">${c.roas || '-'}</td>
-        <td class="mob-meta">오더 ${c.order} · ROAS ${c.roas||'-'} · 광고비 ${c.spend>0?'₩'+c.spend.toLocaleString():'-'}</td>
+        <td class="mob-meta">오더 ${c.order} · ROAS ${c.roas||'-'} · CPL ${_cpl} · 광고비 ${c.spend>0?'₩'+c.spend.toLocaleString():'-'}</td>
       </tr>`;
       };
   // ── 최근 종료 캠페인: 위 퍼널표와 다른 "종료 근거" 형식 (종료직전 CPL·ROAS·매출) ─────────
@@ -1848,10 +1859,10 @@ function render() {
     ? `<tr class="camp-kill-head"><td class="kname">캠페인</td><td class="knum">DB</td><td class="knum">방문</td><td class="knum">세팅</td><td class="knum">오더</td><td class="knum">종료직전 CPL/사유</td><td class="knum">ROAS</td><td class="knum">매출</td></tr>`
     : '';
   // [2026-10-15] OFF(종료·꺼짐) 행도 노출 — 광고비 소진 후 중단된 소재 식별용. ON 먼저 → 구분선 → OFF(흐림).
-  const offSep = offList.length ? `<tr class="camp-sep"><td colspan="8"><span>── 종료·꺼짐 ${offList.length} ──</span></td></tr>` : '';
+  const offSep = offList.length ? `<tr class="camp-sep"><td colspan="9"><span>── 종료·꺼짐 ${offList.length} ──</span></td></tr>` : '';
   ctbody.innerHTML = (onList.length + offList.length) > 0
     ? onList.map(campRow).join('') + offSep + offList.map(campRow).join('')
-    : '<tr><td colspan="8" style="color:#aaa;text-align:center;padding:14px;">데이터 없음</td></tr>';
+    : '<tr><td colspan="9" style="color:#aaa;text-align:center;padding:14px;">데이터 없음</td></tr>';
 }
 
 
