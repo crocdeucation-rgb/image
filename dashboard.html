@@ -209,7 +209,8 @@ body.personal-view .adm-only { display: none !important; }
 .campaign-table th.num { text-align: center; }
 .campaign-table td { padding: 7px 8px; border-bottom: 1px solid #f5f5f5; color: #1a1a1a; }
 .campaign-table tr:last-child td { border-bottom: none; }
-.campaign-table td.name { color: #444; font-size: 10px; word-break: break-all; }
+.campaign-table td.name { color: #444; font-size: 10px; white-space: nowrap; }
+.campaign-table td.name .cname { display:inline-block; max-width:230px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle; }
 .campaign-table td.num { text-align: center; font-weight: 600; color: #1a73e8; font-size: 12px; }
 .campaign-table tr.camp-off td { opacity: 0.5; }
 .state-badge { display: inline-block; font-size: 9px; font-weight: 700; color: #fff; border-radius: 6px; padding: 1px 5px; margin-right: 5px; vertical-align: middle; letter-spacing: .3px; }
@@ -776,8 +777,22 @@ const OFF_REASON = {
   '코넬필기_5R릴스_2608': '사장님 지시 전면 재편집'
 };
 const ON_SET  = new Set(ON_CAMPAIGNS);
-const isOff = (nm) => OFF_SET.has((nm || '').trim());
-const isKeepOn = (nm) => ON_SET.has((nm || '').trim());
+// [2026-10-15] 본사 ON/OFF 라이브화 — execData/dash-campstatus(메타 effective_status).
+//   맵에 있으면 라이브값 우선(방금 끈 것도 자동 반영), 없으면(비메타 버킷) 기존 수동리스트 폴백.
+let _liveStatus = null;   // { '캠페인명':'ON'|'OFF' } — loadCampStatus()가 채움
+const _liveOf = (nm) => {
+  if (!_liveStatus) return null;
+  const k = (nm || '').trim();
+  return Object.prototype.hasOwnProperty.call(_liveStatus, k) ? _liveStatus[k] : null;
+};
+const isOff = (nm) => { const s = _liveOf(nm); if (s != null) return s === 'OFF'; return OFF_SET.has((nm || '').trim()); };
+const isKeepOn = (nm) => { const s = _liveOf(nm); if (s != null) return s === 'ON'; return ON_SET.has((nm || '').trim()); };
+async function loadCampStatus(){
+  try{
+    const o = await _fsGet('execData','dash-campstatus');   // { status:{...}, asof }
+    if (o && o.status && typeof o.status === 'object') _liveStatus = o.status;
+  }catch(e){ _liveStatus = null; }   // 실패 시 수동리스트로 폴백
+}
 
 function showSec(idx) {
   currentSec = idx;
@@ -805,6 +820,7 @@ function renderWebmaDukji(){
 
 async function loadAll() {
   await loadYRank();
+  await loadCampStatus();   // ← 본사 ON/OFF 라이브(메타 실시간) — render 전에 로드
   await Promise.all([loadData(), loadSchedule(), loadCancel()]);
   loadGrowthInflow();   // ← 추가
   loadCalendar();       // ← [2026-10-06] 캘린더뷰
@@ -1790,9 +1806,9 @@ function render() {
         const _roasNum = parseFloat(c.roas);
         const roasColor = isKilled ? '#e11d48' : (isNaN(_roasNum) ? '#6b7280' : (_roasNum >= 1 ? '#0f9d58' : '#e11d48'));
         return `<tr class="${off ? 'camp-off' : ''}${isKilled ? ' camp-killed' : ''}">
-        <td class="name">${badge}${stateBadge}<span class="cname">${nameWithBreaks(c.name)}</span>${cplBadge}</td>
+        <td class="name">${badge}${stateBadge}<span class="cname">${escapeHtml(c.name)}</span>${cplBadge}</td>
         <td class="num metric" data-label="DB">${c.db}</td>
-        <td class="num metric" data-label="방문" style="color:#0891b2">${c.visit} <b style="font-size:10px">(${vr}%)</b>${c.vcoh ? '<div style="font-size:8px;color:#94a3b8;font-weight:600;line-height:1.2;margin-top:1px">'+c.vcoh.split(';').map(function(x){return x.replace(':','');}).join('·')+'</div>' : ''}</td>
+        <td class="num metric" data-label="방문" style="color:#0891b2">${c.visit} <b style="font-size:10px">(${vr}%)</b></td>
         <td class="num metric" data-label="세팅" style="color:#d97706">${c.setting} <b style="font-size:10px">(${sr}%)</b></td>
         <td class="num metric" data-label="오더" style="color:#0f9d58">${c.order} <b style="font-size:10px">(${or_}%)</b></td>
         <td class="num spend" data-label="광고비" style="color:#6b7280;font-size:11px">${c.spend > 0 ? '₩'+c.spend.toLocaleString() : '-'}</td>
@@ -1831,9 +1847,10 @@ function render() {
   const killHead = killedList.length
     ? `<tr class="camp-kill-head"><td class="kname">캠페인</td><td class="knum">DB</td><td class="knum">방문</td><td class="knum">세팅</td><td class="knum">오더</td><td class="knum">종료직전 CPL/사유</td><td class="knum">ROAS</td><td class="knum">매출</td></tr>`
     : '';
-  const offRows = '';  // [2026-09-14] '최근 종료' 섹션 제거 — ON 캠페인만 표시
-  ctbody.innerHTML = onList.length > 0
-    ? onList.map(campRow).join('')
+  // [2026-10-15] OFF(종료·꺼짐) 행도 노출 — 광고비 소진 후 중단된 소재 식별용. ON 먼저 → 구분선 → OFF(흐림).
+  const offSep = offList.length ? `<tr class="camp-sep"><td colspan="8"><span>── 종료·꺼짐 ${offList.length} ──</span></td></tr>` : '';
+  ctbody.innerHTML = (onList.length + offList.length) > 0
+    ? onList.map(campRow).join('') + offSep + offList.map(campRow).join('')
     : '<tr><td colspan="8" style="color:#aaa;text-align:center;padding:14px;">데이터 없음</td></tr>';
 }
 
