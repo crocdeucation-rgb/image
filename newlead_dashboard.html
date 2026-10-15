@@ -480,7 +480,7 @@ function showBlock(which){
 
 async function load(){
   try{
-    var text = await fetch(GVIZ, {cache:'no-store'}).then(function(r){return r.text();});
+    var text = await fetch(GVIZ + '&_cb=' + Date.now(), {cache:'no-store'}).then(function(r){return r.text();});
     var rows = parseCSV(text);
 
     var updated='', yymm='', spendUntil='';
