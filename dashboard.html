@@ -1626,6 +1626,15 @@ function render() {
     return {name:r[0]||name, db,visit,setting,cancel,order,sales,salesNum, cost:r[_co], iroas:parseFloat(r[_co+1])||0, eff:r[_co+2], yRank:(YRANK_MAP[r[0]||name]||0), vcoh:vcoh};
   });
   _dataArr.sort((a,b)=>b.salesNum-a.salesNum);
+  // [2026-10-15] 김윤호 — 담당자 행은 숨기되, 방문·DB 등 수치는 합계에 유지(요청: "방문장수 총에서 빼지마").
+  //   숨김 멤버 통계를 먼저 합계에 더한 뒤 표시 배열에서 제외 → 행만 사라지고 합계는 그대로.
+  const HIDE_ASSIGNEE = ['김윤호'];
+  _dataArr.forEach(d=>{ if(HIDE_ASSIGNEE.includes(d.name)){
+    totalDb+=d.db; totalVisit+=d.visit; totalSetting+=d.setting; totalCancel+=d.cancel; totalOrder+=d.order;
+    if((d.sales+'').includes('만원')) totalSalesNum+=d.salesNum*10000; else totalSalesNum+=d.salesNum;
+    totalCost+=parseFloat(d.cost||'0')||0;
+  }});
+  _dataArr = _dataArr.filter(d=>!HIDE_ASSIGNEE.includes(d.name));
   let rows = _dataArr.map((d, idx) => {
     const rank=idx+1;
     const db=d.db,visit=d.visit,setting=d.setting,cancel=d.cancel,order=d.order,sales=d.sales,salesNum=d.salesNum;
