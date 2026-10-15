@@ -436,12 +436,12 @@ details.collapsible[open]>summary .fold-hint{display:none}
 .cal-cell.sp .cv{font-size:10px}
 .cal-cell .spbar{display:flex;width:84%;height:4px;border-radius:2px;overflow:hidden;margin-top:3px;background:#eef2f7}
 .cal-cell .spbar i{display:block;height:100%}
-#gd-body table,#md-body table{width:100%;border-collapse:collapse;font-size:11.5px}
-#gd-body th,#md-body th{font-size:10px;color:#94a3b8;font-weight:600;padding:6px 5px;border-bottom:1px solid #eee;text-align:right}
-#gd-body th:first-child,#md-body th:first-child{text-align:left}
-#gd-body td,#md-body td{padding:7px 5px;text-align:right;border-bottom:1px solid #f5f5f5}
-#gd-body td:first-child,#md-body td:first-child{text-align:left;font-weight:600}
-#gd-body tr.tot td,#md-body tr.tot td{font-weight:800;border-top:1px solid #e5e7eb}
+#gd-body table,#md-body table,#fd-body table{width:100%;border-collapse:collapse;font-size:11.5px}
+#gd-body th,#md-body th,#fd-body th{font-size:10px;color:#94a3b8;font-weight:600;padding:6px 5px;border-bottom:1px solid #eee;text-align:right}
+#gd-body th:first-child,#md-body th:first-child,#fd-body th:first-child{text-align:left}
+#gd-body td,#md-body td,#fd-body td{padding:7px 5px;text-align:right;border-bottom:1px solid #f5f5f5}
+#gd-body td:first-child,#md-body td:first-child,#fd-body td:first-child{text-align:left;font-weight:600}
+#gd-body tr.tot td,#md-body tr.tot td,#fd-body tr.tot td{font-weight:800;border-top:1px solid #e5e7eb}
 </style>
 </head>
 <body>
@@ -604,20 +604,13 @@ details.collapsible[open]>summary .fold-hint{display:none}
   </table></div>
 </div>
 
-<div class="section-label" style="margin-top:14px">일별 담당자 광고비 <span class="badge">김·장·우 · <span class="spend-asof">어제까지</span></span></div>
+<div class="section-label" style="margin-top:14px">퍼널별 일별 광고비 <span class="badge">본사·김·장·우 · <span class="spend-asof">어제까지</span></span></div>
 <div class="cal-toggle" style="margin:2px 0 7px">
-  <button id="gd-btn-week" class="on" onclick="setGdView('week')">주간</button>
-  <button id="gd-btn-month" onclick="setGdView('month')">월간</button>
+  <button id="fd-btn-week" class="on" onclick="setFdView('week')">주간</button>
+  <button id="fd-btn-month" onclick="setFdView('month')">월간</button>
 </div>
-<div class="sp-legend"><span><i style="background:#2563eb"></i>김윤호</span><span><i style="background:#d97706"></i>장윤호</span><span><i style="background:#0f9d58"></i>우혜림</span></div>
-<div id="gd-body"><div style="color:#aaa;text-align:center;padding:12px;font-size:11px">불러오는 중...</div></div>
-
-<div class="section-label" style="margin-top:14px">본사 일별 광고비 <span class="badge" style="background:#e65100">메타 · <span class="spend-asof">어제까지</span></span></div>
-<div class="cal-toggle" style="margin:2px 0 7px">
-  <button id="md-btn-week" class="on" onclick="setMdView('week')">주간</button>
-  <button id="md-btn-month" onclick="setMdView('month')">월간</button>
-</div>
-<div id="md-body"><div style="color:#aaa;text-align:center;padding:12px;font-size:11px">불러오는 중...</div></div>
+<div class="sp-legend"><span><i style="background:#e65100"></i>본사</span><span><i style="background:#2563eb"></i>김윤호</span><span><i style="background:#d97706"></i>장윤호</span><span><i style="background:#0f9d58"></i>우혜림</span></div>
+<div id="fd-body"><div style="color:#aaa;text-align:center;padding:12px;font-size:11px">불러오는 중...</div></div>
 
 <details class="collapsible"><summary class="section-label">학년별 <span class="badge today" id="grade-tab-label">이번달</span><span class="fold-hint">▸ 펼치기</span></summary>
 <div class="grid-3" id="grade-grid">
@@ -843,6 +836,7 @@ var _bunriCamps = null;   // ★ [분리캠페인] 캠페인별 집계 (대시�
 var _growthDaily = null;  // ★ 일별 담당자 광고비 {날짜:{w우,j장,g김}}
 var _mainDaily = null;    // ★ 본사(메타) 일별 광고비 {날짜:금액} — 기존 대시보드 전용
 var _mdView = 'week';
+var _fdView = 'week';     // ★ 퍼널별 일별 광고비(본사+3명 통합) 주간/월간
 var _gdView = 'week';     // 일별 광고비 주간/월간
 async function loadGrowthInflow(){
   try{
@@ -922,8 +916,45 @@ async function loadGrowthInflow(){
   await loadGrowthSpend();   // ★ 그로스별 광고비(메타광고비 시트)도 로드
   renderGrowthInflow();
   try{ renderBunriCamps(); }catch(e){}   // ★ [분리캠페인] 캠페인별 표
-  try{ renderGrowthDaily(); }catch(e){}  // ★ 일별 담당자 광고비
-  try{ renderMainDaily(); }catch(e){}    // ★ 본사 일별 광고비
+  try{ renderFunnelDaily(); }catch(e){}  // ★ 퍼널별 일별 광고비 (본사+김·장·우 통합)
+}
+// ★ 퍼널별 일별 광고비 — 본사(메타) + 김윤호·장윤호·우혜림 한 표로 통합. 주간/월간 토글.
+function setFdView(v){
+  _fdView=v;
+  var bw=document.getElementById('fd-btn-week'), bm=document.getElementById('fd-btn-month');
+  if(bw) bw.classList.toggle('on', v==='week');
+  if(bm) bm.classList.toggle('on', v==='month');
+  renderFunnelDaily();
+}
+function renderFunnelDaily(){
+  var body=document.getElementById('fd-body'); if(!body) return;
+  var G=_growthDaily||{}, M=_mainDaily||{};
+  var now=new Date(), _p=function(n){return String(n).padStart(2,'0');};
+  var ymd=function(dt){return dt.getFullYear()+'-'+_p(dt.getMonth()+1)+'-'+_p(dt.getDate());};
+  var sp=function(n){ n=Number(n)||0; if(n<=0)return '-'; return (n/10000).toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:1})+'만'; };
+  var dset={}; Object.keys(G).forEach(function(d){dset[d]=1;}); Object.keys(M).forEach(function(d){dset[d]=1;});
+  var allDates=Object.keys(dset);
+  if(!allDates.length){ body.innerHTML='<div style="color:#aaa;text-align:center;padding:12px;font-size:11px">데이터 없음</div>'; return; }
+  var keys;
+  if(_fdView==='month'){
+    var mp=now.getFullYear()+'-'+_p(now.getMonth()+1);
+    keys=allDates.filter(function(d){return d.indexOf(mp)===0;}).sort().reverse();
+  } else {
+    var wkFrom=ymd(new Date(now.getFullYear(),now.getMonth(),now.getDate()-6));
+    keys=allDates.filter(function(d){return d>=wkFrom;}).sort().reverse();
+  }
+  if(!keys.length){ body.innerHTML='<div style="color:#aaa;text-align:center;padding:12px;font-size:11px">데이터 없음</div>'; return; }
+  var KC='#2563eb',JC='#d97706',WC='#0f9d58',MC='#e65100';
+  var hh='<table><thead><tr><th>날짜</th><th style="color:'+MC+'">본사</th><th style="color:'+KC+'">김윤호</th><th style="color:'+JC+'">장윤호</th><th style="color:'+WC+'">우혜림</th><th>합계</th></tr></thead><tbody>';
+  var tM=0,tg=0,tj=0,tw=0;
+  keys.forEach(function(d){
+    var o=G[d]||{w:0,j:0,g:0}, m=M[d]||0;
+    tM+=m; tg+=o.g; tj+=o.j; tw+=o.w;
+    var tot=m+(o.g||0)+(o.j||0)+(o.w||0);
+    hh+='<tr><td>'+d.slice(5)+'</td><td style="color:'+MC+';font-weight:700">'+sp(m)+'</td><td>'+sp(o.g)+'</td><td>'+sp(o.j)+'</td><td>'+sp(o.w)+'</td><td style="font-weight:700">'+sp(tot)+'</td></tr>';
+  });
+  hh+='<tr class="tot"><td>합계</td><td style="color:'+MC+'">'+sp(tM)+'</td><td>'+sp(tg)+'</td><td>'+sp(tj)+'</td><td>'+sp(tw)+'</td><td>'+sp(tM+tg+tj+tw)+'</td></tr></tbody></table>';
+  body.innerHTML=hh;
 }
 // ★ [그로스별 광고비] 메타광고비 시트(execData/dash-metaspend)의 _그로스_* 행 → {총괄,우혜림,장윤호,김윤호}
 var _growthSpend = null;
