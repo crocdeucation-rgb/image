@@ -269,9 +269,8 @@ body.personal-view .adm-only { display: none !important; }
      .cname 이 블록(-webkit-box)이라 자연히 다음 줄에서 시작한다. */
   .campaign-table td.name .cname {
     display: -webkit-box;
-    /* 2줄로 자르면 뒤쪽 날짜코드(_2608)까지 말줄임에 먹혀 소재 구분이 안 된다.
-       3줄이면 현재 이름은 전부 그대로 보이고, 그보다 긴 이름만 …로 잘린다. */
-    -webkit-line-clamp: 3;
+    /* [2026-10-16] 모바일 과밀 해소 — 캠페인명 1줄 말줄임(담당자별처럼 깔끔). */
+    -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
     margin-top: 2px;
@@ -375,6 +374,10 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 @media (max-width: 700px) {
   .campaign-table tr.camp-off-row { display: none !important; }
   body.show-off-campaigns .campaign-table tr.camp-off-row { display: block !important; }
+  /* [2026-10-16] 분리캠페인 꺼짐 접기 — 테이블에 .off-open 붙으면 꺼짐행 펼침(그리드). */
+  .campaign-table.off-open tr.camp-off-row { display: grid !important; }
+  .camp-off-toggle { cursor: pointer; }
+  .camp-off-toggle .offhint { color:#1a73e8; font-weight:700; }
   .camp-toggle { cursor: pointer; }
   .camp-toggle td { color: #1a73e8 !important; font-weight: 700 !important; background: #f0f6ff !important; }
 }
@@ -1125,7 +1128,7 @@ function renderBunriCamps(){
     var sp=c.spend>0?'₩'+c.spend.toLocaleString():'-';
     var _rn=parseFloat(c.roas); var roasC=isNaN(_rn)?'#6b7280':(_rn>=1?'#0f9d58':'#e11d48');
     var stB='<span class="state-badge '+(c.off?'off':'on')+'">'+(c.off?'OFF':'ON')+'</span>';
-    return '<tr'+(c.off?' class="camp-off"':'')+'>'
+    return '<tr'+(c.off?' class="camp-off camp-off-row"':'')+'>'
       +'<td class="name">'+stB+'<span class="cname">'+escapeHtml(c.name)+'</span></td>'
       +'<td class="num metric" data-label="DB">'+c.db+'</td>'
       +'<td class="num metric" data-label="방문" style="color:#0891b2">'+c.visit+pct(c.visit,c.db)+'</td>'
@@ -1141,7 +1144,7 @@ function renderBunriCamps(){
   var byOrd=function(a,b){ return (b.order-a.order)||(b.db-a.db)||(b.spend-a.spend); };
   var onL=camps.filter(function(c){return !c.off;}).sort(byOrd);
   var offL=camps.filter(function(c){return c.off;}).sort(byOrd);
-  var sep=offL.length?'<tr class="camp-sep"><td colspan="9"><span>── 종료·꺼짐 '+offL.length+' ──</span></td></tr>':'';
+  var sep=offL.length?'<tr class="camp-sep camp-off-toggle" onclick="var t=this.closest(\'table\');t.classList.toggle(\'off-open\');this.querySelector(\'.offhint\').textContent=t.classList.contains(\'off-open\')?\'접기 ▴\':\'탭하여 펼치기 ▾\';"><td colspan="9"><span>── 종료·꺼짐 '+offL.length+' · <span class="offhint">탭하여 펼치기 ▾</span> ──</span></td></tr>':'';
   tb.innerHTML=(onL.length+offL.length)>0 ? (onL.map(row).join('')+sep+offL.map(row).join('')) : '<tr><td colspan="9" style="color:#aaa;text-align:center;padding:12px;">데이터 없음</td></tr>';
 }
 
