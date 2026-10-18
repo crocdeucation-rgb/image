@@ -426,7 +426,8 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   <button class="tab summary" onclick="sel('jul',this)">7월 결산</button>
   <button class="tab summary" onclick="sel('aug',this)">8월 결산</button>
   <button class="tab summary" onclick="sel('sep',this)">9월 결산</button>
-  <button class="tab summary on" onclick="sel('oct',this)">10/1~10</button>
+  <button class="tab summary" onclick="sel('oct',this)">10/1~10</button>
+  <button class="tab summary on" onclick="sel('oct2',this)">10/11~17</button>
   <button class="tab" onclick="sel('crm',this)" style="border-color:rgba(180,120,255,.3);color:#b478ff">⚙ CRM 패치</button>
 </div>
 
@@ -1338,7 +1339,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 
 
 <!-- ===== 10/1~10 ===== -->
-<div id="p-oct" class="panel on">
+<div id="p-oct" class="panel">
 
   <div class="thisweek">
     <h4>📌 10/1~10</h4>
@@ -1649,6 +1650,246 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 
 </div>
 
+
+
+<!-- ===== 10/11~17 (3주차) ===== -->
+<div id="p-oct2" class="panel on">
+<style>
+#p-oct2{--x-new:#b478ff;--x-meta:#6c8bd5;--x-green:#1a9e63;--x-amber:#d4900a;--x-red:#c44;--x-faint:#6a6a6a;--x-sub:#3f3f3f;--x-border:#e8e8e8;--x-border2:#f0f0f0;--x-card2:#f8f8f6;--x-hd:#0f1623;--x-teal:#0a8a5c}
+#p-oct2 .x-sub{font-size:13px;color:var(--x-faint);margin:0 2px 16px}
+#p-oct2 .x-sec{background:#fff;border:1px solid var(--x-border);border-radius:16px;padding:20px 22px;margin-top:16px}
+#p-oct2 .x-n{display:inline-block;background:var(--x-hd);color:#fff;font-size:11px;font-weight:800;padding:3px 9px;border-radius:7px;margin-right:8px;vertical-align:2px}
+#p-oct2 .x-h{font-size:16px;font-weight:800;letter-spacing:-.3px;margin-bottom:4px}
+#p-oct2 .x-s{font-size:12.5px;color:var(--x-faint);margin-bottom:14px;line-height:1.6}
+#p-oct2 .x-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:2px -2px}
+#p-oct2 table.x-tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:600px;font-variant-numeric:tabular-nums}
+#p-oct2 table.x-tbl th{background:var(--x-card2);color:var(--x-faint);font-weight:700;font-size:11.5px;text-align:right;padding:9px 11px;border-bottom:1.5px solid var(--x-border);white-space:nowrap}
+#p-oct2 table.x-tbl th:first-child{text-align:left}
+#p-oct2 table.x-tbl td{padding:9px 11px;border-bottom:1px solid var(--x-border2);text-align:right;white-space:nowrap}
+#p-oct2 table.x-tbl td:first-child{text-align:left;font-weight:600}
+#p-oct2 table.x-tbl tr.sub td:first-child{font-weight:500;color:var(--x-sub);padding-left:20px}
+#p-oct2 table.x-tbl tr.sub td:first-child::before{content:'└ ';color:var(--x-faint)}
+#p-oct2 table.x-tbl tr.tot td{border-top:1.5px solid var(--x-border);font-weight:800;background:var(--x-card2)}
+#p-oct2 table.x-tbl tr.nr td{background:rgba(180,120,255,.06)}
+#p-oct2 .nf{display:inline-block;background:var(--x-new);color:#fff;font-size:9.5px;font-weight:800;padding:1px 6px;border-radius:5px;margin-left:5px;vertical-align:1px}
+#p-oct2 .rh{color:var(--x-green);font-weight:800}#p-oct2 .rm{color:var(--x-amber);font-weight:700}#p-oct2 .rl{color:var(--x-red);font-weight:700}
+#p-oct2 .teal{color:var(--x-teal);font-weight:700}
+#p-oct2 .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:1px}
+#p-oct2 .dm{background:var(--x-meta)}#p-oct2 .dn{background:var(--x-new)}
+#p-oct2 .x-cap{font-size:11.5px;color:var(--x-faint);line-height:1.65;margin-top:11px}
+#p-oct2 .x-note{font-size:13px;line-height:1.7;background:var(--x-card2);border-left:3px solid #00c4a7;border-radius:0 10px 10px 0;padding:12px 15px;margin-top:13px}
+#p-oct2 .x-note b.t{display:block;font-weight:800;margin-bottom:3px}
+#p-oct2 .x-note.off{border-left-color:var(--x-red)}
+#p-oct2 .x-axis{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#p-oct2 .x-ax{border:1px solid var(--x-border);border-radius:13px;padding:15px 17px}
+#p-oct2 .x-ax.e{border-top:3px solid var(--x-meta)}#p-oct2 .x-ax.n{border-top:3px solid var(--x-new)}
+#p-oct2 .x-ax .axt{font-size:12px;font-weight:700;color:var(--x-faint);margin-bottom:6px}
+#p-oct2 .x-ax .axt b{color:#111;font-size:13.5px}
+#p-oct2 .x-row{display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0;border-bottom:1px dashed var(--x-border2)}
+#p-oct2 .x-row:last-child{border-bottom:none}#p-oct2 .x-row .l{color:var(--x-faint)}#p-oct2 .x-row .r{font-weight:700}
+#p-oct2 .x-bars{display:flex;align-items:flex-end;gap:10px;height:188px;padding:8px 2px 0;border-bottom:1.5px solid var(--x-border)}
+#p-oct2 .x-bars .col{flex:1;text-align:center}
+#p-oct2 .x-bars .stk{display:flex;flex-direction:column-reverse;height:150px}
+#p-oct2 .x-bars .stk i{display:flex;align-items:center;justify-content:center;border-radius:3px 3px 0 0;color:#fff;font-size:10.5px;font-weight:800}
+#p-oct2 .x-bars .lb{font-size:11px;color:var(--x-faint);margin-top:5px}
+#p-oct2 .x-bars .lb b{color:#111;font-size:12.5px}
+#p-oct2 .x-sum{background:var(--x-hd);color:#fff;border:none;border-radius:16px;padding:20px 22px;margin-top:16px}
+#p-oct2 .x-sum .x-h{color:#fff}
+#p-oct2 .x-sum p{font-size:13.5px;line-height:1.85;color:rgba(255,255,255,.9);margin-top:6px}
+#p-oct2 .x-sum b.k{color:#2fe0bf}
+@media(max-width:720px){#p-oct2 .x-axis{grid-template-columns:1fr}}
+</style>
+
+<div class="kpis" style="grid-template-columns:repeat(5,1fr)">
+  <div class="kpi"><div class="k">유입 DB</div><div class="v t">515건</div><div class="cap">웹마 290 + 신규퍼널 225 · 일평균 73.6</div></div>
+  <div class="kpi"><div class="k">총 광고비</div><div class="v t money">13,959,267</div><div class="cap">메타 실측 10/11~17</div></div>
+  <div class="kpi"><div class="k">결제일 매출</div><div class="v t money" style="color:#1a9e63">45,951,000</div><div class="cap">10/11~17 결제 · 13건</div></div>
+  <div class="kpi"><div class="k">ROAS <span style="font-weight:500">결제일 / 코호트</span></div><div class="v t">3.29<span style="font-size:14px;color:#6a6a6a;font-weight:700"> / 1.24</span></div><div class="cap">경영 보고 / 소재 생사</div></div>
+  <div class="kpi"><div class="k">신규소재 CPL</div><div class="v t money" style="color:#b478ff">17,286</div><div class="cap">기존(34,724)의 1/2</div></div>
+</div>
+<div class="x-sub">10/11 ~ 10/17 · 신규퍼널 담당자별 CBO 재편 · 10/14 신규소재 6종 투입 · 결제일·코호트 ROAS 병기</div>
+
+<div class="x-sec">
+  <div class="x-h">🧭 두 축 비교 — 기존(웹마) vs 신규 퍼널 · ROAS 두 기준</div>
+  <div class="x-s"><b>코호트 ROAS</b>(신청일 기준) = 이번 주 태운 돈이 만든 매출 → 소재 생사 판단. <b>결제일 ROAS</b>(결제일 기준) = 이번 주 실제 들어온 돈 → 경영 보고. 두 값의 격차가 곧 전환 시차 진단입니다. 광고비·유입·매출 모두 10/11~17.</div>
+  <div class="x-scroll"><table class="x-tbl">
+    <thead><tr><th>구분</th><th>유입 DB</th><th>광고비</th><th>결제일 매출</th><th>결제일 ROAS</th><th>코호트 ROAS</th><th>격차</th></tr></thead>
+    <tbody>
+      <tr><td><span class="dot dm"></span>① 기존(웹마)</td><td>290</td><td class="money">10,069,921</td><td class="money">42,483,000</td><td><span class="rh">4.22</span></td><td><span class="rm">1.38</span></td><td>3.1×</td></tr>
+      <tr><td><span class="dot dn"></span>② 신규 퍼널</td><td>225</td><td class="money">3,889,346</td><td class="money">3,468,000</td><td><span class="rl">0.89</span></td><td><span class="rl">0.89</span></td><td>1.0×</td></tr>
+      <tr class="tot"><td>합계</td><td>515</td><td class="money">13,959,267</td><td class="money">45,951,000</td><td><span class="rh">3.29</span></td><td>1.24</td><td>—</td></tr>
+    </tbody>
+  </table></div>
+  <div class="x-cap">※ 기존 웹마는 결제일 ROAS 4.22 vs 코호트 1.38 = <b>3.1배 격차</b> — 이번 주 결제 42,483,000원 중 상당수가 9~10월 초 유입분의 long-tail 전환입니다(건강한 채널). 신규 퍼널은 격차 1.0배 = 아직 당주 신청·당주 결제 1건뿐이라 코호트가 익지 않은 상태입니다. 신규퍼널 유입 147→225건(+53%), 일평균 24.5→32.1건. 두 축 합산 일평균 73.6건으로 목표(70+) 상회.</div>
+</div>
+
+<div class="x-sec">
+  <div class="x-h"><span class="x-n">00</span>채널별 광고비 — 메타 전량 집중</div>
+  <div class="x-s">이번 주 집행은 메타 단일 채널(카카오·네이버 자료 미첨부, 통합 노션에 네이버검색 유입 3건). 광고비는 메타 MCP 실측, 유입은 노션 기준입니다.</div>
+  <div class="x-scroll"><table class="x-tbl">
+    <thead><tr><th>채널</th><th>광고비</th><th>유입(메타)</th><th>유입(노션)</th><th>결제일 매출</th></tr></thead>
+    <tbody>
+      <tr><td><span class="dot dm"></span>메타 — 기존(웹마)</td><td class="money">10,069,921</td><td>257</td><td>290</td><td class="money">42,483,000</td></tr>
+      <tr><td><span class="dot dn"></span>메타 — 신규퍼널</td><td class="money">3,889,346</td><td>225</td><td>225</td><td class="money">3,468,000</td></tr>
+      <tr class="tot"><td>합계</td><td class="money">13,959,267</td><td>482</td><td>515</td><td class="money">45,951,000</td></tr>
+    </tbody>
+  </table></div>
+  <div class="x-cap">※ 신규퍼널 메타 results 225 = 노션 신규퍼널 DB 225 정확히 일치. 기존 웹마 메타 257 vs 노션 290 차이는 네이버검색·채널 미상·페북 유입. 결제일 매출은 노션 결제일 필드 기준(취소/당취/결보=0, 미납 인정).</div>
+</div>
+
+<div class="x-sec">
+  <div class="x-h"><span class="x-n">01</span>메타 소재별 — 신규퍼널 CPL이 기존의 절반</div>
+  <div class="x-s">광고비·CPM·CTR·빈도·results는 메타 실측(10/11~17). 신규퍼널은 소재별 개별캠 → <b>담당자별 CBO 3캠으로 재편</b>. 캠페인(굵은 줄)은 소속 소재의 합입니다.</div>
+  <div class="x-scroll"><table class="x-tbl">
+    <thead><tr><th>캠페인 / 소재</th><th>광고비</th><th>results</th><th>CPL</th><th>CPM</th><th>CTR</th><th>빈도</th></tr></thead>
+    <tbody>
+      <tr><td>노트릴스 영상 2505 🟢</td><td class="money">3,359,785</td><td>78</td><td class="money">43,074</td><td class="money">22,810</td><td>1.53%</td><td>1.42</td></tr>
+      <tr><td>방학점검 2607 🟢</td><td class="money">2,510,188</td><td>66</td><td class="money">38,033</td><td class="money">35,113</td><td>1.64%</td><td>1.24</td></tr>
+      <tr><td>위너테스트 세트 <span style="color:#6a6a6a;font-size:11px">4소재</span></td><td class="money">4,199,948</td><td>113</td><td class="money">37,168</td><td class="money">21,326</td><td>1.49%</td><td>1.84</td></tr>
+      <tr class="sub"><td>노트릴스 재편집 2609</td><td class="money">1,942,830</td><td>53</td><td class="money">36,657</td><td class="money">44,563</td><td>2.03%</td><td>1.42</td></tr>
+      <tr class="sub"><td>노트필기 관리부재 2608</td><td class="money">1,168,523</td><td>31</td><td class="money">37,694</td><td class="money">11,552</td><td>1.28%</td><td>1.60</td></tr>
+      <tr class="sub"><td>MLST 어디서막혔을까 2609 🟢재가동</td><td class="money">962,558</td><td>24</td><td class="money">40,107</td><td class="money">21,961</td><td>1.49%</td><td>1.68</td></tr>
+      <tr class="sub"><td>노트필기 방법제시 2608 <span class="rl">🔴OFF</span></td><td class="money">126,037</td><td>5</td><td class="money">25,207</td><td class="money">15,078</td><td>1.22%</td><td>—</td></tr>
+      <tr class="tot"><td>기존(웹마) 합</td><td class="money">10,069,921</td><td>257</td><td class="money">39,183</td><td>—</td><td>—</td><td>—</td></tr>
+      <tr><td><span class="dot dn"></span>김윤호 (CBO)</td><td class="money">2,516,279</td><td>141</td><td class="money">17,846</td><td class="money">8,663</td><td>0.86%</td><td>2.22</td></tr>
+      <tr class="sub"><td>MLST 공부성격 캐러셀</td><td class="money">2,313,614</td><td>134</td><td class="money">17,266</td><td class="money">8,327</td><td>0.82%</td><td>2.19</td></tr>
+      <tr class="sub nr"><td>과정채점 릴스<span class="nf">10/14</span></td><td class="money">22,295</td><td>1</td><td class="money">22,295</td><td class="money">24,994</td><td>1.01%</td><td>—</td></tr>
+      <tr><td><span class="dot dn"></span>장윤호 (CBO)</td><td class="money">688,144</td><td>64</td><td class="money teal">10,752</td><td class="money">7,194</td><td>1.00%</td><td>1.74</td></tr>
+      <tr class="sub nr"><td>공부인바디 캐러셀6장<span class="nf">10/14</span></td><td class="money">616,553</td><td>59</td><td class="money teal">10,450</td><td class="money">7,115</td><td>1.02%</td><td>1.65</td></tr>
+      <tr class="sub nr"><td>수학 숨은원인 빙산<span class="nf">10/14</span></td><td class="money">52,886</td><td>4</td><td class="money">13,222</td><td class="money">7,258</td><td>0.74%</td><td>—</td></tr>
+      <tr><td><span class="dot dn"></span>우혜림 (CBO)</td><td class="money">684,923</td><td>20</td><td class="money">34,246</td><td class="money">16,337</td><td>1.10%</td><td>1.59</td></tr>
+      <tr class="sub"><td>코넬필기 캐러셀</td><td class="money">598,325</td><td>17</td><td class="money">35,195</td><td class="money">17,000</td><td>1.3%</td><td>1.34</td></tr>
+      <tr class="sub nr"><td>나 억울해요 릴스<span class="nf">10/14</span></td><td class="money">117,153</td><td>7</td><td class="money">16,736</td><td class="money">14,738</td><td>0.97%</td><td>—</td></tr>
+      <tr class="tot"><td>신규퍼널 합</td><td class="money">3,889,346</td><td>225</td><td class="money teal">17,286</td><td>—</td><td>—</td><td>—</td></tr>
+      <tr class="tot"><td>메타 전체</td><td class="money">13,959,267</td><td>482</td><td class="money">28,961</td><td>—</td><td>—</td><td>—</td></tr>
+    </tbody>
+  </table></div>
+  <div class="x-note off"><b class="t">🔴 노트필기 방법제시 2608 — OFF 확정 → 예산 재배분</b>방법제시는 결번율 62%로 리드 품질 자체가 낮아 OFF(메타 PAUSED 적용). <b>위너세트 재가동 후보를 전수 점검했으나 켤 게 없습니다</b> — 국세청첨삭은 결번율은 중간(37%, 관리부재 35%와 비슷)이나 <b>지출(109만) 대비 방문 0으로 전환 경로가 안 나와</b> OFF했고, 나머지는 DB 0 사장. 빈 예산은 검증 소재 <b>공부인바디(CPL 10,450)·방학점검(ROAS 6.79)</b>으로 재배분합니다.</div>
+  <div class="x-scroll" style="margin-top:8px"><table class="x-tbl" style="min-width:560px">
+    <thead><tr><th>위너세트 소재</th><th>상태</th><th>리드</th><th>결번율</th><th>방문/오더</th><th>CTR</th><th>판정</th></tr></thead>
+    <tbody>
+      <tr><td>MLST 어디서막혔을까</td><td class="rh">🟢ON</td><td>37</td><td><span class="rh">16%</span></td><td>0 / 0</td><td>1.53%</td><td style="text-align:left">유지 · 세트 최저 CPR</td></tr>
+      <tr><td>노트릴스 재편집</td><td class="rh">🟢ON</td><td>114</td><td><span class="rh">9%</span></td><td>6 / 0</td><td>2.07%</td><td style="text-align:left">유지</td></tr>
+      <tr><td>노트필기 관리부재</td><td class="rh">🟢ON</td><td>60</td><td><span class="rm">35%</span></td><td>1 / 1</td><td>1.32%</td><td style="text-align:left">유지(관찰)</td></tr>
+      <tr><td>캐러셀 국세청첨삭</td><td class="rl">🔴OFF</td><td>27</td><td><span class="rm">37%</span></td><td>0 / 0</td><td><b>3.48%</b></td><td style="text-align:left">방문 0 → OFF (결번율은 중간)</td></tr>
+      <tr><td>노트필기 방법제시</td><td class="rl">🔴OFF</td><td>8</td><td><span class="rl">62%</span></td><td>0 / 0</td><td>1.22%</td><td style="text-align:left">OFF 확정</td></tr>
+      <tr><td>MLST 프로모션</td><td class="rl">🔴OFF</td><td>0</td><td>—</td><td>0 / 0</td><td>1.06%</td><td style="text-align:left">폐기 · DB 0</td></tr>
+    </tbody>
+  </table></div>
+  <div class="x-cap">※ 상태·CTR = 메타 실측 10/4~17, 리드·결번율·방문/오더 = 노션 신청일 10/1~17. 국세청첨삭은 CTR 세트 최고(3.48%)로 폼은 잘 내지만 <b>방문 0</b>(지출 109만)으로 전환 경로가 없어 껐습니다 — 결번율(37%)은 ON인 관리부재(35%)와 비슷한 수준이라 킬 사유가 아닙니다. 재가동 후보 없음 → 예산 재배분으로 결론.</div>
+  <div class="x-cap">※ 소재 단위 합은 캠페인 총액과 일부 차이 가능(CBO 내부 어트리뷰션). <b>신규퍼널 CPL 17,286원</b> = 기존(39,183원)의 44%. CPM이 싼 구조(7천~1.6만)라 전환·결번율 검증 필요(아래 02).</div>
+</div>
+
+<div class="x-sec" style="border-top:3px solid #b478ff">
+  <div class="x-h">🆕 10/14 신규 투입 소재 — 소재 리프레시</div>
+  <div class="x-s">메인(MLST 공부성격) 피로 분산을 위해 10/14(수) 신규 소재 6종 투입(장윤호 3·김윤호 2·우혜림 1). <b>장윤호 「공부인바디 캐러셀」이 CPL 10,450원·59리드로 전 소재 최고효율</b>, 우혜림 「나 억울해요 릴스」도 CPL 16,736원 양호. (ROAS = 결제일 기준)</div>
+  <div class="gal" id="w3nf-gal"></div>
+  <div class="x-note"><b class="t">🔎 판단</b>공부인바디 캐러셀이 장윤호 CBO 안에서 바로 메인 소재로 올라섰습니다. CPM 7,115·CTR 1.02%로 넓게 싸게 도달하는 구조라, 다음 관문은 결번율(28%)과 방문 전환입니다. 코호트가 익는 다음 주에 방문→오더로 ROAS를 재판정합니다.</div>
+</div>
+
+<div class="x-sec">
+  <div class="x-h"><span class="x-n">02</span>신규 퍼널 funnel — 리드→결번→방문→오더</div>
+  <div class="x-s">리드·결번·방문·오더·매출은 신규 노션 CRM(신청일 10/11~17), 광고비는 메타 소재(ad) 실집행. 유입 효율은 좋으나 <b>결번율 38%(기존 10%의 약 4배)</b>, 방문 4·오더 1로 전환은 초기입니다.</div>
+  <div class="x-scroll"><table class="x-tbl">
+    <thead><tr><th>소재</th><th>담당</th><th>리드</th><th>결번율</th><th>방문</th><th>오더</th><th>매출(코호트)</th><th>광고비</th></tr></thead>
+    <tbody>
+      <tr><td>MLST 공부성격 캐러셀</td><td>김윤호</td><td>133</td><td><span class="rl">48%</span></td><td>4</td><td>1</td><td class="money">3,468,000</td><td class="money">2,313,614</td></tr>
+      <tr class="nr"><td>공부인바디 캐러셀6장<span class="nf">10/14</span></td><td>장윤호</td><td>58</td><td><span class="rm">28%</span></td><td>0</td><td>0</td><td>—</td><td class="money">616,553</td></tr>
+      <tr><td>코넬필기 캐러셀</td><td>우혜림</td><td>17</td><td><span class="rh">6%</span></td><td>0</td><td>0</td><td>—</td><td class="money">598,325</td></tr>
+      <tr class="nr"><td>나 억울해요 릴스<span class="nf">10/14</span></td><td>우혜림</td><td>7</td><td><span class="rh">0%</span></td><td>0</td><td>0</td><td>—</td><td class="money">117,153</td></tr>
+      <tr class="nr"><td>수학 숨은원인 빙산<span class="nf">10/14</span></td><td>장윤호</td><td>4</td><td><span class="rl">50%</span></td><td>0</td><td>0</td><td>—</td><td class="money">52,886</td></tr>
+      <tr><td>노트필기 컨설팅 단일</td><td>김윤호</td><td>1</td><td>100%</td><td>0</td><td>0</td><td>—</td><td class="money">23,723</td></tr>
+      <tr class="nr"><td>과정채점 릴스<span class="nf">10/14</span></td><td>김윤호</td><td>1</td><td>—</td><td>0</td><td>0</td><td>—</td><td class="money">22,295</td></tr>
+      <tr class="nr"><td>우리아이만 달라졌어요<span class="nf">10/14</span></td><td>장윤호</td><td>1</td><td>100%</td><td>0</td><td>0</td><td>—</td><td class="money">18,619</td></tr>
+      <tr class="tot"><td>합계 10/11~17</td><td>—</td><td>225</td><td>38%</td><td>4</td><td>1</td><td class="money">3,468,000</td><td class="money">3,889,346</td></tr>
+    </tbody>
+  </table></div>
+  <div class="x-note"><b class="t">🎯 결번율의 원인 = 온타겟(학부모 35-54) 비율</b>신규 리드 현황 대시보드에 <b>온타겟%</b> 지표를 신설해 보니, 신규퍼널 온타겟은 <b>33%</b>로 본사(79%)의 절반도 안 됩니다. CPM이 싼 대신 비(非)부모(25-34) 유입이 많아 결번율이 높은 구조입니다. 소재별 온타겟(월간): 수학빙산 50% · MLST공부성격 27% · 나억울해요 23% · 공부인바디 22%. <b>볼륨 1위 공부인바디가 온타겟은 낮아</b> — 다음 과제는 연령 적합도를 올리며 볼륨을 지키는 것입니다.</div>
+  <div class="x-cap">※ 오더 1건 = 조하민(10/11·김윤호 MLST, 3,468,000원). 매출은 신청일 코호트라 전환 시차 미반영 잠정값. 장윤호 CBO(공부인바디) 결번율 28%로 신규퍼널 평균(38%)보다 양호. 온타겟% = 메타 연령 분포 × 노션 리드 매칭.</div>
+</div>
+
+<div class="x-sec">
+  <div class="x-h">📦 기존(웹마) 소재 — 지금 돌리는 것 (섬네일)</div>
+  <div class="x-s">소재(ad) 단위 메타 실측(10/11~17). 매출·ROAS는 <b>결제일 기준</b>(노션 결제일 필드). 방학점검이 결제일 ROAS 6.79로 최상위, 노트릴스 영상 3.10.</div>
+  <div class="gal" id="w3ex-gal"></div>
+  <div class="x-scroll" style="margin-top:14px"><table class="x-tbl">
+    <thead><tr><th>소재</th><th>생사</th><th>리드</th><th>결번율</th><th>방문</th><th>결제일 매출</th><th>결제일 ROAS</th><th>광고비</th></tr></thead>
+    <tbody>
+      <tr><td>방학점검 2607</td><td>🟢생존</td><td>66</td><td><span class="rh">3%</span></td><td>4</td><td class="money">17,051,000</td><td><span class="rh">6.79</span></td><td class="money">2,510,188</td></tr>
+      <tr><td>노트릴스 영상 2505</td><td>🟢생존</td><td>76</td><td><span class="rm">13%</span></td><td>7</td><td class="money">10,404,000</td><td><span class="rm">3.10</span></td><td class="money">3,359,785</td></tr>
+      <tr><td>노트릴스 재편집 2609</td><td>🟢생존</td><td>53</td><td><span class="rh">4%</span></td><td>5</td><td class="money">289,000</td><td><span class="rl">0.15</span></td><td class="money">1,942,830</td></tr>
+      <tr><td>노트필기 관리부재 2608</td><td>🟢생존</td><td>32</td><td><span class="rm">25%</span></td><td>0</td><td>—</td><td>집계중</td><td class="money">1,168,523</td></tr>
+      <tr><td>MLST 어디서막혔을까 2609</td><td>🟢재가동</td><td>24</td><td><span class="rh">8%</span></td><td>0</td><td>—</td><td>집계중</td><td class="money">962,558</td></tr>
+      <tr><td>노트필기 방법제시 2608</td><td><span class="rl">🔴OFF</span></td><td>5</td><td><span class="rl">80%</span></td><td>0</td><td>—</td><td>—</td><td class="money">126,037</td></tr>
+      <tr><td>기타 · 채널 미상</td><td>—</td><td>31</td><td><span class="rh">3%</span></td><td>2</td><td class="money">14,739,000</td><td>—</td><td>—</td></tr>
+      <tr class="tot"><td>합계 10/11~17</td><td>—</td><td>290</td><td>10%</td><td>15</td><td class="money">42,483,000</td><td><span class="rh">4.22</span></td><td class="money">10,069,921</td></tr>
+    </tbody>
+  </table></div>
+  <div class="x-cap">※ 결제일 매출 = 이번 주 결제된 금액(신청일 무관), 소재는 학생 귀속 캠페인 기준. 방학점검·노트릴스 영상이 long-tail 전환을 견인했습니다. 노트필기 방법제시는 OFF 후 교체(위 01 참조).</div>
+</div>
+
+<div class="x-sec">
+  <div class="x-h">📈 일별 유입 추이 (10/11~17)</div>
+  <div class="x-s">신규퍼널(보라) + 기존 웹마(파랑) 일별 신청 건수. 막대 안 숫자 = 각 채널 건수. 10/14 = 신규소재 투입일.</div>
+  <div class="x-bars">
+    <div class="col"><div class="stk"><i style="height:90px;background:#6c8bd5">45</i><i style="height:50px;background:#b478ff">48</i></div><div class="lb">10/11 · <b>93</b></div></div>
+    <div class="col"><div class="stk"><i style="height:120px;background:#6c8bd5">60</i><i style="height:30px;background:#b478ff">30</i></div><div class="lb">10/12 · <b>90</b></div></div>
+    <div class="col"><div class="stk"><i style="height:78px;background:#6c8bd5">39</i><i style="height:52px;background:#b478ff">26</i></div><div class="lb">10/13 · <b>65</b></div></div>
+    <div class="col"><div class="stk"><i style="height:98px;background:#6c8bd5">49</i><i style="height:46px;background:#b478ff">23</i></div><div class="lb" style="color:#b478ff">10/14 · <b style="color:#111">72</b></div></div>
+    <div class="col"><div class="stk"><i style="height:62px;background:#6c8bd5">31</i><i style="height:80px;background:#b478ff">40</i></div><div class="lb">10/15 · <b>71</b></div></div>
+    <div class="col"><div class="stk"><i style="height:46px;background:#6c8bd5">23</i><i style="height:54px;background:#b478ff">27</i></div><div class="lb">10/16 · <b>50</b></div></div>
+    <div class="col"><div class="stk"><i style="height:86px;background:#6c8bd5">43</i><i style="height:62px;background:#b478ff">31</i></div><div class="lb">10/17 · <b>74</b></div></div>
+  </div>
+  <div style="display:flex;gap:16px;margin-top:10px;font-size:12px;color:#6a6a6a"><span><span class="dot dm"></span>기존 웹마</span><span><span class="dot dn"></span>신규 퍼널</span><span style="margin-left:auto">주간 합 515건 · 일평균 73.6</span></div>
+</div>
+
+<div class="x-sec">
+  <div class="x-h">🛠 대시보드·운영 구축 — 이번 기간 한 일</div>
+  <div class="x-s">소재 성과 측정과 운영 가시성을 위해 대시보드를 전면 교체·확장했습니다. (아라온 스테티즈 내 웹마케팅·신규 리드 현황·운영본부)</div>
+  <div class="x-scroll"><table class="x-tbl" style="min-width:520px">
+    <thead><tr><th>대시보드</th><th>이번 기간 작업</th></tr></thead>
+    <tbody>
+      <tr><td>신규 리드 현황</td><td style="text-align:left;color:#3f3f3f"><b>전면 교체</b> · <b>온타겟%</b>(학부모 35-54 적합도) 지표 신설 · 캠페인별 소재성과·퍼널·날짜별 광고비</td></tr>
+      <tr><td>웹마케팅</td><td style="text-align:left;color:#3f3f3f"><b>전면 교체</b> · 유입경로 하위팀(본사·파인더·메이킷·부평) 분해 · 온타겟% · 방문 스케줄 · 결제일 ROAS</td></tr>
+      <tr><td>운영본부</td><td style="text-align:left;color:#3f3f3f"><b>지속 업데이트</b> · 회원 여정(가입→첫수업) 통합 · 청약철회 위험·취소/유지 판정 패치(데이터 오염 수정)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="x-s" style="margin-top:14px;margin-bottom:8px"><b>개편된 대시보드 화면</b> (아라온 스테티즈 · 캡처 클릭 시 원본)</div>
+  <div style="column-count:2;column-gap:10px">
+    <figure style="margin:0 0 10px;break-inside:avoid"><a href="소재/dash_웹마케팅.png" target="_blank" style="display:block"><img src="소재/dash_웹마케팅.png" alt="웹마케팅 대시보드" style="width:100%;height:auto;display:block;border:1px solid #e8e8e8;border-radius:10px;background:#edece9"></a><figcaption style="font-size:11.5px;color:#6a6a6a;margin-top:5px">웹마케팅 · 유입경로 분해 · 온타겟%</figcaption></figure>
+    <figure style="margin:0 0 10px;break-inside:avoid"><a href="소재/dash_신규리드.png" target="_blank" style="display:block"><img src="소재/dash_신규리드.png" alt="신규 리드 현황 대시보드" style="width:100%;height:auto;display:block;border:1px solid #e8e8e8;border-radius:10px;background:#edece9"></a><figcaption style="font-size:11.5px;color:#6a6a6a;margin-top:5px">신규 리드 현황 · 온타겟% 신설</figcaption></figure>
+    <figure style="margin:0 0 10px;break-inside:avoid"><a href="소재/dash_운영본부.png" target="_blank" style="display:block"><img src="소재/dash_운영본부.png" alt="운영본부 대시보드" style="width:100%;height:auto;display:block;border:1px solid #e8e8e8;border-radius:10px;background:#edece9"></a><figcaption style="font-size:11.5px;color:#6a6a6a;margin-top:5px">운영본부 · 회원 여정 · 취소/유지 판정 패치</figcaption></figure>
+  </div>
+  <div class="x-cap">※ 온타겟% 지표가 신규퍼널 저전환의 원인(부모 비율 낮음)을 가시화 — 앞으로 소재 연령 최적화의 기준으로 활용합니다. 운영본부 대시보드는 지금도 계속 갱신 중입니다. (캡처 클릭 시 원본)</div>
+</div>
+
+<div class="x-sec">
+  <div class="x-h">🧪 쌤이다 그로스 — 신규 영역 (10월 구축 중)</div>
+  <div class="x-s">아라온 외에 <b>쌤이다(초·중·고 1:1 화상과외)</b> 그로스도 10월부터 병행 구축 중입니다. 이번 기간 산출물 — <b>내일 시연 = 진로진학 관련</b>:</div>
+  <div class="x-scroll"><table class="x-tbl" style="min-width:420px">
+    <thead><tr><th>산출물</th><th>내용</th></tr></thead>
+    <tbody>
+      <tr class="nr"><td>진로진학 관련 <span class="nf" style="background:#1a9e63">🎤 내일 시연</span></td><td style="text-align:left;color:#3f3f3f">발표용 덱 (상세 비공개)</td></tr>
+      <tr><td>랜딩페이지</td><td style="text-align:left;color:#3f3f3f">"복잡할수록, 길은 하나" · 진단→전담→리포트 풀구조</td></tr>
+      <tr><td>히어로 카피 보드</td><td style="text-align:left;color:#3f3f3f">55개 각도 → 1줄 수렴 (D&AD+Bly+Schwartz)</td></tr>
+      <tr><td>브랜드 필름</td><td style="text-align:left;color:#3f3f3f">영상 기획 중</td></tr>
+    </tbody>
+  </table></div>
+  <div class="x-cap">※ 상세 산출물은 별도 — 본 보고서엔 영역·진척만 기재. 내일 시연 예정.</div>
+</div>
+
+<div class="x-sum">
+  <div class="x-h">이번 주 핵심 (3줄 요약)</div>
+  <p><b class="k">① 유입.</b> 신규퍼널 담당자 CBO 재편, 2주차 유입 225건(+53%)·CPL 17,286원(기존의 절반)으로 효율 재입증. 두 축 합산 일평균 73.6건으로 목표(70+) 상회.<br>
+  <b class="k">② 매출.</b> 결제일 기준 45,951,000원(13건)·ROAS 3.29 — 기존 웹마가 4.22로 견인(코호트 1.38과 3.1배 격차 = 건강한 long-tail). 방학점검 결제일 ROAS 6.79로 최고.<br>
+  <b class="k">③ 소재·진단.</b> 10/14 신규 6종 중 <b>공부인바디 캐러셀(CPL 10,450·59리드)</b>이 최고효율로 메인에. 다만 온타겟(학부모) 분석 결과 <b>신규퍼널 부모 비율 33%(본사 79%)</b>로 결번율이 높아, 다음 과제는 연령 적합도입니다. 방법제시(결번 80%)는 품질 저하, 국세청첨삭은 방문 0으로 OFF, 예산 재배분.<br>
+  <b class="k">④ 인프라.</b> 신규 리드·웹마케팅 대시보드 전면 교체(온타겟% 신설), 운영본부 대시보드 지속 업데이트. 쌤이다 그로스 병행 — 내일 진로진학 시연.</p>
+</div>
+
+<div class="x-cap" style="text-align:center;margin-top:16px">
+  출처 — 유입/전환: 노션 CRM(통합 34652211·신규 56b52211) · 광고비/소재지표: 메타 MCP 실측(1397954958746130, 10/11~17) · 매출: 노션 결제일·신청일 기준(취소/당취/결보=0, 미납 인정, 천원) · 실적게시판(원장) 최종 정산 별도
+</div>
+</div>
 
 
 <div id="p-crm" class="panel">
@@ -2398,7 +2639,7 @@ function updateThisWeek(id) {
   // 9월 1주차 탭은 '05 이번 주 한 일/다음 주' 섹션이 대신하므로 하단 THIS WEEK 블록 숨김
   const twBlock = document.getElementById('tw-block');
   const twDiv = document.getElementById('tw-divider');
-  if (id === 'sep' || id === 'oct') {
+  if (id === 'sep' || id === 'oct' || id === 'oct2') {
     if (twBlock) twBlock.style.display = 'none';
     if (twDiv) twDiv.style.display = 'none';
     return;
@@ -2824,6 +3065,28 @@ function chWk(w,btn){
   });
 }
 (function(){var t=document.querySelector('.chwk-btn');if(t)chWk('4',t);})();
+</script>
+
+<script>
+/* 10/11~17 (3주차) 소재 갤러리 — IMGS 키 연동. 매출/ROAS = 결제일 기준 */
+var W3NF_GAL = [
+  {key:'신규_공부인바디_캐러셀', title:'공부인바디 캐러셀6장', st:'best', star:true, tag:'🆕10/14 · 장윤호 · DB 58 · 결번 28%', cpl:'10,450', spendTxt:'광고비 616,553원', sales:0, orders:0},
+  {key:'신규_MLST_캐러셀', title:'MLST 공부성격 캐러셀', st:'keep', tag:'김윤호 · DB 133 · 방문 4', cpl:'17,266', spendTxt:'광고비 2,313,614원', salesTxt:'결제일 ROAS 1.50 · 3,468,000원', sales:3468000, orders:1},
+  {key:'신규_나억울해요_릴스', title:'나 억울해요 릴스', st:'new', tag:'🆕10/14 · 우혜림 · DB 7 · 결번 0%', cpl:'16,736', spendTxt:'광고비 117,153원', sales:0, orders:0},
+  {key:'신규_수학빙산', title:'수학 숨은원인 빙산', st:'new', tag:'🆕10/14 · 장윤호 · DB 4 · 결번 50%', cpl:'13,222', spendTxt:'광고비 52,886원', sales:0, orders:0},
+  {key:'신규_우리아이만_캐러셀', title:'우리아이만 달라졌어요', st:'new', tag:'🆕10/14 · 장윤호 · DB 1', cpl:'18,619', spendTxt:'광고비 18,619원', sales:0, orders:0},
+  {key:'신규_기말고사똑같이', title:'기말고사도 똑같이', st:'new', tag:'🆕 · 김윤호 · 신규 투입', cpl:'집계중', spendTxt:'집계 예정', sales:0, orders:0},
+  {key:'신규_코넬필기_캐러셀', title:'코넬필기 캐러셀', st:'ok', tag:'우혜림 · DB 17 · 결번 6%', cpl:'35,195', spendTxt:'광고비 598,325원', sales:0, orders:0}
+];
+var W3EX_GAL = [
+  {key:'노트필기릴스_2607', title:'방학점검', st:'best', star:true, tag:'🟢생존 · DB 66 · 결번 3%', cpl:'38,033', spendTxt:'광고비 2,510,188원', salesTxt:'결제일 ROAS 6.79 · 17,051,000원', sales:17051000, orders:4},
+  {key:'노트릴스_영상', title:'노트릴스 영상', st:'keep', tag:'🟢생존 · DB 76 · 방문 7', cpl:'43,074', spendTxt:'광고비 3,359,785원', salesTxt:'결제일 ROAS 3.10 · 10,404,000원', sales:10404000, orders:3},
+  {key:'노트릴스_재편집_2609', title:'노트릴스 재편집', st:'keep', tag:'🟢생존 · 위너세트 · DB 53 · 방문 5', cpl:'36,657', spendTxt:'광고비 1,942,830원', salesTxt:'결제일 ROAS 0.15 · 289,000원(미납분)', sales:289000, orders:1},
+  {key:'중간고사_관리부재_2608', title:'노트필기 관리부재', st:'ok', tag:'🟢생존 · 위너세트 · DB 32', cpl:'37,694', spendTxt:'광고비 1,168,523원', sales:0, orders:0},
+  {key:'MLST_어디서막힐까_2609', title:'MLST 어디서막혔을까', st:'keep', tag:'🟢재가동 · 위너세트 · DB 24', cpl:'40,107', spendTxt:'광고비 962,558원', sales:0, orders:0},
+  {key:'중간고사_방법제시_2608', title:'노트필기 방법제시', st:'dead', tag:'🔴OFF 확정 · 결번 80% · DB 5', cpl:'25,207', spendTxt:'광고비 126,037원', sales:0, orders:0}
+];
+try{ renderGal('w3nf-gal', W3NF_GAL, {spendLine:true}); renderGal('w3ex-gal', W3EX_GAL, {spendLine:true}); }catch(e){ console.warn('w3 gal', e); }
 </script>
 </body>
 </html>
