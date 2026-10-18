@@ -14,5 +14,10 @@ const IMGS = {"노트릴스_영상": "https://raw.githubusercontent.com/crocdeuc
 "신규_필기습관": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_habit.jpg",
 "신규_오답노트릴스": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_wrongnote_reels.jpg",
 "신규_초등공부습관": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_habit_elem.jpg",
-"신규_중등기말대비": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_final_mid.jpg"
+"신규_중등기말대비": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/nf_final_mid.jpg",
+"신규_공부인바디_캐러셀": ["https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/공부인바디_01.png", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/공부인바디_02.png", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/공부인바디_03.png", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/공부인바디_04.png", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/공부인바디_05.png", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/공부인바디_06.png"],
+"신규_우리아이만_캐러셀": ["https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/우리아이만_01.png", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/우리아이만_02.png", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/우리아이만_03.png", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/우리아이만_04.png", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/우리아이만_05.png", "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/우리아이만_06.png"],
+"신규_수학빙산": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/수학빙산_단일.png",
+"신규_나억울해요_릴스": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/나억울해요_릴스.jpg",
+"신규_기말고사똑같이": "https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/소재/기말고사똑같이_단일.jpg"
 };
