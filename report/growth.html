@@ -1924,7 +1924,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   <p><b class="k">① 구조.</b> 신규퍼널을 <b>1 CBO → 담당자별 CBO 3개로 분리</b>(김윤호 예산 85~90% 독식 해소). 2주차 유입 225건(+53%)·CPL 17,286원(기존의 절반)으로 효율 재입증, 두 축 합산 일평균 73.6건으로 목표(70+) 상회.<br>
   <b class="k">② 매출.</b> 결제일 기준 45,951,000원(13건)·ROAS 3.18. 검증된 기존 웹마가 long-tail 전환으로 매출을 받쳐주고(결제일 4.02 vs 코호트 1.31 = 전환 시차), 신규퍼널은 육성 2주차로 채널 감을 잡아가며 코호트가 이제 익기 시작하는 단계입니다. (총 광고비 1,446만 = 메타 1,396만 + 네이버 50만)<br>
   <b class="k">③ 소재·측정.</b> 10/14 신규 6종 중 <b>공부인바디 캐러셀(CPL 10,450·59리드)</b>이 최고효율로 메인에 안착. 학생 유입이 많은 채널 특성상, <b>소재 레벨에서 결번율×온타겟(메타 연령)을 교차</b>해 소재 품질을 판정합니다. 전환이 안 되는 소재(방법제시·국세청첨삭)는 정리하고 검증 소재로 예산을 모읍니다.<br>
-  <b class="k">④ 인프라.</b> 신규 리드·웹마케팅 대시보드 전면 교체(온타겟% 신설), 운영본부 대시보드 지속 업데이트. 쌤이다 그로스 병행 — 내일 진로진학 시연.</p>
+  <b class="k">④ 인프라.</b> 신규 리드·웹마케팅 대시보드 전면 교체(온타겟% 신설), 운영본부 대시보드 지속 업데이트. <b>10/17 리드 파이프라인 장애를 당일 복구</b>(널가드+429 해소)하고 집계 함수 다수를 성능 패치했습니다. 쌤이다 그로스 병행 — 내일 진로진학 시연.</p>
 </div>
 
 <div class="x-cap" style="text-align:center;margin-top:16px">
@@ -1938,6 +1938,37 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   <div class="knote">Apps Script 기반 노션 CRM 자동화 · 메타/당근/카카오/텐핑 전채널 통합 파이프라인</div>
 
   <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:20px">
+
+    <!-- 10/16~17 파이프라인 장애복구 + 성능패치 -->
+    <div class="card" style="border-color:#f7d5c9;background:#fffbfa">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(204,68,68,.12);color:var(--red)">FIX</span>
+        <span style="font-size:14px;font-weight:700">리드 파이프라인 장애 복구 + 집계 성능 패치</span>
+        <span style="font-size:12px;color:var(--sub)">2026.10.16 ~ 10.17</span>
+      </div>
+      <div style="font-size:12px;color:var(--sub);line-height:1.9;margin-bottom:14px;padding:12px 14px;background:#fdf2f0;border-radius:8px">
+        <b style="color:var(--text)">왜 했나</b> — 메타 리드가 노션에 <b>3건만</b> 들어오고 시트 전반에 <code>ERROR</code>가 떴습니다. 전화번호 조회맵 널가드 누락과 5,384건 풀로드에 따른 노션 <b>429(레이트리밋)</b>가 겹쳐 유입 파이프라인이 연쇄 크래시한 것으로, <b>당일 복구</b>했습니다. 같은 기간 집계 함수 다수가 6분 타임아웃에 걸려 함께 최적화했습니다. <code>onMetaLeadAdded</code>가 try/catch로 감싸져 실행실패 로그에 안 떠, 셀 ERROR 마커로만 추적해야 했던 점이 진단을 더디게 했습니다.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <div style="font-size:11px;color:var(--red);font-weight:700;margin-bottom:8px;letter-spacing:1px">FIXED</div>
+          <div style="font-size:12px;color:var(--sub);line-height:2">
+            <b>existingPhones 널가드 3곳</b> — sendBulkToNotion·whSendToNotion_·whProcessNewLeads<br>
+            <b>풀로드 2개 함수 45일 필터</b> — 5,384 → 1,607건, whSyncCrossDupe 타임아웃 → 30초<br>
+            <b>복구 확인</b> — 가정 아닌 실제 실행 로그로 검증
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--amber);font-weight:700;margin-bottom:8px;letter-spacing:1px">TUNED</div>
+          <div style="font-size:12px;color:var(--sub);line-height:2">
+            <b>reconcileFormLeads</b> 360초 → 11초 (풀 스캔 → 45일 룩백)<br>
+            <b>dashPush / getLeadStats</b> 360초 타임아웃 → 68초 (쿼리 병합·formatDate 제거·랭킹/Firestore 분리)<br>
+            <b>중복 함수 Ops.gs 통합</b> (ops_mirror·ops_push 스텁 제거) · gviz 텍스트 소실 버그 수정
+          </div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--sub);line-height:1.8;margin-top:12px;padding-top:10px;border-top:1px solid #f0e0db">후속 대기 — ERROR 마커 행 복구(bulkUploadAllSheets) · 중복 점검(whDedupeNotionDryRun) · syncDuplicateHistory 누적 메모리 개선</div>
+    </div>
 
     <!-- 9/1주 통합 대시보드+보안 -->
     <div class="card" style="border-color:#c9dcf7;background:#fbfdff">
