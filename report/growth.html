@@ -1,7 +1,35 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8"><style id="__pregate">body{visibility:hidden!important}#agate{visibility:visible!important}</style><script>try{if(window.self!==window.top){var e=document.getElementById("__pregate");if(e)e.remove();}}catch(_){}</script>
+<meta charset="UTF-8">
+<script>
+(function () {
+  var ua = (navigator.userAgent || '').toLowerCase();
+  if (ua.indexOf('kakaotalk') === -1) return;
+  var url = location.href;
+  if (ua.indexOf('android') > -1) {
+    location.href = 'intent://' + url.replace(/https?:\/\//, '') + '#Intent;scheme=https;package=com.android.chrome;end';
+  } else {
+    location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(url);
+  }
+  setTimeout(function () {
+    try {
+      document.documentElement.style.visibility = 'visible';
+      var o = document.createElement('div');
+      o.style.cssText = 'position:fixed;inset:0;z-index:2147483647;background:#111;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;font-family:-apple-system,sans-serif;line-height:1.7';
+      o.innerHTML = '<div style="font-size:17px;font-weight:700;margin-bottom:10px">외부 브라우저에서 열어주세요</div>'
+        + '<div style="font-size:14px;opacity:.85">구글 로그인은 카카오톡 안에서는 막혀 있습니다.<br>오른쪽 아래 <b>⋮ (점 3개)</b> → <b>다른 브라우저로 열기</b><br>를 눌러 크롬/사파리로 열어주세요.</div>'
+        + '<button id="kkcopy" style="margin-top:18px;padding:10px 18px;border:0;border-radius:8px;background:#2fe0bf;color:#063;font-weight:700;font-size:14px">링크 복사</button>';
+      document.body.appendChild(o);
+      document.getElementById('kkcopy').onclick = function () {
+        var t = this; try { navigator.clipboard.writeText(location.href); } catch (e) {}
+        t.textContent = '링크 복사됨 ✓';
+      };
+    } catch (e) {}
+  }, 1400);
+})();
+</script>
+<style id="__pregate">body{visibility:hidden!important}#agate{visibility:visible!important}</style><script>try{if(window.self!==window.top){var e=document.getElementById("__pregate");if(e)e.remove();}}catch(_){}</script>
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
