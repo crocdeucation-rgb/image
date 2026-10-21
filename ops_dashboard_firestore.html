@@ -1234,7 +1234,7 @@ body.gate-hasbar{padding-top:34px}
    <div class="tabs" id="tabs"></div>
    <div class="qwrap"><input id="q" class="qsearch" placeholder="🔍 회원·담당·강사 검색" autocomplete="off"><div id="qres"></div></div>
  </div>
- <div class="fbar"><div id="brsel" class="chips" style="margin:0"></div><div id="sausel" class="chips" style="margin:4px 0 0"></div></div>
+ <div class="fbar" style="display:none"><div id="brsel" class="chips" style="margin:0"></div></div>
  <div id="app"></div>
 </div>
 <div id="ovl"></div>
@@ -1695,16 +1695,31 @@ function guardBox(){
     kpi('진행',cur.ing,pv&&pv.ing)+kpi('방어율',dr(cur),pv&&dr(pv),'g','%');
   // 토글
   var dimSeg='<div class="seg" style="margin-bottom:8px">'+DIMS.map(function(d){return '<button class="'+(DIM===d[0]?'on':'')+'" data-mdim="'+d[0]+'">'+d[1]+'</button>';}).join('')+'</div>';
+  // [2026-10-22] 추이 지표 토글 — 방어율·취소(해지)·접수를 분류축별 월별 추이로
+  var MET=window.__gmet||'dr';
+  var METS=[['dr','방어율 추이'],['drop','취소 추이'],['mw','접수 추이']];
+  var metSeg='<div class="seg" style="margin-bottom:10px">'+METS.map(function(x){return '<button class="'+(MET===x[0]?'on':'')+'" data-gmet="'+x[0]+'">'+x[1]+'</button>';}).join('')+'</div>';
   var mseg='<div class="seg" style="margin-bottom:10px">'+ms.map(function(m){
     return '<button class="'+(!ALL&&m===G?'on':'')+'" data-gm="'+m+'">'+(+m.slice(5))+'월'+(m===DATA.slice(0,7)?' (진행 중)':'')+'</button>';}).join('')+
     '<button class="'+(ALL?'on':'')+'" data-gm="all">전체</button></div>';
   // 정렬 토글 제거 — 접수 많은 순 고정 (방어율 컬럼은 유지)
   var bar=function(r,col){return '<div style="display:inline-block;width:44px;height:6px;background:#EEF1F6;border-radius:3px;overflow:hidden;vertical-align:middle;margin-right:6px"><i style="display:block;height:100%;width:'+Math.min(r||0,100)+'%;background:'+col+'"></i></div>';};
-  var spark=function(k){return '<div class="spk">'+ms.map(function(mm){var z=(byGM[k]||{})[mm]||{keep:0,drop:0,mw:0};var q=z.keep+z.drop;var r=q?pc(z.keep,q):null;
-      var h=r!=null?Math.max(3,Math.round(r/100*26)):2, on=(!ALL&&mm===G);
-      var col=r==null?'#E3E8F0':(on?'var(--v1)':(r>=55?'#9DB8EE':'#C9D3E6'));
-      return '<span title="'+(+mm.slice(5))+'월 · 접수 '+z.mw+(r!=null?' · 방어율 '+r+'%':' · 결론 없음')+'"><i style="height:'+h+'px;background:'+col+'"></i><em>'+(r!=null?Math.round(r):'·')+'</em></span>';}).join('')+'</div>';};
-  var spLab=ms.length?((+ms[0].slice(5))+'~'+(+ms[ms.length-1].slice(5))+'월 방어율'):'방어율 추이';
+  var spark=function(k){
+    if(MET==='dr'){
+      return '<div class="spk">'+ms.map(function(mm){var z=(byGM[k]||{})[mm]||{keep:0,drop:0,mw:0};var q=z.keep+z.drop;var r=q?pc(z.keep,q):null;
+        var h=r!=null?Math.max(3,Math.round(r/100*26)):2, on=(!ALL&&mm===G);
+        var col=r==null?'#E3E8F0':(on?'var(--v1)':(r>=55?'#9DB8EE':'#C9D3E6'));
+        return '<span title="'+(+mm.slice(5))+'월 · 접수 '+z.mw+(r!=null?' · 방어율 '+r+'%':' · 결론 없음')+'"><i style="height:'+h+'px;background:'+col+'"></i><em>'+(r!=null?Math.round(r):'·')+'</em></span>';}).join('')+'</div>';
+    }
+    // 건수 지표(취소=drop / 접수=mw) — 행 내 최대값 기준 상대 높이, 값 라벨=건수
+    var vmax=1; ms.forEach(function(mm){var z=(byGM[k]||{})[mm]; if(z&&z[MET]>vmax)vmax=z[MET];});
+    return '<div class="spk">'+ms.map(function(mm){var z=(byGM[k]||{})[mm]||{keep:0,drop:0,mw:0};var v=z[MET]||0;
+      var h=v?Math.max(3,Math.round(v/vmax*26)):2, on=(!ALL&&mm===G);
+      var col=!v?'#E3E8F0':(on?(MET==='drop'?'var(--red)':'var(--v1)'):(MET==='drop'?'#F0B1B1':'#C9D3E6'));
+      return '<span title="'+(+mm.slice(5))+'월 · '+(MET==='drop'?'취소':'접수')+' '+v+'건"><i style="height:'+h+'px;background:'+col+'"></i><em>'+(v||'·')+'</em></span>';}).join('')+'</div>';
+  };
+  var _metNm={dr:'방어율',drop:'취소',mw:'접수'}[MET];
+  var spLab=ms.length?((+ms[0].slice(5))+'~'+(+ms[ms.length-1].slice(5))+'월 '+_metNm):_metNm+' 추이';
   var isTeach=(DIM==='teach');
   function mkRows(ks){ return ks.map(function(k){ var c=A.o[k], p=(AP.o||{})[k]||{};
     var cl=c.keep+c.drop, r=cl?pc(c.keep,cl):null, pr=((p.keep||0)+(p.drop||0))?pc(p.keep||0,(p.keep||0)+(p.drop||0)):null;
@@ -1738,8 +1753,8 @@ function guardBox(){
     '</tbody></table></div>';
   var per=ALL?'전체':(+G.slice(5))+'월';
   return zone('guard','var(--pos)','관리 현황',per+' · 방어율 '+(dr(cur)==null?'—':dr(cur)+'%'),'분류축·기간을 바꿔 민원·취소를 분해',
-   '<div class="lead">민원 시트에 올라온 취소 문의를 <b>분류축</b>(팀 A/B·사업담당·코칭담당·지점·상담)과 <b>기간</b>으로 쪼갭니다. 방어율=유지÷(유지+해지), 당일취소 제외. (팀=담임 코칭 기준)</div>'+
-   dimSeg+mseg+'<div class="kpi">'+head+'</div>'+tbl,true);
+   '<div class="lead">민원 시트에 올라온 취소 문의를 <b>분류축</b>(팀 A/B·사업담당·코칭담당·지점·상담)과 <b>기간</b>으로 쪼갭니다. 추이 지표(방어율·취소·접수)를 바꾸면 오른쪽 월별 막대가 그 지표로 바뀝니다. 방어율=유지÷(유지+해지), 당일취소 제외. (팀=담임 코칭 기준)</div>'+
+   dimSeg+metSeg+mseg+'<div class="kpi">'+head+'</div>'+tbl,true);
 }
 function tLbl2(k){return k;}   // (코칭담당 이름은 그대로 — 팀 라벨 아님)
 
@@ -3346,14 +3361,8 @@ function render(){
   try{var _db=document.getElementById('dataBadgeTxt'); if(_db) _db.textContent=(DATA?md(DATA):'—')+(D.dataToTime?' '+D.dataToTime:'');}catch(e){}
   document.body.classList.remove('tab-all','tab-coach','tab-teach');
   document.body.classList.add('tab-'+TAB);
-  var BL=(D.branchList||[]);
-  document.getElementById('brsel').innerHTML=(TAB==='teach')?'':('<button class="chip'+(BR===''?' on':'')+'" data-br="">전체 지점</button>'+
-    BL.map(function(b){return '<button class="chip'+(BR===b?' on':'')+'" data-br="'+esc(b)+'">'+esc(b)+'</button>';}).join(''));
-  document.getElementById('brsel').style.display=(TAB==='teach'||(TAB==='coach'&&window.__cOpen))?'none':'';
-  var SLs=saupList();
-  document.getElementById('sausel').innerHTML=(TAB==='teach'||!SLs.length)?'':('<button class="chip'+(SAUP===''?' on':'')+'" data-saup="">전체 사업부</button>'+
-    SLs.map(function(b){return '<button class="chip'+(SAUP===b?' on':'')+'" data-saup="'+esc(b)+'">사업 '+esc(b)+'</button>';}).join(''));
-  document.getElementById('sausel').style.display=(TAB==='teach'||(TAB==='coach'&&window.__cOpen))?'none':'';
+  // [2026-10-22] 전역 지점 필터 제거 — 섹션별 보기(관리 현황 분류축 등)로 대체. BR='' 고정.
+  document.getElementById('brsel').innerHTML='';
   document.getElementById('qres').innerHTML=searchBox();
   document.getElementById('sub').textContent='시트 '+md(DATA)+' 수집분 기준';
   var T=[['all','전체 현황'],['coach','코칭 현황'],['teach','강사 현황']];
@@ -3403,6 +3412,7 @@ document.addEventListener('click',function(e){
   else if(b.dataset.cg){window.__cg=b.dataset.cg;render();}
   else if(b.dataset.gsort){window.__gsort=b.dataset.gsort;render();}
   else if(b.dataset.mdim){window.__mdim=b.dataset.mdim;render();}
+  else if(b.dataset.gmet){window.__gmet=b.dataset.gmet;render();}
   else if(b.dataset.onbtab){window.__onbtab=b.dataset.onbtab;render();}
   else if(b.dataset.wkstep!==undefined){window.__wkstep=(window.__wkstep===b.dataset.wkstep?'':b.dataset.wkstep);render();}
   else if(b.dataset.expview){window.__expview=b.dataset.expview;render();}
@@ -3426,7 +3436,6 @@ document.addEventListener('click',function(e){
   else if(b.dataset.teach){TAB='teach';window.__tOpen=1;setTimeout(syncMDClass,0);window.__t=b.dataset.teach;render();window.scrollTo(0,0);}
   else if(b.dataset.tsj){window.__tsj=b.dataset.tsj;window.__t=null;render();}
   else if(b.dataset.br!==undefined&&b.classList.contains('chip')){BR=b.dataset.br;render();}
-  else if(b.dataset.saup!==undefined&&b.classList.contains('chip')){SAUP=b.dataset.saup;render();}
   else if(b.dataset.ctab){CTAB=b.dataset.ctab;render();}
   else if(b.dataset.name){window.__cardScrollY=window.pageYOffset||document.documentElement.scrollTop||0;CARD=b.dataset.name;render();}
   else if(b.dataset.z){var k=b.dataset.z;OPENZ[k]=!(OPENZ[k]!==undefined?OPENZ[k]:b.querySelector('.ar').textContent==='▾');render();}
