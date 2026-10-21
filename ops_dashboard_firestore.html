@@ -294,6 +294,11 @@ details[open]>.more::before{content:'▾ '}
 .wl li b.ok{color:var(--pos)}.wl li b.ng{color:var(--red)}.wl li b.mu{color:var(--mute)}
 .wl li.more2 button{color:var(--soft);font-size:11px}
 .grow{cursor:pointer}.grow:hover{background:#F2F5FA}.grow.gopen{background:#FAFBFD}
+.gmsec>summary{font-size:11.5px;font-weight:800;background:#F1F4F9;border-radius:6px;padding:4px 10px;margin-bottom:3px;cursor:pointer;list-style:none;color:var(--ink)}
+.gmsec>summary::-webkit-details-marker{display:none}
+.gmsec>summary::before{content:'▸ ';color:var(--soft)}
+.gmsec[open]>summary::before{content:'▾ '}
+.chart svg text{font-family:inherit}
 .wl.scroll{max-height:250px;overflow-y:auto}
 .sech2{font-size:14.5px;font-weight:900;margin:18px 0 10px;padding-top:14px;border-top:1px dashed var(--line)}
 .scrollx{overflow-x:auto}
@@ -1761,9 +1766,9 @@ function guardBox(){
       P2.forEach(function(m){var bk=bucket(m);if(bk==='keep')k2++;else if(bk==='drop'){d2++;a2+=amtOf(m);}else if(bk==='dang')dg2++;});
       var isCur=(mm===DATA.slice(0,7));
       // [2026-10-22] 월 섹션 접기 — 이달만 기본 펼침, 나머지는 눌러서 펼침
-      return '<details style="margin:6px 0 2px"'+(isCur?' open':'')+'>'
-        +'<summary style="font-size:11px;font-weight:800;background:#F1F4F9;border-radius:6px;padding:3px 8px;margin-bottom:3px;cursor:pointer;list-style:none">▸ '+(+mm.slice(5))+'월'+(isCur?' (이달)':'')
-        +' — 접수 '+mw2+' · 유지 '+k2+' · 해지 '+d2+(a2?' · 취소금액 <span style="color:var(--red)">'+wonC(a2)+'</span>':'')+(dg2?' · 당취 '+dg2:'')+' <span class="z" style="font-weight:600">펼치기/접기</span></summary>'
+      return '<details class="gmsec" style="margin:6px 0 2px"'+(isCur?' open':'')+'>'
+        +'<summary>'+(+mm.slice(5))+'월'+(isCur?' <span style="color:var(--v1)">(이달)</span>':'')
+        +' — 접수 '+mw2+' · <span style="color:var(--pos)">유지 '+k2+'</span> · <span style="color:var(--red)">해지 '+d2+'</span>'+(a2?' · <span style="color:var(--red);font-weight:800">'+wonC(a2)+'</span>':'')+(dg2?' · 당취 '+dg2:'')+'</summary>'
         +P2.map(line).join('')+'</details>';
     }).join('');
     var tot2={mw:L.length,amt:0}; L.forEach(function(m){if(bucket(m)==='drop')tot2.amt+=amtOf(m);});
@@ -1797,8 +1802,9 @@ function guardBox(){
   var CURM=DATA.slice(0,7);
   var SBS=D.salesBySaup||{};   // 월→사업담당→매출(원) — ops.gs 배포 시 교차차트에 매출 라인
   function perTot(k){var a=0,c2=0,k2=0;ms.forEach(function(mm){var z=(byGM[k]||{})[mm]||{};a+=z.amt||0;c2+=z.drop||0;k2+=z.keep||0;});return {amt:a,drop:c2,keep:k2};}
-  // [2026-10-22] 절대 임계값 — 담당 월 취소 2,000만↑ 경고 / 3,000만↑ 비상
-  var WARN=20000000, CRIT=30000000;
+  // [2026-10-22] 축별 3단계 임계값 [경고, 비상, 긴급] — 사업·지점·코칭 2,000/3,000/4,000 · 상담 1,500/2,000/2,500 · 팀 미적용
+  var _TH={sang:[1.5e7,2e7,2.5e7],saup:[2e7,3e7,4e7],teach:[2e7,3e7,4e7],br:[2e7,3e7,4e7],team:[Infinity,Infinity,Infinity]}[DIM]||[2e7,3e7,4e7];
+  var WARN=_TH[0], CRIT=_TH[1], MELT=_TH[2];
   // [2026-10-22] 월별 흐름 문법으로 — 담당당 2행: 금액(▲▼) / 건수 서브행. 히트맵·3줄 셀 제거
   function mkRows(ks){ return ks.map(function(k){
     var T2=perTot(k);
@@ -1808,10 +1814,15 @@ function guardBox(){
         var dlt='';
         if(mi>0){ var pz=(byGM[k]||{})[ms[mi-1]]||{}, pvv=pz.amt||0, dd=v-pvv;
           if(pvv&&dd){ var up=dd>0; dlt='<div style="font-size:10px;font-weight:700;color:'+(up?'var(--red)':'var(--pos)')+'">'+(up?'▲':'▼')+Math.round(Math.abs(dd)/10000).toLocaleString('ko-KR')+'</div>'; } }
-        var crit=(v>=CRIT), warn=(v>=WARN);
-        return '<td class="c"'+(crit?' style="background:#F8DCDA;box-shadow:inset 0 0 0 1.5px var(--red)"':(warn?' style="background:#FDF0EF"':''))+'>'
-          +(crit?'<span style="font-size:9px;font-weight:900;color:#fff;background:var(--red);border-radius:4px;padding:0 4px">비상</span> ':'')
-          +'<b style="color:'+(warn?'var(--red)':'var(--ink)')+'">'+wonC(v)+'</b>'+dlt+'</td>';}).join('')+
+        var melt=(v>=MELT), crit=(!melt&&v>=CRIT), warn=(v>=WARN);
+        var wdlt=dlt.replace(/color:var\(--red\)/,'color:#FFD7D4').replace(/color:var\(--pos\)/,'color:#CFF5E4');
+        if(melt) return '<td class="c" style="background:#6B0F12;box-shadow:inset 0 0 0 2px #FF8A80">'
+          +'<span style="font-size:9px;font-weight:900;color:#6B0F12;background:#FFD7D4;border-radius:4px;padding:0 4px">긴급</span> '
+          +'<b style="color:#fff;font-size:12px">'+wonC(v)+'</b>'+wdlt+'</td>';
+        if(crit) return '<td class="c" style="background:var(--red)">'
+          +'<span style="font-size:9px;font-weight:900;color:var(--red);background:#fff;border-radius:4px;padding:0 4px">비상</span> '
+          +'<b style="color:#fff">'+wonC(v)+'</b>'+wdlt+'</td>';
+        return '<td class="c"'+(warn?' style="background:#FDF0EF"':'')+'><b style="color:'+(warn?'var(--red)':'var(--ink)')+'">'+wonC(v)+'</b>'+dlt+'</td>';}).join('')+
       '<td class="c"><b style="color:var(--ink)">'+(T2.amt?wonC(T2.amt):'·')+'</b></td></tr>';
     var subrow='<tr data-gkey="'+esc(k)+'" class="grow"><td style="padding-left:22px;color:var(--soft);font-size:11px">└ 해지 · 유지 <span class="z">/ 접수</span></td>'+
       ms.map(function(mm){var z=(byGM[k]||{})[mm]||{};
@@ -1839,8 +1850,8 @@ function guardBox(){
     (retK.length?'<tr><td colspan="'+COLS+'" style="background:#F6F8FB;font-size:11px;font-weight:800;color:var(--soft)">퇴사·외부 (재직 명단에 없음 — 당시 접수 기록)</td></tr>'+mkRows(retK):'')+
     '</tbody></table></div>';
   var per=(+G.slice(5))+'월';
-  return zone('guard','var(--pos)','관리 현황',per+' · 방어율 '+(dr(cur)==null?'—':dr(cur)+'%'),'담당별 월별 취소금액 — 이름 클릭 시 상세',
-   '<div class="lead">월별 흐름 민원표처럼 <b>담당이 행, 월이 열</b>입니다. 셀=그 달 취소금액(해지 계약금액 합·당취 제외). 금액은 기본 검정, <b style="color:var(--red)">월 2,000만↑ 경고(빨강) · 3,000만↑ 비상(배지+테두리)</b>. <b>이름을 누르면</b> 매출×취소 교차 차트와 월별 건별 내역(사유·담임·팀)이 펼쳐집니다. KPI는 이달 기준. (팀=담임 코칭 기준)</div>'+
+  return zone('guard','var(--pos)','사업부·지점·상담별 현황',per+' · 방어율 '+(dr(cur)==null?'—':dr(cur)+'%'),'담당별 월별 취소금액 — 행 클릭 시 상세',
+   '<div class="lead">월별 흐름 민원표처럼 <b>담당이 행, 월이 열</b>입니다. 셀=그 달 취소금액(해지 계약금액 합·당취 제외). 금액 3단계 — <b style="color:var(--red)">경고</b> → <b style="color:#fff;background:var(--red);border-radius:4px;padding:0 4px">비상</b> → <b style="color:#FFD7D4;background:#6B0F12;border-radius:4px;padding:0 4px">긴급</b>. 사업·지점·코칭 2,000/3,000/4,000만 · 상담 1,500/2,000/2,500만. <b>이름을 누르면</b> 매출×취소 교차 차트와 월별 건별 내역(사유·담임·팀)이 펼쳐집니다. KPI는 이달 기준. (팀=담임 코칭 기준)</div>'+
    dimSeg+'<div class="kpi">'+head+'</div>'+tbl,true);
 }
 function tLbl2(k){return k;}   // (코칭담당 이름은 그대로 — 팀 라벨 아님)
@@ -3489,7 +3500,7 @@ function render(){
   var el=document.getElementById('app');
   if(TAB==='all'){
     var SEC=[['이번 주 할 일',[['todosum','이번 주 처리·실적',todoSummaryBox],['onbhub','온보딩 허브',onbHubBox],['exp','관리기간 만료 예정',expBox]]],
-             ['관리 현황',[['guard','분해 (담당·지점별)',guardBox],['can','취소 문의',canBox],['dev','기기 · 설치 트러블',devBox]]],
+             ['사업부·지점·상담별 현황',[['guard','담당별 현황·취소',guardBox],['can','취소 문의',canBox],['dev','기기 · 설치 트러블',devBox]]],
              ['분석',[['tcmp','팀 비교 (A vs B)',teamCompareBox],['flow','월별 흐름',flowBox],['funnel','월별 진단',funnelBox],['trend','월별 추이',trendBox]]]];
     var anchor='<div class="anch sticky">'+SEC.map(function(g){
         return '<span class="anch-g">'+g[0]+'</span>'+g[1].map(function(z){return '<button data-anch="'+z[0]+'">'+esc(z[1])+'</button>';}).join('');}).join('<span class="anch-sep"></span>')+'</div>';
