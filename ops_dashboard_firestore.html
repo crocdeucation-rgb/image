@@ -1797,21 +1797,28 @@ function guardBox(){
   var CURM=DATA.slice(0,7);
   var SBS=D.salesBySaup||{};   // 월→사업담당→매출(원) — ops.gs 배포 시 교차차트에 매출 라인
   function perTot(k){var a=0,c2=0,k2=0;ms.forEach(function(mm){var z=(byGM[k]||{})[mm]||{};a+=z.amt||0;c2+=z.drop||0;k2+=z.keep||0;});return {amt:a,drop:c2,keep:k2};}
-  // [2026-10-22] 히트맵 스케일 — 전 담당·전 월 중 최대 취소금액 기준 농도
-  var HMAX=1; Object.keys(byGM).forEach(function(k){ms.forEach(function(mm){var z=byGM[k][mm];if(z&&z.amt>HMAX)HMAX=z.amt;});});
-  var heat=function(v){ if(!v) return ''; var a=Math.min(v/HMAX,1); return 'background:rgba(214,69,69,'+(0.06+a*0.26).toFixed(3)+');'; };
+  // [2026-10-22] 절대 임계값 — 담당 월 취소 2,000만↑ 경고 / 3,000만↑ 비상
+  var WARN=20000000, CRIT=30000000;
+  // [2026-10-22] 월별 흐름 문법으로 — 담당당 2행: 금액(▲▼) / 건수 서브행. 히트맵·3줄 셀 제거
   function mkRows(ks){ return ks.map(function(k){
     var T2=perTot(k);
-    return '<tr data-gkey="'+esc(k)+'" class="grow" title="클릭하면 상세"><td style="white-space:nowrap"><b>'+esc(isTeach?tLbl2(k):k)+'</b> <span class="z" style="font-size:10px">▸</span></td>'+
-      ms.map(function(mm,mi){var z=(byGM[k]||{})[mm]||{};var v=z.amt||0,d2=z.drop||0,on=(mm===CURM);
-        if(!v&&!d2) return '<td class="c'+(on?'':' z')+'">·</td>';
-        // 전월 대비 ▲▼ (월별 흐름과 동일 — 취소는 감소가 좋음)
+    var main='<tr data-gkey="'+esc(k)+'" class="grow" title="클릭하면 상세"><td style="white-space:nowrap;font-weight:800">'+esc(isTeach?tLbl2(k):k)+' <span class="z" style="font-size:10px">▸</span></td>'+
+      ms.map(function(mm,mi){var z=(byGM[k]||{})[mm]||{};var v=z.amt||0,on=(mm===CURM);
+        if(!v) return '<td class="c z">'+((z.drop||z.mw)?'0':'·')+'</td>';
         var dlt='';
         if(mi>0){ var pz=(byGM[k]||{})[ms[mi-1]]||{}, pvv=pz.amt||0, dd=v-pvv;
-          if(pvv&&dd){ var up=dd>0; dlt='<div style="font-size:9.5px;font-weight:800;color:'+(up?'var(--red)':'var(--pos)')+'">'+(up?'▲':'▼')+Math.round(Math.abs(dd)/10000).toLocaleString('ko-KR')+'</div>'; } }
-        return '<td class="c" style="'+heat(v)+'"><b style="color:'+(on?'var(--red)':'#8F3B3D')+';font-size:11.5px">'+(v?wonC(v):'0')+'</b>'+dlt+'<div class="org" style="font-weight:600;white-space:nowrap">해지 '+d2+(z.keep?' · <span style="color:var(--pos)">유지 '+z.keep+'</span>':'')+(z.mw?' / 접수 '+z.mw:'')+'</div></td>';}).join('')+
-      '<td class="c" style="background:#FBF9F9"><b style="color:var(--red)">'+(T2.amt?wonC(T2.amt):'·')+'</b><div class="org" style="font-weight:600">해지 '+T2.drop+(T2.keep?' · <span style="color:var(--pos)">유지 '+T2.keep+'</span>':'')+'</div></td>'+
-      '</tr>';}).join(''); }
+          if(pvv&&dd){ var up=dd>0; dlt='<div style="font-size:10px;font-weight:700;color:'+(up?'var(--red)':'var(--pos)')+'">'+(up?'▲':'▼')+Math.round(Math.abs(dd)/10000).toLocaleString('ko-KR')+'</div>'; } }
+        var crit=(v>=CRIT), warn=(v>=WARN);
+        return '<td class="c"'+(crit?' style="background:#F8DCDA;box-shadow:inset 0 0 0 1.5px var(--red)"':(warn?' style="background:#FDF0EF"':''))+'>'
+          +(crit?'<span style="font-size:9px;font-weight:900;color:#fff;background:var(--red);border-radius:4px;padding:0 4px">비상</span> ':'')
+          +'<b style="color:'+(warn?'var(--red)':'var(--ink)')+'">'+wonC(v)+'</b>'+dlt+'</td>';}).join('')+
+      '<td class="c"><b style="color:var(--ink)">'+(T2.amt?wonC(T2.amt):'·')+'</b></td></tr>';
+    var subrow='<tr data-gkey="'+esc(k)+'" class="grow"><td style="padding-left:22px;color:var(--soft);font-size:11px">└ 해지 · 유지 <span class="z">/ 접수</span></td>'+
+      ms.map(function(mm){var z=(byGM[k]||{})[mm]||{};
+        if(!z.mw&&!z.drop) return '<td class="c z">·</td>';
+        return '<td class="c" style="font-size:11px"><span style="color:var(--red);font-weight:700">'+(z.drop||0)+'</span> · <span style="color:var(--pos);font-weight:700">'+(z.keep||0)+'</span> <span class="z">/ '+(z.mw||0)+'</span></td>';}).join('')+
+      '<td class="c" style="font-size:11px"><span style="color:var(--red);font-weight:700">'+T2.drop+'</span> · <span style="color:var(--pos);font-weight:700">'+(T2.keep||0)+'</span></td></tr>';
+    return main+subrow;}).join(''); }
   var sortf=function(a,b){var x=perTot(a),y=perTot(b);return (y.amt-x.amt)||(y.drop-x.drop);};   // 누적 취소금액 많은 순
   // 퇴사·외부 판정 = HR 재직 명단(hrCoach/hrSaup)에 없으면. 명단 미배포시 이용우·정기상만(코칭).
   function _nm(n){return String(n==null?'':n).replace(/\(.*?\)/g,'').replace(/\s/g,'');}
@@ -1833,7 +1840,7 @@ function guardBox(){
     '</tbody></table></div>';
   var per=(+G.slice(5))+'월';
   return zone('guard','var(--pos)','관리 현황',per+' · 방어율 '+(dr(cur)==null?'—':dr(cur)+'%'),'담당별 월별 취소금액 — 이름 클릭 시 상세',
-   '<div class="lead">월별 흐름 민원표처럼 <b>담당이 행, 월이 열</b>입니다. 셀=그 달 취소금액(해지 계약금액 합·당취 제외)과 건수. <b>이름을 누르면</b> 매출×취소 교차 차트와 월별 건별 내역(사유·담임·팀)이 펼쳐집니다. KPI는 이달 기준. (팀=담임 코칭 기준)</div>'+
+   '<div class="lead">월별 흐름 민원표처럼 <b>담당이 행, 월이 열</b>입니다. 셀=그 달 취소금액(해지 계약금액 합·당취 제외). 금액은 기본 검정, <b style="color:var(--red)">월 2,000만↑ 경고(빨강) · 3,000만↑ 비상(배지+테두리)</b>. <b>이름을 누르면</b> 매출×취소 교차 차트와 월별 건별 내역(사유·담임·팀)이 펼쳐집니다. KPI는 이달 기준. (팀=담임 코칭 기준)</div>'+
    dimSeg+'<div class="kpi">'+head+'</div>'+tbl,true);
 }
 function tLbl2(k){return k;}   // (코칭담당 이름은 그대로 — 팀 라벨 아님)
@@ -3495,8 +3502,20 @@ function render(){
   }
   else if(TAB==='coach') el.innerHTML=(BR?branchStaffBox(BR):'')+coachTab();
   else el.innerHTML=teachTab();
-  document.getElementById('ovl').innerHTML=CARD?card(CARD):((window.__gkey&&window.__gcardHtml)?window.__gcardHtml(window.__gkey):'');
+  document.getElementById('ovl').innerHTML=CARD?card(CARD):((window.__gkey&&window.__gcardHtml)?(function(){
+    // [2026-10-22] 실패 시에도 모달은 뜨고 에러를 그 안에 보여줌 (조용한 실패 방지)
+    try{ return window.__gcardHtml(window.__gkey); }
+    catch(err){ return '<div class="ov" data-close="1"><div class="card"><button class="cls" data-close="1">✕</button>'
+      +'<div style="padding:18px;font-size:12px;line-height:1.6"><b style="color:var(--red)">상세 생성 오류</b> — 이 메시지를 캡쳐해서 보내주세요.<br>'
+      +String(err&&err.message||err).replace(/</g,'&lt;')+'<br><span style="font-size:10px;color:var(--mute)">'+String(err&&err.stack||'').slice(0,400).replace(/</g,'&lt;')+'</span></div></div></div>'; }
+  })():'');
   document.body.style.overflow=(CARD||window.__gkey)?'hidden':'';
+  // [2026-10-22] 담당 행 직접 바인딩 — 위임이 막히는 환경(임베드 등) 대비 이중 안전장치
+  try{ document.querySelectorAll('tr[data-gkey]').forEach(function(tr){
+    tr.onclick=function(ev){ if(ev.target.closest('[data-name],button'))return;
+      ev.stopPropagation();   // 위임 핸들러(토글식) 중복 처리 방지 — 이게 없으면 켜자마자 꺼짐
+      window.__gkey=(window.__gkey===tr.getAttribute('data-gkey'))?null:tr.getAttribute('data-gkey'); render(); };
+  }); }catch(e){}
   try{ if(window.self!==window.top){ var _cs=!!(CARD||window.__gkey); if(_cs!==window.__lastCard){ window.__lastCard=_cs; parent.postMessage({t:_cs?'cardOpen':'cardClose'},'*'); if(_cs){ setTimeout(function(){ try{ var c=document.querySelector('.card'); if(c) c.scrollIntoView({block:'center'}); }catch(e){} },30); } } } }catch(e){}
   // 직접 열람 시에도 모달이 화면 중앙에 오도록 (담당 모달)
   try{ if(window.self===window.top && window.__gkey){ setTimeout(function(){ var c=document.querySelector('#ovl .card'); if(c) c.scrollIntoView({block:'center'}); },30); } }catch(e){}
