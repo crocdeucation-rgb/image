@@ -1837,14 +1837,16 @@ function guardBox(){
       var _nk=String(k).replace(/\(.*?\)/g,'').replace(/\s/g,'');
       var hasSales=(DIM==='saup')&&Object.keys(SBS).some(function(mm){var o=SBS[mm]||{};return Object.keys(o).some(function(n){return String(n).replace(/\(.*?\)/g,'').replace(/\s/g,'')===_nk&&o[n];});});
       var salesOf=function(mm){var o=SBS[mm]||{};var v=0;Object.keys(o).forEach(function(n){if(String(n).replace(/\(.*?\)/g,'').replace(/\s/g,'')===_nk)v+=o[n]||0;});return v;};
-      var canOf=function(mm){var z=(byGM[k]||{})[mm]||{};return (z.amt||0)+(z.dnAmt||0)+dgAmtOf(mm);};
+      var hjOf=function(mm){var z=(byGM[k]||{})[mm]||{};return z.amt||0;};                       // 해지(민원 계약금액)
+      var dgOf=function(mm){var z=(byGM[k]||{})[mm]||{};return (z.dnAmt||0)+dgAmtOf(mm);};       // 당취(운영이관+영업단)
+      var mkD=function(mm,bar){var h=hjOf(mm),d=dgOf(mm);return {lab:(+mm.slice(5))+'월',bar:bar,line:(h?h/10000:null),line2:(d?d/10000:null),part:(mm===CURM)?md(DATA)+'까지':''};};
       chart='<div style="max-width:560px;margin:6px 0 2px">'+combo(hasSales?
-        {title:'매출 × 취소금액(당취 포함)',barName:'매출(만)',lineName:'취소금액 합산(만)',barCol:'#8EA4F8',lineCol:'#B42318',
+        {title:'매출 × 취소 — 해지·당취 구분',barName:'매출(만)',lineName:'해지(만)',line2Name:'당취(만)',barCol:'#8EA4F8',lineCol:'#B42318',line2Col:'#E8862E',
          fmt:function(v){return Math.round(v).toLocaleString('ko-KR')+'만';},
-         data:ms.map(function(mm){var cv=canOf(mm);return {lab:(+mm.slice(5))+'월',bar:Math.round(salesOf(mm)/10000),line:(cv?cv/10000:null),part:(mm===CURM)?md(DATA)+'까지':''};})}:
-        {title:'월별 취소 — 건수 × 금액(당취 포함)',barName:'해지 건수',lineName:'취소금액 합산(만)',barCol:'#F28B7D',lineCol:'#B42318',
+         data:ms.map(function(mm){return mkD(mm,Math.round(salesOf(mm)/10000));})}:
+        {title:'월별 취소 — 해지·당취 구분',barName:'해지 건수',lineName:'해지(만)',line2Name:'당취(만)',barCol:'#F28B7D',lineCol:'#B42318',line2Col:'#E8862E',
          fmt:function(v){return Math.round(v).toLocaleString('ko-KR')+'만';},
-         data:ms.map(function(mm){var z=(byGM[k]||{})[mm]||{};var cv=canOf(mm);return {lab:(+mm.slice(5))+'월',bar:z.drop||0,line:(cv?cv/10000:null),part:(mm===CURM)?md(DATA)+'까지':''};})})+'</div>';
+         data:ms.map(function(mm){var z=(byGM[k]||{})[mm]||{};return mkD(mm,z.drop||0);})})+'</div>';
     }catch(e){}
     return '<div class="ghd"><b>'+esc(k)+'</b><span class="dim">'+(DIMS.filter(function(d){return d[0]===DIM;})[0][1])+'</span></div>'
       +'<div class="gstat"><div>전 기간 접수<b>'+T3.mw+'건</b></div><div>누적 해지금액<b>'+(wonC(T3.amt)||'—')+'</b></div>'
@@ -2780,14 +2782,14 @@ function combo(o){
   var W=440,H=236,pl=12,pr=12,top=30,lineH=62,gap=18,base=H-40,n=o.data.length,cw=(W-pl-pr)/n;
   var bTop=top+lineH+gap, bH=base-bTop;
   var bm=Math.max.apply(null,o.data.map(function(d){return d.bar;}).concat([1]));
-  var lv=o.data.map(function(d){return d.line;}).filter(function(v){return v!=null;});
+  var lv=[]; o.data.forEach(function(d){ if(d.line!=null)lv.push(d.line); if(d.line2!=null)lv.push(d.line2); });
   var lmax=Math.max.apply(null,lv.concat([0.0001])), lmin=Math.min.apply(null,lv.concat([lmax]));
   var span=(lmax-lmin)||lmax||1, lo=Math.max(0,lmin-span*0.35), hi2=lmax+span*0.15;
   var ly=function(v){return top+lineH-(v-lo)/(hi2-lo)*lineH;};
   var s='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block">';
   s+='<rect x="'+pl+'" y="'+(top-8)+'" width="'+(W-pl-pr)+'" height="'+(lineH+16)+'" rx="6" fill="#F7F9FC"/>';
   s+='<line x1="'+pl+'" x2="'+(W-pr)+'" y1="'+base+'" y2="'+base+'" stroke="#D5DCE7"/>';
-  var pts=[];
+  var pts=[], pts2=[];
   o.data.forEach(function(d,i){
     var cx=pl+cw*i+cw/2, bw=Math.min(cw*0.5,34);
     if(d.barA!=null||d.barB!=null||d.barX!=null){   // A/B/미상 스택 (총계=A+B+미상)
@@ -2804,6 +2806,12 @@ function combo(o){
     s+='<text x="'+cx+'" y="'+(base+15)+'" text-anchor="middle" font-size="11" font-weight="500" fill="#6B7688">'+d.lab+'</text>';
     if(d.part) s+='<text x="'+cx+'" y="'+(base+29)+'" text-anchor="middle" font-size="10" fill="#9AA6B8">'+d.part+'</text>';
     if(d.line!=null){pts.push([cx,ly(d.line),d]);}
+    if(d.line2!=null){pts2.push([cx,ly(d.line2),d]);}
+  });
+  if(pts2.length>1) s+='<polyline fill="none" stroke="'+(o.line2Col||'#E8862E')+'" stroke-width="2" stroke-dasharray="5 3" stroke-linejoin="round" points="'+pts2.map(function(p){return p[0]+','+p[1];}).join(' ')+'"/>';
+  pts2.forEach(function(p){
+    s+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="3" fill="#fff" stroke="'+(o.line2Col||'#E8862E')+'" stroke-width="2"/>';
+    s+='<text x="'+p[0]+'" y="'+(p[1]+15)+'" text-anchor="middle" font-size="10" font-weight="600" fill="'+(o.line2Col||'#E8862E')+'">'+o.fmt(p[2].line2)+'</text>';
   });
   if(pts.length>1) s+='<polyline fill="none" stroke="'+o.lineCol+'" stroke-width="2.2" stroke-linejoin="round" points="'+pts.map(function(p){return p[0]+','+p[1];}).join(' ')+'"/>';
   pts.forEach(function(p,i){
@@ -2815,6 +2823,7 @@ function combo(o){
   var leg=(o.data.some(function(d){return d.barA!=null||d.barB!=null||d.barX!=null;}))
     ? '<i style="background:#3B5BDB"></i>A팀<i style="background:#12B886"></i>B팀<i style="background:#C6CDD8"></i>미상<i style="background:'+o.lineCol+';height:3px;margin-top:5px"></i>'+o.lineName
     : '<i style="background:'+o.barCol+'"></i>'+o.barName+'<i style="background:'+o.lineCol+';height:3px;margin-top:5px"></i>'+o.lineName;
+  if(o.line2Name) leg+='<i style="background:'+(o.line2Col||'#E8862E')+';height:3px;margin-top:5px"></i>'+o.line2Name;
   return '<div class="chart"><div class="chh"><b>'+o.title+'</b><span>'+leg+'</span></div>'+s+
     (o.foot?'<div class="chf">'+o.foot+'</div>':'')+'</div>';
 }
