@@ -293,6 +293,7 @@ details[open]>.more::before{content:'▾ '}
 .wl li b{font-size:10px;font-weight:800;margin-left:auto;flex:none}
 .wl li b.ok{color:var(--pos)}.wl li b.ng{color:var(--red)}.wl li b.mu{color:var(--mute)}
 .wl li.more2 button{color:var(--soft);font-size:11px}
+.grow{cursor:pointer}.grow:hover{background:#F2F5FA}.grow.gopen{background:#FAFBFD}
 .wl.scroll{max-height:250px;overflow-y:auto}
 .sech2{font-size:14.5px;font-weight:900;margin:18px 0 10px;padding-top:14px;border-top:1px dashed var(--line)}
 .scrollx{overflow-x:auto}
@@ -1792,7 +1793,7 @@ function guardBox(){
   function perTot(k){var a=0,c2=0;ms.forEach(function(mm){var z=(byGM[k]||{})[mm]||{};a+=z.amt||0;c2+=z.drop||0;});return {amt:a,drop:c2};}
   function mkRows(ks){ return ks.map(function(k){
     var open=(GK===k), T2=perTot(k);
-    return '<tr'+(open?' style="background:#FAFBFD"':'')+'><td style="white-space:nowrap"><button data-gkey="'+esc(k)+'" style="border:0;background:none;font:inherit;font-weight:800;cursor:pointer;padding:0" title="누르면 상세">'+(open?'▾ ':'▸ ')+esc(isTeach?tLbl2(k):k)+'</button></td>'+
+    return '<tr data-gkey="'+esc(k)+'" class="grow'+(open?' gopen':'')+'" title="클릭하면 상세"><td style="white-space:nowrap"><b>'+esc(isTeach?tLbl2(k):k)+'</b> <span class="z" style="font-size:10px">'+(open?'▾':'▸')+'</span></td>'+
       ms.map(function(mm){var z=(byGM[k]||{})[mm]||{};var v=z.amt||0,d2=z.drop||0,on=(mm===CURM);
         if(!v&&!d2) return '<td class="c'+(on?'':' z')+'">·</td>';
         return '<td class="c"><b style="color:'+(on?'var(--red)':'#A3595B')+';font-size:11.5px">'+(v?wonC(v):'0')+'</b><div class="org" style="font-weight:600">'+d2+'건'+(z.mw?' / 접수 '+z.mw:'')+'</div></td>';}).join('')+
@@ -3491,7 +3492,7 @@ document.addEventListener('click',function(e){
   if(c&&(e.target.classList.contains('ov')||e.target.closest('.cls'))){CARD=null;render();if(window.__cardScrollY!=null){window.scrollTo(0,window.__cardScrollY);}return;}
   var _wc=e.target.closest('.wc[data-go]');
   if(_wc && !e.target.closest('button,[data-name]')){ SEL=_wc.dataset.go; render(); return; }
-  var b=e.target.closest('button,[data-z],.qrow,[data-bsel2],[data-jnext],[data-jmore],[data-expmore],[data-canmore],[data-mwper],[data-name],[data-go]');
+  var b=e.target.closest('button,[data-z],.qrow,[data-bsel2],[data-jnext],[data-jmore],[data-expmore],[data-canmore],[data-mwper],[data-name],[data-go],[data-gkey]');
   if(!b) return;
   if(b.dataset.tab){TAB=b.dataset.tab;OPENZ={};window.__tOpen=0;window.__cOpen=0;syncMDClass();render();window.scrollTo(0,0);}
   else if(b.dataset.mv){CUR=add(CUR,7*(+b.dataset.mv));SEL=null;render();}
