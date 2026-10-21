@@ -1699,6 +1699,15 @@ function guardBox(){
   var wonK=function(n){return n?Math.round(n/10000):null;};   // 만 단위 정수
   var head=kpi('접수',cur.mw,pv&&pv.mw)+kpi('유지',cur.keep,pv&&pv.keep,'g')+kpi('해지',cur.drop,pv&&pv.drop,'r')+
     kpi('취소금액',wonK(cur.amt),pv&&wonK(pv.amt),'r','만')+
+    kpi('당일취소',cur.dang?cur.dang:null,pv&&pv.dang,'',''+(cur.dangAmt?' <span style="font-size:10px;color:var(--soft)">·'+Math.round(cur.dangAmt/10000)+'만</span>':''))+
+    (function(){ // ★ [2026-10-22] 매출 대비 취소율 — ops.gs salesByM(데일리실적 신규계약 금액) 배포 시 노출
+      var SBM=D.salesByM||{}; if(!Object.keys(SBM).length) return '';
+      var _sl=ALL?Object.keys(SBM).filter(function(m){return m>='2026-05';}).reduce(function(a,m){return a+(SBM[m]||0);},0):(SBM[G]||0);
+      if(!_sl) return '';
+      var _pvSl=prev?(SBM[prev]||0):0;
+      var v=Math.round(cur.amt/_sl*1000)/10, pvv=(pv&&_pvSl)?Math.round(pv.amt/_pvSl*1000)/10:null;
+      return kpi('매출 대비 취소율 <span style="font-size:9px;color:var(--soft)">해지금액÷신규계약</span>',v,pvv,'r','%');
+    })()+
     kpi('진행',cur.ing,pv&&pv.ing)+kpi('방어율',dr(cur),pv&&dr(pv),'g','%');
   // 토글
   var dimSeg='<div class="seg" style="margin-bottom:8px">'+DIMS.map(function(d){return '<button class="'+(DIM===d[0]?'on':'')+'" data-mdim="'+d[0]+'">'+d[1]+'</button>';}).join('')+'</div>';
@@ -1722,7 +1731,7 @@ function guardBox(){
   var isTeach=(DIM==='teach');
   var GK=window.__gkey||null;
   var wonC=function(n){return n?(Math.round(n/1000)/10).toLocaleString('ko-KR')+'만':null;};
-  var COLS=(isTeach?11:10);
+  var COLS=(isTeach?12:11);
   // ★ 담당(지점·상담) 클릭 → 그 기간 회원 단위 상세 (접수일·상태·금액·소속·사유)
   function detailTr(k){
     var L=(A.items[k]||[]).slice().sort(function(a,b){return (b.recv||'').localeCompare(a.recv||'');});
@@ -1757,11 +1766,12 @@ function guardBox(){
       '<td class="c" style="color:var(--red);font-weight:700">'+(c.drop||'<span class="z">·</span>')+'</td>'+
       '<td class="c">'+(c.ing||'<span class="z">·</span>')+'</td>'+
       '<td class="c" style="white-space:nowrap">'+(c.amt?'<b style="color:var(--red)">'+wonC(c.amt)+'</b>':'<span class="z">·</span>')+'</td>'+
+      '<td class="c" style="white-space:nowrap">'+(c.dang?'<b style="color:#B4700A">'+c.dang+'건</b>'+(c.dangAmt?'<div class="org" style="font-weight:600">'+wonC(c.dangAmt)+'</div>':''):'<span class="z">·</span>')+'</td>'+
       '<td>'+(r==null?'<span class="z">결론 없음</span>':bar(r,'var(--pos)')+'<b>'+r+'%</b>')+'</td>'+
       '<td>'+spark(k,'mw')+'</td>'+
       '<td>'+spark(k,'drop')+'</td>'+
       '<td>'+spark(k,'amt')+'</td></tr>'+(open?detailTr(k):'');}).join(''); }
-  var sortf=function(a,b){return A.o[b].mw-A.o[a].mw;};   // 접수 많은 순 고정
+  var sortf=function(a,b){return (A.o[b].amt-A.o[a].amt)||(A.o[b].mw-A.o[a].mw);};   // [2026-10-22] 취소금액 많은 순 (동률 → 접수순)
   // 퇴사·외부 판정 = HR 재직 명단(hrCoach/hrSaup)에 없으면. 명단 미배포시 이용우·정기상만(코칭).
   function _nm(n){return String(n==null?'':n).replace(/\(.*?\)/g,'').replace(/\s/g,'');}
   var hrC=D.hrCoach?(function(){var o={};D.hrCoach.forEach(function(n){o[n]=1;});return o;})():null;
@@ -1774,13 +1784,13 @@ function guardBox(){
   var allK=Object.keys(A.o).filter(function(k){return A.o[k].mw;});
   var retK=allK.filter(isRet).sort(sortf);
   var mainK=allK.filter(function(k){return !isRet(k);}).sort(sortf);
-  var th='<th>'+(DIMS.filter(function(d){return d[0]===DIM;})[0][1])+'</th>'+(isTeach?'<th class="c">관리중</th>':'')+'<th class="c">접수</th><th class="c">유지</th><th class="c">해지</th><th class="c">진행</th><th class="c">취소금액</th><th>방어율</th><th>접수 추이 <span class="z">'+spRange+'</span></th><th>취소 추이</th><th>취소금액 추이 <span class="z">만</span></th>';
+  var th='<th>'+(DIMS.filter(function(d){return d[0]===DIM;})[0][1])+'</th>'+(isTeach?'<th class="c">관리중</th>':'')+'<th class="c">접수</th><th class="c">유지</th><th class="c">해지</th><th class="c">진행</th><th class="c">취소금액</th><th class="c">당일취소</th><th>방어율</th><th>접수 추이 <span class="z">'+spRange+'</span></th><th>취소 추이</th><th>취소금액 추이 <span class="z">만</span></th>';
   var tbl='<div class="scrollx"><table class="tbl"><thead><tr>'+th+'</tr></thead><tbody>'+mkRows(mainK)+
     (retK.length?'<tr><td colspan="'+COLS+'" style="background:#F6F8FB;font-size:11px;font-weight:800;color:var(--soft)">퇴사·외부 (재직 명단에 없음 — 당시 접수 기록)</td></tr>'+mkRows(retK):'')+
     '</tbody></table></div>';
   var per=ALL?'전체':(+G.slice(5))+'월';
   return zone('guard','var(--pos)','관리 현황',per+' · 방어율 '+(dr(cur)==null?'—':dr(cur)+'%'),'분류축·기간을 바꿔 민원·취소를 분해',
-   '<div class="lead">민원 시트에 올라온 취소 문의를 <b>분류축</b>(팀 A/B·사업담당·코칭담당·지점·상담)과 <b>기간</b>으로 쪼갭니다. 오른쪽엔 <b>접수·취소·취소금액 월별 추이(5월~)</b>가 나란히. <b>이름을 누르면</b> 그 기간 회원 단위 상세(접수일·상태·금액·사유)가 펼쳐집니다. 취소금액=해지 건 계약금액 합. 방어율=유지÷(유지+해지), 당일취소 제외. (팀=담임 코칭 기준)</div>'+
+   '<div class="lead">민원 시트에 올라온 취소 문의를 <b>분류축</b>(팀 A/B·사업담당·코칭담당·지점·상담)과 <b>기간</b>으로 쪼갭니다. 오른쪽엔 <b>접수·취소·취소금액 월별 추이(5월~)</b>가 나란히. <b>이름을 누르면</b> 그 기간 회원 단위 상세(접수일·상태·금액·사유)가 펼쳐집니다. 취소금액=<b>해지 건 계약금액 합(당일취소 제외)</b> — 당취 금액이 있으면 +당취로 병기. 방어율=유지÷(유지+해지), 당일취소 제외. (팀=담임 코칭 기준)</div>'+
    dimSeg+mseg+'<div class="kpi">'+head+'</div>'+tbl,true);
 }
 function tLbl2(k){return k;}   // (코칭담당 이름은 그대로 — 팀 라벨 아님)
@@ -2815,15 +2825,21 @@ function flowBox(){
     var dec=x.keep+x.drop, dr=pc(x.keep,dec);
     return Object.assign({},x,{mwR:x.active?pc(x.mw,x.active):null,defR:dr,canR:x.active?pc(x.can,x.active):null,part:x.m===DATA.slice(0,7)});});
   // 월×팀(A/B) 재집계 — 민원(inbox)·취소(can2). 담임 기준.
-  var mwMT={}, canMT={}, kTot={};   // kTot = 월별 막은 금액(유지 건 계약금액 합, 전사)
+  var mwMT={}, canMT={}, kTot={};   // kTot = 월별 막은 계약금액(순 — 유지 후 재취소 건 제외)
+  // ★ [2026-10-22] 순 기준: 유지 판정 후 더 늦은 접수에서 완결(취소)된 회원은 "막은 금액"에서 제외
+  var _kNm=function(n){return String(n||'').replace(/\(.*?\)/g,'').replace(/\s/g,'');};
+  var _byNm={}; (D.inbox||[]).forEach(function(i){(_byNm[_kNm(i.name)]=_byNm[_kNm(i.name)]||[]).push(i);});
+  var _heldNow=function(i){return !(_byNm[_kNm(i.name)]||[]).some(function(o){return o!==i&&o.status==='완결'&&(o.recv||'')>(i.recv||'');});};
   (D.inbox||[]).forEach(function(i){var m=(i.recv||'').slice(0,7);
     var _a=parseInt(String(i.amt||'').replace(/[^0-9]/g,''),10)||0;
-    if(i.status==='유지'&&_a) kTot[m]=(kTot[m]||0)+_a;
+    var _held=(i.status==='유지')&&_a&&_heldNow(i);
+    if(_held) kTot[m]=(kTot[m]||0)+_a;
     var t=teamAB(i.teach);if(t!=='A팀'&&t!=='B팀')return;var tk=t.charAt(0);
     var o=(mwMT[m]=mwMT[m]||{A:{mw:0,keep:0,drop:0,keepAmt:0},B:{mw:0,keep:0,drop:0,keepAmt:0}})[tk];o.mw++;
-    if(i.status==='유지'){o.keep++;o.keepAmt+=_a;} else if(i.status==='완결'&&i.resp!=='당일취소')o.drop++;});
+    if(i.status==='유지'){o.keep++;if(_held)o.keepAmt+=_a;} else if(i.status==='완결'&&i.resp!=='당일취소')o.drop++;});
   (D.can2||[]).forEach(function(x){var m=x.can&&x.can.mon?'2026-'+('0'+x.can.mon).slice(-2):'';var t=teamAB(teachName(x));if(t!=='A팀'&&t!=='B팀')return;var tk=t.charAt(0);
     (canMT[m]=canMT[m]||{A:0,B:0})[tk]++;});
+  var M2={}; col.forEach(function(x){M2[x.m]=x;});   // [2026-10-22] 월→mon2 lookup (팀미상 잔여 계산)
   var trow=function(nm,color,fn){return '<tr><td style="padding-left:30px;color:'+color+';font-weight:700;font-size:11.5px">'+nm+'</td>'+
     col.map(function(x){var v=fn(x.m);return '<td class="c" style="font-size:11px;color:'+color+'">'+(v==null||v===''?'<span class="z">·</span>':v)+'</td>';}).join('')+'</tr>';};
   var AB=function(getA,getB){return trow('└ A팀','#2A42A8',getA)+trow('└ B팀','#117A55',getB);};
@@ -2854,12 +2870,13 @@ function flowBox(){
     AB(mwv('A','mw'),mwv('B','mw'))+
     row('유지','keep',{mw:1,sub:1,col:'var(--pos)'})+
     AB(mwv('A','keep'),mwv('B','keep'))+
-    (function(){ // ★ [2026-10-22] 막은 금액 — 유지 건 계약금액 합 (민원시트 기준)
+    (function(){ // ★ [2026-10-22] 막은 계약금액 — 유지 건 계약금액 합. 실보전액 아님(재이탈 가능·사용대금 미차감)
       var _w=function(v){return v?(Math.round(v/1000)/10).toLocaleString('ko-KR')+'만':null;};
-      var main='<tr><td style="padding-left:22px;color:var(--soft)">막은 금액<div class="org">유지 건 계약금액 합 (민원시트)</div></td>'+
+      var main='<tr><td style="padding-left:22px;color:var(--soft)">막은 계약금액 (순)<div class="org">유지 후 현재까지 취소 안 된 건만 — 재취소분 제외·사용대금 미차감</div></td>'+
         col.map(function(x){var v=kTot[x.m];return '<td class="c" style="color:var(--pos);font-size:11px;font-weight:700">'+(v?_w(v):'<span class="z">·</span>')+'</td>';}).join('')+'</tr>';
       var kamv=function(tk){return function(m){var o=mwMT[m];if(!o)return '';var v=o[tk].keepAmt||0;return v?_w(v):'·';};};
-      return main+AB(kamv('A'),kamv('B'));
+      var kuv=function(m){var t=kTot[m]||0;var o=mwMT[m]||{A:{keepAmt:0},B:{keepAmt:0}};var u=t-(o.A.keepAmt||0)-(o.B.keepAmt||0);return u>0?_w(u):(t?'·':'');};
+      return main+AB(kamv('A'),kamv('B'))+trow('└ 팀 미상·담임없음','var(--soft)',kuv);
     })()+
     row('해지','drop',{mw:1,sub:1,col:'var(--red)'})+
     AB(mwv('A','drop'),mwv('B','drop'))+
@@ -2871,6 +2888,7 @@ function flowBox(){
     sec('취소 (취소입력시트 · 실완결)')+
     row('취소','can',{delta:'dn',col:'var(--red)',tip:'취소입력시트 완결 건 (7월부터)'})+
     AB(canv('A'),canv('B'))+
+    trow('└ 팀 미상·담임없음 <span style="font-weight:600">(당취 포함)</span>','var(--soft)',function(m){var x=M2[m];if(!x||x.can==null)return '';var o=canMT[m]||{A:0,B:0};var u=x.can-o.A-o.B;return u>0?u:'·';})+
     row('당일취소','canDang',{sub:1,tip:'구분=당일취소'})+
     row('재이탈','re',{sub:1,tip:'앞서 민원 유지됐던 회원이 재취소'})+
     row('점검 필요 분류','chk',{sub:1,tip:'고객 오해·관리·수업'})+
@@ -2878,8 +2896,10 @@ function flowBox(){
     (function(){ // ★ [2026-10-22] 팀별 취소금액 — ops.gs canByTeach 배포 시 자동 노출
       var CBT=D.canByTeach||{}; if(!Object.keys(CBT).length) return '';
       var catm={}; Object.keys(CBT).forEach(function(m){var o=CBT[m],r={A:0,B:0};Object.keys(o).forEach(function(t){var tt=teamAB(t);if(tt==='A팀')r.A+=o[t].amt||0;else if(tt==='B팀')r.B+=o[t].amt||0;});catm[m]=r;});
-      var camv=function(tk){return function(m){var o=catm[m];if(!o)return '';var v=o[tk];return v?(Math.round(v/1000)/10).toLocaleString('ko-KR')+'만':'·';};};
-      return AB(camv('A'),camv('B'));
+      var _w2=function(v){return v?(Math.round(v/1000)/10).toLocaleString('ko-KR')+'만':'·';};
+      var camv=function(tk){return function(m){var o=catm[m];if(!o)return '';return _w2(o[tk]);};};
+      var cuv=function(m){var x=M2[m];if(!x||x.canAmt==null)return '';var o=catm[m]||{A:0,B:0};var u=x.canAmt-(o.A||0)-(o.B||0);return u>0?_w2(u):'·';};
+      return AB(camv('A'),camv('B'))+trow('└ 팀 미상·담임없음 <span style="font-weight:600">(당취 포함)</span>','var(--soft)',cuv);
     })()+
     '</tbody></table></div>';
   return zone('flow','var(--pos)','월별 흐름','','관리 → 민원 → 결과 → 취소를 달마다',
