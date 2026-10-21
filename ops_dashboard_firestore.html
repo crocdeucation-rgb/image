@@ -1383,7 +1383,12 @@ function weekBox(){
       return '<div class="ws '+cls+'"><em>'+t+'</em><span>'+n+'</span></div><ul class="wl">'+items.slice(0,max).join('')+
         (n>max?'<li class="more2"><button data-go="'+d+'">외 '+(n-max)+' →</button></li>':'')+'</ul>';};
     var evItems=ppl.map(function(n){var L=g[n],dn=L.every(function(x){return x.st==='done';}),ms=L.some(function(x){return x.st==='miss';});
+      // [2026-10-22] 사업·상담 지점 병기 — 여정(JBYN) 우선, 없으면 이벤트 필드 폴백 (날짜별 상세 jr-meta와 동일 소스)
+      var _j=JBYN[String(n).replace(/\(.*?\)/g,'').replace(/\s/g,'')]||{};
+      var _sg=_j.sang||L[0].sang||'', _sa=_j.saup||L[0].saup||'', _b=_j.br||L[0].br||'';
+      var _bt=(_sg?'상담 '+_sg:'')+(_sg&&_sa?'·':'')+(_sa?'사업 '+_sa:''); if(!_bt)_bt=_b;
       return '<li><button data-name="'+esc(n)+'">'+(L[0].time?'<i>'+L[0].time+'</i>':'')+esc(n)+'</button>'+L.map(function(x){return '<span class="kbadge '+esc(x.kind)+'">'+esc(x.kind)+'</span>';}).join('')+
+        (_bt?'<small>'+esc(_bt)+'</small>':'')+
         (d<TODAY?(dn?'<b class="ok">✓</b>':(ms?'<b class="ng">칸 비어 있음</b>':'')):'')+'</li>';});
     var xItems=X.map(function(o){return '<li><button data-name="'+esc(o.m.n)+'">'+esc(o.m.n)+'</button><small>'+esc(o.c)+'</small>'+
       (o.m.mw?'<b class="'+(mwRes(o.m)==='진행'?'ng':'mu')+'">민원 '+mwRes(o.m)+'</b>':'')+'</li>';});
