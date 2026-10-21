@@ -1249,7 +1249,12 @@ function brTxt(b,sg,sa){var P=[];if(b)P.push(esc(b));if(sg)P.push('상담 '+esc(
 function saupOfName(n){ var j=JBYN[String(n||'').replace(/\(.*?\)/g,'').replace(/\s/g,'')]||{}; if(j.saup) return j.saup; return todoLook(n).saup||''; }
 function saupHit(sa){ return !SAUP || sa===SAUP; }
 function saupList(){ var m={}; Object.keys(CO).forEach(function(c){['live','exp'].forEach(function(k){(CO[c][k]||[]).forEach(function(x){if(x.saup)m[x.saup]=1;});});});
-  (D.journey||[]).forEach(function(j){if(j.saup)m[j.saup]=1;}); return Object.keys(m).sort(function(a,b){return a.localeCompare(b,'ko');}); }
+  (D.journey||[]).forEach(function(j){if(j.saup)m[j.saup]=1;});
+  var names=Object.keys(m);
+  // [2026-10-22] 재직 중인 사업부만 노출 — HR 재직 명단(hrSaup) 교집합. 명단 미배포 시 전체.
+  if(D.hrSaup&&D.hrSaup.length){ var _n=function(x){return String(x==null?'':x).replace(/\(.*?\)/g,'').replace(/\s/g,'');};
+    var hs={}; D.hrSaup.forEach(function(x){hs[_n(x)]=1;}); names=names.filter(function(x){return hs[_n(x)];}); }
+  return names.sort(function(a,b){return a.localeCompare(b,'ko');}); }
 var HOL=D.holidays||{}; var TODAY=D.today, DATA=D.dataTo, CUR=TODAY, SEL=null, TAB='all', CARD=null, OPENZ={}, MISS=null, CTAB='live', BR='', SAUP='', Q='';
 // 담임(코칭) 이름 → A팀/B팀 : 취소·민원·진단을 팀별로 쪼갤 때 공용 (1팀=A, 2팀=B)
 var _TEAMAB=(function(){var o={};Object.keys(CO).forEach(function(k){var t=CO[k]&&CO[k].team,ab=t==='1팀'?'A팀':t==='2팀'?'B팀':'';if(ab)o[String(k).replace(/\(.*?\)/g,'').replace(/\s+/g,'')]=ab;});return o;})();
