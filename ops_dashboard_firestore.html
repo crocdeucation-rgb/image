@@ -2764,19 +2764,22 @@ function teamCompareBox(){
   (D.can2||[]).forEach(function(x){if(!inBr(x))return;var t=teamAB(teachName(x));if(t!=='A팀'&&t!=='B팀')return;var tk=t.charAt(0);if(mk(x)===mon)T[tk].can++;});
   var S=window.SALESMTD;
   var wM=function(n){return (Math.round(n/1000)/10).toLocaleString()+'만';};
-  var dr=function(o){var c=o.keep+o.drop;return c?Math.round(o.keep/c*1000)/10:null;};
   var moN=(+mon.slice(5));
+  // ★ [2026-10-22] 팀별 취소금액 — ops.gs canByTeach(담임별 취소 건·금액) 배포 시 금액 병기, 전엔 건수만
+  var CT=(D.canByTeach||{})[mon]||null;
+  var cAB={A:{c:0,amt:0},B:{c:0,amt:0}};
+  if(CT){Object.keys(CT).forEach(function(t){var tt=teamAB(t);if(tt!=='A팀'&&tt!=='B팀')return;var k=tt.charAt(0);cAB[k].c+=CT[t].cnt||0;cAB[k].amt+=CT[t].amt||0;});}
+  var canCell=function(k){return CT?(cAB[k].c+'건·'+wM(cAB[k].amt)):T[k].can;};
   var rows=[
     ['관리중',T.A.live+'명',T.B.live+'명','현재 코칭 담당'],
     ['민원 진행',T.A.mwOpen,T.B.mwOpen,'미해결 접수'],
-    ['방어율',dr(T.A)==null?'—':dr(T.A)+'%',dr(T.B)==null?'—':dr(T.B)+'%','유지÷(유지+해지)'],
-    ['취소('+moN+'월)',T.A.can,T.B.can,'취소입력시트'],
+    ['취소('+moN+'월)',canCell('A'),canCell('B'),'취소입력시트'+(CT?' · 건수·취소매출':'')],
     ['자체매출('+moN+'월)',S&&S.by.A?S.by.A.c+'건·'+wM(S.by.A.amt):'—',S&&S.by.B?S.by.B.c+'건·'+wM(S.by.B.amt):'—','추가계약']
   ];
   var body='<div class="scrollx"><table class="tbl tcmp"><thead><tr><th>지표</th><th class="c">A팀</th><th class="c">B팀</th><th>기준</th></tr></thead><tbody>'+
     rows.map(function(r){return '<tr><td style="font-weight:800">'+r[0]+'</td><td class="c" style="color:#2A42A8;font-weight:800">'+r[1]+'</td><td class="c" style="color:#117A55;font-weight:800">'+r[2]+'</td><td class="z">'+r[3]+'</td></tr>';}).join('')+'</tbody></table></div>';
-  return zone('tcmp','var(--v1)','팀 비교 (A vs B)','담임 코칭 기준','관리중·민원·방어율·취소·매출을 두 팀 나란히',
-    '<div class="lead">담임 코칭 기준으로 A팀·B팀 핵심 지표를 나란히 둡니다. 전체 총계는 각 섹션에서 보고, 여기선 두 팀 격차만 빠르게. (가입·리드는 담임이 없어 제외)</div>'+body,true);
+  return zone('tcmp','var(--v1)','팀 비교 (A vs B)','이번 달 스냅샷','현재 관리중·민원·이달 취소·자체매출만 — 월별 추이는 아래 월별 흐름',
+    '<div class="lead">담임 코칭 기준의 <b>현재·이달 스냅샷</b>입니다 (관리중·미해결 민원·이달 취소·자체매출). 방어율·민원 등 월별 A/B 추이는 아래 <b>월별 흐름</b>에 있어 여기선 뺐습니다. (가입·리드는 담임이 없어 제외)</div>'+body,true);
 }
 function flowBox(){
   var M=D.mon2||[];
@@ -2835,6 +2838,12 @@ function flowBox(){
     row('재이탈','re',{sub:1,tip:'앞서 민원 유지됐던 회원이 재취소'})+
     row('점검 필요 분류','chk',{sub:1,tip:'고객 오해·관리·수업'})+
     row('취소 금액','canAmt',{sub:1,money:1,col:'var(--red)',tip:'취소매출 = 계약금액 − 사용대금'})+
+    (function(){ // ★ [2026-10-22] 팀별 취소금액 — ops.gs canByTeach 배포 시 자동 노출
+      var CBT=D.canByTeach||{}; if(!Object.keys(CBT).length) return '';
+      var catm={}; Object.keys(CBT).forEach(function(m){var o=CBT[m],r={A:0,B:0};Object.keys(o).forEach(function(t){var tt=teamAB(t);if(tt==='A팀')r.A+=o[t].amt||0;else if(tt==='B팀')r.B+=o[t].amt||0;});catm[m]=r;});
+      var camv=function(tk){return function(m){var o=catm[m];if(!o)return '';var v=o[tk];return v?(Math.round(v/1000)/10).toLocaleString('ko-KR')+'만':'·';};};
+      return AB(camv('A'),camv('B'));
+    })()+
     '</tbody></table></div>';
   return zone('flow','var(--pos)','월별 흐름','','관리 → 민원 → 결과 → 취소를 달마다',
     '<div class="lead">총합은 시점이 섞여 흐름이 안 보여서 <b>달마다</b> 나눕니다. ▲▼는 전월 대비. 민원(방어)은 민원 시트 월 탭 기준(2~4월 없음), 취소 금액·건수는 취소입력시트 실완결 기준(7월부터 운영 — 5·6월은 미기재). '+
@@ -3371,8 +3380,8 @@ function render(){
   var el=document.getElementById('app');
   if(TAB==='all'){
     var SEC=[['이번 주 할 일',[['todosum','이번 주 처리·실적',todoSummaryBox],['onbhub','온보딩 허브',onbHubBox],['exp','관리기간 만료 예정',expBox]]],
-             ['관리 현황',[['guard','분해 (담당·지점별)',guardBox],['can','취소 문의',canBox]]],
-             ['분석',[['tcmp','팀 비교 (A vs B)',teamCompareBox],['flow','월별 흐름',flowBox],['funnel','월별 진단',funnelBox],['trend','월별 추이',trendBox],['dev','기기 · 설치 트러블',devBox]]]];
+             ['관리 현황',[['guard','분해 (담당·지점별)',guardBox],['can','취소 문의',canBox],['dev','기기 · 설치 트러블',devBox]]],
+             ['분석',[['tcmp','팀 비교 (A vs B)',teamCompareBox],['flow','월별 흐름',flowBox],['funnel','월별 진단',funnelBox],['trend','월별 추이',trendBox]]]];
     var anchor='<div class="anch sticky">'+SEC.map(function(g){
         return '<span class="anch-g">'+g[0]+'</span>'+g[1].map(function(z){return '<button data-anch="'+z[0]+'">'+esc(z[1])+'</button>';}).join('');}).join('<span class="anch-sep"></span>')+'</div>';
     el.innerHTML=anchor+SEC.map(function(g,gi){
