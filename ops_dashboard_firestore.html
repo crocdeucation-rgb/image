@@ -298,6 +298,11 @@ details[open]>.more::before{content:'▾ '}
 .gmsec>summary::-webkit-details-marker{display:none}
 .gmsec>summary::before{content:'▸ ';color:var(--soft)}
 .gmsec[open]>summary::before{content:'▾ '}
+/* [2026-10-22] 담당 모달 내역 타이포 위계 고정 — .card 상속 차단 */
+.gdtl{font-size:12px;line-height:1.55;color:var(--ink);font-weight:500}
+.gdtl .gnm{border:0;background:none;cursor:pointer;padding:0;font-family:inherit;font-size:12.5px;font-weight:800;color:var(--ink)}
+.gdtl .gnm:hover{text-decoration:underline}
+.gdtl .tag{font-size:10px}
 .chart svg text{font-family:inherit}
 .wl.scroll{max-height:250px;overflow-y:auto}
 .sech2{font-size:14.5px;font-weight:900;margin:18px 0 10px;padding-top:14px;border-top:1px dashed var(--line)}
@@ -1750,7 +1755,7 @@ function guardBox(){
       var meta=[]; if(DIM!=='saup'&&m.saup)meta.push(SA_O+esc(m.saup)+SA_C); if(DIM!=='br'&&m.br)meta.push(esc(m.br)); if(DIM!=='sang'&&m.sang)meta.push('상담 '+esc(m.sang)); if(DIM!=='teach'&&m.teach&&m.teach!=='-')meta.push('담임 '+esc(m.teach));
       return '<div style="display:flex;gap:8px;align-items:baseline;padding:3px 0;border-bottom:1px solid #F0F2F7;flex-wrap:wrap">'
         +'<span class="z" style="flex:none;font-size:10.5px;min-width:34px">'+(m.recv?md(m.recv):'—')+'</span>'
-        +'<button class="nmbtn" data-name="'+esc(m.name)+'" style="font-weight:800;border:0;background:none;font:inherit;cursor:pointer;padding:0">'+esc(m.name)+'</button>'
+        +'<button class="gnm" data-name="'+esc(m.name)+'">'+esc(m.name)+'</button>'
         +(m.grade?'<span class="z" style="font-size:10.5px">'+esc(m.grade)+'</span>':'')
         +st(m)
         +((_a&&(bk==='drop'||bk==='dang'))?'<b style="color:var(--red);font-size:11px">'+wonC(_a)+'</b>':'')
@@ -1796,7 +1801,7 @@ function guardBox(){
   }
   // ★ [2026-10-22] 담당 클릭 = 회원 카드와 같은 모달 — 검증된 오버레이 패턴 재사용
   window.__gcardHtml=function(k){
-    return '<div class="ov" data-close="1"><div class="card"><button class="cls" data-close="1">✕</button><div style="padding:4px 2px">'+gBody(k)+'</div></div></div>';
+    return '<div class="ov" data-close="1"><div class="card"><button class="cls" data-close="1">✕</button><div class="gdtl" style="padding:4px 2px">'+gBody(k)+'</div></div></div>';
   };
   // ★ [2026-10-22] 민원표식 매트릭스 — 행=담당, 열=월(5월~). 셀=취소금액(만)+건수. 이름 클릭 → 교차차트+월별 건별 상세
   var CURM=DATA.slice(0,7);
