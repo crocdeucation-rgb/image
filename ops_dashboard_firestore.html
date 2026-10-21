@@ -1702,38 +1702,27 @@ function guardBox(){
     kpi('진행',cur.ing,pv&&pv.ing)+kpi('방어율',dr(cur),pv&&dr(pv),'g','%');
   // 토글
   var dimSeg='<div class="seg" style="margin-bottom:8px">'+DIMS.map(function(d){return '<button class="'+(DIM===d[0]?'on':'')+'" data-mdim="'+d[0]+'">'+d[1]+'</button>';}).join('')+'</div>';
-  // [2026-10-22] 추이 지표 토글 — 방어율·취소(해지)·접수를 분류축별 월별 추이로
-  var MET=window.__gmet||'dr';
-  var METS=[['dr','방어율 추이'],['drop','취소 추이'],['amt','취소금액 추이'],['mw','접수 추이']];
-  var metSeg='<div class="seg" style="margin-bottom:10px">'+METS.map(function(x){return '<button class="'+(MET===x[0]?'on':'')+'" data-gmet="'+x[0]+'">'+x[1]+'</button>';}).join('')+'</div>';
+  // [2026-10-22] 추이 3종(접수·취소·취소금액)을 토글 없이 나란히 — 방어율 추이 토글 제거
   var mseg='<div class="seg" style="margin-bottom:10px">'+ms.map(function(m){
     return '<button class="'+(!ALL&&m===G?'on':'')+'" data-gm="'+m+'">'+(+m.slice(5))+'월'+(m===DATA.slice(0,7)?' (진행 중)':'')+'</button>';}).join('')+
     '<button class="'+(ALL?'on':'')+'" data-gm="all">전체</button></div>';
   // 정렬 토글 제거 — 접수 많은 순 고정 (방어율 컬럼은 유지)
   var bar=function(r,col){return '<div style="display:inline-block;width:44px;height:6px;background:#EEF1F6;border-radius:3px;overflow:hidden;vertical-align:middle;margin-right:6px"><i style="display:block;height:100%;width:'+Math.min(r||0,100)+'%;background:'+col+'"></i></div>';};
-  var spark=function(k){
-    if(MET==='dr'){
-      return '<div class="spk">'+ms.map(function(mm){var z=(byGM[k]||{})[mm]||{keep:0,drop:0,mw:0};var q=z.keep+z.drop;var r=q?pc(z.keep,q):null;
-        var h=r!=null?Math.max(3,Math.round(r/100*26)):2, on=(!ALL&&mm===G);
-        var col=r==null?'#E3E8F0':(on?'var(--v1)':(r>=55?'#9DB8EE':'#C9D3E6'));
-        return '<span title="'+(+mm.slice(5))+'월 · 접수 '+z.mw+(r!=null?' · 방어율 '+r+'%':' · 결론 없음')+'"><i style="height:'+h+'px;background:'+col+'"></i><em>'+(r!=null?Math.round(r):'·')+'</em></span>';}).join('')+'</div>';
-    }
-    // 건수·금액 지표(취소=drop / 취소금액=amt / 접수=mw) — 행 내 최대값 기준 상대 높이
-    var isAmt=(MET==='amt'), red=(MET==='drop'||isAmt);
-    var vmax=1; ms.forEach(function(mm){var z=(byGM[k]||{})[mm]; if(z&&z[MET]>vmax)vmax=z[MET];});
-    return '<div class="spk">'+ms.map(function(mm){var z=(byGM[k]||{})[mm]||{keep:0,drop:0,mw:0,amt:0};var v=z[MET]||0;
+  var spark=function(k,met){
+    var isAmt=(met==='amt'), red=(met==='drop'||isAmt);
+    var vmax=1; ms.forEach(function(mm){var z=(byGM[k]||{})[mm]; if(z&&z[met]>vmax)vmax=z[met];});
+    return '<div class="spk">'+ms.map(function(mm){var z=(byGM[k]||{})[mm]||{keep:0,drop:0,mw:0,amt:0};var v=z[met]||0;
       var h=v?Math.max(3,Math.round(v/vmax*26)):2, on=(!ALL&&mm===G);
       var col=!v?'#E3E8F0':(on?(red?'var(--red)':'var(--v1)'):(red?'#F0B1B1':'#C9D3E6'));
       var lab=isAmt?(v?Math.round(v/10000):'·'):(v||'·');
-      var tip=isAmt?('취소금액 '+(Math.round(v/1000)/10).toLocaleString('ko-KR')+'만'):((MET==='drop'?'취소 ':'접수 ')+v+'건');
+      var tip=isAmt?('취소금액 '+(Math.round(v/1000)/10).toLocaleString('ko-KR')+'만'):((met==='drop'?'취소 ':'접수 ')+v+'건');
       return '<span title="'+(+mm.slice(5))+'월 · '+tip+'"><i style="height:'+h+'px;background:'+col+'"></i><em>'+lab+'</em></span>';}).join('')+'</div>';
   };
-  var _metNm={dr:'방어율',drop:'취소',amt:'취소금액(만)',mw:'접수'}[MET];
-  var spLab=ms.length?((+ms[0].slice(5))+'~'+(+ms[ms.length-1].slice(5))+'월 '+_metNm):_metNm+' 추이';
+  var spRange=ms.length?((+ms[0].slice(5))+'~'+(+ms[ms.length-1].slice(5))+'월'):'';
   var isTeach=(DIM==='teach');
   var GK=window.__gkey||null;
   var wonC=function(n){return n?(Math.round(n/1000)/10).toLocaleString('ko-KR')+'만':null;};
-  var COLS=(isTeach?10:9);
+  var COLS=(isTeach?11:10);
   // ★ 담당(지점·상담) 클릭 → 그 기간 회원 단위 상세 (접수일·상태·금액·소속·사유)
   function detailTr(k){
     var L=(A.items[k]||[]).slice().sort(function(a,b){return (b.recv||'').localeCompare(a.recv||'');});
@@ -1761,16 +1750,17 @@ function guardBox(){
     var act=(isTeach&&CO[k])?CO[k].live.length:null;
     var d=(r!=null&&pr!=null)?Math.round((r-pr)*10)/10:null;
     var open=(GK===k);
-    return '<tr'+(open?' style="background:#FAFBFD"':'')+'><td><button data-gkey="'+esc(k)+'" style="border:0;background:none;font:inherit;font-weight:800;cursor:pointer;padding:0">'+(open?'▾ ':'▸ ')+esc(isTeach?tLbl2(k):k)+'</button></td>'+
+    return '<tr'+(open?' style="background:#FAFBFD"':'')+'><td><button data-gkey="'+esc(k)+'" style="border:0;background:none;font:inherit;font-weight:800;cursor:pointer;padding:0" title="누르면 회원 단위 상세">'+esc(isTeach?tLbl2(k):k)+'</button></td>'+
       (isTeach?'<td class="c">'+(act!=null?act:'<span class="z">·</span>')+(act&&c.mw?'<div class="org" style="font-weight:600">접수율 '+pc(c.mw,act)+'%</div>':'')+'</td>':'')+
       '<td class="c"><b>'+c.mw+'</b></td>'+
       '<td class="c" style="color:var(--pos);font-weight:700">'+(c.keep||'<span class="z">·</span>')+'</td>'+
       '<td class="c" style="color:var(--red);font-weight:700">'+(c.drop||'<span class="z">·</span>')+'</td>'+
-      '<td class="c" style="white-space:nowrap">'+(c.amt?'<b style="color:var(--red)">'+wonC(c.amt)+'</b>':'<span class="z">·</span>')+(prev&&p.amt?'<div class="org" style="font-weight:600">전월 '+wonC(p.amt)+'</div>':'')+'</td>'+
       '<td class="c">'+(c.ing||'<span class="z">·</span>')+'</td>'+
+      '<td class="c" style="white-space:nowrap">'+(c.amt?'<b style="color:var(--red)">'+wonC(c.amt)+'</b>':'<span class="z">·</span>')+'</td>'+
       '<td>'+(r==null?'<span class="z">결론 없음</span>':bar(r,'var(--pos)')+'<b>'+r+'%</b>')+'</td>'+
-      '<td class="c" style="white-space:nowrap">'+(pr==null?'<span class="z">—</span>':pr+'%'+(d?'<div style="font-size:10.5px;font-weight:700;color:'+(d>0?'var(--pos)':'var(--red)')+'">'+(d>0?'▲':'▼')+Math.abs(d)+'</div>':''))+'</td>'+
-      '<td>'+spark(k)+'</td></tr>'+(open?detailTr(k):'');}).join(''); }
+      '<td>'+spark(k,'mw')+'</td>'+
+      '<td>'+spark(k,'drop')+'</td>'+
+      '<td>'+spark(k,'amt')+'</td></tr>'+(open?detailTr(k):'');}).join(''); }
   var sortf=function(a,b){return A.o[b].mw-A.o[a].mw;};   // 접수 많은 순 고정
   // 퇴사·외부 판정 = HR 재직 명단(hrCoach/hrSaup)에 없으면. 명단 미배포시 이용우·정기상만(코칭).
   function _nm(n){return String(n==null?'':n).replace(/\(.*?\)/g,'').replace(/\s/g,'');}
@@ -1784,14 +1774,14 @@ function guardBox(){
   var allK=Object.keys(A.o).filter(function(k){return A.o[k].mw;});
   var retK=allK.filter(isRet).sort(sortf);
   var mainK=allK.filter(function(k){return !isRet(k);}).sort(sortf);
-  var th='<th>'+(DIMS.filter(function(d){return d[0]===DIM;})[0][1])+'</th>'+(isTeach?'<th class="c">관리중</th>':'')+'<th class="c">접수</th><th class="c">유지</th><th class="c">해지</th><th class="c">취소금액</th><th class="c">진행</th><th>방어율</th><th class="c">전월</th><th>'+spLab+'</th>';
+  var th='<th>'+(DIMS.filter(function(d){return d[0]===DIM;})[0][1])+'</th>'+(isTeach?'<th class="c">관리중</th>':'')+'<th class="c">접수</th><th class="c">유지</th><th class="c">해지</th><th class="c">진행</th><th class="c">취소금액</th><th>방어율</th><th>접수 추이 <span class="z">'+spRange+'</span></th><th>취소 추이</th><th>취소금액 추이 <span class="z">만</span></th>';
   var tbl='<div class="scrollx"><table class="tbl"><thead><tr>'+th+'</tr></thead><tbody>'+mkRows(mainK)+
     (retK.length?'<tr><td colspan="'+COLS+'" style="background:#F6F8FB;font-size:11px;font-weight:800;color:var(--soft)">퇴사·외부 (재직 명단에 없음 — 당시 접수 기록)</td></tr>'+mkRows(retK):'')+
     '</tbody></table></div>';
   var per=ALL?'전체':(+G.slice(5))+'월';
   return zone('guard','var(--pos)','관리 현황',per+' · 방어율 '+(dr(cur)==null?'—':dr(cur)+'%'),'분류축·기간을 바꿔 민원·취소를 분해',
-   '<div class="lead">민원 시트에 올라온 취소 문의를 <b>분류축</b>(팀 A/B·사업담당·코칭담당·지점·상담)과 <b>기간</b>으로 쪼갭니다. <b>담당·지점 이름을 누르면</b> 그 기간 회원 단위 상세(접수일·상태·금액·사유)가 펼쳐집니다. 취소금액=해지 건 계약금액 합(당일취소 별도). 방어율=유지÷(유지+해지), 당일취소 제외. (팀=담임 코칭 기준)</div>'+
-   dimSeg+metSeg+mseg+'<div class="kpi">'+head+'</div>'+tbl,true);
+   '<div class="lead">민원 시트에 올라온 취소 문의를 <b>분류축</b>(팀 A/B·사업담당·코칭담당·지점·상담)과 <b>기간</b>으로 쪼갭니다. 오른쪽엔 <b>접수·취소·취소금액 월별 추이(5월~)</b>가 나란히. <b>이름을 누르면</b> 그 기간 회원 단위 상세(접수일·상태·금액·사유)가 펼쳐집니다. 취소금액=해지 건 계약금액 합. 방어율=유지÷(유지+해지), 당일취소 제외. (팀=담임 코칭 기준)</div>'+
+   dimSeg+mseg+'<div class="kpi">'+head+'</div>'+tbl,true);
 }
 function tLbl2(k){return k;}   // (코칭담당 이름은 그대로 — 팀 라벨 아님)
 
@@ -3468,7 +3458,6 @@ document.addEventListener('click',function(e){
   else if(b.dataset.cg){window.__cg=b.dataset.cg;render();}
   else if(b.dataset.gsort){window.__gsort=b.dataset.gsort;render();}
   else if(b.dataset.mdim){window.__mdim=b.dataset.mdim;render();}
-  else if(b.dataset.gmet){window.__gmet=b.dataset.gmet;render();}
   else if(b.dataset.gkey!==undefined){window.__gkey=(window.__gkey===b.dataset.gkey?null:b.dataset.gkey);render();}
   else if(b.dataset.onbtab){window.__onbtab=b.dataset.onbtab;render();}
   else if(b.dataset.wkstep!==undefined){window.__wkstep=(window.__wkstep===b.dataset.wkstep?'':b.dataset.wkstep);render();}
