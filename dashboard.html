@@ -311,6 +311,7 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 .visit-assignee.noh { background: #0d9488; }
 .visit-assignee.won { background: #b45309; }
 .visit-assignee.ahn { background: #4338ca; }
+.visit-assignee.seul { background: #db2777; }
 .visit-empty { padding: 20px; text-align: center; color: #aaa; font-size: 12px; }
   .crate { font-size:10px; margin-top:3px; font-weight:600; }
   .route-eff { font-size:9px; margin-top:2px; color:#556; font-weight:600; letter-spacing:-0.2px; }
@@ -736,7 +737,7 @@ const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJ
     const LEDGER_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBUBxnTPPn_AebCqxIC8Q2x-5V3VuvIY6MM6QlgKVUUA7Bbjh3jMO7q6i4sDgQse-UKsNGe5Hxt7QF/pub?gid=431762866&single=true&output=csv';
     const CANCEL_CSV_URL = 'https://docs.google.com/spreadsheets/d/1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU/gviz/tq?tqx=out:csv&headers=0&gid=431762866';
 
-const ASSIGNEES = ['우혜림','김윤호','장윤호','박창건','김태석','노영호','김원득','김우진','안준섭','김주환'];
+const ASSIGNEES = ['우혜림','김윤호','장윤호','박창건','김태석','노영호','김원득','김우진','안준섭','김주환','김슬기'];
 // [2026-09-02] 담당자 수 변동(김주환 추가 등)에도 안 깨지게 — 고정 행번호 대신 라벨로 탐색.
 //   시트 '담당자' 헤더 다음행 = 담당자 데이터 시작 / '캠페인' 헤더 = 캠페인 블록 시작.
 //   (옛 고정값 46/58은 담당자 10명 기준. 11명 되며 캠페인이 60으로 밀려 0으로 뜬 사건 방지.)
@@ -2032,7 +2033,7 @@ async function loadSchedule() {
       const isToday = dStr === todayStr;
       const dateStr = (d.getMonth()+1) + '/' + d.getDate() + ' (' + dayNames[d.getDay()] + ')';
       const assignee = r[6] || '';
-      const cmap = { '우혜림':'hye','김윤호':'kim','장윤호':'jang','박창건':'park','김우진':'woo','김태석':'tae','김성윤':'sung','노영호':'noh','김원득':'won','안준섭':'ahn' };
+      const cmap = { '우혜림':'hye','김윤호':'kim','장윤호':'jang','박창건':'park','김우진':'woo','김태석':'tae','김성윤':'sung','노영호':'noh','김원득':'won','안준섭':'ahn','김슬기':'seul' };
       const assigneeClass = 'visit-assignee ' + (cmap[assignee] || '');
       const assigneeHtml = assignee ? `<span class="${assigneeClass}">${escapeHtml(assignee)}</span>` : '';
       const pageId = (r[7] || '').replace(/-/g, '');
