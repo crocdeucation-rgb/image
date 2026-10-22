@@ -1,495 +1,2016 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>그로스 스테이터스</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
-<style>
-:root{
-  --bg:#eef0f4; --card:#ffffff; --line:#e8eaef; --ink:#1a1d24; --sub:#8b93a2;
-  --blue:#1a73e8; --green:#0f9d58; --purple:#9333ea; --amber:#f4b400; --red:#e11d48;
-  --cyan:#0891b2; --shadow:0 1px 2px rgba(20,25,40,.04),0 4px 16px rgba(20,25,40,.05);
-}
-*{box-sizing:border-box;margin:0;padding:0;font-family:'Pretendard',-apple-system,system-ui,sans-serif}
-body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settings:"tnum"}
-.top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.top h1{font-size:19px;font-weight:800;letter-spacing:-.03em}
-.top .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px rgba(15,157,88,.15)}
-.top .upd{font-size:11.5px;color:var(--sub)}
-.top .rf{margin-left:auto;font-size:12px;padding:6px 13px;border:1px solid var(--line);border-radius:9px;background:var(--card);cursor:pointer;color:#5a6272;font-weight:600}
-.top .rf:hover{border-color:#cdd2db}
+var NOTION_TOKEN = PropertiesService.getScriptProperties().getProperty('NOTION_TOKEN');
+var DATABASE_ID  = PropertiesService.getScriptProperties().getProperty('DATABASE_ID');
 
-.sec-nav{display:none;justify-content:center;gap:6px;margin-bottom:12px}
-.sec-nav-btn{font-size:12px;font-weight:700;padding:6px 16px;border-radius:16px;border:1px solid var(--line);background:var(--card);color:#7a828f;cursor:pointer;letter-spacing:-.01em}
-.sec-nav-btn.on{background:var(--blue);color:#fff;border-color:var(--blue)}
-
-.board{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:14px;height:calc(100vh - 62px)}
-.colwrap{display:flex;flex-direction:column;gap:12px;min-height:0}
-.mid{display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:12px;min-height:0}
-@media (min-width:1241px){
-  .sec-nav{display:none}
-  .colwrap.sec{display:flex!important}
-  .mid.sec{display:grid!important}
+// ============================================
+// [개인 ROAS용] 소재/채널 CPL 가중 + 소재키 정규화 (2026-08 개편)
+// 받은 DB 전체의 획득원가(CPL 합) 대비 매출 = 담당자 개인 ROAS
+// ── 2026-08-04 메타 CPL 8월 실측 갱신 (MCP ads_get_ad_entities, 8/1~8/4 MTD) ──
+//   위너 하드코딩이 실측의 절반이었음(노트릴스 16,591→26,363 / 노필릴스 13,512→24,922).
+//   투입원가 과소평가 → 개인ROAS 과대평가 문제 교정.
+//   신규 소재 3종(원톱·5단계루틴·기초부족) 추가. 표본 2~3건이라 잠정값(리드 쌓이면 갱신).
+//   너만본다는 8월 1건에 270,649(노이즈)라 과거값 30,946 유지(정지 소재).
+// ============================================
+// [2026-09-19] 대쉬보드 매일 갱신 — getLeadStats → 순위 → Firestore 순서.
+// ★ [2026-10-17 분리] 한 통에 3개(getLeadStats+순위+Firestore) 넣어 6분 초과 → 2개 트리거로 분리.
+//   dashPush = getLeadStats만 / dashFirestorePush = 순위+Firestore. 각자 6분 예산.
+//   ▸ 트리거: dashPush 매시 1회, dashFirestorePush 매시 1회(아무 분, 시트 현재상태를 읽으므로 타이밍 무관).
+function dashPush(){
+  var log=[];
+  try{ getLeadStats();        log.push('✅ getLeadStats'); }catch(e){ log.push('❌ getLeadStats: '+e); }
+  Logger.log('===== dashPush(getLeadStats) 완료 =====\n'+log.join('\n'));
 }
 
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
-.ch{display:flex;align-items:center;gap:8px;padding:11px 15px 10px;border-bottom:1px solid var(--line)}
-.ch .t{font-size:13px;font-weight:800;letter-spacing:-.02em}
-.ch .cnt{font-size:11px;font-weight:800;color:#fff;border-radius:20px;padding:1px 8px;min-width:20px;text-align:center}
-.ch .sp{margin-left:auto}
-.ch .tabs{display:flex;gap:4px}
-.tab{font-size:11px;padding:3px 9px;border-radius:14px;border:1px solid var(--line);background:#fff;color:#7a828f;cursor:pointer;font-weight:600;white-space:nowrap}
-.tab.on{background:var(--blue);color:#fff;border-color:var(--blue)}
-.pad{padding:12px 14px}
-.scroll{overflow-y:auto;min-height:0}
-.scroll::-webkit-scrollbar{width:7px} .scroll::-webkit-scrollbar-thumb{background:#d5d9e0;border-radius:4px}
-
-.sales{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 14px}
-.sc{background:#fafbfc;border:1px solid var(--line);border-radius:11px;padding:9px 10px;text-align:center}
-.sc .l{font-size:10px;color:var(--sub);margin-bottom:3px} .sc .l b{color:#b8bec9;font-weight:700;margin-left:2px}
-.sc .v{font-size:15px;font-weight:800;letter-spacing:-.02em}
-.sc.now .v{color:var(--purple)}
-
-.pfwrap{overflow:auto}
-.pf{width:100%;border-collapse:collapse;font-size:11.5px;white-space:nowrap}
-.pf th{position:sticky;top:0;background:#f5f7fb;color:#5b6472;font-weight:700;font-size:10.5px;padding:7px 6px;text-align:center;border-bottom:1px solid var(--line)}
-.pf td{padding:7px 6px;text-align:center;border-bottom:1px solid #f4f5f8}
-.pf tr:last-child td{border-bottom:none}
-.pf tr.tot{background:#fafbfd;font-weight:800} .pf tr.tot td{border-top:1.5px solid var(--line)}
-.pf td.nm{text-align:left;font-weight:800;color:#3c434f;padding-left:12px}
-.pf .db{color:var(--blue);font-weight:700} .pf .vs{color:var(--amber);font-weight:700} .pf .se{color:#2563eb;font-weight:700}
-.pf .ca{color:var(--red);font-weight:700} .pf .od{color:var(--green);font-weight:700} .pf .sl{color:var(--purple);font-weight:800}
-.pf .rt{color:#9aa1ad;font-size:10.5px} .pf .ro{color:var(--green);font-weight:800} .pf .ef{color:var(--purple);font-weight:700}
-.pf .fee{color:#d4380d;font-weight:800}
-.pf .mob-meta{display:none}   /* PC 숨김 — 모바일에서만 2줄 요약 */
-
-.heat{width:100%;border-collapse:collapse;font-size:10.5px}
-.heat th{color:#8b93a2;font-weight:700;font-size:9px;padding:4px 2px;text-align:center;white-space:nowrap}
-.heat th.l,.heat td.l{text-align:left;font-weight:800;color:#4a515d;padding-left:12px;white-space:nowrap}
-.heat td{text-align:center;padding:1.5px}
-.heat .cell{display:block;padding:5px 1px;border-radius:5px;font-weight:800;min-width:20px}
-
-.hl{display:flex;flex-direction:column}
-.hlrow{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid #f4f5f8}
-.hlrow:last-child{border-bottom:none}
-.hlrow .ic{font-size:16px;width:20px;text-align:center}
-.hlrow .lb{font-size:11px;color:var(--sub);width:64px;flex:0 0 auto;font-weight:600}
-.hlrow .nm{font-size:14px;font-weight:800;letter-spacing:-.02em}
-.hlrow .vl{margin-left:auto;font-size:12.5px;font-weight:800;color:var(--purple);white-space:nowrap}
-.hlrow.warn{background:#fffaf5} .hlrow.warn .vl{color:#e65100}
-.hlrow.hold{background:#f6f9ff} .hlrow.hold .vl{color:var(--blue)}
-.hlrow .no{font-size:9px;color:#a7aeba;margin-left:6px}
-
-.grp{padding:8px 0}
-.glabel{display:flex;align-items:center;gap:7px;padding:4px 14px 7px;font-size:11.5px;font-weight:800;color:#5b6472}
-.glabel .gc{font-size:10px;font-weight:800;color:#fff;border-radius:20px;padding:0 7px}
-.item{display:flex;align-items:center;gap:8px;padding:7px 14px;font-size:12.5px}
-.item+.item{border-top:1px solid #f6f7f9}
-.item .when{font-size:11px;font-weight:700;color:var(--blue);min-width:58px;flex:0 0 auto}
-.item .tm{font-size:11px;color:var(--green);min-width:38px;flex:0 0 auto}
-.item a.nm{font-weight:700;color:var(--ink);text-decoration:none;letter-spacing:-.01em}
-.item a.nm:hover{text-decoration:underline;color:var(--blue)}
-.item .gr{font-size:10px;color:#a7aeba}
-.item .badge{font-size:9.5px;color:#64748b;background:#f1f3f7;border-radius:7px;padding:1px 7px}
-.item .as{font-size:9.5px;color:#fff;background:#98a0ad;border-radius:20px;padding:1px 7px;margin-left:auto;flex:0 0 auto;white-space:nowrap}
-.item .mn{font-size:10px;color:#c084fc;font-weight:700}
-.chk{width:16px;height:16px;flex:0 0 auto;cursor:pointer;accent-color:var(--purple)}
-.item.done a.nm,.item.done .gr,.item.done .when{text-decoration:line-through;color:#c2c7d0}
-.item.done .as{opacity:.45}
-.item.today{background:#fffdf4}
-.item.today .when{color:#e65100;font-weight:800}
-.empty{padding:16px 14px;text-align:center;color:#b5bac4;font-size:11.5px}
-
-.as.hye{background:var(--green)} .as.kim{background:var(--blue)} .as.jang{background:#f97316} .as.park{background:var(--purple)} .as.ahn{background:#4338ca}
-.as.woo{background:var(--red)} .as.tae{background:var(--cyan)} .as.sung{background:#7c3aed} .as.noh{background:#0d9488} .as.won{background:#b45309} .as.seul{background:#db2777}
-
-.wk{width:100%;border-collapse:collapse;font-size:12px}
-.wk th{background:#f7f8fb;color:#6b7280;font-weight:700;font-size:9.5px;padding:6px 3px;text-align:center}
-.wk th.l{text-align:left;padding-left:14px}
-.wk td{padding:5px 3px;text-align:center;border-bottom:1px solid #f4f5f8}
-.wk td.nm{text-align:left;padding-left:14px;white-space:nowrap;font-weight:800}
-.wk tr:last-child td{border-bottom:none}
-
-/* 10월 공지 박스 */
-.notice-oct{font-size:12px;line-height:1.75;opacity:.96;word-break:keep-all;overflow-wrap:break-word}
-.notice-oct b.y{color:#ffd966}
-.fee-mini{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
-.fee-mini span{font-size:11px;font-weight:700;background:rgba(255,255,255,.12);border-radius:6px;padding:2px 8px}
-
-@media (max-width:1240px){
-  .board{grid-template-columns:minmax(0,1fr);height:auto}
-  .colwrap,.mid{min-height:0}
-  .board .card.colwrap,.board .card[style*="flex:1"]{flex:0 1 auto!important}
-  .scroll{max-height:none!important;overflow:visible}
-  #situation.scroll{max-height:420px;overflow-y:auto}
-  .sec-nav{display:flex}
-  .ch{flex-wrap:wrap;gap:6px}
-  .ch .tabs{flex-wrap:nowrap;width:100%;justify-content:flex-start}
-  .mid.sec .card{flex:0 1 auto}
-  .mid.sec .scroll{max-height:none}
-  .sec{display:none}
-  .colwrap.sec.on{display:flex}
-  .mid.sec.on{display:grid}
-  .heat{font-size:9.5px}
-  .heat th{font-size:8.5px;padding:3px 1px}
-  .heat td{padding:1px}
-  .heat th.l,.heat td.l{padding-left:8px}
-  .heat .cell{min-width:17px;padding:4px 1px}
-  .top{flex-wrap:nowrap;gap:8px}
-  .top h1{font-size:15px;white-space:nowrap;flex-shrink:0}
-  .top .upd{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-  .top .rf{font-size:11px;padding:5px 10px;white-space:nowrap;flex-shrink:0}
-  /* [2026-10-15] 모바일 = 가로 잘림/스크롤 대신 2줄 요약 리스트.
-     1줄: [순위] 담당자 ····· 매출 / 2줄: 수수료·오더·DB·방문·세팅·ROAS 전부 */
-  .pfwrap{min-width:0;overflow:visible}
-  .pf{display:block;width:100%;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
-  .pf thead{display:none}
-  .pf tbody{display:block}
-  .pf tr{display:grid;grid-template-columns:38px 1fr auto;grid-template-areas:"rank name sales" "meta meta meta";
-    column-gap:8px;row-gap:2px;align-items:center;padding:8px 11px;border-bottom:1px solid #f2f4f7}
-  .pf tr:last-child{border-bottom:none}
-  .pf tr.tot{background:#f6f8ff}
-  .pf td{display:block;padding:0;border:none;text-align:left}
-  .pf td.rk{grid-area:rank;font-size:11px;text-align:center;line-height:1.25;white-space:nowrap}
-  .pf td.nm{grid-area:name;font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .pf td.sl{grid-area:sales;font-size:14px;font-weight:800;color:var(--purple);text-align:right;white-space:nowrap}
-  .pf td.mob-meta{grid-area:meta;display:block;font-size:10.5px;color:#8b93a2;line-height:1.4}
-  .pf td.od,.pf td.rt,.pf td.fee,.pf td.db,.pf td.vs,.pf td.se,.pf td.ro{display:none}
-  .pf td::before{display:none!important}
-  .sales{grid-template-columns:repeat(2,1fr)}
-  .sales .sc .v{font-size:12.5px;letter-spacing:-.03em;line-height:1.25}
-  #heat-wrap{min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
-  .heat{min-width:600px}
-  .pfwrap, #heat-wrap{position:relative}
-  .hlrow .nm{white-space:nowrap;flex-shrink:0}
-  .hlrow .no{font-size:8.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+function dashFirestorePush(){
+  var log=[];
+  try{ saveDailyRank();       log.push('✅ 순위'); }catch(e){ log.push('❌ 순위: '+e); }
+  try{ saveDashToFirestore(); log.push('✅ dash'); }catch(e){ log.push('❌ dash: '+e); }
+  Logger.log('===== dashFirestorePush 완료 =====\n'+log.join('\n'));
 }
-</style>
-</head>
-<body>
-<div class="top">
-  <span class="dot"></span>
-  <h1>그로스 스테이터스</h1>
-  <span class="upd" id="upd">불러오는 중...</span>
-  <button class="rf" onclick="loadAll()">새로고침</button>
-</div>
 
-<div class="sec-nav">
-  <button class="sec-nav-btn on" onclick="showSec(0)">성과</button>
-  <button class="sec-nav-btn" onclick="showSec(1)">팀현황</button>
-  <button class="sec-nav-btn" onclick="showSec(2)">방문</button>
-</div>
-
-<div class="board">
-  <!-- 좌: 담당자 퍼널 -->
-  <div class="colwrap sec on">
-    <div class="card">
-      <div class="ch"><span class="t">매출</span><span class="badge sp">결제일 기준</span></div>
-      <div class="sales">
-        <div class="sc now"><div class="l">이번 달<b id="dn-m"></b></div><div class="v" id="s-m">-</div></div>
-        <div class="sc"><div class="l">지난 달</div><div class="v" id="s-lm">-</div></div>
-        <div class="sc now"><div class="l">이번 주<b id="dn-w"></b></div><div class="v" id="s-w">-</div></div>
-        <div class="sc"><div class="l">지난 주</div><div class="v" id="s-lw">-</div></div>
-      </div>
-    </div>
-
-    <div class="card colwrap" style="flex:1;min-height:0;gap:0">
-      <div class="ch">
-        <span class="t">🏆 10월 그로스팀 순위 <span style="font-size:10px;font-weight:600;color:#8b93a2">순위=매출순 · 건당 수수료</span></span>
-        <span class="tabs sp" id="pf-tabs">
-          <span class="tab on" onclick="setPerfTab(0)">이번달</span>
-          <span class="tab" onclick="setPerfTab(1)">지난달</span>
-          <span class="tab" onclick="setPerfTab(2)">전체</span>
-        </span>
-      </div>
-      <div class="pfwrap scroll" style="flex:1">
-        <table class="pf">
-          <thead><tr><th>순위</th><th>담당자</th><th>매출</th><th>오더</th><th>건당</th><th>수수료</th><th>DB</th><th>방문</th><th>세팅</th><th>ROAS</th></tr></thead>
-          <tbody id="pf-body"><tr><td colspan="10" class="empty">불러오는 중...</td></tr></tbody>
-        </table>
-      </div>
-    </div>
-    <div class="card">
-      <div class="ch"><span class="t">🔥 덕질 스탯</span><span class="badge sp">이번주</span></div>
-      <div class="hl" id="hl"></div>
-    </div>
-  </div>
-
-  <!-- 가운데: 지금 챙길 리드 + 10월 공지 -->
-  <div class="mid sec">
-    <div class="card colwrap" style="flex:1;min-height:0;gap:0">
-      <div class="ch"><span class="t">📋 지금 챙길 리드</span><span class="badge sp">실시간</span></div>
-      <div class="scroll" id="situation" style="flex:1"><div class="empty">불러오는 중...</div></div>
-    </div>
-    <div class="card" style="position:relative;overflow:hidden;background:linear-gradient(135deg,#0f1830,#1e2d4f);color:#fff;padding:20px 22px">
-      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 75% 25%, rgba(70,110,200,.28), transparent 58%),radial-gradient(ellipse at 15% 85%, rgba(30,50,90,.3), transparent 55%);opacity:.7;pointer-events:none"></div>
-      <div style="position:relative;z-index:1">
-      <div style="font-weight:800;font-size:15px;margin-bottom:12px;letter-spacing:-.3px">🎯 10월 업무 시스템 <span style="opacity:.65;font-weight:600;font-size:12px">· 숫자가 전부다</span></div>
-      <div class="notice-oct">
-        <b class="y">1. 신규 DB 자동배정 복귀</b><br>
-        · 유입 즉시 순차로 담당 자동 지정<br><br>
-        <b class="y">2. 오후 2시 미접촉 재분배</b><br>
-        · 배정받고 <b>오후 2시까지 코멘트(접촉 기록) 없으면</b> = 미접촉<br>
-        · 미접촉·부재 DB 전면 재분배 (다른 담당에게 넘어감)<br>
-        · <b>콜했으면 반드시 코멘트</b> — 그게 내 DB 지키는 법<br><br>
-        <b class="y">3. 순위 = 매출순 · 건당 수수료</b>
-        <div class="fee-mini">
-          <span>1등 15만</span><span>2등 12만</span><span>3등 10만</span><span>4등 7만</span><span>5등 5만</span>
-        </div>
-      </div>
-      <div style="font-size:12px;line-height:1.7;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.2);opacity:.9">
-        전국 3억 달성 시 <b style="color:#5dd39e">전원 건당 15만</b> · 2억 미달 시 <b style="color:#f59e9e">전원 건당 5만</b> (순위 무관)
-      </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 우: 시상 포스터 + 바로가기 -->
-  <div class="colwrap sec">
-    <a href="https://github.com/crocdeucation-rgb/image/blob/main/KakaoTalk_20261003_135501433.png?raw=true" target="_blank"
-       style="display:block;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.12);border:1px solid var(--border,#e2e6ef);margin-bottom:14px">
-      <img src="https://github.com/crocdeucation-rgb/image/blob/main/KakaoTalk_20261003_135501433.png?raw=true"
-           alt="그로스팀 10월" style="width:100%;height:auto;display:block" />
-    </a>
-    <div style="display:flex;flex-direction:column;gap:10px">
-      <a href="https://drive.google.com/drive/folders/1QpRfhW4EbVv62nPqspYWfZd-ZyIl0qcT?usp=sharing" target="_blank"
-         style="display:block;background:var(--card2,#f0f2f8);border:0.5px solid var(--border,#e2e6ef);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--text,#333)">
-        <div style="font-weight:800;font-size:14px;margin-bottom:3px">🎙️ 녹취 아카이브</div>
-        <div style="font-size:11px;color:#8b93a2;line-height:1.5">우리 상담 녹취 모음 · 잘한 콜 들으며 스크립트·클로징 배우기</div>
-      </a>
-      <a href="https://drive.google.com/drive/folders/1nfA4yvQYrd1pxS_jMH5Vqw_T51ITKidS?usp=drive_link" target="_blank"
-         style="display:block;background:var(--card2,#f0f2f8);border:0.5px solid var(--border,#e2e6ef);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--text,#333)">
-        <div style="font-weight:800;font-size:14px;margin-bottom:3px">📋 브리핑 아카이브</div>
-        <div style="font-size:11px;color:#8b93a2;line-height:1.5">주간·데일리 브리핑 모음 · 공지·전략·업무 변경사항 다시보기</div>
-      </a>
-      <a href="https://crocdeucation-rgb.github.io/image/notion_manual.html" target="_blank"
-         style="display:block;background:var(--card2,#f0f2f8);border:0.5px solid var(--border,#e2e6ef);border-radius:12px;padding:14px 18px;text-decoration:none;color:var(--text,#333)">
-        <div style="font-weight:800;font-size:14px;margin-bottom:3px">📖 리드관리 매뉴얼</div>
-        <div style="font-size:11px;color:#8b93a2;line-height:1.5">노션 상태 입력·부재/홀딩 처리·담당 변경 방법 등 업무 가이드</div>
-      </a>
-    </div>
-  </div>
-</div>
-
-<script>
-const SITUATION_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=669050300&single=true&output=csv';
-const SUMMARY_CSV_URL   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1438610573&single=true&output=csv';
-const SCHEDULE_CSV_URL  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJM18PpCJdk7ajik__XSEB6lgOmahUdTeXT_bKqr52VadEMP_BnNLg0oDdpQA-slQ14TNSkfXxn/pub?gid=1384080283&single=true&output=csv';
-const WORK_CSV_URL      = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRp14Bg9QZsfrfO9bv63ZjHnM4OL5A-7-eiQX-J4hVku0W-qwKmTQT6vlVRp-vBGBM87wajO7Qe6Xs_/pub?gid=1370179906&single=true&output=csv';
-const WEBAPP_URL        = 'https://script.google.com/macros/s/AKfycbxu_6qC9WKTtVcAJJtoh_EfmvUbyzbkZFlTRC7uUr_dFmUYehON0Vhb3HdAwrTnF37w/exec';
-
-const MID_DAYS=4;
-const ASSIGNEES=['우혜림','김윤호','장윤호','박창건','김태석','김성윤','노영호','김원득','김우진','안준섭','김주환','김슬기'];
-// [2026-10-07] 화면에서 숨길 담당자 (시트 인덱스 밀림 방지 위해 배열은 유지, 렌더만 제외)
-const HIDE_ASSIGNEES=['김성윤'];
-const ASSIGNEE_START_IDX=46;   // 폴백용(라벨 못 찾을 때만)
-// [2026-10-15] 고정 인덱스(46) 버그 수정 — 시트 '담당자'~'캠페인' 구간의 실제 행을
-//   이름(r[0]) 기준으로 읽고 중복 제거. getLeadStats 레이아웃이 바뀌어도 안 깨짐.
-//   (안준섭 0원·캠페인 NaN 행이 뜨던 원인 = 고정 46 + 11명 배열이 시트 10행과 어긋남)
-function getAssigneeRows(){
-  var start=-1;
-  for(var i=0;i<summaryRows.length;i++){ if(((((summaryRows[i]||[])[0])||'')+'').trim()==='담당자'){ start=i+1; break; } }
-  if(start<0) start=ASSIGNEE_START_IDX;
-  var out=[], seen={};
-  for(var i=start;i<summaryRows.length;i++){
-    var r=summaryRows[i]||[]; var nm=canonNm((((r[0])||'')+'').trim());
-    if(!nm||nm==='캠페인'||nm==='합계'||nm==='기간유입'||nm==='일자별유입'||nm==='유입경로별') break;
-    if(seen[nm]) continue; seen[nm]=true; r[0]=nm; out.push(r);
+function cplOf(campaign, isMeta){
+  var c = campaign || '';
+  if(isMeta){
+    if(/권한이 부족/.test(c))           return 37212;  // 삭제된 정지소재 단일5종(악플사건) — 노션엔 에러문자열로 유입. 595,397/16
+    if(/방으로가세요/.test(c))          return 36052;  // 박은영PM 8월 실측 (27건) 973,391/27
+    if(/다른처방|같은점수/.test(c))     return 97034;  // 박은영PM 맞춤처방 8월 실측 (1건, 노이즈) 97,034/1
+    if(/원톱/.test(c))                  return 44731;  // 박은영PM 중간고사훅 8월 실측 (43건) 1,923,445/43
+    if(/5단계루틴/.test(c))             return 65861;  // 8월 실측 (6건, 표본 적음) 395,167/6
+    if(/기초부족/.test(c))              return 89023;  // 8월 실측 (3건, 표본 적음) 267,069/3
+    if(/너만본다/.test(c))              return 30946;  // 정지·8월 1건(270k)은 노이즈라 과거값 유지
+    if(/노트릴스.*(영상|2505)/.test(c)) return 34631;  // 8월 실측 (186건) 6,441,442/186
+    if(/노트릴스_채리|_채리_|채리_260/.test(c)) return 57055;  // 8월 실측 (25건) 1,426,365/25
+    if(/노트필기릴스|노트필기캐러셀/.test(c)) return 29008;  // 8월 실측 (87건) 2,523,660/87
+    if(/GT노트피드백/.test(c))          return 55326;  // 8월 실측 (29건) 1,604,444/29
+    if(/MLST캐러셀/.test(c))            return 19247;  // 정지 (과거값)
+    if(/MLST/.test(c))                 return 12314;  // 정지 (V1~V4 전부, 과거값)
+    if(/노트공부법|오답노트/.test(c))    return 17964;  // 정지 (과거값)
+    return 38303; // 메타 평균(캠페인 불명) — 8/14 blended (17,198,251 / 449)
   }
+  return ({'CPA(텐핑)':29822,'카카오':54511,'네이버브랜드':41000,'네이버GFA':151368,'Organic':0,'당근':0,'기타':0})[campaign] || 0;
+}
+// ============================================
+// [2026-09] 소재 그룹핑 — 위너테스트 세트(캠페인) 하위 소재들을 그룹으로 묶음.
+//   메타 캠페인 = "위너테스트 세트" 하나인데, 그 안에 소재(광고)가 여러 그룹.
+//   노션 캠페인필드 = 메타 ad_name(소재명). 이걸 그룹키로 치환해 DB·광고비·CPL을 그룹 단위로.
+//   ▸ 새 소재 추가 시: 메타 ad_name을 규칙대로 짓고, CAMPAIGN_SPEND에 그룹 광고비만 갱신하면 자동 매칭.
+// ============================================
+function campaignGroupOf(campaign){
+  var c = campaign || '';
+  // 위너테스트 세트 하위 그룹
+  if (/노트필기_(시간압박|관리부재|방법제시|학원무용)/.test(c)) return '위너노트필기';
+  if (/^MLST_|_MLST_/.test(c))          return '위너MLST';       // MLST_성향테스트_2609 등
+  if (/노트릴스_재편집/.test(c))         return '위너노트릴스';
+  // 그 외는 원래 캠페인명 그대로 (노트릴스_영상_2505, 방학점검 등은 기존 캠페인 매칭 유지)
+  return c;
+}
+
+function sojKeyOf(campaign, isMeta){
+  var c = campaign || '';
+  if(isMeta){
+    if(/^위너노트릴스$/.test(c)) return '위너노트릴스';   // [2026-09] 위너 그룹명 그대로 (campaignGroupOf 치환분) — MLST 규칙보다 먼저
+    if(/^위너노트필기$/.test(c)) return '위너노트필기';
+    if(/^위너MLST$/.test(c))     return '위너MLST';       // ★ /MLST/ 규칙보다 먼저 (안 그러면 MLST공부로 샘)
+    if(/권한이 부족/.test(c))           return '정지소재단일';  // 삭제된 단일5종(악플사건) — 캐러셀과 분리
+    if(/방으로가세요/.test(c))          return '방으로';      // 박은영PM ★ 원톱보다 먼저
+    if(/다른처방|같은점수/.test(c))     return '맞춤처방';    // 박은영PM ★ 원톱보다 먼저
+    if(/원톱/.test(c))                  return '원톱';        // 박은영PM 중간고사훅
+    if(/5단계루틴/.test(c))             return '5단계루틴';    // 신규
+    if(/기초부족/.test(c))              return '기초부족';    // 신규
+    if(/너만본다/.test(c))              return '너만본다';  // ★ 채리보다 먼저 (유"채리" 오분류 방지)
+    if(/노트릴스.*(영상|2505)/.test(c)) return '노트릴스';
+    if(/노트릴스_채리|_채리_|채리_260/.test(c)) return '채리';  // ★ 진짜 채리만
+    if(/노트필기릴스|노트필기캐러셀/.test(c)) return '노필릴스';
+    if(/GT노트피드백/.test(c))          return 'GT';
+    if(/MLST캐러셀/.test(c))            return 'MLST캐러셀';
+    if(/MLST/.test(c))                 return 'MLST공부';  // ★ V1~V4 전부
+    if(/노트공부법|오답노트/.test(c))    return '노트공부법';
+    return '메타기타';
+  }
+  return ({'CPA(텐핑)':'CPA(텐핑)','카카오':'카카오','Organic':'Organic','네이버브랜드':'네이버브랜드'})[campaign] || '기타';
+}
+
+// ============================================
+// [담당자 이름 정규화] 노션 담당자_P(People)의 표시이름 → 실제 담당자명
+// ============================================
+var NAMEMAP = {
+  'sunrim':'우혜림',
+  'changgun08@naver.com':'박창건',
+  'kingsy0616@naver.com':'김성윤',
+  'araon_school@naver.com':'노영호',
+  'skfkr4@gmail.com':'김우진',
+  '김성윤대리':'김성윤',
+  'kjhmp874@gmail.com':'김주환',
+  'kimjuhwan':'김주환'
+};
+function resolveAssignee(props){
+  var p  = props['담당자_P'] && props['담당자_P'].people ? props['담당자_P'].people[0] : null;
+  var nm = (p && p.name) ? p.name : '';
+  var em = (p && p.person && p.person.email) ? p.person.email : '';
+  return NAMEMAP[nm] || NAMEMAP[em] || nm || (props['담당자'] && props['담당자'].select ? props['담당자'].select.name : '') || '';
+}
+
+
+function campaignGroupOf2(){}
+
+var _META_SHEET_CAMPS = null;   // [메타광고비 자동] 이번달 메타 캠페인별 시트값 임시 보관
+var AD_SPEND = {
+  '2605': { 메타광고: 8171263,  Organic: 0, 당근: 1038120, 네이버GFA: 573376, CPA: 0, 기타: 0 },
+  '2606': { 메타광고: 21260805, Organic: 0, 당근: 1961880, 네이버GFA: 314411, CPA: 0, 기타: 0 },
+  '2607': { 메타광고: 28248342, Organic: 0, 당근: 0,       네이버GFA: 21015,  CPA: 0, 기타: 0 },
+  '2608': { 메타광고: 43154790, Organic: 0, 당근: 0,       네이버GFA: 411531, CPA: 0, 기타: 0 },
+  '2609': { 메타광고: 39637358, Organic: 0, 당근: 0, 네이버GFA: 0, CPA: 0, 기타: 0 },  // [09-30] 9/1~30 실집행(results, MCP)
+  '2610': { 메타광고: 5793849,  Organic: 0, 당근: 0, 네이버GFA: 0, CPA: 0, 기타: 0 }  // [10-05] 10/1~4 누적 실집행(results, MCP)
+};
+ 
+var MONTH_SPEND_TOTAL = {
+  '2605': 12646141, '2606': 34693402, '2607': 34370000, '2608': 63564071, '2609': 39637358
+};
+ 
+var CAMPAIGN_SPEND = {
+  'ARA_노트릴스_영상_2505':        { '2607': 11829381, '2608': 20061375, '2609': 14025260, '2610': 1942353, status: 'ON' },
+  'AD_노트필기릴스_방학점검_2607':  { '2607': 4066995,  '2608': 9906436,  '2609': 10276367, '2610': 1452715, status: 'ON' },
+  '위너노트필기':                  { '2607': 0,        '2608': 731552,   '2609': 4354025, '2610': 938636,  status: 'ON' },
+  '위너MLST':                     { '2607': 0,        '2608': 0,        '2609': 1405254, '2610': 262535,  status: 'ON' },
+  '위너노트릴스':                  { '2607': 0,        '2608': 0,        '2609': 9571183, '2610': 1053822, status: 'ON' },
+  '캐러셀_국세청첨삭':             { '2607': 0,        '2608': 0,        '2609': 5269,    '2610': 143788,  status: 'ON' },
+  'ARA_노트릴스_채리_2606':                                   { '2607': 5282806,  '2608': 1426365,  '2609': 0, status: 'OFF' },
+  'ARA_GT노트피드백_영상_2605':                               { '2607': 2879191,  '2608': 2185983,  '2609': 0, status: 'OFF' },
+  'ARA_원톱_박은영_중간고사훅_2608':                          { '2607': 0,        '2608': 3023160,  '2609': 0, status: 'OFF' },
+  '[소재01] 릴스_너만본다_유채리_수학81→100_영어83→96':        { '2607': 835557,   '2608': 270649,   '2609': 0, status: 'OFF' },
+  '캐러셀_01_중간고사전략_4장':                                { '2607': 0,        '2608': 680188,   '2609': 0, status: 'OFF' },
+  '아라온스쿨_잠재고객_5단계루틴_2606W19':                     { '2607': 0,        '2608': 395167,   '2609': 0, status: 'OFF' },
+  'ARA_기초부족_단일이미지_2505':                             { '2607': 0,        '2608': 267069,   '2609': 0, status: 'OFF' },
+  'ARA_MLST캐러셀_2606_광고01':                              { '2607': 1212531,  '2608': 0,        '2609': 0, status: 'OFF' },
+  '지금 당장 방으로가세요_AD':                                { '2607': 0,        '2608': 2476686,  '2609': 0, status: 'OFF' },
+  'ARA_MLST_V3_무료점검':                                    { '2607': 1219103,  '2608': 0,        '2609': 0, status: 'OFF' },
+  '원톱_같은점수다른처방_릴스_2608':                          { '2607': 0,        '2608': 960700,   '2609': 0, status: 'OFF' },
+  '정지_단일5종(삭제-학생들악플바이럴)':                       { '2607': 0,        '2608': 595397,   '2609': 0, status: 'OFF' },
+  'ARA_노트필기_중간고사_전환_2608':                          { '2607': 0,        '2608': 219299,   '2609': 0, status: 'OFF' }
+};
+
+// [2026-09-14] ★ 투입원가 배분용 헬퍼 (신규)
+//   metaSpendOfYYMM = 그달 메타광고비 (AD_SPEND). blended CPL 분자.
+function metaSpendOfYYMM(yymm){
+  return (AD_SPEND[yymm] && AD_SPEND[yymm].메타광고) ? AD_SPEND[yymm].메타광고 : 0;
+}
+//   텐핑 = TENPING_DEPOSIT(VAT포함 입금액) 누적. 충전월≠유입월이라 코호트 균일 CPL.
+function tenpingTotalDeposit(){
+  var t = 0; for (var k in TENPING_DEPOSIT) t += TENPING_DEPOSIT[k]; return t;
+}
+
+var AD_SPEND_SS_ID = '1K0UYFSJK4QycxYvzRNsitlKKY3YB9KeZ1mRdctGPLFg';
+
+function ymd(v) {
+  if (v && typeof v.getTime === 'function' && !isNaN(v.getTime())) {
+    return Utilities.formatDate(v, 'GMT+9', 'yyyy-MM-dd');
+  }
+  var s = String(v || '').trim();
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.substring(0, 10);
+  var d = new Date(s);
+  if (!isNaN(d.getTime())) return Utilities.formatDate(d, 'GMT+9', 'yyyy-MM-dd');
+  return '';
+}
+
+function sumSpendFromSheet(sheetName, since, until, opts) {
+  opts = opts || {};
+  try {
+    var ss = SpreadsheetApp.openById(AD_SPEND_SS_ID);
+    var sh = ss.getSheetByName(sheetName);
+    if (!sh || sh.getLastRow() < 2) return 0;
+    var last = sh.getLastRow();
+    var data = sh.getRange(2, 1, last - 1, 10).getValues();
+    var total = 0;
+    data.forEach(function(r) {
+      var d = ymd(r[0]);
+      if (!d || d < since || d > until) return;
+      var type = String(r[2] || '').trim();
+      var cost = Number(r[5] || 0);
+      if (!cost) return;
+      if (opts.onlyTypes && opts.onlyTypes.indexOf(type) < 0) return;
+      var free = Number(r[9] || 0);
+      if (free > 0) { cost = cost - free; if (cost < 0) cost = 0; }
+      total += cost;
+    });
+    return total;
+  } catch (e) {
+    Logger.log('⚠️ ' + sheetName + ' 광고비 합산 실패 (0 처리): ' + e);
+    return 0;
+  }
+}
+
+var TENPING_DEPOSIT = {
+  '2603': 1100000, '2606': 9031000, '2608': 13200000
+};
+var CPA_COHORT = {
+  monthSpend: 364000,
+  monthDb:    13,
+  monthInvalid: 2,
+  allSpend:   9364000,
+  allDb:      314,
+  allInvalid: 21,
+  active:     true
+};
+
+function toKSTDateStr(d) {
+  if (!d) return '';
+  return new Date(d.getTime() + 9*60*60*1000).toISOString().slice(0,10);
+}
+
+function queryNotionAll(filter) {
+  var all = [];
+  var cursor = null;
+  do {
+    var body = { page_size: 100 };
+    if (filter) body.filter = filter;
+    if (cursor) body.start_cursor = cursor;
+    var data = null;
+    for (var attempt = 0; attempt < 3; attempt++) {
+      var res = UrlFetchApp.fetch(
+        'https://api.notion.com/v1/databases/' + DATABASE_ID + '/query',
+        {
+          method: 'post', contentType: 'application/json',
+          headers: { 'Authorization': 'Bearer ' + NOTION_TOKEN, 'Notion-Version': '2022-06-28' },
+          payload: JSON.stringify(body), muteHttpExceptions: true
+        }
+      );
+      var code = res.getResponseCode();
+      if (code === 200) { data = JSON.parse(res.getContentText()); break; }
+      if (code === 429 || code >= 500) {
+        Logger.log('노션 ' + code + ' — 재시도 ' + (attempt + 1) + '/3');
+        Utilities.sleep(1500 * (attempt + 1));
+        continue;
+      }
+      throw new Error('노션 응답 오류 ' + code + ': ' + res.getContentText().substring(0, 200));
+    }
+    if (!data || !data.results) throw new Error('노션 결과 없음 (rate limit 재시도 실패 가능)');
+    all = all.concat(data.results);
+    cursor = data.has_more ? data.next_cursor : null;
+    Utilities.sleep(350);
+  } while (cursor);
+  return all;
+}
+
+function collectLeadResults() {
+  var now = new Date();
+  var sevenMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 7, 1);
+  var twoMonthsAgo   = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+  // ★ [성능] 신청일·결제일 2회 전수스캔 → or 필터 1회로 통합 (노션이 합집합·중복제거 반환 → 결과 동일)
+  return queryNotionAll({ or: [
+    { property: '신청일', date: { on_or_after: sevenMonthsAgo.toISOString() } },
+    { property: '결제일', date: { on_or_after: twoMonthsAgo.toISOString() } }
+  ]});
+}
+
+function getLeadStats() {
+  try {
+    const now = new Date();
+    const monthStart     = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastMonthStart = new Date(now.getFullYear(), now.getMonth()-1, 1);
+    const lastMonthEnd   = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    function startOfWeek(d) {
+      const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const dow = x.getDay();
+      x.setDate(x.getDate() - (dow === 0 ? 6 : dow - 1));
+      return x;
+    }
+    const weekStart     = startOfWeek(now);
+    const lastWeekStart = new Date(weekStart);
+    lastWeekStart.setDate(weekStart.getDate() - 7);
+    const lastWeekEnd   = weekStart;
+
+    const monthDayNo = now.getDate();
+    const weekDayNo  = Math.floor((now - weekStart) / 86400000) + 1;
+
+    let allResults = collectLeadResults();
+
+    const _cx = fetchLedgerCancel_(monthStart, lastMonthStart, lastMonthEnd, weekStart, lastWeekStart);
+
+    let todayInflow=0, yesterdayInflow=0;
+    let todayVisitDone=0, todayVisitPlan=0, todayOrderStatus=0, todayKulbo=0;
+    let monthVisitAll=0, lastMonthVisitAll=0, allVisitAll=0;
+    let monthVisitStatus=0, lastMonthVisitStatus=0, allVisitStatus=0;
+    let monthOrder=0, lastMonthOrder=0, allOrder=0;
+    let monthVisitDone=0, lastMonthVisitDone=0, allVisitDone=0;
+    let monthVisitPlan=0, lastMonthVisitPlan=0, allVisitPlan=0;
+    let monthOrderStatus=0, lastMonthOrderStatus=0, allOrderStatus=0;
+    let monthKulbo=0, lastMonthKulbo=0, allKulbo=0;
+    let monthTotal=0, monthDrop=0, monthPayOrder=0, monthSales=0;
+    let lastMonthTotal=0, lastMonthDrop=0, lastMonthPayOrder=0, lastMonthSales=0;
+    let allTotal=0, allDrop=0, allPayOrder=0, allSales=0;
+
+    let weekSales = 0, lastWeekSales = 0;
+
+    let sourceMonth = { arawiki: 0, odiplaan: 0, brand: 0 };
+    let sourceLast  = { arawiki: 0, odiplaan: 0, brand: 0 };
+    let sourceAll   = { arawiki: 0, odiplaan: 0, brand: 0 };
+    let gradeMonth = { 초: 0, 중: 0, 고: 0, 미기재: 0 };
+    let gradeLast  = { 초: 0, 중: 0, 고: 0, 미기재: 0 };
+    let gradeAll   = { 초: 0, 중: 0, 고: 0, 미기재: 0 };
+    const emptyGrade = () => ({ 초: 0, 중: 0, 고: 0, 미기재: 0 });
+    let gradeVisitMonth = emptyGrade(), gradeVisitLast = emptyGrade(), gradeVisitAll = emptyGrade();
+    let gradeOrderMonth = emptyGrade(), gradeOrderLast = emptyGrade(), gradeOrderAll = emptyGrade();
+    let gradeKulboMonth = emptyGrade(), gradeKulboLast = emptyGrade(), gradeKulboAll = emptyGrade();
+
+    const ROUTE_KEYS = ['메타광고','Organic','당근','카카오','네이버브랜드','네이버GFA','CPA','기타'];
+    const emptyRoute = () => ROUTE_KEYS.reduce((o, k) => { o[k] = 0; return o; }, {});
+    let routeMonth = emptyRoute();
+    let routeLast  = emptyRoute();
+    let routeAll   = emptyRoute();
+    let routeVisit = emptyRoute();
+    let routeSetting = emptyRoute();
+    let routeCancel = emptyRoute();
+    let routeOrder = emptyRoute();
+    let routeVisitMonth = emptyRoute(),   routeVisitLast = emptyRoute();
+    let routeSettingMonth = emptyRoute(), routeSettingLast = emptyRoute();
+    let routeOrderMonth = emptyRoute(),   routeOrderLast = emptyRoute();
+    let routeSalesLast  = emptyRoute();
+    let routeSalesMonth = emptyRoute();
+    let routeSalesAll   = emptyRoute();
+    let cpaMonthSpendAuto = 0;
+    let cpaMonthDbValid   = 0;
+    let cpaMonthInvalid   = 0;
+
+    // [2026-10-15] 담당자별 성과분석 로스터.
+    //   · 김성윤: 전부 0 → 로스터에서 완전 제거(총계 영향 없음)
+    //   · 김윤호: 방문 집계가 합계에 들어가야 하므로 ASSIGNEES엔 남김. 단 화면 행은 프론트에서 숨김(HIDE_ASSIGNEE)
+    //   · 김주환 추가
+    const ASSIGNEES = ['우혜림','김윤호','장윤호','박창건','김태석','노영호','김원득','김우진','안준섭','김주환'];
+    const emptyAssignee = () => ({ db: 0, visit: 0, setting: 0, cancel: 0, order: 0, sales: 0, cost: 0, soj: {}, camps: [] });
+    let monthSetting=0, lastMonthSetting=0, allSetting=0;
+    let monthCancelAll=0, lastMonthCancelAll=0, allCancelAll=0;
+    let monthVisitFull=0, lastMonthVisitFull=0, allVisitFull=0;
+    let assigneeMonth = {};
+    let assigneeLast  = {};
+    let assigneeAll   = {};
+    let assigneeWeek  = {};
+    ASSIGNEES.forEach(a => {
+      assigneeMonth[a] = emptyAssignee();
+      assigneeLast[a]  = emptyAssignee();
+      assigneeAll[a]   = emptyAssignee();
+      assigneeWeek[a]  = { db:0, visit:0, setting:0, order:0, sales:0, cancel:0, hold:0, drop:0, recover:0, recoverOff:0, soj:{} };
+    });
+
+    // [2026-09-14] ★ 원가배분용: 채널×유입월 유효DB (결번·중복 제외). blended CPL 분모.
+    var validDbByCh = { '메타광고':{}, '카카오':{}, '네이버브랜드':{}, 'CPA':{} };
+    var cpaValidTotal = 0;   // 텐핑 누적 유효DB (코호트 CPL 분모)
+
+    let campaignMonth = {};
+    let campaignLast  = {};
+    let campaignAll   = {};
+    let campaignVisitMonth = {}, campaignVisitLast = {}, campaignVisitAll = {};
+    let campaignOrderMonth = {}, campaignOrderLast = {}, campaignOrderAll = {};
+    let campaignSettingMonth = {}, campaignSettingLast = {}, campaignSettingAll = {};
+    let campaignIsMeta = {};
+    let campaignSalesMonth = {}, campaignSalesLast = {}, campaignSalesAll = {};
+    let campaignVisitCohortM = {};
+    let assigneeVisitCohortM = {};
+
+    const todayStr = toKSTDateStr(now);
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = toKSTDateStr(yesterday);
+
+    allResults.forEach(page => {
+      const props = page.properties;
+      const nameCheck   = props['이름']?.title?.[0]?.plain_text || '';
+      const sourceCheck = props['리드출처']?.select?.name || '';
+      const salesCheck  = props['매출']?.number || 0;
+      if (!nameCheck && !sourceCheck && !salesCheck) return;
+
+      const dateStr      = props['신청일']?.date?.start || page.created_time;
+      const date         = new Date(dateStr);
+      const _recYYMM     = (function(){ var _k=new Date(date.getTime()+32400000); return (''+_k.getUTCFullYear()).slice(2)+('0'+(_k.getUTCMonth()+1)).slice(-2); })();  // ★[성능] 루프당 formatDate 반복 제거 (KST yyMM, 값 동일)
+      const payDateStr   = props['결제일']?.date?.start || null;
+      const payDate      = payDateStr ? new Date(payDateStr) : null;
+      const visitDateStr = props['방문 일정']?.date?.start || null;
+      const visitDate    = visitDateStr ? new Date(visitDateStr) : null;
+      const status       = props['상태']?.select?.name || '';
+      const isRecover    = props['홀딩회수']?.checkbox === true;
+      const isRecoverOff = props['부재회수']?.checkbox === true;
+      const salesRaw     = props['매출']?.number || 0;
+      const sales        = salesRaw > 0 ? salesRaw * 1000 : 0;
+      const source       = props['리드출처']?.select?.name || '';
+      const srcRaw = (props['소스']?.select?.name
+                   || (props['소스']?.rich_text || []).map(rt => rt.plain_text).join('')
+                   || '').trim().toLowerCase();
+      function srcToChannel(s) {
+        if (['meta_ad','ig','inbody','fb','og'].includes(s)) return '메타광고';
+        if (['insta','ad','reviews','blog','cafe','event','promotion3'].includes(s)) return 'Organic';
+        if (s === 'daangn' || s === 'carrot') return '당근';
+        if (s === '모먼트' || s === 'kakao_bizform' || s.indexOf('kakao') >= 0) return '카카오';
+        if (s === 'tenping' || s === 'adlix') return 'CPA';
+        if (s === 'naver_gfa')   return '네이버GFA';
+        if (s === 'naver_brand') return '네이버브랜드';
+        if (s === 'naver')       return '네이버브랜드';
+        return '기타';
+      }
+      const assignee = resolveAssignee(props);
+
+      const isToday     = toKSTDateStr(date) === todayStr;
+      const isYesterday = toKSTDateStr(date) === yesterdayStr;
+      const isMonth     = date >= monthStart;
+      const isRecent30  = date >= new Date(now.getTime() - 30*86400000);
+      const isLastMonth = date >= lastMonthStart && date < lastMonthEnd;
+
+      const visitDateKST         = toKSTDateStr(visitDate);
+      const isVisitDateMonth     = visitDate ? visitDate >= monthStart : false;
+      const isVisitDateLastMonth = visitDate ? (visitDate >= lastMonthStart && visitDate < lastMonthEnd) : false;
+      const isPayMonth           = payDate ? payDate >= monthStart : false;
+      const isPayLastMonth       = payDate ? (payDate >= lastMonthStart && payDate < lastMonthEnd) : false;
+
+      const isKulbo       = status === '결보';
+      const isOrder       = status === '오더';
+      const isDrop        = ['방문취소','결번/대상아님','니즈없음'].includes(status);
+      const isWeekSignup  = date >= weekStart;
+      const isWeekVisit   = visitDate ? visitDate >= weekStart : false;
+      const isWeekPay     = payDate ? payDate >= weekStart : false;
+      const isHold        = status.includes('홀딩');
+      const isDropNum     = status === '결번/대상아님';
+      const isVisitStatus = status === '방문';
+      const isVisitDone   = (isVisitStatus && visitDate && visitDateKST < todayStr) || isKulbo || isOrder;
+      const isVisitPlan   = isVisitStatus && visitDate && visitDateKST >= todayStr;
+
+      allTotal++;
+      if (isDrop)      allDrop++;
+      if (isToday)     todayInflow++;
+      if (isYesterday) yesterdayInflow++;
+
+      if (source.includes('아라위키'))      sourceAll.arawiki++;
+      else if (source.includes('오디플랜')) sourceAll.odiplaan++;
+      else if (source.includes('브랜드'))   sourceAll.brand++;
+
+      const gradeRaw = props['학년']?.select?.name || '';
+      const gradeKey = gradeRaw.includes('초') ? '초' : gradeRaw.includes('중') ? '중' : gradeRaw.includes('고') ? '고' : '미기재';
+      gradeAll[gradeKey]++;
+
+      const routeKey = srcToChannel(srcRaw);
+      routeAll[routeKey]++;
+      if (routeKey === 'CPA' && srcRaw === 'tenping' && isMonth) {
+        const validity = props['유효성']?.select?.name || '승인 대기';
+        const price = props['단가']?.number || 0;
+        if (validity === '무효') { cpaMonthInvalid++; }
+        else { cpaMonthSpendAuto += price; cpaMonthDbValid++; }
+      }
+      {
+        const isCancelR = status === '방문취소';
+        const isVisitR = isVisitStatus || isCancelR || isKulbo || isOrder;
+        const isSettingR = isKulbo || isOrder;
+        const vM = visitDate ? isVisitDateMonth : isMonth;
+        const vL = visitDate ? isVisitDateLastMonth : isLastMonth;
+        if (isVisitR)   { routeVisit[routeKey]++;   if (vM) routeVisitMonth[routeKey]++;   if (vL) routeVisitLast[routeKey]++; }
+        if (isSettingR) {
+          routeSetting[routeKey]++;
+          var _sM = isKulbo ? vM : isPayMonth;
+          var _sL = isKulbo ? vL : isPayLastMonth;
+          if (_sM) routeSettingMonth[routeKey]++;
+          if (_sL) routeSettingLast[routeKey]++;
+        }
+        if (isOrder)    { routeOrder[routeKey]++;   if (isPayMonth) routeOrderMonth[routeKey]++; if (isPayLastMonth) routeOrderLast[routeKey]++; }
+        if (isCancelR)  routeCancel[routeKey]++;
+      }
+
+      {
+        const gVisit = isVisitStatus || (status === '방문취소') || isKulbo || isOrder;
+        const gvM = visitDate ? isVisitDateMonth : isMonth;
+        const gvL = visitDate ? isVisitDateLastMonth : isLastMonth;
+        if (gVisit)  { gradeVisitAll[gradeKey]++; if (gvM) gradeVisitMonth[gradeKey]++; if (gvL) gradeVisitLast[gradeKey]++; }
+        if (isOrder) { gradeOrderAll[gradeKey]++; if (isPayMonth) gradeOrderMonth[gradeKey]++; if (isPayLastMonth) gradeOrderLast[gradeKey]++; }
+        if (isKulbo) { gradeKulboAll[gradeKey]++; if (isVisitDateMonth) gradeKulboMonth[gradeKey]++; if (isVisitDateLastMonth) gradeKulboLast[gradeKey]++; }
+      }
+
+      var campaignRaw = ((props['캠페인']?.rich_text || [])
+                        .map(rt => rt.plain_text).join('')
+                        || props['캠페인']?.title?.[0]?.plain_text
+                        || '').trim();
+      if (/권한이 부족/.test(campaignRaw)) campaignRaw = '정지_단일5종(삭제-학생들악플바이럴)';
+
+      const isMetaSrc = ['meta_ad','ig','inbody','fb'].includes(srcRaw);
+      const channelLabel = { 'CPA':'CPA(텐핑)','카카오':'카카오','네이버브랜드':'네이버브랜드','네이버GFA':'네이버GFA','당근':'당근','Organic':'Organic','기타':'기타' }[routeKey] || routeKey;
+      var campaign = isMetaSrc ? (campaignRaw || 'ARA_기타(메타 미표기)') : (campaignRaw || channelLabel);
+      if (isMetaSrc) campaign = campaignGroupOf(campaign);
+      const campIsMeta = isMetaSrc;
+      if (campaign) { campaignAll[campaign] = (campaignAll[campaign] || 0) + 1; campaignIsMeta[campaign] = campIsMeta; }
+
+      if (campaign) {
+        const cVisit = isVisitStatus || (status === '방문취소') || isKulbo || isOrder;
+        const cvM = visitDate ? isVisitDateMonth : isMonth;
+        const cvL = visitDate ? isVisitDateLastMonth : isLastMonth;
+        const inc = (o, k) => { o[k] = (o[k] || 0) + 1; };
+        if (cVisit) { inc(campaignVisitAll, campaign); if (cvM) inc(campaignVisitMonth, campaign); if (cvL) inc(campaignVisitLast, campaign); }
+        if (cVisit && cvM) {
+          var _sm = (date.getMonth()+1) + '';
+          if (!campaignVisitCohortM[campaign]) campaignVisitCohortM[campaign] = {};
+          campaignVisitCohortM[campaign][_sm] = (campaignVisitCohortM[campaign][_sm]||0) + 1;
+        }
+        if (isOrder) { inc(campaignOrderAll, campaign); if (isPayMonth) inc(campaignOrderMonth, campaign); if (isPayLastMonth) inc(campaignOrderLast, campaign); }
+        if (isKulbo || isOrder) {
+          inc(campaignSettingAll, campaign);
+          if (isKulbo ? cvM : isPayMonth)     inc(campaignSettingMonth, campaign);
+          if (isKulbo ? cvL : isPayLastMonth) inc(campaignSettingLast, campaign);
+        }
+      }
+
+      if (isMonth) {
+        monthTotal++;
+        if (isDrop) monthDrop++;
+        if (source.includes('아라위키'))      sourceMonth.arawiki++;
+        else if (source.includes('오디플랜')) sourceMonth.odiplaan++;
+        else if (source.includes('브랜드'))   sourceMonth.brand++;
+        gradeMonth[gradeKey]++;
+        routeMonth[routeKey]++;
+        if (campaign) campaignMonth[campaign] = (campaignMonth[campaign] || 0) + 1;
+      }
+      if (isLastMonth) {
+        lastMonthTotal++;
+        if (isDrop) lastMonthDrop++;
+        if (source.includes('아라위키'))      sourceLast.arawiki++;
+        else if (source.includes('오디플랜')) sourceLast.odiplaan++;
+        else if (source.includes('브랜드'))   sourceLast.brand++;
+        gradeLast[gradeKey]++;
+        routeLast[routeKey]++;
+        if (campaign) campaignLast[campaign] = (campaignLast[campaign] || 0) + 1;
+      }
+
+      if (isVisitStatus) {
+        allVisitAll++;
+        if (isVisitDateMonth)     monthVisitAll++;
+        if (isVisitDateLastMonth) lastMonthVisitAll++;
+      }
+      if (isKulbo) {
+        allVisitAll++;
+        if (isVisitDateMonth)     monthVisitAll++;
+        if (isVisitDateLastMonth) lastMonthVisitAll++;
+      }
+      if (isOrder) {
+        allVisitAll++;
+        if (isPayMonth)     monthVisitAll++;
+        if (isPayLastMonth) lastMonthVisitAll++;
+      }
+
+      if (isVisitStatus && isVisitDone) {
+        allVisitDone++; allVisitStatus++;
+        if (isVisitDateMonth)     { monthVisitDone++; monthVisitStatus++; }
+        if (isVisitDateLastMonth) { lastMonthVisitDone++; lastMonthVisitStatus++; }
+      }
+      if (isKulbo) {
+        allVisitDone++; allVisitStatus++; allKulbo++;
+        if (isVisitDateMonth)     { monthVisitDone++; monthVisitStatus++; monthKulbo++; }
+        if (isVisitDateLastMonth) { lastMonthVisitDone++; lastMonthVisitStatus++; lastMonthKulbo++; }
+      }
+      if (isOrder) {
+        allVisitDone++; allVisitStatus++; allOrder++; allOrderStatus++;
+        if (isPayMonth)     { monthVisitDone++; monthVisitStatus++; monthOrder++; monthOrderStatus++; }
+        if (isPayLastMonth) { lastMonthVisitDone++; lastMonthVisitStatus++; lastMonthOrder++; lastMonthOrderStatus++; }
+      }
+
+      {
+        const isCancelS = status === '방문취소';
+        const isVisitFullS = isVisitStatus || isCancelS || isKulbo || isOrder;
+        const isSettingS = isKulbo || isOrder;
+        const vM = visitDate ? isVisitDateMonth : isMonth;
+        const vL = visitDate ? isVisitDateLastMonth : isLastMonth;
+        if (isVisitFullS) { allVisitFull++; if (vM) monthVisitFull++; if (vL) lastMonthVisitFull++; }
+        if (isSettingS)   { allSetting++;   if (isKulbo?vM:(isOrder?isPayMonth:vM)) monthSetting++; if (isKulbo?vL:(isOrder?isPayLastMonth:vL)) lastMonthSetting++; }
+        if (isCancelS)    { allCancelAll++; if (isMonth) monthCancelAll++; if (isLastMonth) lastMonthCancelAll++; }
+      }
+
+      if (isVisitPlan) {
+        allVisitPlan++;
+        if (isVisitDateMonth)     monthVisitPlan++;
+        if (isVisitDateLastMonth) lastMonthVisitPlan++;
+      }
+
+      if (isVisitStatus && isVisitDone && visitDateKST === todayStr) todayVisitDone++;
+      if (isVisitPlan && visitDateKST === todayStr)                  todayVisitPlan++;
+      if (isOrder && isToday)                                        todayOrderStatus++;
+      if (isKulbo && visitDateKST === todayStr)                      todayKulbo++;
+
+      if (payDate) {
+        allPayOrder++;
+        if (isPayMonth)     monthPayOrder++;
+        if (isPayLastMonth) lastMonthPayOrder++;
+        if (sales > 0) {
+          allSales += sales;
+          routeSalesAll[routeKey] += sales;
+          if (isPayMonth)     { monthSales += sales;     routeSalesMonth[routeKey] += sales; }
+          if (isPayLastMonth) { lastMonthSales += sales; routeSalesLast[routeKey]  += sales; }
+          if (campaign) {
+            campaignSalesAll[campaign] = (campaignSalesAll[campaign] || 0) + sales;
+            if (isPayMonth)     campaignSalesMonth[campaign] = (campaignSalesMonth[campaign] || 0) + sales;
+            if (isPayLastMonth) campaignSalesLast[campaign]  = (campaignSalesLast[campaign]  || 0) + sales;
+          }
+          if (payDate >= weekStart)                              weekSales += sales;
+          if (payDate >= lastWeekStart && payDate < lastWeekEnd) lastWeekSales += sales;
+        }
+      }
+
+      var _excludeFromAssignee = (status === '결번/대상아님') || (status === '중복' && isRecent30);
+
+      // [2026-09-14] ★ 채널×유입월 유효DB 집계 (담당자 무관, 원가 분모용).
+      //   유효 = 결번·중복(30일) 제외 = _excludeFromAssignee false.
+      if (!_excludeFromAssignee) {
+        var _inYYMM0 = _recYYMM;
+        if (validDbByCh[routeKey]) {
+          validDbByCh[routeKey][_inYYMM0] = (validDbByCh[routeKey][_inYYMM0]||0) + 1;
+        }
+        if (routeKey === 'CPA') cpaValidTotal++;
+      }
+
+      if (ASSIGNEES.includes(assignee) && !_excludeFromAssignee) {
+        if (isMonth)     assigneeMonth[assignee].db++;
+        if (isLastMonth) assigneeLast[assignee].db++;
+        assigneeAll[assignee].db++;
+
+        var __sk  = sojKeyOf(campaign, campIsMeta);
+        // [2026-09-14] 유입월 YYMM 태그 (신청일 기준). 원가배분 월매칭용.
+        var __inYYMM = _recYYMM;
+        var __campObj = { campaign: campaign, isMeta: campIsMeta, route: routeKey, inYYMM: __inYYMM };
+        if (isMonth)     { assigneeMonth[assignee].soj[__sk] = (assigneeMonth[assignee].soj[__sk]||0)+1;
+                           assigneeMonth[assignee].camps.push(__campObj); }
+        if (isLastMonth) { assigneeLast[assignee].soj[__sk] = (assigneeLast[assignee].soj[__sk]||0)+1;
+                           assigneeLast[assignee].camps.push(__campObj); }
+        assigneeAll[assignee].soj[__sk] = (assigneeAll[assignee].soj[__sk]||0)+1;
+        // ★ 전체(A) camps = 전 기간 유입분(5~9월). 이게 없어서 A원가가 M+L만 잡히던 버그.
+        assigneeAll[assignee].camps.push(__campObj);
+
+        const isCancel   = status === '방문취소';
+        const isVisitAll = isVisitStatus || isCancel || isKulbo || isOrder;
+        const isSetting  = isKulbo || isOrder;
+
+        const inMonth = visitDate ? isVisitDateMonth : (isOrder && isPayMonth);
+        const inLast  = visitDate ? isVisitDateLastMonth : (isOrder && isPayLastMonth);
+
+        if (isVisitAll) {
+          const vMonth = visitDate ? inMonth : isMonth;
+          const vLast  = visitDate ? inLast  : isLastMonth;
+          if (vMonth) assigneeMonth[assignee].visit++;
+          if (vLast)  assigneeLast[assignee].visit++;
+          assigneeAll[assignee].visit++;
+          if (vMonth) {
+            var _asm = (date.getMonth()+1) + '';
+            if (!assigneeVisitCohortM[assignee]) assigneeVisitCohortM[assignee] = {};
+            assigneeVisitCohortM[assignee][_asm] = (assigneeVisitCohortM[assignee][_asm]||0) + 1;
+          }
+        }
+        if (isSetting) {
+          if (inMonth) assigneeMonth[assignee].setting++;
+          if (inLast)  assigneeLast[assignee].setting++;
+          assigneeAll[assignee].setting++;
+        }
+        if (isCancel) {
+          if (isMonth)     assigneeMonth[assignee].cancel++;
+          if (isLastMonth) assigneeLast[assignee].cancel++;
+          assigneeAll[assignee].cancel++;
+        }
+
+        if (isOrder && isPayMonth)     { assigneeMonth[assignee].order++; assigneeMonth[assignee].sales += sales; }
+        if (isOrder && isPayLastMonth) { assigneeLast[assignee].order++;  assigneeLast[assignee].sales += sales; }
+        if (isOrder)                   { assigneeAll[assignee].order++;   assigneeAll[assignee].sales += sales; }
+
+        const w = assigneeWeek[assignee];
+        const wVisit = visitDate ? isWeekVisit : isWeekSignup;
+        if (isWeekSignup) { w.db++; w.soj[__sk] = (w.soj[__sk]||0)+1; }
+        if (isVisitAll && wVisit)        w.visit++;
+        if (isKulbo && isWeekVisit)      w.setting++;
+        if (isOrder && isWeekPay)        { w.setting++; w.order++; w.sales += sales; }
+        if (isCancel && isWeekSignup)    w.cancel++;
+        if (isHold && isWeekSignup)      w.hold++;
+        if (isDropNum && isWeekSignup)   w.drop++;
+        if (isRecover && isWeekVisit)    w.recover++;
+        if (isRecoverOff && isWeekVisit) w.recoverOff++;
+      }
+    });
+
+    function won(n) {
+      if (!n) return '0원';
+      if (n >= 10000) return (Math.round(n/1000)/10) + '만원';
+      return n + '원';
+    }
+    function cohortStr(m){
+      if(!m) return '';
+      return Object.keys(m).map(Number).sort(function(a,b){return b-a;})
+        .map(function(mo){ return mo+'월:'+m[mo]; }).join(';');
+    }
+    function convStr(visit, total) {
+      return total+'→'+visit+' ('+(total ? Math.round(visit/total*100) : 0)+'%)';
+    }
+    function convOrderStr(order, visit) {
+      return visit+'→'+order+' ('+(visit ? Math.round(order/visit*100) : 0)+'%)';
+    }
+
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName('요약') || ss.insertSheet('요약');
+    sheet.clearContents();
+
+    sheet.getRange('A1:E1').setValues([['유입 현황','오늘','이번달','지난달','전체']]);
+    sheet.getRange('A2:E3').setValues([
+      ['총 유입',   todayInflow,     monthTotal,     lastMonthTotal,     allTotal],
+      ['어제 유입', yesterdayInflow, 0,              0,                  0]
+    ]);
+
+    sheet.getRange('A5:E5').setValues([['방문/오더','오늘','이번달','지난달','전체']]);
+    sheet.getRange('A6:E9').setValues([
+      ['방문완료', todayVisitDone,   monthVisitDone,   lastMonthVisitDone,   allVisitDone],
+      ['방문예정', todayVisitPlan,   monthVisitPlan,   lastMonthVisitPlan,   allVisitPlan],
+      ['오더',     todayOrderStatus, monthOrderStatus, lastMonthOrderStatus, allOrderStatus],
+      ['결보',     todayKulbo,       monthKulbo,       lastMonthKulbo,       allKulbo]
+    ]);
+
+    monthSales     = (_cx.sMonth || 0);
+    lastMonthSales = (_cx.sLast  || 0);
+    allSales       = (_cx.sAll   || 0);
+    weekSales      = (_cx.sWeek     || 0);
+    lastWeekSales  = (_cx.sLastWeek || 0);
+    sheet.getRange('A11:D11').setValues([['매출 항목','금액','매출 항목','금액']]);
+    sheet.getRange('A12:D13').setValues([
+      ['이번 달 매출 (' + monthDayNo + '일차)', won(monthSales),     '이번 주 매출 (' + weekDayNo + '일차)', won(weekSales)],
+      ['지난 달 매출',                          won(lastMonthSales), '지난 주 매출',                        won(lastWeekSales)]
+    ]);
+
+    function rate(a, b) { return b + '→' + a + ' (' + (b ? Math.round(a/b*100) : 0) + '%)'; }
+    sheet.getRange('A16:D16').setValues([['전환','이번달','지난달','전체']]);
+    sheet.getRange('A17:D20').setValues([
+      ['신청→방문', rate(monthVisitFull, monthTotal),       rate(lastMonthVisitFull, lastMonthTotal),       rate(allVisitFull, allTotal)],
+      ['방문→세팅', rate(monthSetting, monthVisitFull),     rate(lastMonthSetting, lastMonthVisitFull),     rate(allSetting, allVisitFull)],
+      ['세팅→오더', rate(monthOrderStatus, monthSetting),   rate(lastMonthOrderStatus, lastMonthSetting),   rate(allOrderStatus, allSetting)],
+      ['방문취소',  rate(monthCancelAll, monthVisitFull),   rate(lastMonthCancelAll, lastMonthVisitFull),   rate(allCancelAll, allVisitFull)]
+    ]);
+
+    sheet.getRange('A22:D22').setValues([['리드출처','이번달','지난달','전체']]);
+    sheet.getRange('A23:D26').setValues([
+      ['아라위키', sourceMonth.arawiki,  sourceLast.arawiki,  sourceAll.arawiki],
+      ['오디플랜', sourceMonth.odiplaan, sourceLast.odiplaan, sourceAll.odiplaan],
+      ['브랜드',   sourceMonth.brand,    sourceLast.brand,    sourceAll.brand],
+      ['합계', sourceMonth.arawiki+sourceMonth.odiplaan+sourceMonth.brand, sourceLast.arawiki+sourceLast.odiplaan+sourceLast.brand, sourceAll.arawiki+sourceAll.odiplaan+sourceAll.brand]
+    ]);
+
+    sheet.getRange('A28:M28').setValues([['학년별','이번달DB','지난달DB','전체DB','이번달방문','지난달방문','전체방문','이번달오더','지난달오더','전체오더','이번달결보','지난달결보','전체결보']]);
+    const gradeKeysArr = ['초','중','고','미기재'];
+    const gradeLabelMap = { '초':'초등', '중':'중학', '고':'고등', '미기재':'미기재' };
+    const gSum = (o) => gradeKeysArr.reduce((s,k)=>s+o[k],0);
+    const gradeRows = gradeKeysArr.map(k => [
+      gradeLabelMap[k],
+      gradeMonth[k], gradeLast[k], gradeAll[k],
+      gradeVisitMonth[k], gradeVisitLast[k], gradeVisitAll[k],
+      gradeOrderMonth[k], gradeOrderLast[k], gradeOrderAll[k],
+      gradeKulboMonth[k], gradeKulboLast[k], gradeKulboAll[k]
+    ]);
+    gradeRows.push([
+      '합계',
+      gSum(gradeMonth), gSum(gradeLast), gSum(gradeAll),
+      gSum(gradeVisitMonth), gSum(gradeVisitLast), gSum(gradeVisitAll),
+      gSum(gradeOrderMonth), gSum(gradeOrderLast), gSum(gradeOrderAll),
+      gSum(gradeKulboMonth), gSum(gradeKulboLast), gSum(gradeKulboAll)
+    ]);
+    sheet.getRange(29, 1, gradeRows.length, 13).setValues(gradeRows);
+    sheet.getRange(29, 2, gradeRows.length, 12).setNumberFormat('0');
+
+    function pct(a,b){ return b ? Math.round(a/b*100)+'%' : '0%'; }
+    const lastYYMM = Utilities.formatDate(lastMonthStart, 'GMT+9', 'yyMM');
+    const thisYYMM = Utilities.formatDate(monthStart, 'GMT+9', 'yyMM');
+    const spendLast = Object.assign({}, AD_SPEND[lastYYMM] || {});
+    const spendThis = Object.assign({}, AD_SPEND[thisYYMM] || {});
+        // ── [메타광고비 자동] 이번달 메타광고비를 '메타광고비' 탭에서 읽어 덮어씀 ──
+    var _metaSheet = (typeof loadMetaSpend_ === 'function') ? loadMetaSpend_(thisYYMM) : null;
+    if (_metaSheet && _metaSheet.total > 0) {
+      var _codeMeta = spendThis['메타광고'] || 0;
+      spendThis['메타광고'] = _metaSheet.total;
+      // ★ [버그수정] CPL 분자(metaSpendOfYYMM)는 AD_SPEND[thisYYMM].메타광고를 읽는데
+      //   여기(spendThis)만 덮어쓰면 투입원가가 스테일 코드값으로 과소계산됨 → AD_SPEND 원본도 갱신.
+      if (!AD_SPEND[thisYYMM]) AD_SPEND[thisYYMM] = {};
+      AD_SPEND[thisYYMM].메타광고 = _metaSheet.total;
+      Logger.log('[메타광고비 자동] 이번달 메타광고 ' + _codeMeta.toLocaleString() +
+                 ' → 시트 ' + _metaSheet.total.toLocaleString() +
+                 ' (캠페인 ' + Object.keys(_metaSheet.camps).length + '개)');
+      _META_SHEET_CAMPS = _metaSheet.camps;
+    } else {
+      _META_SHEET_CAMPS = null;
+      Logger.log('[메타광고비 자동] 시트 미사용 → 코드값 유지');
+    }
+    const lastSince = Utilities.formatDate(lastMonthStart, 'GMT+9', 'yyyy-MM-dd');
+    const lastUntil = Utilities.formatDate(new Date(lastMonthEnd.getTime() - 86400000), 'GMT+9', 'yyyy-MM-dd');
+    const thisSince = Utilities.formatDate(monthStart, 'GMT+9', 'yyyy-MM-dd');
+    const _yestForSpend = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+    const thisUntil = (_yestForSpend >= monthStart)
+      ? Utilities.formatDate(_yestForSpend, 'GMT+9', 'yyyy-MM-dd')
+      : thisSince;
+
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const _spendDayNo = Math.max(1, monthDayNo - 1);
+    const prorate = _spendDayNo / daysInMonth;
+
+    spendLast['카카오'] = sumSpendFromSheet('카카오모먼트', lastSince, lastUntil);
+    spendThis['카카오'] = sumSpendFromSheet('카카오모먼트', thisSince, thisUntil);
+    var _BS = ['BRAND_SEARCH', 'BRAND_SEARCH_FEE'];
+    var NAVER_BRAND_MONTHLY = { '2605':1400000, '2606':1540000, '2607':1650000, '2608':1650000, '2609':1650000 };
+    spendThis['네이버브랜드'] = sumSpendFromSheet('네이버SA', thisSince, thisUntil, { onlyTypes: _BS });
+    spendLast['네이버브랜드'] = NAVER_BRAND_MONTHLY[lastYYMM] || sumSpendFromSheet('네이버SA', lastSince, lastUntil, { onlyTypes: _BS });
+    var _pcLast = sumSpendFromSheet('네이버SA', lastSince, lastUntil, { onlyTypes: ['POWER_CONTENTS'] });
+    var _pcThis = sumSpendFromSheet('네이버SA', thisSince, thisUntil, { onlyTypes: ['POWER_CONTENTS'] });
+
+    Logger.log('광고비 자동합산 — 지난달(' + lastSince + '~' + lastUntil + ') 카카오 ' +
+               spendLast['카카오'].toLocaleString() + ' / 네이버브랜드 ' + spendLast['네이버브랜드'].toLocaleString());
+    Logger.log('광고비 자동합산 — 이번달(' + thisSince + '~' + thisUntil + ', 브검 일할 ' +
+               monthDayNo + '/' + daysInMonth + '=' + prorate.toFixed(3) + ') 카카오 ' +
+               spendThis['카카오'].toLocaleString() + ' / 네이버브랜드 ' + spendThis['네이버브랜드'].toLocaleString());
+
+    // ============================================================
+    // [2026-09-14] 투입원가 = 유입월별 blended 배분 (전면 재작성)
+    //   ▸ 취지: 광고비 총액에서 중복(30일)·결번 제외한 유효 DB 비율로 개인 배분.
+    //   ▸ 메타 = 유입월 blended CPL (그달 메타광고비 ÷ 그달 메타 유효DB).
+    //   ▸ 텐핑 = 누적입금(VAT포함) ÷ 누적 유효DB (코호트 균일. 충전월≠유입월).
+    //   ▸ 카카오·네이버 = 그달 실집행 ÷ 그달 유효DB.
+    //   ▸ camps에 유입월(inYYMM) 태그. M/L/A 전부 동일 로직. A는 전 기간 camps.
+    //   ▸ 개별 합 = Σ(월blended × 월유효DB) = 전사 광고비 → 정합.
+    // ============================================================
+    var _metaCplCache = {};
+    function metaCplByMonth(yymm){
+      if (_metaCplCache[yymm] !== undefined) return _metaCplCache[yymm];
+      var spend = metaSpendOfYYMM(yymm);
+      var db    = (validDbByCh['메타광고'][yymm] || 0);
+      var cpl   = (spend > 0 && db > 0) ? Math.round(spend / db) : 0;
+      _metaCplCache[yymm] = cpl;
+      return cpl;
+    }
+    var _tenpingCpl = (cpaValidTotal > 0) ? Math.round(tenpingTotalDeposit() / cpaValidTotal) : 0;
+
+    var _chSpendCache = {};
+    function channelSpendByMonth(route, yymm){
+      var key = route + '|' + yymm;
+      if (_chSpendCache[key] !== undefined) return _chSpendCache[key];
+      var val = 0;
+      if (yymm === thisYYMM)      val = (spendThis[route] || 0);
+      else if (yymm === lastYYMM) val = (spendLast[route] || 0);
+      else {
+        var y = 2000 + parseInt(yymm.substring(0,2),10);
+        var m = parseInt(yymm.substring(2,4),10);
+        var s = Utilities.formatDate(new Date(y, m-1, 1), 'GMT+9', 'yyyy-MM-dd');
+        var e = Utilities.formatDate(new Date(y, m, 0),   'GMT+9', 'yyyy-MM-dd');
+        if (route === '카카오')          val = sumSpendFromSheet('카카오모먼트', s, e);
+        else if (route === '네이버브랜드') {
+          val = NAVER_BRAND_MONTHLY[yymm] || sumSpendFromSheet('네이버SA', s, e, { onlyTypes: _BS });
+        }
+      }
+      _chSpendCache[key] = val;
+      return val;
+    }
+    function channelCplByMonth(route, yymm){
+      if (route === 'CPA') return _tenpingCpl;
+      if (route === '메타광고') return metaCplByMonth(yymm);
+      if (route === 'Organic' || route === '당근' || route === '기타' || route === '네이버GFA') return 0;
+      var sp = channelSpendByMonth(route, yymm);
+      var db = (validDbByCh[route] && validDbByCh[route][yymm]) ? validDbByCh[route][yymm] : 0;
+      return (sp > 0 && db > 0) ? Math.round(sp / db) : 0;
+    }
+    function calcCostV2(camps){
+      if (!camps || !camps.length) return 0;
+      var sum = 0;
+      camps.forEach(function(c){
+        var yymm = c.inYYMM || thisYYMM;
+        if (c.isMeta) sum += metaCplByMonth(yymm);
+        else          sum += channelCplByMonth(c.route, yymm);
+      });
+      return sum;
+    }
+    ASSIGNEES.forEach(function(a){
+      assigneeMonth[a].cost = calcCostV2(assigneeMonth[a].camps);
+      assigneeLast[a].cost  = calcCostV2(assigneeLast[a].camps);
+      assigneeAll[a].cost   = calcCostV2(assigneeAll[a].camps);   // ★ 전 기간 camps → 정상
+    });
+    Logger.log('[투입원가 v2] 메타CPL(월별) ' +
+      Object.keys(_metaCplCache).sort().map(function(k){return k+':'+_metaCplCache[k];}).join(' ') +
+      ' / 텐핑코호트CPL ' + _tenpingCpl +
+      ' / 담당자원가A ' + ASSIGNEES.map(function(a){return a+':'+Math.round(assigneeAll[a].cost/10000)+'만';}).join(' '));
+    // ★ [정합 점검] 이번달 Σ투입원가 vs 실집행(메타+카카오+네이버). 차이 = 미배정·비랭킹·결번 리드 몫.
+    var _sumCostM = ASSIGNEES.reduce(function(s,a){return s+(assigneeMonth[a].cost||0);},0);
+    var _realSpendM = (spendThis['메타광고']||0)+(spendThis['카카오']||0)+(spendThis['네이버브랜드']||0)+(_pcThis||0);
+    Logger.log('[투입원가 정합] 이번달 Σ투입원가 '+Math.round(_sumCostM/10000)+'만 vs 실집행(메타+카카오+네이버) '+Math.round(_realSpendM/10000)+'만 / 메타분모 유효DB '+(validDbByCh['메타광고'][thisYYMM]||0)+'건');
+
+    sheet.getRange('A35:S35').setValues([['유입경로별',
+      '이번달DB','지난달DB','전체DB',
+      '이번달방문','지난달방문','전체방문',
+      '이번달세팅','지난달세팅','전체세팅',
+      '이번달오더','지난달오더','전체오더',
+      '지난달광고비','지난달CPL','지난달ROAS',
+      '이번달광고비','이번달CPL','이번달ROAS']]);
+    const routeRows = ROUTE_KEYS.map(k => {
+      const spL   = spendLast[k] || 0;
+      const cplL  = (spL && routeLast[k]) ? Math.round(spL / routeLast[k]) : 0;
+      const roasL = spL ? (routeSalesLast[k] / spL) : 0;
+      const spM   = spendThis[k] || 0;
+      const cplM  = (spM && routeMonth[k]) ? Math.round(spM / routeMonth[k]) : 0;
+      const roasM = spM ? (routeSalesMonth[k] / spM) : 0;
+      const isCohort = (k === 'CPA');
+      const roasLStr = isCohort ? '코호트' : (spL ? roasL.toFixed(2) : '');
+      const roasMStr = isCohort ? '코호트' : (spM ? roasM.toFixed(2) : '');
+      return [
+        k,
+        routeMonth[k], routeLast[k], routeAll[k],
+        routeVisitMonth[k], routeVisitLast[k], routeVisit[k],
+        routeSettingMonth[k], routeSettingLast[k], routeSetting[k],
+        routeOrderMonth[k], routeOrderLast[k], routeOrder[k],
+        spL, cplL, roasLStr,
+        spM, cplM, roasMStr
+      ];
+    });
+    sheet.getRange(36, 1, routeRows.length, 19).setValues(routeRows);
+    sheet.getRange(36, 2, routeRows.length, 12).setNumberFormat('0');
+    const sumRow = 36 + routeRows.length;
+    const sumOf = (o) => Object.values(o).reduce((a,b)=>a+b,0);
+    const tDb = sumOf(routeAll), tDbLast = sumOf(routeLast), tDbMon = sumOf(routeMonth);
+    const tSpendL = sumOf(spendLast), tRvLast = sumOf(routeSalesLast);
+    const tSpendM = sumOf(spendThis), tRvMon = sumOf(routeSalesMonth);
+    sheet.getRange(sumRow, 1, 1, 19).setValues([[
+      '합계', tDbMon, tDbLast, tDb,
+      sumOf(routeVisitMonth), sumOf(routeVisitLast), sumOf(routeVisit),
+      sumOf(routeSettingMonth), sumOf(routeSettingLast), sumOf(routeSetting),
+      sumOf(routeOrderMonth), sumOf(routeOrderLast), sumOf(routeOrder),
+      tSpendL, (tSpendL && tDbLast) ? Math.round(tSpendL/tDbLast) : 0, tSpendL ? (tRvLast/tSpendL).toFixed(2) : '',
+      tSpendM, (tSpendM && tDbMon) ? Math.round(tSpendM/tDbMon) : 0, tSpendM ? (tRvMon/tSpendM).toFixed(2) : ''
+    ]]);
+    sheet.getRange(sumRow, 2, 1, 12).setNumberFormat('0');
+
+    const assigneeStartRow = sumRow + 2;
+    sheet.getRange(assigneeStartRow, 1, 1, 31).setValues([[
+      '담당자',
+      '이번달 DB','이번달 방문','이번달 세팅','이번달 방취','이번달 오더','이번달 매출',
+      '지난달 DB','지난달 방문','지난달 세팅','지난달 방취','지난달 오더','지난달 매출',
+      '전체 DB','전체 방문','전체 세팅','전체 방취','전체 오더','전체 매출',
+      '원가M','ROASM','효율M','원가L','ROASL','효율L','원가A','ROASA','효율A',
+      '소재분포M','소재분포L','소재분포A'
+    ]]);
+    ASSIGNEES.forEach(function(a){
+     var c = _cx.mgr[a];
+     if (!c) { assigneeMonth[a].sales = 0; assigneeLast[a].sales = 0; assigneeAll[a].sales = 0; return; }
+     assigneeMonth[a].sales = (c.sm || 0);
+     assigneeLast[a].sales  = (c.sl || 0);
+     assigneeAll[a].sales   = (c.sa || 0);
+    });
+
+    const assigneeRows = ASSIGNEES.map(a => [
+      a,
+      assigneeMonth[a].db, assigneeMonth[a].visit, assigneeMonth[a].setting, assigneeMonth[a].cancel, assigneeMonth[a].order, won(assigneeMonth[a].sales),
+      assigneeLast[a].db,  assigneeLast[a].visit,  assigneeLast[a].setting,  assigneeLast[a].cancel,  assigneeLast[a].order,  won(assigneeLast[a].sales),
+      assigneeAll[a].db,   assigneeAll[a].visit,   assigneeAll[a].setting,   assigneeAll[a].cancel,   assigneeAll[a].order,   won(assigneeAll[a].sales),
+      Math.round(assigneeMonth[a].cost/10000),
+      assigneeMonth[a].cost ? +(assigneeMonth[a].sales/assigneeMonth[a].cost).toFixed(2) : 0,
+      assigneeMonth[a].db   ? +(assigneeMonth[a].sales/assigneeMonth[a].db/10000).toFixed(1) : 0,
+      Math.round(assigneeLast[a].cost/10000),
+      assigneeLast[a].cost ? +(assigneeLast[a].sales/assigneeLast[a].cost).toFixed(2) : 0,
+      assigneeLast[a].db   ? +(assigneeLast[a].sales/assigneeLast[a].db/10000).toFixed(1) : 0,
+      Math.round(assigneeAll[a].cost/10000),
+      assigneeAll[a].cost ? +(assigneeAll[a].sales/assigneeAll[a].cost).toFixed(2) : 0,
+      assigneeAll[a].db   ? +(assigneeAll[a].sales/assigneeAll[a].db/10000).toFixed(1) : 0,
+      Object.keys(assigneeMonth[a].soj).map(function(k){return k+":"+assigneeMonth[a].soj[k];}).join(";"),
+      Object.keys(assigneeLast[a].soj).map(function(k){return k+":"+assigneeLast[a].soj[k];}).join(";"),
+      Object.keys(assigneeAll[a].soj).map(function(k){return k+":"+assigneeAll[a].soj[k];}).join(";")
+    ]);
+    sheet.getRange(assigneeStartRow + 1, 1, assigneeRows.length, 31).setValues(assigneeRows);
+
+    sheet.getRange(assigneeStartRow, 33).setValue('방문코호트M');
+    ASSIGNEES.forEach(function(a, i){
+      sheet.getRange(assigneeStartRow + 1 + i, 33).setValue(cohortStr(assigneeVisitCohortM[a]));
+    });
+
+    const campaignStartRow = assigneeStartRow + 1 + ASSIGNEES.length + 1;
+    sheet.getRange(campaignStartRow, 1, 1, 20).setValues([['캠페인','채널','이번달DB','지난달DB','전체DB','이번달방문','지난달방문','전체방문','이번달세팅','지난달세팅','전체세팅','이번달오더','지난달오더','전체오더','지난달광고비','지난달매출','지난달ROAS','이번달광고비','이번달매출','이번달ROAS']]);
+    const campaignSorted = Object.entries(campaignAll).sort((a,b) => {
+      const sa = (CAMPAIGN_SPEND[a[0]] && CAMPAIGN_SPEND[a[0]].status === 'ON') ? 0 : 1;
+      const sb = (CAMPAIGN_SPEND[b[0]] && CAMPAIGN_SPEND[b[0]].status === 'ON') ? 0 : 1;
+      if (sa !== sb) return sa - sb;
+      return (campaignOrderAll[b[0]]||0)-(campaignOrderAll[a[0]]||0) || b[1]-a[1];
+    }).slice(0, 50);
+    Logger.log('[진단] 비메타캠 = ' + campaignSorted
+      .filter(function(e){return !campaignIsMeta[e[0]];})
+      .map(function(e){return '「'+e[0]+'」';}).join(' ') +
+      ' / isMeta카카오=' + campaignIsMeta['카카오'] +
+      ' / spendThis카카오=' + (spendThis['카카오']||0));
+    if (campaignSorted.length > 0) {
+      const campaignRows = campaignSorted.map(([name]) => {
+        const cs   = CAMPAIGN_SPEND[name] || {};
+        var spL  = cs[lastYYMM] || 0;
+        var spM  = cs[thisYYMM] || 0;
+                if (_META_SHEET_CAMPS && campaignIsMeta[name] && _META_SHEET_CAMPS[name] != null) {
+          spM = _META_SHEET_CAMPS[name];
+        }
+        // [2026-09] 비메타 채널(카카오·네이버·텐핑)은 CAMPAIGN_SPEND에 없어
+        //   캠페인별 광고비가 0으로 뜨던 버그 → 경로별과 동일하게 채널 실집행에서 채움.
+        //   이름 포함매칭(메타 캠페인명엔 카카오/네이버가 없어 오매칭 없음). isMeta 조건 안 씀
+        //   (카카오 행에 메타 리드가 섞여 isMeta=true로 찍혀도 광고비는 채워지게).
+        var _nm = (name || '').trim();
+        if (_nm.indexOf('카카오') >= 0) {
+          spM = spendThis['카카오'] || 0;  spL = spendLast['카카오'] || 0;
+        } else if (_nm.indexOf('네이버') >= 0 && _nm.indexOf('GFA') < 0) {
+          spM = spendThis['네이버브랜드'] || 0;  spL = spendLast['네이버브랜드'] || 0;
+        } else if (_nm.indexOf('텐핑') >= 0 || _nm.indexOf('CPA') >= 0) {
+          spM = TENPING_DEPOSIT[thisYYMM] || 0;  spL = TENPING_DEPOSIT[lastYYMM] || 0;
+        }
+        const rvL  = campaignSalesLast[name]  || 0;
+        const rvM  = campaignSalesMonth[name] || 0;
+        const roasL = spL ? +(rvL / spL).toFixed(2) : 0;
+        const roasM = spM ? +(rvM / spM).toFixed(2) : 0;
+        return [
+          name,
+          campaignIsMeta[name] ? '메타' : name,
+          campaignMonth[name] || 0, campaignLast[name] || 0, campaignAll[name] || 0,
+          campaignVisitMonth[name] || 0, campaignVisitLast[name] || 0, campaignVisitAll[name] || 0,
+          campaignSettingMonth[name] || 0, campaignSettingLast[name] || 0, campaignSettingAll[name] || 0,
+          campaignOrderMonth[name] || 0, campaignOrderLast[name] || 0, campaignOrderAll[name] || 0,
+          spL, rvL, roasL,
+          spM, rvM, roasM
+        ];
+      });
+      sheet.getRange(campaignStartRow + 1, 1, campaignRows.length, 20).setValues(campaignRows);
+      sheet.getRange(campaignStartRow, 21).setValue('방문코호트M');
+      campaignSorted.forEach(function(entry, i){
+        sheet.getRange(campaignStartRow + 1 + i, 21).setValue(cohortStr(campaignVisitCohortM[entry[0]]));
+      });
+    }
+
+    const cohortStartRow = campaignStartRow + 1 + (campaignSorted.length || 0) + 2;
+    const cpaOrder = routeOrder['CPA'] || 0;
+    const cpaDb    = routeAll['CPA'] || 0;
+    const cpaMonthSpend = TENPING_DEPOSIT[thisYYMM] || 0;
+    const cpaMonthDb    = cpaMonthDbValid;
+    const cpaSalesM = routeSalesMonth['CPA'] || 0;
+    const cpaRoasM  = cpaMonthSpend ? (cpaSalesM / cpaMonthSpend) : 0;
+    const cpaCplM   = cpaMonthDb ? Math.round(cpaMonthSpend / cpaMonthDb) : 0;
+    const cpaAllSpend = Object.keys(TENPING_DEPOSIT).reduce(function(a,k){ return a + TENPING_DEPOSIT[k]; }, 0);
+    const cpaAllDb    = CPA_COHORT.allDb;
+    const cpaSalesA = routeSalesAll['CPA'] || 0;
+    const cpaRoasA  = cpaAllSpend ? (cpaSalesA / cpaAllSpend) : 0;
+    const cpaCplA   = cpaAllDb ? Math.round(cpaAllSpend / cpaAllDb) : 0;
+    const cpaSales = cpaSalesA, cpaRoas = cpaRoasA;
+
+    sheet.getRange(cohortStartRow, 1, 1, 2).setValues([['텐핑코호트','값']]);
+    const cohortRows = [
+      ['누적 투자',   cpaAllSpend],
+      ['유효 DB',     cpaAllDb],
+      ['노션 DB',     cpaDb],
+      ['실질 CPL',    cpaCplA],
+      ['누적 오더',   cpaOrder],
+      ['누적 회수',   cpaSalesA],
+      ['누적 ROAS',   cpaRoasA.toFixed(2)],
+      ['회수율(%)',   cpaAllSpend ? Math.round(cpaSalesA / cpaAllSpend * 100) : 0],
+      ['무효 DB',     CPA_COHORT.allInvalid || 0],
+      ['이번달 투자', cpaMonthSpend],
+      ['이번달 유효DB', cpaMonthDb],
+      ['이번달 무효', cpaMonthInvalid],
+      ['이번달 CPL',  cpaCplM],
+      ['이번달 회수', cpaSalesM],
+      ['이번달 ROAS', cpaRoasM.toFixed(2)],
+      ['집행상태',    CPA_COHORT.active ? '집행중' : '중단(잔액 0)']
+    ];
+    sheet.getRange(cohortStartRow + 1, 1, cohortRows.length, 2).setValues(cohortRows);
+    sheet.getRange(cohortStartRow + 1, 2, cohortRows.length, 1).setNumberFormat('0');
+    Logger.log('텐핑 코호트 — [전체] 투자 ' + cpaAllSpend.toLocaleString() +
+               ' / 회수 ' + cpaSalesA.toLocaleString() + ' / ROAS ' + cpaRoasA.toFixed(2) +
+               ' · [이번달] 투자 ' + cpaMonthSpend.toLocaleString() +
+               ' (유효' + cpaMonthDb + '/무효' + cpaMonthInvalid + ')' +
+               ' / 회수 ' + cpaSalesM.toLocaleString() + ' / ROAS ' + cpaRoasM.toFixed(2) +
+               ' / 오더 ' + cpaOrder + '건');
+
+    function topBy(fn, minVisit) {
+      var best = null, bestV = -1;
+      ASSIGNEES.forEach(function(a) {
+        var w = assigneeWeek[a];
+        if (minVisit && w.visit < minVisit) return;
+        var v = fn(w);
+        if (v > bestV) { bestV = v; best = a; }
+      });
+      return { name: best, val: bestV };
+    }
+    var hlSales = topBy(function(w){ return w.sales; });
+    var hlVisit = topBy(function(w){ return w.visit; });
+    var hlConv  = topBy(function(w){ return w.visit ? w.order / w.visit : 0; }, 3);
+    var hlRecover    = topBy(function(w){ return w.recover; });
+    var hlRecoverOff = topBy(function(w){ return w.recoverOff; });
+    var hlDrop  = topBy(function(w){ return w.cancel + w.drop; });
+    var hlConvName = (hlConv.name && hlConv.val > 0) ? hlConv.name : '';
+    var convDetail = hlConvName ? ('방문' + assigneeWeek[hlConvName].visit + '→오더' + assigneeWeek[hlConvName].order) : '';
+    var hlDropName = (hlDrop.val > 0) ? hlDrop.name : '';
+    var hlDropSoj  = hlDropName
+      ? Object.keys(assigneeWeek[hlDropName].soj).map(function(k){ return k + ':' + assigneeWeek[hlDropName].soj[k]; }).join(';')
+      : '';
+
+    const hlStartRow = cohortStartRow + 1 + cohortRows.length + 2;
+    sheet.getRange(hlStartRow, 1, 1, 4).setValues([['주간하이라이트','이름','값','부가']]);
+    const hlRows = [
+      ['매출왕',   hlSales.val > 0 ? hlSales.name : '-', hlSales.val > 0 ? won(hlSales.val) : '', ''],
+      ['방문왕',   hlVisit.val > 0 ? hlVisit.name : '-', hlVisit.val > 0 ? hlVisit.val : '', ''],
+      ['전환왕',   hlConvName || '-', hlConvName ? Math.round(hlConv.val * 100) + '%' : '', convDetail],
+      ['홀딩회수', hlRecover.val > 0 ? hlRecover.name : '-', hlRecover.val > 0 ? hlRecover.val : '', ''],
+      ['부재회수', hlRecoverOff.val > 0 ? hlRecoverOff.name : '-', hlRecoverOff.val > 0 ? hlRecoverOff.val : '', ''],
+      ['결번진단', hlDropName || '-', hlDrop.val > 0 ? hlDrop.val : '', hlDropSoj]
+    ];
+    sheet.getRange(hlStartRow + 1, 1, hlRows.length, 4).setValues(hlRows);
+    Logger.log('주간 하이라이트 — 매출왕 ' + hlSales.name + ' / 방문왕 ' + hlVisit.name +
+               ' / 전환왕 ' + (hlConvName || '없음') + ' / 홀딩회수 ' + hlRecover.name + ' / 결번 ' + (hlDropName || '없음'));
+
+    var _spendAllFixed = 0;
+    for (var _mk in MONTH_SPEND_TOTAL) { _spendAllFixed += MONTH_SPEND_TOTAL[_mk]; }
+    var _spendThisSum = 0;
+    for (var _ck in spendThis) { if (_ck !== 'CPA') _spendThisSum += (spendThis[_ck] || 0); }
+    _spendThisSum += (TENPING_DEPOSIT[thisYYMM] || 0);
+    var _spendAll = _spendAllFixed + _spendThisSum;
+    var _roasAll = _spendAll ? +(allSales / _spendAll).toFixed(2) : 0;
+    var spendStartRow = hlStartRow + 1 + hlRows.length + 2;
+    sheet.getRange(spendStartRow, 1, 1, 2).setValues([['전체광고비','값']]);
+    sheet.getRange(spendStartRow + 1, 1, 4, 2).setValues([
+      ['전체 광고비',   _spendAll],
+      ['종결월 확정(5~8월)', _spendAllFixed],
+      ['이번달 라이브',  _spendThisSum],
+      ['전체 ROAS',     _roasAll]
+    ]);
+    sheet.getRange(spendStartRow + 1, 2, 3, 1).setNumberFormat('0');
+    Logger.log('[전체광고비] 확정(5~8) ' + _spendAllFixed.toLocaleString() +
+               ' + 이번달 ' + _spendThisSum.toLocaleString() +
+               ' = ' + _spendAll.toLocaleString() + ' / 전체ROAS ' + _roasAll);
+
+    // ════════════════════════════════════════════════════════════
+// [캘린더뷰] 기존 노션 날짜별 유입 — getLeadStats 맨 끝에 추가
+//
+//   위치: getLeadStats 함수 안, "exportSchedule(allResults);" 바로 윗줄에 붙여넣기.
+//   ⚠️ 기존 로직·숫자 0 수정. 요약 시트 맨 끝에 '일자별유입' 블록만 추가.
+//      dashboard가 라벨('일자별유입')로 찾으므로 뒤에 붙여도 기존 블록 안 밀림.
+//
+//   집계: 신청일(date) 기준 날짜별 유입 건수. 이번달 + 지난달치.
+//        allResults 루프를 또 돌지 않고, 이미 파싱된 값 재활용용으로 가볍게 재집계.
+// ════════════════════════════════════════════════════════════
+
+    // ── [캘린더뷰] 일자별 유입 집계 (신청일 기준, 최근 60일) ──
+    var _dailyInflow = {};   // 'yyyy-MM-dd' → 건수
+    var _calSince = new Date(now.getTime() - 62*86400000);
+    allResults.forEach(function(page){
+      var props = page.properties;
+      var nameC = (props['이름'] && props['이름'].title && props['이름'].title[0]) ? props['이름'].title[0].plain_text : '';
+      var srcC  = (props['리드출처'] && props['리드출처'].select) ? props['리드출처'].select.name : '';
+      var salC  = (props['매출'] && props['매출'].number) ? props['매출'].number : 0;
+      if (!nameC && !srcC && !salC) return;
+      var dstr = (props['신청일'] && props['신청일'].date) ? props['신청일'].date.start : page.created_time;
+      var d = new Date(dstr);
+      if (isNaN(d.getTime()) || d < _calSince) return;
+      var key = Utilities.formatDate(d, 'GMT+9', 'yyyy-MM-dd');
+      _dailyInflow[key] = (_dailyInflow[key] || 0) + 1;
+    });
+    // 요약 시트 맨 끝에 '일자별유입' 블록 기록 (A=날짜, B=건수)
+    var _calStartRow = sheet.getLastRow() + 2;
+    sheet.getRange(_calStartRow, 1, 1, 2).setValues([['일자별유입','건수']]);
+    var _calRows = Object.keys(_dailyInflow).sort().map(function(k){ return [k, _dailyInflow[k]]; });
+    if (_calRows.length > 0) {
+      sheet.getRange(_calStartRow + 1, 1, _calRows.length, 2).setValues(_calRows);
+      sheet.getRange(_calStartRow + 1, 2, _calRows.length, 1).setNumberFormat('0');
+    }
+    Logger.log('[캘린더뷰] 기존노션 일자별유입 ' + _calRows.length + '일치 기록');
+    // ── 캘린더뷰 블록 끝 ──
+
+    exportSchedule(allResults);
+    exportSituation(allResults);
+    Logger.log('완료! (모수 ' + allResults.length + '건)');
+  } catch (err) {
+    Logger.log('getLeadStats 에러 (시트 유지): ' + err.toString());
+  }
+}
+
+function exportSchedule(allResults) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const schedule = [];
+
+  allResults.forEach(page => {
+    const props    = page.properties;
+    const name     = props['이름']?.title?.[0]?.plain_text || '';
+    const grade    = props['학년']?.select?.name || '';
+    const assignee = resolveAssignee(props);
+    const status   = props['상태']?.select?.name || '';
+
+    const _signStr = props['신청일']?.date?.start || page.created_time;
+    const _signMon = _signStr ? (new Date(_signStr).getMonth() + 1) + '월' : '';
+    const _srcRaw = (props['소스']?.select?.name
+                  || (props['소스']?.rich_text || []).map(rt => rt.plain_text).join('')
+                  || '').trim().toLowerCase();
+    let _ch = '';
+    if (['meta_ad','ig','inbody','fb','og'].includes(_srcRaw)) _ch = '메타';
+    else if (_srcRaw === 'tenping' || _srcRaw === 'adlix') _ch = '텐핑';
+    else if (_srcRaw.indexOf('kakao') >= 0 || _srcRaw === '모먼트') _ch = '카카오';
+    else if (_srcRaw.indexOf('naver') >= 0) _ch = '네이버';
+    else if (['insta','ad','reviews','blog','cafe','event','promotion3'].includes(_srcRaw)) _ch = '무료';
+    else if (_srcRaw === 'daangn' || _srcRaw === 'carrot') _ch = '당근';
+    const cohort = _signMon ? (_ch ? _signMon + '·' + _ch : _signMon) : '';
+
+    const visitDateStr = props['방문 일정']?.date?.start || null;
+    if (visitDateStr) {
+      const visitDate = new Date(visitDateStr);
+      visitDate.setHours(0, 0, 0, 0);
+      if (visitDate >= today && (status !== '오더' && status !== '결보' && status !== '미납')) {
+        const timeStr = visitDateStr.length > 10 ? visitDateStr.substring(11, 16) : '';
+        schedule.push({ date: visitDate, time: timeStr, name, grade, type: 'visit', sales: '', assignee, pageId: page.id, cohort: cohort });
+      }
+    }
+
+    const isOrder = status === '오더' || status === '미납';
+    if (isOrder) {
+      const payDateStr = props['결제일']?.date?.start || null;
+      if (payDateStr) {
+        const payDate  = new Date(payDateStr);
+        payDate.setHours(0, 0, 0, 0);
+        const salesRaw = props['매출']?.number || 0;
+        if (salesRaw > 0) {
+          schedule.push({ date: payDate, time: '', name, grade, type: 'order', sales: String(salesRaw), assignee, pageId: page.id, cohort: cohort });
+        }
+      }
+    }
+  });
+
+  schedule.sort((a, b) => {
+    if (a.date.getTime() !== b.date.getTime()) return a.date - b.date;
+    if (a.time !== b.time) return (a.time || '99:99').localeCompare(b.time || '99:99');
+    return a.type.localeCompare(b.type);
+  });
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName('schedule') || ss.insertSheet('schedule');
+  sheet.clear();
+
+  const rows = [['날짜','시간','이름','학년','타입','매출','담당자','pageId','코호트']];
+  schedule.forEach(s => {
+    const dateStr = Utilities.formatDate(s.date, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+    rows.push([dateStr, s.time, s.name, s.grade, s.type, s.sales, s.assignee, s.pageId || '', s.cohort || '']);
+  });
+  sheet.getRange(1, 1, rows.length, 9).setValues(rows);
+  Logger.log('일정 export: 방문 ' + schedule.filter(s=>s.type==='visit').length + '건 / 오더 ' + schedule.filter(s=>s.type==='order').length + '건');
+}
+
+function _pad2(n) { return String(n).padStart(2, '0'); }
+
+function exportScheduleStandalone() {
+  try {
+    const allResults = collectLeadResults();
+    exportSchedule(allResults);
+  } catch (err) {
+    Logger.log('exportScheduleStandalone 에러 (시트 유지): ' + err.toString());
+  }
+}
+
+function exportSituation(allResults) {
+  const todayStr = toKSTDateStr(new Date());
+  const rows = [['pageId','이름','학년','담당자','상태','방문일','방문시간','우선','중간관리']];
+
+  function shortGrade(g) {
+    if (!g) return '';
+    if (g.indexOf('초') >= 0) { var m = g.match(/\d+/); return m ? '초'+m[0] : '초'; }
+    if (g.indexOf('중') >= 0) { var m = g.match(/\d+/); return m ? '중'+m[0] : '중'; }
+    if (g.indexOf('고') >= 0) { var m = g.match(/\d+/); return m ? '고'+m[0] : '고'; }
+    return g;
+  }
+  function safe(s) { return String(s || '').replace(/,/g, ' ').trim(); }
+
+  allResults.forEach(function(page) {
+    const props = page.properties;
+    const name = props['이름']?.title?.[0]?.plain_text || '';
+    if (!name) return;
+
+    const status = props['상태']?.select?.name || '';
+    if (status === '오더' || status === '결보' || status === '미납') return;
+
+    const assignee = resolveAssignee(props);
+    const visitStr = props['방문 일정']?.date?.start || '';
+    const visitDate = visitStr ? visitStr.substring(0, 10) : '';
+    const visitTime = (visitStr && visitStr.length > 10) ? visitStr.substring(11, 16) : '';
+    const prioProp = props['📌 우선'] || props['우선'] || props['📌우선'];
+    const priority  = (prioProp && prioProp.checkbox) ? 1 : 0;
+    const midDone   = props['중간관리']?.checkbox ? 1 : 0;
+    const isHold    = status.indexOf('홀딩') >= 0;
+
+    const hasFutureVisit = visitDate && (visitDate >= todayStr);
+    if (!(hasFutureVisit || isHold || priority)) return;
+
+    rows.push([
+      page.id, safe(name), shortGrade(props['학년']?.select?.name || ''),
+      safe(assignee), safe(status), visitDate, visitTime, priority, midDone
+    ]);
+  });
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName('situation') || ss.insertSheet('situation');
+  sheet.clear();
+  sheet.getRange(1, 1, rows.length, 9).setValues(rows);
+  Logger.log('상황판 export: ' + (rows.length - 1) + '건');
+}
+
+// [2026-09-05] 원장(리드요약_원장)에서 order매출 (전사 + 담당자별) 집계.
+function fetchLedgerCancel_(monthStart, lastMonthStart, lastMonthEnd, weekStart, lastWeekStart) {
+  var out = { month:0, last:0, all:0, sMonth:0, sLast:0, sAll:0, sWeek:0, sLastWeek:0, mgr:{} };
+  try {
+    var url = 'https://docs.google.com/spreadsheets/d/1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU'
+            + '/gviz/tq?tqx=out:csv&headers=0&gid=431762866';
+    var res = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+    if (res.getResponseCode() !== 200) { Logger.log('[원장] fetch 실패 ' + res.getResponseCode()); return out; }
+    var rows = res.getContentText().trim().split('\n').map(function(r){
+      return r.split(',').map(function(c){ return c.trim().replace(/^"|"$/g,''); });
+    });
+    function ensureMgr(m){ if(!out.mgr[m]) out.mgr[m]={ m:0,l:0,a:0, sm:0,sl:0,sa:0 }; return out.mgr[m]; }
+    rows.forEach(function(r){
+      var dstr = String(r[0]||'').trim();
+      if (!/^\d{4}-\d{2}-\d{2}/.test(dstr)) return;
+      var d = new Date(dstr);
+      if (isNaN(d.getTime())) return;
+      var mgr   = (r[6] || '').trim();
+      var state = (r[4] || '').trim();
+      var _sang = (r[11] || '').trim();   // 상담칸(B열) — QUERY select에 Col13 추가 필요
+      var isNF  = (_sang==='파인더웹마'||_sang==='메이킷웹마'||_sang==='우림웹마');   // 신규퍼널 → 담당자 순위 제외(전사엔 포함)
+      var salesRaw = parseFloat(r[5]) || 0;
+      var cxRaw    = parseFloat(r[8]) || 0;
+      var bucket = null;
+      if (d >= monthStart)                              bucket = 'm';
+      else if (d >= lastMonthStart && d < lastMonthEnd) bucket = 'l';
+      if (cxRaw > 0) {
+        var camt = cxRaw * 1000;
+        out.all += camt;
+        if (bucket === 'm') out.month += camt;
+        if (bucket === 'l') out.last  += camt;
+        if (mgr && !isNF) { var mc = ensureMgr(mgr); mc.a += camt;
+                   if (bucket==='m') mc.m += camt; if (bucket==='l') mc.l += camt; }
+      }
+      if (state === 'order' && salesRaw > 0) {
+        var samt = salesRaw * 1000;
+        out.sAll += samt;
+        if (bucket === 'm') out.sMonth += samt;
+        if (bucket === 'l') out.sLast  += samt;
+        // ★ 주간 (원장 기준, 취소 반영)
+        if (weekStart && d >= weekStart) out.sWeek += samt;
+        else if (weekStart && lastWeekStart && d >= lastWeekStart && d < weekStart) out.sLastWeek += samt;
+        if (mgr && !isNF) {
+          var ms = ensureMgr(mgr); ms.sa += samt;
+          if (bucket === 'm') ms.sm += samt;
+          if (bucket === 'l') ms.sl += samt;
+        }
+      }
+    });
+    Logger.log('[원장] 전사 순매출 이번달 ' + Math.round(out.sMonth/10000) + '만 / 지난달 '
+             + Math.round(out.sLast/10000) + '만 / 이번주 ' + Math.round(out.sWeek/10000) + '만 / 지난주 ' + Math.round(out.sLastWeek/10000) + '만');
+  } catch(e) { Logger.log('[원장] 예외: ' + e); }
   return out;
 }
-// 표시 제외: 김성윤=완전제거 / 김윤호=행 숨김(단 방문 등은 합계엔 유지)
-var TEAM_DROP=['김성윤'], TEAM_HIDE_KEEPTOTAL=['김윤호'];
-const SOJ_KEYS=['노트릴스','노필릴스','채리','GT','원톱','5단계루틴','기초부족','MLST공부','MLST캐러셀','노트공부법','너만본다','CPA(텐핑)','카카오','Organic','네이버브랜드','기타'];
-const cmap={'우혜림':'hye','김윤호':'kim','장윤호':'jang','박창건':'park','김우진':'woo','김태석':'tae','김성윤':'sung','노영호':'noh','김원득':'won','안준섭':'ahn','김슬기':'seul'};
-const dayN=['일','월','화','수','목','금','토'];
-const WDAYS=['월','화','수','목','금','토'];
-let summaryRows=[], perfTab=0, workState={};
 
-// [2026-10] 매출순 등수별 건당 수수료 (만원)
-function feeRate(rank){ return ({1:15,2:12,3:10,4:7,5:5})[rank] || 5; }
-
-let currentSec=0;
-function showSec(i){
-  currentSec=i;
-  document.querySelectorAll('.board > .sec').forEach((s,k)=>s.classList.toggle('on',k===i));
-  document.querySelectorAll('.sec-nav-btn').forEach((b,k)=>b.classList.toggle('on',k===i));
-}
-
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-// [2026-10-22] 노션 이름 끝에 잘못 붙은 홑/겹자모(예: 김슬기ᄈ→김슬기) 제거 — 색상·집계 매칭용
-function canonNm(s){return String(s==null?'':s).replace(/[ᄀ-ᇿ㄰-㆏ꥠ-꥿ힰ-퟿\s]+$/,'');}
-function asB(a){a=canonNm(a);return a?'<span class="as '+(cmap[a]||'')+'">'+esc(a)+'</span>':''}
-function nmL(n,p){p=(p||'').replace(/-/g,'');return p?'<a class="nm" href="https://notion.so/'+p+'" target="_blank" rel="noopener">'+esc(n)+'</a>':'<span class="nm">'+esc(n)+'</span>'}
-function tMid(){var t=new Date();t.setHours(0,0,0,0);return t}
-function vFmt(vd,vt){if(!vd)return{lab:'',diff:null};var d=new Date(vd+'T00:00:00');var df=Math.round((d-tMid())/86400000);return{lab:(d.getMonth()+1)+'/'+d.getDate()+' ('+dayN[d.getDay()]+')',diff:df,tm:vt||''}}
-function pickDay(s){var m=String(s||'').match(/\((\d+일차)\)/);return m?m[1]:''}
-async function csv(u){var t=await (await fetch(u)).text();return t.trim().split('\n').map(r=>r.split(',').map(c=>c.trim()))}
-
-async function loadAll(){
-  document.getElementById('upd').textContent='불러오는 중...';
-  await Promise.all([loadSit(),loadSum()]);
-  document.getElementById('upd').textContent='업데이트 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
-}
-
-async function loadSit(){
-  let rows;
-  try{ rows=await csv(SITUATION_CSV_URL); rows.shift(); }
-  catch(e){ document.getElementById('situation').innerHTML='<div class="empty">데이터를 불러오지 못했어요. GitHub(https)에서 열어야 표시됩니다.</div>'; return; }
-  const L=rows.filter(r=>r[0]).map(r=>({pageId:r[0],name:r[1],grade:r[2],as:r[3],status:r[4],vd:r[5],vt:r[6],prio:r[7]==='1',mid:r[8]==='1'}));
-  const mid=[];
-  L.forEach(l=>{ const v=vFmt(l.vd,l.vt);
-    if(v.diff!==null&&v.diff>=MID_DAYS) mid.push({l,v});
+// [2026-09-19] 방식 D — dashboard 산출물을 execData에 저장. dashboard.html이 읽음(경영진 전용).
+//   요약·schedule·순위이력 시트 + 원장(취소gid). getLeadStats/saveDailyRank 실행 후 호출.
+function saveDashToFirestore() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  // 대쉬보드 스프레드시트 내 탭들을 2차원 배열로 → execData
+  var TABS = { 'dash-summary':'요약', 'dash-schedule':'schedule', 'dash-rank':'순위이력', 'dash-metaspend':'메타광고비' };
+  Object.keys(TABS).forEach(function(key){
+    try{
+      var sh = ss.getSheetByName(TABS[key]);
+      if(!sh){ Logger.log('❌ '+TABS[key]+' 시트 없음'); return; }
+      var clean = sh.getDataRange().getDisplayValues();
+      _saveToExecData(key, { rows:clean });
+      Logger.log('🔐 execData/'+key+' 저장 ('+clean.length+'행)');
+    }catch(e){ Logger.log('❌ '+key+' 예외: '+e); }
   });
-  mid.sort((a,b)=>a.v.diff-b.v.diff);
-  const midRow=({l,v})=>'<div class="item '+(l.mid?'done':'')+'"><input type="checkbox" class="chk" '+(l.mid?'checked':'')+' onchange="tglMid(this,\''+l.pageId+'\')"><span class="when">'+v.lab+'</span>'+nmL(l.name,l.pageId)+' <span class="gr">'+esc(l.grade)+'</span><span class="mn">+'+v.diff+'일</span>'+asB(l.as)+'</div>';
-  const grp=(icon,label,color,arr,fn)=>'<div class="grp"><div class="glabel">'+icon+' '+label+'<span class="gc" style="background:'+color+'">'+arr.length+'</span></div>'+(arr.length?arr.map(fn).join(''):'<div class="empty">없음</div>')+'</div>';
-  document.getElementById('situation').innerHTML = grp('🔔','중간관리','var(--purple)',mid,midRow);
-}
-function tglMid(el,pid){
-  el.closest('.item').classList.toggle('done',el.checked);
-  if(!WEBAPP_URL||WEBAPP_URL.indexOf('PASTE_')===0) return;
-  fetch(WEBAPP_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'midmanage',pageId:pid,checked:el.checked})}).catch(function(){});
-}
-
-function sg(g){if(!g)return'';if(g.indexOf('초')>=0){var m=g.match(/\d+/);return m?'초'+m[0]:'초'}if(g.indexOf('중')>=0){var m=g.match(/\d+/);return m?'중'+m[0]:'중'}if(g.indexOf('고')>=0){var m=g.match(/\d+/);return m?'고'+m[0]:'고'}return g}
-
-const RANK_CSV_URL = 'https://docs.google.com/spreadsheets/d/1bkKxvdFlEgP8EoNjMmLzemFfRjJIfhc3EyIJI5v3Eo8/gviz/tq?tqx=out:csv&headers=0&gid=690549750';
-var YRANK_MAP = {};
-async function loadYRank(){
+  // 원장 취소(gid=431762866) — dashboard가 CANCEL_CSV로 읽던 것
   try{
-    var rows = await csv(RANK_CSV_URL);
-    function unq(s){ return String(s||'').replace(/^"|"$/g,'').trim(); }
-    rows.forEach(function(r){
-      var nm = unq(r[6]);
-      if(nm && nm!=='담당자') YRANK_MAP[nm] = parseInt(unq(r[7])||'0')||0;
+    var url='https://docs.google.com/spreadsheets/d/1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU/gviz/tq?tqx=out:csv&headers=0&gid=431762866';
+    var res=UrlFetchApp.fetch(url,{muteHttpExceptions:true});
+    if(res.getResponseCode()===200){
+      var rows2=res.getContentText().trim().split('\n').map(function(r){
+        return r.split(',').map(function(c){ return c.trim().replace(/^"|"$/g,''); });
+      });
+      _saveToExecData('dash-cancel', { rows:rows2 });
+      Logger.log('🔐 execData/dash-cancel 저장 ('+rows2.length+'행)');
+    }
+  }catch(e){ Logger.log('❌ dash-cancel 예외: '+e); }
+}
+
+// execData 저장 (아라위키의 _saveToExecData와 동일 — 대쉬보드 프로젝트용 사본)
+function _saveToExecData(docId, dataObj) {
+  try {
+    var token = ScriptApp.getOAuthToken();
+    var url = 'https://firestore.googleapis.com/v1/projects/dashboard-88ba4/databases/(default)/documents/execData/' + encodeURIComponent(docId);
+    var payload = { fields: {
+      json:    { stringValue: JSON.stringify(dataObj) },
+      updated: { stringValue: Utilities.formatDate(new Date(),'Asia/Seoul','yyyy-MM-dd HH:mm:ss') }
+    } };
+    var res = UrlFetchApp.fetch(url, {
+      method:'patch', headers:{ Authorization:'Bearer '+token },
+      contentType:'application/json', payload:JSON.stringify(payload), muteHttpExceptions:true
     });
-  }catch(e){ YRANK_MAP={}; }
+    if(res.getResponseCode()!==200) Logger.log('❌ execData 저장 실패 '+res.getResponseCode()+': '+res.getContentText().slice(0,300));
+  } catch(e){ Logger.log('❌ execData 저장 예외: '+e); }
 }
-async function loadSum(){
-  await loadYRank();
-  try{ summaryRows=await csv(SUMMARY_CSV_URL); }
-  catch(e){ document.getElementById('hl').innerHTML='<div class="empty">성과 로드 실패</div>'; return; }
-  const r12=summaryRows[11]||[], r13=summaryRows[12]||[];
-  document.getElementById('s-m').textContent=r12[1]||'-';
-  document.getElementById('s-w').textContent=r12[3]||'-';
-  document.getElementById('s-lm').textContent=r13[1]||'-';
-  document.getElementById('s-lw').textContent=r13[3]||'-';
-  document.getElementById('dn-m').textContent=pickDay(r12[0]);
-  document.getElementById('dn-w').textContent=pickDay(r12[2]);
-  renderHL(); renderPerf();
-}
-function renderHL(){
-  var hl={};
-  for(var i=0;i<summaryRows.length;i++){ if(summaryRows[i]&&summaryRows[i][0]==='주간하이라이트'){ for(var j=i+1;j<Math.min(i+9,summaryRows.length);j++){var r=summaryRows[j];if(!r||!r[0])break;hl[r[0]]={name:r[1]||'-',val:r[2]||'',extra:r[3]||''}} break; } }
-  // [2026-10] 급상승왕 = 매출순 순위 상승폭 (매출 기준)
-  var _hideAll=TEAM_DROP.concat(TEAM_HIDE_KEEPTOTAL);
-  function rankOf(tab){var o=tab*6+1,a=[];getAssigneeRows().forEach(function(r){var nm=((r[0]||'')+'').trim();if(_hideAll.indexOf(nm)!==-1)return;var sn=parseFloat(((r[o+5]||'0')+'').replace(/[^0-9.]/g,''))||0;a.push({name:nm,sales:sn});});a.sort(function(x,y){return y.sales-x.sales;});var rk={};a.forEach(function(x,idx){rk[x.name]=idx+1;});return rk;}
-  var curR=rankOf(0), prvR=rankOf(1), topRise=null, mx=0;
-  Object.keys(curR).forEach(function(nm){var d=(prvR[nm]||99)-(curR[nm]||99);if(d>mx){mx=d;topRise=nm;}});
-  var row=function(ic,lb,nm,vl){return '<div class="hlrow"><span class="ic">'+ic+'</span><span class="lb">'+lb+'</span><span class="nm">'+esc(nm||'-')+'</span><span class="vl">'+esc(vl||'')+'</span></div>';};
-  var _o=1;
-  var _stat={db:{n:'-',v:0},od:{n:'-',v:0},sl:{n:'-',v:0}};
-  getAssigneeRows().forEach(function(r){
-    var nm=((r[0]||'')+'').trim();
-    if(_hideAll.indexOf(nm)!==-1) return;   // 김성윤·김윤호 제외
-    var db=+(r[_o]||0), od=+(r[_o+4]||0), sl=parseFloat(((r[_o+5]||'0')+'').replace(/[^0-9.]/g,''))||0;
-    if(db>_stat.db.v){_stat.db={n:nm,v:db};}
-    if(od>_stat.od.v){_stat.od={n:nm,v:od};}
-    if(sl>_stat.sl.v){_stat.sl={n:nm,v:sl};}
+
+function checkWeekSales(){
+  var now=new Date();
+  function startOfWeek(d){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate());var dow=x.getDay();x.setDate(x.getDate()-(dow===0?6:dow-1));return x;}
+  var weekStart=startOfWeek(now);
+  var lastWeekStart=new Date(weekStart); lastWeekStart.setDate(weekStart.getDate()-7);
+  var url='https://docs.google.com/spreadsheets/d/1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU/gviz/tq?tqx=out:csv&headers=0&gid=431762866';
+  var res=UrlFetchApp.fetch(url,{muteHttpExceptions:true});
+  var rows=res.getContentText().trim().split('\n').map(function(r){return r.split(',').map(function(c){return c.trim().replace(/^"|"$/g,'');});});
+  var wk=0,lwk=0,wkCnt=0,lwkCnt=0;
+  rows.forEach(function(r){
+    var dstr=String(r[0]||'').trim();
+    if(!/^\d{4}-\d{2}-\d{2}/.test(dstr))return;
+    var d=new Date(dstr); if(isNaN(d.getTime()))return;
+    var state=(r[4]||'').trim(), sales=parseFloat(r[5])||0;
+    if(state==='order'&&sales>0){
+      if(d>=weekStart){wk+=sales;wkCnt++;}
+      else if(d>=lastWeekStart&&d<weekStart){lwk+=sales;lwkCnt++;}
+    }
   });
-  document.getElementById('hl').innerHTML =
-      row('💰','매출왕',_stat.sl.n,_stat.sl.v?_stat.sl.v.toLocaleString()+'만':'-')
-    + row('🎯','오더왕',_stat.od.n,_stat.od.v?_stat.od.v+'건':'-')
-    + row('📥','DB왕',_stat.db.n,_stat.db.v?_stat.db.v+'건':'-')
-    + (topRise&&mx>0?row('🚀','급상승왕',topRise,'▲'+mx):row('🚀','급상승왕','-',''))
-    + row('🏆','방문왕',hl['방문왕']?hl['방문왕'].name:'-',hl['방문왕']?hl['방문왕'].val:'')
-    + row('⚡','전환왕',hl['전환왕']?hl['전환왕'].name:'-',hl['전환왕']?hl['전환왕'].val:'')
-    + row('⏳','홀딩회수',hl['홀딩회수']?hl['홀딩회수'].name:'-',hl['홀딩회수']?hl['홀딩회수'].val:'')
-    + row('🔄','부재회수',hl['부재회수']?hl['부재회수'].name:'-',hl['부재회수']?hl['부재회수'].val:'');
+  Logger.log('주 시작일: '+Utilities.formatDate(weekStart,'GMT+9','yyyy-MM-dd (E)'));
+  Logger.log('원장 이번주 order매출: '+Math.round(wk*1000/10000)+'만 ('+wkCnt+'건)');
+  Logger.log('원장 지난주 order매출: '+Math.round(lwk*1000/10000)+'만 ('+lwkCnt+'건)');
 }
-function setPerfTab(i){perfTab=i;var ts=document.querySelectorAll('#pf-tabs .tab');for(var k=0;k<ts.length;k++)ts[k].classList.toggle('on',k===i);renderPerf()}
-function renderPerf(){
-  if(!summaryRows.length)return;
-  var off=perfTab*6+1, co=19+perfTab*3;
-  // [2026-10] 매출순 순위 (전월 대비는 매출순위로)
-  var _rawA=getAssigneeRows();
-  function calcSalesRank(tab){
-    var o=tab*6+1, a=[];
-    _rawA.forEach(function(r){
-      var nm=((r[0]||'')+'').trim();
-      if(TEAM_DROP.concat(TEAM_HIDE_KEEPTOTAL).indexOf(nm)!==-1) return;
-      var sn=parseFloat(((r[o+5]||'0')+'').replace(/[^0-9.]/g,''))||0;
-      a.push({name:nm, sales:sn});
-    });
-    a.sort(function(x,y){return y.sales-x.sales;});
-    var rk={}; a.forEach(function(x,idx){rk[x.name]=idx+1;});
-    return rk;
+
+
+// ════════════════════════════════════════════════════════════
+// 메타 광고비 자동 조회 — [1단계: 검증용] 로그 출력만, AD_SPEND 자동수정 안 함
+//   대쉬보드 프로젝트에 추가. META_ADS_TOKEN 필요.
+//
+//   매일 아침 실행 → 로그에 "AD_SPEND/CAMPAIGN_SPEND에 넣을 값" 출력.
+//   네가 수동값이랑 대조 → 며칠 일치 확인되면 2단계(완전자동)로.
+//
+//   규칙 (state.md):
+//   · spend(사용금액) 기준 — results/lead 아님
+//   · 어제까지(확정구간) — 당일은 미확정이라 제외
+//   · 위너테스트 세트 = ad레벨로 그룹 합산 (위너노트필기/MLST/노트릴스/캐러셀국세청첨삭)
+//   · 분리 캠페인(우혜림/장윤호/김윤호) = 제외 (기존 AD_SPEND에 넣으면 중복)
+//   · VAT 별도 (메타 spend는 원래 VAT 별도라 그대로)
+// ════════════════════════════════════════════════════════════
+
+var META_AD_ACCT = '1397954958746130';
+var META_WINNER_CAMP_ID = '120254223415250667';   // 위너테스트 세트 캠페인 ID
+
+// 분리 캠페인 — 기존 AD_SPEND에서 제외 (campaign_name 포함 매칭)
+var META_SPLIT_CAMPAIGNS = ['우혜림', '장윤호', '김윤호'];
+
+// 위너세트 하위 ad → 그룹키 (state.md campaignGroupOf/sojKeyOf 규칙)
+function metaWinnerGroup(adName) {
+  var c = adName || '';
+  if (/노트필기_(시간압박|관리부재|방법제시|학원무용)/.test(c)) return '위너노트필기';
+  if (/^MLST_|_MLST_/.test(c))     return '위너MLST';
+  if (/노트릴스_재편집/.test(c))    return '위너노트릴스';
+  if (/국세청첨삭/.test(c))         return '캐러셀_국세청첨삭';
+  return '위너기타';   // 매칭 안 되면 별도 표시 (규칙 추가 필요 신호)
+}
+
+// 캠페인명 → CAMPAIGN_SPEND 키 (위너세트 외 기존 캠페인)
+function metaCampKey(name) {
+  var c = (name || '').trim();
+  // 기존 CAMPAIGN_SPEND 키와 일치시킴 (필요시 여기 매핑 추가)
+  return c;
+}
+
+function _metaFetch(url) {
+  var res = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+  if (res.getResponseCode() !== 200) {
+    throw new Error('HTTP ' + res.getResponseCode() + ': ' + res.getContentText().substring(0, 200));
   }
-  var tDb=0,tVs=0,tSe=0,tCa=0,tOd=0,tSales=0,tSpend=0,tFee=0;
-  var data=_rawA.map(function(r){
-    var nm=((r[0]||'')+'').trim();
-    var db=+(r[off]||0),vs=+(r[off+1]||0),se=+(r[off+2]||0),ca=+(r[off+3]||0),od=+(r[off+4]||0);
-    var sales=r[off+5]||'0원';
-    var salesNum=parseFloat((sales+'').replace(/[^0-9.]/g,''))||0;
-    var roasNum=+(r[co+1]||0);
-    return {name:nm, db:db,vs:vs,se:se,ca:ca,od:od, sales:sales, salesNum:salesNum, roas:roasNum,
-            ef:(r[co+2]?r[co+2]+'만':'-'),
-            yRank:(YRANK_MAP[nm]||0)};
-  });
-  // 김성윤=완전제거 / 김윤호=행 숨김(단 방문 등은 합계 유지)
-  data=data.filter(function(d){ return TEAM_DROP.indexOf(d.name)===-1; });
-  data.forEach(function(d){ if(TEAM_HIDE_KEEPTOTAL.indexOf(d.name)!==-1){ tDb+=d.db;tVs+=d.vs;tSe+=d.se;tCa+=d.ca;tOd+=d.od;tSales+=d.salesNum; if(d.roas>0&&d.salesNum>0)tSpend+=d.salesNum/d.roas; } });
-  data=data.filter(function(d){ return TEAM_HIDE_KEEPTOTAL.indexOf(d.name)===-1; });
-  // [2026-10] 매출로만 정렬
-  data.sort(function(a,b){return b.salesNum-a.salesNum;});
-  var rows=data.map(function(d,idx){
-    tDb+=d.db;tVs+=d.vs;tSe+=d.se;tCa+=d.ca;tOd+=d.od;tSales+=d.salesNum;
-    if(d.roas>0&&d.salesNum>0) tSpend+=d.salesNum/d.roas;
-    var hasRank = d.salesNum>0;            // [2026-10] 순위 자격 = 매출>0
-    var rank = hasRank ? idx+1 : 0;
-    var rate = hasRank ? feeRate(rank) : 0;
-    var fee = hasRank ? d.od*rate : 0;     // 수수료 = 오더 × 등수별 건당
-    tFee += fee;
-    var dDelta = (hasRank && d.yRank>0) ? (d.yRank-rank) : 0;
-    var dv;
-    if(!hasRank)                   dv='';
-    else if(d.yRank>0 && dDelta>0) dv='<span style="color:#0f9d58;font-weight:800;font-size:10px">▲'+dDelta+'</span><span style="color:#9aa3b0;font-size:9px"> 어제'+d.yRank+'위</span>';
-    else if(d.yRank>0 && dDelta<0) dv='<span style="color:#e11d48;font-weight:800;font-size:10px">▼'+(-dDelta)+'</span><span style="color:#9aa3b0;font-size:9px"> 어제'+d.yRank+'위</span>';
-    else if(d.yRank>0)             dv='<span style="color:#9aa3b0;font-size:10px">—</span>';
-    else                          dv='<span style="color:#5b5fe0;font-weight:800;font-size:9px">NEW</span>';
-    var medal = !hasRank ? '<b style="color:#c2c8d2">'+(idx+1)+'</b>' : rank===1?'👑':rank===2?'🥈':rank===3?'🥉':'<b style="color:#8b93a2">'+rank+'</b>';
-    return '<tr'+(rank&&rank<=3?' style="background:rgba(91,95,224,.04)"':'')+'>'
-      +'<td class="rk" style="text-align:center;white-space:nowrap;line-height:1.5">'+medal+'<br>'+dv+'</td>'
-      +'<td class="nm">'+esc(d.name)+'</td>'
-      +'<td class="sl">'+esc(d.sales)+'</td>'
-      +'<td class="od">'+d.od+'</td>'
-      +'<td class="rt">'+(hasRank?rate+'만':'-')+'</td>'
-      +'<td class="fee">'+(fee?fee.toLocaleString()+'만':'-')+'</td>'
-      +'<td class="db">'+d.db+'</td><td class="vs">'+d.vs+'</td><td class="se">'+d.se+'</td>'
-      +'<td class="ro">'+(d.roas?d.roas.toFixed(2):'-')+'</td>'
-      +'<td class="mob-meta">수수료 '+(fee?fee.toLocaleString()+'만':'-')+' · 오더 '+d.od+' · DB '+d.db+' · 방문 '+d.vs+' · 세팅 '+d.se+' · ROAS '+(d.roas?d.roas.toFixed(2):'-')+'</td>'
-      +'</tr>';
-  });
-  var tRoas=tSpend>0?(tSales/tSpend).toFixed(2):'-';
-  rows.push('<tr class="tot"><td class="rk"></td><td class="nm">합계</td><td class="sl">'+tSales.toLocaleString()+'만원</td><td class="od">'+tOd+'</td><td class="rt"></td><td class="fee">'+tFee.toLocaleString()+'만</td><td class="db">'+tDb+'</td><td class="vs">'+tVs+'</td><td class="se">'+tSe+'</td><td class="ro">'+tRoas+'</td><td class="mob-meta">수수료 '+tFee.toLocaleString()+'만 · 오더 '+tOd+' · DB '+tDb+' · 방문 '+tVs+' · 세팅 '+tSe+' · ROAS '+tRoas+'</td></tr>');
-  document.getElementById('pf-body').innerHTML=rows.join('');
-
-  var sojCol=perfTab===1?29:(perfTab===2?30:28);
-  var _hAll=TEAM_DROP.concat(TEAM_HIDE_KEEPTOTAL);
-  var hd=getAssigneeRows().filter(function(r){return _hAll.indexOf(((r[0]||'')+'').trim())===-1;}).map(function(r){var s={};(r[sojCol]||'').split(';').forEach(function(p){var k=p.lastIndexOf(':');if(k>0)s[p.slice(0,k)]=+(p.slice(k+1))||0});return{name:((r[0]||'')+'').trim(),soj:s}});
-  var keys=SOJ_KEYS.filter(function(k){return hd.some(function(d){return (d.soj[k]||0)>0})});
-  var mx=1; hd.forEach(function(d){keys.forEach(function(k){if((d.soj[k]||0)>mx)mx=d.soj[k]})});
-  var col=function(v){if(!v)return'#f6f7f9';var t=Math.min(v/mx,1);return'rgba(147,51,234,'+(0.10+t*0.72).toFixed(2)+')'};
-  var ht;
-  if(!keys.length){ht='<div class="empty">이 기간 소재 배정 없음</div>'}
-  else{ht='<table class="heat"><thead><tr><th class="l">담당자</th>'+keys.map(function(k){return'<th>'+esc(k)+'</th>'}).join('')+'</tr></thead><tbody>'+hd.map(function(d){return'<tr><td class="l">'+esc(d.name)+'</td>'+keys.map(function(k){var v=d.soj[k]||0;var fg=v>mx*0.55?'#fff':'#5b4a6b';return'<td><span class="cell" style="background:'+col(v)+';color:'+fg+'">'+(v||'')+'</span></td>'}).join('')+'</tr>'}).join('')+'</tbody></table>'}
-  var _hw=document.getElementById('heat-wrap'); if(_hw) _hw.innerHTML=ht;
+  return JSON.parse(res.getContentText());
 }
 
-loadAll();
-setInterval(loadAll,5*60*1000);
-</script>
-</body>
-</html>
+function metaSpendCheck() {
+  var token = PropertiesService.getScriptProperties().getProperty('META_ADS_TOKEN');
+  if (!token) { Logger.log('❌ META_ADS_TOKEN 없음'); return; }
+
+  // 어제까지 (확정 구간). 이번달 1일 ~ 어제.
+  var now = new Date();
+  var yymm = Utilities.formatDate(now, 'GMT+9', 'yyMM');
+  var monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  var yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+  // 어제가 이번달 1일보다 이전이면(월초 1일) 그냥 1일
+  var since = Utilities.formatDate(monthStart, 'GMT+9', 'yyyy-MM-dd');
+  var until = (yesterday >= monthStart)
+    ? Utilities.formatDate(yesterday, 'GMT+9', 'yyyy-MM-dd')
+    : since;
+
+  Logger.log('════ 메타 광고비 자동조회 (검증) ════');
+  Logger.log('기간: ' + since + ' ~ ' + until + ' (어제까지 확정)');
+  Logger.log('기준월: ' + yymm);
+  Logger.log('');
+
+  // 1) 캠페인 레벨 조회
+  var campUrl = 'https://graph.facebook.com/v18.0/act_' + META_AD_ACCT + '/insights'
+    + '?level=campaign&fields=campaign_name,campaign_id,spend'
+    + '&time_range=' + encodeURIComponent(JSON.stringify({since: since, until: until}))
+    + '&limit=100&access_token=' + token;
+  var campData = _metaFetch(campUrl);
+  var camps = campData.data || [];
+
+  var result = {};      // 키 → 광고비
+  var splitSum = 0;     // 분리 캠페인 합 (제외 대상, 참고용)
+  var winnerCampSpend = 0;
+  var metaTotal = 0;    // AD_SPEND.메타광고 = 분리캠 제외 전체
+
+  camps.forEach(function(r) {
+    var name = r.campaign_name || '';
+    var spend = Math.round(parseFloat(r.spend || 0));
+    if (spend <= 0) return;
+
+    // 분리 캠페인 제외
+    var isSplit = META_SPLIT_CAMPAIGNS.some(function(k){ return name.indexOf(k) !== -1; });
+    if (isSplit) { splitSum += spend; return; }
+
+    // 위너세트는 ad레벨 재조회 (아래서 처리) — 여기선 합만 기록
+    if (r.campaign_id === META_WINNER_CAMP_ID || name.indexOf('위너테스트') !== -1) {
+      winnerCampSpend = spend;
+      metaTotal += spend;
+      return;
+    }
+
+    // 일반 캠페인
+    var key = metaCampKey(name);
+    result[key] = (result[key] || 0) + spend;
+    metaTotal += spend;
+  });
+
+  // 2) 위너세트 ad레벨 조회 → 그룹 합산
+  var winnerGroups = {};
+  if (winnerCampSpend > 0) {
+    var adUrl = 'https://graph.facebook.com/v18.0/act_' + META_AD_ACCT + '/insights'
+      + '?level=ad&fields=ad_name,spend'
+      + '&filtering=' + encodeURIComponent(JSON.stringify([{field:'campaign.id', operator:'IN', value:[META_WINNER_CAMP_ID]}]))
+      + '&time_range=' + encodeURIComponent(JSON.stringify({since: since, until: until}))
+      + '&limit=100&access_token=' + token;
+    try {
+      var adData = _metaFetch(adUrl);
+      (adData.data || []).forEach(function(a) {
+        var g = metaWinnerGroup(a.ad_name || '');
+        var sp = Math.round(parseFloat(a.spend || 0));
+        if (sp > 0) winnerGroups[g] = (winnerGroups[g] || 0) + sp;
+      });
+    } catch(e) {
+      Logger.log('⚠️ 위너세트 ad레벨 조회 실패: ' + e);
+    }
+  }
+
+  // ── 출력 ──
+  Logger.log('─── AD_SPEND[\'' + yymm + '\'].메타광고 ───');
+  Logger.log('  ' + metaTotal.toLocaleString() + '   ← 이 값으로 교체');
+  Logger.log('');
+  Logger.log('─── CAMPAIGN_SPEND (일반 캠페인) ───');
+  Object.keys(result).sort(function(a,b){ return result[b]-result[a]; }).forEach(function(k) {
+    Logger.log("  '" + k + "': { '" + yymm + "': " + result[k] + " }");
+  });
+  Logger.log('');
+  Logger.log('─── CAMPAIGN_SPEND (위너세트 그룹) ───');
+  var wSum = 0;
+  Object.keys(winnerGroups).forEach(function(g) {
+    Logger.log("  '" + g + "': { '" + yymm + "': " + winnerGroups[g] + " }");
+    wSum += winnerGroups[g];
+  });
+  Logger.log('  (위너그룹 합 ' + wSum.toLocaleString() + ' vs 캠페인레벨 ' + winnerCampSpend.toLocaleString() + ' — 일치해야 정상)');
+  Logger.log('');
+  Logger.log('─── 참고 ───');
+  Logger.log('  분리 캠페인(제외) 합: ' + splitSum.toLocaleString() + '원 (우혜림/장윤호/김윤호 — 별도 대시보드)');
+  Logger.log('  메타광고 총합(분리제외): ' + metaTotal.toLocaleString() + '원');
+  Logger.log('');
+  Logger.log('⚠️ 위 값을 수동 CAMPAIGN_SPEND/AD_SPEND와 대조. 며칠 일치하면 완전자동 전환.');
+  if (winnerGroups['위너기타']) {
+    Logger.log('🔴 "위너기타" 발생 — 새 소재 그룹 규칙 추가 필요 (metaWinnerGroup 함수).');
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// 메타 광고비 → 시트 자동 저장 (대쉬보드 프로젝트)
+//   매일 7시반 트리거. 메타 긁어서 '메타광고비' 탭에 기록.
+//   getLeadStats가 이 탭에서 이번달 광고비를 읽음 (loadMetaSpend_).
+//
+//   · 이번달(현재 YYMM)만 자동. 과거월은 getLeadStats 코드값 유지.
+//   · 위너세트 ad레벨 합산 / 분리캠 제외 / 노트필기릴스 매핑 반영.
+//   · 탭 없으면 자동 생성.
+// ════════════════════════════════════════════════════════════
+
+var META_ADS_TOKEN2 = PropertiesService.getScriptProperties().getProperty('META_ADS_TOKEN');
+var META_AD_ACCT2   = '1397954958746130';
+var META_WINNER_ID2 = '120254223415250667';   // 위너테스트 세트
+var META_SPEND_SHEET = '메타광고비';
+
+// 분리 캠페인 (기존 AD_SPEND 제외)
+var META_SPLIT2 = ['우혜림', '장윤호', '김윤호'];
+
+// 메타 캠페인명 → 코드 CAMPAIGN_SPEND 키 매핑 (이름 바뀐 것만)
+var META_NAME_MAP = {
+  'ARA_노트필기릴스_전환_2607': 'AD_노트필기릴스_방학점검_2607'
+  // 앞으로 메타에서 캠페인명 바뀌면 여기 추가
+};
+function metaMapKey2(name){ var c=(name||'').trim(); return META_NAME_MAP[c] || c; }
+
+// 위너세트 하위 ad → 그룹키
+function metaWinnerGroup2(adName){
+  var c = adName || '';
+  if (/노트필기_(시간압박|관리부재|방법제시|학원무용)/.test(c)) return '위너노트필기';
+  if (/^MLST_|_MLST_/.test(c))     return '위너MLST';
+  if (/노트릴스_재편집/.test(c))    return '위너노트릴스';
+  if (/국세청첨삭/.test(c))         return '캐러셀_국세청첨삭';
+  return '위너기타';
+}
+
+function _metaFetch2(url){
+  var res = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+  if (res.getResponseCode() !== 200) throw new Error('HTTP '+res.getResponseCode()+': '+res.getContentText().substring(0,200));
+  return JSON.parse(res.getContentText());
+}
+
+// ── 메인: 메타 긁어서 시트 저장 (★ 그로스별 광고비 = adset 레벨 쪼개기) ──
+//   [2026-10-07] 그로스 3명 = "신규 퍼널 테스트" 캠페인의 광고세트(adset)로 분리됨.
+//     광고세트명: "우혜림 소재" / "장윤호 소재" / "김윤호 소재"
+//   총괄 = 메타(3명 adset 제외) + 카카오 + 네이버브랜드 + 네이버파워컨텐츠.
+function saveMetaSpendToSheet(){
+  try{
+    var token = META_ADS_TOKEN2;
+    if(!token){ Logger.log('❌ META_ADS_TOKEN 없음'); return; }
+
+    // 로컬 헬퍼: 그로스 담당자 판별 — 캠페인/adset명에 우혜림·장윤호·김윤호 포함 여부
+    function _growthWho(nm){
+      var n=String(nm||''), G=['우혜림','장윤호','김윤호'];
+      for(var i=0;i<G.length;i++){ if(n.indexOf(G[i])!==-1) return G[i]; }
+      return null;
+    }
+    // 로컬 헬퍼: 그로스 소재(ad)별 연령 적합도 — 한 기간(since~until). {adn:{c:핵심리드,n:총리드}}
+    //   (세그먼트 적합도 whMetaAgeBreakdown과 별개 — 이건 소재별 _적합_ 용)
+    function _growthAgeFit_(acct, since, until){
+      var out={};
+      var url='https://graph.facebook.com/v18.0/act_'+acct+'/insights'
+        +'?level=ad&breakdowns=age&fields=campaign_name,ad_name,actions'
+        +'&time_range='+encodeURIComponent(JSON.stringify({since:since,until:until}))
+        +'&limit=500&access_token='+token;
+      (_metaFetch2(url).data||[]).forEach(function(a){
+        if(!_growthWho(a.campaign_name||'')) return;
+        var adn=(a.ad_name||'').trim(); if(!adn) return;
+        var lead=0; (a.actions||[]).forEach(function(x){ if(x.action_type==='onsite_conversion.lead_grouped') lead+=parseInt(x.value||0); });
+        if(lead<=0) return;
+        var core=(a.age==='35-44'||a.age==='45-54')?lead:0;
+        var o=out[adn]||(out[adn]={c:0,n:0});
+        o.c+=core; o.n+=lead;
+      });
+      return out;
+    }
+
+    var now = new Date();
+    var yymm = Utilities.formatDate(now, 'GMT+9', 'yyMM');
+    var monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    var yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate()-1);
+    var since = Utilities.formatDate(monthStart, 'GMT+9', 'yyyy-MM-dd');
+    var until = (yesterday>=monthStart) ? Utilities.formatDate(yesterday,'GMT+9','yyyy-MM-dd') : since;
+
+    var splitByName = { '우혜림':0, '장윤호':0, '김윤호':0 };
+
+    // 1) 캠페인 레벨
+    var campUrl = 'https://graph.facebook.com/v18.0/act_'+META_AD_ACCT2+'/insights'
+      + '?level=campaign&fields=campaign_name,campaign_id,spend'
+      + '&time_range='+encodeURIComponent(JSON.stringify({since:since,until:until}))
+      + '&limit=100&access_token='+token;
+    var camps = (_metaFetch2(campUrl).data) || [];
+
+    var result = {};
+    var metaTotal = 0, splitSum = 0, winnerCampSpend = 0, growthCampSpend = 0;
+
+    camps.forEach(function(r){
+      var name=r.campaign_name||'', spend=Math.round(parseFloat(r.spend||0));
+      if(spend<=0) return;
+      // ★ 그로스 캠페인: 사람분류는 adset에서(개명 대응) — 여기선 합만 + metaTotal 제외
+      if(_growthWho(name)){ growthCampSpend+=spend; splitSum+=spend; return; }
+      if(r.campaign_id===META_WINNER_ID2 || name.indexOf('위너테스트')!==-1){ winnerCampSpend=spend; metaTotal+=spend; return; }
+      var key=metaMapKey2(name);
+      result[key]=(result[key]||0)+spend;
+      metaTotal+=spend;
+    });
+
+    // 2) 위너세트 ad레벨 → 그룹
+    var winnerGroups={};
+    if(winnerCampSpend>0){
+      var adUrl='https://graph.facebook.com/v18.0/act_'+META_AD_ACCT2+'/insights'
+        +'?level=ad&fields=ad_name,spend'
+        +'&filtering='+encodeURIComponent(JSON.stringify([{field:'campaign.id',operator:'IN',value:[META_WINNER_ID2]}]))
+        +'&time_range='+encodeURIComponent(JSON.stringify({since:since,until:until}))
+        +'&limit=100&access_token='+token;
+      try{
+        (_metaFetch2(adUrl).data||[]).forEach(function(a){
+          var g=metaWinnerGroup2(a.ad_name||''), sp=Math.round(parseFloat(a.spend||0));
+          if(sp>0) winnerGroups[g]=(winnerGroups[g]||0)+sp;
+        });
+      }catch(e){ Logger.log('⚠️ 위너 ad레벨 실패: '+e); }
+    }
+    Object.keys(winnerGroups).forEach(function(g){ result[g]=(result[g]||0)+winnerGroups[g]; });
+
+    // ★ 2-b) 그로스 사람분류 = adset 레벨. adset명(우혜림세트 등) 우선, 없으면 캠페인명.
+    if(growthCampSpend>0){
+      var gsUrl='https://graph.facebook.com/v18.0/act_'+META_AD_ACCT2+'/insights'
+        +'?level=adset&fields=campaign_name,adset_name,spend'
+        +'&time_range='+encodeURIComponent(JSON.stringify({since:since,until:until}))
+        +'&limit=500&access_token='+token;
+      try{
+        (_metaFetch2(gsUrl).data||[]).forEach(function(a){
+          if(!_growthWho(a.campaign_name||'')) return;
+          var sp=Math.round(parseFloat(a.spend||0)); if(sp<=0) return;
+          var who=_growthWho(a.adset_name||'') || _growthWho(a.campaign_name||'');
+          if(who) splitByName[who]+=sp;
+        });
+      }catch(e){ Logger.log('⚠️ 그로스 adset 분류 실패: '+e); }
+    }
+
+    // ★ 2-c) 그로스 ad(소재) → _소재_<ad_name> (whBuildDashData가 매칭)
+    var growthAds = {};
+    if(growthCampSpend>0){
+      var gaUrl='https://graph.facebook.com/v18.0/act_'+META_AD_ACCT2+'/insights'
+        +'?level=ad&fields=campaign_name,ad_name,spend'
+        +'&time_range='+encodeURIComponent(JSON.stringify({since:since,until:until}))
+        +'&limit=200&access_token='+token;
+      try{
+        (_metaFetch2(gaUrl).data||[]).forEach(function(a){
+          if(!_growthWho(a.campaign_name||'')) return;
+          var sp=Math.round(parseFloat(a.spend||0)); if(sp<=0) return;
+          var adn=(a.ad_name||'').trim();
+          if(adn) growthAds[adn]=(growthAds[adn]||0)+sp;
+        });
+      }catch(e){ Logger.log('⚠️ 그로스 ad(소재) 조회 실패: '+e); }
+    }
+
+    // ★ 2-d) 그로스 소재 × 연령 → 기간별 타겟 적합도(핵심 35-54 %)
+    //   오늘/주간(최근7일)/월간(이번달)/전체(~3개월) 각각 집계 호출(4회). time_increment 안 씀(빈응답 회피).
+    //   growthFit[adn] = {t,w,m,a} (해당 기간 리드 없으면 null → HTML '집계 전')
+    var growthFit = {};
+    if(growthCampSpend>0){
+      try{
+        var _today  = Utilities.formatDate(now,'GMT+9','yyyy-MM-dd');
+        var _wkFrom = Utilities.formatDate(new Date(now.getFullYear(),now.getMonth(),now.getDate()-6),'GMT+9','yyyy-MM-dd'); // 최근 7일
+        var _allFrom= Utilities.formatDate(new Date(now.getFullYear(),now.getMonth()-2,1),'GMT+9','yyyy-MM-dd');           // 전체 = 최근 ~3개월
+        var fT=_growthAgeFit_(META_AD_ACCT2, _today,  _today);  // 오늘
+        var fW=_growthAgeFit_(META_AD_ACCT2, _wkFrom, _today);  // 주간
+        var fM=_growthAgeFit_(META_AD_ACCT2, since,   _today);  // 월간(이번달 1일~)
+        var fA=_growthAgeFit_(META_AD_ACCT2, _allFrom,_today);  // 전체
+        var _pct=function(o){ return (o&&o.n>0)?Math.round(o.c/o.n*100):null; };
+        var _names={}; [fT,fW,fM,fA].forEach(function(m){ Object.keys(m).forEach(function(k){ _names[k]=1; }); });
+        Object.keys(_names).forEach(function(adn){
+          growthFit[adn]={ t:_pct(fT[adn]), w:_pct(fW[adn]), m:_pct(fM[adn]), a:_pct(fA[adn]) };
+        });
+      }catch(e){ Logger.log('⚠️ 그로스 기간별 적합도 실패: '+e); }
+    }
+
+        // ★ 2-e) 그로스 소재 ON/OFF — /ads 엣지 (insights엔 effective_status 없음)
+    //   ⚠️ fields의 campaign{name} 중괄호는 반드시 encodeURIComponent (안 하면 GAS "Invalid argument")
+    //   [2026-10-21] 캠페인 분리로 동명 소재 2벌(구 PAUSED + 신 ACTIVE) 존재 →
+    //   "같은 이름 중 하나라도 ACTIVE면 ON" 판정. (기존: PAUSED 복제본만 봐도 OFF 오판)
+    //   그로스 판별도 캠페인명 외 세트명까지 확인 (다른 블록과 동일 기준).
+    var growthOff = {};
+    if(growthCampSpend>0){
+      try{
+        var stUrl='https://graph.facebook.com/v18.0/act_'+META_AD_ACCT2+'/ads'
+          +'?fields='+encodeURIComponent('name,effective_status,campaign{name},adset{name}')
+          +'&filtering='+encodeURIComponent(JSON.stringify([{field:'effective_status',operator:'IN',value:['ACTIVE','PAUSED','ADSET_PAUSED','CAMPAIGN_PAUSED']}]))
+          +'&limit=500&access_token='+token;
+        var _seen={}, _actv={};
+        (_metaFetch2(stUrl).data||[]).forEach(function(a){
+          var cn=(a.campaign&&a.campaign.name)||'', an=(a.adset&&a.adset.name)||'';
+          if(!_growthWho(cn) && !_growthWho(an)) return;
+          var nm=(a.name||'').trim(); if(!nm) return;
+          var es=(a.effective_status||'').toUpperCase(); if(!es) return;
+          _seen[nm]=true;
+          if(es==='ACTIVE') _actv[nm]=true;
+        });
+        Object.keys(_seen).forEach(function(nm){ if(!_actv[nm]) growthOff[nm]=true; });
+      }catch(e){ Logger.log('⚠️ 그로스 소재 상태 조회 실패: '+e); }
+    }
+
+    // ★ 2-f) 그로스 담당자별 일별 광고비 — adset 일별 spend(time_increment=1) → 세트명으로 사람 매칭.
+    //   날짜별 유입(주간/월간 토글)처럼 보기 위함. until=어제까지(확정분). ds[date]={우,장,김}
+    var growthDaily = {};
+    if(growthCampSpend>0){
+      try{
+        var _dSince = Utilities.formatDate(new Date(now.getFullYear(),now.getMonth(),now.getDate()-31),'GMT+9','yyyy-MM-dd'); // 주간(최근7일)+월간 커버
+        var ddUrl='https://graph.facebook.com/v18.0/act_'+META_AD_ACCT2+'/insights'
+          +'?level=adset&fields=campaign_name,adset_name,spend'
+          +'&time_increment=1'
+          +'&time_range='+encodeURIComponent(JSON.stringify({since:_dSince,until:until}))
+          +'&limit=500&access_token='+token;
+        (_metaFetch2(ddUrl).data||[]).forEach(function(a){
+          if(!_growthWho(a.campaign_name||'')) return;
+          var who=_growthWho(a.adset_name||'') || _growthWho(a.campaign_name||'');
+          if(!who) return;
+          var d=(a.date_start||'').trim(); if(!d) return;
+          var sp=Math.round(parseFloat(a.spend||0)); if(sp<=0) return;
+          var o=growthDaily[d]||(growthDaily[d]={'우혜림':0,'장윤호':0,'김윤호':0});
+          o[who]+=sp;
+        });
+      }catch(e){ Logger.log('⚠️ 그로스 일별 광고비 실패: '+e); }
+    }
+
+    // ★ 2-g) 본사(메타) 일별 광고비 — 그로스 3명 제외 전체 메타 campaign, time_increment=1.
+    //   그로스 일별(2-f)처럼 주간/월간 토글로 보기 위함. date_start별 spend 합.
+    var mainDaily = {};   // date -> 메타 spend (그로스 제외, 본사·전체 메타)
+    try{
+      var _mdSince = Utilities.formatDate(new Date(now.getFullYear(),now.getMonth(),now.getDate()-31),'GMT+9','yyyy-MM-dd');
+      var mdUrl='https://graph.facebook.com/v18.0/act_'+META_AD_ACCT2+'/insights'
+        +'?level=campaign&fields=campaign_name,spend'
+        +'&time_increment=1'
+        +'&time_range='+encodeURIComponent(JSON.stringify({since:_mdSince,until:until}))
+        +'&limit=800&access_token='+token;
+      (_metaFetch2(mdUrl).data||[]).forEach(function(a){
+        if(_growthWho(a.campaign_name||'')) return;   // 그로스 3명 제외 → 본사 몫
+        var d=(a.date_start||'').trim(); if(!d) return;
+        var sp=Math.round(parseFloat(a.spend||0)); if(sp<=0) return;
+        mainDaily[d]=(mainDaily[d]||0)+sp;
+      });
+    }catch(e){ Logger.log('⚠️ 본사 일별 광고비 실패: '+e); }
+
+    // ★ 3) 타채널(카카오·네이버) — 전부 "총괄"
+    var _kakao=0, _naverBrand=0, _naverPC=0;
+    try{ _kakao = sumSpendFromSheet('카카오모먼트', since, until); }catch(e){}
+    try{ _naverBrand = sumSpendFromSheet('네이버SA', since, until, { onlyTypes:['BRAND_SEARCH','BRAND_SEARCH_FEE'] }); }catch(e){}
+    try{ _naverPC = sumSpendFromSheet('네이버SA', since, until, { onlyTypes:['POWER_CONTENTS'] }); }catch(e){}
+    var _otherCh = _kakao + _naverBrand + _naverPC;
+    var _chongTotal = metaTotal + _otherCh;
+
+    // ★ [지난달 총괄] 본사(총괄)만
+    var lmStart = new Date(now.getFullYear(), now.getMonth()-1, 1);
+    var lmEnd   = new Date(now.getFullYear(), now.getMonth(), 0);
+    var sinceL  = Utilities.formatDate(lmStart,'GMT+9','yyyy-MM-dd');
+    var untilL  = Utilities.formatDate(lmEnd,  'GMT+9','yyyy-MM-dd');
+    var metaTotalLast = 0;
+    try{
+      var campUrlL = 'https://graph.facebook.com/v18.0/act_'+META_AD_ACCT2+'/insights'
+        + '?level=campaign&fields=campaign_name,spend'
+        + '&time_range='+encodeURIComponent(JSON.stringify({since:sinceL,until:untilL}))
+        + '&limit=100&access_token='+token;
+      (_metaFetch2(campUrlL).data||[]).forEach(function(r){
+        var name=r.campaign_name||'', spend=Math.round(parseFloat(r.spend||0));
+        if(spend<=0) return;
+        if(_growthWho(name)) return;
+        metaTotalLast += spend;
+      });
+    }catch(e){ Logger.log('⚠️ 지난달 메타 조회 실패: '+e); }
+    var _kakaoL=0, _naverBrandL=0, _naverPCL=0;
+    try{ _kakaoL      = sumSpendFromSheet('카카오모먼트', sinceL, untilL); }catch(e){}
+    try{ _naverBrandL = sumSpendFromSheet('네이버SA', sinceL, untilL, { onlyTypes:['BRAND_SEARCH','BRAND_SEARCH_FEE'] }); }catch(e){}
+    try{ _naverPCL    = sumSpendFromSheet('네이버SA', sinceL, untilL, { onlyTypes:['POWER_CONTENTS'] }); }catch(e){}
+    var _otherChLast   = _kakaoL + _naverBrandL + _naverPCL;
+    var _chongTotalLast = metaTotalLast + _otherChLast;
+
+    // ── 시트 기록 ──
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sh = ss.getSheetByName(META_SPEND_SHEET) || ss.insertSheet(META_SPEND_SHEET);
+    sh.clearContents();
+
+    var rows = [];
+    rows.push(['_갱신', Utilities.formatDate(now,'GMT+9','yyyy-MM-dd HH:mm'), '_기간', since+'~'+until, '_월', yymm]);
+    rows.push(['메타광고_총합', metaTotal, '', '', '', '']);
+    rows.push(['_그로스_총괄', _chongTotal, '_메타', metaTotal, '_타채널', _otherCh]);
+    rows.push(['_그로스_우혜림', splitByName['우혜림'], '', '', '', '']);
+    rows.push(['_그로스_장윤호', splitByName['장윤호'], '', '', '', '']);
+    rows.push(['_그로스_김윤호', splitByName['김윤호'], '', '', '', '']);
+    rows.push(['_그로스_총괄_L', _chongTotalLast, '_메타', metaTotalLast, '_타채널', _otherChLast]);
+    // ★ 적합도: [1]오늘 [2]주간 [3]월간 [4]전체 (빈값=해당기간 리드없음→'집계 전')
+    Object.keys(growthFit).forEach(function(adn){
+      var r=growthFit[adn];
+      rows.push(['_적합_'+adn, (r.t==null?'':r.t), (r.w==null?'':r.w), (r.m==null?'':r.m), (r.a==null?'':r.a), '']);
+    });
+    // ★ 소재 상태: 꺼진 소재만 기록 (기본 = ON)
+    Object.keys(growthOff).forEach(function(adn){
+      if(growthOff[adn]) rows.push(['_상태_'+adn, 'OFF', '', '', '', '']);
+    });
+    Object.keys(growthAds).sort(function(a,b){return growthAds[b]-growthAds[a];}).forEach(function(adn){
+      rows.push(['_소재_'+adn, growthAds[adn], '', '', '', '']);
+    });
+    // ★ 일별 광고비: [1]우혜림 [2]장윤호 [3]김윤호 [4]합계
+    Object.keys(growthDaily).sort().forEach(function(d){
+      var o=growthDaily[d];
+      rows.push(['_일별_'+d, o['우혜림'], o['장윤호'], o['김윤호'], (o['우혜림']+o['장윤호']+o['김윤호']), '']);
+    });
+    // ★ 본사(메타) 일별 광고비: [1]메타 (그로스 제외)
+    Object.keys(mainDaily).sort().forEach(function(d){
+      rows.push(['_본사일별_'+d, mainDaily[d], '', '', '', '']);
+    });
+    rows.push(['_타채널_카카오', _kakao, '_네이버브랜드', _naverBrand, '_네이버파워컨텐츠', _naverPC]);
+    Object.keys(result).sort(function(a,b){return result[b]-result[a];}).forEach(function(k){
+      rows.push([k, result[k], '', '', '', '']);
+    });
+
+    var _wr = sh.getRange(1,1,rows.length,6);
+    // ★ [2026-10-15 버그수정] @포맷 + 모든 값 "문자열 변환".
+    //   B열은 광고비(숫자)가 대부분 → gviz가 숫자형으로 추론 → _상태_행 'OFF'(텍스트)를 빈값으로 날림 → OFF 유실.
+    //   @포맷만으론 부족(숫자값은 여전히 숫자 셀) → 셀을 진짜 텍스트로 만들려면 값 자체를 문자열로 넣어야 함.
+    //   whLoadGrowthSpend_/loadMetaSpend_는 parseInt/parseFloat라 문자열 숫자여도 영향 없음.
+    _wr.setNumberFormat('@');
+    var _rowsStr = rows.map(function(r){ return r.map(function(c){ return (c==null)?'':(''+c); }); });
+    _wr.setValues(_rowsStr);
+
+    Logger.log('✅ 메타광고비 시트 저장 완료');
+    Logger.log('  기간: '+since+'~'+until+' / 월: '+yymm);
+    Logger.log('  메타광고 총합(그로스3명 제외): '+metaTotal.toLocaleString()+'원');
+    Logger.log('  그로스별 — 총괄 '+_chongTotal.toLocaleString()+' (메타'+metaTotal.toLocaleString()+'+타채널'+_otherCh.toLocaleString()+')');
+    Logger.log('    우혜림 '+splitByName['우혜림'].toLocaleString()+' / 장윤호 '+splitByName['장윤호'].toLocaleString()+' / 김윤호 '+splitByName['김윤호'].toLocaleString()+' (그로스캠페인합 '+growthCampSpend.toLocaleString()+')');
+    Logger.log('  소재 '+Object.keys(growthAds).length+'개 · 적합도 '+Object.keys(growthFit).length+'개 · OFF '+Object.keys(growthOff).length+'개 · 일별 '+Object.keys(growthDaily).length+'일 · 본사캠페인 '+Object.keys(result).length+'개 기록');
+    if(winnerGroups['위너기타']) Logger.log('🔴 "위너기타" 발생 — metaWinnerGroup2 규칙 추가 필요');
+
+    // ★ 캠페인 ON/OFF 라이브 상태(본사 대시보드용) — 기존대로 유지
+    try{ whCampaignStatus(); }catch(e){ Logger.log('⚠️ whCampaignStatus 실패: '+e); }
+  }catch(err){
+    Logger.log('❌ saveMetaSpendToSheet 에러: '+err);
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// ★ 캠페인 ON/OFF 라이브 상태 → execData/dash-campstatus
+//   [2026-10-15] 본사 캠페인 표의 ON/OFF를 "수동 리스트"가 아니라
+//   Meta effective_status로 자동 반영. 광고비 조회(saveMetaSpendToSheet)에
+//   같이 태워 매일 갱신 + 단독 실행도 가능.
+//
+//   · /campaigns?fields=name,effective_status (object edge — insights엔 상태 없음)
+//   · 위너테스트는 ad레벨로 그룹(위너노트필기 등)별 — 하나라도 ACTIVE면 ON
+//   · 분리캠(신규 퍼널 테스트 = 그로스 3명)은 본사표 소관 아님 → 제외
+//   · 키는 원문명 + metaMapKey2 + metaCampKey 모두 넣어 요약시트 어느 키로 와도 매칭
+//   · 저장형식: { status:{ '캠페인명':'ON'|'OFF', ... }, asof:'...' }
+//   · 대시보드는 이 맵에 있으면 라이브값, 없으면(비메타 버킷) 기존 수동리스트 폴백
+// ════════════════════════════════════════════════════════════
+function whCampaignStatus(){
+  try{
+    var token = META_ADS_TOKEN2;
+    if(!token){ Logger.log('❌ META_ADS_TOKEN 없음'); return; }
+    var acct = META_AD_ACCT2;
+    var GROWTH = '신규 퍼널 테스트';   // 분리캠(그로스 3명) — 본사표 제외
+    var statusMap = {};
+    function setStat(k, on){ if(k==null) return; k=String(k).trim(); if(!k) return; statusMap[k]= on ? 'ON':'OFF'; }
+
+    // 1) 캠페인 레벨 effective_status (DELETED 제외한 전체 — PAUSED도 반환됨 → 방금 끈 것 잡힘)
+    var cUrl = 'https://graph.facebook.com/v18.0/act_'+acct+'/campaigns'
+      + '?fields='+encodeURIComponent('name,effective_status')
+      + '&limit=300&access_token='+token;
+    var camps = (_metaFetch2(cUrl).data)||[];
+    camps.forEach(function(c){
+      var name=c.name||'', eff=(c.effective_status||'').toUpperCase();
+      if(name.indexOf(GROWTH)!==-1) return;           // 분리캠 제외
+      if(name.indexOf('위너테스트')!==-1) return;      // 위너테스트는 ad레벨로 (2단계)
+      var on = (eff==='ACTIVE');
+      setStat(name, on);
+      setStat(metaMapKey2(name), on);
+      setStat(metaCampKey(name), on);
+    });
+
+    // 2) 위너테스트 ad레벨 → 그룹(위너노트필기/MLST/노트릴스…)별. 하나라도 ACTIVE면 그룹 ON.
+    try{
+      var aUrl = 'https://graph.facebook.com/v18.0/act_'+acct+'/ads'
+        + '?fields='+encodeURIComponent('name,effective_status')
+        + '&filtering='+encodeURIComponent(JSON.stringify([{field:'campaign.id',operator:'IN',value:[META_WINNER_ID2]}]))
+        + '&limit=300&access_token='+token;
+      var grp = {};
+      (_metaFetch2(aUrl).data||[]).forEach(function(a){
+        var g=metaWinnerGroup2(a.name||''), on=((a.effective_status||'').toUpperCase()==='ACTIVE');
+        grp[g] = grp[g] || false; if(on) grp[g]=true;
+      });
+      Object.keys(grp).forEach(function(g){ setStat(g, grp[g]); });
+    }catch(e){ Logger.log('⚠️ 위너 ad 상태 조회 실패: '+e); }
+
+    _saveToExecData('dash-campstatus', {
+      status: statusMap,
+      asof: Utilities.formatDate(new Date(),'Asia/Seoul','yyyy-MM-dd HH:mm')
+    });
+    var onN=0, offN=0;
+    Object.keys(statusMap).forEach(function(k){ if(statusMap[k]==='ON') onN++; else offN++; });
+    Logger.log('✅ execData/dash-campstatus 저장 — 키 '+Object.keys(statusMap).length+'개 (ON '+onN+' / OFF '+offN+')  campaigns '+camps.length+'개');
+  }catch(err){ Logger.log('❌ whCampaignStatus 에러: '+err); }
+}
+
+// ════════════════════════════════════════════════════════════
+// ★★ 복구: loadMetaSpend_ + installMetaSpendTrigger ★★
+//   [2026-10-07] saveMetaSpendToSheet v2 교체 때 이 두 함수가 같이 날아감.
+//   그래서 getLeadStats가 "시트 미사용 → 코드값 유지" → 유입경로별 579만 고정.
+//   ⚠️ 반드시 getLeadStats와 "같은 파일" 맨 끝에 붙일 것.
+//      (별도 파일에 넣으면 로드 타이밍 꼬여 또 "함수 없음" 날 수 있음)
+//   ⚠️ 혹시 다른 파일에 loadMetaSpend_ 이미 붙였으면 그건 삭제 — 중복 금지.
+// ════════════════════════════════════════════════════════════
+
+// ── 읽기 헬퍼: getLeadStats가 호출. '메타광고비' 탭 → {총합, 캠페인맵} ──
+//   이번달 YYMM이 시트 _월과 같을 때만 사용. 다르면 null(코드값 폴백).
+function loadMetaSpend_(expectYYMM){
+  try{
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sh = ss.getSheetByName(META_SPEND_SHEET);   // '메타광고비'
+    if(!sh || sh.getLastRow()<2) return null;
+    var vals = sh.getRange(1,1,sh.getLastRow(),6).getValues();
+    var sheetYYMM = (vals[0] && vals[0][5]) ? String(vals[0][5]).trim() : '';
+    if(expectYYMM && sheetYYMM && sheetYYMM !== expectYYMM) return null;  // 월 다르면 폴백
+    var total = 0, map = {};
+    for(var i=1;i<vals.length;i++){
+      var k=String(vals[i][0]||'').trim(), v=parseFloat(vals[i][1])||0;
+      if(!k) continue;
+      if(k==='메타광고_총합'){ total=v; continue; }
+      if(k.indexOf('_')===0) continue;   // _그로스_*, _타채널_* 행은 캠페인맵 제외
+      map[k]=v;
+    }
+    return { total: total, camps: map, yymm: sheetYYMM };
+  }catch(e){ Logger.log('loadMetaSpend_ 에러: '+e); return null; }
+}
+
+// ── 트리거 설치 (1회 실행) — 매일 저녁 7:30 (태평양시간 고려) ──
+function installMetaSpendTrigger(){
+  var triggers = ScriptApp.getProjectTriggers();
+  for(var i=0;i<triggers.length;i++){
+    if(triggers[i].getHandlerFunction()==='saveMetaSpendToSheet') ScriptApp.deleteTrigger(triggers[i]);
+  }
+  ScriptApp.newTrigger('saveMetaSpendToSheet')
+    .timeBased().everyDays(1).atHour(19).nearMinute(30).create();
+  Logger.log('saveMetaSpendToSheet 매일 19:30 트리거 설치 완료');
+}
