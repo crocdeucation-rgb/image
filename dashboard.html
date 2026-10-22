@@ -738,6 +738,8 @@ const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJ
     const CANCEL_CSV_URL = 'https://docs.google.com/spreadsheets/d/1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU/gviz/tq?tqx=out:csv&headers=0&gid=431762866';
 
 const ASSIGNEES = ['우혜림','김윤호','장윤호','박창건','김태석','노영호','김원득','김우진','안준섭','김주환','김슬기'];
+// [2026-10-22] 노션 이름 끝에 잘못 붙은 홑/겹자모(예: 김슬기ᄈ→김슬기) 제거 — 색상·집계 매칭용
+function canonNm(s){return String(s==null?'':s).replace(/[ᄀ-ᇿ㄰-㆏ꥠ-꥿ힰ-퟿\s]+$/,'');}
 // [2026-09-02] 담당자 수 변동(김주환 추가 등)에도 안 깨지게 — 고정 행번호 대신 라벨로 탐색.
 //   시트 '담당자' 헤더 다음행 = 담당자 데이터 시작 / '캠페인' 헤더 = 캠페인 블록 시작.
 //   (옛 고정값 46/58은 담당자 10명 기준. 11명 되며 캠페인이 60으로 밀려 0으로 뜬 사건 방지.)
@@ -1628,9 +1630,9 @@ function render() {
   //   실제 행을 이름(r[0])으로 읽고 중복 제거 → 행수/순서 불일치로 생기던 유령중복(김주환 2명)·누락 제거.
   let _assigneeRaw=[]; { const _seen={};
     for(let _i=ASSIGNEE_START_IDX; _i<allRows.length; _i++){
-      const _rr=allRows[_i]||[]; const _nm=((_rr[0]||'')+'').trim();
+      const _rr=allRows[_i]||[]; const _nm=canonNm(((_rr[0]||'')+'').trim());
       if(!_nm||_nm==='캠페인'||_nm==='합계'||_nm==='기간유입'||_nm==='일자별유입'||_nm==='유입경로별') break;
-      if(_seen[_nm]) continue; _seen[_nm]=true; _assigneeRaw.push(_rr);
+      if(_seen[_nm]) continue; _seen[_nm]=true; _rr[0]=_nm; _assigneeRaw.push(_rr);
     } }
   let _dataArr = _assigneeRaw.map((r) => {
     const db=parseInt(r[offset]||'0')||0, visit=parseInt(r[offset+1]||'0')||0, setting=parseInt(r[offset+2]||'0')||0;
@@ -2032,7 +2034,7 @@ async function loadSchedule() {
       const dStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
       const isToday = dStr === todayStr;
       const dateStr = (d.getMonth()+1) + '/' + d.getDate() + ' (' + dayNames[d.getDay()] + ')';
-      const assignee = r[6] || '';
+      const assignee = canonNm(r[6] || '');
       const cmap = { '우혜림':'hye','김윤호':'kim','장윤호':'jang','박창건':'park','김우진':'woo','김태석':'tae','김성윤':'sung','노영호':'noh','김원득':'won','안준섭':'ahn','김슬기':'seul' };
       const assigneeClass = 'visit-assignee ' + (cmap[assignee] || '');
       const assigneeHtml = assignee ? `<span class="${assigneeClass}">${escapeHtml(assignee)}</span>` : '';
