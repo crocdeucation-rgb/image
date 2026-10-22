@@ -102,7 +102,7 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 .empty{padding:16px 14px;text-align:center;color:#b5bac4;font-size:11.5px}
 
 .as.hye{background:var(--green)} .as.kim{background:var(--blue)} .as.jang{background:#f97316} .as.park{background:var(--purple)} .as.ahn{background:#4338ca}
-.as.woo{background:var(--red)} .as.tae{background:var(--cyan)} .as.sung{background:#7c3aed} .as.noh{background:#0d9488} .as.won{background:#b45309}
+.as.woo{background:var(--red)} .as.tae{background:var(--cyan)} .as.sung{background:#7c3aed} .as.noh{background:#0d9488} .as.won{background:#b45309} .as.seul{background:#db2777}
 
 .wk{width:100%;border-collapse:collapse;font-size:12px}
 .wk th{background:#f7f8fb;color:#6b7280;font-weight:700;font-size:9.5px;padding:6px 3px;text-align:center}
@@ -280,7 +280,7 @@ const WORK_CSV_URL      = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRp14
 const WEBAPP_URL        = 'https://script.google.com/macros/s/AKfycbxu_6qC9WKTtVcAJJtoh_EfmvUbyzbkZFlTRC7uUr_dFmUYehON0Vhb3HdAwrTnF37w/exec';
 
 const MID_DAYS=4;
-const ASSIGNEES=['우혜림','김윤호','장윤호','박창건','김태석','김성윤','노영호','김원득','김우진','안준섭','김주환'];
+const ASSIGNEES=['우혜림','김윤호','장윤호','박창건','김태석','김성윤','노영호','김원득','김우진','안준섭','김주환','김슬기'];
 // [2026-10-07] 화면에서 숨길 담당자 (시트 인덱스 밀림 방지 위해 배열은 유지, 렌더만 제외)
 const HIDE_ASSIGNEES=['김성윤'];
 const ASSIGNEE_START_IDX=46;   // 폴백용(라벨 못 찾을 때만)
@@ -302,7 +302,7 @@ function getAssigneeRows(){
 // 표시 제외: 김성윤=완전제거 / 김윤호=행 숨김(단 방문 등은 합계엔 유지)
 var TEAM_DROP=['김성윤'], TEAM_HIDE_KEEPTOTAL=['김윤호'];
 const SOJ_KEYS=['노트릴스','노필릴스','채리','GT','원톱','5단계루틴','기초부족','MLST공부','MLST캐러셀','노트공부법','너만본다','CPA(텐핑)','카카오','Organic','네이버브랜드','기타'];
-const cmap={'우혜림':'hye','김윤호':'kim','장윤호':'jang','박창건':'park','김우진':'woo','김태석':'tae','김성윤':'sung','노영호':'noh','김원득':'won','안준섭':'ahn'};
+const cmap={'우혜림':'hye','김윤호':'kim','장윤호':'jang','박창건':'park','김우진':'woo','김태석':'tae','김성윤':'sung','노영호':'noh','김원득':'won','안준섭':'ahn','김슬기':'seul'};
 const dayN=['일','월','화','수','목','금','토'];
 const WDAYS=['월','화','수','목','금','토'];
 let summaryRows=[], perfTab=0, workState={};
