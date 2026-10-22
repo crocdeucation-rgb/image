@@ -293,9 +293,9 @@ function getAssigneeRows(){
   if(start<0) start=ASSIGNEE_START_IDX;
   var out=[], seen={};
   for(var i=start;i<summaryRows.length;i++){
-    var r=summaryRows[i]||[]; var nm=(((r[0])||'')+'').trim();
+    var r=summaryRows[i]||[]; var nm=canonNm((((r[0])||'')+'').trim());
     if(!nm||nm==='캠페인'||nm==='합계'||nm==='기간유입'||nm==='일자별유입'||nm==='유입경로별') break;
-    if(seen[nm]) continue; seen[nm]=true; out.push(r);
+    if(seen[nm]) continue; seen[nm]=true; r[0]=nm; out.push(r);
   }
   return out;
 }
@@ -318,7 +318,9 @@ function showSec(i){
 }
 
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function asB(a){return a?'<span class="as '+(cmap[a]||'')+'">'+esc(a)+'</span>':''}
+// [2026-10-22] 노션 이름 끝에 잘못 붙은 홑/겹자모(예: 김슬기ᄈ→김슬기) 제거 — 색상·집계 매칭용
+function canonNm(s){return String(s==null?'':s).replace(/[ᄀ-ᇿ㄰-㆏ꥠ-꥿ힰ-퟿\s]+$/,'');}
+function asB(a){a=canonNm(a);return a?'<span class="as '+(cmap[a]||'')+'">'+esc(a)+'</span>':''}
 function nmL(n,p){p=(p||'').replace(/-/g,'');return p?'<a class="nm" href="https://notion.so/'+p+'" target="_blank" rel="noopener">'+esc(n)+'</a>':'<span class="nm">'+esc(n)+'</span>'}
 function tMid(){var t=new Date();t.setHours(0,0,0,0);return t}
 function vFmt(vd,vt){if(!vd)return{lab:'',diff:null};var d=new Date(vd+'T00:00:00');var df=Math.round((d-tMid())/86400000);return{lab:(d.getMonth()+1)+'/'+d.getDate()+' ('+dayN[d.getDay()]+')',diff:df,tm:vt||''}}
