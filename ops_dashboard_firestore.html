@@ -1682,6 +1682,29 @@ function expBox(){
    (noexp?'<div class="lead" style="margin-top:10px">관리만료일이 시트에 없는 회원이 <b>'+noexp+'명</b> 있습니다. 이 회원들은 만료가 와도 미리 보이지 않습니다.</div>':''),true);
 }
 function tLbl(t){return t==='1팀'?'A팀':t==='2팀'?'B팀':(t||'');}   // 1팀/2팀 → 실제 A팀/B팀
+// [2026-10-23] 지점 통합 — 팀명을 지점으로 묶음. 빈값·기타·미기재는 원본 그대로(합치지 않음).
+//   확정 규칙(신상준): 상암·파인더 계열→파인더루원 / 마포지점→마포연합센터 흡수 /
+//   부천실무→메이킷위드(현재) / 악어에듀 전부 하나 / 가산연합·부평·마곡 N팀→각 지점.
+//   (파인더상암 중 김원득·문수호만 실제 마포연합센터지만 그건 사람별 HR이라 여기선 다 파인더루원)
+function brNorm(h){
+  h=String(h==null?'':h).trim();
+  if(!h) return '';
+  if(h.indexOf('부평')===0) return '부평지점';
+  if(h.indexOf('메이킷위드')===0) return '메이킷위드';
+  if(h.indexOf('부천')===0) return '메이킷위드';          // 부천실무* = 현재 메이킷
+  if(h.indexOf('스카이에듀')===0) return '스카이에듀';
+  if(h.indexOf('수호에듀')===0) return '수호에듀';
+  if(h.indexOf('더온에듀')===0) return '더온에듀';
+  if(h.indexOf('악어에듀')===0) return '악어에듀';        // 악어에듀운영팀 포함 하나로
+  if(h.indexOf('오름')===0) return '오름에듀';
+  if(h.indexOf('가산연합')===0) return '가산연합센터';
+  if(h.indexOf('마포')===0) return '마포연합센터';        // 마포연합*·마포지점 전부 흡수
+  if(h.indexOf('마곡')===0) return '마곡지점';
+  if(h.indexOf('수원')===0) return '수원지점';
+  if(h.indexOf('파인더')===0) return '파인더루원';        // 파인더상암·루원·운영 전부
+  if(h.indexOf('상암')===0) return '파인더루원';          // 구 상암 = 파인더 계열
+  return h.replace(/\s*\d*\s*(팀|과)$/,'').trim()||h;
+}
 var RETIRED_C={'이용우':1,'정기상':1};   // 코칭 퇴사자 — 별도 분리
 function guardBox(){
   // 관리 현황 — 민원(취소문의) 분해를 분류축(사업담당/코칭담당/지점/상담) × 기간(월별·전체) 토글로.
@@ -1690,7 +1713,7 @@ function guardBox(){
   var DIM=window.__mdim||'saup';   // 기본 = 사업담당
   var DIMS=[['saup','사업담당',function(m){return m.saup||'미기재';}],
             ['sang','상담',function(m){return m.sang||'미기재';}],
-            ['br','지점',function(m){return m.br||'미기재';}],
+            ['br','지점',function(m){return brNorm(m.br)||'미기재';}],
             ['teach','코칭담당',function(m){return m.teach||'(미기재)';}],
             ['team','팀(A/B)',function(m){return teamAB(m.teach);}]];
   var dimf=(DIMS.filter(function(d){return d[0]===DIM;})[0]||DIMS[0])[2];
@@ -2232,7 +2255,7 @@ function funnelBox(){
       var chk=L.filter(function(x){return x.can.big==='점검 필요';}).length, re=L.filter(function(x){return x.can.resp==='재이탈';}).length;
       return '<div class="dbar" style="grid-template-columns:140px 1fr auto"><span class="dl" style="width:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(k)+'</span><span class="dt"><i style="width:'+(L.length/mx*100)+'%;background:#F28B7D"></i></span>'+
         '<b class="dv">'+L.length+'<small>'+(chk?'점검 '+chk:'')+(re?(chk?' · ':'')+'재이탈 '+re:'')+'</small></b></div>';}).join('')+'</div></div>';};
-  var dists='<div class="fdist">'+dist(function(x){return teamAB(teachName(x));},'팀(A/B)')+dist(function(x){return teachName(x);},'코칭 담당')+dist(function(x){return x.br;},'지점')+'</div>';
+  var dists='<div class="fdist">'+dist(function(x){return teamAB(teachName(x));},'팀(A/B)')+dist(function(x){return teachName(x);},'코칭 담당')+dist(function(x){return brNorm(x.br);},'지점')+'</div>';
   return zone('funnel','var(--v1)','진단 — 월별','관리 → 민원 → 방어 → 취소','달을 고르면 그 달 흐름 · 원인은 달마다 나란히',
     '<div class="lead">민원 시트 월 탭 기준(2~4월 탭 없음). 위 카드는 고른 달과 전월 비교, 아래 표는 달마다 취소가 <b>어떤 원인·어떤 경로</b>로 났는지 나란히 놓은 것입니다. 색이 진할수록 그 항목 건수가 많은 달.</div>'+
     seg+funnel+mat+dists,true);
@@ -2241,7 +2264,7 @@ function byBox(){
   var C=(D.can2||[]).filter(function(m){return inBr(m);});
   if(!C.length) return '';
   var F=window.__bf||'지점';
-  var keyf={'지점':function(x){return x.br||'기타';},'상담':function(x){return x.sang||'미기재';},
+  var keyf={'지점':function(x){return brNorm(x.br)||'기타';},'상담':function(x){return x.sang||'미기재';},
             '방문':function(x){return x.saup||'미기재';},'코칭':function(x){return teachName(x);}}[F];
   var SEL=window.__bsel2||'';
   var ms=['2026-06','2026-07','2026-08','2026-09'];
