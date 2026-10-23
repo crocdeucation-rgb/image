@@ -140,6 +140,7 @@
   .tbody{flex:1;min-width:0}
   .tname{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:16px;font-weight:800;margin-bottom:3px}
   .tnew{background:#E6F7EE;color:var(--green);font-size:10px;font-weight:800;padding:1px 6px;border-radius:6px}
+  .tpre{background:#FDF1E2;color:var(--orange);font-size:10px;font-weight:800;padding:1px 6px;border-radius:6px}
   .tin{font-size:11px;color:#9AA6B8;font-weight:600;margin-left:auto}
 
   .tbig{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:2px 0 8px}
@@ -181,6 +182,29 @@
   .tavail .avnote{margin-top:9px;padding-top:9px;border-top:1px dashed #D5DDE8;font-size:10.5px;line-height:1.7;color:#8A94A6}
   .tavail .avnote b{color:#5c6b8a;font-weight:800}
   .tloading{text-align:center;padding:50px 20px;color:var(--gray)}
+  /* 과목별 커버 가능 타임 대시보드 */
+  .sdash{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:0 3px 14px rgba(20,40,80,.05)}
+  .sdash-hd{font-size:15px;font-weight:900;color:var(--navy);display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-bottom:12px}
+  .sdash-hd .sdh-s{font-size:11px;font-weight:600;color:var(--gray2)}
+  .sdash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+  .sdcard{position:relative;background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:12px 14px 13px;overflow:hidden}
+  .sdcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--sc,#4C6EF5)}
+  .sd-chd{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+  .sd-sub{font-size:14px;font-weight:900;color:var(--navy)}
+  .sd-num{font-size:22px;font-weight:900;letter-spacing:-1px;color:var(--sc,#4C6EF5)}
+  .sd-num span{font-size:11px;font-weight:800;margin-left:2px}
+  .sd-meta{font-size:10.5px;color:var(--gray2);font-weight:700;margin:1px 0 9px}
+  .sd-rows{display:flex;flex-direction:column;gap:5px}
+  .sd-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 9px}
+  .sd-row.pre{opacity:.82;background:repeating-linear-gradient(135deg,rgba(232,133,12,.04) 0 6px,transparent 6px 12px)}
+  .sd-rn{font-size:12px;font-weight:900;color:var(--navy);white-space:nowrap;display:flex;align-items:center;gap:4px}
+  .sd-rn i{font-style:normal;font-size:9px;color:var(--orange);font-weight:800;background:#FDF1E2;padding:1px 5px;border-radius:5px}
+  .sd-rv{font-size:11px;font-weight:600;color:#4A5568;line-height:1.35;word-break:keep-all}
+  .sd-rt{font-size:15px;font-weight:900;color:var(--sc,#4C6EF5);white-space:nowrap;text-align:right}
+  .sd-rt small{font-size:9.5px;font-weight:800;color:var(--gray2);margin-left:2px}
+  .sdash-note{margin-top:11px;padding-top:10px;border-top:1px dashed var(--line);font-size:10.5px;line-height:1.7;color:var(--gray2)}
+  .sdash-note b{color:var(--gray);font-weight:800}
+  .sdash-miss{font-size:12.5px;color:var(--gray);font-weight:600}
 
 #opsnav{display:none}
 body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sgate.hidden) #opsnav{display:flex}
@@ -233,6 +257,7 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
   </div><!-- /pane0 -->
 
   <div class="tabpane" id="pane1">
+    <div id="subjdash"></div>
     <div class="tgrid" id="tgrid"><div class="tloading">강사 데이터 불러오는 중…</div></div>
   </div><!-- /pane1 -->
 
@@ -427,7 +452,7 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
 
 // ========== 강사 현황 탭 ==========
 var SSAM_PHOTO_BASE='https://crocdeucation-rgb.github.io/image/report/ssam/';
-var SSAM_ROMAJA={'안중현':'anjunghyeon','최정민':'choejeongmin','최광백':'choegwangbaek'};
+var SSAM_ROMAJA={'안중현':'anjunghyeon','최정민':'choejeongmin','최광백':'choegwangbaek','이지원':'leejiwon','이소원':'leesowon','임가은':'imgaeun','이예빈':'leeyebin','박소연':'parksoyeon'};
 function tPhotoUrl(name){return SSAM_ROMAJA[name]?(SSAM_PHOTO_BASE+SSAM_ROMAJA[name]+'.jpg'):'';}
 function tParseCSV(text){var rows=[],row=[],cur='',q=false;for(var i=0;i<text.length;i++){var c=text[i];if(q){if(c==='"'){if(text[i+1]==='"'){cur+='"';i++;}else q=false;}else cur+=c;}else{if(c==='"')q=true;else if(c===','){row.push(cur);cur='';}else if(c==='\n'){row.push(cur);rows.push(row);row=[];cur='';}else if(c==='\r'){}else cur+=c;}}if(cur!==''||row.length){row.push(cur);rows.push(row);}return rows;}
 function tRowsToCsv(rows){return (rows||[]).map(function(r){return (r||[]).map(function(c){var s=String(c==null?'':c);return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}).join(',');}).join('\n');}
@@ -495,6 +520,154 @@ function tSchedHtml(name){
     '<div class="tcal-wrap"><div class="tcal-days">'+dayHead+'</div><div class="tcal-body"><div class="tcal-axis" style="height:'+totalH+'px">'+hourLines+'</div><div class="tcal-grid">'+cols+'</div></div></div>'+avail;
 }
 
+// ===== 과목별 커버 가능 타임 대시보드 =====
+var T_WD_WIN=[16*60,25*60], T_WE_WIN=[10*60,25*60], T_DOW=['월','화','수','목','금','토','일'];
+function tEsc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function tToMin24(t){var m=String(t).match(/(\d{1,2})\s*:\s*(\d{2})/);if(!m)return null;return +m[1]*60+ +m[2];}
+function tSchedKey(name){if(T_SCHED[name])return name;for(var k in T_SCHED){if(k.indexOf(name)===0)return k;}return null;}
+// 아라 기존 수업(찬 시간) — tSchedHtml과 동일 해석
+function tBusyByDay(name){
+  var k=tSchedKey(name),busy={};if(!k)return busy;
+  var s=T_SCHED[k];
+  s.rows.forEach(function(r){
+    var mm=String(r.time).match(/(\d{1,2}:\d{2})\s*[~\-]\s*(\d{1,2}:\d{2})/);
+    var st=mm?tToMin(mm[1]):tToMin(r.time),en=mm?tToMin(mm[2]):(st!=null?st+40:null);
+    if(st==null)return;
+    r.cells.forEach(function(c,di){
+      if(!c)return;var wd=T_DOW.indexOf(s.days[di]);if(wd<0)return;
+      (busy[wd]=busy[wd]||[]).push([st,en]);
+    });
+  });
+  return busy;
+}
+function tMergeWins(ws){ws=ws.slice().sort(function(a,b){return a[0]-b[0];});var out=[];ws.forEach(function(w){var L=out[out.length-1];if(L&&w[0]<=L[1]){if(w[1]>L[1])L[1]=w[1];}else out.push(w.slice());});return out;}
+function tSubFree(win,busy){ // 창(win)에서 busy 제외한 빈 분
+  if(!win||win[1]<=win[0])return 0;
+  var b=(busy||[]).map(function(x){return [Math.max(x[0],win[0]),Math.min(x[1],win[1])];}).filter(function(x){return x[1]>x[0];}).sort(function(a,b){return a[0]-b[0];});
+  var cur=win[0],free=0;
+  b.forEach(function(x){if(x[0]>cur)free+=x[0]-cur;if(x[1]>cur)cur=x[1];});
+  if(win[1]>cur)free+=win[1]-cur;
+  return free;
+}
+// 과목별 시트의 요일/시간 셀 → {요일idx:[[s,e],..]} (학생 수업창과 교집합)
+function tParseAvailCell(dayCell,timeCell,isWe){
+  var out={},dayStr=String(dayCell||'').trim(),timeStr=String(timeCell||'').trim();
+  if(/^x$/i.test(dayStr)||/^x$/i.test(timeStr))return out;
+  var win=isWe?T_WE_WIN:T_WD_WIN,defDays=[];
+  T_DOW.forEach(function(d,i){if(dayStr.indexOf(d)>=0&&(isWe?i>=5:i<5))defDays.push(i);});
+  function addRanges(days,txt){
+    var rs=[],re=/(\d{1,2}\s*:\s*\d{2})\s*[~\-]\s*(\d{1,2}\s*:\s*\d{2})/g,m;
+    while((m=re.exec(txt)))rs.push([tToMin24(m[1]),tToMin24(m[2])]);
+    if(!rs.length&&/종일|가능/.test(txt))rs=[[win[0],win[1]]];
+    rs.forEach(function(r){
+      var s=Math.max(r[0],win[0]),e=Math.min(r[1],win[1]);
+      if(e>s)days.forEach(function(wd){(out[wd]=out[wd]||[]).push([s,e]);});
+    });
+  }
+  if(!timeStr){if(defDays.length)addRanges(defDays,'가능');return out;}
+  timeStr.split(/\n/).map(function(x){return x.trim();}).filter(Boolean).forEach(function(ln){
+    var mm=ln.match(/^([월화수목금토일·,\s]+)[-–—]\s*(.+)$/);
+    if(mm){
+      var ds=[];T_DOW.forEach(function(d,i){if(mm[1].indexOf(d)>=0&&(isWe?i>=5:i<5))ds.push(i);});
+      addRanges(ds.length?ds:defDays,mm[2]);
+    }else addRanges(defDays,ln);
+  });
+  return out;
+}
+// 가용시간 기재 없는 강사(안중현·최정민 등) 폴백 = 개별카드와 동일: 수업 있는 평일 + 주말 전체
+function tDefaultDayWins(name){
+  var out={},busy=tBusyByDay(name);
+  for(var wd=0;wd<7;wd++){
+    var isWe=wd>=5;
+    if(!isWe&&!(busy[wd]&&busy[wd].length))continue;
+    out[wd]=[(isWe?T_WE_WIN:T_WD_WIN).slice()];
+  }
+  return out;
+}
+function tTeacherFreeMin(name,dayWins){
+  var busy=tBusyByDay(name),total=0;
+  for(var wd in dayWins){
+    tMergeWins(dayWins[wd]).forEach(function(w){total+=tSubFree(w,busy[wd]);});
+  }
+  return total;
+}
+var SD_COL={'국어':'#2E5BFF','영어':'#0F9D6E','수학':'#6D5AE6','과학':'#0E9C8A','사회':'#E8850C','한국사':'#E5533D'};
+// 시트 셀 → 사람이 읽는 가능시간 라벨 (요일 + 시간대, 평일/주말)
+function tAvailLabel(t,hasExplicit){
+  if(!hasExplicit)return '아라 시간표 기준 (시간 미기재)';
+  function clean(s){return String(s||'').replace(/\r/g,'').replace(/\n+/g,' · ').replace(/\s+/g,' ').trim();}
+  var parts=[];
+  var wdD=clean(t.wdD),wdT=clean(t.wdT),weD=clean(t.weD),weT=clean(t.weT);
+  if(wdD&&!/^x$/i.test(wdD)){parts.push('평일 '+wdD+(wdT&&!/^x$/i.test(wdT)?' '+wdT:''));}
+  else if(wdT&&!/^x$/i.test(wdT)){parts.push('평일 '+wdT);}
+  if(weD&&!/^x$/i.test(weD)){parts.push('주말 '+weD+(weT&&!/^x$/i.test(weT)?' '+weT:''));}
+  else if(weT&&!/^x$/i.test(weT)&&!/^x$/i.test(weD||'')){parts.push('주말 '+weT);}
+  return parts.join('  /  ')||'—';
+}
+function renderSubjDash(rows,statusMap){
+  var el=document.getElementById('subjdash');if(!el)return;
+  rows=rows||[];
+  var hIdx=-1;rows.forEach(function(r,i){if(hIdx<0&&(r||[]).some(function(c){return String(c||'').trim()==='과목';}))hIdx=i;});
+  if(hIdx<0){el.innerHTML='';return;}
+  var H=rows[hIdx].map(function(c){return String(c||'').trim();});
+  function col(kw){for(var i=0;i<H.length;i++)if(H[i].replace(/\s/g,'').indexOf(kw)>=0)return i;return -1;}
+  var iSub=col('과목'),iNm=col('이름'),iWdD=col('평일요일'),iWdT=col('평일시간'),iWeD=col('주말요일'),iWeT=col('주말시간');
+  var subjects=[],bySub={},curSub='';
+  rows.slice(hIdx+1).forEach(function(r){
+    r=r||[];
+    var sub=String(r[iSub]||'').trim();if(sub)curSub=sub;
+    var nm=String(r[iNm]||'').trim();if(!curSub||!nm)return;
+    if(!bySub[curSub]){bySub[curSub]=[];subjects.push(curSub);}
+    bySub[curSub].push({name:nm,wdD:r[iWdD]||'',wdT:r[iWdT]||'',weD:r[iWeD]||'',weT:r[iWeT]||''});
+  });
+  if(!subjects.length){el.innerHTML='';return;}
+  var cards='';
+  subjects.forEach(function(sub){
+    var list=bySub[sub],tot=0,pre=0,rowsArr=[];
+    list.forEach(function(t){
+      var wd1=tParseAvailCell(t.wdD,t.wdT,false),we1=tParseAvailCell(t.weD,t.weT,true);
+      var hasExplicit=Object.keys(wd1).length||Object.keys(we1).length||String(t.wdD).trim()||String(t.weD).trim();
+      var dayWins;
+      if(!hasExplicit)dayWins=tDefaultDayWins(t.name);
+      else{dayWins={};[wd1,we1].forEach(function(src){for(var k in src)dayWins[k]=(dayWins[k]||[]).concat(src[k]);});}
+      var tm=Math.floor(tTeacherFreeMin(t.name,dayWins)/150);
+      var st=statusMap[t.name]||'';
+      var isPre=st&&st!=='재직';
+      if(isPre)pre++;
+      tot+=tm;
+      rowsArr.push({nm:t.name,tm:tm,pre:isPre,st:st,avail:tAvailLabel(t,hasExplicit)});
+    });
+    rowsArr.sort(function(a,b){return b.tm-a.tm;});
+    var rowHtml=rowsArr.map(function(c){
+      return '<div class="sd-row'+(c.pre?' pre':'')+'">'
+        +'<div class="sd-rn">'+tEsc(c.nm)+(c.pre?'<i>'+tEsc(c.st)+'</i>':'')+'</div>'
+        +'<div class="sd-rv">'+tEsc(c.avail)+'</div>'
+        +'<div class="sd-rt">'+c.tm+'<small>타임</small></div></div>';
+    }).join('');
+    var colv=SD_COL[sub]||'#4C6EF5';
+    cards+='<div class="sdcard" style="--sc:'+colv+'">'
+      +'<div class="sd-chd"><div class="sd-sub">'+tEsc(sub)+'</div><div class="sd-num">주 '+tot+'<span>타임</span></div></div>'
+      +'<div class="sd-meta">60분 수업 · 주2회 반 기준 · 강사 '+list.length+'명'+(pre?' (예정 '+pre+')':'')+'</div>'
+      +'<div class="sd-rows">'+rowHtml+'</div></div>';
+  });
+  el.innerHTML='<div class="sdash"><div class="sdash-hd">📊 과목별 커버 가능 타임 <span class="sdh-s"><b style="color:var(--navy)">1타임 = 정규 60분 수업을 주2회 하는 반 1개</b> (쉬는 15분 포함 = 주 150분) — 과목별로 반을 몇 개 더 열 수 있는지</span></div>'
+    +'<div class="sdash-grid">'+cards+'</div>'
+    +'<div class="sdash-note">※ <b>단위</b>: 주 N타임 = 60분 정규반(주2회) N개 개설 여력. 1회 단위 아님 — 1회 기준 교시 수는 ×2.<br>※ 강사별 가용시간(★과목별 수업가능 시간 시트)을 <b>학생 수업창(평일 16시~새벽1시 · 주말 10시~새벽1시)</b>과 교집합 후, 기존 아라 수업 시간을 차감해 환산한 <b>참고 여력</b>.<br>'
+    +'※ 시간 미기재 강사는 개별 카드와 동일 기준(수업 있는 평일+주말)으로 계산. 주말 "가능(조율)"은 전체 포함. 한 강사가 여러 과목이면 과목마다 중복 집계(합산 금지).</div></div>';
+}
+function loadSubjDash(statusMap){
+  tFsGet('execData','hr-ssam-avail').then(function(o){renderSubjDash(o.rows||[],statusMap);})
+  .catch(function(){
+    // 폴백: gviz 직접 (시트 공유 열려있을 때만 동작)
+    var u='https://docs.google.com/spreadsheets/d/1cUFTNJVY24tbIo-NK1nhV1nxg2PbNMfnJd5HFDZNPTQ/gviz/tq?tqx=out:csv&gid=20261023&headers=0';
+    fetch(u).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(t){renderSubjDash(tParseCSV(t),statusMap);})
+    .catch(function(){
+      var el=document.getElementById('subjdash');
+      if(el)el.innerHTML='<div class="sdash sdash-miss">📊 과목별 가능 타임: 데이터 없음 — GAS 저장 함수에 ★과목별 수업가능 시간 시트를 execData/hr-ssam-avail 로 푸시 추가 필요</div>';
+    });
+  });
+}
+
 function tCardHtml(e){
   var purl=tPhotoUrl(e.name);
   var rawSub=(e.sub&&e.sub!=='전체'&&e.sub!=='미구분')?e.sub:'';
@@ -520,7 +693,8 @@ function tCardHtml(e){
     }).join('');
   }
   var isNew=e.isNew?'<span class="tnew">NEW</span>':'';
-  return '<div class="tcard">'+photo+'<div class="tbody"><div class="tname">'+e.name+isNew+'<span class="tin">'+(e.inD||'')+'</span></div>'+(e._bigSubj||'')+school+note+tSchedHtml(e.name)+'</div></div>';
+  var stBadge=e.st?'<span class="tpre">'+e.st+'</span>':'';
+  return '<div class="tcard">'+photo+'<div class="tbody"><div class="tname">'+e.name+isNew+stBadge+'<span class="tin">'+(e.inD||'')+'</span></div>'+(e._bigSubj||'')+school+note+tSchedHtml(e.name)+'</div></div>';
 }
 
 async function loadTeachers(){
@@ -530,16 +704,20 @@ async function loadTeachers(){
     tParseSched(schedCsv);
     var rows=tParseCSV(ssamCsv),H=rows[1]||[],idx={};
     H.forEach(function(hh,i){hh=String(hh||'').trim();if(hh)idx[hh]=i;});
-    var list=[];
+    var list=[],statusMap={};
     for(var r=2;r<rows.length;r++){
       var row=rows[r],nm=String(row[idx['이름']]||'').trim();if(!nm)continue;
       var jae=('재직' in idx)?String(row[idx['재직']]||'').trim():'';
-      if(jae&&jae!=='재직')continue;
+      statusMap[nm]=jae||'재직';
+      if(/퇴사/.test(jae))continue;
       var inRaw=row[idx['입사일']]||'';var im=String(inRaw).match(/(\d{4})[-.\/]\s*(\d{1,2})[-.\/]\s*(\d{1,2})/);
-      list.push({name:nm,sub:('과목' in idx)?String(row[idx['과목']]||'').trim():'',school:('학교' in idx)?String(row[idx['학교']]||'').trim():'',note:('특이사항' in idx)?String(row[idx['특이사항']]||'').trim():'',inD:im?(im[1]+'-'+('0'+im[2]).slice(-2)+'-'+('0'+im[3]).slice(-2)):'',isNew:false});
+      list.push({st:(jae&&jae!=='재직')?jae:'',name:nm,sub:('과목' in idx)?String(row[idx['과목']]||'').trim():'',school:('학교' in idx)?String(row[idx['학교']]||'').trim():'',note:('특이사항' in idx)?String(row[idx['특이사항']]||'').trim():'',inD:im?(im[1]+'-'+('0'+im[2]).slice(-2)+'-'+('0'+im[3]).slice(-2)):'',isNew:false});
     }
+    var ORD={'':0,'교육중':1,'교육예정':2};
+    list.sort(function(a,b){return (ORD[a.st]!=null?ORD[a.st]:3)-(ORD[b.st]!=null?ORD[b.st]:3);});
     var el=document.getElementById('tgrid');
     el.innerHTML=list.length?list.map(tCardHtml).join(''):'<div class="tloading">강사 데이터가 없습니다.</div>';
+    loadSubjDash(statusMap);
   }catch(e){console.error(e);document.getElementById('tgrid').innerHTML='<div class="tloading">강사 데이터를 불러오지 못했습니다.</div>';}
 }
 
