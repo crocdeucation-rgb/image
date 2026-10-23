@@ -509,10 +509,10 @@ function tSchedHtml(name){
     if(op[1]>cursor)dayFree+=(op[1]-cursor);
     freeMin+=Math.max(0,dayFree);
   }
-  var t60=Math.floor(freeMin/150),t90=Math.floor(freeMin/210),tsg=Math.floor(freeMin/40),freeH=(freeMin/60);
+  var t60=Math.floor(freeMin/180),t90=Math.floor(freeMin/240),tsg=Math.floor(freeMin/40),freeH=(freeMin/60);
   var avail='<div class="tavail"><div class="avh">💡 가능 타임 <span class="avs">평일 16시~·주말 10시~ 기준 · 빈 '+(freeH%1?freeH.toFixed(1):freeH)+'시간</span></div>'+
-    '<div class="avr"><span class="avk">정규 60분</span><span class="avn">(쉬는 15분 포함)</span><span class="avv">주 '+t60+'타임</span></div>'+
-    '<div class="avr"><span class="avk">정규 90분</span><span class="avn">(쉬는 15분 포함)</span><span class="avv">주 '+t90+'타임</span></div>'+
+    '<div class="avr"><span class="avk">정규 60분</span><span class="avn">(쉬는 30분 포함)</span><span class="avv">주 '+t60+'타임</span></div>'+
+    '<div class="avr"><span class="avk">정규 90분</span><span class="avn">(쉬는 30분 포함)</span><span class="avv">주 '+t90+'타임</span></div>'+
     '<div class="avr sg"><span class="avk">시강 30분</span><span class="avn">(쉬는 10분 포함)</span><span class="avv">최대 '+tsg+'회</span></div>'+
     '<div class="avnote">※ <b>평일 16시~</b>: 학생이 학교 끝나고 오는 시간 기준 (초·중등 하교 후). 고등은 보통 더 늦음. &nbsp;<b>주말 10시~</b>: 종일 가능. &nbsp;상한은 <b>새벽 1시</b>까지(과외 특성).<br>※ <b>정규 1타임 = 주2회</b>(월·수 등). 아라 수업은 고정이라 찬 시간으로 계산. 수업 없는 평일은 근무일 아님으로 제외.<br>※ 빈 시간 ÷ (수업+쉬는시간)으로 환산한 <b>참고 여력</b> — 실제 배정은 시간대 조정 필요.</div></div>';
 
@@ -630,7 +630,7 @@ function renderSubjDash(rows,statusMap){
       var dayWins;
       if(!hasExplicit)dayWins=tDefaultDayWins(t.name);
       else{dayWins={};[wd1,we1].forEach(function(src){for(var k in src)dayWins[k]=(dayWins[k]||[]).concat(src[k]);});}
-      var tm=Math.floor(tTeacherFreeMin(t.name,dayWins)/150);
+      var tm=Math.floor(tTeacherFreeMin(t.name,dayWins)/180);
       var st=statusMap[t.name]||'';
       var isPre=st&&st!=='재직';
       if(isPre)pre++;
@@ -650,10 +650,10 @@ function renderSubjDash(rows,statusMap){
       +'<div class="sd-meta">60분 수업 · 주2회 반 기준 · 강사 '+list.length+'명'+(pre?' (예정 '+pre+')':'')+'</div>'
       +'<div class="sd-rows">'+rowHtml+'</div></div>';
   });
-  el.innerHTML='<div class="sdash"><div class="sdash-hd">📊 과목별 커버 가능 타임 <span class="sdh-s"><b style="color:var(--navy)">1타임 = 정규 60분 수업을 주2회 하는 반 1개</b> (쉬는 15분 포함 = 주 150분) — 과목별로 반을 몇 개 더 열 수 있는지</span></div>'
+  el.innerHTML='<div class="sdash"><div class="sdash-hd">📊 과목별 커버 가능 타임 <span class="sdh-s"><b style="color:var(--navy)">1타임 = 정규 60분 수업을 주2회 하는 반 1개</b> (수업 60분 + 쉬는 30분 = 1회 90분 · 주2회 = 180분) — 과목별로 반을 몇 개 더 열 수 있는지</span></div>'
     +'<div class="sdash-grid">'+cards+'</div>'
-    +'<div class="sdash-note">※ <b>단위</b>: 주 N타임 = 60분 정규반(주2회) N개 개설 여력. 1회 단위 아님 — 1회 기준 교시 수는 ×2.<br>※ 강사별 가용시간(★과목별 수업가능 시간 시트)을 <b>학생 수업창(평일 16시~새벽1시 · 주말 10시~새벽1시)</b>과 교집합 후, 기존 아라 수업 시간을 차감해 환산한 <b>참고 여력</b>.<br>'
-    +'※ 시간 미기재 강사는 개별 카드와 동일 기준(수업 있는 평일+주말)으로 계산. 주말 "가능(조율)"은 전체 포함. 한 강사가 여러 과목이면 과목마다 중복 집계(합산 금지).</div></div>';
+    +'<div class="sdash-note">※ <b>단위</b>: 주 N타임 = 60분 정규반(주2회) N개 개설 여력. 1회당 수업 60분+쉬는 30분(=90분)으로 환산. 1회 단위 아님 — 1회 기준 교시 수는 ×2.<br>※ 강사별 가용시간(★과목별 수업가능 시간 시트)을 <b>학생 수업창(평일 16시~새벽1시 · 주말 10시~새벽1시)</b>과 교집합 후, 기존 아라 수업 시간을 차감해 환산한 <b>참고 여력</b>.<br>'
+    +'※ 쌤이다 수업 불가 강사(아라 전담)는 과목별 시트에 미기재 → 집계 제외. 시간 미기재 강사는 개별 카드와 동일 기준(수업 있는 평일+주말)으로 계산. 주말 "가능(조율)"은 전체 포함. 한 강사가 여러 과목이면 과목마다 중복 집계(합산 금지).</div></div>';
 }
 function loadSubjDash(statusMap){
   tFsGet('execData','hr-ssam-avail').then(function(o){renderSubjDash(o.rows||[],statusMap);})
