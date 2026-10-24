@@ -522,6 +522,17 @@ function tSchedHtml(name){
 
 // ===== 과목별 커버 가능 타임 대시보드 =====
 var T_WD_WIN=[16*60,25*60], T_WE_WIN=[10*60,25*60], T_DOW=['월','화','수','목','금','토','일'];
+// 학년별 평일 귀가(=수업 시작 하한): 초 15시 / 중 16시 / 고 17시 (야자생도 17시 창에 포함)
+// 강사의 '대상 학년(~까지)'에서 '맡을 수 있는 가장 이른 학년'으로 하한 결정.
+//   '최소 초5'처럼 초등 하단 제한이 있으면 중등급(16시)으로 봄.
+function tWdFloorByGrade(gradeStr){
+  var g=String(gradeStr||'');
+  var hasElemLimit=/최소\s*초|초\s*5\s*이상|초5\s*이상/.test(g); // 초등이지만 저학년 불가 → 중등급 취급
+  if(/초/.test(g)&&!hasElemLimit)return 15*60;   // 초등 가능
+  if(/중/.test(g)||hasElemLimit)return 16*60;     // 중등까지
+  if(/고/.test(g))return 17*60;                   // 고등만
+  return 16*60;                                   // 불명 → 중등 기준
+}
 function tEsc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function tToMin24(t){var m=String(t).match(/(\d{1,2})\s*:\s*(\d{2})/);if(!m)return null;return +m[1]*60+ +m[2];}
 function tSchedKey(name){if(T_SCHED[name])return name;for(var k in T_SCHED){if(k.indexOf(name)===0)return k;}return null;}
@@ -550,10 +561,10 @@ function tSubFree(win,busy){ // 창(win)에서 busy 제외한 빈 분
   return free;
 }
 // 과목별 시트의 요일/시간 셀 → {요일idx:[[s,e],..]} (학생 수업창과 교집합)
-function tParseAvailCell(dayCell,timeCell,isWe){
+function tParseAvailCell(dayCell,timeCell,isWe,wdFloor){
   var out={},dayStr=String(dayCell||'').trim(),timeStr=String(timeCell||'').trim();
   if(/^x$/i.test(dayStr)||/^x$/i.test(timeStr))return out;
-  var win=isWe?T_WE_WIN:T_WD_WIN,defDays=[];
+  var win=isWe?T_WE_WIN:[(wdFloor!=null?wdFloor:T_WD_WIN[0]),T_WD_WIN[1]],defDays=[];
   T_DOW.forEach(function(d,i){if(dayStr.indexOf(d)>=0&&(isWe?i>=5:i<5))defDays.push(i);});
   function addRanges(days,txt){
     var rs=[],re=/(\d{1,2}\s*:\s*\d{2})\s*[~\-]\s*(\d{1,2}\s*:\s*\d{2})/g,m;
@@ -575,12 +586,12 @@ function tParseAvailCell(dayCell,timeCell,isWe){
   return out;
 }
 // 가용시간 기재 없는 강사(안중현·최정민 등) 폴백 = 개별카드와 동일: 수업 있는 평일 + 주말 전체
-function tDefaultDayWins(name){
-  var out={},busy=tBusyByDay(name);
+function tDefaultDayWins(name,wdFloor){
+  var out={},busy=tBusyByDay(name),wdWin=[(wdFloor!=null?wdFloor:T_WD_WIN[0]),T_WD_WIN[1]];
   for(var wd=0;wd<7;wd++){
     var isWe=wd>=5;
     if(!isWe&&!(busy[wd]&&busy[wd].length))continue;
-    out[wd]=[(isWe?T_WE_WIN:T_WD_WIN).slice()];
+    out[wd]=[(isWe?T_WE_WIN:wdWin).slice()];
   }
   return out;
 }
@@ -611,24 +622,34 @@ function renderSubjDash(rows,statusMap){
   if(hIdx<0){el.innerHTML='';return;}
   var H=rows[hIdx].map(function(c){return String(c||'').trim();});
   function col(kw){for(var i=0;i<H.length;i++)if(H[i].replace(/\s/g,'').indexOf(kw)>=0)return i;return -1;}
-  var iSub=col('과목'),iNm=col('이름'),iWdD=col('평일요일'),iWdT=col('평일시간'),iWeD=col('주말요일'),iWeT=col('주말시간');
+  var iSub=col('과목'),iNm=col('이름'),iGr=col('대상학년'),iWdD=col('평일요일'),iWdT=col('평일시간'),iWeD=col('주말요일'),iWeT=col('주말시간');
+  if(iGr<0)iGr=col('학년');
   var subjects=[],bySub={},curSub='';
   rows.slice(hIdx+1).forEach(function(r){
     r=r||[];
     var sub=String(r[iSub]||'').trim();if(sub)curSub=sub;
     var nm=String(r[iNm]||'').trim();if(!curSub||!nm)return;
     if(!bySub[curSub]){bySub[curSub]=[];subjects.push(curSub);}
-    bySub[curSub].push({name:nm,wdD:r[iWdD]||'',wdT:r[iWdT]||'',weD:r[iWeD]||'',weT:r[iWeT]||''});
+    bySub[curSub].push({name:nm,grade:(iGr>=0?r[iGr]||'':''),wdD:r[iWdD]||'',wdT:r[iWdT]||'',weD:r[iWeD]||'',weT:r[iWeT]||''});
   });
   if(!subjects.length){el.innerHTML='';return;}
-  var cards='';
+  // 강사 구성·가용시간이 완전히 동일한 과목끼리 묶기 (예: 사회·한국사 = 안중현 동일) — 시트는 그대로, 표시만 합침
+  function sig(list){return list.map(function(t){return t.name+'|'+String(t.wdD).trim()+'|'+String(t.wdT).trim()+'|'+String(t.weD).trim()+'|'+String(t.weT).trim();}).sort().join('§');}
+  var groups=[],seen={};
   subjects.forEach(function(sub){
-    var list=bySub[sub],tot=0,pre=0,rowsArr=[];
+    var s=sig(bySub[sub]);
+    if(seen[s]!=null){groups[seen[s]].subs.push(sub);}
+    else{seen[s]=groups.length;groups.push({subs:[sub],list:bySub[sub]});}
+  });
+  var cards='';
+  groups.forEach(function(g){
+    var sub=g.subs.join('·'),list=g.list,tot=0,pre=0,rowsArr=[];
     list.forEach(function(t){
-      var wd1=tParseAvailCell(t.wdD,t.wdT,false),we1=tParseAvailCell(t.weD,t.weT,true);
+      var floor=tWdFloorByGrade(t.grade);
+      var wd1=tParseAvailCell(t.wdD,t.wdT,false,floor),we1=tParseAvailCell(t.weD,t.weT,true,floor);
       var hasExplicit=Object.keys(wd1).length||Object.keys(we1).length||String(t.wdD).trim()||String(t.weD).trim();
       var dayWins;
-      if(!hasExplicit)dayWins=tDefaultDayWins(t.name);
+      if(!hasExplicit)dayWins=tDefaultDayWins(t.name,floor);
       else{dayWins={};[wd1,we1].forEach(function(src){for(var k in src)dayWins[k]=(dayWins[k]||[]).concat(src[k]);});}
       var tm=Math.floor(tTeacherFreeMin(t.name,dayWins)/180);
       var st=statusMap[t.name]||'';
@@ -644,7 +665,7 @@ function renderSubjDash(rows,statusMap){
         +'<div class="sd-rv">'+tEsc(c.avail)+'</div>'
         +'<div class="sd-rt">'+c.tm+'<small>타임</small></div></div>';
     }).join('');
-    var colv=SD_COL[sub]||'#4C6EF5';
+    var colv=SD_COL[sub]||SD_COL[g.subs[0]]||'#4C6EF5';
     cards+='<div class="sdcard" style="--sc:'+colv+'">'
       +'<div class="sd-chd"><div class="sd-sub">'+tEsc(sub)+'</div><div class="sd-num">주 '+tot+'<span>타임</span></div></div>'
       +'<div class="sd-meta">60분 수업 · 주2회 반 기준 · 강사 '+list.length+'명'+(pre?' (예정 '+pre+')':'')+'</div>'
@@ -652,8 +673,8 @@ function renderSubjDash(rows,statusMap){
   });
   el.innerHTML='<div class="sdash"><div class="sdash-hd">📊 과목별 커버 가능 타임 <span class="sdh-s"><b style="color:var(--navy)">1타임 = 정규 60분 수업을 주2회 하는 반 1개</b> (수업 60분 + 쉬는 30분 = 1회 90분 · 주2회 = 180분) — 과목별로 반을 몇 개 더 열 수 있는지</span></div>'
     +'<div class="sdash-grid">'+cards+'</div>'
-    +'<div class="sdash-note">※ <b>단위</b>: 주 N타임 = 60분 정규반(주2회) N개 개설 여력. 1회당 수업 60분+쉬는 30분(=90분)으로 환산. 1회 단위 아님 — 1회 기준 교시 수는 ×2.<br>※ 강사별 가용시간(★과목별 수업가능 시간 시트)을 <b>학생 수업창(평일 16시~새벽1시 · 주말 10시~새벽1시)</b>과 교집합 후, 기존 아라 수업 시간을 차감해 환산한 <b>참고 여력</b>.<br>'
-    +'※ 쌤이다 수업 불가 강사(아라 전담)는 과목별 시트에 미기재 → 집계 제외. 시간 미기재 강사는 개별 카드와 동일 기준(수업 있는 평일+주말)으로 계산. 주말 "가능(조율)"은 전체 포함. 한 강사가 여러 과목이면 과목마다 중복 집계(합산 금지).</div></div>';
+    +'<div class="sdash-note">※ <b>단위</b>: 주 N타임 = 60분 정규반(주2회) N개 개설 여력. 1회당 수업 60분+쉬는 30분(=90분)으로 환산. 1회 단위 아님 — 1회 기준 교시 수는 ×2.<br>※ <b>학생 귀가 기준 창</b>: 초등 15시~ · 중등 16시~ · 고등 17시~(야자생 포함) · 상한 새벽1시 / 주말 10시~. 강사가 맡는 가장 이른 학년으로 평일 시작시각 결정(강사가 직접 적은 시작시각이 있으면 그걸 우선).<br>※ 위 창과 강사 가용시간을 교집합 후 기존 아라 수업 시간을 차감해 환산한 <b>참고 여력</b>.<br>'
+    +'※ 쌤이다 수업 불가 강사(아라 전담)는 과목별 시트에 미기재 → 집계 제외. 한 강사가 여러 과목이면 과목마다 중복 집계(합산 금지) — 같은 강사는 동시 수업 불가.</div></div>';
 }
 function loadSubjDash(statusMap){
   tFsGet('execData','hr-ssam-avail').then(function(o){renderSubjDash(o.rows||[],statusMap);})
