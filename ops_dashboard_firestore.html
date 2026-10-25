@@ -1706,6 +1706,7 @@ function brNorm(h){
   return h.replace(/\s*\d*\s*(팀|과)$/,'').trim()||h;
 }
 var RETIRED_C={'이용우':1,'정기상':1};   // 코칭 퇴사자 — 별도 분리
+var RETIRED_S={'박종현':1};   // 사업담당 퇴사자 — 재직명단(hrSaup) 미배포 시 폴백. 퇴사자 생기면 여기 추가
 function guardBox(){
   // 관리 현황 — 민원(취소문의) 분해를 분류축(사업담당/코칭담당/지점/상담) × 기간(월별·전체) 토글로.
   var IB=(D.inbox||[]).filter(function(m){return inBr(m);});
@@ -1935,7 +1936,7 @@ function guardBox(){
   var hrS=D.hrSaup?(function(){var o={};D.hrSaup.forEach(function(n){o[n]=1;});return o;})():null;
   function isRet(k){
     if(DIM==='teach'){ if(k==='(미기재)')return false; return hrC? !hrC[_nm(k)] : !!RETIRED_C[k]; }
-    if(DIM==='saup'){ if(k==='미기재')return false; return hrS? !hrS[_nm(k)] : false; }
+    if(DIM==='saup'){ if(k==='미기재')return true; return hrS? !hrS[_nm(k)] : !!RETIRED_S[_nm(k)]; }
     return false;
   }
   var allK=Object.keys(byGM).filter(function(k){return perTot(k).drop||((A.o[k]||{}).mw);});   // 전 기간 기준
@@ -1947,7 +1948,7 @@ function guardBox(){
     ms.map(function(mm){return '<th class="c" style="min-width:76px">'+(+mm.slice(5))+'월'+(mm===CURM?'<div class="org" style="font-weight:600">'+md(DATA)+'까지</div>':'')+'</th>';}).join('')+
     '<th class="c" style="min-width:80px">누적</th>';
   var tbl='<div class="scrollx"><table class="tbl mtbl"><thead><tr>'+th+'</tr></thead><tbody>'+mkRows(mainK)+
-    (retK.length?'<tr><td colspan="'+COLS+'" style="background:#F6F8FB;font-size:11px;font-weight:800;color:var(--soft)">퇴사·외부 (재직 명단에 없음 — 당시 접수 기록)</td></tr>'+mkRows(retK):'')+
+    (retK.length?'<tr><td colspan="'+COLS+'" style="background:#F6F8FB;font-size:11px;font-weight:800;color:var(--soft)">퇴사·외부·미기재 (재직 명단에 없거나 사업부 미기재 — 당시 접수 기록)</td></tr>'+mkRows(retK):'')+
     '</tbody></table></div>';
   var per=(+G.slice(5))+'월';
   return zone('guard','var(--pos)','사업부·지점·상담별 현황',per+' · 방어율 '+(dr(cur)==null?'—':dr(cur)+'%'),'담당별 월별 취소금액 — 행 클릭 시 상세',
