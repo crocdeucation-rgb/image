@@ -1942,13 +1942,14 @@ function guardBox(){
   var allK=Object.keys(byGM).filter(function(k){return perTot(k).drop||((A.o[k]||{}).mw);});   // 전 기간 기준
   if(DIM==='saup'||DIM==='sang'){ var _have={}; allK.forEach(function(k){_have[_dk(k)]=1;});
     Object.keys(dangGM).forEach(function(nk){ if(!_have[nk]){allK.push(nk);_have[nk]=1;} }); }   // ★ 당취만 있는 담당
-  var retK=allK.filter(isRet).sort(sortf);
+  // 퇴사·외부·미기재는 취소 실적(해지금액·해지건·당취건) 있는 사람만 노출 — 전부 0이면 숨김
+  var retK=allK.filter(isRet).filter(function(k){var t=perTot(k);return (t.amt||0)>0||(t.drop||0)>0||(t.dangCnt||0)>0;}).sort(sortf);
   var mainK=allK.filter(function(k){return !isRet(k);}).sort(sortf);
   var th='<th style="min-width:110px">'+(DIMS.filter(function(d){return d[0]===DIM;})[0][1])+'</th>'+
     ms.map(function(mm){return '<th class="c" style="min-width:76px">'+(+mm.slice(5))+'월'+(mm===CURM?'<div class="org" style="font-weight:600">'+md(DATA)+'까지</div>':'')+'</th>';}).join('')+
     '<th class="c" style="min-width:80px">누적</th>';
   var tbl='<div class="scrollx"><table class="tbl mtbl"><thead><tr>'+th+'</tr></thead><tbody>'+mkRows(mainK)+
-    (retK.length?'<tr><td colspan="'+COLS+'" style="background:#F6F8FB;font-size:11px;font-weight:800;color:var(--soft)">퇴사·외부·미기재 (재직 명단에 없거나 사업부 미기재 — 당시 접수 기록)</td></tr>'+mkRows(retK):'')+
+    (retK.length?'<tr><td colspan="'+COLS+'" style="background:#F6F8FB;font-size:11px;font-weight:800;color:var(--soft)">퇴사·외부·미기재 '+retK.length+'명 (재직 명단에 없거나 사업부 미기재 — 당시 접수 기록)</td></tr>'+mkRows(retK):'')+
     '</tbody></table></div>';
   var per=(+G.slice(5))+'월';
   return zone('guard','var(--pos)','사업부·지점·상담별 현황',per+' · 방어율 '+(dr(cur)==null?'—':dr(cur)+'%'),'담당별 월별 취소금액 — 행 클릭 시 상세',
