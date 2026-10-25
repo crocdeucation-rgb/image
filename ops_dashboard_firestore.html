@@ -1935,8 +1935,8 @@ function guardBox(){
   var hrC=D.hrCoach?(function(){var o={};D.hrCoach.forEach(function(n){o[n]=1;});return o;})():null;
   var hrS=D.hrSaup?(function(){var o={};D.hrSaup.forEach(function(n){o[n]=1;});return o;})():null;
   function isRet(k){
-    if(DIM==='teach'){ if(k==='(미기재)')return false; return hrC? !hrC[_nm(k)] : !!RETIRED_C[k]; }
-    if(DIM==='saup'){ if(k==='미기재')return true; return hrS? !hrS[_nm(k)] : !!RETIRED_S[_nm(k)]; }
+    if(DIM==='teach'){ if(k==='(미기재)')return false; if(RETIRED_C[_nm(k)])return true; return hrC? !hrC[_nm(k)] : !!RETIRED_C[k]; }
+    if(DIM==='saup'){ if(k==='미기재')return true; if(RETIRED_S[_nm(k)])return true; return hrS? !hrS[_nm(k)] : false; }
     return false;
   }
   var allK=Object.keys(byGM).filter(function(k){return perTot(k).drop||((A.o[k]||{}).mw);});   // 전 기간 기준
