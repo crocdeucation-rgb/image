@@ -1948,8 +1948,10 @@ function guardBox(){
   var th='<th style="min-width:110px">'+(DIMS.filter(function(d){return d[0]===DIM;})[0][1])+'</th>'+
     ms.map(function(mm){return '<th class="c" style="min-width:76px">'+(+mm.slice(5))+'월'+(mm===CURM?'<div class="org" style="font-weight:600">'+md(DATA)+'까지</div>':'')+'</th>';}).join('')+
     '<th class="c" style="min-width:80px">누적</th>';
+  var _retId='ret_'+DIM;
+  var _retRows=mkRows(retK).replace(/<tr /g,'<tr data-retrow="'+_retId+'" style="display:none" ');
   var tbl='<div class="scrollx"><table class="tbl mtbl"><thead><tr>'+th+'</tr></thead><tbody>'+mkRows(mainK)+
-    (retK.length?'<tr><td colspan="'+COLS+'" style="background:#F6F8FB;font-size:11px;font-weight:800;color:var(--soft)">퇴사·외부·미기재 '+retK.length+'명 (재직 명단에 없거나 사업부 미기재 — 당시 접수 기록)</td></tr>'+mkRows(retK):'')+
+    (retK.length?'<tr class="retbar" data-rettoggle="'+_retId+'" style="cursor:pointer"><td colspan="'+COLS+'" style="background:#F6F8FB;font-size:11px;font-weight:800;color:var(--soft)"><span class="retarrow" style="display:inline-block;margin-right:5px">▸</span>퇴사·외부·미기재 '+retK.length+'명 (재직 명단에 없거나 사업부 미기재 — 당시 접수 기록) · <span style="font-weight:600;color:#9AA6B8">클릭하면 펼치기</span></td></tr>'+_retRows:'')+
     '</tbody></table></div>';
   var per=(+G.slice(5))+'월';
   return zone('guard','var(--pos)','사업부·지점·상담별 현황',per+' · 방어율 '+(dr(cur)==null?'—':dr(cur)+'%'),'담당별 월별 취소금액 — 행 클릭 시 상세',
@@ -2169,7 +2171,7 @@ function devBox(){
   return zone('dev','var(--amber)','기기 · 설치 트러블',L.length+'건','노트북·프로그램·캠 관련 기록',
    '<div class="lead">오티·코칭 메모에서 기기·설치 관련 문구를 모았습니다. 분류는 문구 기준이라 정확하지 않을 수 있습니다.</div>'+
    '<div class="seg">'+tabs.map(function(t){
-     return '<button class="'+(F===t[0]?'on':'')+'" data-df="'+esc(t[0])+'">'+t[1]+' '+t[2]+'</button>';}).join('')+'</div>'+body,true);
+     return '<button class="'+(F===t[0]?'on':'')+'" data-df="'+esc(t[0])+'">'+t[1]+' '+t[2]+'</button>';}).join('')+'</div>'+body,false);
 }
 /* ── 코칭부서 퍼널: 관리 → 민원 → 취소 → 방어 ── */
 function branchStaffBox(fix){
@@ -3732,4 +3734,14 @@ render();
 })();
 };
 if(window.OPS)window.__bootOps();
+// 퇴사·외부·미기재 섹션 접기/펼치기 (기본 접힘, 동적 테이블이라 document 위임)
+document.addEventListener('click',function(e){
+  var bar=e.target.closest&&e.target.closest('.retbar[data-rettoggle]');
+  if(!bar)return;
+  var id=bar.getAttribute('data-rettoggle');
+  var open=bar.getAttribute('data-open')==='1';
+  bar.setAttribute('data-open',open?'0':'1');
+  var ar=bar.querySelector('.retarrow'); if(ar)ar.textContent=open?'▸':'▾';
+  document.querySelectorAll('tr[data-retrow="'+id+'"]').forEach(function(r){r.style.display=open?'none':'';});
+});
 </script></body></html>
