@@ -455,7 +455,8 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
   <button class="tab summary" onclick="sel('aug',this)">8월 결산</button>
   <button class="tab summary" onclick="sel('sep',this)">9월 결산</button>
   <button class="tab summary" onclick="sel('oct',this)">10/1~10</button>
-  <button class="tab summary on" onclick="sel('oct2',this)">10/11~17</button>
+  <button class="tab summary" onclick="sel('oct2',this)">10/11~17</button>
+  <button class="tab summary on" onclick="sel('oct3',this)">10/17~23</button>
   <button class="tab" onclick="sel('crm',this)" style="border-color:rgba(180,120,255,.3);color:#b478ff">⚙ CRM 패치</button>
 </div>
 
@@ -1681,7 +1682,7 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 
 
 <!-- ===== 10/11~17 (3주차) ===== -->
-<div id="p-oct2" class="panel on">
+<div id="p-oct2" class="panel">
 <style>
 #p-oct2{--x-new:#b478ff;--x-meta:#6c8bd5;--x-green:#1a9e63;--x-amber:#d4900a;--x-red:#c44;--x-faint:#6a6a6a;--x-sub:#3f3f3f;--x-border:#e8e8e8;--x-border2:#f0f0f0;--x-card2:#f8f8f6;--x-hd:#0f1623;--x-teal:#0a8a5c}
 #p-oct2 .x-sub{font-size:13px;color:var(--x-faint);margin:0 2px 16px}
@@ -2014,6 +2015,307 @@ body{background:var(--bg);color:var(--text);font-family:'Pretendard','Spoqa Han 
 
 <div class="x-cap" style="text-align:center;margin-top:16px">
   출처 — 유입/전환: 노션 CRM(통합 34652211·신규 56b52211) · 광고비: 메타 MCP 실측(1397954958746130) + 네이버 자동수집(월정액 일할) · 매출: 전체실적 기준(김사라 차장 집계) 권위 소스 + 노션 결제일·신청일 교차(소재 귀속용) · 방문: 어드민 방문장(노션 누락 보완)
+</div>
+</div>
+
+
+<div id="p-oct3" class="panel on">
+<style>
+#p-oct3{--x-new:#b478ff;--x-meta:#6c8bd5;--x-green:#1a9e63;--x-amber:#d4900a;--x-red:#c44;--x-faint:#6a6a6a;--x-sub:#3f3f3f;--x-border:#e8e8e8;--x-border2:#f0f0f0;--x-card2:#f8f8f6;--x-hd:#0f1623;--x-teal:#0a8a5c}
+#p-oct3 .x-sub{font-size:13px;color:var(--x-faint);margin:0 2px 16px}
+#p-oct3 .x-sec{background:#fff;border:1px solid var(--x-border);border-radius:16px;padding:20px 22px;margin-top:16px}
+#p-oct3 .x-n{display:inline-block;background:var(--x-hd);color:#fff;font-size:11px;font-weight:800;padding:3px 9px;border-radius:7px;margin-right:8px;vertical-align:2px}
+#p-oct3 .x-h{font-size:16px;font-weight:800;letter-spacing:-.3px;margin-bottom:4px}
+#p-oct3 .x-s{font-size:12.5px;color:var(--x-faint);margin-bottom:14px;line-height:1.6}
+#p-oct3 .x-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:2px -2px}
+#p-oct3 table.x-tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:600px;font-variant-numeric:tabular-nums}
+#p-oct3 table.x-tbl th{background:var(--x-card2);color:var(--x-faint);font-weight:700;font-size:11.5px;text-align:right;padding:9px 11px;border-bottom:1.5px solid var(--x-border);white-space:nowrap}
+#p-oct3 table.x-tbl th:first-child{text-align:left}
+#p-oct3 table.x-tbl td{padding:9px 11px;border-bottom:1px solid var(--x-border2);text-align:right;white-space:nowrap}
+#p-oct3 table.x-tbl td:first-child{text-align:left;font-weight:600}
+#p-oct3 table.x-tbl tr.sub td:first-child{font-weight:500;color:var(--x-sub);padding-left:20px}
+#p-oct3 table.x-tbl tr.sub td:first-child::before{content:'└ ';color:var(--x-faint)}
+#p-oct3 table.x-tbl tr.tot td{border-top:1.5px solid var(--x-border);font-weight:800;background:var(--x-card2)}
+#p-oct3 table.x-tbl tr.nr td{background:rgba(180,120,255,.06)}
+#p-oct3 .nf{display:inline-block;background:var(--x-new);color:#fff;font-size:9.5px;font-weight:800;padding:1px 6px;border-radius:5px;margin-left:5px;vertical-align:1px}
+#p-oct3 .rh{color:var(--x-green);font-weight:800}#p-oct3 .rm{color:var(--x-amber);font-weight:700}#p-oct3 .rl{color:var(--x-red);font-weight:700}
+#p-oct3 .teal{color:var(--x-teal);font-weight:700}
+#p-oct3 .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:1px}
+#p-oct3 .dm{background:var(--x-meta)}#p-oct3 .dn{background:var(--x-new)}
+#p-oct3 .x-cap{font-size:11.5px;color:var(--x-faint);line-height:1.65;margin-top:11px}
+#p-oct3 .x-note{font-size:13px;line-height:1.7;background:var(--x-card2);border-left:3px solid #00c4a7;border-radius:0 10px 10px 0;padding:12px 15px;margin-top:13px}
+#p-oct3 .x-note b.t{display:block;font-weight:800;margin-bottom:3px}
+#p-oct3 .x-note.off{border-left-color:var(--x-red)}
+#p-oct3 a.dlink{display:inline-block;font-size:11.5px;font-weight:700;color:#0e8f78;background:rgba(0,196,167,.1);border:1px solid rgba(0,196,167,.35);padding:3px 9px;border-radius:7px;text-decoration:none;white-space:nowrap}
+#p-oct3 a.dlink:hover{background:rgba(0,196,167,.2)}
+#p-oct3 .x-cap a{color:#0e8f78;font-weight:700;text-decoration:none}
+#p-oct3 .x-bars{display:flex;align-items:flex-end;gap:10px;height:188px;padding:8px 2px 0;border-bottom:1.5px solid var(--x-border)}
+#p-oct3 .x-bars .col{flex:1;text-align:center}
+#p-oct3 .x-bars .stk{display:flex;flex-direction:column-reverse;height:150px}
+#p-oct3 .x-bars .stk i{display:flex;align-items:center;justify-content:center;border-radius:3px 3px 0 0;color:#fff;font-size:10.5px;font-weight:800}
+#p-oct3 .x-bars .lb{font-size:11px;color:var(--x-faint);margin-top:5px}
+#p-oct3 .x-bars .lb b{color:#111;font-size:12.5px}
+#p-oct3 .x-sum{background:var(--x-hd);color:#fff;border:none;border-radius:16px;padding:20px 22px;margin-top:16px}
+#p-oct3 .x-sum .x-h{color:#fff}
+#p-oct3 .x-sum p{font-size:13.5px;line-height:1.85;color:rgba(255,255,255,.9);margin-top:6px}
+#p-oct3 .x-sum b.k{color:#2fe0bf}
+#p-oct3 .ph{display:flex;align-items:center;justify-content:center;background:#edece9;border:1px dashed #cfcdc8;border-radius:10px;color:#9a978f;font-size:12px;font-weight:700;aspect-ratio:1/1}
+</style>
+
+<div class="kpis" style="grid-template-columns:repeat(5,1fr)">
+  <div class="kpi"><div class="k">유입 DB</div><div class="v t">521건</div><div class="cap">기존웹마 284 + 신규퍼널 237 · 일평균 74.4</div></div>
+  <div class="kpi"><div class="k">총 광고비</div><div class="v t money">13,355,880</div><div class="cap">메타 실측 전부 (10/24까지 확정)</div></div>
+  <div class="kpi"><div class="k">매출 (전체실적)</div><div class="v t money" style="color:#1a9e63">49,130,000</div><div class="cap">10/18~24 · 오더 11건 (일요일 제외)</div></div>
+  <div class="kpi"><div class="k">ROAS <span style="font-weight:500">매출/광고비</span></div><div class="v t">3.68</div><div class="cap">기존 3.44 · 신규 4.41</div></div>
+  <div class="kpi"><div class="k">신규소재 CPL</div><div class="v t money" style="color:#b478ff">14,757</div><div class="cap">기존(40,159)의 1/2.7</div></div>
+</div>
+<div class="x-sub">10/18(일) ~ 10/24(토) · 3차 주간 · 장윤호·우혜림 캠페인 <b>세트분리</b>(원본 OFF→사본 ON) · <b>우혜림(부평) 첫 매출 발생</b> · 오늘(일 10/25)은 광고비 미반영이라 제외</div>
+
+<div class="x-sec">
+  <div class="x-h">🧭 두 축 비교 — 기존(웹마) vs 신규 퍼널</div>
+  <div class="x-s">유입·광고비는 10/18~24 전 기간(메타 실측·노션 CRM), <b>매출은 전체실적 기준</b>입니다. 집계 창은 <b>10/18(일)~10/24(토)</b>, 오늘(일 10/25)은 광고비 미반영이라 제외. 신규 퍼널 매출은 이번 주 <b>전부 우혜림(부평)</b>에서 나왔습니다 — <b>우혜림(부평)의 첫 매출</b>입니다(파인더·메이킷은 리드는 쌓이나 전환은 다음 주로 이연).</div>
+  <div class="x-scroll"><table class="x-tbl">
+    <thead><tr><th>구분</th><th>유입 DB</th><th>광고비</th><th>매출</th><th>ROAS</th><th>CPL</th><th>DB당매출</th></tr></thead>
+    <tbody>
+      <tr><td><span class="dot dm"></span>① 기존(웹마)</td><td>284</td><td class="money">10,079,827</td><td class="money">34,680,000</td><td><span class="rm">3.44</span></td><td class="money">40,159</td><td class="money">122,113</td></tr>
+      <tr><td><span class="dot dn"></span>② 신규 퍼널</td><td>237</td><td class="money">3,276,053</td><td class="money">14,450,000</td><td><span class="rh">4.41</span></td><td class="money teal">14,757</td><td class="money">60,970</td></tr>
+      <tr class="sub"><td>└ 부평(우혜림) 단독</td><td>35</td><td class="money">962,698</td><td class="money">14,450,000</td><td><span class="rh">15.01</span></td><td class="money">27,506</td><td class="money rh">412,857</td></tr>
+      <tr class="tot"><td>합계</td><td>521</td><td class="money">13,355,880</td><td class="money">49,130,000</td><td><span class="rh">3.68</span></td><td class="money">28,236</td><td class="money">94,300</td></tr>
+    </tbody>
+  </table></div>
+  <div class="x-cap">※ <b>우혜림(부평) 단독 ROAS 15.01</b> — 광고비 96만으로 매출 1,445만을 만든 이번 주 최고 효율 퍼널입니다(오더 3건: 안태영·안태경·김재준). 파인더(김윤호)·메이킷(장윤호)은 리드는 많으나 아직 오더 0(전환 시차). 기존 웹마는 검증 채널로 매출을 받칩니다. <b>매출은 전체실적 기준</b>이며, <b>토요일(10/24) 매출 정민윤 2,312천 포함</b>·일요일(오늘 10/25)만 제외입니다. DB·광고비 모두 10/18~24 동일 창.</div>
+</div>
+
+<div class="x-sec">
+  <div class="x-h"><span class="x-n">00</span>채널별 — 메타 집중</div>
+  <div class="x-s">이번 주 돈이 나간 채널은 <b>메타뿐</b>(카카오·텐핑·당근 중단). 광고비는 메타 MCP 실측, DB는 노션 유입경로 기준입니다.</div>
+  <div class="x-scroll"><table class="x-tbl">
+    <thead><tr><th>채널</th><th>광고비</th><th>results(메타)</th><th>비고</th></tr></thead>
+    <tbody>
+      <tr><td><span class="dot dn"></span>메타 — 신규퍼널(3명 CBO)</td><td class="money">3,276,053</td><td>222</td><td style="text-align:left;color:#6a6a6a;font-size:11.5px">김윤호·장윤호·우혜림 담당자별 CBO</td></tr>
+      <tr><td><span class="dot dm"></span>메타 — 기존(웹마)</td><td class="money">10,079,827</td><td>251</td><td style="text-align:left;color:#6a6a6a;font-size:11.5px">위너세트·노트릴스영상·방학점검</td></tr>
+      <tr class="tot"><td>메타 소계</td><td class="money">13,355,880</td><td>473</td><td style="text-align:left;font-weight:500;font-size:11.5px">총 광고비 전부</td></tr>
+      <tr><td>노션 유입(신청) 합</td><td>—</td><td>521</td><td style="text-align:left;color:#6a6a6a;font-size:11.5px">기존웹마 284 + 신규퍼널 237</td></tr>
+      <tr><td>카카오·텐핑·당근·네이버</td><td class="money">0</td><td>—</td><td style="text-align:left;color:#6a6a6a;font-size:11.5px">집행 중단 (네이버 월정액 별도 월집계)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="x-cap">※ 메타 results 473(본사 251 + 신규 222)은 메타 실측, 노션 신청 유입 521은 CRM 기준(신청일 10/18~24). 두 수치 차(48)는 광고 노출 보고 인스타·링크로 들어온 자연 유입입니다.</div>
+</div>
+
+<div class="x-sec">
+  <div class="x-h"><span class="x-n">01</span>메타 소재별 — 캠페인/소재 실측</div>
+  <div class="x-s">광고비·results·CPL은 메타 실측(10/18~24). 신규퍼널은 담당자별 CBO 3개 분리 유지, 이번 주 <b>장윤호·우혜림은 세트(캠페인)를 복제 분리</b>했습니다(아래 설명). 캠페인(굵은 줄)은 소속 소재의 합입니다.</div>
+  <div class="x-note"><b class="t">🔧 이번 주 구조 변경 — 리드 쏠림 해소 위한 세트 재편</b>
+  신규 CBO에서 <b>장윤호(메이킷)·김윤호(파인더)로 리드(학생)가 과도하게 쏠려</b>(메이킷 127·파인더 69로 신규 222의 88%) 예산·머신러닝이 두 퍼널에 집중됐습니다. 이를 분산·통제하기 위해:<br>
+  • <b>장윤호</b> — <b>세트 분리 + 캠페인 분리</b>(원본 OFF → 복제 사본 ON). 소재별 예산 통제력 확보.<br>
+  • <b>김윤호</b> — <b>잘 들어오던 소재(MLST 공부성격)는 그대로 두고, 나머지 소재를 다른 세트로 분리</b>해 성과 소재 보호 + 신규 테스트 분리.<br>
+  • <b>우혜림(부평)</b> — 코넬필기·기말고사억울 세트분리(원본 OFF → 사본 ON).<br>
+  리포트에서는 <b>원본+사본을 합쳐 담당자(퍼널) 하나로 표시</b>합니다. 최종 상태: 원본 OFF(PAUSED) · 사본 ON(ACTIVE).</div>
+  <div class="x-scroll"><table class="x-tbl" style="min-width:520px">
+    <thead><tr><th>캠페인 / 소재</th><th>광고비</th><th>results</th><th>CPL</th></tr></thead>
+    <tbody>
+      <tr><td>위너테스트 세트 🟢 <span style="color:#6a6a6a;font-size:10px">(기존 소재 3종)</span></td><td class="money">4,199,978</td><td>129</td><td class="money">32,558</td></tr>
+      <tr class="sub"><td>노트릴스 재편집 2609 <span class="rh">🟢최다리드</span></td><td class="money">2,244,658</td><td>72</td><td class="money teal">31,176</td></tr>
+      <tr class="sub"><td>노트필기 관리부재 2608 🟢</td><td class="money">1,157,427</td><td>32</td><td class="money">36,169</td></tr>
+      <tr class="sub"><td>MLST 어디서막혔을까 2609 <span class="rh">🟢재가동</span></td><td class="money">797,893</td><td>25</td><td class="money">31,916</td></tr>
+      <tr><td>노트릴스 영상 2505 🟢</td><td class="money">3,359,995</td><td>73</td><td class="money">46,027</td></tr>
+      <tr><td>노트필기릴스 전환(방학점검) 2607 🟢</td><td class="money">2,519,854</td><td>49</td><td class="money">51,426</td></tr>
+      <tr class="tot"><td>기존(웹마) 합 · 매출 34,680천 · ROAS 3.44</td><td class="money">10,079,827</td><td>251</td><td class="money">40,159</td></tr>
+      <tr><td><span class="dot dn"></span>김윤호 — 파인더 (CBO)</td><td class="money">1,399,994</td><td>69</td><td class="money">20,290</td></tr>
+      <tr><td><span class="dot dn"></span>장윤호 — 메이킷 (원본+사본)</td><td class="money">913,361</td><td>127</td><td class="money teal">7,192</td></tr>
+      <tr class="sub"><td>공부인바디 캐러셀6장 <span class="rl">🔴원본 OFF</span></td><td class="money">—</td><td>126</td><td class="money teal">—</td></tr>
+      <tr class="sub nr"><td>학원3개 캐러셀6장 <span class="rh">🟢사본 ON</span></td><td class="money">—</td><td>5</td><td>—</td></tr>
+      <tr><td><span class="dot dn"></span>우혜림 — 부평 (원본+사본)</td><td class="money">962,698</td><td>26</td><td class="money">37,027</td></tr>
+      <tr class="sub"><td>코넬필기 캐러셀</td><td class="money">570,189</td><td>14</td><td class="money">40,728</td></tr>
+      <tr class="sub"><td>기말고사 억울 릴스</td><td class="money">335,400</td><td>11</td><td class="money">30,491</td></tr>
+      <tr class="tot"><td>신규퍼널 합</td><td class="money">3,276,053</td><td>222</td><td class="money teal">14,757</td></tr>
+      <tr class="tot"><td>메타 전체</td><td class="money">13,355,880</td><td>473</td><td class="money">28,236</td></tr>
+    </tbody>
+  </table></div>
+  <div class="x-cap">※ 소재 단위 합은 캠페인 총액과 일부 차이 가능(CBO 내부 어트리뷰션). <b>장윤호 메이킷</b>은 CPL 7,192원·리드 127로 전 소재 최고 볼륨·효율이나, 오더 전환은 아직(아래 02). <b>신규퍼널 CPL 14,757원</b> = 기존(40,159원)의 37%. 신청DB 기준 소재별 분해는 아래 01-B.</div>
+</div>
+
+<div class="x-sec">
+  <div class="x-h">📁 기존(웹마) 소재 — 지금 돌리는 것 (섬네일)</div>
+  <div class="x-s">소재(ad) 단위 성과(10/18~24). 매출·ROAS는 <b>결제일 기준</b>(노션 캠페인 귀속). <b>재편집이 결번율 0%·ROAS 4.12로 최상위</b>, 노트릴스 영상 2.41.</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
+    <div style="border:2px solid #1a9e63;border-radius:12px;overflow:hidden;background:#fff">
+      <div class="ph" style="aspect-ratio:4/3;border:none;border-radius:0">섬네일 업로드 예정</div>
+      <div style="padding:12px 14px"><div style="font-weight:800;font-size:13.5px">노트릴스 재편집 <span style="font-size:10px;background:#eef;color:#4a4ad0;padding:1px 6px;border-radius:5px">위너</span> <span style="font-size:10px;background:#1a9e63;color:#fff;padding:1px 6px;border-radius:5px">최고효율</span></div>
+      <div style="font-size:11.5px;color:#6a6a6a;margin-top:6px">🟢 생존 · 위너세트 · DB 70 · <b style="color:#1a9e63">결번 0%</b> · 방문 4 · CPL 31,176</div>
+      <div style="font-size:11.5px;color:#9a978f;margin-top:5px">광고비 2,244,658원</div>
+      <div style="font-size:12.5px;color:#1a9e63;font-weight:800;margin-top:5px">결제일 ROAS 4.12 · 9,248,000원 · 3건</div></div>
+    </div>
+    <div style="border:1px solid #e8e8e8;border-radius:12px;overflow:hidden;background:#fff">
+      <div class="ph" style="aspect-ratio:4/3;border:none;border-radius:0">섬네일 업로드 예정</div>
+      <div style="padding:12px 14px"><div style="font-weight:800;font-size:13.5px">노트릴스 영상 <span style="font-size:10px;background:#eef2f7;color:#5a6a80;padding:1px 6px;border-radius:5px">유지</span></div>
+      <div style="font-size:11.5px;color:#6a6a6a;margin-top:6px">🟢 생존 · DB 71 · <b style="color:#c44">결번 60%</b> · 방문 16 · CPL 46,027</div>
+      <div style="font-size:11.5px;color:#9a978f;margin-top:5px">광고비 3,359,995원</div>
+      <div style="font-size:12.5px;color:#1a9e63;font-weight:800;margin-top:5px">결제일 ROAS 2.41 · 8,092,000원 · 2건</div></div>
+    </div>
+    <div style="border:1px solid #e8e8e8;border-radius:12px;overflow:hidden;background:#fff">
+      <div class="ph" style="aspect-ratio:4/3;border:none;border-radius:0">섬네일 업로드 예정</div>
+      <div style="padding:12px 14px"><div style="font-weight:800;font-size:13.5px">노트필기릴스 방학점검 <span style="font-size:10px;background:#eef2f7;color:#5a6a80;padding:1px 6px;border-radius:5px">유지</span></div>
+      <div style="font-size:11.5px;color:#6a6a6a;margin-top:6px">🟢 생존 · DB 49 · <b style="color:#c44">결번 67%</b> · 방문 13 · CPL 51,426</div>
+      <div style="font-size:11.5px;color:#9a978f;margin-top:5px">광고비 2,519,854원</div>
+      <div style="font-size:12.5px;color:#d4900a;font-weight:800;margin-top:5px">결제일 ROAS 1.38 · 3,468,000원 · 1건</div></div>
+    </div>
+    <div style="border:1px solid #e8e8e8;border-radius:12px;overflow:hidden;background:#fff">
+      <div class="ph" style="aspect-ratio:4/3;border:none;border-radius:0">섬네일 업로드 예정</div>
+      <div style="padding:12px 14px"><div style="font-weight:800;font-size:13.5px">MLST 어디서막혔을까 <span style="font-size:10px;background:#e8faf6;color:#0a8a5c;padding:1px 6px;border-radius:5px">재가동</span></div>
+      <div style="font-size:11.5px;color:#6a6a6a;margin-top:6px">🟢 재가동 · 위너세트 · DB 25 · <b style="color:#1a9e63">결번 0%</b> · 방문 0 · CPL 31,916</div>
+      <div style="font-size:11.5px;color:#9a978f;margin-top:5px">광고비 797,893원</div>
+      <div style="font-size:12.5px;color:#1a9e63;font-weight:800;margin-top:5px">결제일 ROAS 2.17 · 1,734,000원 · 1건</div></div>
+    </div>
+    <div style="border:1px solid #e8e8e8;border-radius:12px;overflow:hidden;background:#fff">
+      <div class="ph" style="aspect-ratio:4/3;border:none;border-radius:0">섬네일 업로드 예정</div>
+      <div style="padding:12px 14px"><div style="font-weight:800;font-size:13.5px">노트필기 관리부재 <span style="font-size:10px;background:#eef;color:#4a4ad0;padding:1px 6px;border-radius:5px">위너</span></div>
+      <div style="font-size:11.5px;color:#6a6a6a;margin-top:6px">🟢 생존 · 위너세트 · DB 32 · 결번 — · 방문 0 · CPL 36,169</div>
+      <div style="font-size:11.5px;color:#9a978f;margin-top:5px">광고비 1,157,427원</div>
+      <div style="font-size:12px;color:#9a978f;margin-top:5px">오더 0 · 전환 코호트 관찰</div></div>
+    </div>
+    <div style="border:1px solid #e8e8e8;border-radius:12px;overflow:hidden;background:#fff;opacity:.72">
+      <div class="ph" style="aspect-ratio:4/3;border:none;border-radius:0">섬네일 업로드 예정</div>
+      <div style="padding:12px 14px"><div style="font-weight:800;font-size:13.5px">노트필기 방법제시 <span style="font-size:10px;background:#fdeeee;color:#c44;padding:1px 6px;border-radius:5px">폐기</span></div>
+      <div style="font-size:11.5px;color:#6a6a6a;margin-top:6px">🔴 OFF 확정 · 이번 주 미집행</div>
+      <div style="font-size:11.5px;color:#9a978f;margin-top:5px">광고비 0원</div>
+      <div style="font-size:12px;color:#9a978f;margin-top:5px">세트에서 제외 유지</div></div>
+    </div>
+  </div>
+  <div class="x-s" style="margin-bottom:8px"><b>소재별 성적표</b> — 방문·세팅·결번율·결제매출 (합계 담당자별 표·전체실적과 정합)</div>
+  <div class="x-scroll"><table class="x-tbl" style="min-width:940px">
+    <thead><tr><th>소재</th><th>생사</th><th>신청DB</th><th>리드</th><th>방문</th><th>세팅</th><th>결번율</th><th>광고비</th><th>CPL</th><th>오더</th><th>결제매출</th><th>ROAS</th></tr></thead>
+    <tbody>
+      <tr><td>노트릴스 재편집 2609</td><td><span class="rh">🟢최다리드</span></td><td>70</td><td>72</td><td>4</td><td>3</td><td><span class="rh">0%</span></td><td class="money">2,244,658</td><td class="money teal">31,176</td><td>3</td><td class="money">9,248,000</td><td><span class="rh">4.12</span></td></tr>
+      <tr><td>노트릴스 영상 2505</td><td><span class="rh">🟢위너</span></td><td>71</td><td>73</td><td>16</td><td>5</td><td>60%</td><td class="money">3,359,995</td><td class="money">46,027</td><td>2</td><td class="money">8,092,000</td><td><span class="rm">2.41</span></td></tr>
+      <tr><td>노트필기릴스 방학점검 2607</td><td>🟢</td><td>49</td><td>49</td><td>13</td><td>3</td><td>67%</td><td class="money">2,519,854</td><td class="money">51,426</td><td>1</td><td class="money">3,468,000</td><td><span class="rl">1.38</span></td></tr>
+      <tr><td>MLST 어디서막혔을까 2609</td><td><span class="rh">🟢재가동</span></td><td>25</td><td>25</td><td>0</td><td>1</td><td>0%</td><td class="money">797,893</td><td class="money">31,916</td><td>1</td><td class="money">1,734,000</td><td>2.17</td></tr>
+      <tr><td>노트필기 관리부재 2608</td><td>🟢</td><td>32</td><td>32</td><td>0</td><td>0</td><td>—</td><td class="money">1,157,427</td><td class="money">36,169</td><td>0</td><td class="money">0</td><td>—</td></tr>
+      <tr><td>네이버검색 <span style="color:#6a6a6a;font-size:10px">naver_brand</span></td><td>—</td><td>—</td><td>—</td><td>0</td><td>1</td><td><span class="rh">0%</span></td><td style="color:#9a978f">월정액 별도</td><td>—</td><td>1</td><td class="money">3,468,000</td><td>—</td></tr>
+      <tr><td>메타 · 5단계루틴 <span style="color:#6a6a6a;font-size:10px">잠재고객 2606W19</span></td><td>—</td><td>—</td><td>—</td><td>1</td><td>2</td><td>50%</td><td>—</td><td>—</td><td>1</td><td class="money">5,202,000</td><td>—</td></tr>
+      <tr><td>organic <span style="color:#6a6a6a;font-size:10px">자연·재방(og/ig)</span></td><td>—</td><td>—</td><td>—</td><td>2</td><td>1</td><td><span class="rl">100%</span></td><td>—</td><td>—</td><td>0</td><td class="money">3,468,000</td><td>—</td></tr>
+      <tr><td>메타 · 유채리 릴스 <span style="color:#6a6a6a;font-size:10px">너만본다</span></td><td>—</td><td>—</td><td>—</td><td>0</td><td>1</td><td><span class="rl">100%</span></td><td>—</td><td>—</td><td>0</td><td class="money">0</td><td>—</td></tr>
+      <tr><td>메타 · 기타 구소재 <span style="color:#6a6a6a;font-size:10px">새잠재·무료방문코치 등</span></td><td>—</td><td>—</td><td>—</td><td>6</td><td>4</td><td><span class="rl">100%</span></td><td>—</td><td>—</td><td>0</td><td class="money">0</td><td>—</td></tr>
+      <tr><td>노션 미기록 <span style="color:#6a6a6a;font-size:10px">소스 공란</span></td><td>—</td><td>—</td><td>—</td><td>6</td><td>3</td><td><span class="rl">100%</span></td><td>—</td><td>—</td><td>0</td><td class="money">0</td><td>—</td></tr>
+      <tr class="tot"><td>기존(웹마) 합</td><td>—</td><td>284</td><td>251</td><td>48</td><td>24</td><td>63%</td><td class="money">10,079,827</td><td class="money">40,159</td><td>9</td><td class="money">34,680,000</td><td><span class="rm">3.44</span></td></tr>
+    </tbody>
+  </table></div>
+  <div class="x-cap">※ 위너 外 유입을 <b>채널·소스별로 분해</b>(네이버검색·메타 구소재 캠페인·organic). <b>재편집이 결번율 0%·오더 3건·ROAS 4.12로 최고 효율</b>(정민윤 10/24 포함)·최다리드(72)·최저CPL(31,176). 영상은 방문 16으로 유입은 많으나 결번율 60%로 전환 누수. 비위너 매출: <b>네이버 3,468(오더1)·메타 5단계루틴 5,202(오더1)·organic 재방 3,468</b>. 네이버는 월정액이라 광고비 별도 월집계. 매출·오더·배정은 담당자별 표·전체실적과 정합(34,680천·오더9). 방문·세팅은 노션 소스 귀속 기준이라 담당자별 표(방문 44·세팅 23, 담당자 식별 기준)와 미상 귀속분만큼 소수 차이.</div>
+</div>
+
+<div class="x-sec">
+  <div class="x-h"><span class="x-n">02</span>신규 퍼널 funnel — 리드→방문→오더</div>
+  <div class="x-s">리드는 메타 소재 실측(10/18~24), 방문·오더·매출은 어드민 방문장(금주 등록분). <b>우혜림(부평)이 첫 오더 3건·매출 1,445만</b>을 만들었고, 파인더(김윤호)·메이킷은 이번 주 리드는 쌓이나 전환은 다음 주 과제입니다.</div>
+  <div class="x-scroll"><table class="x-tbl" style="min-width:620px">
+    <thead><tr><th>퍼널(담당)</th><th>리드</th><th>방문</th><th>거절</th><th>오더</th><th>매출</th><th>광고비</th><th>ROAS</th></tr></thead>
+    <tbody>
+      <tr><td><span class="dot dn"></span>부평 (우혜림)</td><td>26</td><td>5</td><td>0</td><td><span class="rh">3</span></td><td class="money">14,450,000</td><td class="money">962,698</td><td><span class="rh">15.01</span></td></tr>
+      <tr><td><span class="dot dn"></span>파인더 (김윤호)</td><td>69</td><td>2</td><td>1</td><td>0</td><td>—</td><td class="money">1,399,994</td><td>—</td></tr>
+      <tr><td><span class="dot dn"></span>메이킷 (장윤호)</td><td>127</td><td>1</td><td>0</td><td>0</td><td>—</td><td class="money">913,361</td><td>—</td></tr>
+      <tr class="tot"><td>신규퍼널 합</td><td>222</td><td>8</td><td>1</td><td>3</td><td class="money">14,450,000</td><td class="money">3,276,053</td><td><span class="rh">4.41</span></td></tr>
+    </tbody>
+  </table></div>
+  <div class="x-note"><b class="t">🎯 판단 — 부평 전환 입증, 메이킷 볼륨은 전환 숙제</b>우혜림(부평)은 리드 26으로 많지 않지만 <b>오더 3·ROAS 15.01</b>으로 전환 질이 가장 좋습니다(상담 역량+소재 궁합). 장윤호(메이킷)는 공부인바디로 <b>리드 127 최대 볼륨</b>을 뽑았으나 아직 오더 0 — 세트분리(사본)로 머신러닝 리셋 직후라 다음 주 전환을 봅니다. 김윤호(파인더)는 리드 69·방문 2로 코호트가 익는 중입니다.</div>
+  <div class="x-cap">※ 리드=메타 results(소재), 방문·거절·오더·매출=어드민 방문장(금주 등록분). 신규퍼널 매출은 전부 부평(우혜림) — 신청일 코호트라 파인더·메이킷은 전환 시차로 아직 미발생입니다.</div>
+</div>
+
+<div class="x-sec" style="border-top:3px solid #b478ff">
+  <div class="x-h">🆕 이번 주 신규 투입 소재 — 섬네일</div>
+  <div class="x-s">김윤호(파인더) 신규 3종 + 장윤호(메이킷) 복제 세트. 캐러셀 커버 컷입니다(각 6장). <b>공부체력·사교육비·문해력레드</b>로 메인(MLST) 피로 분산, 장윤호는 <b>학원3개 캐러셀</b>을 사본 세트로 투입했습니다.</div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+    <figure style="margin:0"><img src="소재/jang_hagwon3_1.png" alt="장윤호 학원3개 캐러셀" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;border:1px solid #e8e8e8;border-radius:10px;background:#edece9"><figcaption style="font-size:11px;color:#6a6a6a;margin-top:5px">장윤호 · 학원3개 캐러셀 <span class="rh" style="font-size:10px">🟢사본ON</span><br><span style="color:#9a978f">사본 세트 · 리드 5</span></figcaption></figure>
+    <figure style="margin:0"><img src="소재/kim_gongbuchelyeok_1.png" alt="김윤호 공부체력 캐러셀" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;border:1px solid #e8e8e8;border-radius:10px;background:#edece9"><figcaption style="font-size:11px;color:#6a6a6a;margin-top:5px">김윤호 · 공부체력 캐러셀 <span class="nf">신규</span><br><span style="color:#9a978f">파인더 신규 투입 · 전환 관찰</span></figcaption></figure>
+    <figure style="margin:0"><img src="소재/kim_sagyoyukbi_1.png" alt="김윤호 사교육비 캐러셀" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;border:1px solid #e8e8e8;border-radius:10px;background:#edece9"><figcaption style="font-size:11px;color:#6a6a6a;margin-top:5px">김윤호 · 사교육비 캐러셀 <span class="nf">신규</span><br><span style="color:#9a978f">파인더 신규 투입 · 전환 관찰</span></figcaption></figure>
+    <figure style="margin:0"><img src="소재/kim_munhaeryeok_red_1.png" alt="김윤호 문해력 노트필기 레드" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;border:1px solid #e8e8e8;border-radius:10px;background:#edece9"><figcaption style="font-size:11px;color:#6a6a6a;margin-top:5px">김윤호 · 문해력 노트필기_레드 <span class="nf">신규</span><br><span style="color:#9a978f">파인더 신규 투입 · 전환 관찰</span></figcaption></figure>
+  </div>
+  <div class="x-cap">※ 섬네일은 캐러셀 1컷(커버)입니다. 각 소재 6장 전체는 <b>소재/ 폴더</b>에 업로드(영문 파일명). 신규소재는 아직 리드 소량 — 다음 주 CPL·전환으로 생사 판정합니다.</div>
+</div>
+
+<div class="x-sec">
+  <div class="x-h">👥 본사 웹마 담당자별 실적 — 지난주↔이번주 비교</div>
+  <div class="x-s"><b>본사 웹마케팅팀</b> 기준(세팅일). 김윤호·장윤호는 신규퍼널로 이동해 제외. <b>우혜림은 본사 상담분만</b> 표기하고, 부평(우린웹마) 신규퍼널 분리분은 아래 ‘신규·기존 총합’으로 뺐습니다(중복 제거). <b>지난주 2차(10/11~17) → 이번주 3차(10/18~24)</b> 비교(일요일 10/25 제외).</div>
+  <div class="x-scroll"><table class="x-tbl" style="min-width:980px">
+    <thead><tr><th>담당자</th><th>배정<br><span style="font-weight:400;font-size:9px;color:#6a6a6a">DB</span></th><th>방문</th><th>방취</th><th>세팅</th><th>오더</th><th>결보</th><th>결번율</th><th>매출(3차)</th><th>DB당매출</th><th>추이 vs 2차</th></tr></thead>
+    <tbody>
+      <tr><td>안준섭</td><td>36</td><td>10</td><td>1</td><td>4</td><td>2</td><td>2</td><td>50%</td><td class="money">10,404,000</td><td class="money rh">289</td><td><span class="rl">▼ -4,624</span></td></tr>
+      <tr><td>김우진</td><td>39</td><td>12</td><td>3</td><td>9</td><td>2</td><td>7</td><td><span class="rl">78%</span></td><td class="money">7,514,000</td><td class="money">193</td><td><span class="rh">▲ +4,046</span></td></tr>
+      <tr><td>박창건</td><td>34</td><td>2</td><td>0</td><td>2</td><td>2</td><td>0</td><td><span class="rh">0%</span></td><td class="money">6,358,000</td><td class="money rh">187</td><td><span class="rh">▲ +578</span></td></tr>
+      <tr><td>우혜림 <span style="color:#6a6a6a;font-size:10px">본사분</span></td><td>39</td><td>7</td><td>0</td><td>3</td><td>1</td><td>2</td><td>67%</td><td class="money">3,468,000</td><td class="money">89</td><td><span class="rl">▼ -10,982</span></td></tr>
+      <tr><td>노영호</td><td>40</td><td>3</td><td>1</td><td>2</td><td>1</td><td>1</td><td>50%</td><td class="money">3,468,000</td><td class="money">87</td><td><span class="rh">▲ +3,179</span></td></tr>
+      <tr><td>김슬기 <span class="nf" style="background:#db2777">신규</span></td><td>0<span style="color:#6a6a6a;font-size:9px"> 재배정</span></td><td>—</td><td>—</td><td>3</td><td>1</td><td>2</td><td>67%</td><td class="money">3,468,000</td><td class="money">—</td><td><span class="rh">🆕</span></td></tr>
+      <tr><td>김원득</td><td>40</td><td>6</td><td>1</td><td>0</td><td>0</td><td>0</td><td>—</td><td class="money">0</td><td class="money rl">0</td><td><span class="rl">▼ -3,468</span></td></tr>
+      <tr><td>김주환</td><td>31</td><td>4</td><td>2</td><td>0</td><td>0</td><td>0</td><td>—</td><td class="money">0</td><td class="money rl">0</td><td><span class="rl">▼ -3,468</span></td></tr>
+      <tr><td>김태석</td><td>25</td><td>—</td><td>—</td><td>0</td><td>0</td><td>0</td><td>—</td><td class="money">0</td><td class="money rl">0</td><td>—</td></tr>
+      <tr class="tot"><td>기존 본사 합계</td><td>284</td><td>44</td><td>8</td><td>23</td><td>9</td><td>14</td><td>61%</td><td class="money">34,680,000</td><td class="money">122</td><td><span class="rl">▼ -11,271</span></td></tr>
+    </tbody>
+  </table></div>
+  <div class="x-cap">※ <b>배정(DB) = 노션 통합CRM 신청일(10/18~24) 담당자_P 집계</b> — 합 284, 두 축 기존 유입과 일치. 방문·방취 = 어드민 방문장(금주 등록분). 세팅·오더·결보·매출 = 전체실적(세팅일·10/18~24·일요일 제외·취소 반영). <b>DB당매출(천) = 매출÷배정</b> — 효율 1위 <b>안준섭 289</b>·김우진 193(정민윤 10/24 포함)·박창건 187, 저효율 노영호 87(배정 40인데 전환 저조). <b>결번율 = 결보÷세팅</b>, 김우진 78%(세팅9·결보7) 점검. 김슬기는 자동배정 제외(부재 재배정분 처리)라 배정 0·오더 1. 우혜림 본사 -10,982천은 부평 신규퍼널로 축 이동(부평 포함 총 17,918천 ▲). 김원득·김주환·김태석은 배정 받았으나 세팅 0.</div>
+
+  <div class="x-s" style="margin-top:14px;margin-bottom:6px"><b>신규 · 기존 주간 총합</b> <span style="color:#6a6a6a;font-weight:400">(중복 제거 — 단순합이 전체와 일치)</span></div>
+  <div class="x-scroll"><table class="x-tbl" style="min-width:480px">
+    <thead><tr><th>구분</th><th>지난주 매출</th><th>이번주 매출</th><th>추이(천)</th></tr></thead>
+    <tbody>
+      <tr><td>기존 본사웹마</td><td class="money">45,951,000</td><td class="money">34,680,000</td><td><span class="rl">▼ -11,271</span></td></tr>
+      <tr><td>신규 퍼널 <span style="color:#6a6a6a;font-size:10px">부평·파인더·메이킷</span></td><td class="money">6,936,000</td><td class="money">14,450,000</td><td><span class="rh">▲ +7,514</span></td></tr>
+      <tr class="tot"><td>전체 총합</td><td class="money">52,887,000</td><td class="money">49,130,000</td><td><span class="rl">▼ -3,757</span></td></tr>
+    </tbody>
+  </table></div>
+  <div class="x-cap">※ 우혜림 부평 분리로 중복 제거 완료 — 기존·신규 단순합 = 전체(34,680+14,450=49,130). 지난주 신규=파인더 2건(이태윤·조하민 각 3,468천), 이번주 신규=부평 3건(안태영·안태경·김재준 1,445만). 전체 -376만은 지난주 안준섭·우혜림 본사 고점 대비 조정이며, 부평 신규 전환(+751만)이 상쇄 중입니다.</div>
+
+  <div class="x-s" style="margin-top:16px;margin-bottom:8px"><b>일자별 유입 추이 — 본사 · 신규 분리</b> (10/18~24 · 메타 results 기준)</div>
+  <div style="display:flex;gap:14px;margin-bottom:8px;font-size:11.5px;color:#6a6a6a"><span><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#6c8bd5;vertical-align:middle;margin-right:4px"></i>본사(기존 웹마)</span><span><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#2fbfa6;vertical-align:middle;margin-right:4px"></i>신규 퍼널(3명)</span></div>
+  <div class="x-bars">
+    <div class="col"><div class="stk"><i style="height:40px;background:#6c8bd5;border-radius:0">40</i><i style="height:90px;background:#2fbfa6">90</i></div><div class="lb">10/18(일) · <b>130</b></div></div>
+    <div class="col"><div class="stk"><i style="height:33px;background:#6c8bd5;border-radius:0">33</i><i style="height:34px;background:#2fbfa6">34</i></div><div class="lb">10/19(월) · <b>67</b></div></div>
+    <div class="col"><div class="stk"><i style="height:16px;background:#6c8bd5;border-radius:0">16</i><i style="height:17px;background:#2fbfa6">17</i></div><div class="lb">10/20(화) · <b>33</b></div></div>
+    <div class="col"><div class="stk"><i style="height:34px;background:#6c8bd5;border-radius:0">34</i><i style="height:35px;background:#2fbfa6">35</i></div><div class="lb">10/21(수) · <b>69</b></div></div>
+    <div class="col"><div class="stk"><i style="height:52px;background:#6c8bd5;border-radius:0">52</i><i style="height:28px;background:#2fbfa6">28</i></div><div class="lb">10/22(목) · <b>80</b></div></div>
+    <div class="col"><div class="stk"><i style="height:33px;background:#6c8bd5;border-radius:0">33</i><i style="height:11px;background:#2fbfa6">11</i></div><div class="lb">10/23(금) · <b>44</b></div></div>
+    <div class="col"><div class="stk"><i style="height:43px;background:#6c8bd5;border-radius:0">43</i><i style="height:7px;background:#2fbfa6">7</i></div><div class="lb">10/24(토) · <b>50</b></div></div>
+  </div>
+  <div style="display:flex;gap:16px;margin-top:10px;font-size:12px;color:#6a6a6a"><span>메타 results(leadgen) 기준</span><span style="margin-left:auto">주간 본사 251 · 신규 222 · <b>합계 473</b></span></div>
+  <div class="x-cap">※ 일별 본사/신규는 메타 results(leadgen) 실측(10/18~24, 일요일 10/25 제외). <b>10/18(일) 신규퍼널 90건으로 주말 피크 견인</b>(본사 40 대비 2.3배) — 신규 CBO가 주말 볼륨에 강합니다. 노션 CRM 신청 기준 총 유입은 521건으로 집계 기준 차이가 있습니다. 금·토 신규 급감(11→7)은 세트분리(사본) ML 리셋 직후 구간.</div>
+</div>
+
+<div class="x-sec">
+  <div class="x-h">🎬 쌤이다 프로젝트 — 콘텐츠 파이프라인 (진행중)</div>
+  <div class="x-s"><b>쌤이다</b> 브랜드 프로젝트 진행 현황입니다(아라온 신규퍼널 소재와는 <b>별개 프로젝트</b>). 랜딩·영상·쌤캐스트·수행평가 허브 라인.</div>
+  <div class="x-scroll"><table class="x-tbl" style="min-width:620px">
+    <thead><tr><th>항목</th><th style="text-align:left">상태 / 내용</th><th>단계</th></tr></thead>
+    <tbody>
+      <tr><td>쌤이다 랜딩 <span class="nf">완성</span></td><td style="text-align:left;color:#3f3f3f"><b>3버전 제작 완료</b> — 리포트형(blue)·튜터링형·메인</td><td><a class="dlink" href="https://crocdeucation-rgb.github.io/ssamida-landing/" target="_blank" rel="noopener">메인 ↗</a></td></tr>
+      <tr><td>스토리보드</td><td style="text-align:left;color:#3f3f3f">영상 스토리보드 <b>논의 완료</b> — ‘세 개의 길’ 콘셉트</td><td>확정</td></tr>
+      <tr><td>세 개의 길 (영상)</td><td style="text-align:left;color:#3f3f3f"><b>이번 주 확정 촬영 예정</b></td><td><span class="rh">촬영</span></td></tr>
+      <tr><td>쌤캐스트</td><td style="text-align:left;color:#3f3f3f">꼭지: 입시의 복잡함 · 본인은 어떤 전형으로 · 요즘 입시 어떻게 보는지 — <b>기획 진행중</b>(최광백 준비 · 신상준 꼭지 확정)</td><td>기획</td></tr>
+      <tr><td>수행평가 허브</td><td style="text-align:left;color:#3f3f3f">데이터 <b>수집 완료</b> → <b>구축 기획중</b> — 학교 평가계획 기반 상시 유입 자산</td><td>구축</td></tr>
+    </tbody>
+  </table></div>
+  <div class="x-cap">※ 랜딩 변형: 리포트형 <a class="dlink" href="https://crocdeucation-rgb.github.io/ssamida-landing/ssamida-report-img-blue.html" target="_blank" rel="noopener">blue ↗</a> · 튜터링형 <a class="dlink" href="https://crocdeucation-rgb.github.io/ssamida-landing/ssamida-tutoring.html" target="_blank" rel="noopener">tutoring ↗</a>. 쌤이다는 아라온 퍼포먼스 소재와 분리된 브랜드 프로젝트입니다.</div>
+</div>
+
+<div class="x-sec">
+  <div class="x-h">🛠 대시보드·운영 — 이번 기간 한 일</div>
+  <div class="x-s">라이브 대시보드 — 시연 시 실화면 확인. 이번 기간 웹마 유입 현황표에 <b>매출 컬럼 추가</b>, 지점 통합(가산연합 1/2/3팀→센터) 등 패치.</div>
+  <div class="x-scroll"><table class="x-tbl" style="min-width:560px">
+    <thead><tr><th>대시보드</th><th style="text-align:left">이번 기간 작업</th><th>바로가기</th></tr></thead>
+    <tbody>
+      <tr><td>신규 리드 현황</td><td style="text-align:left;color:#3f3f3f">유입 현황표 <b>매출 컬럼 추가</b> · 퍼널별 ROAS 정합(우린웹마→부평 매핑 수정)</td><td><a class="dlink" href="https://crocdeucation-rgb.github.io/image/newlead_dashboard.html" target="_blank" rel="noopener">열기 ↗</a></td></tr>
+      <tr><td>웹마케팅</td><td style="text-align:left;color:#3f3f3f">담당자 매출 이중집계 수정(부평웹마 분리) · 김슬기 신규 담당자 반영</td><td><a class="dlink" href="https://crocdeucation-rgb.github.io/image/dashboard.html" target="_blank" rel="noopener">열기 ↗</a></td></tr>
+      <tr><td>운영본부 현황판 <span class="nf">신설</span></td><td style="text-align:left;color:#3f3f3f"><b>사업부·지점·상담·코칭·팀(A/B) 현황판 신규 구축</b> — 접수·유지·해지·취소금액·방어율 KPI + 월별 담당 성과(취소 3단계 경고/비상/긴급). 지점 통합(가산연합 1/2/3팀→센터, 팀→지점) · 코칭 탭 장애 복구(opsPush) 반영</td><td><a class="dlink" href="https://crocdeucation-rgb.github.io/image/ops_dashboard_firestore.html" target="_blank" rel="noopener">열기 ↗</a></td></tr>
+    </tbody>
+  </table></div>
+  <div class="x-cap">※ 썸네일 시연은 '열기 ↗' 라이브 링크로 실화면 확인. 이번 주 소재 썸네일은 <b>업로드 예정</b>(추가 반영).</div>
+</div>
+
+<div class="x-sum">
+  <div class="x-h">이번 주 핵심 (3줄 요약)</div>
+  <p><b class="k">① 부평 첫 매출.</b> 신규 퍼널에서 <b>우혜림(부평)이 첫 오더 3건·매출 1,445만·ROAS 15.01</b>을 만들었습니다(파인더·메이킷은 전환 이연). 신규퍼널 CPL 14,757원(기존의 37%)으로 효율은 유지되고, 부평이 전환을 먼저 열었습니다. 두 축 합산 유입 521건·일평균 74.4건으로 목표(70+) 상회.<br>
+  <b class="k">② 세트분리.</b> 장윤호·우혜림 캠페인을 <b>원본→사본으로 세트분리</b>(원본 OFF·사본 ON)해 예산 통제력을 확보했습니다. 장윤호 메이킷은 리드 127·CPL 7,192원으로 최대 볼륨이나 오더 전환은 다음 주 숙제(분리 직후 ML 리셋).<br>
+  <b class="k">③ 매출·측정.</b> 전체실적 기준 매출 49,130,000원(오더 11건 = 기존 본사 9 + 부평 2·<b>토 포함·일요일 10/25 제외</b>), ROAS 3.68. 기존 본사 결번율 61%(세팅 23·결보 14) — 김우진 78%가 점검 포인트. 신규 담당자 <b>김슬기도 첫 매출</b> 발생. <b>운영본부 현황판 신설</b>(사업부·지점·상담 취소/방어율) + 유입 현황표 매출 컬럼·부평웹마 매핑·지점 통합 반영.</p>
+</div>
+
+<div class="x-cap" style="text-align:center;margin-top:16px">
+  출처 — 집계 창 10/18(일)~10/24(토), 일요일(10/25) 제외 · 유입/전환: 노션 CRM(통합 34652211·신규 56b52211, 신청일 기준) · 광고비: 메타 MCP 실측(1397954958746130) · 매출: 전체실적(김사라 차장 집계, 세팅일) 권위 소스 · 방문: 어드민 방문장 · 소재 ON/OFF: 메타 캠페인 effective_status 실측
 </div>
 </div>
 
@@ -2796,7 +3098,7 @@ function updateThisWeek(id) {
   // 9월 1주차 탭은 '05 이번 주 한 일/다음 주' 섹션이 대신하므로 하단 THIS WEEK 블록 숨김
   const twBlock = document.getElementById('tw-block');
   const twDiv = document.getElementById('tw-divider');
-  if (id === 'sep' || id === 'oct' || id === 'oct2') {
+  if (id === 'sep' || id === 'oct' || id === 'oct2' || id === 'oct3') {
     if (twBlock) twBlock.style.display = 'none';
     if (twDiv) twDiv.style.display = 'none';
     return;
