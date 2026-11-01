@@ -1956,22 +1956,37 @@ window.loadMonth = loadMonth;
 (async function(){
   await loadMonth('현재');   // 기본 = 현재월
   // 월 선택 바 삽입 (대시보드 최상단) — [2026-09] 연도 토글 추가
+  // ★ [2026-11-01] 월 탭 자동 생성 — 매달 YEAR_ORDER/LABEL/MONTH_GIDS에 손으로 새 달을
+  //   추가하지 않아도 되게 바꿈. buildAllMonths 로 박제(dashData/YYYY-MM)만 하면 탭이 생긴다.
+  //   (loadMonth 는 Firestore 만 읽으므로 gid 는 필요 없음 — MONTH_GIDS 는 2025 레거시용으로만 유지)
+  var _nowY = new Date().getFullYear(), _nowM = new Date().getMonth() + 1;
   var YEAR_ORDER = {
-    '2026': ['현재','2026-09','2026-08','2026-07','2026-06','2026-05','2026-04','2026-03','2026-02','2026-01'],
-    '2025': ['2025-12','2025-11','2025-10','2025-09','2025-08','2025-07','2025-06','2025-05','2025-04','2025-03','2025-02','2025-01']
+    '2026': (function(){
+      var a = ['현재'];
+      var last = (_nowY > 2026) ? 12 : (_nowM - 1);   // 2026 진행 중이면 직전월까지
+      for (var m = last; m >= 1; m--) a.push('2026-' + ('0'+m).slice(-2));
+      return a;
+    })(),
+    '2025': (function(){
+      var a = []; for (var m = 12; m >= 1; m--) a.push('2025-' + ('0'+m).slice(-2)); return a;
+    })()
   };
-  var LABEL = {
-    '현재':'이번달',
-    '2026-09':'9월','2026-08':'8월','2026-07':'7월','2026-06':'6월','2026-05':'5월','2026-04':'4월','2026-03':'3월','2026-02':'2월','2026-01':'1월',
-    '2025-12':'12월','2025-11':'11월','2025-10':'10월','2025-09':'9월','2025-08':'8월','2025-07':'7월','2025-06':'6월','2025-05':'5월','2025-04':'4월','2025-03':'3월','2025-02':'2월','2025-01':'1월'
-  };
+  var LABEL = (function(){
+    var L = { '현재':'이번달' };
+    ['2026','2025'].forEach(function(y){
+      for (var m = 1; m <= 12; m++) L[y + '-' + ('0'+m).slice(-2)] = m + '월';
+    });
+    return L;
+  })();
   window.__curYear = '2026';
 
   function _renderMonthBtns(year){
     var order = YEAR_ORDER[year] || YEAR_ORDER['2026'];
     var html = '';
     order.forEach(function(k){
-      if(k!=='현재' && !MONTH_GIDS[k]) return;
+      // 2026(올해)은 YEAR_ORDER 가 직전월까지만 만들어 주므로 gid 체크 불필요(데이터는 Firestore).
+      //   2025 등 과거 연도는 기존대로 MONTH_GIDS 에 있는 달만 노출.
+      if(k!=='현재' && year!=='2026' && !MONTH_GIDS[k]) return;
       var isOn = (year==='2026' && k==='현재');
       html += '<button class="mo-sel-btn'+(isOn?' on':'')+'" data-mo="'+k+'" onclick="loadMonth(\''+k+'\')" '
           + 'style="background:var(--card2,#f0f2f8);border:0.5px solid var(--border,#e2e6ef);color:var(--sub,#667);'
