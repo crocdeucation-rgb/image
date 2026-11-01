@@ -1091,10 +1091,15 @@ function renderGrowthInflow(){
   var afterCutChong = isThisMonth ? _chongAfterCut : 0;
   var _ft = window._fnlTot || {visit:0,setting:0,order:0};
   var _spSum = spChong + ((isThisMonth||isLastMonth) ? members.reduce(function(s,m){return s+spOf(m);},0) : 0), _inM=chongMonth+g3Month;
-  var totRow='<tr style="font-weight:800;background:#f1f5f9"><td class="name">총합계</td><td class="num db">'+tdCell(chongToday+g3Today)+'</td><td class="num" style="color:#f97316">'+tdCell(chongYday+g3Yday)+'</td><td class="num" style="color:#9333ea">'+_inM+'</td><td class="num" style="color:#0891b2">'+((_ft.visit||0)+g3Visit)+'</td><td class="num" style="color:#2563eb">'+((_ft.setting||0)+g3Setting)+'</td><td class="num order">'+((_ft.order||0)+g3Order)+'</td><td class="num" style="color:#e65100">'+spFmtCell(_spSum)+'</td><td class="num" style="color:#0891b2">'+cplCell(_spSum,_inM,afterCutTot)+'</td><td class="num" style="color:#9333ea;font-weight:700">'+salesFmt(_chongSalesWon+members.reduce(function(s,m){return s+(g3(m).sales||0);},0))+'</td><td class="num" style="color:#0f9d58">'+roasCell(_chongSalesWon,_spSum)+'</td></tr>';
+  // ★ [2026-11-01] _chongSalesWon(원장 sLast)은 '웹마 전체'(본사+분리퍼널 3팀) 합계다.
+  //   본사웹마 행에 그대로 쓰면 과대이고, 3퍼널을 또 더하면 총합계가 이중 계상된다.
+  //   → 총합계 = 웹마 전체 그대로 / 본사웹마 = 전체 − 3퍼널 (담당자별 합계와 일치)
+  var _g3SalesSum     = members.reduce(function(s,m){ return s + (g3(m).sales||0); }, 0);
+  var _chongOnlySales = Math.max(0, _chongSalesWon - _g3SalesSum);
+  var totRow='<tr style="font-weight:800;background:#f1f5f9"><td class="name">총합계</td><td class="num db">'+tdCell(chongToday+g3Today)+'</td><td class="num" style="color:#f97316">'+tdCell(chongYday+g3Yday)+'</td><td class="num" style="color:#9333ea">'+_inM+'</td><td class="num" style="color:#0891b2">'+((_ft.visit||0)+g3Visit)+'</td><td class="num" style="color:#2563eb">'+((_ft.setting||0)+g3Setting)+'</td><td class="num order">'+((_ft.order||0)+g3Order)+'</td><td class="num" style="color:#e65100">'+spFmtCell(_spSum)+'</td><td class="num" style="color:#0891b2">'+cplCell(_spSum,_inM,afterCutTot)+'</td><td class="num" style="color:#9333ea;font-weight:700">'+salesFmt(_chongSalesWon)+'</td><td class="num" style="color:#0f9d58">'+roasCell(_chongSalesWon,_spSum)+'</td></tr>';
   var h = totRow + '<tr><td class="name">본사웹마</td><td class="num db">'+tdCell(chongToday)+'</td><td class="num" style="color:#f97316">'+tdCell(chongYday)+'</td><td class="num" style="color:#9333ea">'+chongMonth+'</td>'
     +'<td class="num" style="color:#0891b2">'+(_ft.visit||0)+'</td><td class="num" style="color:#2563eb">'+(_ft.setting||0)+'</td><td class="num order">'+(_ft.order||0)+'</td>'
-    +'<td class="num" style="color:#e65100">'+spFmtCell(spChong)+'</td><td class="num" style="color:#0891b2">'+cplCell(spChong, chongMonth, afterCutChong)+'</td><td class="num" style="color:#9333ea;font-weight:700">'+salesFmt(_chongSalesWon)+'</td><td class="num" style="color:#0f9d58">'+roasCell(_chongSalesWon, spChong)+'</td></tr>';
+    +'<td class="num" style="color:#e65100">'+spFmtCell(spChong)+'</td><td class="num" style="color:#0891b2">'+cplCell(spChong, chongMonth, afterCutChong)+'</td><td class="num" style="color:#9333ea;font-weight:700">'+salesFmt(_chongOnlySales)+'</td><td class="num" style="color:#0f9d58">'+roasCell(_chongOnlySales, spChong)+'</td></tr>';
   members.forEach(function(m){
     var d = g3(m);   // 기간별(이번달/지난달/전체) 3명 값
     var _spM = spOf(m);   // 이번달=실시간 / 지난달=_일별 직전월합 / 전체=0
