@@ -33,8 +33,8 @@
   .scard.sales .v{color:var(--purple)} .scard.cpl .v{color:var(--amber)}
   .scard.today .v{color:var(--green)} .scard.yday .v{color:#ea580c} .scard.week .v{color:var(--teal)}
   /* 날짜별 유입 주간/월간 토글 */
-  .cal-tabs{display:flex;gap:5px;margin-bottom:8px}
-  .cal-tabs button{padding:4px 13px;font-size:11px;font-weight:700;border-radius:7px;border:1px solid var(--line);background:#fff;color:var(--sub);cursor:pointer}
+  .cal-tabs{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap}
+  .cal-tabs button{padding:4px 10px;font-size:10.5px;font-weight:700;border-radius:7px;border:1px solid var(--line);background:#fff;color:var(--sub);cursor:pointer}
   .cal-tabs button.on{background:var(--green);color:#fff;border-color:var(--green)}
   /* 월간 달력 히트맵 */
   .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
@@ -129,7 +129,8 @@
   .db-row .dv{font-size:12px;font-weight:800;color:var(--green);min-width:28px;text-align:right}
 
   /* PC 3단 가로 배치 */
-  .dash3{display:grid;grid-template-columns:1.4fr 1.4fr 1fr;gap:18px;align-items:start}
+  .dash3{display:grid;grid-template-columns:1.42fr 1.5fr .88fr;gap:13px;align-items:start}
+  @media(max-width:1340px){.dash3{grid-template-columns:1.42fr 1.5fr .85fr;gap:11px}}
   @media(max-width:1100px){.dash3{grid-template-columns:1fr 1fr;gap:16px}}
   .dash3 .col{min-width:0}
 
@@ -147,6 +148,34 @@
     .dash3::-webkit-scrollbar{display:none}
     .dash3 .col{flex:0 0 100%;width:100%;scroll-snap-align:start;padding:0 1px}
   }
+
+  /* ★ [2026-11-02] 담당자별 표도 고정폭 — 광고비/CPL/ROAS 가 잘리던 문제 */
+  #assignee-tbl{table-layout:fixed;width:100%;font-size:11px}
+  #assignee-tbl thead th{padding:7px 2px;font-size:9.5px}
+  #assignee-tbl tbody td{padding:8px 2px;font-size:11px}
+  #assignee-tbl th:nth-child(1),#assignee-tbl td:nth-child(1){width:7.5%;padding-left:8px}
+  #assignee-tbl th:nth-child(2),#assignee-tbl td:nth-child(2){width:15%;overflow:hidden;text-overflow:ellipsis}
+  #assignee-tbl th:nth-child(3),#assignee-tbl td:nth-child(3){width:17%}
+  #assignee-tbl th:nth-child(4),#assignee-tbl td:nth-child(4),
+  #assignee-tbl th:nth-child(5),#assignee-tbl td:nth-child(5),
+  #assignee-tbl th:nth-child(6),#assignee-tbl td:nth-child(6){width:8.3%}
+  #assignee-tbl .dbsub{font-size:7.5px;color:#9aa3b0;font-weight:600;margin-top:1px;white-space:nowrap;letter-spacing:-.4px}
+  #assignee-tbl th:nth-child(7),#assignee-tbl td:nth-child(7){width:12%}
+  #assignee-tbl th:nth-child(8),#assignee-tbl td:nth-child(8),
+  #assignee-tbl th:nth-child(9),#assignee-tbl td:nth-child(9){width:9.5%}
+  #assignee-tbl th:nth-child(10),#assignee-tbl td:nth-child(10){width:9%}
+  #assignee-tbl .rate{font-size:8.5px;margin-left:0}
+
+  /* ★ [2026-11-02] 캠페인별 표가 잘리던 문제 — 컬럼 압축 + 소재명 말줄임 */
+  #campaign-tbl{table-layout:fixed;width:100%;font-size:11px}
+  #campaign-tbl thead th{padding:7px 2px;font-size:9.5px}
+  #campaign-tbl tbody td{padding:8px 2px;font-size:11px}
+  #campaign-tbl th:first-child,#campaign-tbl td:first-child{width:auto;padding-left:9px;overflow:hidden;text-overflow:ellipsis}
+  #campaign-tbl th:not(:first-child),#campaign-tbl td:not(:first-child){width:9.2%}
+  #campaign-tbl th:nth-child(6),#campaign-tbl td:nth-child(6),
+  #campaign-tbl th:nth-child(7),#campaign-tbl td:nth-child(7),
+  #campaign-tbl th:nth-child(8),#campaign-tbl td:nth-child(8){width:11%}
+  #campaign-tbl .rate{font-size:8.5px;margin-left:0}
 
   .note{font-size:11.5px;color:var(--sub);line-height:1.6;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
   .note b{color:var(--ink)}
@@ -225,8 +254,10 @@
 
       <div class="sec camp" style="margin-top:18px">날짜별 광고비 <span class="badge">담당자별 · <span class="asof-spend">어제까지</span></span></div>
       <div class="cal-tabs">
-        <button class="on" id="sp-btn-week" onclick="setSpendView('week')">주간</button>
-        <button id="sp-btn-month" onclick="setSpendView('month')">월간</button>
+        <button class="on" id="sp-btn-week" onclick="setSpendView('week')">이번주</button>
+        <button id="sp-btn-lweek" onclick="setSpendView('lweek')">지난주</button>
+        <button id="sp-btn-month" onclick="setSpendView('month')">이번달</button>
+        <button id="sp-btn-lmonth" onclick="setSpendView('lmonth')">지난달</button>
       </div>
       <div class="sp-legend"><span><i style="background:var(--blue)"></i>김윤호</span><span><i style="background:var(--amber)"></i>장윤호</span><span><i style="background:var(--green)"></i>우혜림</span></div>
       <div id="spend-body"><div class="loading">불러오는 중…</div></div>
@@ -236,8 +267,10 @@
     <div class="col">
       <div class="sec day">날짜별 유입 <span class="badge" id="cal-title">이번 주</span></div>
       <div class="cal-tabs">
-        <button class="on" id="cal-btn-week" onclick="setCalView('week')">주간</button>
-        <button id="cal-btn-month" onclick="setCalView('month')">월간</button>
+        <button class="on" id="cal-btn-week" onclick="setCalView('week')">이번주</button>
+        <button id="cal-btn-lweek" onclick="setCalView('lweek')">지난주</button>
+        <button id="cal-btn-month" onclick="setCalView('month')">이번달</button>
+        <button id="cal-btn-lmonth" onclick="setCalView('lmonth')">지난달</button>
       </div>
       <div class="daybars" id="daybars"><div class="loading">불러오는 중…</div></div>
 
@@ -245,8 +278,10 @@
       <div style="font-size:9.5px;color:#94a3b8;margin:-3px 0 8px">온타겟 = 핵심 학부모(35-54) 리드 비율 · <span style="color:#0f9d58">70%↑</span> <span style="color:#f59e0b">45~69</span> <span style="color:#ef4444">↓45</span></div>
       <div class="cal-tabs" id="fit-tabs">
         <button id="fit-btn-t" onclick="setFitView('t')">오늘</button>
-        <button id="fit-btn-w" onclick="setFitView('w')">주간</button>
-        <button class="on" id="fit-btn-m" onclick="setFitView('m')">월간</button>
+        <button id="fit-btn-w" onclick="setFitView('w')">이번주</button>
+        <button id="fit-btn-lw" onclick="setFitView('lw')">지난주</button>
+        <button class="on" id="fit-btn-m" onclick="setFitView('m')">이번달</button>
+        <button id="fit-btn-lm" onclick="setFitView('lm')">지난달</button>
         <button id="fit-btn-a" onclick="setFitView('a')">전체</button>
       </div>
       <div id="agefit-box"><div class="loading">불러오는 중…</div></div>
@@ -274,6 +309,9 @@ function setMoView(v){
     b.style.background = on ? '#1f3864' : '#f0f2f8';
     b.style.color      = on ? '#fff'    : '#667';
   });
+  // ★ 하위 섹션(날짜별 유입·광고비·타겟적합도)도 같은 달 기준으로 같이 이동
+  if (v === 'l') { setCalView('lmonth'); setSpendView('lmonth'); setFitView('lm'); }
+  else           { setCalView('week');   setSpendView('week');   setFitView('m');  }
   load(true);
 }
 
@@ -299,9 +337,10 @@ function fnl(cell){
 function numOf(cell){ var m=String(cell||'').match(/^(\d+)/); return m?parseInt(m[1],10):0; }
 // ── 타겟 적합도 (기간 토글: 오늘/주간/월간/전체) ──
 var _fitArr=[], _fitAfBox=null, _fitPeriod='m';
+var FIT_KEYS=['t','w','lw','m','lm','a'];
 function setFitView(p){
   _fitPeriod=p;
-  ['t','w','m','a'].forEach(function(k){
+  FIT_KEYS.forEach(function(k){
     var b=document.getElementById('fit-btn-'+k); if(b) b.classList.toggle('on', k===p);
   });
   renderFit();
@@ -341,12 +380,12 @@ function renderFit(){
 }
 
 // ── 날짜별 광고비 (담당자별, 주간/월간 토글) ──
-var _spendDaily={}, _spendView='week';
+var _spendDaily={}, _spendView='week';   // 'week'|'lweek'|'month'|'lmonth'
 function setSpendView(v){
   _spendView=v;
-  var bw=document.getElementById('sp-btn-week'), bm=document.getElementById('sp-btn-month');
-  if(bw) bw.classList.toggle('on', v==='week');
-  if(bm) bm.classList.toggle('on', v==='month');
+  CAL_KEYS.forEach(function(k){
+    var b=document.getElementById('sp-btn-'+k); if(b) b.classList.toggle('on', k===v);
+  });
   renderSpend();
 }
 var KC_='#2563eb', JC_='#d97706', WC_='#0f9d58';   // 김/장/우 색
@@ -356,9 +395,11 @@ function renderSpend(){
   var now=new Date(), _p=function(n){return String(n).padStart(2,'0');};
   var ymd=function(dt){return dt.getFullYear()+'-'+_p(dt.getMonth()+1)+'-'+_p(dt.getDate());};
 
-  if(_spendView==='month'){
+  if(_spendView==='month' || _spendView==='lmonth'){
     // ── 월간: 캘린더형 (날짜별 유입과 동일 구조) + 셀마다 3명 누적바 ──
-    var y=now.getFullYear(), m=now.getMonth(), todayKey=ymd(now);
+    var _mo=(_spendView==='lmonth')?-1:0;
+    var _b=new Date(now.getFullYear(), now.getMonth()+_mo, 1);
+    var y=_b.getFullYear(), m=_b.getMonth(), todayKey=ymd(now);
     var mp=y+'-'+_p(m+1);
     var mx=1; Object.keys(_spendDaily).forEach(function(k){ if(k.indexOf(mp)===0){ var o=_spendDaily[k]; var t=o.g+o.j+o.w; if(t>mx)mx=t; } });
     var first=new Date(y,m,1), startDow=(first.getDay()+6)%7, days=new Date(y,m+1,0).getDate();
@@ -380,13 +421,16 @@ function renderSpend(){
     body.innerHTML=h;
   } else {
     // ── 주간: 표(날짜|김|장|우|합계) — 최근 7일, 최신 위로 ──
-    var wkFrom=ymd(new Date(now.getFullYear(),now.getMonth(),now.getDate()-6));
-    var keys=Object.keys(_spendDaily).filter(function(d){return d>=wkFrom;}).sort().reverse();
-    if(!keys.length){ body.innerHTML='<div class="loading">데이터 없음</div>'; return; }
+    var _wo=(_spendView==='lweek')?-7:0;
+    function _sow(dt){var x=new Date(dt.getFullYear(),dt.getMonth(),dt.getDate());var dw=x.getDay();x.setDate(x.getDate()-(dw===0?6:dw-1));return x;}
+    var _ws=_sow(now); _ws.setDate(_ws.getDate()+_wo);
+    var _we=new Date(_ws); _we.setDate(_ws.getDate()+6);
+    var wkFrom=ymd(_ws), wkTo=ymd(_we);
+    var keys=[]; for(var _k=6;_k>=0;_k--){ var _dk=new Date(_ws); _dk.setDate(_ws.getDate()+_k); keys.push(ymd(_dk)); }
     var hh='<div class="tbl-wrap"><table id="spend-tbl"><thead><tr><th>날짜</th><th>김윤호</th><th>장윤호</th><th>우혜림</th><th>합계</th></tr></thead><tbody>';
     var tg=0,tj=0,tw=0;
     keys.forEach(function(d){
-      var o=_spendDaily[d]; tg+=o.g; tj+=o.j; tw+=o.w;
+      var o=_spendDaily[d]||{g:0,j:0,w:0}; tg+=o.g; tj+=o.j; tw+=o.w;
       hh+='<tr><td>'+d.slice(5)+'</td>'
         +'<td class="num spend">'+wonSp(o.g)+'</td>'
         +'<td class="num spend">'+wonSp(o.j)+'</td>'
@@ -400,52 +444,55 @@ function renderSpend(){
   }
 }
 
-// ── 날짜별 유입 (주간/월간 토글) ──
-var _calDaily={}, _calView='week';
+// ── 날짜별 유입 (이번주/지난주/이번달/지난달 토글) ──
+var _calDaily={}, _calView='week';   // 'week'|'lweek'|'month'|'lmonth'
+var CAL_KEYS=['week','lweek','month','lmonth'];
 function setCalView(v){
   _calView=v;
-  var bw=document.getElementById('cal-btn-week'), bm=document.getElementById('cal-btn-month');
-  if(bw) bw.classList.toggle('on', v==='week');
-  if(bm) bm.classList.toggle('on', v==='month');
+  CAL_KEYS.forEach(function(k){
+    var b=document.getElementById('cal-btn-'+k); if(b) b.classList.toggle('on', k===v);
+  });
   renderCalendar();
 }
 function renderCalendar(){
   var body=document.getElementById('daybars'), title=document.getElementById('cal-title');
   if(!body) return;
-  var d=_calDaily||{};
-  var now=new Date();
-  var _ymd=function(dt){return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');};
+  var d=_calDaily||{}, now=new Date();
+  var _p=function(n){return String(n).padStart(2,'0');};
+  var _ymd=function(dt){return dt.getFullYear()+'-'+_p(dt.getMonth()+1)+'-'+_p(dt.getDate());};
   var todayKey=_ymd(now);
-  var vals=Object.keys(d).map(function(k){return d[k];}); var mx=1; vals.forEach(function(v){if(v>mx)mx=v;});
-  var color=function(v){ if(!v) return '#f3f4f6'; var t=Math.min(v/mx,1); return 'rgba(15,157,88,'+(0.15+t*0.8).toFixed(2)+')'; };
-  var fg=function(v){ return v>mx*0.55?'#fff':'#333'; };
 
-  if(_calView==='month'){
-    if(title) title.textContent=(now.getMonth()+1)+'월';
-    var y=now.getFullYear(), m=now.getMonth();
-    var first=new Date(y,m,1), startDow=(first.getDay()+6)%7;
-    var days=new Date(y,m+1,0).getDate();
+  if(_calView==='month' || _calView==='lmonth'){
+    var off=(_calView==='lmonth')?-1:0;
+    var base=new Date(now.getFullYear(), now.getMonth()+off, 1);
+    var y=base.getFullYear(), m=base.getMonth(), pre=y+'-'+_p(m+1);
+    // ★ 스케일은 해당 달 안에서만 (전체 최대값 쓰면 지난달이 다 흐려짐)
+    var mx=1, sum=0;
+    Object.keys(d).forEach(function(k){ if(k.indexOf(pre)===0){ sum+=d[k]; if(d[k]>mx)mx=d[k]; } });
+    var color=function(v){ if(!v) return '#f3f4f6'; return 'rgba(15,157,88,'+(0.15+Math.min(v/mx,1)*0.8).toFixed(2)+')'; };
+    var fg=function(v){ return v>mx*0.55?'#fff':'#333'; };
+    if(title) title.textContent=(m+1)+'월 · 총 '+sum+'건';
+    var first=new Date(y,m,1), startDow=(first.getDay()+6)%7, days=new Date(y,m+1,0).getDate();
     var dows=['월','화','수','목','금','토','일'];
     var h='<div class="cal-grid">'+dows.map(function(x){return '<div class="cal-dow">'+x+'</div>';}).join('');
     for(var i=0;i<startDow;i++) h+='<div class="cal-cell empty"></div>';
     for(var dd=1;dd<=days;dd++){
-      var key=y+'-'+String(m+1).padStart(2,'0')+'-'+String(dd).padStart(2,'0');
-      var v=d[key]||0;
-      h+='<div class="cal-cell'+(key===todayKey?' today':'')+'" style="background:'+color(v)+'"><span class="cd">'+dd+'</span><span class="cv" style="color:'+fg(v)+'">'+(v||'')+'</span></div>';
+      var key=y+'-'+_p(m+1)+'-'+_p(dd), v=d[key]||0;
+      h+='<div class="cal-cell'+(key===todayKey?' today':'')+'" style="background:'+color(v)+'" title="'+key.slice(5)+' · '+v+'건"><span class="cd">'+dd+'</span><span class="cv" style="color:'+fg(v)+'">'+(v||'')+'</span></div>';
     }
     h+='</div><div class="cal-legend">적음 <span class="lg" style="background:'+color(1)+'"></span><span class="lg" style="background:'+color(Math.round(mx*0.5))+'"></span><span class="lg" style="background:'+color(mx)+'"></span> 많음</div>';
     body.innerHTML=h;
   } else {
-    if(title) title.textContent='이번 주';
+    var wOff=(_calView==='lweek')?-7:0;
     function startOfWeek(dt){var x=new Date(dt.getFullYear(),dt.getMonth(),dt.getDate());var dow=x.getDay();x.setDate(x.getDate()-(dow===0?6:dow-1));return x;}
-    var ws=startOfWeek(now);
-    var dowNames=['월','화','수','목','금','토','일'];
-    var days=[];
+    var ws=startOfWeek(now); ws.setDate(ws.getDate()+wOff);
+    var dowNames=['월','화','수','목','금','토','일'], days=[], wsum=0;
     for(var k=0;k<7;k++){
       var dk=new Date(ws); dk.setDate(ws.getDate()+k);
-      var key=_ymd(dk);
-      days.push({ dow:dowNames[k], md:(dk.getMonth()+1)+'/'+dk.getDate(), val:(d[key]||0), today:(key===todayKey) });
+      var key=_ymd(dk), val=(d[key]||0); wsum+=val;
+      days.push({ dow:dowNames[k], md:(dk.getMonth()+1)+'/'+dk.getDate(), val:val, today:(key===todayKey) });
     }
+    if(title) title.textContent=(_calView==='lweek'?'지난 주':'이번 주')+' · 총 '+wsum+'건';
     var wmx=1; days.forEach(function(x){if(x.val>wmx)wmx=x.val;});
     var h='';
     days.forEach(function(x){
@@ -614,7 +661,7 @@ async function load(useCache){
         var _cpl=(a.sp>0&&_db>0)?won(Math.round(a.sp/_db)):'-';
         var _pd=periodByName[a.name]||{t:0,y:0,w:0};
         var _dbCell='<div style="font-weight:800;line-height:1.1">'+a.db+'</div>'
-          +'<div style="font-size:8.5px;color:#9aa3b0;font-weight:600;margin-top:1px;white-space:nowrap">오늘'+_pd.t+'·어제'+_pd.y+'·주간'+_pd.w+'</div>';
+          + (MOVIEW==='l' ? '' : '<div class="dbsub">오늘'+_pd.t+'·어제'+_pd.y+'·주간'+_pd.w+'</div>');
         ahtml += '<tr><td class="rk">'+medal+mv+'</td>'
           +'<td><span class="who '+whoClass(a.name)+'"></span>'+a.name+'</td>'
           +'<td class="num db">'+_dbCell+'</td>'
@@ -634,7 +681,7 @@ async function load(useCache){
       var _dbUntil=sumDb-_totCut;   // ★ 광고비 집계일까지 DB (cutoff 이후 유입 제외)
       var _tcpl=(sumSpend>0&&_dbUntil>0)?won(Math.round(sumSpend/_dbUntil)):'-';
       var _totDbCell='<div style="font-weight:800;line-height:1.1">'+sumDb+'</div>'
-        +'<div style="font-size:8.5px;color:#9aa3b0;font-weight:600;margin-top:1px;white-space:nowrap">오늘'+sumToday+'·어제'+sumYday+'·주간'+sumWeek+'</div>';
+        + (MOVIEW==='l' ? '' : '<div class="dbsub">오늘'+sumToday+'·어제'+sumYday+'·주간'+sumWeek+'</div>');
       ahtml += '<tr class="total"><td></td><td>합계</td>'
         +'<td class="num db">'+_totDbCell+'</td><td class="num visit">'+fnl(t[2])+'</td>'
         +'<td class="num setting">'+fnl(t[3])+'</td>'
@@ -652,11 +699,18 @@ async function load(useCache){
     var _totCutS = (aEnd>=0 && rows[aEnd] && Number(rows[aEnd][10])) || afterCutoff;   // 합계 afterCut 우선
     var _dbUntilS=sumDb-_totCutS;   // ★ 광고비 집계일까지 DB
     var totCpl = (sumSpend>0&&_dbUntilS>0) ? won(Math.round(sumSpend/_dbUntilS)) : '-';
+    // ★ [2026-11-02] 지난달 뷰에선 오늘/어제/주간이 무의미 → 방문/세팅/오더로 교체
+    var _pctOf=function(n,d){ return d>0 ? '<div class="sub">'+Math.round(n/d*100)+'%</div>' : ''; };
+    var _midCards = (MOVIEW==='l')
+      ? '<div class="scard visit"><div class="l">방문</div><div class="v">'+sumVisit+'<span>건</span></div>'+_pctOf(sumVisit,sumDb)+'</div>'
+       +'<div class="scard today"><div class="l">세팅</div><div class="v">'+sumSet+'<span>건</span></div>'+_pctOf(sumSet,sumVisit)+'</div>'
+       +'<div class="scard order"><div class="l">오더</div><div class="v">'+sumOrder+'<span>건</span></div>'+_pctOf(sumOrder,sumSet)+'</div>'
+      : '<div class="scard today"><div class="l">오늘 유입</div><div class="v">'+sumToday+'<span>건</span></div></div>'
+       +'<div class="scard yday"><div class="l">어제 유입</div><div class="v">'+sumYday+'<span>건</span></div></div>'
+       +'<div class="scard week"><div class="l">주간 유입</div><div class="v">'+sumWeek+'<span>건</span></div></div>';
     document.getElementById('summary').innerHTML =
-      '<div class="scard db"><div class="l">총 리드 <span style="font-size:8px;color:#bbb">월간</span></div><div class="v">'+sumDb+'<span>건</span></div></div>'
-     +'<div class="scard today"><div class="l">오늘 유입</div><div class="v">'+sumToday+'<span>건</span></div></div>'
-     +'<div class="scard yday"><div class="l">어제 유입</div><div class="v">'+sumYday+'<span>건</span></div></div>'
-     +'<div class="scard week"><div class="l">주간 유입</div><div class="v">'+sumWeek+'<span>건</span></div></div>'
+      '<div class="scard db"><div class="l">총 리드 <span style="font-size:8px;color:#bbb">'+moLabel+'</span></div><div class="v">'+sumDb+'<span>건</span></div></div>'
+     +_midCards
      +'<div class="scard cpl"><div class="l">CPL <span style="font-size:8px;color:#bbb">'+asofLabel+'</span></div><div class="v">'+totCpl+'</div><div class="sub">광고비 '+wonSp(sumSpend)+' · ROAS '+totRoas+'</div></div>';
 
     // ── 퍼널 전환 깔때기 ──
@@ -689,8 +743,9 @@ async function load(useCache){
         var _fp=String(y[11]==null?'':y[11]).split('|');
         var _pick=function(s){ return (s===''||s==null)?null:(parseInt(s)||0); };
         var _fitObj;
-        if(_fp.length<=1){ var _lv=_pick(_fp[0]); _fitObj={t:_lv,w:_lv,m:_lv,a:_lv}; }  // 구포맷(단일값) 호환 — GAS 미배포 시 전 기간 동일표시
-        else { _fitObj={ t:_pick(_fp[0]), w:_pick(_fp[1]), m:_pick(_fp[2]), a:_pick(_fp[3]) }; }
+        if(_fp.length<=1){ var _lv=_pick(_fp[0]); _fitObj={t:_lv,w:_lv,m:_lv,a:_lv,lw:_lv,lm:_lv}; }  // 구포맷(단일값) 호환
+        else { _fitObj={ t:_pick(_fp[0]), w:_pick(_fp[1]), m:_pick(_fp[2]), a:_pick(_fp[3]),
+                         lw:_pick(_fp[4]), lm:_pick(_fp[5]) }; }   // [4]지난주 [5]지난달 (구포맷이면 undefined→null)
         var _off=(String(y[12]||'').toUpperCase()==='OFF');
         // 전체 소재 수집 — 적합도 없는 신규 소재는 각 기간 null('집계 전')
         if(y[0]!=='(소재미상)') _fitArr.push({name:y[0], fit:_fitObj, db:_cdb, off:_off});
