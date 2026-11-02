@@ -586,7 +586,7 @@ details.collapsible[open]>summary .fold-hint{display:none}
 </div>
 
 <div id="camp-view-bunri">
-  <div class="asof-note" style="color:#94a3b8">그로스 3명 소재(ad)별 · 소재=담당자 1:1 · CPL은 광고비 집계일까지 유입 기준 (이번달 전용)</div>
+  <div class="asof-note" id="bunri-camp-note" style="color:#94a3b8">그로스 3명 소재(ad)별 · 소재=담당자 1:1 · CPL은 광고비 집계일까지 유입 기준 (이번달)</div>
   <div id="bunri-section">
   <div class="tbl-scroll" style="margin-top:6px"><table class="campaign-table" id="bunri-camp-tbl">
     <thead><tr><th>캠페인명</th><th class="num">DB</th><th class="num">방문</th><th class="num">세팅</th><th class="num">오더</th><th class="num">광고비</th><th class="num">CPL</th><th class="num">매출</th><th class="num">ROAS</th></tr></thead>
@@ -847,7 +847,14 @@ async function loadAll() {
 // [그로스별 유입] 우혜림 DB 시트(대시보드 탭) gviz 로드
 var GROWTH_GVIZ = 'https://docs.google.com/spreadsheets/d/1l0H8mY0SHiENr9Mlvnha7WVNAxA-iPQh0AB55eXhFaA/gviz/tq?tqx=out:csv&headers=0&sheet=' + encodeURIComponent('대시보드');
 var _growthInflow = null;
-var _bunriCamps = null;   // ★ [분리캠페인] 캠페인별 집계 (대시보드 탭 캠페인 블록)
+var _bunriCamps = null;   // ★ [분리캠페인] 캠페인별 집계 (대시보드 탭 캠페인 블록 — 이번달)
+var _bunriCampsL = null;  // ★ [2026-11-03] 지난달 분리캠페인 (캠페인L 블록)
+// ★ [2026-11-03 버그수정] 대시보드 탭에 지난달 블록(담당자L/합계L/캠페인L)이 추가되면서
+//   '캠페인' 블록 파싱이 거기서 안 멈추고 지난달 행까지 먹어버림 → 이번달 표에 10월 숫자(합계L 741 등)가 섞임.
+//   블록 헤더를 한 곳에 모아 모든 파서가 같은 기준으로 끊게 한다. 블록이 또 늘어도 여기만 고치면 됨.
+var DASH_BLOCKS = {'갱신':1,'담당자':1,'합계':1,'기간유입':1,'신규합계':1,'그로스월별':1,'캠페인':1,
+                   '담당자L':1,'합계L':1,'캠페인L':1,'일자별유입':1,'일별광고비':1,'본사일별광고비':1};
+function isDashBlock(v){ return DASH_BLOCKS[String(v||'').trim()] === 1; }
 var _growthDaily = null;  // ★ 일별 담당자 광고비 {날짜:{w우,j장,g김}}
 var _mainDaily = null;    // ★ 본사(메타) 일별 광고비 {날짜:금액} — 기존 대시보드 전용
 var _mdView = 'week';
@@ -878,6 +885,7 @@ async function loadGrowthInflow(){
     if(aS>=0 && aE>aS){
       for(var ar=aS;ar<aE;ar++){
         var ax=rows[ar]; var anm=(ax[0]||'').trim(); if(!anm) continue;
+        if(isDashBlock(anm)) break;
         if(!out[anm]) out[anm]={t:0,y:0,m:0};
         out[anm].dbAll=parseInt(ax[1])||0;   // 누적 DB (전체 탭용)
         out[anm].visit=_numOf(ax[2]); out[anm].setting=_numOf(ax[3]); out[anm].order=_numOf(ax[5]);
@@ -891,7 +899,7 @@ async function loadGrowthInflow(){
     if(gmS>=0){
       for(var gr=gmS;gr<rows.length;gr++){
         var gx=rows[gr]; var gnm=(gx[0]||'').trim();
-        if(!gnm || gnm==='캠페인' || gnm==='일자별유입' || gnm==='담당자' || gnm==='기간유입') break;
+        if(!gnm || isDashBlock(gnm)) break;
         if(!out[gnm]) out[gnm]={t:0,y:0,m:0};
         out[gnm].mVisit=parseInt(gx[1])||0; out[gnm].mSetting=parseInt(gx[2])||0; out[gnm].mOrder=parseInt(gx[3])||0;
         out[gnm].lDb=parseInt(gx[4])||0; out[gnm].lVisit=parseInt(gx[5])||0; out[gnm].lSetting=parseInt(gx[6])||0; out[gnm].lOrder=parseInt(gx[7])||0;
@@ -899,19 +907,22 @@ async function loadGrowthInflow(){
       }
     }
     // ★ [분리캠페인] 캠페인 블록 파싱 — [캠페인,DB,방문,세팅,방취,오더,매출,광고비,CPL,ROAS,afterCut]
-    var cS=-1;
-    for(var ci=0;ci<rows.length;ci++){ if((rows[ci][0]||'').trim()==='캠페인'){ cS=ci+1; break; } }
-    var camps=[];
-    if(cS>=0){
-      for(var cr=cS;cr<rows.length;cr++){
+    function _readCampBlock(marker){
+      var bS=-1;
+      for(var ci=0;ci<rows.length;ci++){ if((rows[ci][0]||'').trim()===marker){ bS=ci+1; break; } }
+      var arr=[];
+      if(bS<0) return arr;
+      for(var cr=bS;cr<rows.length;cr++){
         var cx=rows[cr]; var cnm=(cx[0]||'').trim();
-        if(!cnm || cnm==='일자별유입' || cnm==='기간유입' || cnm==='담당자') break;
-        camps.push({ name:cnm, db:parseInt(cx[1])||0, visit:_numOf(cx[2]), setting:_numOf(cx[3]),
-                     order:_numOf(cx[5]), sales:parseInt(cx[6])||0, spend:parseInt(cx[7])||0, roas:(cx[9]||''), afterCut:parseInt(cx[10])||0,
-                     off:(String(cx[12]||'').toUpperCase()==='OFF') });   // [9]=ROAS [12]=소재 ON/OFF
+        if(!cnm || isDashBlock(cnm)) break;   // ★ 지난달 블록(담당자L 등)에서 확실히 끊김
+        arr.push({ name:cnm, db:parseInt(cx[1])||0, visit:_numOf(cx[2]), setting:_numOf(cx[3]),
+                   order:_numOf(cx[5]), sales:parseInt(cx[6])||0, spend:parseInt(cx[7])||0, roas:(cx[9]||''), afterCut:parseInt(cx[10])||0,
+                   off:(String(cx[12]||'').toUpperCase()==='OFF') });   // [9]=ROAS [12]=소재 ON/OFF
       }
+      return arr;
     }
-    _bunriCamps = camps;
+    _bunriCamps  = _readCampBlock('캠페인');
+    _bunriCampsL = _readCampBlock('캠페인L');
     // ★ 일별 담당자 광고비 블록 — [날짜, 우혜림, 장윤호, 김윤호, 합계]
     var _gd={}, dS=-1;
     for(var di=0;di<rows.length;di++){ if((rows[di][0]||'').trim()==='일별광고비'){ dS=di+1; break; } }
@@ -1149,11 +1160,15 @@ function setCampView(v){
 }
 function renderBunriCamps(){
   var tb=document.getElementById('bunri-camp-tbody'); if(!tb) return;
-  var camps=_bunriCamps||[];
-  var isThisMonth=(routeTab===0);
-  // ★ 분리캠페인은 이번달 전용 — 지난달/전체 탭이면 분리 버튼 숨기고 본사뷰로 전환
-  var bb=document.getElementById('camp-btn-bunri'); if(bb) bb.style.display = isThisMonth ? '' : 'none';
-  if(!isThisMonth){ if(_campView==='bunri') setCampView('main'); return; }
+  // ★ [2026-11-03] 지난달 탭 = 캠페인L 블록. 전체 탭만 분리뷰 비활성(누적 데이터 없음).
+  var isThisMonth=(routeTab===0), isLastMonth=(routeTab===1);
+  var camps = isLastMonth ? (_bunriCampsL||[]) : (_bunriCamps||[]);
+  var bb=document.getElementById('camp-btn-bunri');
+  var _avail = (isThisMonth || (isLastMonth && camps.length>0));
+  if(bb) bb.style.display = _avail ? '' : 'none';
+  if(!_avail){ if(_campView==='bunri') setCampView('main'); return; }
+  var _nt=document.getElementById('bunri-camp-note');
+  if(_nt) _nt.textContent = '그로스 3명 소재(ad)별 · 소재=담당자 1:1 · CPL은 광고비 집계일까지 유입 기준 ('+(isLastMonth?'지난달':'이번달')+')';
   if(!camps.length){ tb.innerHTML='<tr><td colspan="9" style="color:#aaa;text-align:center;padding:12px;">데이터 없음</td></tr>'; return; }
   // ── 본사 표와 동일한 리스트 틀(campaign-table) — ON 먼저(오더순) → 꺼짐 구분선 → OFF(흐림) ──
   var pct=function(a,b){ return b>0?' <b style="font-size:10px">('+Math.round(a/b*100)+'%)</b>':''; };
