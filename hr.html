@@ -16,6 +16,12 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .tabs{display:flex;gap:8px;margin-bottom:16px}
 .tabbtn{background:#E7ECF4;border:none;color:var(--soft);font-family:inherit;font-weight:700;font-size:13px;padding:8px 16px;border-radius:30px;cursor:pointer}
 .tabbtn.on{background:var(--ink);color:#fff}
+/* ★ [2026-11-03] 연도 탭 — 연도가 2개 이상일 때만 노출 */
+.ytabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.ybtn{background:#fff;border:1px solid var(--line);color:var(--soft);font-family:inherit;font-weight:800;font-size:12px;padding:6px 14px;border-radius:30px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.ybtn.on{background:var(--v1);border-color:var(--v1);color:#fff}
+.ybtn .yd{font-size:9.5px;font-weight:800;opacity:.75;background:rgba(0,0,0,.08);padding:1px 6px;border-radius:8px}
+.ybtn.on .yd{background:rgba(255,255,255,.22)}
 /* KPI */
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
 .kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px}
@@ -245,16 +251,17 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
 </div>
 <div class="wrap">
 <div class="hd"><div><div class="k">HR 인사 리포트 · 경영진용</div><h1 id="pageTitle">인사 현황 — 인력 추이</h1>
-<div class="m" id="pageSub">2026년 1~10월 · 월말 재직 기준</div></div>
-<div class="asof">기준<b id="asofMo">2026년 10월</b></div></div>
+<div class="m" id="pageSub">월말 재직 기준</div></div>
+<div class="asof">기준<b id="asofMo">—</b></div></div>
+<div class="ytabs" id="ytabs" style="display:none"></div>
 <div class="tabs" id="tabs"></div>
 <div class="kpis" id="kpis"></div>
 <div class="card" id="comboCard"><h2 id="comboTitle"></h2><div class="sub">선 = 월말 전체 재직 인원 (재직 기준·정확) · 막대 = 월별 입사/퇴사 흐름 (참고) · 클릭하면 그 달 상세</div>
   <div class="hscroll"><div id="combo"></div></div>
   <div class="clgd"><span><i style="background:#5DCAA5"></i>입사</span><span><i style="background:#F09595"></i>퇴사</span><span><i style="background:#161C2B"></i>월말 재직 인원</span></div></div>
-<div class="card" id="tenureCard"><h2 id="tenTitle"></h2><div class="sub">2026년 퇴사자를 근속 기간별로 분류 · 얼마나 빨리 나가는지가 채용 효율의 핵심 지표</div>
+<div class="card" id="tenureCard"><h2 id="tenTitle"></h2><div class="sub" id="tenSub">퇴사자를 근속 기간별로 분류 · 얼마나 빨리 나가는지가 채용 효율의 핵심 지표</div>
   <div id="tenure"></div></div>
-<div class="card" id="brCard"><h2 id="brTitle"></h2><div class="sub">각 카드 = 현재 인원 · 1~10월 미니 추이 · 연초 대비 순증감</div>
+<div class="card" id="brCard"><h2 id="brTitle"></h2><div class="sub" id="brSub">각 카드 = 현재 인원 · 미니 추이 · 연초 대비 순증감</div>
   <div class="brgrid" id="brgrid"></div>
   
   <div class="swipehint">← 좌우로 밀어 지점을 넘겨보세요 · 탭하면 상세로</div></div>
@@ -284,6 +291,47 @@ function daysBetween(a,b){ return Math.round((b-a)/86400000); }
 function monthEnd(y,mo){ return new Date(y,mo,0); } // mo=1~12, day0 of next month
 function num(v){ if(v==null)return null; var s=String(v).replace(/,/g,''); var n=parseFloat(s); return isNaN(n)?null:n; }
 
+// ★★ [2026-11-03] 월 롤오버 — 1월~현재월 자동 생성. 매달 손댈 필요 없음.
+// ★★ [2026-11-03] 연도 롤오버 — 내년이 와도 손 안 대게. 연도별로 묶여서 탭으로 전환.
+var HR_START_YEAR = 2026;                        // HR 데이터 시작 연도 (이것만 고정)
+function nowY(){ return new Date().getFullYear(); }
+function nowM(){ return new Date().getMonth() + 1; }
+var HR_YEAR = Math.max(HR_START_YEAR, nowY());   // 지금 보고 있는 연도
+function yearsAvail(){ var a=[]; for (var y = nowY(); y >= HR_START_YEAR; y--) a.push(y); return a; }
+// 지난 연도 = 1~12월(확정) / 올해 = 1~현재월
+function monthsOfYear(y){
+  var last = (y < nowY()) ? 12 : (y > nowY() ? 0 : nowM());
+  var a = []; for (var m = 1; m <= last; m++) a.push(m);
+  return a;
+}
+function monthsUpToNow(){ return monthsOfYear(HR_YEAR); }
+function lastMonthNum(){ var a = monthsUpToNow(); return a.length ? a[a.length - 1] : 12; }
+
+// ★★ [2026-11-03] 조직개편 — 개인 소속 이동. from(월)부터 새 지점, 그 이전 달은 원래 지점 유지.
+//   (과거 추이를 덮어쓰지 않으려고 '월별'로 적용한다. 전출/전입은 입사·퇴사로 안 잡히고
+//    지점 start/end 인원 차이로만 나타난다 — 의도된 동작.)
+//   부서별로 분리: 같은 이름이 다른 부서(예: 사업부 웹마)에 있어도 안 건드림.
+var MOVES = {
+//   was = 이동 전 지점. 인사시트가 신규 소속으로 이미 덮어써도 과거 달이 안 틀어지게 명시.
+  '상담부': {
+    '김윤호': { y: 2026, from: 11, to: '파인더마포', was: '파인더루원' },
+    '김원득': { y: 2026, from: 11, to: '파인더루원', was: '파인더마포' }   // 구 마포연합센터
+  }
+};
+function grpAt(dept, e, mo){
+  var d = MOVES[dept], mv = d && d[e.name];
+  if (!mv) return e.grp;
+  var after = (HR_YEAR > mv.y) || (HR_YEAR === mv.y && mo >= mv.from);
+  return after ? mv.to : (mv.was || e.grp);
+}
+function moveTargets(dept){
+  var d = MOVES[dept] || {}, out = [];
+  Object.keys(d).forEach(function(k){
+    [d[k].to, d[k].was].forEach(function(g){ if (g && out.indexOf(g) < 0) out.push(g); });
+  });
+  return out;
+}
+
 function h2branch(h){
   h=String(h||'').trim();
   if(['부평1팀','부평2팀','부평운영팀'].indexOf(h)>=0)return '부평지점';
@@ -291,7 +339,8 @@ function h2branch(h){
   if(['메이킷위드1과','메이킷위드2과','메이킷위드운영팀','메이킷위드1팀','메이킷위드2팀','메이킷위드3팀'].indexOf(h)>=0)return '메이킷위드';
   if(h.indexOf('가산연합')>=0)return '가산연합센터';   // 센터·메이킷위드팀·인투팀·1/2/3팀(개편) 전부 통합
   if(h==='파인더루원')return '파인더루원';
-  if(['마포연합센터','마포연합인투팀','마포연합파인더팀','마포지점'].indexOf(h)>=0)return '마포연합센터';
+  // ★ [2026-11-03] 마포연합센터 → 파인더마포 (지점은 동일, 명칭만 변경)
+  if(['마포연합센터','마포연합인투팀','마포연합파인더팀','마포지점','파인더마포'].indexOf(h)>=0)return '파인더마포';
   if(['스카이에듀1팀','스카이에듀2팀','스카이에듀3팀','스카이에듀4팀'].indexOf(h)>=0)return '스카이에듀';
   if(h.indexOf('상암')>=0||h.indexOf('삼암')>=0)return '파인더루원';
   if(h.indexOf('마곡')>=0)return '마곡지점';
@@ -346,19 +395,22 @@ function activeAt(e,end){
 
 // 부서 데이터 빌드 (매출 salesFn optional)
 function buildDept(dept,emps,salesFn){
-  var months=[1,2,3,4,5,6,7,8,9,10];
-  var grps=[]; emps.forEach(function(e){if(grps.indexOf(e.grp)<0)grps.push(e.grp);}); grps.sort();
+  var Y=HR_YEAR;
+  var months=monthsUpToNow();
+  var grps=[]; emps.forEach(function(e){if(grps.indexOf(e.grp)<0)grps.push(e.grp);});
+  moveTargets(dept).forEach(function(g){ if(grps.indexOf(g)<0) grps.push(g); });   // 전입 지점이 아직 없으면 추가
+  grps.sort();
   var trend={}, totalT=[];
   grps.forEach(function(g){trend[g]=[];});
   months.forEach(function(mo){
-    var end=monthEnd(2026,mo);
-    grps.forEach(function(g){ trend[g].push(emps.filter(function(e){return e.grp===g&&activeAt(e,end);}).length); });
+    var end=monthEnd(Y,mo);
+    grps.forEach(function(g){ trend[g].push(emps.filter(function(e){return grpAt(dept,e,mo)===g&&activeAt(e,end);}).length); });
     totalT.push(emps.filter(function(e){return activeAt(e,end);}).length);
   });
   var monthsD={};
   months.forEach(function(mo){
-    var MS=new Date(2026,mo-1,1), ME=monthEnd(2026,mo);
-    var prevEnd=mo>1?monthEnd(2026,mo-1):new Date(2025,11,31);
+    var MS=new Date(Y,mo-1,1), ME=monthEnd(Y,mo);
+    var prevEnd=mo>1?monthEnd(Y,mo-1):new Date(Y-1,11,31);
     var groups={}, s_in=0,s_out=0;
     emps.forEach(function(e){
       var isOut=!!(e.outD&&e.outD>=MS&&e.outD<=ME);
@@ -369,18 +421,19 @@ function buildDept(dept,emps,salesFn){
       var isNew=!!(e.inD&&e.inD>=MS&&e.inD<=ME)&&!isOut;
       if(isNew)s_in++; if(isOut)s_out++;
       var span=(e.inD&&e.outD)?daysBetween(e.inD,e.outD):null;
-      var sal=(isOut && (dept==='상담부'||dept==='사업부') && salesFn)?salesFn(e.name,e.inD,e.outD,dept):{};
+      var sal=(isOut && (dept==='상담부'||dept==='사업부') && salesFn)?salesFn(e.name,e.inD,e.outD,dept,Y):{};
       var salTot=0; for(var k in sal)salTot+=sal[k];
-      var onLeave=!!e.leave&&mo>=2;
+      var onLeave=!!e.leave&&(Y>2026||(Y===2026&&mo>=2));
       var m={name:e.name,sub:e.sub,rank:e.rank,note:e.note,school:e.school,inD:dstr(e.inD),in_md:mdstr(e.inD),out_md:mdstr(e.outD),
              span:span,isOut:isOut,isNew:isNew,onLeave:onLeave,sales:sal,sales_tot:salTot};
-      (groups[e.grp]=groups[e.grp]||[]).push(m);
+      var _eg=grpAt(dept,e,mo);
+      (groups[_eg]=groups[_eg]||[]).push(m);
     });
     var glist=[];
     Object.keys(groups).sort().forEach(function(g){
       var mem=groups[g];
       var jae=mem.filter(function(x){return !x.isOut&&!x.onLeave;}).length;
-      var start=emps.filter(function(e){return e.grp===g&&activeAt(e,prevEnd);}).length;
+      var start=emps.filter(function(e){return grpAt(dept,e,mo-1)===g&&activeAt(e,prevEnd);}).length;
       var gin=mem.filter(function(x){return x.isNew;}).length, gout=mem.filter(function(x){return x.isOut;}).length;
       glist.push({name:g,jae:jae,start:start,in:gin,out:gout,members:mem});
     });
@@ -391,7 +444,7 @@ function buildDept(dept,emps,salesFn){
   // 근속분포
   var ten={d0:0,d1_6:0,d7_13:0,d14_29:0,d30_89:0,d90:0}, tvals=[];
   emps.forEach(function(e){
-    if(e.outD&&e.outD.getFullYear()===2026&&e.outD.getMonth()<=9&&e.inD){
+    if(e.outD&&e.outD.getFullYear()===Y&&e.outD.getMonth()<=(lastMonthNum()-1)&&e.inD){
       var d=daysBetween(e.inD,e.outD); if(d<0)return; tvals.push(d);
       if(d===0)ten.d0++; else if(d<7)ten.d1_6++; else if(d<14)ten.d7_13++; else if(d<30)ten.d14_29++; else if(d<90)ten.d30_89++; else ten.d90++;
     }
@@ -408,16 +461,21 @@ function buildDept(dept,emps,salesFn){
 //    URL은 gviz+headers=0 (publish 금지 — 캐시로 매출 0 사고).
 function _salesNum(v){ var n=parseFloat(String(v||'').replace(/[^0-9.\-]/g,'')); return isNaN(n)?0:n; }
 // 날짜 파싱: 'YYYY-MM-DD' 또는 'MM월 DD일' → 월(1~12)
-function _salesMonth(d){
-  d=String(d||'').trim(); if(!d)return 0;
-  var m1=d.match(/(\d{4})-(\d{1,2})-(\d{1,2})/); if(m1)return +m1[2];
-  var m2=d.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*일/); if(m2)return +m2[1];
-  return 0;
+// ★ [2026-11-03] 월만 뽑던 걸 연+월로. 2025/2026 원장이 월만으로 섞이던 버그도 같이 잡힘.
+//   'MM월 DD일' 처럼 연도가 없으면 그 원장의 연도(fbY)로 본다.
+function _salesYM(d, fbY){
+  d=String(d||'').trim(); if(!d)return null;
+  var m1=d.match(/(\d{4})-(\d{1,2})-(\d{1,2})/); if(m1)return {y:+m1[1], m:+m1[2]};
+  var m2=d.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*일/); if(m2)return {y:fbY, m:+m2[1]};
+  return null;
 }
 // CSV들(월종결·총매출) → recs[{name,mo,amt}]
-function buildSalesRecs(csvTexts){
+// sources = [{csv:'...', year:2026}, ...]  (옛 호출처럼 문자열 배열도 허용)
+function buildSalesRecs(sources){
   var recs=[];
-  csvTexts.forEach(function(txt){
+  (sources||[]).forEach(function(src){
+    var txt=(typeof src==='string')?src:src.csv;
+    var fbY=(typeof src==='string')?nowY():src.year;
     var rows=parseCSV(txt);
     // 헤더행 자동탐지: row[1]에 '상담' & row[17]에 '상태' 든 행 다음부터 데이터
     var hi=0;
@@ -426,27 +484,29 @@ function buildSalesRecs(csvTexts){
     }
     for(var r=hi+1;r<rows.length;r++){
       var row=rows[r];
-      var mo=_salesMonth(row[0]);            // 날짜(0)→월
-      if(!mo)continue;
+      var _ym=_salesYM(row[0], fbY);         // 날짜(0)→{연,월}
+      if(!_ym)continue;
+      var mo=_ym.m, yr=_ym.y;
       var amt=_salesNum(row[3]);             // 매출(D열=3, 상담·사업 공유)
       if(amt<=0)continue;
       var sang=String(row[1]||'').trim();    // 상담원(B열=1)
       var saup=String(row[5]||'').trim();    // 사업부담당자(F열=5)
-      if(sang) recs.push({name:sang,mo:mo,amt:amt*1000,dept:'상담부'});
-      if(saup) recs.push({name:saup,mo:mo,amt:amt*1000,dept:'사업부'});
+      if(sang) recs.push({name:sang,y:yr,mo:mo,amt:amt*1000,dept:'상담부'});
+      if(saup) recs.push({name:saup,y:yr,mo:mo,amt:amt*1000,dept:'사업부'});
     }
   });
   return recs;
 }
 function makeSalesFn(recs){
-  return function(name,inD,outD,dept){
+  return function(name,inD,outD,dept,Y){
     var by={};
     var inMo=inD?(inD.getFullYear()*12+inD.getMonth()):0;
     var outMo=outD?(outD.getFullYear()*12+outD.getMonth()):9999;
     recs.forEach(function(rec){
       if(rec.name!==name)return;
       if(dept && rec.dept!==dept)return;    // 소속 일치하는 레코드만 (상담↔상담, 사업↔사업)
-      var recMo=2026*12+(rec.mo-1);
+      if(Y && rec.y!==Y)return;             // ★ 보고 있는 연도만
+      var recMo=rec.y*12+(rec.mo-1);
       if(inD && recMo<inMo)return;
       if(outD && recMo>outMo)return;
       by[rec.mo]=(by[rec.mo]||0)+rec.amt;
@@ -457,7 +517,7 @@ function makeSalesFn(recs){
 var SSAM_PHOTO_BASE='https://crocdeucation-rgb.github.io/image/report/ssam/';
 var SSAM_ROMAJA={'안중현':'anjunghyeon','최정민':'choejeongmin'};
 function ssamPhotoUrl(name){return SSAM_ROMAJA[name]?(SSAM_PHOTO_BASE+SSAM_ROMAJA[name]+'.jpg'):'';}
-const ORDER={"상담부":["가산연합센터","마곡지점","마포연합센터","메이킷위드","부평지점","수원지점","파인더루원","스카이에듀"],"사업부":["수호에듀","오름에듀","더온에듀","웹마케팅","인투수도권1팀","인투수도권2팀","인투수도권3팀","인투경상팀","인투충청전라팀","지니스터디","본사"],"수업강사":["국어","영어","수학","사회","과학","역사","미술","코딩","위드온","필기방","사무보조"],"코칭코치":["팀A","팀B","지원"],"쌤이다":[]}, LEAD={"메이킷위드":"지사장 장윤호","파인더루원":"지사장 김윤호","부평지점":"지점장 우혜림","마곡지점":"김슬기(휴직)","수원지점":"김우진 대리","가산연합센터":"장윤호·우혜림","마포연합센터":"김윤호·노영호","팀A":"정나영 본부장","팀B":"장영주 과장","지원":"출석체크·개통 A/S"};
+const ORDER={"상담부":["가산연합센터","마곡지점","파인더마포","메이킷위드","부평지점","수원지점","파인더루원","스카이에듀"],"사업부":["수호에듀","오름에듀","더온에듀","웹마케팅","인투수도권1팀","인투수도권2팀","인투수도권3팀","인투경상팀","인투충청전라팀","지니스터디","본사"],"수업강사":["국어","영어","수학","사회","과학","역사","미술","코딩","위드온","필기방","사무보조"],"코칭코치":["팀A","팀B","지원"],"쌤이다":[]}, LEAD={"메이킷위드":"지사장 장윤호","파인더루원":"지사장 김원득","부평지점":"지점장 우혜림","마곡지점":"김슬기(휴직)","수원지점":"김우진 대리","가산연합센터":"장윤호·우혜림","파인더마포":"지사장 김윤호","팀A":"정나영 본부장","팀B":"장영주 과장","지원":"출석체크·개통 A/S"};
 var HR_URLS={
   sangdam:"https://docs.google.com/spreadsheets/d/e/2PACX-1vQsnuROsI7L8HP80yoRQCuaAkcoPnVcK9TY1U2Z-B8AVHmz_Y7rO4_aUBLsgu91bJGj63xJFmNrnPaJ/pub?gid=120536013&single=true&output=csv",
   saup:"https://docs.google.com/spreadsheets/d/e/2PACX-1vTOyHCwLPcRpL2wumHbbZCSuzSZJJw7zaGeARW2I9JjWbX-lA0Uf6mVO5n4JHIKfaAzeSrOFEvjvdKi/pub?gid=1502260628&single=true&output=csv",
@@ -520,7 +580,9 @@ async function loadHR(){
     // HR 인사시트 5개 + 시간표 = execData / 원장 2개 = dashData/ledger-2026,2025
     var keys=['hr-sangdam','hr-saup','hr-coach','hr-suup','hr-ssam','hr-ssam-sched'];
     var execP=keys.map(function(k){ return _fsGet('execData',k).then(function(o){return _rowsToCsv(o.rows);}).catch(function(){return '';}); });
-    var ledP=['ledger-2026','ledger-2025'].map(function(k){ return _fsGet('dashData',k).then(function(o){return o;}).catch(function(){return {rows:[]};}); });
+    // ★ [2026-11-03] 원장 키 자동 생성 — 시작연도 직전 ~ 올해. 없는 연도는 빈 배열로 떨어짐.
+    var ledYears=[]; for(var _y=nowY(); _y>=HR_START_YEAR-1; _y--) ledYears.push(_y);
+    var ledP=ledYears.map(function(y){ return _fsGet('dashData','ledger-'+y).then(function(o){return o;}).catch(function(){return {rows:[]};}); });
     var execRes=await Promise.all(execP);
     var ledRes=await Promise.all(ledP);
     // 원장은 저장 시 11필드 배열(cols=[date,sang,student,sales,saup,gubun,team,grade,cancelAmt,state,nopo]).
@@ -536,12 +598,10 @@ async function loadHR(){
       });
       return _rowsToCsv(out);
     }
-    var salesCsvs=[ ledgerToWideCsv(ledRes[0].rows), ledgerToWideCsv(ledRes[1].rows) ];
-    var res=execRes.concat(salesCsvs);   // [0-4]=HR, [5]=시간표, [6-7]=원장wide
-    // 기존 흐름 유지 — 인덱스만 재배치: res2 = [sangdam,saup,coach,suup,ssam,wolgyeol,chongmae,ssamSchedule]
-    var res2=[ res[0],res[1],res[2],res[3],res[4], res[6],res[7], res[5] ];
-    var salesFn=makeSalesFn(buildSalesRecs([res2[5],res2[6]]));
-    parseSsamSchedule(res2[7]);
+    var salesSrc=ledRes.map(function(o,i){ return { csv: ledgerToWideCsv(o.rows), year: ledYears[i] }; });
+    var res2=[ execRes[0],execRes[1],execRes[2],execRes[3],execRes[4] ];
+    var salesFn=makeSalesFn(buildSalesRecs(salesSrc));
+    parseSsamSchedule(execRes[5]);
     var depts={
       '상담부':loadDept(res2[0],h2branch,'부서명'),
       '사업부':loadDept(res2[1],saupBranch,'부서명'),
@@ -549,15 +609,39 @@ async function loadHR(){
       '수업강사':loadDept(res2[3],function(x){return x||'미구분';},'과목'),
       '쌤이다':loadDept(res2[4],function(x){return x||'전체';},'과목')
     };
-    for(var d in depts){DATA[d]=buildDept(d,depts[d],salesFn);}
+    DEPT_EMPS=depts; SALES_FN=salesFn;        // ★ 연도 전환 시 재계산용 보관
+    rebuildYear();
     return true;
   }catch(e){console.error('HR load fail',e);return false;}
 }
-const MONTHS=[1,2,3,4,5,6,7,8,9,10];
+var MONTHS=monthsUpToNow();   // ★ [2026-11-03] 하드코딩 제거 — 매월 1일 / 매년 1월 자동 롤오버
+var DEPT_EMPS=null, SALES_FN=null;
+// 연도가 바뀌면 그 해 기준으로 전부 다시 집계 (원본 emps는 그대로 두고 재계산만)
+function rebuildYear(){
+  MONTHS=monthsUpToNow();
+  if(DEPT_EMPS){ for(var d in DEPT_EMPS){ DATA[d]=buildDept(d,DEPT_EMPS[d],SALES_FN); } }
+  curMonth=curMo(curDept);
+}
+function selYear(y){
+  if(y===HR_YEAR)return;
+  HR_YEAR=y; rebuildYear(); renderAll();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function renderYearTabs(){
+  var el=document.getElementById('ytabs'); if(!el)return;
+  var ys=yearsAvail();
+  if(ys.length<2){ el.style.display='none'; return; }   // 연도 하나뿐이면 숨김
+  el.style.display='flex';
+  el.innerHTML=ys.map(function(y){
+    var done=(y<nowY());
+    return '<button class="ybtn'+(y===HR_YEAR?' on':'')+'" onclick="selYear('+y+')">'+y+'년'
+         + (done?'<span class="yd">확정</span>':'')+'</button>';
+  }).join('');
+}
 // 데이터 있는 마지막 달의 인덱스 (0-base). 10월이 아직 안 채워진 부서는 자동으로 9월을 현재로 유지.
 function lastIdx(dept){let t=(DATA[dept]&&DATA[dept].totalTrend)||[];for(let i=t.length-1;i>=0;i--){if(t[i]>0)return i;}return t.length-1;}
 function curMo(dept){return MONTHS[lastIdx(dept)];}
-let curDept='상담부', curMonth=10;
+let curDept='상담부', curMonth=MONTHS[MONTHS.length-1];
 function man(n){n=n||0;if(n>=1e8)return (n/1e8).toFixed(2).replace(/\.?0+$/,'')+'억';if(n>=1e4)return Math.round(n/1e4)+'만';return ''+Math.round(n);}
 function spanBadge(sp){if(sp==null)return '';let c=sp<=30?'sp-o':sp<=90?'sp-r':'sp-g';return `<span class="bg-span ${c}">${sp}일 만에</span>`;}
 function orderedGroups(dept){let keys=Object.keys(DATA[dept].trend),ord=ORDER[dept]||[];let head=ord.filter(g=>keys.includes(g));let rest=keys.filter(g=>!head.includes(g)).sort();return head.concat(rest).filter(g=>!DATA[dept].trend[g].every(v=>v===0));}
@@ -678,7 +762,7 @@ function renderMbar(){document.getElementById('mbar').innerHTML=MONTHS.map(m=>{l
 function renderMonth(){
   let md=DATA[curDept].months[curMonth]||DATA[curDept].months[String(curMonth)];
   document.getElementById('mTitle').textContent=`${curMonth}월 인사 상세`;
-  document.getElementById('mPill').textContent=`${curDept} · 2026년 ${curMonth}월`;
+  document.getElementById('mPill').textContent=`${curDept} · ${HR_YEAR}년 ${curMonth}월`;
   let s=md.sum;
   document.getElementById('hero').innerHTML=`<div><div class="l">${curDept} 재직 인원 (월초 → 월말)</div><div class="flow"><span class="s">${s.start}</span><span class="ar">→</span><span class="e">${s.end}</span><span style="font-size:13px;color:#8A94A6">명</span></div></div><div class="io"><div class="in">${curMonth}월 입사<b>+${s.in}</b></div><div class="out">${curMonth}월 퇴사<b>-${s.out}</b></div></div>`;
   let groups=md.groups.slice(),ord=orderedGroups(curDept);
@@ -833,7 +917,7 @@ function selMonth(m){curMonth=m;renderCombo();renderMbar();renderMonth();}
 function renderTenure(){
   let T=DATA[curDept].tenure;
   document.getElementById('tenTitle').textContent=`${curDept} — 퇴사자 근속 기간 분포`;
-  if(!T.total){document.getElementById('tenure').innerHTML='<div style="color:#9AA6B8;font-size:13px;padding:10px">2026년 퇴사 데이터 없음</div>';return;}
+  if(!T.total){document.getElementById('tenure').innerHTML='<div style="color:#9AA6B8;font-size:13px;padding:10px">'+HR_YEAR+'년 퇴사 데이터 없음</div>';return;}
   let segs=[
     {k:'당일',v:T.bins.d0,c:'#C92A2A'},
     {k:'1~6일',v:T.bins.d1_6,c:'#E8590C'},
@@ -859,13 +943,19 @@ function renderTenure(){
     <div class="tsegs">${rows}</div>`;
 }
 function renderAll(){
+  renderYearTabs();
   renderTabs();
-  var am=document.getElementById('asofMo'); if(am){var li0=lastIdx(curDept);am.textContent='2026년 '+MONTHS[li0]+'월';}
+  var am=document.getElementById('asofMo'); if(am){var li0=lastIdx(curDept);am.textContent=HR_YEAR+'년 '+MONTHS[li0]+'월';}
   var isSsam=(curDept==='쌤이다');
   document.body.classList.toggle('ssam-mode',isSsam);
   var pt=document.getElementById('pageTitle'), ps=document.getElementById('pageSub');
   if(pt) pt.textContent=isSsam?'쌤이다 — 강사 현황':'인사 현황 — 인력 추이';
-  if(ps) ps.textContent=isSsam?'10월 정식 출범 · 증원 진행 중':'2026년 1~10월 · 월말 재직 기준';
+  var _rng = HR_YEAR+'년 1~'+lastMonthNum()+'월';
+  if(ps) ps.textContent=isSsam?'10월 정식 출범 · 증원 진행 중':(_rng+' · 월말 재직 기준');
+  var _bs=document.getElementById('brSub');
+  if(_bs) _bs.textContent='각 카드 = 현재 인원 · '+_rng+' 미니 추이 · 연초 대비 순증감';
+  var _ts=document.getElementById('tenSub');
+  if(_ts) _ts.textContent=HR_YEAR+'년 퇴사자를 근속 기간별로 분류 · 얼마나 빨리 나가는지가 채용 효율의 핵심 지표';
   // 쌤이다: 지점/근속/월추이/월별탭 전부 숨김 → 강사 인사상세만
   var hide=['comboCard','tenureCard','brCard','mbar'];
   hide.forEach(function(id){var el=document.getElementById(id);if(el)el.style.display=isSsam?'none':'';});
