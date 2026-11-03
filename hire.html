@@ -580,13 +580,19 @@ var PLACE_FULL='퀸즈파크10, 서울 강서구 마곡중앙6로 66, 414호';
 // [2026-09-10] 지사 자체면접 통합 — 지점별 면접장소 매핑 (사장님 조망용, 시간순 통합 + 장소배지)
 var JISA_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSUcPm-SYlCaeNj0i0PJoCVG5LufnlD8dC-UptL4LaEq1sJIEtdzipD8K5G8VaR4lNuesWWoxDhJTez/pub?output=csv";
 // 지점명(부분일치) → {short:배지, full:주소, cls:색}
+// ★ [2026-11-03] 마포연합센터 → '파인더마포'로 개명되면서 '파인더' 부분일치에 걸려
+//   루원(인천 봉오재3로)으로 잘못 찍히던 문제. not 조건으로 제외 → 개명 전과 동일하게 기본(마곡)으로 떨어짐.
+//   파인더마포 면접장소 주소 확정되면 아래에 { key:'파인더마포', ... } 한 줄 추가하면 됨.
 var PLACE_MAP = [
-  { key:'파인더', short:'루원', foot:'봄645 406호', full:'인천 서구 봉오재3로 120 봄645 406호', cls:'pl-luone' },
+  { key:'파인더', not:'마포', short:'루원', foot:'봄645 406호', full:'인천 서구 봉오재3로 120 봄645 406호', cls:'pl-luone' },
   { key:'메이킷',  short:'부천', foot:'U1센터 1820호', full:'경기 부천시 조마루로385번길 92 부천테크노밸리 U1센터 1820호', cls:'pl-bucheon' }
 ];
 function placeOf(iv){
   var g=String(iv.branch||iv.site||'');
-  for(var i=0;i<PLACE_MAP.length;i++){ if(g.indexOf(PLACE_MAP[i].key)>=0) return PLACE_MAP[i]; }
+  for(var i=0;i<PLACE_MAP.length;i++){
+    var P=PLACE_MAP[i];
+    if(g.indexOf(P.key)>=0 && !(P.not && g.indexOf(P.not)>=0)) return P;
+  }
   return { key:'마곡', short:'마곡', foot:'퀸즈파크10', full:PLACE_FULL, cls:'pl-magok' };
 }
 function jobNorm(s){ s=String(s||''); if(s.indexOf('상담')>=0)return '상담부'; if(s.indexOf('사업')>=0)return '사업부'; if(s.indexOf('코칭')>=0)return '코칭'; if(s.indexOf('강사')>=0)return '강사'; return s||'기타'; }
@@ -866,7 +872,7 @@ function timelineGroupHtml(g){
   var whoBadge=g.who?'<span class="tl-who '+(isEdu?'edu':'')+'">'+esc(nameOnly(g.who))+'</span>':'';
   // 장소 색 + 지역명 + 방번호
   var grpCls='pl-magok', regionName='마곡';
-  if(isEdu){ var _e=g.eduPlace||''; if(_e.indexOf('부천')>=0||_e.indexOf('메이킷')>=0){grpCls='pl-bucheon';regionName='부천';} else if(_e.indexOf('루원')>=0||_e.indexOf('파인더')>=0){grpCls='pl-luone';regionName='루원';} }
+  if(isEdu){ var _e=g.eduPlace||''; if(_e.indexOf('부천')>=0||_e.indexOf('메이킷')>=0){grpCls='pl-bucheon';regionName='부천';} else if(_e.indexOf('루원')>=0||(_e.indexOf('파인더')>=0&&_e.indexOf('마포')<0)){grpCls='pl-luone';regionName='루원';} }
   else if(g.place){ grpCls=g.place.cls; regionName=g.place.short; }
   var room = isEdu ? _roomOf(g.eduPlace) : '';
   // 헤더 = 시간 + 딱지 + 진행자(이름만) + [모바일용 지역칩] + 인원
@@ -987,7 +993,8 @@ window.__dpMonth=null; // 로드 후 최신월 자동
 function dpWon(n){return (n||0).toLocaleString('ko-KR');}
 
 function passCountByMonth(moLabel){
-  var yy='2026-'+('0'+String(moLabel).replace('월','')).slice(-2);
+  // ★ [2026-11-03] 연도 하드코딩 제거 — 주간보고 시트는 월만 주므로 현재 연도로 맞춘다.
+  var yy=(new Date().getFullYear())+'-'+('0'+String(moLabel).replace('월','')).slice(-2);
   var out={total:0, jk:0, am:0, plan:0, attend:0, eduWait:0, has:false, jkList:[], amList:[]};
   if(typeof IVS==='undefined' || !IVS.length) return out;
   out.has=true;
