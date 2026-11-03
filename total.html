@@ -1107,7 +1107,7 @@ var MONTH_GIDS = {
 };
 // 지점 인원 (상담부 매출현황 기준 — 실적현황 갱신 시 같이 업데이트). 인투본사 무시. 오름=미파악(공란).
 var BRANCH_HEAD = {
-  '가산연합센터':11, '메이킷위드':11, '부평지점':7, '파인더마포':11,
+  '가산연합센터':11, '메이킷위드':11, '부평지점':7, '마포연합센터':11, '파인더마포':11,
   '수호에듀':11, '마곡지점':7, '더온에듀':6, '수원지점':5,
   '파인더루원':5, '스카이에듀':3, '오름에듀':2
 };
@@ -2269,7 +2269,10 @@ function brApplyProfile(brName){
 var BRANCH_PHOTO_EDITORS = {
   '가산연합센터': ['김성윤'],
   '마곡지점':     ['안준섭'],
-  '파인더마포':   ['노영호'],              // ★ [2026-11-03] 개명 + 김원득 루원으로 전출
+  // ★ [2026-11-03] 조직개편: 김윤호=파인더마포 지사장 / 김원득=파인더루원 지사장
+  //   노영호는 26.11.02부로 오스페이스 이동 → 권한에서 제외
+  '마포연합센터': ['김윤호'],              // 구 이름(과거 월 카드)
+  '파인더마포':   ['김윤호'],
   '파인더루원':   ['김원득'],
   '수원지점':     ['김우진']
 };
@@ -3316,7 +3319,19 @@ async function fdLoadLedger(){
   return dedup;
 }
 /* 조직 판별 → 표시 그룹키 */
-function fdOrgOf(r){ return r.isWeb ? '웹마케팅' : fdBranch(r.team); }
+// ★★ [2026-11-03] 지점 개명 이력 — 11/1부로 마포연합센터 → 파인더마포. 소급 안 함.
+//   10월 박제·과거 리포트는 '마포연합센터' 그대로 나와야 한다.
+var BRANCH_RENAME=[{old:'마포연합센터', nw:'파인더마포', y:2026, m:11}];
+function fdBrAt(name, dt){
+  if(!dt) return name;
+  var mi=dt.getFullYear()*12+dt.getMonth();
+  for(var i=0;i<BRANCH_RENAME.length;i++){
+    var R=BRANCH_RENAME[i];
+    if(name===R.old||name===R.nw) return (mi>=R.y*12+(R.m-1))?R.nw:R.old;
+  }
+  return name;
+}
+function fdOrgOf(r){ return r.isWeb ? '웹마케팅' : fdBrAt(fdBranch(r.team), r.dt); }
 /* [2026-09] 이름→HR소속 맵 (buildTotalData가 만든 __D.persons/divpersons = HR 무적 소속) */
 function fdHrTeam(name, useF){
   var D=window.__D||{};
@@ -3333,9 +3348,10 @@ function fdBranch(h){
   if(h.indexOf('수호에듀')===0) return '수호에듀';
   if(h.indexOf('더온에듀')===0) return '더온에듀';
   if(h.indexOf('가산연합')===0) return '가산연합센터';
-  // ★ [2026-11-03] 마포연합센터 → 파인더마포. '파인더' 규칙보다 반드시 먼저.
-  if(h.indexOf('파인더마포')===0) return '파인더마포';
-  if(h.indexOf('마포연합')===0) return '파인더마포';
+  // ★ [2026-11-03] 마포연합센터 ↔ 파인더마포 = 같은 지점. 표준키는 옛 이름 하나,
+  //   화면 이름은 fdBrAt(발효월)이 정함. '파인더' 규칙보다 반드시 먼저.
+  if(h.indexOf('파인더마포')===0) return '마포연합센터';
+  if(h.indexOf('마포연합')===0) return '마포연합센터';
   if(h==='파인더'||h.indexOf('파인더상암')===0||h.indexOf('파인더루원')===0) return '파인더루원';
   if(h.indexOf('마곡')===0) return '마곡지점';
   if(h.indexOf('수원')===0) return '수원지점';
