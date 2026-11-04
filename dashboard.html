@@ -738,6 +738,21 @@ const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJ
     const CANCEL_CSV_URL = 'https://docs.google.com/spreadsheets/d/1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU/gviz/tq?tqx=out:csv&headers=0&gid=431762866';
 
 const ASSIGNEES = ['우혜림','김윤호','장윤호','박창건','김태석','노영호','김원득','김우진','안준섭','김주환','김슬기'];
+// ★★ [2026-11-03] 배정 제외 발효월 — 그 달부터 담당자 목록·배정표에서 뺀다. 이전 달 탭은 그대로 보존.
+//   전체 탭은 과거가 섞여 있으므로 제외하지 않는다.
+//   [2026-11-04] 요청에 따라 HIDE → DROP(완전 제거)로 변경. 이들 수치는 담당자별 합계에서도 빠진다.
+//   ⚠️ 그래서 담당자별 합계 DB가 유입현황 '본사웹마'보다 적을 수 있다(배정 전환 전 남은 건 때문).
+//   합계에 남기고 행만 숨기려면 아래 DROP_ASSIGNEE ↔ HIDE_ASSIGNEE 위치만 바꾸면 됨.
+const OFF_ROSTER_FROM = { '노영호':'2026-11', '김태석':'2026-11', '김원득':'2026-11' };
+function OFF_ROSTER_NOW(){
+  var n=new Date();
+  var tY=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');
+  var l=new Date(n.getFullYear(), n.getMonth()-1, 1);
+  var lY=l.getFullYear()+'-'+String(l.getMonth()+1).padStart(2,'0');
+  var ym = (funnelTab===0) ? tY : (funnelTab===1 ? lY : '');
+  if(!ym) return [];
+  return Object.keys(OFF_ROSTER_FROM).filter(function(k){ return ym >= OFF_ROSTER_FROM[k]; });
+}
 // [2026-10-22] 노션 이름 끝에 잘못 붙은 홑/겹자모(예: 김슬기ᄈ→김슬기) 제거 — 색상·집계 매칭용
 function canonNm(s){return String(s==null?'':s).replace(/[ᄀ-ᇿ㄰-㆏ꥠ-꥿ힰ-퟿\s]+$/,'');}
 // [2026-09-02] 담당자 수 변동(김주환 추가 등)에도 안 깨지게 — 고정 행번호 대신 라벨로 탐색.
@@ -1688,7 +1703,7 @@ function render() {
   _dataArr.sort((a,b)=>b.salesNum-a.salesNum);
   // [2026-10-15] 김윤호 — 담당자 행은 숨기되, 방문·DB 등 수치는 합계에 유지(요청: "방문장수 총에서 빼지마").
   //   숨김 멤버 통계를 먼저 합계에 더한 뒤 표시 배열에서 제외 → 행만 사라지고 합계는 그대로.
-  const DROP_ASSIGNEE = ['김성윤'];        // 완전 제거(값 0 → 합계 영향 없음)
+  const DROP_ASSIGNEE = ['김성윤'].concat(OFF_ROSTER_NOW());   // 완전 제거 — 합계에서도 빠짐
   const HIDE_ASSIGNEE = ['김윤호'];         // 행만 숨김, 방문 등은 합계 유지
   _dataArr = _dataArr.filter(d=>!DROP_ASSIGNEE.includes(d.name));
   _dataArr.forEach(d=>{ if(HIDE_ASSIGNEE.includes(d.name)){
@@ -1807,7 +1822,7 @@ function render() {
   const SOJ_KEYS=['위너노트릴스','위너노트필기','위너MLST','노트릴스','노필릴스','채리','GT','원톱','맞춤처방','방으로','5단계루틴','기초부족','MLST공부','MLST캐러셀','노트공부법','정지소재단일','너만본다','메타기타','CPA(텐핑)','카카오','Organic','네이버브랜드','기타'];
   const _sojCol = funnelTab===1 ? 29 : (funnelTab===2 ? 30 : 28);
   // [2026-10-15] 담당자 테이블과 동일하게 실제 시트행(_assigneeRaw) 기반 + 김성윤·김윤호 제외(유령중복 방지)
-  const _HEAT_HIDE=['김성윤','김윤호'];
+  const _HEAT_HIDE=['김성윤','김윤호'].concat(OFF_ROSTER_NOW());   // ★ 노영호·김태석 26.11~ 제외
   const heatData=_assigneeRaw.filter(r=>_HEAT_HIDE.indexOf(((r[0]||'')+'').trim())===-1).map((r)=>{
     const soj={}; (r[_sojCol]||'').split(';').forEach(p=>{const idx=p.lastIndexOf(':'); if(idx>0){soj[p.slice(0,idx)]=parseInt(p.slice(idx+1))||0;}});
     return {name:r[0], soj};
