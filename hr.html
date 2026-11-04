@@ -332,7 +332,13 @@ var LEAD_HIST = {
   '파인더루원':   [ { from:'2025-01', who:'지사장 김윤호' }, { from:'2026-11', who:'지사장 김윤호 · 부지사장 김원득' } ],
   '파인더마포':   [ { from:'2026-11', who:'지사장 김윤호' } ],
   // 노영호 26.11.02부로 오스페이스 이동 → 11월부터 표기에서 빠짐
-  '마포연합센터': [ { from:'2025-01', who:'부지사장 김원득·노영호' }, { from:'2026-11', who:'' } ]
+  '마포연합센터': [ { from:'2025-01', who:'부지사장 김원득·노영호' }, { from:'2026-11', who:'' } ],
+  '마곡지점':     [ { from:'2026-02', who:'지점장 김슬기(휴직)' }, { from:'2026-10', who:'지점장 김슬기' } ],
+  // ★ [2026-11-05] 장윤호가 수원 인수 — 부천·수원 두 지사장 겸임
+  '메이킷위드':      [ { from:'2025-01', who:'지사장 장윤호' } ],
+  '메이킷위드 부천': [ { from:'2026-11', who:'지사장 장윤호' } ],
+  '수원지점':        [ { from:'2026-11', who:'지사장 장윤호' } ],
+  '메이킷위드 수원': [ { from:'2026-11', who:'지사장 장윤호' } ]
 };
 function leadOf(br, mo){
   var h = LEAD_HIST[br];
@@ -429,15 +435,51 @@ function loadDept(csvText, grpfn, subcol){
     if(isJae && inD===null) inD=new Date(2025,0,1);
     var drop=(!isJae)&&(outD===null);
     if(drop)continue;
-    var leave=(nm==='김슬기'&&rank==='본부장');
+    // ★ [2026-11-05] 휴직을 '구간'으로. 복직하면 to 만 채우면 되고 과거 휴직기간은 그대로 보존된다.
+    //   (기존엔 '2026-02부터 영구 휴직' 고정이라 복직을 표현할 방법이 없었음)
+    var leave=LEAVE_OF(nm, rank);
     out.push({name:nm,sub:sub||'미구분',grp:grpfn(sub),rank:rank,note:note,school:school,inD:inD,outD:outD,isJae:isJae,leave:leave});
   }
   return out;
 }
 
+// ★ [2026-11-05] 휴직 이력 — {from:'YYYY-MM', to:'YYYY-MM'|null}. to=복직월(그 달부터 재직).
+//   김슬기 2026-02 휴직 → 2026-10-12 복직 (월말 기준 판정이라 10월부터 재직).
+var LEAVE_HIST = {
+  '김슬기': { rank:'본부장', from:'2026-02', to:'2026-10' }
+};
+function LEAVE_OF(nm, rank){
+  var L = LEAVE_HIST[nm];
+  if (!L) return null;
+  if (L.rank && rank !== L.rank) return null;
+  return L;
+}
+function _miOfYM(ym){ var m=String(ym||'').match(/(\d{4})-(\d{1,2})/); return m ? (+m[1])*12 + (+m[2]-1) : null; }
+/** 그 시점(월말 Date)에 휴직 중인가 */
+function onLeaveAt(e, endDate){
+  var L = e.leave; if (!L) return false;
+  var mi = endDate.getFullYear()*12 + endDate.getMonth();
+  var f = _miOfYM(L.from); if (f == null || mi < f) return false;
+  var t = _miOfYM(L.to);   if (t != null && mi >= t) return false;   // 복직월부터 해제
+  return true;
+}
+
+// ★★ [2026-11-05] 전출 — 퇴사가 아님. 그 달부터 이 부서 집계에서 통째로 빠진다.
+//   인원수·추이·지점카드 전부 제외되고, '퇴사'로도 안 잡힘(퇴사 건수·근속분포 오염 없음).
+//   노영호 26.11 오스페이스(별도 법인) 발령.
+var TRANSFER_OUT = {
+  '노영호': { from:'2026-11', to:'오스페이스' }
+};
+function outOfScopeAt(e, endDate){
+  var T = TRANSFER_OUT[e.name]; if (!T) return false;
+  var f = _miOfYM(T.from); if (f == null) return false;
+  return (endDate.getFullYear()*12 + endDate.getMonth()) >= f;
+}
+
 function activeAt(e,end){
+  if(outOfScopeAt(e,end))return false;   // ★ 전출 — 그 달부터 인원에서 빠짐
   if(!e.inD||e.inD>end)return false;
-  if(e.leave && end>=new Date(2026,1,1))return false;
+  if(onLeaveAt(e,end))return false;
   if(e.isJae)return true;
   return e.outD===null||e.outD>end;
 }
@@ -462,9 +504,10 @@ function buildDept(dept,emps,salesFn){
     var prevEnd=mo>1?monthEnd(Y,mo-1):new Date(Y-1,11,31);
     var groups={}, s_in=0,s_out=0;
     emps.forEach(function(e){
+      if(outOfScopeAt(e,ME))return;   // ★ 전출 — 명단에도 안 뜸 (퇴사로도 안 잡힘)
       var isOut=!!(e.outD&&e.outD>=MS&&e.outD<=ME);
       var isEnd=activeAt(e,ME);
-      var onLeaveNow=!!e.leave&&ME>=new Date(2026,1,1);
+      var onLeaveNow=onLeaveAt(e,ME);
       var isEndOrLeave=isEnd||(onLeaveNow&&e.isJae);
       if(!isOut&&!isEndOrLeave)return;
       var isNew=!!(e.inD&&e.inD>=MS&&e.inD<=ME)&&!isOut;
@@ -472,7 +515,7 @@ function buildDept(dept,emps,salesFn){
       var span=(e.inD&&e.outD)?daysBetween(e.inD,e.outD):null;
       var sal=(isOut && (dept==='상담부'||dept==='사업부') && salesFn)?salesFn(e.name,e.inD,e.outD,dept,Y):{};
       var salTot=0; for(var k in sal)salTot+=sal[k];
-      var onLeave=!!e.leave&&(Y>2026||(Y===2026&&mo>=2));
+      var onLeave=onLeaveAt(e,ME);
       var m={name:e.name,sub:e.sub,rank:e.rank,note:e.note,school:e.school,inD:dstr(e.inD),in_md:mdstr(e.inD),out_md:mdstr(e.outD),
              span:span,isOut:isOut,isNew:isNew,onLeave:onLeave,sales:sal,sales_tot:salTot};
       var _eg=grpAt(dept,e,mo);
@@ -566,7 +609,7 @@ function makeSalesFn(recs){
 var SSAM_PHOTO_BASE='https://crocdeucation-rgb.github.io/image/report/ssam/';
 var SSAM_ROMAJA={'안중현':'anjunghyeon','최정민':'choejeongmin'};
 function ssamPhotoUrl(name){return SSAM_ROMAJA[name]?(SSAM_PHOTO_BASE+SSAM_ROMAJA[name]+'.jpg'):'';}
-const ORDER={"상담부":["가산연합센터","마곡지점","마포연합센터","파인더마포","메이킷위드","메이킷위드 부천","부평지점","수원지점","메이킷위드 수원","파인더루원","스카이에듀"],"사업부":["수호에듀","오름에듀","더온에듀","웹마케팅","인투수도권1팀","인투수도권2팀","인투수도권3팀","인투경상팀","인투충청전라팀","지니스터디","본사"],"수업강사":["국어","영어","수학","사회","과학","역사","미술","코딩","위드온","필기방","사무보조"],"코칭코치":["팀A","팀B","지원"],"쌤이다":[]}, LEAD={"메이킷위드":"지사장 장윤호","메이킷위드 부천":"지사장 장윤호","메이킷위드 수원":"지사장 장윤호","파인더루원":"지사장 김원득","부평지점":"지점장 우혜림","마곡지점":"김슬기(휴직)","수원지점":"김우진 대리","가산연합센터":"장윤호·우혜림","마포연합센터":"부지사장 김원득·노영호","팀A":"정나영 본부장","팀B":"장영주 과장","지원":"출석체크·개통 A/S"};
+const ORDER={"상담부":["가산연합센터","마곡지점","마포연합센터","파인더마포","메이킷위드","메이킷위드 부천","부평지점","수원지점","메이킷위드 수원","파인더루원","스카이에듀"],"사업부":["수호에듀","오름에듀","더온에듀","웹마케팅","인투수도권1팀","인투수도권2팀","인투수도권3팀","인투경상팀","인투충청전라팀","지니스터디","본사"],"수업강사":["국어","영어","수학","사회","과학","역사","미술","코딩","위드온","필기방","사무보조"],"코칭코치":["팀A","팀B","지원"],"쌤이다":[]}, LEAD={"메이킷위드":"지사장 장윤호","메이킷위드 부천":"지사장 장윤호","메이킷위드 수원":"지사장 장윤호","파인더루원":"지사장 김원득","부평지점":"지점장 우혜림","마곡지점":"지점장 김슬기","수원지점":"김우진 대리","가산연합센터":"장윤호·우혜림","마포연합센터":"부지사장 김원득·노영호","팀A":"정나영 본부장","팀B":"장영주 과장","지원":"출석체크·개통 A/S"};
 var HR_URLS={
   sangdam:"https://docs.google.com/spreadsheets/d/e/2PACX-1vQsnuROsI7L8HP80yoRQCuaAkcoPnVcK9TY1U2Z-B8AVHmz_Y7rO4_aUBLsgu91bJGj63xJFmNrnPaJ/pub?gid=120536013&single=true&output=csv",
   saup:"https://docs.google.com/spreadsheets/d/e/2PACX-1vTOyHCwLPcRpL2wumHbbZCSuzSZJJw7zaGeARW2I9JjWbX-lA0Uf6mVO5n4JHIKfaAzeSrOFEvjvdKi/pub?gid=1502260628&single=true&output=csv",
@@ -693,7 +736,9 @@ function curMo(dept){return MONTHS[lastIdx(dept)];}
 let curDept='상담부', curMonth=MONTHS[MONTHS.length-1];
 function man(n){n=n||0;if(n>=1e8)return (n/1e8).toFixed(2).replace(/\.?0+$/,'')+'억';if(n>=1e4)return Math.round(n/1e4)+'만';return ''+Math.round(n);}
 function spanBadge(sp){if(sp==null)return '';let c=sp<=30?'sp-o':sp<=90?'sp-r':'sp-g';return `<span class="bg-span ${c}">${sp}일 만에</span>`;}
-function orderedGroups(dept){let keys=Object.keys(DATA[dept].trend),ord=ORDER[dept]||[];let head=ord.filter(g=>keys.includes(g));let rest=keys.filter(g=>!head.includes(g)).sort();return head.concat(rest).filter(g=>!DATA[dept].trend[g].every(v=>v===0));}
+// ★ [2026-11-05] 별도 법인·타 사업부 — 지점 카드·추이에서 제외 (인원수엔 남김)
+var NON_BRANCH_HR = { '오스페이스':1, '인투본사':1 };
+function orderedGroups(dept){let keys=Object.keys(DATA[dept].trend).filter(g=>!NON_BRANCH_HR[g]),ord=ORDER[dept]||[];let head=ord.filter(g=>keys.includes(g));let rest=keys.filter(g=>!head.includes(g)).sort();return head.concat(rest).filter(g=>!DATA[dept].trend[g].every(v=>v===0));}
 function sumOf(dept,mo){let m=DATA[dept].months[mo]||DATA[dept].months[String(mo)];return m.sum;}
 
 function renderTabs(){document.getElementById('tabs').innerHTML=['수업강사','코칭코치','사업부','상담부'].map(d=>`<button class="tabbtn ${d===curDept?'on':''}" onclick="selDept('${d}')">${d}</button>`).join('');}
@@ -906,7 +951,7 @@ function memRow(m){
   let badge=m.isOut?'<span class="bg-out">퇴사</span>':(m.isNew?'<span class="bg-new">NEW</span>':'');
   let prom=(!m.isOut&&m.note&&m.note.includes('진급'))?'<span class="bg-prom">진급</span>':'';
   let rank=m.rank?`<span class="mrank">${m.rank}</span>`:'';
-  let leaveBadge=m.onLeave?'<span class="bg-leave">휴직 · 2월~</span>':'';
+  let leaveBadge=m.onLeave?'<span class="bg-leave">휴직</span>':'';
   let roleBadge='';
   if(m.note){let n=m.note;
     if(/출첵|출석/.test(n))roleBadge='<span class="bg-role">출석체크</span>';
