@@ -314,33 +314,82 @@ function lastMonthNum(){ var a = monthsUpToNow(); return a.length ? a[a.length -
 var MOVES = {
 //   was = 이동 전 지점. 인사시트가 신규 소속으로 이미 덮어써도 과거 달이 안 틀어지게 명시.
   '상담부': {
-    '김윤호': { y: 2026, from: 11, to: '파인더마포', was: '파인더루원' },
-    '김원득': { y: 2026, from: 11, to: '파인더루원', was: '파인더마포' }   // 구 마포연합센터
+    '김윤호': { y: 2026, from: 11, to: '파인더마포',   was: '파인더루원' },
+    '김원득': { y: 2026, from: 11, to: '파인더루원',   was: '마포연합센터' }
   }
 };
+// ★★ [2026-11-03] 지점 개명 이력 — 조직개편 11/1부로 '마포연합센터' → '파인더마포'.
+//   ⚠️ 소급 금지. 1~10월 추이·상세는 '마포연합센터'로 남아야 한다.
+var BRANCH_RENAME = [
+  { old:'마포연합센터', nw:'파인더마포',      y:2026, m:11 },
+  { old:'수원지점',     nw:'메이킷위드 수원', y:2026, m:11 },   // ★ [2026-11-05] 수원 독립
+  { old:'메이킷위드',   nw:'메이킷위드 부천', y:2026, m:11 }
+];
+// ★ [2026-11-03] 지점장도 발령 이력이 있다. 10월 파인더루원 = 김윤호 / 11월부터 = 김원득.
+//   여기 없는 지점은 기존 LEAD 상수 그대로.
+var LEAD_HIST = {
+  // 김윤호가 루원·마포 두 지사 겸임 (26.11~), 루원은 김원득 부지사장
+  '파인더루원':   [ { from:'2025-01', who:'지사장 김윤호' }, { from:'2026-11', who:'지사장 김윤호 · 부지사장 김원득' } ],
+  '파인더마포':   [ { from:'2026-11', who:'지사장 김윤호' } ],
+  // 노영호 26.11.02부로 오스페이스 이동 → 11월부터 표기에서 빠짐
+  '마포연합센터': [ { from:'2025-01', who:'부지사장 김원득·노영호' }, { from:'2026-11', who:'' } ]
+};
+function leadOf(br, mo){
+  var h = LEAD_HIST[br];
+  if (h){
+    var mi = HR_YEAR*12 + ((mo||1)-1), best = null, bmi = -1;
+    for (var i=0;i<h.length;i++){
+      var mm = String(h[i].from).match(/(\d{4})-(\d{1,2})/); if(!mm) continue;
+      var f = (+mm[1])*12 + (+mm[2]-1);
+      if (f <= mi && f > bmi){ bmi = f; best = h[i].who; }
+    }
+    if (best !== null) return best;   // 빈 문자열 = 그 달부터 표기 없음 (falsy라 && 쓰면 안 됨)
+  }
+  return LEAD[br] || '';
+}
+function brNameAt(name, y, mo){
+  var mi = y*12 + (mo-1);
+  for (var i=0;i<BRANCH_RENAME.length;i++){
+    var R = BRANCH_RENAME[i];
+    if (name === R.old || name === R.nw) return (mi >= R.y*12 + (R.m-1)) ? R.nw : R.old;
+  }
+  return name;
+}
 function grpAt(dept, e, mo){
   var d = MOVES[dept], mv = d && d[e.name];
-  if (!mv) return e.grp;
-  var after = (HR_YEAR > mv.y) || (HR_YEAR === mv.y && mo >= mv.from);
-  return after ? mv.to : (mv.was || e.grp);
+  var g = e.grp;
+  if (mv) {
+    var after = (HR_YEAR > mv.y) || (HR_YEAR === mv.y && mo >= mv.from);
+    g = after ? mv.to : (mv.was || e.grp);
+  }
+  return brNameAt(g, HR_YEAR, mo);   // ★ 그 달 기준 지점명
 }
 function moveTargets(dept){
   var d = MOVES[dept] || {}, out = [];
   Object.keys(d).forEach(function(k){
     [d[k].to, d[k].was].forEach(function(g){ if (g && out.indexOf(g) < 0) out.push(g); });
   });
+  // 개명 전/후 이름도 그룹 목록에 넣어둔다 (그 달에만 값이 생김)
+  if (dept === '상담부') BRANCH_RENAME.forEach(function(R){
+    [R.old, R.nw].forEach(function(g){ if (out.indexOf(g) < 0) out.push(g); });
+  });
   return out;
 }
 
 function h2branch(h){
   h=String(h||'').trim();
+  // ★★ [2026-11-05] 수원 독립·메이킷위드 합병 — 반드시 최상단.
+  //   아래 indexOf('부천')>=0 규칙이 '메이킷위드 부천'을 부평지점으로 먹어버린다.
+  if(h.replace(/\s/g,'').indexOf('메이킷위드수원')===0)return '수원지점';
+  if(h.replace(/\s/g,'').indexOf('메이킷위드부천')===0)return '메이킷위드';
   if(['부평1팀','부평2팀','부평운영팀'].indexOf(h)>=0)return '부평지점';
   if(h.indexOf('부천')>=0)return '부평지점';
   if(['메이킷위드1과','메이킷위드2과','메이킷위드운영팀','메이킷위드1팀','메이킷위드2팀','메이킷위드3팀'].indexOf(h)>=0)return '메이킷위드';
   if(h.indexOf('가산연합')>=0)return '가산연합센터';   // 센터·메이킷위드팀·인투팀·1/2/3팀(개편) 전부 통합
   if(h==='파인더루원')return '파인더루원';
-  // ★ [2026-11-03] 마포연합센터 → 파인더마포 (지점은 동일, 명칭만 변경)
-  if(['마포연합센터','마포연합인투팀','마포연합파인더팀','마포지점','파인더마포'].indexOf(h)>=0)return '파인더마포';
+  // ★ [2026-11-03] 마포연합센터 ↔ 파인더마포 = 같은 지점. 표준키는 옛 이름 하나로 모으고,
+  //   그 달 이름은 brNameAt(발효월 2026-11)이 정한다. 10월 이전은 '마포연합센터' 유지.
+  if(['마포연합센터','마포연합인투팀','마포연합파인더팀','마포지점','파인더마포'].indexOf(h)>=0)return '마포연합센터';
   if(['스카이에듀1팀','스카이에듀2팀','스카이에듀3팀','스카이에듀4팀'].indexOf(h)>=0)return '스카이에듀';
   if(h.indexOf('상암')>=0||h.indexOf('삼암')>=0)return '파인더루원';
   if(h.indexOf('마곡')>=0)return '마곡지점';
@@ -517,7 +566,7 @@ function makeSalesFn(recs){
 var SSAM_PHOTO_BASE='https://crocdeucation-rgb.github.io/image/report/ssam/';
 var SSAM_ROMAJA={'안중현':'anjunghyeon','최정민':'choejeongmin'};
 function ssamPhotoUrl(name){return SSAM_ROMAJA[name]?(SSAM_PHOTO_BASE+SSAM_ROMAJA[name]+'.jpg'):'';}
-const ORDER={"상담부":["가산연합센터","마곡지점","파인더마포","메이킷위드","부평지점","수원지점","파인더루원","스카이에듀"],"사업부":["수호에듀","오름에듀","더온에듀","웹마케팅","인투수도권1팀","인투수도권2팀","인투수도권3팀","인투경상팀","인투충청전라팀","지니스터디","본사"],"수업강사":["국어","영어","수학","사회","과학","역사","미술","코딩","위드온","필기방","사무보조"],"코칭코치":["팀A","팀B","지원"],"쌤이다":[]}, LEAD={"메이킷위드":"지사장 장윤호","파인더루원":"지사장 김원득","부평지점":"지점장 우혜림","마곡지점":"김슬기(휴직)","수원지점":"김우진 대리","가산연합센터":"장윤호·우혜림","파인더마포":"지사장 김윤호","팀A":"정나영 본부장","팀B":"장영주 과장","지원":"출석체크·개통 A/S"};
+const ORDER={"상담부":["가산연합센터","마곡지점","마포연합센터","파인더마포","메이킷위드","메이킷위드 부천","부평지점","수원지점","메이킷위드 수원","파인더루원","스카이에듀"],"사업부":["수호에듀","오름에듀","더온에듀","웹마케팅","인투수도권1팀","인투수도권2팀","인투수도권3팀","인투경상팀","인투충청전라팀","지니스터디","본사"],"수업강사":["국어","영어","수학","사회","과학","역사","미술","코딩","위드온","필기방","사무보조"],"코칭코치":["팀A","팀B","지원"],"쌤이다":[]}, LEAD={"메이킷위드":"지사장 장윤호","메이킷위드 부천":"지사장 장윤호","메이킷위드 수원":"지사장 장윤호","파인더루원":"지사장 김원득","부평지점":"지점장 우혜림","마곡지점":"김슬기(휴직)","수원지점":"김우진 대리","가산연합센터":"장윤호·우혜림","마포연합센터":"부지사장 김원득·노영호","팀A":"정나영 본부장","팀B":"장영주 과장","지원":"출석체크·개통 A/S"};
 var HR_URLS={
   sangdam:"https://docs.google.com/spreadsheets/d/e/2PACX-1vQsnuROsI7L8HP80yoRQCuaAkcoPnVcK9TY1U2Z-B8AVHmz_Y7rO4_aUBLsgu91bJGj63xJFmNrnPaJ/pub?gid=120536013&single=true&output=csv",
   saup:"https://docs.google.com/spreadsheets/d/e/2PACX-1vTOyHCwLPcRpL2wumHbbZCSuzSZJJw7zaGeARW2I9JjWbX-lA0Uf6mVO5n4JHIKfaAzeSrOFEvjvdKi/pub?gid=1502260628&single=true&output=csv",
@@ -746,7 +795,7 @@ function renderBranches(){
     const px=i=>i/(arr.length-1)*w, py=v=>h-2-(h-4)*(v-mn)/rng;
     let d=arr.map((v,i)=>`${i?'L':'M'}${px(i).toFixed(1)},${py(v).toFixed(1)}`).join(' ');
     let col=net>0?'#20A56D':net<0?'#E23A22':'#9AA6B8';
-    let lead=LEAD[g]||'';
+    let lead=leadOf(g, curMonth);
     return `<div class="brc">
       <div class="bn">${g}</div><div class="bl">${lead}</div>
       <div class="brow"><div class="now">${now}<small>명</small></div>
@@ -768,7 +817,8 @@ function renderMonth(){
   let groups=md.groups.slice(),ord=orderedGroups(curDept);
   groups.sort((a,b)=>{let ia=ord.indexOf(a.name),ib=ord.indexOf(b.name);ia=ia<0?999:ia;ib=ib<0?999:ib;return ia-ib;});
   document.getElementById('grid').innerHTML=groups.map(g=>{
-    let lead=LEAD[g.name]?`<span class="c-won">${LEAD[g.name]}</span>`:'';
+    let _ld=leadOf(g.name, curMonth);
+    let lead=_ld?`<span class="c-won">${_ld}</span>`:'';
     let bySub={};g.members.forEach(m=>{(bySub[m.sub]=bySub[m.sub]||[]).push(m);});
     let body='';
     Object.keys(bySub).sort().forEach(sub=>{let arr=bySub[sub].slice().sort((a,b)=>(a.isOut-b.isOut)||(a.inD<b.inD?-1:1));let sj=arr.filter(m=>!m.isOut).length;if(sub!==g.name)body+=`<div class="subteam">${sub} <span class="subcnt">${sj}</span></div>`;arr.forEach(m=>body+=memRow(m));});
