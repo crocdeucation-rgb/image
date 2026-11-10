@@ -273,6 +273,37 @@ body.is-live .closed-only{display:none !important}
 #opsnav{display:none}
 body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sgate.hidden) #opsnav{display:flex}
 #opsnav{position:sticky;top:0;z-index:200;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:9px 16px;flex-wrap:wrap}#opsnav .onav-logo{font-size:14px;font-weight:800;letter-spacing:-.3px;white-space:nowrap}#opsnav .onav-logo b{color:var(--v1)}#opsnav .onav-tabs{display:flex;gap:5px;overflow-x:auto;-webkit-overflow-scrolling:touch}#opsnav .onav-tabs a{text-decoration:none;background:var(--bg);color:var(--soft);font-size:13px;font-weight:700;padding:8px 16px;border-radius:22px;white-space:nowrap}#opsnav .onav-tabs a:hover{color:var(--ink)}#opsnav .onav-tabs a.on{background:var(--v1);color:#fff}body.gate-hasbar #opsnav{top:34px}@media(max-width:768px){#opsnav{padding:7px 10px;gap:8px}#opsnav .onav-logo{font-size:12.5px}#opsnav .onav-tabs a{padding:7px 13px;font-size:12.5px}}
+/* ───── [2026-11] 더보기 리그 — 개인 TOP(상담 15위 / 사업 10위) 전용 ───── */
+.bar.in-cl,.bar.in-el,.bar.in-ecl,.bar.in-ml{border-left:3px solid transparent;padding-left:9px}
+.bar.in-cl{border-left-color:var(--v1)}
+.bar.in-el{border-left-color:var(--web)}
+.bar.in-ecl{border-left-color:var(--pos)}
+.bar.in-ml{border-left-color:#DDE3EC}
+.bar.in-ml .fill{background:linear-gradient(90deg,#AEB8C9,#C6CEDC)}
+.bar.in-ml .nm,.bar.in-ml .rk,.bar.in-ml .outlbl{color:#8A94A6}
+.mlhd{display:flex;align-items:center;gap:8px;margin:14px 0 4px;padding-left:2px}
+.mlhd:first-child{margin-top:2px}
+.mlhd .mldot{width:3px;height:14px;border-radius:2px;flex-shrink:0}
+.mlhd .mlnm{font-size:11.5px;font-weight:900;letter-spacing:.3px}
+.mlhd .mlsub{font-size:10.5px;color:#9AA6B8;font-weight:600}
+.mlhd .mlln{flex:1;border-top:1px solid var(--line)}
+.ml-cl{color:var(--v1)}.mlb-cl{background:var(--v1)}
+.ml-el{color:var(--web)}.mlb-el{background:var(--web)}
+.ml-ecl{color:var(--pos)}.mlb-ecl{background:var(--pos)}
+.ml-ml{color:#9AA6B8}.mlb-ml{background:#C6CEDC}
+.mlguard{display:flex;align-items:center;gap:7px;background:#FFF6ED;border:1px solid #FFE0C2;border-radius:9px;padding:7px 11px;margin:9px 0 2px;font-size:11.5px;font-weight:700;color:#C25608}
+.mlguard b{font-weight:900}
+.mlbox{overflow:hidden;max-height:0;transition:max-height .35s ease}
+.mlbox.open{max-height:3000px}
+.mlbtn{width:100%;margin-top:9px;background:#F4F6FB;border:1px solid var(--line);border-radius:10px;padding:9px;font-family:inherit;font-size:12.5px;font-weight:800;color:var(--soft);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.mlbtn:hover{background:#EDF1F8}
+.mlbtn svg{transition:transform .3s}
+.mlbtn.open svg{transform:rotate(180deg)}
+.mlbd{display:inline-flex;align-items:center;font-size:9.5px;font-weight:900;padding:2px 7px;border-radius:7px;margin-left:5px;vertical-align:middle}
+.mlbd-up{background:#E7F7EF;color:var(--pos)}
+.mlbd-dn{background:#FDECE9;color:var(--red)}
+.mlbd-hold{background:#FFF1E2;color:#C25608}
+@media(max-width:820px){.bar.in-cl,.bar.in-el,.bar.in-ecl,.bar.in-ml{padding-left:7px}}
 </style>
 <style id="araon-card-style">
 .pc-clickable{cursor:pointer;transition:.12s}
@@ -1508,18 +1539,62 @@ h+='<div class="bar br-clickable" onclick="openBranchCard(\''+x.name.replace(/'/
 function barsDv(arr){var mx=Math.max.apply(null,arr.map(function(x){return x.sales;}))||1;var h='';
 arr.forEach(function(x,i){var w=Math.max(x.sales/mx*100,3);
 var ins=w>=18;h+='<div class="bar"><div class="rk'+(i<3?' t':'')+'">'+(i+1)+'</div><div class="nm">'+x.name+'</div><div class="track"><div class="fill" style="width:'+w+'%">'+(ins?'<span>'+won(x.sales)+'</span>':'')+'</div>'+(ins?'':'<span class="outlbl" style="left:calc('+w+'% + 8px)">'+won(x.sales)+'</span>')+'</div><div class="meta">세팅 <b>'+x.set+'</b> · 오더 <b>'+x.ord+'</b> · 1인당 <b>'+won(x.per)+'</b></div></div>';});return h;}
-function barsP(arr,seg){var mx=Math.max.apply(null,arr.map(function(x){return x.sales;}))||1;var h='';
+function barsP(arr,seg){
+var mx=Math.max.apply(null,arr.map(function(x){return x.sales;}))||1;
 var _dk0=window.__DK||{}; var _dmArr=((_dk0.rankMove||{}).daily||{})[seg]||[];
 var _dmMap={}; _dmArr.forEach(function(r){ _dmMap[r.name]=r; });
-arr.forEach(function(x,i){var w=Math.max(x.sales/mx*100,3);
-var ip=w>=18;var _c=cxTag(x.cxa,seg);var cx=_c?'<br>'+_c:'';
-var _r=_dmMap[x.name]; var _mv='';
-if(_r){ if(_r.prevRank==null) _mv='<span class="mvnew">NEW</span>'; else if(_r.move>0) _mv='<span class="mvup">▲'+_r.move+'</span>'; else if(_r.move<0) _mv='<span class="mvdn">▼'+(-_r.move)+'</span>'; }
-var _pnm=x.name.replace(/[ABab]$/,''); var _prm=(window.ROMAJA&&(ROMAJA[x.name]||ROMAJA[_pnm]))||'';
-var _pup=(window.__profiles&&window.__profiles[x.name]&&window.__profiles[x.name].photoURL)||'';
-var _purl=_pup||(_prm?('https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/photos/'+_prm+'.jpg'):'');
-var _pimg=_purl?('<img src="'+_purl+'" class="bar-av" alt="" onerror="this.outerHTML=\'<div class=&quot;bar-av bar-av-ini&quot;>'+x.name.charAt(0)+'</div>\'">'):('<div class="bar-av bar-av-ini">'+x.name.charAt(0)+'</div>');
-h+='<div class="bar"><div class="rk'+(i<3?' t':'')+'">'+(i+1)+'</div>'+_pimg+'<div class="nm">'+x.name+tags(x.name,i===0)+_mv+'<span class="s">'+x.team+'</span></div><div class="track"><div class="fill" style="width:'+w+'%">'+(ip?'<span>'+won(x.sales)+'</span>':'')+'</div>'+(ip?'':'<span class="outlbl" style="left:calc('+w+'% + 8px)">'+won(x.sales)+'</span>')+'</div><div class="meta">'+(seg==='saup' ? ('장당 <b>'+(x.set>0?eokman(Math.round(x.sales/x.set)):'-')+'</b>') : ('방문 <b>'+(x.visit||0)+'</b> · 세팅 <b>'+x.set+'</b> · 오더 <b>'+x.ord+'</b>'))+cx+'</div></div>';});return h;}
+// [2026-11] 더보기 리그 — 컷 밖은 접어서 숨김. 상담 15위 / 사업 10위.
+var ML_CUT   = (seg==='saup') ? 10 : 15;
+var ML_TIERS = (seg==='saup')
+  ? [{k:'cl',nm:'챔스권',to:3},{k:'el',nm:'유로파권',to:6},{k:'ecl',nm:'컨퍼런스권',to:10}]
+  : [{k:'cl',nm:'챔스권',to:3},{k:'el',nm:'유로파권',to:8},{k:'ecl',nm:'컨퍼런스권',to:15}];
+var ML_HOLD  = 1000000;   // 방어 배지 임계 — 컷 마지막과 바로 아래 격차
+var N=arr.length;
+var _gap=(N>ML_CUT)?(arr[ML_CUT-1].sales-arr[ML_CUT].sales):null;
+var _SHIELD='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>';
+var _CHEV='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>';
+function _mlRow(x,i,tier){
+  var w=Math.max(x.sales/mx*100,3);
+  var ip=w>=18; var _c=cxTag(x.cxa,seg); var cx=_c?'<br>'+_c:'';
+  var _r=_dmMap[x.name]; var _mv='';
+  if(_r){ if(_r.prevRank==null) _mv='<span class="mvnew">NEW</span>'; else if(_r.move>0) _mv='<span class="mvup">▲'+_r.move+'</span>'; else if(_r.move<0) _mv='<span class="mvdn">▼'+(-_r.move)+'</span>'; }
+  // 승격·강등·방어 — 컷선을 넘나든 경우만
+  var _rk=i+1, _bd='';
+  if(_r && _r.prevRank!=null){
+    if(_r.prevRank>ML_CUT && _rk<=ML_CUT)      _bd='<span class="mlbd mlbd-up">승격</span>';
+    else if(_r.prevRank<=ML_CUT && _rk>ML_CUT) _bd='<span class="mlbd mlbd-dn">강등</span>';
+  }
+  if(!_bd && _rk===ML_CUT && _gap!=null && _gap<ML_HOLD) _bd='<span class="mlbd mlbd-hold">방어</span>';
+  var _pnm=x.name.replace(/[ABab]$/,''); var _prm=(window.ROMAJA&&(ROMAJA[x.name]||ROMAJA[_pnm]))||'';
+  var _pup=(window.__profiles&&window.__profiles[x.name]&&window.__profiles[x.name].photoURL)||'';
+  var _purl=_pup||(_prm?('https://raw.githubusercontent.com/crocdeucation-rgb/image/main/report/photos/'+_prm+'.jpg'):'');
+  var _pimg=_purl?('<img src="'+_purl+'" class="bar-av" alt="" onerror="this.outerHTML=\'<div class=&quot;bar-av bar-av-ini&quot;>'+x.name.charAt(0)+'</div>\'">'):('<div class="bar-av bar-av-ini">'+x.name.charAt(0)+'</div>');
+  return '<div class="bar in-'+tier+'"><div class="rk'+(i<3?' t':'')+'">'+(i+1)+'</div>'+_pimg+'<div class="nm">'+x.name+tags(x.name,i===0)+_mv+_bd+'<span class="s">'+x.team+'</span></div><div class="track"><div class="fill" style="width:'+w+'%">'+(ip?'<span>'+won(x.sales)+'</span>':'')+'</div>'+(ip?'':'<span class="outlbl" style="left:calc('+w+'% + 8px)">'+won(x.sales)+'</span>')+'</div><div class="meta">'+(seg==='saup' ? ('장당 <b>'+(x.set>0?eokman(Math.round(x.sales/x.set)):'-')+'</b>') : ('방문 <b>'+(x.visit||0)+'</b> · 세팅 <b>'+x.set+'</b> · 오더 <b>'+x.ord+'</b>'))+cx+'</div></div>';
+}
+var h='', _prev=0;
+ML_TIERS.forEach(function(T){
+  var _to=Math.min(T.to,N);
+  if(_to<=_prev){ _prev=_to; return; }   // 인원이 적어 빈 구간이면 헤더도 안 띄움
+  h+='<div class="mlhd"><span class="mldot mlb-'+T.k+'"></span><span class="mlnm ml-'+T.k+'">'+T.nm+'</span><span class="mlsub">'+(_prev+1)+' – '+_to+'위'+((T.to===ML_CUT&&N>ML_CUT)?' · 더보기 방어선':'')+'</span><span class="mlln"></span></div>';
+  h+=arr.slice(_prev,_to).map(function(x,i){ return _mlRow(x,_prev+i,T.k); }).join('');
+  _prev=_to;
+});
+if(N>ML_CUT){
+  h+='<div class="mlguard">'+_SHIELD+'더보기 방어선 <b>'+won(_gap)+'원</b> &nbsp;·&nbsp; '+(ML_CUT+1)+'위 '+arr[ML_CUT].name+' → '+ML_CUT+'위 '+arr[ML_CUT-1].name+'까지</div>';
+  h+='<div class="mlhd"><span class="mldot mlb-ml"></span><span class="mlnm ml-ml">더보기 리그</span><span class="mlsub">'+(ML_CUT+1)+'위 – '+N+'위 · '+(N-ML_CUT)+'명</span><span class="mlln"></span></div>';
+  h+='<button class="mlbtn" id="mlbtn" onclick="mlTog()">더보기 리그 '+(N-ML_CUT)+'명 보기 '+_CHEV+'</button>';
+  h+='<div class="mlbox" id="mlbox"><div style="padding-top:6px">'+arr.slice(ML_CUT).map(function(x,i){ return _mlRow(x,ML_CUT+i,'ml'); }).join('')+'</div></div>';
+}
+return h;}
+// [2026-11] 더보기 리그 펼치기/접기 — 탭 전환 시 innerHTML 재생성되므로 항상 접힌 상태로 시작
+window.mlTog=function(){
+  var b=document.getElementById('mlbox'), t=document.getElementById('mlbtn');
+  if(!b||!t) return;
+  var open=b.classList.toggle('open'); t.classList.toggle('open',open);
+  var n=b.querySelectorAll('.bar').length;
+  var _c='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>';
+  t.innerHTML=(open?'접기':'더보기 리그 '+n+'명 보기')+' '+_c;
+};
 window.sw=function(i,btn){var D=window.__D;if(i===4 && !_BOSS) return;window.__curTab=i;var _tg=document.getElementById('brSortTog'); if(_tg) _tg.style.display=(i===0)?'':'none';document.querySelectorAll('.tabbtn').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');
 document.getElementById('note').style.display=(i===2||i===4)?'block':'none';
 document.getElementById('body').innerHTML=i===0?barsBr(D.branches, window.__brSort||'sales'):i===2?barsDv(D.divs):i===3?barsP(D.persons,'sang'):barsP(D.divpersons,'saup');setTimeout(attachCardClicks,50);}
