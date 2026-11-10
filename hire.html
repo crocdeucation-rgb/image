@@ -143,6 +143,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .tl-place2.pl-gasan{color:#0B7285}
 .tl-place2.pl-bupyeong{color:#C2255C}
 .tl-place2.pl-suwon{color:#5C940D}
+.tl-place2.pl-daejeon{color:#AE3EC9}
 .tl-place2.pl-etc{color:#868E96}
 /* 모바일 전용 지역칩 (헤더 우측) — PC 숨김 */
 .tl-region-m{display:none;font-size:10px;font-weight:800}
@@ -153,6 +154,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .tl-region-m.pl-gasan{color:#0B7285}
 .tl-region-m.pl-bupyeong{color:#C2255C}
 .tl-region-m.pl-suwon{color:#5C940D}
+.tl-region-m.pl-daejeon{color:#AE3EC9}
 .tl-region-m.pl-etc{color:#868E96}
 /* [2026-09-10] 그룹 좌측 색띠 = 장소 구분 (본사 파랑 / 지사 초록·보라) */
 .tl-grp.bar-pl-magok{border-left:3px solid #4C6EF5;padding-left:9px}
@@ -162,6 +164,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .tl-grp.bar-pl-gasan{border-left:3px solid #0B7285;padding-left:9px}
 .tl-grp.bar-pl-bupyeong{border-left:3px solid #C2255C;padding-left:9px}
 .tl-grp.bar-pl-suwon{border-left:3px solid #5C940D;padding-left:9px}
+.tl-grp.bar-pl-daejeon{border-left:3px solid #AE3EC9;padding-left:9px}
 .tl-grp.bar-pl-etc{border-left:3px solid #868E96;padding-left:9px}
 .tl-who.edu{color:#0B7A70;background:#D6F5F0}
 .tl-cnt{font-size:9px;font-weight:800;color:#fff;background:#4C6EF5;padding:2px 7px;border-radius:20px;margin-left:auto}
@@ -504,7 +507,7 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
       <button class="cal-navbtn" onclick="calMove(1)">›</button>
     </div>
   </div>
-  <div class="cal-place-banner"><b style="color:#E8590C">● 마포</b> 파인더마포 · <b style="color:#7048E8">● 루원</b> 인천 서구 봉오재3로 120 봄645 406호 · <b style="color:#1D9E75">● 부천</b> 부천테크노밸리 U1센터 1820호 · <b style="color:#0B7285">● 가산</b> 가산연합센터 · <b style="color:#C2255C">● 부평</b> 부평지점 · <b style="color:#5C940D">● 수원</b> 메이킷위드 수원</div>
+  <div class="cal-place-banner"><b style="color:#E8590C">● 마포</b> 파인더마포 · <b style="color:#7048E8">● 루원</b> 인천 서구 봉오재3로 120 봄645 406호 · <b style="color:#1D9E75">● 부천</b> 부천테크노밸리 U1센터 1820호 · <b style="color:#0B7285">● 가산</b> 가산연합센터 · <b style="color:#C2255C">● 부평</b> 부평지점 · <b style="color:#5C940D">● 수원</b> 메이킷위드 수원 · <b style="color:#AE3EC9">● 대전</b> 스카이에듀</div>
   <div id="cal_grid"></div>
   <div class="cal-mob"><div class="cms-modetog" id="cms_modetog"><button class="cms-mt on" data-m="day" onclick="calSetMode('day')">일간</button><button class="cms-mt" data-m="week" onclick="calSetMode('week')">주간</button></div><div class="cms-strip" id="cms_strip"></div><div id="cms_body"></div></div>
   <div class="cal-swipe-hint" id="cal_hint"></div>
@@ -612,6 +615,8 @@ var PLACE_MAP = [
   { key:'부천',   short:'부천', foot:'U1센터 1820호', full:'경기 부천시 조마루로385번길 92 부천테크노밸리 U1센터 1820호', cls:'pl-bucheon' },
   { key:'가산',   short:'가산', foot:'', full:'', cls:'pl-gasan' },
   { key:'부평',   short:'부평', foot:'', full:'', cls:'pl-bupyeong' },
+  { key:'스카이', short:'대전', foot:'', full:'', cls:'pl-daejeon' },
+  { key:'대전',   short:'대전', foot:'', full:'', cls:'pl-daejeon' },
   { key:'마곡',   short:'마곡', foot:'퀸즈파크10', full:PLACE_FULL, cls:'pl-magok' }
 ];
 // 지점명·교육장소 텍스트 → 장소. 못 찾으면 null (호출부가 판단).
