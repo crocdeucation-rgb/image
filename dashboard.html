@@ -1064,10 +1064,13 @@ function renderGrowthInflow(){
   var gi = _growthInflow || {};
   var sp = _growthSpend || {};
   // ★ 3명 하위퍼널 광고비(원): 이번달=실시간 sp[m] / 지난달=_일별 직전월합 / 전체=0
-  //   _그로스_XXX_L 백필 불필요 — _일별 행이 시트에 남아있어 직전월을 매달 자동 합산
+  //   [2026-11-11 FIX] 지난달은 _그로스_XXX_L(시트 확정값) 우선, 없을 때만 _일별 합산으로 폴백.
+  //     _일별 행은 31일 롤링 수집이라 월 중순이면 지난달 초순이 빠져 금액이 매일 줄었다.
   var _ms = _growthMonthSpend || {};
   var _lmKey = (function(){ var n=new Date(); var d=new Date(n.getFullYear(), n.getMonth()-1, 1); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); })();
-  var spOf = function(m){ if(isThisMonth) return sp[m]||0; if(isLastMonth) return (_ms[_lmKey]&&_ms[_lmKey][m])||0; return 0; };
+  var spOf = function(m){ if(isThisMonth) return sp[m]||0;
+                          if(isLastMonth) return (sp[m+'_L']||0) || ((_ms[_lmKey]&&_ms[_lmKey][m])||0);
+                          return 0; };
   var spFmt = function(won){ won=won||0; if(won<=0) return '-'; return (won/10000).toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:1})+'만'; };
   var salesFmt = function(won){ won=won||0; return won>0 ? Math.round(won/10000).toLocaleString()+'만' : '-'; };   // ★ 매출 컬럼(원→만)
   // 상단 카드 = 전체(총괄). 표는 그 분해: 그로스 총괄 + 3명. 합계 행은 카드와 중복이라 제거.
