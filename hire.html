@@ -631,9 +631,12 @@ function placeByText(txt){
 // ★★ [2026-11-11] iv.site 는 채용경로(알바몬·사람인 등)지 장소가 아니다.
 //   예전 코드가 branch||site 로 봐서 '알바몬'이 지역 배지로 찍혔다. branch 만 본다.
 var PLACE_NONE = { key:'', short:'', foot:'', full:'', cls:'pl-etc' };
-// ★ [2026-11-11] 본사(마곡) 교육 진행자 — 쌤이다/강사 본사 교육은 지점이 아니라 마곡에서 한다.
-//   교육장소 칸이 비어 있을 때만 쓰는 폴백. 칸에 장소가 적혀 있으면 그 값이 우선.
-var EDU_HQ_WHO = /신우성/;
+// ★ [2026-11-11] 본사(마곡 414호) 교육 진행자.
+//   지점 교육은 각 지점에서 하지만, 본사 교육(쌤이다·아라온스쿨·코칭)은 마곡 414호에서 한다.
+//   신우성=쌤이다 / 정나영·장영주·손수지=코칭 등 아라온스쿨 본사 교육.
+//   교육장소 칸이 비어 있을 때만 쓰는 폴백 — 칸에 장소가 적혀 있으면 그 값이 항상 우선.
+var EDU_HQ_WHO  = /신우성|정나영|장영주|손수지/;
+var EDU_HQ_ROOM = '414호';
 function placeOf(iv){
   var g=String(iv.branch||'');
   var P=placeByText(g);
@@ -923,19 +926,21 @@ function timelineGroupHtml(g){
   // ★★ [2026-11-11] 마곡 기본값 제거. 각 지점이 자기 지점에서 면접·교육을 하고 면접관이 이동한다.
   //   교육장소 텍스트가 비거나 매칭 안 되면 → 그 교육 대상자의 지점으로 떨어뜨린다.
   //   그래도 모르면 장소를 비워 둔다 (틀린 '마곡'보다 공란이 낫다).
-  var grpCls='pl-etc', regionName='';
+  var grpCls='pl-etc', regionName='', _hqEdu=false;
   if(isEdu){
     var _e=g.eduPlace||'';
     var _ep=placeByText(_e);
     // ★ [2026-11-11] 신우성 = 쌤이다 본사 교육 담당 — 지점 교육이 아니라 본사(마곡)에서 한다.
     //   상담부 지점 교육만 각 지점에서 하고, 쌤이다/강사 본사 교육은 마곡 유지.
-    if(!_ep && EDU_HQ_WHO.test(String(g.who||''))) _ep=placeByText('마곡');
+    if(!_ep && EDU_HQ_WHO.test(String(g.who||''))){ _ep=placeByText('마곡'); _hqEdu=true; }
     // 그래도 모르면 교육 대상자의 지점으로
     if(!_ep){ for(var _i=0;_i<g.members.length && !_ep;_i++){ var _b=String(g.members[_i].branch||''); if(_b) _ep=placeByText(_b); } }
     if(_ep){ grpCls=_ep.cls; regionName=_ep.short; }
   }
   else if(g.place && g.place.short){ grpCls=g.place.cls; regionName=g.place.short; }
   var room = isEdu ? _roomOf(g.eduPlace) : '';
+  // ★ [2026-11-11] 본사 교육인데 교육장소 칸이 비어 호수를 못 뽑았으면 414호로 채운다
+  if(isEdu && _hqEdu && !room) room = EDU_HQ_ROOM;
   // 헤더 = 시간 + 딱지 + 진행자(이름만) + [모바일용 지역칩] + 인원
   var h='<div class="tl-grp bar-'+grpCls+(isEdu?' edu':'')+'"><div class="tl-hd">'
     +'<span class="tl-tm">'+esc(g.time)+'</span>'+kindBadge+whoBadge
