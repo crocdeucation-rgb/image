@@ -628,15 +628,18 @@ function placeByText(txt){
   }
   return null;
 }
+// ★★ [2026-11-11] iv.site 는 채용경로(알바몬·사람인 등)지 장소가 아니다.
+//   예전 코드가 branch||site 로 봐서 '알바몬'이 지역 배지로 찍혔다. branch 만 본다.
+var PLACE_NONE = { key:'', short:'', foot:'', full:'', cls:'pl-etc' };
 function placeOf(iv){
-  var g=String(iv.branch||iv.site||'');
+  var g=String(iv.branch||'');
   var P=placeByText(g);
   if(P) return P;
-  // ★ 지점명은 있는데 매핑에 없는 경우 — 지점명 그대로 표기한다.
-  //   예전처럼 마곡으로 떨어뜨리면 없는 면접이 생겨버린다. 새 지점이 생기면 여기서 회색 배지로 눈에 띈다.
+  // 지점명은 있는데 매핑에 없는 경우 — 지점명 그대로. 새 지점이 생기면 회색 배지로 눈에 띈다.
   if(g) return { key:g, short:g.replace(/지점|연합센터|센터|연합/g,'').trim().slice(0,4)||g, foot:'', full:g, cls:'pl-etc' };
-  // branch 빈 값 = 본사 시트. 본사 면접은 폐지됐고 과거분만 마곡이다.
-  return { key:'마곡', short:'마곡', foot:'퀸즈파크10', full:PLACE_FULL, cls:'pl-magok' };
+  // ★ branch 가 비면 장소를 모른다 — 마곡으로 찍지 않고 비워 둔다.
+  //   각 지점이 자기 지점에서 면접·교육을 하고 면접관이 이동하는 체제라 '본사 장소'가 없다.
+  return PLACE_NONE;
 }
 function jobNorm(s){ s=String(s||''); if(s.indexOf('상담')>=0)return '상담부'; if(s.indexOf('사업')>=0)return '사업부'; if(s.indexOf('코칭')>=0)return '코칭'; if(s.indexOf('강사')>=0)return '강사'; return s||'기타'; }
 function mgrBadge(name){
@@ -914,12 +917,17 @@ function timelineGroupHtml(g){
   var kindBadge='<span class="tl-kind '+(isEdu?'edu':'iv')+'">'+g.kind+'</span>';
   var whoBadge=g.who?'<span class="tl-who '+(isEdu?'edu':'')+'">'+esc(nameOnly(g.who))+'</span>':'';
   // 장소 색 + 지역명 + 방번호
-  var grpCls='pl-magok', regionName='마곡';
-  // ★ [2026-11-11] 교육장소도 PLACE_MAP 재사용 — 기존엔 부천·루원만 분기해서 마포·가산·부평·수원이 마곡으로 떨어졌다.
-  if(isEdu){ var _e=g.eduPlace||'';
-    var _ep=placeByText(_e) || (_e.indexOf('루원')>=0 ? placeByText('파인더루원') : null);
-    if(_ep){ grpCls=_ep.cls; regionName=_ep.short; } }
-  else if(g.place){ grpCls=g.place.cls; regionName=g.place.short; }
+  // ★★ [2026-11-11] 마곡 기본값 제거. 각 지점이 자기 지점에서 면접·교육을 하고 면접관이 이동한다.
+  //   교육장소 텍스트가 비거나 매칭 안 되면 → 그 교육 대상자의 지점으로 떨어뜨린다.
+  //   그래도 모르면 장소를 비워 둔다 (틀린 '마곡'보다 공란이 낫다).
+  var grpCls='pl-etc', regionName='';
+  if(isEdu){
+    var _e=g.eduPlace||'';
+    var _ep=placeByText(_e);
+    if(!_ep){ for(var _i=0;_i<g.members.length && !_ep;_i++){ var _b=String(g.members[_i].branch||''); if(_b) _ep=placeByText(_b); } }
+    if(_ep){ grpCls=_ep.cls; regionName=_ep.short; }
+  }
+  else if(g.place && g.place.short){ grpCls=g.place.cls; regionName=g.place.short; }
   var room = isEdu ? _roomOf(g.eduPlace) : '';
   // 헤더 = 시간 + 딱지 + 진행자(이름만) + [모바일용 지역칩] + 인원
   var h='<div class="tl-grp bar-'+grpCls+(isEdu?' edu':'')+'"><div class="tl-hd">'
@@ -927,7 +935,9 @@ function timelineGroupHtml(g){
     +'<span class="tl-region-m '+grpCls+'">'+esc(regionName)+'</span>'   // 모바일 전용(우측), PC 숨김
     +(multi?'<span class="tl-cnt">'+g.members.length+'</span>':'')+'</div>';
   // 장소 줄 = 헤더와 명단 사이 (PC 전용: 지역+방번호). 모바일 숨김
-  var placeLine='<div class="tl-place2 '+grpCls+'">'+esc(regionName)+(room?(' '+esc(room)):'')+'</div>';
+  // ★ [2026-11-11] 지역명·호수 둘 다 없으면 장소줄 자체를 그리지 않는다 (빈 배지 방지)
+  var _plTxt=(regionName?esc(regionName):'')+(room?((regionName?' ':'')+esc(room)):'');
+  var placeLine=_plTxt?('<div class="tl-place2 '+grpCls+'">'+_plTxt+'</div>'):'';
   h+=placeLine;
   g.members.forEach(function(iv){
     var st=miniStatus(iv), drop=isDrop(iv);
@@ -958,8 +968,9 @@ window.openIv=function(date,name){
     +(iv.site?'<span class="ivm-tag">'+esc(iv.site)+'</span>':'')
     +(iv.region?'<span class="ivm-tag">'+esc(iv.region)+'</span>':'')+'</div></div>';
   h+='<div class="ivm-body">';
+  // ★ [2026-11-11] 장소 미상이면 줄 자체를 빼고, 주소가 없으면 지점명만 쓴다
   var _pl=placeOf(iv);
-  h+='<div class="ivm-row"><span class="ivm-lbl">장소</span><span class="ivm-val"><b style="color:#4C6EF5">'+esc(_pl.short)+'</b> · '+esc(_pl.full)+'</span></div>';
+  if(_pl.short) h+='<div class="ivm-row"><span class="ivm-lbl">장소</span><span class="ivm-val"><b style="color:#4C6EF5">'+esc(_pl.short)+'</b>'+(_pl.full?(' · '+esc(_pl.full)):'')+'</span></div>';
   h+='<div class="ivm-row"><span class="ivm-lbl">면접관</span><span class="ivm-val">'+esc(interviewerOf(iv))+'</span></div>';
   h+='<div class="ivm-row"><span class="ivm-lbl">참석</span><span class="ivm-val '+(iv.attend.indexOf('불참')>=0?'ns':iv.attend.indexOf('참석')>=0?'at':'')+'">'+(esc(iv.attend)||'-')+'</span></div>';
   h+='<div class="ivm-row"><span class="ivm-lbl">결과</span><span class="ivm-val '+(iv.pass.indexOf('불합격')>=0?'fa':iv.pass.indexOf('합격')>=0?'ps':'')+'">'+(esc(iv.pass)||'-')+'</span></div>';
