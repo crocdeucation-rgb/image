@@ -631,11 +631,13 @@ function placeByText(txt){
 // ★★ [2026-11-11] iv.site 는 채용경로(알바몬·사람인 등)지 장소가 아니다.
 //   예전 코드가 branch||site 로 봐서 '알바몬'이 지역 배지로 찍혔다. branch 만 본다.
 var PLACE_NONE = { key:'', short:'', foot:'', full:'', cls:'pl-etc' };
-// ★ [2026-11-11] 본사(마곡 414호) 교육 진행자.
-//   지점 교육은 각 지점에서 하지만, 본사 교육(쌤이다·아라온스쿨·코칭)은 마곡 414호에서 한다.
-//   신우성=쌤이다 / 정나영·장영주·손수지=코칭 등 아라온스쿨 본사 교육.
-//   교육장소 칸이 비어 있을 때만 쓰는 폴백 — 칸에 장소가 적혀 있으면 그 값이 항상 우선.
-var EDU_HQ_WHO  = /신우성|정나영|장영주|손수지/;
+// ★★ [2026-11-11] 본사(마곡 414호) 진행자 — 면접·교육 공용.
+//   상담부 지점 건은 각 지점에서 하고 면접관이 이동하지만,
+//   본사 건은 마곡 414호에서 한다:
+//     신우성 = 쌤이다 / 엄현호 = 쌤이다 강사 면접 / 손수지·정나영·장영주 = 아라온스쿨 코칭
+//   ⚠️ 지점·교육장소가 적혀 있으면 그 값이 항상 우선. 비었을 때만 도는 폴백이다.
+//   (엄현호 이사가 지점에서 면접을 봐도 그 행엔 지점이 적히므로 이 규칙이 덮지 않는다)
+var EDU_HQ_WHO  = /신우성|정나영|장영주|손수지|엄현호/;
 var EDU_HQ_ROOM = '414호';
 function placeOf(iv){
   var g=String(iv.branch||'');
@@ -938,9 +940,14 @@ function timelineGroupHtml(g){
     if(_ep){ grpCls=_ep.cls; regionName=_ep.short; }
   }
   else if(g.place && g.place.short){ grpCls=g.place.cls; regionName=g.place.short; }
+  // ★ [2026-11-11] 면접도 지점이 비었는데 본사 진행자면 마곡 414호 (쌤이다 강사·본사 코칭)
+  if(!regionName && EDU_HQ_WHO.test(String(g.who||''))){
+    var _hq=placeByText('마곡');
+    if(_hq){ grpCls=_hq.cls; regionName=_hq.short; _hqEdu=true; }
+  }
   var room = isEdu ? _roomOf(g.eduPlace) : '';
-  // ★ [2026-11-11] 본사 교육인데 교육장소 칸이 비어 호수를 못 뽑았으면 414호로 채운다
-  if(isEdu && _hqEdu && !room) room = EDU_HQ_ROOM;
+  // ★ [2026-11-11] 본사 건인데 장소 칸이 비어 호수를 못 뽑았으면 414호로 채운다 (면접·교육 공통)
+  if(_hqEdu && !room) room = EDU_HQ_ROOM;
   // 헤더 = 시간 + 딱지 + 진행자(이름만) + [모바일용 지역칩] + 인원
   var h='<div class="tl-grp bar-'+grpCls+(isEdu?' edu':'')+'"><div class="tl-hd">'
     +'<span class="tl-tm">'+esc(g.time)+'</span>'+kindBadge+whoBadge
