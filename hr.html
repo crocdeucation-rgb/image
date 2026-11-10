@@ -353,6 +353,27 @@ function leadOf(br, mo){
   }
   return LEAD[br] || '';
 }
+// ★★ [2026-11-11 FIX] 지점 생애주기 — 그 달에 존재하지 않는 지점을 지점카드에서 제외.
+//   증상: 11월 지점카드에 '마포연합센터 0명'·'메이킷위드 0명'·'수원지점 0명'이 남고,
+//        흡수된 '마곡지점'도 0명으로 계속 떴다.
+//   원인: orderedGroups가 '연간 전체가 0인 그룹'만 걸러서, 1~10월 값이 있는 옛 이름은 살아남았다.
+//   ⚠️ 추이(스파크라인)는 연간 배열을 그대로 쓰므로 과거 달 데이터는 손상되지 않는다.
+var BRANCH_RETIRE = [
+  { name:'마곡지점', y:2026, m:11 }   // 2026-11 흡수 (10월까지는 존재 — 과거 리포트엔 남아야 함)
+];
+function brLiveAt(name, y, mo){
+  var mi = y*12 + (mo-1);
+  for (var i=0;i<BRANCH_RENAME.length;i++){
+    var R = BRANCH_RENAME[i], eff = R.y*12 + (R.m-1);
+    if (name === R.old) return mi <  eff;   // 개명 발효 후 = 옛 이름 비활성
+    if (name === R.nw)  return mi >= eff;   // 개명 발효 전 = 새 이름 비활성
+  }
+  for (var j=0;j<BRANCH_RETIRE.length;j++){
+    var T = BRANCH_RETIRE[j];
+    if (name === T.name) return mi < T.y*12 + (T.m-1);
+  }
+  return true;
+}
 function brNameAt(name, y, mo){
   var mi = y*12 + (mo-1);
   for (var i=0;i<BRANCH_RENAME.length;i++){
@@ -828,8 +849,9 @@ function renderBranches(){
   if(curDept==='쌤이다'||curDept==='수업강사'){ if(brCard) brCard.style.display='none'; return; }  // 쌤이다·수업강사는 지점 구분 없음
   if(brCard) brCard.style.display='';
   document.getElementById('brTitle').textContent=`${curDept} — 지점별 현황`;
-  let gs=orderedGroups(curDept);
   let li=lastIdx(curDept);
+  // ★ [2026-11-11 FIX] 그 달에 존재하지 않는 지점(개명 전/후 이름·흡수 지점) 제외 — 0명 유령카드 방지
+  let gs=orderedGroups(curDept).filter(g=>brLiveAt(g, HR_YEAR, MONTHS[li]));
   // 현재 인원 큰 순
   gs=gs.slice().sort((a,b)=>DATA[curDept].trend[b][li]-DATA[curDept].trend[a][li]);
   document.getElementById('brgrid').innerHTML=gs.map(g=>{

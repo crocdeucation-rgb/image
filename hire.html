@@ -139,15 +139,30 @@ body{background:var(--bg);color:var(--ink);font-family:'Pretendard',sans-serif;-
 .tl-place2.pl-magok{color:#4C6EF5}
 .tl-place2.pl-bucheon{color:#1D9E75}
 .tl-place2.pl-luone{color:#7048E8}
+.tl-place2.pl-mapo{color:#E8590C}
+.tl-place2.pl-gasan{color:#0B7285}
+.tl-place2.pl-bupyeong{color:#C2255C}
+.tl-place2.pl-suwon{color:#5C940D}
+.tl-place2.pl-etc{color:#868E96}
 /* 모바일 전용 지역칩 (헤더 우측) — PC 숨김 */
 .tl-region-m{display:none;font-size:10px;font-weight:800}
 .tl-region-m.pl-magok{color:#4C6EF5}
 .tl-region-m.pl-bucheon{color:#1D9E75}
 .tl-region-m.pl-luone{color:#7048E8}
+.tl-region-m.pl-mapo{color:#E8590C}
+.tl-region-m.pl-gasan{color:#0B7285}
+.tl-region-m.pl-bupyeong{color:#C2255C}
+.tl-region-m.pl-suwon{color:#5C940D}
+.tl-region-m.pl-etc{color:#868E96}
 /* [2026-09-10] 그룹 좌측 색띠 = 장소 구분 (본사 파랑 / 지사 초록·보라) */
 .tl-grp.bar-pl-magok{border-left:3px solid #4C6EF5;padding-left:9px}
 .tl-grp.bar-pl-bucheon{border-left:3px solid #1D9E75;padding-left:9px}
 .tl-grp.bar-pl-luone{border-left:3px solid #7048E8;padding-left:9px}
+.tl-grp.bar-pl-mapo{border-left:3px solid #E8590C;padding-left:9px}
+.tl-grp.bar-pl-gasan{border-left:3px solid #0B7285;padding-left:9px}
+.tl-grp.bar-pl-bupyeong{border-left:3px solid #C2255C;padding-left:9px}
+.tl-grp.bar-pl-suwon{border-left:3px solid #5C940D;padding-left:9px}
+.tl-grp.bar-pl-etc{border-left:3px solid #868E96;padding-left:9px}
 .tl-who.edu{color:#0B7A70;background:#D6F5F0}
 .tl-cnt{font-size:9px;font-weight:800;color:#fff;background:#4C6EF5;padding:2px 7px;border-radius:20px;margin-left:auto}
 .tl-card{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #E7ECF4;border-left:3px solid #CBD5E8;border-radius:8px;padding:8px 10px;margin-bottom:4px;cursor:pointer;transition:.12s}
@@ -489,7 +504,7 @@ body:has(#agate.hidden) #opsnav,body:has(#authGate.hidden) #opsnav,body:has(#sga
       <button class="cal-navbtn" onclick="calMove(1)">›</button>
     </div>
   </div>
-  <div class="cal-place-banner"><b style="color:#4C6EF5">● 마곡</b> 퀸즈파크10(강서구 마곡중앙6로 66, 414호) · <b style="color:#1D9E75">● 부천</b> 부천테크노밸리 U1센터 1820호 · <b style="color:#7048E8">● 루원</b> 인천 서구 봉오재3로 120 봄645 406호</div>
+  <div class="cal-place-banner"><b style="color:#E8590C">● 마포</b> 파인더마포 · <b style="color:#7048E8">● 루원</b> 인천 서구 봉오재3로 120 봄645 406호 · <b style="color:#1D9E75">● 부천</b> 부천테크노밸리 U1센터 1820호 · <b style="color:#0B7285">● 가산</b> 가산연합센터 · <b style="color:#C2255C">● 부평</b> 부평지점 · <b style="color:#5C940D">● 수원</b> 메이킷위드 수원</div>
   <div id="cal_grid"></div>
   <div class="cal-mob"><div class="cms-modetog" id="cms_modetog"><button class="cms-mt on" data-m="day" onclick="calSetMode('day')">일간</button><button class="cms-mt" data-m="week" onclick="calSetMode('week')">주간</button></div><div class="cms-strip" id="cms_strip"></div><div id="cms_body"></div></div>
   <div class="cal-swipe-hint" id="cal_hint"></div>
@@ -580,19 +595,42 @@ var PLACE_FULL='퀸즈파크10, 서울 강서구 마곡중앙6로 66, 414호';
 // [2026-09-10] 지사 자체면접 통합 — 지점별 면접장소 매핑 (사장님 조망용, 시간순 통합 + 장소배지)
 var JISA_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSUcPm-SYlCaeNj0i0PJoCVG5LufnlD8dC-UptL4LaEq1sJIEtdzipD8K5G8VaR4lNuesWWoxDhJTez/pub?output=csv";
 // 지점명(부분일치) → {short:배지, full:주소, cls:색}
-// ★ [2026-11-03] 마포연합센터 → '파인더마포'로 개명되면서 '파인더' 부분일치에 걸려
-//   루원(인천 봉오재3로)으로 잘못 찍히던 문제. not 조건으로 제외 → 개명 전과 동일하게 기본(마곡)으로 떨어짐.
-//   파인더마포 면접장소 주소 확정되면 아래에 { key:'파인더마포', ... } 한 줄 추가하면 됨.
+// ★★ [2026-11-11 전면수정] 각 지점이 자기 지점에서 면접을 본다 — 지점 = 면접장소.
+//   [이전 구조의 문제] 매핑에 루원·부천 둘만 있고 나머지는 전부 기본값 '마곡'으로 떨어졌다.
+//     11/3에 파인더마포를 not:'마포'로 제외하면서 마포까지 마곡행이 됐고, 그 결과
+//     ① 하지도 않는 마곡 면접이 있는 것처럼 보이고 ② 마포·가산·부평·수원 면접이 전부 사라졌다.
+//   [현재 체제] 마포=파인더마포 / 루원=파인더루원 / 부천=메이킷위드 부천 /
+//              가산=가산연합센터 / 부평=부평지점 / 수원=메이킷위드 수원.
+//              본사(마곡) 면접은 폐지 — 과거 데이터 표시용으로만 남긴다.
+//   ⚠️ 순서 중요: '마포'가 '파인더'보다, '수원'이 '메이킷'보다 위에 있어야 한다.
+//   ⚠️ foot/full이 빈 지점은 면접장소 주소가 아직 미등록 — 확보되면 그 줄만 채우면 된다.
 var PLACE_MAP = [
+  { key:'마포',   short:'마포', foot:'', full:'', cls:'pl-mapo' },
+  { key:'수원',   short:'수원', foot:'', full:'', cls:'pl-suwon' },
   { key:'파인더', not:'마포', short:'루원', foot:'봄645 406호', full:'인천 서구 봉오재3로 120 봄645 406호', cls:'pl-luone' },
-  { key:'메이킷',  short:'부천', foot:'U1센터 1820호', full:'경기 부천시 조마루로385번길 92 부천테크노밸리 U1센터 1820호', cls:'pl-bucheon' }
+  { key:'메이킷', not:'수원', short:'부천', foot:'U1센터 1820호', full:'경기 부천시 조마루로385번길 92 부천테크노밸리 U1센터 1820호', cls:'pl-bucheon' },
+  { key:'부천',   short:'부천', foot:'U1센터 1820호', full:'경기 부천시 조마루로385번길 92 부천테크노밸리 U1센터 1820호', cls:'pl-bucheon' },
+  { key:'가산',   short:'가산', foot:'', full:'', cls:'pl-gasan' },
+  { key:'부평',   short:'부평', foot:'', full:'', cls:'pl-bupyeong' },
+  { key:'마곡',   short:'마곡', foot:'퀸즈파크10', full:PLACE_FULL, cls:'pl-magok' }
 ];
-function placeOf(iv){
-  var g=String(iv.branch||iv.site||'');
+// 지점명·교육장소 텍스트 → 장소. 못 찾으면 null (호출부가 판단).
+function placeByText(txt){
+  var g=String(txt||'');
   for(var i=0;i<PLACE_MAP.length;i++){
     var P=PLACE_MAP[i];
     if(g.indexOf(P.key)>=0 && !(P.not && g.indexOf(P.not)>=0)) return P;
   }
+  return null;
+}
+function placeOf(iv){
+  var g=String(iv.branch||iv.site||'');
+  var P=placeByText(g);
+  if(P) return P;
+  // ★ 지점명은 있는데 매핑에 없는 경우 — 지점명 그대로 표기한다.
+  //   예전처럼 마곡으로 떨어뜨리면 없는 면접이 생겨버린다. 새 지점이 생기면 여기서 회색 배지로 눈에 띈다.
+  if(g) return { key:g, short:g.replace(/지점|연합센터|센터|연합/g,'').trim().slice(0,4)||g, foot:'', full:g, cls:'pl-etc' };
+  // branch 빈 값 = 본사 시트. 본사 면접은 폐지됐고 과거분만 마곡이다.
   return { key:'마곡', short:'마곡', foot:'퀸즈파크10', full:PLACE_FULL, cls:'pl-magok' };
 }
 function jobNorm(s){ s=String(s||''); if(s.indexOf('상담')>=0)return '상담부'; if(s.indexOf('사업')>=0)return '사업부'; if(s.indexOf('코칭')>=0)return '코칭'; if(s.indexOf('강사')>=0)return '강사'; return s||'기타'; }
@@ -872,7 +910,10 @@ function timelineGroupHtml(g){
   var whoBadge=g.who?'<span class="tl-who '+(isEdu?'edu':'')+'">'+esc(nameOnly(g.who))+'</span>':'';
   // 장소 색 + 지역명 + 방번호
   var grpCls='pl-magok', regionName='마곡';
-  if(isEdu){ var _e=g.eduPlace||''; if(_e.indexOf('부천')>=0||_e.indexOf('메이킷')>=0){grpCls='pl-bucheon';regionName='부천';} else if(_e.indexOf('루원')>=0||(_e.indexOf('파인더')>=0&&_e.indexOf('마포')<0)){grpCls='pl-luone';regionName='루원';} }
+  // ★ [2026-11-11] 교육장소도 PLACE_MAP 재사용 — 기존엔 부천·루원만 분기해서 마포·가산·부평·수원이 마곡으로 떨어졌다.
+  if(isEdu){ var _e=g.eduPlace||'';
+    var _ep=placeByText(_e) || (_e.indexOf('루원')>=0 ? placeByText('파인더루원') : null);
+    if(_ep){ grpCls=_ep.cls; regionName=_ep.short; } }
   else if(g.place){ grpCls=g.place.cls; regionName=g.place.short; }
   var room = isEdu ? _roomOf(g.eduPlace) : '';
   // 헤더 = 시간 + 딱지 + 진행자(이름만) + [모바일용 지역칩] + 인원
