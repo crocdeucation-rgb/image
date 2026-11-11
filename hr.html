@@ -436,16 +436,22 @@ function saupBranch(h){
 function coachGrp(x){ x=String(x||'').trim(); if(x==='A'||x==='B')return '팀'+x; if(x===''||x==='None'||x==='미구분')return '지원'; return x||'지원'; }
 
 // 로더: CSV텍스트 → emps[]
-function loadDept(csvText, grpfn, subcol){
+// ★★ [2026-11-11] fillDown — 분류 칸이 '병합 스타일'인 시트 대응.
+//   운영센터(수업) 인사기록은 과목 칸이 각 그룹 첫 줄에만 있고 나머지는 빈칸이다.
+//   그대로 읽으면 과목별 1명씩만 잡히고 나머지가 전부 '미구분'으로 떨어진다.
+//   (실측 2026-11-11: 41명 중 35명이 미구분. 국어·영어·사회·수학/과학·특강·내근 각 1명씩만 분류)
+//   → 빈칸이면 바로 위 행의 값을 물려받는다. 분류 칸이 실제로 비어도 되는 시트에는 켜지 말 것.
+function loadDept(csvText, grpfn, subcol, fillDown){
   var rows=parseCSV(csvText);
   var H=rows[1]; var idx={};
   H.forEach(function(h,i){ h=String(h||'').trim(); if(h)idx[h]=i; });
-  var out=[];
+  var out=[], _lastSub='';
   for(var r=2;r<rows.length;r++){
     var row=rows[r];
     var nm=String(row[idx['이름']]||'').trim();
     if(!nm)continue;
     var sub=(subcol in idx)?String(row[idx[subcol]]||'').trim():'전체';
+    if(fillDown){ if(sub) _lastSub=sub; else sub=_lastSub; }
     var rank=('직급' in idx)?String(row[idx['직급']]||'').trim():'';
     var note=('특이사항' in idx)?String(row[idx['특이사항']]||'').trim():'';
     var school=('학교' in idx)?String(row[idx['학교']]||'').trim():'';
@@ -630,7 +636,7 @@ function makeSalesFn(recs){
 var SSAM_PHOTO_BASE='https://crocdeucation-rgb.github.io/image/report/ssam/';
 var SSAM_ROMAJA={'안중현':'anjunghyeon','최정민':'choejeongmin'};
 function ssamPhotoUrl(name){return SSAM_ROMAJA[name]?(SSAM_PHOTO_BASE+SSAM_ROMAJA[name]+'.jpg'):'';}
-const ORDER={"상담부":["가산연합센터","마곡지점","마포연합센터","파인더마포","메이킷위드","메이킷위드 부천","부평지점","수원지점","메이킷위드 수원","파인더루원","스카이에듀"],"사업부":["수호에듀","오름에듀","더온에듀","웹마케팅","인투수도권1팀","인투수도권2팀","인투수도권3팀","인투경상팀","인투충청전라팀","지니스터디","본사"],"수업강사":["국어","영어","수학","사회","과학","역사","미술","코딩","위드온","필기방","사무보조"],"코칭코치":["팀A","팀B","지원"],"쌤이다":[]}, LEAD={"메이킷위드":"지사장 장윤호","메이킷위드 부천":"지사장 장윤호","메이킷위드 수원":"지사장 장윤호","파인더루원":"지사장 김원득","부평지점":"지점장 우혜림","마곡지점":"지점장 김슬기","수원지점":"김우진 대리","가산연합센터":"장윤호·우혜림","마포연합센터":"부지사장 김원득·노영호","팀A":"정나영 본부장","팀B":"장영주 과장","지원":"출석체크·개통 A/S"};
+const ORDER={"상담부":["가산연합센터","마곡지점","마포연합센터","파인더마포","메이킷위드","메이킷위드 부천","부평지점","수원지점","메이킷위드 수원","파인더루원","스카이에듀"],"사업부":["수호에듀","오름에듀","더온에듀","웹마케팅","인투수도권1팀","인투수도권2팀","인투수도권3팀","인투경상팀","인투충청전라팀","지니스터디","본사"],"수업강사":["국어","영어","수학/과학","사회","특강","내근","수학","과학","역사","미술","코딩","위드온","필기방","사무보조"],"코칭코치":["팀A","팀B","지원"],"쌤이다":[]}, LEAD={"메이킷위드":"지사장 장윤호","메이킷위드 부천":"지사장 장윤호","메이킷위드 수원":"지사장 장윤호","파인더루원":"지사장 김원득","부평지점":"지점장 우혜림","마곡지점":"지점장 김슬기","수원지점":"김우진 대리","가산연합센터":"장윤호·우혜림","마포연합센터":"부지사장 김원득·노영호","팀A":"정나영 본부장","팀B":"장영주 과장","지원":"출석체크·개통 A/S"};
 var HR_URLS={
   sangdam:"https://docs.google.com/spreadsheets/d/e/2PACX-1vQsnuROsI7L8HP80yoRQCuaAkcoPnVcK9TY1U2Z-B8AVHmz_Y7rO4_aUBLsgu91bJGj63xJFmNrnPaJ/pub?gid=120536013&single=true&output=csv",
   saup:"https://docs.google.com/spreadsheets/d/e/2PACX-1vTOyHCwLPcRpL2wumHbbZCSuzSZJJw7zaGeARW2I9JjWbX-lA0Uf6mVO5n4JHIKfaAzeSrOFEvjvdKi/pub?gid=1502260628&single=true&output=csv",
@@ -719,7 +725,7 @@ async function loadHR(){
       '상담부':loadDept(res2[0],h2branch,'부서명'),
       '사업부':loadDept(res2[1],saupBranch,'부서명'),
       '코칭코치':loadDept(res2[2],coachGrp,'팀'),
-      '수업강사':loadDept(res2[3],function(x){return x||'미구분';},'과목'),
+      '수업강사':loadDept(res2[3],function(x){return x||'미구분';},'과목',true),   // ★ 과목 칸 병합 스타일 → 내림채움
       '쌤이다':loadDept(res2[4],function(x){return x||'전체';},'과목')
     };
     DEPT_EMPS=depts; SALES_FN=salesFn;        // ★ 연도 전환 시 재계산용 보관
