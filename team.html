@@ -111,7 +111,7 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 .wk td.nm{text-align:left;padding-left:14px;white-space:nowrap;font-weight:800}
 .wk tr:last-child td{border-bottom:none}
 
-/* 10월 공지 박스 */
+/* 업무 시스템 공지 박스 */
 .notice-oct{font-size:12px;line-height:1.75;opacity:.96;word-break:keep-all;overflow-wrap:break-word}
 .notice-oct b.y{color:#ffd966}
 .fee-mini{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
@@ -196,7 +196,7 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
 
     <div class="card colwrap" style="flex:1;min-height:0;gap:0">
       <div class="ch">
-        <span class="t">🏆 10월 그로스팀 순위 <span style="font-size:10px;font-weight:600;color:#8b93a2">순위=매출순 · 건당 수수료</span></span>
+        <span class="t">🏆 <span id="m-rank">이번달</span> 그로스팀 순위 <span style="font-size:10px;font-weight:600;color:#8b93a2">순위=매출순 · 건당 수수료</span></span>
         <span class="tabs sp" id="pf-tabs">
           <span class="tab on" onclick="setPerfTab(0)">이번달</span>
           <span class="tab" onclick="setPerfTab(1)">지난달</span>
@@ -216,7 +216,7 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
     </div>
   </div>
 
-  <!-- 가운데: 지금 챙길 리드 + 10월 공지 -->
+  <!-- 가운데: 지금 챙길 리드 + 업무 시스템 공지 -->
   <div class="mid sec">
     <div class="card colwrap" style="flex:1;min-height:0;gap:0">
       <div class="ch"><span class="t">📋 지금 챙길 리드</span><span class="badge sp">실시간</span></div>
@@ -225,7 +225,7 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
     <div class="card" style="position:relative;overflow:hidden;background:linear-gradient(135deg,#0f1830,#1e2d4f);color:#fff;padding:20px 22px">
       <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 75% 25%, rgba(70,110,200,.28), transparent 58%),radial-gradient(ellipse at 15% 85%, rgba(30,50,90,.3), transparent 55%);opacity:.7;pointer-events:none"></div>
       <div style="position:relative;z-index:1">
-      <div style="font-weight:800;font-size:15px;margin-bottom:12px;letter-spacing:-.3px">🎯 10월 업무 시스템 <span style="opacity:.65;font-weight:600;font-size:12px">· 숫자가 전부다</span></div>
+      <div style="font-weight:800;font-size:15px;margin-bottom:12px;letter-spacing:-.3px">🎯 <span id="m-notice">이번달</span> 업무 시스템 <span style="opacity:.65;font-weight:600;font-size:12px">· 숫자가 전부다</span></div>
       <div class="notice-oct">
         <b class="y">1. 신규 DB 자동배정 복귀</b><br>
         · 유입 즉시 순차로 담당 자동 지정<br><br>
@@ -250,7 +250,7 @@ body{background:var(--bg);color:var(--ink);padding:14px 16px;font-feature-settin
     <a href="https://github.com/crocdeucation-rgb/image/blob/main/KakaoTalk_20261003_135501433.png?raw=true" target="_blank"
        style="display:block;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.12);border:1px solid var(--border,#e2e6ef);margin-bottom:14px">
       <img src="https://github.com/crocdeucation-rgb/image/blob/main/KakaoTalk_20261003_135501433.png?raw=true"
-           alt="그로스팀 10월" style="width:100%;height:auto;display:block" />
+           alt="그로스팀 시상 포스터" style="width:100%;height:auto;display:block" />
     </a>
     <div style="display:flex;flex-direction:column;gap:10px">
       <a href="https://drive.google.com/drive/folders/1QpRfhW4EbVv62nPqspYWfZd-ZyIl0qcT?usp=sharing" target="_blank"
@@ -504,6 +504,14 @@ function renderPerf(){
   var _hw=document.getElementById('heat-wrap'); if(_hw) _hw.innerHTML=ht;
 }
 
+// ★★ [2026-11-11] 월 라벨 자동 롤오버 — 매달 손으로 '10월→11월' 고치던 것 제거.
+//   순위 카드·업무 시스템 공지 제목이 현재 월을 따라간다. 규정(수수료·재분배)은 월과 무관하게 동일.
+//   ⚠️ 시상 포스터 이미지는 월별 파일이라 자동이 안 됨 — 새 포스터 올리면 img src를 바꿔야 한다.
+function paintMonthLabels(){
+  var t=(new Date().getMonth()+1)+'월';
+  ['m-rank','m-notice'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent=t; });
+}
+paintMonthLabels();
 loadAll();
 setInterval(loadAll,5*60*1000);
 </script>
