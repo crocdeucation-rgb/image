@@ -312,6 +312,7 @@ a.visit-name:hover { text-decoration: underline; color: #1a73e8; }
 .visit-assignee.won { background: #b45309; }
 .visit-assignee.ahn { background: #4338ca; }
 .visit-assignee.seul { background: #db2777; }
+.visit-assignee.seo { background: #65a30d; }
 .visit-empty { padding: 20px; text-align: center; color: #aaa; font-size: 12px; }
   .crate { font-size:10px; margin-top:3px; font-weight:600; }
   .route-eff { font-size:9px; margin-top:2px; color:#556; font-weight:600; letter-spacing:-0.2px; }
@@ -737,7 +738,7 @@ const SCHEDULE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCsXJ
     const LEDGER_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTBUBxnTPPn_AebCqxIC8Q2x-5V3VuvIY6MM6QlgKVUUA7Bbjh3jMO7q6i4sDgQse-UKsNGe5Hxt7QF/pub?gid=431762866&single=true&output=csv';
     const CANCEL_CSV_URL = 'https://docs.google.com/spreadsheets/d/1lfvUHZcm58JX_dVEkj-5jGEf16W1__w90HUwSWd2IGU/gviz/tq?tqx=out:csv&headers=0&gid=431762866';
 
-const ASSIGNEES = ['우혜림','김윤호','장윤호','박창건','김태석','노영호','김원득','김우진','안준섭','김주환','김슬기'];
+const ASSIGNEES = ['우혜림','김윤호','장윤호','박창건','김태석','노영호','김원득','김우진','안준섭','김주환','김슬기','서경윤'];   // [2026-11-17] 서경윤 추가 — GAS getLeadStats ASSIGNEES와 순서 동일 유지
 // ★★ [2026-11-03] 배정 제외 발효월 — 그 달부터 담당자 목록·배정표에서 뺀다. 이전 달 탭은 그대로 보존.
 //   전체 탭은 과거가 섞여 있으므로 제외하지 않는다.
 //   [2026-11-04] 요청에 따라 HIDE → DROP(완전 제거)로 변경. 이들 수치는 담당자별 합계에서도 빠진다.
@@ -2147,7 +2148,7 @@ async function loadSchedule() {
       const isToday = dStr === todayStr;
       const dateStr = (d.getMonth()+1) + '/' + d.getDate() + ' (' + dayNames[d.getDay()] + ')';
       const assignee = canonNm(r[6] || '');
-      const cmap = { '우혜림':'hye','김윤호':'kim','장윤호':'jang','박창건':'park','김우진':'woo','김태석':'tae','김성윤':'sung','노영호':'noh','김원득':'won','안준섭':'ahn','김슬기':'seul' };
+      const cmap = { '우혜림':'hye','김윤호':'kim','장윤호':'jang','박창건':'park','김우진':'woo','김태석':'tae','김성윤':'sung','노영호':'noh','김원득':'won','안준섭':'ahn','김슬기':'seul','서경윤':'seo' };
       const assigneeClass = 'visit-assignee ' + (cmap[assignee] || '');
       const assigneeHtml = assignee ? `<span class="${assigneeClass}">${escapeHtml(assignee)}</span>` : '';
       const pageId = (r[7] || '').replace(/-/g, '');
