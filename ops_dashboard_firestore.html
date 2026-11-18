@@ -1205,7 +1205,9 @@ body.gate-hasbar{padding-top:34px}
       if(window.__bootOps) window.__bootOps();
     }catch(e){
       if(String(e&&e.code||e).indexOf('permission')>=0){ /* 아직 로그인 전 — auth 콜백에서 재시도 */ return; }
-      showMsg('데이터를 불러오지 못했습니다.', (e&&e.message)||e);
+      // [2026-11-18] 진단: 어느 줄에서 터졌는지 스택 상위 3줄 같이 표시
+      var _st=String((e&&e.stack)||'').split('\n').slice(1,4).map(function(l){return l.trim().replace(/^at\s+/,'').replace(/https?:\/\/[^\s)]*\//g,'').replace(/[<>&]/g,'');}).join('<br>');
+      showMsg('데이터를 불러오지 못했습니다.', ((e&&e.message)||e)+(_st?'<br><span style="font:500 11px monospace;color:#B0B8C4">'+_st+'</span>':''));
     }
   }
   // gate.js가 firebase 초기화·로그인 처리 → 인증(권한통과) 시점에 읽는다.
