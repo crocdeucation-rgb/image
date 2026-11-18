@@ -1725,6 +1725,10 @@ function guardBox(){
   var msSet={}; IB.forEach(function(m){var mm=(m.recv||'').slice(0,7); if(mm>='2026-05')msSet[mm]=1;});
   var ms=Object.keys(msSet).sort();
   // [2026-10-22] 월 토글 제거 — 표·KPI는 이달 고정, 월별 수치는 각 행 월별 금액·상세의 월 섹션에 상시 노출
+  // [2026-11-18] 민원 월이 하나도 없으면 G=undefined → .slice 크래시로 대시보드 전체가 죽던 문제 방지
+  if(!ms.length){ var _n=(D.inbox||[]).length, _r=((D.inbox||[])[0]||{}).recv;
+    return zone('guard','var(--pos)','사업부·지점·상담별 현황','데이터 없음','',
+     '<div class="lead">표시할 민원(취소문의) 데이터가 없습니다. 전체 민원 '+_n+'건 · 필터 후 '+IB.length+'건'+(_n?' · 첫 행 접수일 값: <b>'+esc(String(_r))+'</b> (2026-05 이후 YYYY-MM-DD 형식이어야 집계됨)':' — opsPush가 민원 시트를 못 읽었을 가능성')+'</div>',true); }
   var G=ms[ms.length-1], ALL=false;
   var prev=null; if(!ALL){var gi=ms.indexOf(G); prev=gi>0?ms[gi-1]:null;}
   // 집계: 월필터(null=전체) → {그룹: {mw,keep,drop,dang,ing}}  / 전사합도
