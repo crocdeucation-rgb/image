@@ -456,35 +456,58 @@ details.collapsible[open]>summary .fold-hint{display:none}
 #gd-body td,#md-body td,#fd-body td{padding:7px 5px;text-align:right;border-bottom:1px solid #f5f5f5}
 #gd-body td:first-child,#md-body td:first-child,#fd-body td:first-child{text-align:left;font-weight:600}
 #gd-body tr.tot td,#md-body tr.tot td,#fd-body tr.tot td{font-weight:800;border-top:1px solid #e5e7eb}
-/* ★ [2026-11-23] 쌤이다 퍼널 — 별도 광고계정, 담당자 없음. layout 전체폭 */
+/* ★ [2026-11-23 v2] 쌤이다 퍼널 — 확정 구간 vs 오늘 분리 · 그래프·막대·카드. layout 전체폭 */
 #sec4{grid-column:1/-1;margin-top:6px}
-.sec-title.teal{border-bottom:2px solid #0e9c8a}
-#sec4 .ss-sub{font-size:10.5px;color:#94a3b8;font-weight:600;margin-left:6px}
-#sec4 .section-label{border-left-color:#0e9c8a}
-#sec4 .grid-6{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
-#sec4 .ss-cols{display:grid;grid-template-columns:1.25fr 1fr .8fr;gap:14px}
-#sec4 table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #eee;border-radius:8px;overflow:hidden;font-size:11px}
-#sec4 th{background:#effaf8;color:#0e7490;font-weight:700;padding:6px 5px;text-align:center;white-space:nowrap}
-#sec4 td{padding:6px 5px;border-top:1px solid #f1f5f9;text-align:center;white-space:nowrap}
-#sec4 td:first-child,#sec4 th:first-child{text-align:left;padding-left:8px}
-#sec4 tr.tot td{font-weight:800;background:#f8fafc}
-#sec4 tr.zero td{color:#b6bfcc}
-#sec4 .na{color:#cbd5e1}
-#sec4 .st{display:inline-block;font-size:9px;font-weight:800;border-radius:6px;padding:1px 5px;margin-right:4px}
-#sec4 .st.on{color:#0f9d58;background:#e8f5ee}#sec4 .st.off{color:#94a3b8;background:#f1f5f9}
-#sec4 .gbar{display:flex;align-items:center;gap:6px;margin:5px 0;font-size:11px}
-#sec4 .gbar .l{width:40px;color:#475569;font-weight:700;word-break:keep-all}
-#sec4 .gbar .b{flex:1;background:#eef2f7;border-radius:4px;height:14px;overflow:hidden}
-#sec4 .gbar .b i{display:block;height:100%;background:#0e9c8a}
-#sec4 .gbar .n{width:76px;text-align:right;color:#334155;font-weight:700;white-space:nowrap}
-#sec4 .ss-memo{font-size:10px;color:#94a3b8;line-height:1.7;margin-top:8px;padding-left:9px}
-#sec4 .ss-memo b{color:#64748b}
-#sec4 details.ss-fold summary{cursor:pointer;font-size:10.5px;color:#64748b;font-weight:700;padding:5px 2px}
-#sec4 .ss-tg{display:inline-flex;gap:3px;margin-left:auto}
-#sec4 .ss-tg button{font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid #ddd;background:#fff;color:#64748b;cursor:pointer}
-#sec4 .ss-tg button.on{background:#0e9c8a;border-color:#0e9c8a;color:#fff}
-@media(max-width:1100px){#sec4 .ss-cols{grid-template-columns:1fr}#sec4 .grid-6{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:700px){#sec4 .tbl-scroll table{min-width:520px}#sec4 .ss-sub{display:block;margin:2px 0 0}}
+.sec-title.teal{border-bottom:2px solid #0e9c8a;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+#sec4 .ss-sub{font-size:10.5px;color:#94a3b8;font-weight:600}
+#sec4 .ss-chip{margin-left:auto;font-size:10px;font-weight:800;color:#0e7490;background:#e6f7f5;border-radius:10px;padding:3px 9px}
+#sec4 .ss-card{background:#fff;border:1px solid #e8edf3;border-radius:12px;padding:13px 15px;min-width:0}
+#sec4 .ss-lbl{font-size:12.5px;font-weight:800;display:flex;align-items:center;gap:6px;margin-bottom:9px;flex-wrap:wrap}
+#sec4 .ss-lbl .s{font-size:10px;font-weight:600;color:#94a3b8}
+#sec4 .ss-k{font-size:10px;color:#64748b;font-weight:700}
+#sec4 .ss-big{font-size:24px;font-weight:900;letter-spacing:-.8px;white-space:nowrap}
+#sec4 .ss-big small{font-size:12px;font-weight:700;color:#64748b;margin-left:2px}
+#sec4 .ss-tag{display:inline-block;font-size:10px;font-weight:800;border-radius:8px;padding:2px 8px}
+#sec4 .ss-tag.ok{background:#e6f7f5;color:#0e7490}#sec4 .ss-tag.live{background:#fff3e0;color:#e65100}
+#sec4 .ss-r1{display:grid;grid-template-columns:1.7fr 1fr;gap:12px;margin-bottom:12px}
+#sec4 .ss-conf{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+#sec4 .ss-conf>div{border-left:3px solid #0e9c8a;padding-left:10px;min-width:0}
+#sec4 .ss-today{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#sec4 .ss-pend{font-size:12px;color:#94a3b8;font-weight:700;margin-top:5px}
+#sec4 .ss-foot{font-size:10.5px;color:#64748b;margin-top:10px;padding-top:8px;border-top:1px dashed #e5e7eb}
+#sec4 .ss-foot b{color:#0f172a}
+#sec4 .ss-r2,#sec4 .ss-r3{display:grid;grid-template-columns:1.25fr 1fr;gap:12px;margin-bottom:12px}
+#sec4 .ss-legend{display:flex;gap:10px;font-size:10px;color:#64748b;margin-left:auto}
+#sec4 .ss-legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:3px}
+#sec4 .ss-rt,#sec4 .ss-rh{display:grid;grid-template-columns:minmax(110px,1.1fr) 1fr 50px 80px 70px;gap:8px;align-items:center}
+#sec4 .ss-rh{font-size:9.5px;color:#94a3b8;font-weight:700;padding-bottom:4px}
+#sec4 .ss-rh span:nth-child(n+3),#sec4 .ss-rt>span:nth-child(n+3){text-align:right}
+#sec4 .ss-rt{padding:8px 0;border-top:1px solid #f1f5f9;font-size:11.5px}
+#sec4 .ss-rt .nm b{display:block;font-size:12px;word-break:keep-all}#sec4 .ss-rt .nm i{font-style:normal;font-size:9.5px;color:#94a3b8}
+#sec4 .ss-bar{height:11px;background:#eef2f7;border-radius:6px;overflow:hidden}#sec4 .ss-bar i{display:block;height:100%;background:#0e9c8a;border-radius:6px}
+#sec4 .ss-rt.zero{color:#94a3b8}
+#sec4 .ss-conv{margin-top:10px;font-size:10.5px;color:#64748b;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:8px;padding:6px 10px}
+#sec4 .ss-adw{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+#sec4 .ss-ad{border:1px solid #e8edf3;border-radius:10px;padding:9px 11px;min-width:0}
+#sec4 .ss-ad .nm{font-size:12px;font-weight:800;word-break:break-all}
+#sec4 .ss-ad .set{font-size:9.5px;color:#94a3b8;margin-bottom:6px}
+#sec4 .ss-ad .ld{font-size:20px;font-weight:900;color:#0e9c8a}#sec4 .ss-ad .ld small{font-size:10.5px;color:#64748b}
+#sec4 .ss-ad .m{display:grid;grid-template-columns:auto 1fr;gap:2px 8px;font-size:10px;color:#64748b;margin-top:5px}
+#sec4 .ss-ad .m b{color:#0f172a;font-weight:700;text-align:right}
+#sec4 .ss-zt{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+#sec4 .ss-zt b{font-size:17px}
+#sec4 .ss-zr{display:grid;grid-template-columns:1fr 74px 56px;gap:6px;padding:5px 0;border-top:1px solid #f1f5f9;align-items:center;font-size:11px}
+#sec4 .ss-zr span:nth-child(2){text-align:right}
+#sec4 .ss-zr .mini{height:6px;background:#eef2f7;border-radius:3px;overflow:hidden}#sec4 .ss-zr .mini i{display:block;height:100%;background:#94a3b8}
+#sec4 .ss-r4{display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:12px}
+#sec4 .ss-stack{display:flex;height:22px;border-radius:6px;overflow:hidden;font-size:10px;font-weight:800;color:#fff;background:#eef2f7}
+#sec4 .ss-stack div{display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden}
+#sec4 .ss-memo{font-size:10px;color:#64748b;line-height:1.75}
+#sec4 .ss-memo b{color:#334155}
+#sec4 .ss-empty{color:#94a3b8;font-size:11.5px;text-align:center;padding:14px}
+@media(max-width:1100px){#sec4 .ss-r1,#sec4 .ss-r2,#sec4 .ss-r3{grid-template-columns:1fr}#sec4 .ss-r4{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){#sec4 .ss-conf{grid-template-columns:1fr 1fr 1fr;gap:6px}#sec4 .ss-big{font-size:17px}#sec4 .ss-adw{grid-template-columns:1fr}#sec4 .ss-r4{grid-template-columns:1fr}
+  #sec4 .ss-rt,#sec4 .ss-rh{grid-template-columns:minmax(90px,1fr) 60px 36px 64px 56px;gap:5px}#sec4 .ss-chip{margin-left:0}}
 /* 표 min-content 때문에 열이 화면 밖으로 밀리던 것 방지 (표는 자체 가로스크롤) */
 .layout > .section { min-width: 0; }
 /* ★ [2026-11-23] 폴드·태블릿 가로(701~1100px) — B안: 우측 열(날짜별 유입·타겟 적합도·방문)을 맨 위 가로 띠로.
@@ -729,32 +752,33 @@ details.collapsible[open]>summary .fold-hint{display:none}
 </div>
 </div>
 
-<!-- ★ [2026-11-23] 섹션4: 쌤이다 퍼널 — 별도 광고계정·담당자 없음. 데이터: execData/dash-ssamida (대쉬보드 GAS ssamidaPush) -->
+<!-- ★ [2026-11-23 v2] 섹션4: 쌤이다 퍼널 — 별도 광고계정·담당자 없음. 데이터: execData/dash-ssamida (데일리 실적 GAS ssamidaPush) -->
 <div class="section" id="sec4">
-<div class="sec-title teal">쌤이다 퍼널 <span class="ss-sub">별도 광고계정 1841543493568221 · 담당자 배정 없음 · 기간 토글 연동</span></div>
-<div class="section-label" style="margin-top:0">요약 <span class="badge today" id="ss-tab-label">이번달</span><span class="asof-badge" style="background:#0891b2" id="ss-asof">불러오는 중</span></div>
-<div class="grid-6" id="ss-kpi"></div>
-<div class="ss-cols">
-  <div>
-    <div class="section-label">유입경로 <span class="badge">광고세트·폼별</span></div>
-    <div class="tbl-scroll"><table><thead><tr><th>유입경로</th><th>폼</th><th>리드</th><th>광고비</th><th>CPL</th><th>매출</th><th>ROAS</th></tr></thead><tbody id="ss-route"></tbody></table></div>
-    <div class="section-label">소재별 <span class="badge">광고비순</span></div>
-    <div class="tbl-scroll"><table><thead><tr><th>소재</th><th>광고비</th><th>노출</th><th>CTR</th><th>CPM</th><th>리드</th><th>CPL</th></tr></thead><tbody id="ss-ad"></tbody></table></div>
-    <div id="ss-ad-more"></div>
-  </div>
-  <div>
-    <div class="section-label">일별 광고비·리드 <span class="ss-tg" id="ss-dtg"><button class="on" onclick="setSsDay('week')">7일</button><button onclick="setSsDay('period')">기간 전체</button></span></div>
-    <div class="tbl-scroll"><table><thead><tr><th>날짜</th><th>광고비</th><th>리드</th><th>CPL</th></tr></thead><tbody id="ss-day"></tbody></table></div>
-    <div class="ss-memo">· 리드 날짜 = 한국시간 · CPL = 광고비 집계일까지 유입 기준</div>
-  </div>
-  <div>
-    <div class="section-label">학년 분포</div><div id="ss-grade"></div>
-    <div class="section-label">매체</div><div id="ss-plat"></div>
-    <div class="ss-memo"><b>집계 기준</b><br>· 리드 = 폼 들어온 건 전부 (결번·이름 미기재 포함)<br>· 메타 테스트 리드·내부 QA(test/테스트)만 제외<br>· 같은 리드ID 여러 탭 중복 = 1건<br>· 광고비 = 메타 실측 (쌤이다 광고계정)<br>· 전환(상담·매출·ROAS) = 어드민 연결 후 표시 (노션 미사용)<br><span id="ss-phq"></span></div>
-  </div>
+<div class="sec-title teal">쌤이다 퍼널 <span class="ss-sub" id="ss-start">별도 광고계정 · 담당자 배정 없음 · 기간 토글 연동</span><span class="ss-chip" id="ss-asof">불러오는 중</span></div>
+<div class="ss-r1">
+  <div class="ss-card"><div class="ss-lbl"><span class="ss-tag ok">확정 구간</span><span id="ss-conf-range">-</span><span class="s">광고비·리드 둘 다 집계 끝난 날짜만</span></div>
+    <div class="ss-conf" id="ss-conf"></div><div class="ss-foot" id="ss-conf-foot"></div></div>
+  <div class="ss-card"><div class="ss-lbl"><span class="ss-tag live">오늘 · 진행 중</span><span id="ss-today-d">-</span></div>
+    <div class="ss-today" id="ss-today"></div><div class="ss-foot" id="ss-today-foot"></div></div>
+</div>
+<div class="ss-r2">
+  <div class="ss-card"><div class="ss-lbl">일별 흐름 <span class="s">막대 = 리드 · 선 = 광고비 (최근 14일)</span><span class="ss-legend"><span><i style="background:#0e9c8a"></i>리드</span><span><i style="background:#f59e0b"></i>광고비</span></span></div>
+    <div id="ss-chart"></div></div>
+  <div class="ss-card"><div class="ss-lbl">어디로 들어왔나 <span class="s" id="ss-route-s">광고세트·폼별</span></div>
+    <div class="ss-rh"><span>유입경로</span><span>리드 비중</span><span>리드</span><span>광고비</span><span>1건당</span></div>
+    <div id="ss-route"></div>
+    <div class="ss-conv">상담·매출·ROAS → <b>어드민 연결 후 이 자리에 붙음</b> (리드마다 어드민 문의번호 저장 중)</div></div>
+</div>
+<div class="ss-r3">
+  <div class="ss-card"><div class="ss-lbl">리드가 나온 소재 <span class="s" id="ss-adw-s"></span></div><div class="ss-adw" id="ss-adw"></div></div>
+  <div class="ss-card"><div class="ss-zt"><span class="ss-lbl" style="margin:0">리드 0건 · 광고비만 나간 소재 <span class="s" id="ss-z-s"></span></span><b id="ss-z-tot"></b></div><div id="ss-z"></div></div>
+</div>
+<div class="ss-r4">
+  <div class="ss-card"><div class="ss-lbl">학년 <span class="s" id="ss-g-s"></span></div><div id="ss-grade"></div></div>
+  <div class="ss-card"><div class="ss-lbl">매체</div><div id="ss-plat"></div></div>
+  <div class="ss-card"><div class="ss-lbl">집계 기준</div><div class="ss-memo">· 리드 = 폼 들어온 건 전부 (결번·이름 미기재 포함)<span id="ss-phq"></span><br>· 메타 테스트·내부 QA만 제외 · 같은 리드 ID 중복 = 1건<br>· <b>1건당 비용 = 광고비 집계일까지 들어온 리드로만 계산</b> (오늘 리드는 광고비 반영 후 포함)<br>· 광고비 = 메타 쌤이다 광고계정 · 기간 토글(이번달/지난달/전체) 연동</div></div>
 </div>
 </div>
-
 </div>
 
 <script>
@@ -1715,121 +1739,157 @@ function setPeriodAll(idx){
 }
 
 // ════════════════════════════════════════════
-// ★ [2026-11-23] 쌤이다 퍼널 — execData/dash-ssamida (대쉬보드 GAS ssamidaPush, 1시간 주기)
+// ★ [2026-11-23 v2] 쌤이다 퍼널 — execData/dash-ssamida (데일리 실적 GAS ssamidaPush, 1시간 주기)
 //   리드: 쌤이다 리드시트 전 탭(메타폼 F1~F4 + 메인랜딩 설문). 결번 포함 전부 카운트, 테스트만 제외.
-//   광고비: 메타 쌤이다 광고계정 소재×일별 실측. 기간 = 전역 토글(routeTab) 연동.
+//   광고비: 메타 쌤이다 광고계정 소재×일별 (토큰 전까지 GAS 수동입력). 기간 = 전역 토글(routeTab) 연동.
+//   화면 원칙: 광고비 집계 끝난 날(확정 구간)과 오늘(진행 중)을 분리 — CPL은 확정 구간 리드로만.
 // ════════════════════════════════════════════
-var _ssam = null, _ssDay = 'week';
+var _ssam = null;
 async function loadSsamida(){
   try{ _ssam = await _fsGet('execData','dash-ssamida'); }
   catch(e){ _ssam = null; }
   renderSsamida();
 }
-function setSsDay(v){
-  _ssDay = v;
-  document.querySelectorAll('#ss-dtg button').forEach(function(b,i){ b.classList.toggle('on', (i===0)===(v==='week')); });
-  renderSsamida();
-}
 function _ssWon(n){ n=Math.round(Number(n)||0); return n.toLocaleString('ko-KR'); }
-function _ssCpl(sp,ld){ return (ld>0 && sp>0) ? _ssWon(sp/ld) : '<span class="na">—</span>'; }
+function _ssMd(d){ return d ? String(d).slice(5).replace('-','/') : ''; }
 function _ssPeriod(){
   var now=new Date(), p=function(n){return String(n).padStart(2,'0');};
   var rt=(typeof routeTab!=='undefined')?routeTab:0;
   if(rt===2) return {fn:function(){return true;}, label:'전체'};
   var d=new Date(now.getFullYear(), now.getMonth()-(rt===1?1:0), 1);
   var mk=d.getFullYear()+'-'+p(d.getMonth()+1);
-  return {fn:function(day){ return String(day||'').indexOf(mk)===0; }, label: rt===1?'지난달':'이번달', mk:mk};
+  return {fn:function(day){ return String(day||'').indexOf(mk)===0; }, label: rt===1?'지난달':'이번달'};
 }
+function _ssEl(id){ return document.getElementById(id); }
 function renderSsamida(){
-  var kpi=document.getElementById('ss-kpi'); if(!kpi) return;
+  if(!_ssEl('ss-conf')) return;
   var P=_ssPeriod(), D=_ssam;
-  document.getElementById('ss-tab-label').textContent=P.label;
-  var asof=document.getElementById('ss-asof');
   if(!D){
-    asof.textContent='데이터 없음';
-    kpi.innerHTML='<div class="card" style="grid-column:1/-1;color:#94a3b8;font-size:12px">쌤이다 데이터 없음 — 대쉬보드 GAS에서 ssamidaPush 실행 필요 (execData/dash-ssamida)</div>';
-    ['ss-route','ss-ad','ss-day'].forEach(function(id){ document.getElementById(id).innerHTML=''; });
+    _ssEl('ss-asof').textContent='데이터 없음';
+    _ssEl('ss-conf').innerHTML='<div class="ss-empty" style="grid-column:1/-1">쌤이다 데이터 없음 — 데일리 실적 GAS에서 ssamidaPush 실행 필요</div>';
     return;
   }
-  // ★ 광고비 집계 끝날짜 — CPL은 이 날짜까지 유입만으로 계산 (아라 본사 퍼널과 같은 기준)
-  var spUntil=(D.spend||[]).reduce(function(m,x){return x.d>m?x.d:m;},'');
-  var _md=function(d){return d?String(d).slice(5).replace('-','/'):'';};
-  asof.textContent='유입 '+_md((D.asof||'').slice(0,10))+' '+(D.asof||'').slice(11)+' · 광고비 '+(D.spendManual?'수동입력 ':'')+(spUntil?_md(spUntil)+'까지':'없음')+(D.spendErr?' · 광고비 오류':'');
   var _p=function(n){return String(n).padStart(2,'0');}, _n=new Date();
   var today=_n.getFullYear()+'-'+_p(_n.getMonth()+1)+'-'+_p(_n.getDate());
-  var L=(D.leads||[]).filter(function(x){return P.fn(x.d);});
-  var S=(D.spend||[]).filter(function(x){return P.fn(x.d);});
-  var spTot=S.reduce(function(a,x){return a+(x.sp||0);},0);
-  var inCut=function(x){ return !spUntil || x.d<=spUntil; };
+  var yd=new Date(_n.getFullYear(),_n.getMonth(),_n.getDate()-1), yday=yd.getFullYear()+'-'+_p(yd.getMonth()+1)+'-'+_p(yd.getDate());
+  var allL=D.leads||[], allS=D.spend||[];
+  var spUntil=allS.reduce(function(m,x){return x.d>m?x.d:m;},'');
+  var inCut=function(x){ return !!spUntil && x.d<=spUntil; };
+  var L=allL.filter(function(x){return P.fn(x.d);}), S=allS.filter(function(x){return P.fn(x.d);});
   var Lc=L.filter(inCut);
-  var todayLd=(D.leads||[]).filter(function(x){return x.d===today;}).length;
-  var onCamps=(D.camps||[]).filter(function(c){return c.st==='ACTIVE';});
-  var budget=onCamps.reduce(function(a,c){return a+(c.budget||0);},0);
-  var card=function(l,v,cls){return '<div class="card"><div class="clabel">'+l+'</div><div class="cval sm '+(cls||'')+'">'+v+'</div></div>';};
-  kpi.innerHTML = card('광고비', D.spendErr&&!S.length?'<span class="na">수집 오류</span>':_ssWon(spTot)+'원')
-    + card('리드', L.length+'건','green')
-    + card('CPL'+(spUntil?' <span style="font-size:9px">('+_md(spUntil)+'까지 유입)</span>':''), Lc.length&&spTot? _ssWon(spTot/Lc.length)+'원':'—')
-    + card('오늘 리드', todayLd+'건','orange')
-    + card('일예산', budget? _ssWon(budget)+'원':'—')
-    + card('켜진 캠페인', onCamps.length+'개');
+  var first=allS.concat(allL).reduce(function(m,x){return (!m||x.d<m)?x.d:m;},'');
+  _ssEl('ss-start').textContent=(first?_ssMd(first)+' 시작 · ':'')+'별도 광고계정 · 담당자 배정 없음 · '+P.label;
+  _ssEl('ss-asof').textContent='유입 '+_ssMd((D.asof||'').slice(0,10))+' '+(D.asof||'').slice(11)+' · 광고비 '+(D.spendManual?'수동입력 ':'')+(spUntil?_ssMd(spUntil)+'까지':'없음')+(D.spendErr?' · 광고비 오류':'');
 
-  // ── 유입경로: 메타 광고세트 / 메타폼(광고 외) / 메인랜딩(UTM 소스별)
+  // ── 1행: 확정 구간
+  var spTot=S.reduce(function(a,x){return a+(x.sp||0);},0);
+  var cFrom=S.concat(Lc).reduce(function(m,x){return (!m||x.d<m)?x.d:m;},'');
+  var cTo=spUntil && P.fn(spUntil) ? spUntil : S.reduce(function(m,x){return x.d>m?x.d:m;},'');
+  _ssEl('ss-conf-range').textContent = cFrom ? _ssMd(cFrom)+' ~ '+_ssMd(cTo||cFrom) : '해당 기간 없음';
+  var big=function(k,v,u,c){return '<div><div class="ss-k">'+k+'</div><div class="ss-big"'+(c?' style="color:'+c+'"':'')+'>'+v+'<small>'+u+'</small></div></div>';};
+  _ssEl('ss-conf').innerHTML = big('광고비',_ssWon(spTot),'원') + big('리드',Lc.length,'건','#0e9c8a') + big('리드 1건당 비용', (Lc.length&&spTot)?_ssWon(spTot/Lc.length):'—', (Lc.length&&spTot)?'원':'');
+  var onC=(D.camps||[]).filter(function(c){return c.st==='ACTIVE';});
+  var bud=onC.reduce(function(a,c){return a+(c.budget||0);},0);
+  _ssEl('ss-conf-foot').innerHTML = P.label+' 누적 리드 <b>'+L.length+'건</b>'+(bud?' · 일예산 <b>'+_ssWon(bud)+'원</b>':'')+' · 켜진 캠페인 <b>'+onC.length+'개</b>';
+
+  // ── 1행: 오늘
+  var tL=allL.filter(function(x){return x.d===today;}).length;
+  var tS=allS.filter(function(x){return x.d===today;}).reduce(function(a,x){return a+(x.sp||0);},0);
+  _ssEl('ss-today-d').textContent=_ssMd(today);
+  _ssEl('ss-today').innerHTML = '<div><div class="ss-k">리드</div><div class="ss-big" style="color:#ea580c">'+tL+'<small>건</small></div></div>'
+    + '<div><div class="ss-k">광고비</div>'+(tS?'<div class="ss-big">'+_ssWon(tS)+'<small>원</small></div><div class="ss-memo">진행 중 수치</div>':'<div class="ss-pend">내일 반영</div><div class="ss-memo">반영되면 확정 구간으로 넘어감</div>')+'</div>';
+  var yL=allL.filter(function(x){return x.d===yday;}).length, yS=allS.filter(function(x){return x.d===yday;}).reduce(function(a,x){return a+(x.sp||0);},0);
+  _ssEl('ss-today-foot').innerHTML='어제('+_ssMd(yday)+') 리드 <b>'+yL+'건</b> · 광고비 <b>'+(yS?_ssWon(yS)+'원':'미반영')+'</b>';
+
+  // ── 2행: 일별 흐름 (기간 안, 최근 14일, 오늘 포함)
+  var DM={};
+  S.forEach(function(x){ (DM[x.d]||(DM[x.d]={sp:0,ld:0})).sp+=x.sp||0; });
+  L.forEach(function(x){ (DM[x.d]||(DM[x.d]={sp:0,ld:0})).ld++; });
+  var days=Object.keys(DM).sort().slice(-14);
+  if(!days.length){ _ssEl('ss-chart').innerHTML='<div class="ss-empty">데이터 없음</div>'; }
+  else{
+    var W=640,H=210,x0=44,x1=W-14,yb=170,yt=24, n=days.length, slot=(x1-x0)/n, bw=Math.min(56,slot*.55);
+    var mL=Math.max.apply(null,days.map(function(d){return DM[d].ld;}))||1, mS=Math.max.apply(null,days.map(function(d){return DM[d].sp;}))||1;
+    var yL=function(v){return yb-(v/mL)*(yb-yt);}, yS=function(v){return yb-(v/mS)*(yb-yt);};
+    var g='<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="'+H+'" style="display:block">';
+    g+='<line x1="'+x0+'" y1="'+yb+'" x2="'+x1+'" y2="'+yb+'" stroke="#e5e7eb"/>';
+    var pts=[], small=n>8;
+    days.forEach(function(d,i){
+      var o=DM[d], cx=x0+slot*i+slot/2, isT=(d===today), h=yb-yL(o.ld);
+      g+='<rect x="'+(cx-bw/2)+'" y="'+yL(o.ld)+'" width="'+bw+'" height="'+h+'" rx="3" fill="'+(isT?'#5eead4':'#0e9c8a')+'"'+(isT?' stroke="#0e9c8a" stroke-dasharray="4 3"':'')+'/>';
+      g+='<text x="'+cx+'" y="'+(yL(o.ld)-5)+'" text-anchor="middle" font-size="'+(small?10:12)+'" font-weight="800" fill="#0f172a">'+o.ld+'</text>';
+      g+='<text x="'+cx+'" y="'+(yb+16)+'" text-anchor="middle" font-size="'+(small?9.5:11)+'" fill="'+(isT?'#ea580c':'#475569')+'" font-weight="'+(isT?800:400)+'">'+_ssMd(d)+(isT?' 오늘':'')+'</text>';
+      if(o.sp>0) pts.push([cx,yS(o.sp),o.sp]);
+      else if(isT||d>spUntil) g+='<text x="'+cx+'" y="'+(yb+29)+'" text-anchor="middle" font-size="9" fill="#94a3b8">광고비 미반영</text>';
+    });
+    if(pts.length){
+      g+='<polyline points="'+pts.map(function(p){return p[0]+','+p[1];}).join(' ')+'" fill="none" stroke="#f59e0b" stroke-width="2.5"/>';
+      pts.forEach(function(p){ g+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="3.5" fill="#f59e0b"/>'; if(!small) g+='<text x="'+p[0]+'" y="'+(p[1]-8)+'" text-anchor="middle" font-size="10" font-weight="700" fill="#b45309">'+_ssWon(p[2])+'</text>'; });
+    }
+    g+='</svg>';
+    _ssEl('ss-chart').innerHTML=g;
+  }
+
+  // ── 2행: 어디로 들어왔나
   var R={}, key=function(k,form){ if(!R[k]) R[k]={k:k,form:{},ld:0,lc:0,sp:0}; if(form) R[k].form[form]=(R[k].form[form]||0)+1; return R[k]; };
   (D.ads||[]).forEach(function(a){ if(a.adset) key(a.adset); });
   S.forEach(function(x){ key(x.adset||'(광고세트 미상)').sp+=x.sp||0; });
   L.forEach(function(x){
     var k = x.src==='landing' ? '메인랜딩 · '+(x.utm||'직접') : (x.adset || '메타폼 (광고 외)');
-    var _r=key(k, x.form); _r.ld++; if(inCut(x)) _r.lc++;
+    var r=key(k, x.form); r.ld++; if(inCut(x)) r.lc++;
   });
   var rows=Object.keys(R).map(function(k){return R[k];}).sort(function(a,b){return (b.ld-a.ld)||(b.sp-a.sp);});
-  var tL=0,tS=0,tC=0, h='';
-  rows.forEach(function(r){
-    tL+=r.ld; tS+=r.sp; tC+=r.lc;
+  var hasLanding=rows.some(function(r){return r.k.indexOf('메인랜딩')===0;});
+  var rh=rows.map(function(r){
     var fm=Object.keys(r.form).sort(function(a,b){return r.form[b]-r.form[a];})[0] || ((r.k.match(/\((F\d)\)/)||[])[1]||'');
-    h+='<tr'+(!r.ld&&!r.sp?' class="zero"':'')+'><td>'+r.k+'</td><td>'+fm+'</td><td>'+(r.ld?'<b>'+r.ld+'</b>':0)+'</td><td>'+(r.sp?_ssWon(r.sp):'<span class="na">—</span>')+'</td><td>'+(r.sp?_ssCpl(r.sp,r.lc):'<span class="na">—</span>')+'</td><td class="na">—</td><td class="na">—</td></tr>';
-  });
-  h+='<tr class="tot"><td>합계</td><td></td><td>'+tL+'</td><td>'+_ssWon(tS)+'</td><td>'+_ssCpl(tS,tC)+'</td><td class="na">—</td><td class="na">—</td></tr>';
-  document.getElementById('ss-route').innerHTML=h;
+    var pct=L.length? r.ld/L.length*100 : 0;
+    var nm=r.k.replace(/\s*\(F\d\)\s*$/,'');
+    return '<div class="ss-rt'+(r.ld?'':' zero')+'"><span class="nm"><b>'+nm+'</b><i>'+(fm||'')+'</i></span><span class="ss-bar"><i style="width:'+pct.toFixed(1)+'%"></i></span><span style="font-weight:800">'+r.ld+'</span><span>'+(r.sp?_ssWon(r.sp):'—')+'</span><span style="font-weight:700">'+((r.sp&&r.lc)?_ssWon(r.sp/r.lc):'—')+'</span></div>';
+  }).join('');
+  if(!hasLanding) rh+='<div class="ss-rt zero"><span class="nm"><b>메인랜딩 설문</b><i>ssamida.com · 광고 외</i></span><span class="ss-bar"><i style="width:0"></i></span><span>0</span><span>—</span><span>—</span></div>';
+  _ssEl('ss-route').innerHTML = rh || '<div class="ss-empty">데이터 없음</div>';
+  _ssEl('ss-route-s').textContent='광고세트·폼별 · '+P.label;
 
-  // ── 소재별
+  // ── 3행: 소재
   var A={}, st={};
   (D.ads||[]).forEach(function(a){ st[a.ad]=a.st; });
-  S.forEach(function(x){ var a=A[x.ad]||(A[x.ad]={ad:x.ad,sp:0,imp:0,clk:0,ld:0,lc:0}); a.sp+=x.sp||0; a.imp+=x.imp||0; a.clk+=x.clk||0; });
-  L.forEach(function(x){ if(!x.ad) return; var a=A[x.ad]||(A[x.ad]={ad:x.ad,sp:0,imp:0,clk:0,ld:0,lc:0}); a.ld++; if(inCut(x)) a.lc++; });
-  var al=Object.keys(A).map(function(k){return A[k];}).sort(function(a,b){return (b.sp-a.sp)||(b.ld-a.ld);});
-  var main=al.filter(function(a){return a.sp>=10000||a.ld>0;}), rest=al.filter(function(a){return !(a.sp>=10000||a.ld>0);});
-  var badge=function(n){ var s=st[n]; if(!s) return ''; return '<span class="st '+(s==='ACTIVE'?'on':'off')+'">'+(s==='ACTIVE'?'ON':'OFF')+'</span>'; };
-  var arow=function(a){ return '<tr><td>'+badge(a.ad)+a.ad+'</td><td>'+_ssWon(a.sp)+'</td><td>'+_ssWon(a.imp)+'</td><td>'+(a.imp?(a.clk/a.imp*100).toFixed(2)+'%':'—')+'</td><td>'+(a.imp?_ssWon(a.sp/a.imp*1000):'—')+'</td><td>'+(a.ld?'<b>'+a.ld+'</b>':0)+'</td><td>'+_ssCpl(a.sp,a.lc)+'</td></tr>'; };
-  document.getElementById('ss-ad').innerHTML = main.length ? main.map(arow).join('') : '<tr><td colspan="7" style="color:#aaa;text-align:center">데이터 없음</td></tr>';
-  document.getElementById('ss-ad-more').innerHTML = rest.length ? '<details class="ss-fold"><summary>나머지 소재 '+rest.length+'개 (광고비 1만원 미만) 펼치기</summary><div class="tbl-scroll"><table><tbody>'+rest.map(arow).join('')+'</tbody></table></div></details>' : '';
+  S.forEach(function(x){ var a=A[x.ad]||(A[x.ad]={ad:x.ad,set:x.adset,sp:0,imp:0,clk:0,ld:0,lc:0}); a.sp+=x.sp||0; a.imp+=x.imp||0; a.clk+=x.clk||0; if(!a.set) a.set=x.adset; });
+  L.forEach(function(x){ if(!x.ad) return; var a=A[x.ad]||(A[x.ad]={ad:x.ad,set:x.adset,sp:0,imp:0,clk:0,ld:0,lc:0}); a.ld++; if(inCut(x)) a.lc++; });
+  var al=Object.keys(A).map(function(k){return A[k];});
+  var win=al.filter(function(a){return a.ld>0;}).sort(function(a,b){return (b.ld-a.ld)||(b.sp-a.sp);});
+  var zero=al.filter(function(a){return !a.ld && a.sp>0;}).sort(function(a,b){return b.sp-a.sp;});
+  var off=function(n){ return st[n] && st[n]!=='ACTIVE' ? ' <span style="font-size:9px;color:#94a3b8;font-weight:700">OFF</span>' : ''; };
+  _ssEl('ss-adw-s').textContent=win.length+'개 · 리드 많은 순';
+  _ssEl('ss-adw').innerHTML = win.length ? win.map(function(a){
+    return '<div class="ss-ad"><div class="nm">'+a.ad+off(a.ad)+'</div><div class="set">'+(a.set||'')+'</div><div class="ld">'+a.ld+'<small> 건</small></div>'
+      +'<div class="m"><span>광고비</span><b>'+_ssWon(a.sp)+'</b><span>1건당</span><b>'+((a.sp&&a.lc)?_ssWon(a.sp/a.lc):'—')+'</b><span>CTR</span><b>'+(a.imp?(a.clk/a.imp*100).toFixed(2)+'%':'—')+'</b><span>CPM</span><b>'+(a.imp?_ssWon(a.sp/a.imp*1000):'—')+'</b></div></div>';
+  }).join('') : '<div class="ss-empty" style="grid-column:1/-1">해당 기간 리드 없음</div>';
+  var zTot=zero.reduce(function(s,a){return s+a.sp;},0), zMax=zero.length?zero[0].sp:1;
+  _ssEl('ss-z-s').textContent=zero.length+'개';
+  _ssEl('ss-z-tot').innerHTML=zero.length? _ssWon(zTot)+'<small style="font-size:11px;color:#64748b">원</small>' : '';
+  var zTop=zero.filter(function(a){return a.sp>=10000;}), zRest=zero.filter(function(a){return a.sp<10000;});
+  if(zTop.length<3){ zTop=zero.slice(0,5); zRest=zero.slice(5); }
+  var zh=zTop.map(function(a){ return '<div class="ss-zr"><span>'+a.ad+off(a.ad)+'</span><span>'+_ssWon(a.sp)+'</span><span class="mini"><i style="width:'+(a.sp/zMax*100).toFixed(0)+'%"></i></span></div>'; }).join('');
+  if(zRest.length) zh+='<div class="ss-zr" style="color:#94a3b8"><span>나머지 '+zRest.length+'개 (1만원 미만)</span><span>'+_ssWon(zRest.reduce(function(s,a){return s+a.sp;},0))+'</span><span></span></div>';
+  _ssEl('ss-z').innerHTML = zh || '<div class="ss-empty">없음</div>';
 
-  // ── 일별 (7일 / 기간 전체). '전체' 탭 + 기간전체면 월별로 묶음
-  var DM={};
-  var monthly = (_ssDay==='period' && P.label==='전체');
-  var dk=function(d){ return monthly ? String(d).slice(0,7) : d; };
-  var srcL = _ssDay==='week' ? (D.leads||[]) : L, srcS = _ssDay==='week' ? (D.spend||[]) : S;
-  var from='';
-  if(_ssDay==='week'){ var f=new Date(_n.getFullYear(),_n.getMonth(),_n.getDate()-6); from=f.getFullYear()+'-'+_p(f.getMonth()+1)+'-'+_p(f.getDate()); }
-  srcS.forEach(function(x){ if(from&&x.d<from) return; var o=DM[dk(x.d)]||(DM[dk(x.d)]={sp:0,ld:0}); o.sp+=x.sp||0; });
-  srcL.forEach(function(x){ if(from&&x.d<from) return; var o=DM[dk(x.d)]||(DM[dk(x.d)]={sp:0,ld:0}); o.ld++; });
-  var ks=Object.keys(DM).sort().reverse(), dS=0,dL=0,dLc=0;
-  var dh=ks.map(function(k){ var o=DM[k]; dS+=o.sp; dL+=o.ld; if(!spUntil || monthly || k<=spUntil) dLc+=o.ld;
-    var lb = monthly ? k : k.slice(5).replace('-','/') + (k===today?' (오늘)':'');
-    return '<tr><td>'+lb+'</td><td>'+(o.sp?_ssWon(o.sp):'<span class="na">—</span>')+'</td><td>'+(o.ld?'<b>'+o.ld+'</b>':0)+'</td><td>'+_ssCpl(o.sp,o.ld)+'</td></tr>'; }).join('');
-  dh += ks.length ? '<tr class="tot"><td>합계</td><td>'+_ssWon(dS)+'</td><td>'+dL+'</td><td>'+_ssCpl(dS,dLc)+'</td></tr>' : '<tr><td colspan="4" style="color:#aaa;text-align:center">데이터 없음</td></tr>';
-  document.getElementById('ss-day').innerHTML=dh;
-
-  // ── 학년 / 매체
-  var bars=function(map,total){ return Object.keys(map).sort(function(a,b){return map[b]-map[a];}).map(function(k){
-    var pct= total? (map[k]/total*100):0;
-    return '<div class="gbar"><span class="l">'+k+'</span><span class="b"><i style="width:'+pct.toFixed(1)+'%"></i></span><span class="n">'+map[k]+' · '+pct.toFixed(1)+'%</span></div>'; }).join('') || '<div class="ss-memo">데이터 없음</div>'; };
-  var G={}, PL={}, PLN={ig:'인스타',fb:'페이스북',an:'오디언스',ms:'메신저'};
+  // ── 4행: 학년 / 매체
+  var stack=function(map,total,colors){
+    var ks=Object.keys(map).sort(function(a,b){return map[b]-map[a];});
+    if(!total) return '<div class="ss-empty">데이터 없음</div>';
+    var bar='<div class="ss-stack">'+ks.map(function(k,i){ var p=map[k]/total*100;
+      return '<div style="width:'+p.toFixed(1)+'%;background:'+(colors[i]||'#cbd5e1')+(i===1?';color:#0f766e':'')+'">'+(p>=12?k+' '+map[k]+(i===0?' · '+p.toFixed(1)+'%':''):'')+'</div>'; }).join('')+'</div>';
+    var small=ks.filter(function(k){return map[k]/total*100<12;}).map(function(k){return k+' '+map[k]+'건 ('+(map[k]/total*100).toFixed(1)+'%)';}).join(' · ');
+    return bar+(small?'<div class="ss-memo" style="margin-top:6px">'+small+'</div>':'');
+  };
+  var G={}, PL={}, PLN={ig:'인스타그램',fb:'페이스북',an:'오디언스',ms:'메신저'};
   L.forEach(function(x){ var g=x.grade||'미기재'; G[g]=(G[g]||0)+1;
     var pl = x.src==='landing' ? '랜딩' : (PLN[x.plat]||x.plat||'기타'); PL[pl]=(PL[pl]||0)+1; });
-  document.getElementById('ss-grade').innerHTML=bars(G,L.length);
-  document.getElementById('ss-plat').innerHTML=bars(PL,L.length);
+  _ssEl('ss-g-s').textContent=L.length+'건';
+  _ssEl('ss-grade').innerHTML=stack(G,L.length,['#0e9c8a','#5eead4','#99f6e4','#cbd5e1']);
+  _ssEl('ss-plat').innerHTML=stack(PL,L.length,['#7c3aed','#c4b5fd','#ddd6fe']);
   var bad=L.filter(function(x){return !x.ph;}).length;
-  document.getElementById('ss-phq').innerHTML = bad ? '· 번호 형식 불량 '+bad+'건 (카운트엔 포함)' : '';
+  _ssEl('ss-phq').textContent = bad ? ' · 번호 형식 불량 '+bad+'건 포함' : '';
 }
 // 기존 호출부 호환 (HTML onclick 둘 다 setPeriodAll로 통일)
 function setFunnelAll(idx){ setPeriodAll(idx); }
