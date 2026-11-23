@@ -1812,11 +1812,11 @@ function renderSsamida(){
   if(_ssDay==='week'){ var f=new Date(_n.getFullYear(),_n.getMonth(),_n.getDate()-6); from=f.getFullYear()+'-'+_p(f.getMonth()+1)+'-'+_p(f.getDate()); }
   srcS.forEach(function(x){ if(from&&x.d<from) return; var o=DM[dk(x.d)]||(DM[dk(x.d)]={sp:0,ld:0}); o.sp+=x.sp||0; });
   srcL.forEach(function(x){ if(from&&x.d<from) return; var o=DM[dk(x.d)]||(DM[dk(x.d)]={sp:0,ld:0}); o.ld++; });
-  var ks=Object.keys(DM).sort().reverse(), dS=0,dL=0;
-  var dh=ks.map(function(k){ var o=DM[k]; dS+=o.sp; dL+=o.ld;
+  var ks=Object.keys(DM).sort().reverse(), dS=0,dL=0,dLc=0;
+  var dh=ks.map(function(k){ var o=DM[k]; dS+=o.sp; dL+=o.ld; if(!spUntil || monthly || k<=spUntil) dLc+=o.ld;
     var lb = monthly ? k : k.slice(5).replace('-','/') + (k===today?' (오늘)':'');
     return '<tr><td>'+lb+'</td><td>'+(o.sp?_ssWon(o.sp):'<span class="na">—</span>')+'</td><td>'+(o.ld?'<b>'+o.ld+'</b>':0)+'</td><td>'+_ssCpl(o.sp,o.ld)+'</td></tr>'; }).join('');
-  dh += ks.length ? '<tr class="tot"><td>합계</td><td>'+_ssWon(dS)+'</td><td>'+dL+'</td><td>'+_ssCpl(dS,dL)+'</td></tr>' : '<tr><td colspan="4" style="color:#aaa;text-align:center">데이터 없음</td></tr>';
+  dh += ks.length ? '<tr class="tot"><td>합계</td><td>'+_ssWon(dS)+'</td><td>'+dL+'</td><td>'+_ssCpl(dS,dLc)+'</td></tr>' : '<tr><td colspan="4" style="color:#aaa;text-align:center">데이터 없음</td></tr>';
   document.getElementById('ss-day').innerHTML=dh;
 
   // ── 학년 / 매체
