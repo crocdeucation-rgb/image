@@ -479,7 +479,7 @@ details.collapsible[open]>summary .fold-hint{display:none}
 #sec4 .ss-r2,#sec4 .ss-r3{display:grid;grid-template-columns:1.25fr 1fr;gap:12px;margin-bottom:12px}
 #sec4 .ss-legend{display:flex;gap:10px;font-size:10px;color:#64748b;margin-left:auto}
 #sec4 .ss-legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:3px}
-#sec4 .ss-rt,#sec4 .ss-rh{display:grid;grid-template-columns:minmax(110px,1.1fr) 1fr 50px 80px 70px;gap:8px;align-items:center}
+#sec4 .ss-rt,#sec4 .ss-rh{display:grid;grid-template-columns:minmax(100px,1.1fr) .8fr 40px 72px 62px 78px 46px;gap:7px;align-items:center}
 #sec4 .ss-rh{font-size:9.5px;color:#94a3b8;font-weight:700;padding-bottom:4px}
 #sec4 .ss-rh span:nth-child(n+3),#sec4 .ss-rt>span:nth-child(n+3){text-align:right}
 #sec4 .ss-rt{padding:8px 0;border-top:1px solid #f1f5f9;font-size:11.5px}
@@ -505,9 +505,28 @@ details.collapsible[open]>summary .fold-hint{display:none}
 #sec4 .ss-memo{font-size:10px;color:#64748b;line-height:1.75}
 #sec4 .ss-memo b{color:#334155}
 #sec4 .ss-empty{color:#94a3b8;font-size:11.5px;text-align:center;padding:14px}
+#sec4 .ss-r5{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+#sec4 .ss-funnel{display:flex;align-items:stretch;gap:6px;flex-wrap:wrap}
+#sec4 .ss-fs{flex:1;min-width:86px;background:#f8fafc;border:1px solid #e8edf3;border-radius:10px;padding:8px 10px}
+#sec4 .ss-fs b{display:block;font-size:20px;font-weight:900}#sec4 .ss-fs span{font-size:10px;color:#64748b;font-weight:700}
+#sec4 .ss-fs i{font-style:normal;font-size:10px;color:#0e7490;font-weight:800}
+#sec4 .ss-farr{align-self:center;color:#cbd5e1;font-weight:900}
+#sec4 table.ss-t{width:100%;border-collapse:collapse;font-size:11px}
+#sec4 .ss-t th{background:#effaf8;color:#0e7490;font-weight:700;padding:6px 5px;text-align:right;white-space:nowrap}
+#sec4 .ss-t td{padding:6px 5px;border-top:1px solid #f1f5f9;text-align:right;white-space:nowrap}
+#sec4 .ss-t th:first-child,#sec4 .ss-t td:first-child{text-align:left}
+#sec4 .ss-t tr.tot td{font-weight:800;background:#f8fafc}
+#sec4 .ss-sc{display:grid;grid-template-columns:78px 44px 1fr auto;gap:6px;align-items:center;padding:6px 2px;border-top:1px solid #f1f5f9;font-size:11px}
+#sec4 .ss-sc.today{background:#fffbeb}
+#sec4 .ss-kind{font-size:9.5px;font-weight:800;border-radius:6px;padding:1px 6px;color:#fff}
+#sec4 .ss-kind.v{background:#2563eb}#sec4 .ss-kind.f{background:#0e9c8a}
+#sec4 .ss-res{font-size:9.5px;color:#94a3b8;font-weight:700}
+#sec4 .ss-wait{border:1px dashed #cbd5e1;background:#f8fafc;border-radius:12px;padding:14px 16px;font-size:11.5px;color:#64748b;margin-bottom:12px}
+#sec4 .ss-wait b{color:#0f172a}
+@media(max-width:1100px){#sec4 .ss-r5{grid-template-columns:1fr}}
 @media(max-width:1100px){#sec4 .ss-r1,#sec4 .ss-r2,#sec4 .ss-r3{grid-template-columns:1fr}#sec4 .ss-r4{grid-template-columns:1fr 1fr}}
 @media(max-width:700px){#sec4 .ss-conf{grid-template-columns:1fr 1fr 1fr;gap:6px}#sec4 .ss-big{font-size:17px}#sec4 .ss-adw{grid-template-columns:1fr}#sec4 .ss-r4{grid-template-columns:1fr}
-  #sec4 .ss-rt,#sec4 .ss-rh{grid-template-columns:minmax(90px,1fr) 60px 36px 64px 56px;gap:5px}#sec4 .ss-chip{margin-left:0}}
+  #sec4 .ss-rt,#sec4 .ss-rh{grid-template-columns:minmax(80px,1fr) 0 30px 60px 52px 62px 38px;gap:4px}#sec4 .ss-rt .ss-bar,#sec4 .ss-rh span:nth-child(2){visibility:hidden}#sec4 .ss-chip{margin-left:0}}
 /* 표 min-content 때문에 열이 화면 밖으로 밀리던 것 방지 (표는 자체 가로스크롤) */
 .layout > .section { min-width: 0; }
 /* ★ [2026-11-23] 폴드·태블릿 가로(701~1100px) — B안: 우측 열(날짜별 유입·타겟 적합도·방문)을 맨 위 가로 띠로.
@@ -761,13 +780,14 @@ details.collapsible[open]>summary .fold-hint{display:none}
   <div class="ss-card"><div class="ss-lbl"><span class="ss-tag live">오늘 · 진행 중</span><span id="ss-today-d">-</span></div>
     <div class="ss-today" id="ss-today"></div><div class="ss-foot" id="ss-today-foot"></div></div>
 </div>
+<div id="ss-adm"></div>
 <div class="ss-r2">
   <div class="ss-card"><div class="ss-lbl">일별 흐름 <span class="s">막대 = 리드 · 선 = 광고비 (최근 14일)</span><span class="ss-legend"><span><i style="background:#0e9c8a"></i>리드</span><span><i style="background:#f59e0b"></i>광고비</span></span></div>
     <div id="ss-chart"></div></div>
   <div class="ss-card"><div class="ss-lbl">어디로 들어왔나 <span class="s" id="ss-route-s">광고세트·폼별</span></div>
-    <div class="ss-rh"><span>유입경로</span><span>리드 비중</span><span>리드</span><span>광고비</span><span>1건당</span></div>
+    <div class="ss-rh"><span>유입경로</span><span>리드 비중</span><span>리드</span><span>광고비</span><span>1건당</span><span>매출</span><span>ROAS</span></div>
     <div id="ss-route"></div>
-    <div class="ss-conv">상담·매출·ROAS → <b>어드민 연결 후 이 자리에 붙음</b> (리드마다 어드민 문의번호 저장 중)</div></div>
+    <div class="ss-conv" id="ss-conv">매출·ROAS = 어드민 결제(결제일 기준) · 리드 문의번호로 광고세트에 연결</div></div>
 </div>
 <div class="ss-r3">
   <div class="ss-card"><div class="ss-lbl">리드가 나온 소재 <span class="s" id="ss-adw-s"></span></div><div class="ss-adw" id="ss-adw"></div></div>
@@ -1790,7 +1810,7 @@ function renderSsamida(){
   _ssEl('ss-conf').innerHTML = big('광고비',_ssWon(spTot),'원') + big('리드',Lc.length,'건','#0e9c8a') + big('리드 1건당 비용', (Lc.length&&spTot)?_ssWon(spTot/Lc.length):'—', (Lc.length&&spTot)?'원':'');
   var onC=(D.camps||[]).filter(function(c){return c.st==='ACTIVE';});
   var bud=onC.reduce(function(a,c){return a+(c.budget||0);},0);
-  _ssEl('ss-conf-foot').innerHTML = P.label+' 누적 리드 <b>'+L.length+'건</b>'+(bud?' · 일예산 <b>'+_ssWon(bud)+'원</b>':'')+' · 켜진 캠페인 <b>'+onC.length+'개</b>';
+  _ssEl('ss-conf-foot').innerHTML = P.label+' 누적 리드 <b>'+L.length+'건</b>'+((D.admin&&spTot)?' · 매출(결제일) <b>'+_ssWon((D.admin.payments||[]).filter(function(p){return P.fn(String(p.at||'').slice(0,10));}).reduce(function(s,p){var a=Number(p.amount)||0;return s+(p.kind==='환불'?-Math.abs(a):a);},0))+'원</b> · ROAS <b>'+((D.admin.payments||[]).filter(function(p){return P.fn(String(p.at||'').slice(0,10));}).reduce(function(s,p){var a=Number(p.amount)||0;return s+(p.kind==='환불'?-Math.abs(a):a);},0)/spTot).toFixed(2)+'</b>':'')+(bud?' · 일예산 <b>'+_ssWon(bud)+'원</b>':'')+' · 켜진 캠페인 <b>'+onC.length+'개</b>';
 
   // ── 1행: 오늘
   var tL=allL.filter(function(x){return x.d===today;}).length;
@@ -1838,15 +1858,22 @@ function renderSsamida(){
     var k = x.src==='landing' ? '메인랜딩 · '+(x.utm||'직접') : (x.adset || '메타폼 (광고 외)');
     var r=key(k, x.form); r.ld++; if(inCut(x)) r.lc++;
   });
+  // 어드민 결제 → 문의번호(bid) → 리드 시트 광고세트로 매출 귀속 (결제일 기준, 기간 안)
+  var ADM=D.admin||null, bid2k={};
+  allL.forEach(function(x){ if(x.bid) bid2k[String(x.bid)] = x.src==='landing' ? '메인랜딩 · '+(x.utm||'직접') : (x.adset || '메타폼 (광고 외)'); });
+  var payP=ADM?(ADM.payments||[]).filter(function(p){return P.fn(String(p.at||'').slice(0,10));}):[];
+  var payAmt=function(p){ var a=Number(p.amount)||0; return p.kind==='환불' ? -Math.abs(a) : a; };
+  var revTot=payP.reduce(function(s,p){return s+payAmt(p);},0);
+  payP.forEach(function(p){ var k=bid2k[String(p.id)]; if(!k) return; var r=key(k); r.rev=(r.rev||0)+payAmt(p); });
   var rows=Object.keys(R).map(function(k){return R[k];}).sort(function(a,b){return (b.ld-a.ld)||(b.sp-a.sp);});
   var hasLanding=rows.some(function(r){return r.k.indexOf('메인랜딩')===0;});
   var rh=rows.map(function(r){
     var fm=Object.keys(r.form).sort(function(a,b){return r.form[b]-r.form[a];})[0] || ((r.k.match(/\((F\d)\)/)||[])[1]||'');
     var pct=L.length? r.ld/L.length*100 : 0;
     var nm=r.k.replace(/\s*\(F\d\)\s*$/,'');
-    return '<div class="ss-rt'+(r.ld?'':' zero')+'"><span class="nm"><b>'+nm+'</b><i>'+(fm||'')+'</i></span><span class="ss-bar"><i style="width:'+pct.toFixed(1)+'%"></i></span><span style="font-weight:800">'+r.ld+'</span><span>'+(r.sp?_ssWon(r.sp):'—')+'</span><span style="font-weight:700">'+((r.sp&&r.lc)?_ssWon(r.sp/r.lc):'—')+'</span></div>';
+    return '<div class="ss-rt'+(r.ld?'':' zero')+'"><span class="nm"><b>'+nm+'</b><i>'+(fm||'')+'</i></span><span class="ss-bar"><i style="width:'+pct.toFixed(1)+'%"></i></span><span style="font-weight:800">'+r.ld+'</span><span>'+(r.sp?_ssWon(r.sp):'—')+'</span><span style="font-weight:700">'+((r.sp&&r.lc)?_ssWon(r.sp/r.lc):'—')+'</span><span>'+(r.rev?_ssWon(r.rev):'—')+'</span><span style="font-weight:800;color:#0e7490">'+((r.rev&&r.sp)?(r.rev/r.sp).toFixed(2):'—')+'</span></div>';
   }).join('');
-  if(!hasLanding) rh+='<div class="ss-rt zero"><span class="nm"><b>메인랜딩 설문</b><i>ssamida.com · 광고 외</i></span><span class="ss-bar"><i style="width:0"></i></span><span>0</span><span>—</span><span>—</span></div>';
+  if(!hasLanding) rh+='<div class="ss-rt zero"><span class="nm"><b>메인랜딩 설문</b><i>ssamida.com · 광고 외</i></span><span class="ss-bar"><i style="width:0"></i></span><span>0</span><span>—</span><span>—</span><span>—</span><span>—</span></div>';
   _ssEl('ss-route').innerHTML = rh || '<div class="ss-empty">데이터 없음</div>';
   _ssEl('ss-route-s').textContent='광고세트·폼별 · '+P.label;
 
@@ -1888,8 +1915,62 @@ function renderSsamida(){
   _ssEl('ss-g-s').textContent=L.length+'건';
   _ssEl('ss-grade').innerHTML=stack(G,L.length,['#0e9c8a','#5eead4','#99f6e4','#cbd5e1']);
   _ssEl('ss-plat').innerHTML=stack(PL,L.length,['#7c3aed','#c4b5fd','#ddd6fe']);
+  _ssRenderAdmin(D, P, today);
   var bad=L.filter(function(x){return !x.ph;}).length;
   _ssEl('ss-phq').textContent = bad ? ' · 번호 형식 불량 '+bad+'건 포함' : '';
+}
+
+// ★ [2026-11-23] 쌤이다 어드민 블록 — 전환 흐름 · 경로별(방문/시강) · 담당자별 · 방문/시강 스케줄
+//   데이터: D.admin = {leads, events, schedule, payments} (GAS ssamReadAdmin_). id = 리드보드 문의번호.
+//   코호트 기준: 리드 접수일이 기간 안인 리드의 이후 진행. 매출 합계는 결제일 기준(위 카드)과 별개로 코호트 매출.
+function _ssRenderAdmin(D, P, today){
+  var box=_ssEl('ss-adm'); if(!box) return;
+  var A=D.admin;
+  if(!A){ box.innerHTML='<div class="ss-wait"><b>어드민 연결 대기</b> — 연결되면 이 자리에 <b>전환 흐름(리드→연락→방문/시강→결제)</b> · <b>방문 경로 vs 시강 경로</b> · <b>담당자별 성과</b> · <b>방문·시강 스케줄</b>이 붙음'+(D.adminErr?' <span style="color:#dc2626">· 연결 오류: '+D.adminErr+'</span>':'')+'</div>'; return; }
+  var day=function(t){return String(t||'').slice(0,10);};
+  var LA=(A.leads||[]).filter(function(x){return P.fn(day(x.at));});
+  var ev={}; (A.events||[]).forEach(function(e){ (ev[String(e.id)]||(ev[String(e.id)]=[])).push(e); });
+  var pay={}; (A.payments||[]).forEach(function(p){ (pay[String(p.id)]||(pay[String(p.id)]=[])).push(p); });
+  var has=function(x,re){ if(re.test(String(x.status||''))) return true; return (ev[String(x.id)]||[]).some(function(e){return re.test(String(e.to||''));}); };
+  var RE={reach:/^(?!신규$).+/, visit:/방문(?!취소)/, free:/시강/, paid:/오더|전환됨|결제/};
+  var firstPay=function(x){ var ps=(pay[String(x.id)]||[]).filter(function(p){return p.kind!=='환불';}).sort(function(a,b){return a.at<b.at?-1:1;}); return ps[0]||null; };
+  var isPaid=function(x){ return !!firstPay(x) || has(x,RE.paid); };
+  var rev=function(x){ return (pay[String(x.id)]||[]).reduce(function(s,p){var a=Number(p.amount)||0;return s+(p.kind==='환불'?-Math.abs(a):a);},0); };
+  var reached=function(x){ return String(x.status||'')!=='신규' || (ev[String(x.id)]||[]).length>0; };
+  var n=LA.length, nR=LA.filter(reached).length, nV=LA.filter(function(x){return has(x,RE.visit);}).length,
+      nF=LA.filter(function(x){return has(x,RE.free);}).length, nP=LA.filter(isPaid).length;
+  var pct=function(a,b){return b? (a/b*100).toFixed(1)+'%':'—';};
+  var fs=function(lbl,v,base){return '<div class="ss-fs"><span>'+lbl+'</span><b>'+v+'</b>'+(base!==undefined?'<i>'+pct(v,base)+'</i>':'')+'</div>';};
+  var funnel='<div class="ss-funnel">'+fs('리드',n)+'<span class="ss-farr">›</span>'+fs('연락',nR,n)+'<span class="ss-farr">›</span>'+fs('방문',nV,n)+fs('시강',nF,n)+'<span class="ss-farr">›</span>'+fs('결제',nP,n)+'</div>';
+  // 경로별
+  var path=function(lbl,arr){ var p=arr.filter(isPaid), d=p.map(function(x){var f=firstPay(x); if(!f) return null; return (new Date(day(f.at))-new Date(day(x.at)))/864e5;}).filter(function(v){return v!==null;});
+    var avg=d.length? (d.reduce(function(a,b){return a+b;},0)/d.length).toFixed(1)+'일':'—';
+    return '<tr><td>'+lbl+'</td><td>'+arr.length+'</td><td>'+p.length+'</td><td>'+pct(p.length,arr.length)+'</td><td>'+avg+'</td><td>'+_ssWon(arr.reduce(function(s,x){return s+rev(x);},0))+'</td></tr>'; };
+  var V=LA.filter(function(x){return has(x,RE.visit);}), F=LA.filter(function(x){return has(x,RE.free)&&!has(x,RE.visit);}),
+      O=LA.filter(function(x){return !has(x,RE.visit)&&!has(x,RE.free);});
+  var paths='<table class="ss-t"><thead><tr><th>경로</th><th>리드</th><th>결제</th><th>결제율</th><th>결제까지</th><th>매출(코호트)</th></tr></thead><tbody>'
+    +path('방문 경로',V)+path('시강 경로',F)+path('방문·시강 없음',O)+'</tbody></table>';
+  // 담당자별
+  var OW={}; LA.forEach(function(x){ var o=x.owner||'미배정'; (OW[o]||(OW[o]=[])).push(x); });
+  var ow=Object.keys(OW).sort(function(a,b){ if(a==='미배정') return 1; if(b==='미배정') return -1; return OW[b].length-OW[a].length; });
+  var orow=function(o,arr){ var p=arr.filter(isPaid).length;
+    return '<tr><td>'+o+'</td><td>'+arr.length+'</td><td>'+arr.filter(reached).length+'</td><td>'+arr.filter(function(x){return has(x,RE.visit);}).length+'</td><td>'+arr.filter(function(x){return has(x,RE.free);}).length+'</td><td><b>'+p+'</b></td><td>'+pct(p,arr.length)+'</td><td>'+_ssWon(arr.reduce(function(s,x){return s+rev(x);},0))+'</td></tr>'; };
+  var owner='<table class="ss-t"><thead><tr><th>담당자</th><th>리드</th><th>연락</th><th>방문</th><th>시강</th><th>결제</th><th>결제율</th><th>매출(코호트)</th></tr></thead><tbody>'
+    +ow.map(function(o){return orow(o,OW[o]);}).join('')+(ow.length>1?orow('<b>합계</b>',LA).replace('<tr>','<tr class="tot">'):'')+'</tbody></table>';
+  // 스케줄 (오늘 이후 + 오늘)
+  var sc=(A.schedule||[]).filter(function(x){return day(x.at)>=today;}).sort(function(a,b){return a.at<b.at?-1:1;});
+  var WD=['일','월','화','수','목','금','토'];
+  var schedH = sc.length ? sc.slice(0,20).map(function(x){ var d=new Date(day(x.at)); var isT=day(x.at)===today;
+      return '<div class="ss-sc'+(isT?' today':'')+'"><span style="font-weight:700;color:'+(isT?'#ea580c':'#1d4ed8')+'">'+(isT?'오늘':_ssMd(day(x.at))+' ('+WD[d.getDay()]+')')+'</span><span>'+String(x.at||'').slice(11,16)+'</span>'
+        +'<span><b>'+(x.name||'')+'</b> <span style="color:#94a3b8">'+(x.grade||'')+(x.subject?' · '+x.subject:'')+'</span> · '+(x.who||'미정')+(x.result?' <span class="ss-res">'+x.result+'</span>':'')+'</span>'
+        +'<span class="ss-kind '+(x.kind==='방문'?'v':'f')+'">'+(x.kind||'')+'</span></div>'; }).join('')+(sc.length>20?'<div class="ss-memo" style="margin-top:6px">외 '+(sc.length-20)+'건</div>':'')
+    : '<div class="ss-empty">예정된 방문·시강 없음</div>';
+  box.innerHTML =
+    '<div class="ss-card" style="margin-bottom:12px"><div class="ss-lbl">전환 흐름 <span class="s">'+P.label+' 접수 리드 기준 · 어드민 '+(A.asof||'')+'</span></div>'+funnel+'</div>'
+   +'<div class="ss-r5"><div class="ss-card"><div class="ss-lbl">경로별 <span class="s">방문 경로 vs 시강 경로 · 결제까지 = 접수→첫 결제 평균 일수</span></div><div class="tbl-scroll">'+paths+'</div>'
+   +'<div class="ss-lbl" style="margin-top:12px">담당자별 <span class="s">'+P.label+' 접수 리드</span></div><div class="tbl-scroll">'+owner+'</div></div>'
+   +'<div class="ss-card"><div class="ss-lbl">방문·시강 스케줄 <span class="s"><span class="ss-kind v">방문</span> <span class="ss-kind f">시강</span> · 오늘 이후</span></div>'+schedH+'</div></div>';
+  var conv=_ssEl('ss-conv'); if(conv) conv.innerHTML='매출·ROAS = 어드민 결제(결제일 기준, 환불 차감) · 리드 문의번호로 광고세트에 연결';
 }
 // 기존 호출부 호환 (HTML onclick 둘 다 setPeriodAll로 통일)
 function setFunnelAll(idx){ setPeriodAll(idx); }
