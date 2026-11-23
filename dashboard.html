@@ -485,6 +485,17 @@ details.collapsible[open]>summary .fold-hint{display:none}
 #sec4 .ss-tg button.on{background:#0e9c8a;border-color:#0e9c8a;color:#fff}
 @media(max-width:1100px){#sec4 .ss-cols{grid-template-columns:1fr}#sec4 .grid-6{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:700px){#sec4 .tbl-scroll table{min-width:520px}#sec4 .ss-sub{display:block;margin:2px 0 0}}
+/* 표 min-content 때문에 열이 화면 밖으로 밀리던 것 방지 (표는 자체 가로스크롤) */
+.layout > .section { min-width: 0; }
+/* ★ [2026-11-23] 폴드·태블릿 가로(701~1100px) — B안: 우측 열(날짜별 유입·타겟 적합도·방문)을 맨 위 가로 띠로.
+   PC(1100 초과)는 기존 3열 그대로, 모바일(700 이하)은 기존 탭 그대로. */
+@media (min-width: 701px) and (max-width: 1100px) {
+  #sec3 { grid-column: 1 / -1; order: -1; display: grid !important; grid-template-columns: 1.15fr .9fr 1.35fr; gap: 10px; }
+  #sec3 .s3-blk { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 8px 10px; max-height: 230px; overflow-y: auto; min-width: 0; }
+  #sec3 .s3-blk > .sec-title { margin-top: 0 !important; }
+  #sec3 .cal-wrap, #sec3 .visit-panel { box-shadow: none; border: 0; padding: 0; margin: 0; }
+  #sec1 { order: 0; } #sec2 { order: 1; } #sec4 { order: 2; }
+}
 </style>
 </head>
 <body>
@@ -680,6 +691,7 @@ details.collapsible[open]>summary .fold-hint{display:none}
 
 <!-- 섹션3: 방문 스케줄 -->
 <div class="section" id="sec3">
+<div class="s3-blk">
 <div class="section-label" style="margin-top:0">날짜별 유입 <span class="badge today">전체 통합</span></div>
 <div class="cal-wrap">
   <div class="cal-head">
@@ -691,7 +703,9 @@ details.collapsible[open]>summary .fold-hint{display:none}
   </div>
   <div id="cal-body"><div style="color:#aaa;text-align:center;padding:16px;font-size:11px">불러오는 중...</div></div>
 </div>
+</div>
 
+<div class="s3-blk">
 <div class="sec-title" style="margin-top:16px">🎯 타겟 적합도 <span style="font-size:9px;color:#94a3b8;font-weight:600">On-Target % · 학부모 연령</span></div>
 <div style="font-size:9.5px;color:#94a3b8;margin:2px 0 7px">
   <span style="color:#0f9d58;font-weight:800">■</span> 온타겟35-54
@@ -705,10 +719,13 @@ details.collapsible[open]>summary .fold-hint{display:none}
   <button id="af-btn-a" onclick="setAgeFitView('a')">전체</button>
 </div>
 <div id="agefit-box"><div style="color:#aaa;text-align:center;padding:12px;font-size:11px">불러오는 중...</div></div>
+</div>
 
+<div class="s3-blk">
 <div class="sec-title amber" style="margin-top:16px">방문 스케줄</div>
 <div class="visit-panel">
   <div id="visit-list"><div class="visit-empty">불러오는 중...</div></div>
+</div>
 </div>
 </div>
 
